@@ -13,6 +13,8 @@ import {
   type EnrollmentQr,
 } from '@pi-remote/pi-rpc-protocol';
 
+import { DEMO_IDENTITY, isDemoMode } from './demo.js';
+
 const DATABASE_NAME = 'pi-remote-device-v1';
 const STORE_NAME = 'credentials';
 const DEVICE_RECORD = 'device';
@@ -65,6 +67,7 @@ export async function enrollDevice(serializedQr: string): Promise<DeviceIdentity
 }
 
 export async function establishSession(): Promise<DeviceIdentity | null> {
+  if (isDemoMode()) return DEMO_IDENTITY;
   const device = await loadDevice();
   if (device === null) return null;
   if (device.origin !== window.location.origin) {

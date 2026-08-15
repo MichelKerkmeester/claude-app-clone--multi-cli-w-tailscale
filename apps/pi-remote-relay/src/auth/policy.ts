@@ -15,7 +15,11 @@ export type AuthorizedAction =
   | 'accept-edits:create'
   | 'attention:read'
   | 'push:manage'
-  | 'prompt:submit';
+  | 'prompt:submit'
+  | 'prompt:abort'
+  | 'runtime:read'
+  | 'runtime:control'
+  | 'commands:list';
 
 const AUTHORIZED_ACTIONS = new Set<string>([
   'health:read',
@@ -31,6 +35,10 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   'attention:read',
   'push:manage',
   'prompt:submit',
+  'prompt:abort',
+  'runtime:read',
+  'runtime:control',
+  'commands:list',
 ]);
 
 /** Keep unknown and tool-mutation actions denied unless explicitly authorized. */

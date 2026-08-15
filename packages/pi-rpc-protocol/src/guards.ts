@@ -18,6 +18,10 @@ import type {
   ApprovalRequestedPayload,
   ApprovalResultPayload,
   ApplicationSessionResponse,
+  AvailableModelDto,
+  CommandCatalogDto,
+  CommandDescriptorDto,
+  CommandSource,
   DevicePublicKeyJwk,
   EnrollmentQr,
   EnrollmentResponse,
@@ -27,8 +31,15 @@ import type {
   PiRpcEvent,
   PiRpcEventType,
   PiRpcResponse,
+  PromptAbortResponse,
   PromptSubmitCommand,
   PromptSubmitResponse,
+  RuntimeControlCommand,
+  RuntimeControlResponse,
+  RuntimeModelCatalogDto,
+  RuntimeMode,
+  RuntimeOperation,
+  RuntimeStateDto,
   SessionCardDto,
   SessionChallengeResponse,
   PushHintPayload,
@@ -39,6 +50,8 @@ import type {
   TranscriptPageDto,
   WebSocketTicketResponse,
 } from './types.js';
+
+import { RUNTIME_MODES } from './types.js';
 
 const APPROVAL_RESULT_STATUSES = new Set([
   'approved',
@@ -200,6 +213,21 @@ export function isPiRpcCommand(value: unknown): value is PiRpcCommand {
   if (value.type === 'get_entries') {
     return (value.since === undefined || typeof value.since === 'string') && isJsonValue(value);
   }
+  if (
+    value.type === 'get_available_models' ||
+    value.type === 'get_available_thinking_levels' ||
+    value.type === 'get_commands'
+  ) {
+    return Object.keys(value).every((key) => key === 'type' || key === 'id');
+  }
+  if (value.type === 'set_model') {
+    return (
+      typeof value.provider === 'string' && typeof value.modelId === 'string' && isJsonValue(value)
+    );
+  }
+  if (value.type === 'set_thinking_level') {
+    return typeof value.level === 'string' && isJsonValue(value);
+  }
   return (
     [
       'abort',
@@ -213,16 +241,28 @@ export function isPiRpcCommand(value: unknown): value is PiRpcCommand {
 }
 
 /** Narrow an unknown value to the exact transient phone-to-relay prompt command. */
+const PROMPT_SUBMIT_KEYS = new Set([
+  'type',
+  'submissionId',
+  'sessionId',
+  'message',
+  'ticket',
+  'streamingBehavior',
+]);
+
 export function isPromptSubmitCommand(value: unknown): value is PromptSubmitCommand {
   return (
     isRecord(value) &&
-    hasOnlyKeys(value, ['type', 'submissionId', 'sessionId', 'message', 'ticket']) &&
+    Object.keys(value).every((key) => PROMPT_SUBMIT_KEYS.has(key)) &&
     value.type === 'prompt.submit' &&
     isOpaqueId(value.submissionId) &&
     isOpaqueId(value.sessionId) &&
     typeof value.message === 'string' &&
     value.message.trim().length > 0 &&
-    isOpaqueId(value.ticket)
+    isOpaqueId(value.ticket) &&
+    (value.streamingBehavior === undefined ||
+      value.streamingBehavior === 'steer' ||
+      value.streamingBehavior === 'followUp')
   );
 }
 
@@ -641,4 +681,199 @@ function isExactOrigin(value: unknown): value is string {
   } catch {
     return false;
   }
+}
+
+// ── Runtime control (model, thinking level, plan mode) ────────────────────────
+
+const RUNTIME_MODE_SET = new Set<RuntimeMode>(RUNTIME_MODES);
+const COMMAND_SOURCES = new Set<CommandSource>(['extension', 'prompt', 'skill']);
+
+/** Narrow an unknown value to a bounded model descriptor (no path separators). */
+export function isAvailableModelDto(value: unknown): value is AvailableModelDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['provider', 'id', 'label']) &&
+    isPathFreeToken(value.provider, 200) &&
+    isPathFreeToken(value.id, 200) &&
+    isPathFreeToken(value.label, 200)
+  );
+}
+
+/** Narrow an unknown value to the authoritative runtime state snapshot. */
+export function isRuntimeStateDto(value: unknown): value is RuntimeStateDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'sessionId',
+      'revision',
+      'model',
+      'thinkingLevel',
+      'availableThinkingLevels',
+      'mode',
+      'streaming',
+      'updatedAt',
+    ]) &&
+    isOpaqueId(value.sessionId) &&
+    isNonNegativeSafeInteger(value.revision) &&
+    (value.model === null || isAvailableModelDto(value.model)) &&
+    isNonEmptyBoundedString(value.thinkingLevel, 64) &&
+    Array.isArray(value.availableThinkingLevels) &&
+    value.availableThinkingLevels.every((level) => isNonEmptyBoundedString(level, 64)) &&
+    typeof value.mode === 'string' &&
+    RUNTIME_MODE_SET.has(value.mode as RuntimeMode) &&
+    typeof value.streaming === 'boolean' &&
+    isTimestamp(value.updatedAt)
+  );
+}
+
+/** Narrow an unknown value to a runtime operation; host-only states are never requests. */
+export function isRuntimeOperation(value: unknown): value is RuntimeOperation {
+  if (!isRecord(value)) {
+    return false;
+  }
+  if (value.type === 'set_model') {
+    return (
+      hasOnlyKeys(value, ['type', 'provider', 'modelId']) &&
+      isPathFreeToken(value.provider, 200) &&
+      isPathFreeToken(value.modelId, 200)
+    );
+  }
+  if (value.type === 'set_thinking_level') {
+    return hasOnlyKeys(value, ['type', 'level']) && isNonEmptyBoundedString(value.level, 64);
+  }
+  if (value.type === 'set_mode') {
+    return (
+      hasOnlyKeys(value, ['type', 'mode']) && (value.mode === 'build' || value.mode === 'plan')
+    );
+  }
+  return false;
+}
+
+/** Narrow an unknown value to a correlated runtime control command. */
+export function isRuntimeControlCommand(value: unknown): value is RuntimeControlCommand {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'type',
+      'controlId',
+      'sessionId',
+      'expectedRevision',
+      'operation',
+      'ticket',
+    ]) &&
+    value.type === 'runtime.control' &&
+    isOpaqueId(value.controlId) &&
+    isOpaqueId(value.sessionId) &&
+    isNonNegativeSafeInteger(value.expectedRevision) &&
+    isRuntimeOperation(value.operation) &&
+    isOpaqueId(value.ticket)
+  );
+}
+
+/** Narrow an unknown value to a bounded runtime model catalog. */
+export function isRuntimeModelCatalogDto(value: unknown): value is RuntimeModelCatalogDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['sessionId', 'runtimeRevision', 'models']) &&
+    isOpaqueId(value.sessionId) &&
+    isNonNegativeSafeInteger(value.runtimeRevision) &&
+    Array.isArray(value.models) &&
+    value.models.every(isAvailableModelDto)
+  );
+}
+
+/** Narrow an unknown value to a bounded command descriptor. */
+export function isCommandDescriptorDto(value: unknown): value is CommandDescriptorDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'name',
+      'description',
+      'source',
+      'enabled',
+      'disabledReason',
+      'requiresConfirmation',
+    ]) &&
+    isPathFreeToken(value.name, 200) &&
+    (value.description === null || isBoundedString(value.description, 2_000)) &&
+    typeof value.source === 'string' &&
+    COMMAND_SOURCES.has(value.source as CommandSource) &&
+    typeof value.enabled === 'boolean' &&
+    (value.disabledReason === null || isBoundedString(value.disabledReason, 500)) &&
+    typeof value.requiresConfirmation === 'boolean'
+  );
+}
+
+/** Narrow an unknown value to a bounded command catalog. */
+export function isCommandCatalogDto(value: unknown): value is CommandCatalogDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['sessionId', 'revision', 'commands']) &&
+    isOpaqueId(value.sessionId) &&
+    isNonNegativeSafeInteger(value.revision) &&
+    Array.isArray(value.commands) &&
+    value.commands.every(isCommandDescriptorDto)
+  );
+}
+
+/** Narrow an unknown value to a fail-closed runtime control response. */
+export function isRuntimeControlResponse(value: unknown): value is RuntimeControlResponse {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['outcome']) || !isRecord(value.outcome)) {
+    return false;
+  }
+  if (value.outcome.status === 'accepted' || value.outcome.status === 'stale') {
+    return (
+      hasOnlyKeys(value.outcome, ['status', 'state']) && isRuntimeStateDto(value.outcome.state)
+    );
+  }
+  if (
+    value.outcome.status === 'unsupported' ||
+    value.outcome.status === 'unavailable' ||
+    value.outcome.status === 'delivery-unknown'
+  ) {
+    return (
+      hasOnlyKeys(value.outcome, ['status', 'reason']) &&
+      isNonEmptyBoundedString(value.outcome.reason, 500)
+    );
+  }
+  return false;
+}
+
+/** Narrow an unknown value to a fail-closed prompt abort response. */
+export function isPromptAbortResponse(value: unknown): value is PromptAbortResponse {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['outcome']) || !isRecord(value.outcome)) {
+    return false;
+  }
+  if (value.outcome.status === 'aborted') {
+    return hasOnlyKeys(value.outcome, ['status']);
+  }
+  if (value.outcome.status === 'unavailable' || value.outcome.status === 'delivery-unknown') {
+    return (
+      hasOnlyKeys(value.outcome, ['status', 'reason']) &&
+      isNonEmptyBoundedString(value.outcome.reason, 500)
+    );
+  }
+  return false;
+}
+
+function isNonNegativeSafeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}
+
+function isBoundedString(value: unknown, maxLength: number): value is string {
+  return typeof value === 'string' && value.length <= maxLength;
+}
+
+function isNonEmptyBoundedString(value: unknown, maxLength: number): value is string {
+  return typeof value === 'string' && value.length > 0 && value.length <= maxLength;
+}
+
+function isPathFreeToken(value: unknown, maxLength: number): value is string {
+  return (
+    typeof value === 'string' &&
+    value.length > 0 &&
+    value.length <= maxLength &&
+    !value.includes('/') &&
+    !value.includes('\\')
+  );
 }

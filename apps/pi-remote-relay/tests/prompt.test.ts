@@ -68,11 +68,11 @@ describe('live prompt command transport', () => {
     });
 
     expect(response.status).toBe(202);
+    // An idle submit carries no streamingBehavior; steer/followUp are sent only mid-turn.
     expect(harness.send).toHaveBeenCalledWith({
       id: 'prompt_submission_001',
       type: 'prompt',
       message: `Continue with token=${canary}`,
-      streamingBehavior: 'steer',
     });
     const payload = (await response.json()) as { block: { role: string; text: string } };
     expect(payload.block).toMatchObject({ role: 'user', text: 'Continue with [REDACTED_SECRET]' });

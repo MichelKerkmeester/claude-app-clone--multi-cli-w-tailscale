@@ -8,6 +8,7 @@ import type { ChildProcessWithoutNullStreams, spawn as nodeSpawn } from 'node:ch
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { fullAccessPiArguments } from '../src/index.js';
 import { RpcDemultiplexer } from '../src/rpc/demux.js';
 import { StrictJsonlDecoder } from '../src/rpc/framing.js';
 import { RpcSupervisor } from '../src/rpc/supervisor.js';
@@ -152,6 +153,74 @@ describe('supervisor command writes', () => {
     ).resolves.toMatchObject({ command: 'prompt', success: true });
     expect(writes).toEqual([
       '{"id":"prompt_submission_001","type":"prompt","message":"Steer the current turn","streamingBehavior":"steer"}\n',
+    ]);
+  });
+});
+
+describe('full-access launch posture', () => {
+  it('returns the desktop-parity vector with no tool restriction', () => {
+    const args = fullAccessPiArguments();
+    expect(args).toEqual(['--mode', 'rpc', '--no-session', '--approve']);
+    // A tool restriction or extension gate here would silently collapse desktop
+    // parity back to the steering-only posture, so their absence is load-bearing.
+    expect(args).not.toContain('--no-tools');
+    expect(args).not.toContain('--tools');
+    expect(args).not.toContain('--no-extensions');
+  });
+
+  it('reaches pi unmodified when the supervisor is launched with it', async () => {
+    const stdin = new PassThrough();
+    const stdout = new PassThrough();
+    const stderr = new PassThrough();
+    const child = Object.assign(new EventEmitter(), {
+      stdin,
+      stdout,
+      stderr,
+      exitCode: null,
+      kill: vi.fn(),
+    }) as unknown as ChildProcessWithoutNullStreams;
+    const spawn = vi.fn(() => child) as unknown as typeof nodeSpawn;
+    const supervisor = new RpcSupervisor({
+      spawn,
+      requestTimeoutMs: 100,
+      args: fullAccessPiArguments(),
+    });
+    const started = supervisor.start();
+    child.emit('spawn');
+    await started;
+    expect(spawn).toHaveBeenCalledWith('pi', ['--mode', 'rpc', '--no-session', '--approve'], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+  });
+
+  it('keeps the safe supervisor default fail-closed and distinct from full access', async () => {
+    const stdin = new PassThrough();
+    const stdout = new PassThrough();
+    const stderr = new PassThrough();
+    const child = Object.assign(new EventEmitter(), {
+      stdin,
+      stdout,
+      stderr,
+      exitCode: null,
+      kill: vi.fn(),
+    }) as unknown as ChildProcessWithoutNullStreams;
+    const spawn = vi.fn(() => child) as unknown as typeof nodeSpawn;
+    const supervisor = new RpcSupervisor({ spawn, requestTimeoutMs: 100 });
+    const started = supervisor.start();
+    child.emit('spawn');
+    await started;
+    // The no-argument posture must stay read-only no matter how full access evolves.
+    expect(spawn).toHaveBeenCalledWith(
+      'pi',
+      ['--mode', 'rpc', '--no-session', '--no-tools', '--no-extensions'],
+      { stdio: ['pipe', 'pipe', 'pipe'] },
+    );
+    expect(fullAccessPiArguments()).not.toEqual([
+      '--mode',
+      'rpc',
+      '--no-session',
+      '--no-tools',
+      '--no-extensions',
     ]);
   });
 });

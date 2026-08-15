@@ -6,11 +6,23 @@ import {
   isAcceptEditsGrantDto,
   isApprovalCardDto,
   isApprovalDecisionResponse,
+  isCommandCatalogDto,
+  isPromptAbortResponse,
+  isRuntimeControlResponse,
+  isRuntimeModelCatalogDto,
+  isRuntimeStateDto,
   isSessionCardDto,
   isPromptSubmitResponse,
   isSyncMessage,
   isTranscriptPageDto,
   isWebSocketTicketResponse,
+  type CommandCatalogDto,
+  type PromptAbortResponse,
+  type RuntimeControlCommand,
+  type RuntimeControlResponse,
+  type RuntimeModelCatalogDto,
+  type RuntimeOperation,
+  type RuntimeStateDto,
   type SessionCardDto,
   type AcceptEditsGrantDto,
   type ApprovalCardDto,
@@ -22,6 +34,7 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { establishSession } from './auth.js';
+import { demoPostJson, demoSocket, isDemoMode } from './demo.js';
 
 const PAGE_LIMIT = 100;
 const MAX_PAGES = 100;
@@ -47,6 +60,7 @@ export async function submitPrompt(
   sessionId: string,
   submissionId: string,
   message: string,
+  streamingBehavior?: 'steer' | 'followUp',
   signal?: AbortSignal,
 ): Promise<TextBlock> {
   const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
@@ -61,6 +75,7 @@ export async function submitPrompt(
       sessionId,
       message,
       ticket: ticketPayload.ticket,
+      ...(streamingBehavior === undefined ? {} : { streamingBehavior }),
     },
     signal,
     [202],
@@ -69,6 +84,79 @@ export async function submitPrompt(
     throw new Error('Relay returned an invalid prompt acknowledgement.');
   }
   return payload.block;
+}
+
+export async function fetchRuntimeState(signal?: AbortSignal): Promise<RuntimeStateDto> {
+  const payload = await postJson('/api/runtime/state', undefined, signal);
+  if (!isRecord(payload) || !isRuntimeStateDto(payload.state)) {
+    throw new Error('Relay returned an invalid runtime state.');
+  }
+  return payload.state;
+}
+
+export async function fetchRuntimeModels(signal?: AbortSignal): Promise<RuntimeModelCatalogDto> {
+  const payload = await postJson('/api/runtime/models', undefined, signal);
+  if (!isRuntimeModelCatalogDto(payload)) {
+    throw new Error('Relay returned an invalid model catalog.');
+  }
+  return payload;
+}
+
+export async function fetchCommands(signal?: AbortSignal): Promise<CommandCatalogDto> {
+  const payload = await postJson('/api/commands/list', undefined, signal);
+  if (!isCommandCatalogDto(payload)) {
+    throw new Error('Relay returned an invalid command catalog.');
+  }
+  return payload;
+}
+
+/**
+ * Send one host-confirmed runtime mutation. A fresh one-use ticket is obtained
+ * immediately before the write, and every settled outcome — including stale,
+ * unsupported, and delivery-unknown — is returned rather than thrown, so the UI can
+ * reconcile without ever inventing an optimistic committed value or auto-retrying.
+ */
+export async function controlRuntime(
+  sessionId: string,
+  expectedRevision: number,
+  operation: RuntimeOperation,
+  signal?: AbortSignal,
+): Promise<RuntimeControlResponse> {
+  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
+  if (!isWebSocketTicketResponse(ticketPayload)) {
+    throw new Error('Relay returned an invalid command ticket.');
+  }
+  const command: RuntimeControlCommand = {
+    type: 'runtime.control',
+    controlId: `control_${crypto.randomUUID().replaceAll('-', '_')}`,
+    sessionId,
+    expectedRevision,
+    operation,
+    ticket: ticketPayload.ticket,
+  };
+  const payload = await postJson('/api/runtime/control', command, signal, [202, 409, 422, 503]);
+  if (!isRuntimeControlResponse(payload)) {
+    throw new Error('Relay returned an invalid runtime control result.');
+  }
+  return payload;
+}
+
+/** Interrupt the running agent. A fresh one-use ticket is obtained immediately before. */
+export async function abortPrompt(signal?: AbortSignal): Promise<PromptAbortResponse> {
+  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
+  if (!isWebSocketTicketResponse(ticketPayload)) {
+    throw new Error('Relay returned an invalid command ticket.');
+  }
+  const payload = await postJson(
+    '/api/prompt/abort',
+    { ticket: ticketPayload.ticket },
+    signal,
+    [202, 503],
+  );
+  if (!isPromptAbortResponse(payload)) {
+    throw new Error('Relay returned an invalid abort result.');
+  }
+  return payload;
 }
 
 export async function fetchApprovals(
@@ -159,6 +247,7 @@ export async function openSyncSocket(
   onMessage: (message: SyncMessage) => void,
   signal?: AbortSignal,
 ): Promise<WebSocket> {
+  if (isDemoMode()) return demoSocket(sessionId, onMessage as (message: unknown) => void);
   if ((await establishSession()) === null) {
     throw new Error('Device enrollment is required before opening the read-only stream.');
   }
@@ -196,6 +285,7 @@ async function postJson(
   signal?: AbortSignal,
   acceptedStatuses: readonly number[] = [],
 ): Promise<unknown> {
+  if (isDemoMode()) return demoPostJson(path, body);
   const response = await fetch(path, {
     method: 'POST',
     cache: 'no-store',

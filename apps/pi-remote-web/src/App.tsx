@@ -11,7 +11,15 @@ import {
   type SessionCardDto,
   type SyncMessage,
 } from '@pi-remote/pi-rpc-protocol';
-import { useEffect, useReducer, useRef, useState, type Dispatch, type ReactNode } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type Dispatch,
+  type ReactNode,
+} from 'react';
 import {
   Button,
   Disclosure,
@@ -41,6 +49,7 @@ import {
   type PushConfig,
 } from './attention.js';
 import {
+  abortPrompt,
   createAcceptEditsGrant,
   decideApproval,
   fetchApprovals,
@@ -60,6 +69,11 @@ import {
   type SessionListState,
   type TranscriptState,
 } from './state.js';
+import { SessionComposer } from './SessionComposer.js';
+import { SessionHeader } from './SessionHeader.js';
+import { useCommands } from './commands.js';
+import { useRuntime } from './runtime.js';
+import { groupBlocksIntoTurns } from './turns.js';
 
 const initialCache = loadCache();
 type ThemePreference = 'system' | 'light' | 'dark';
@@ -219,23 +233,33 @@ export function App() {
     setSelectedSessionId(sessionId);
   }
 
+  // In a live session the global bar yields to the quiet SessionHeader (back · model · overflow).
+  const inSession = authReady && !reviewOpen && !inboxOpen && selectedSessionId !== null;
+  const openReview = () => {
+    setReviewOpen(true);
+    setInboxOpen(false);
+  };
+  const openInbox = () => {
+    setReviewOpen(false);
+    setInboxOpen(true);
+  };
+
   return (
     <div className="app-shell">
-      <Header
-        connection={connection.phase}
-        onHome={() => {
-          setReviewOpen(false);
-          navigate(null);
-        }}
-        onReview={() => setReviewOpen(true)}
-        onInbox={() => {
-          setReviewOpen(false);
-          setInboxOpen(true);
-        }}
-        reviewAvailable={authReady}
-        theme={theme}
-        onThemeChange={setTheme}
-      />
+      {!inSession && (
+        <Header
+          connection={connection.phase}
+          onHome={() => {
+            setReviewOpen(false);
+            navigate(null);
+          }}
+          onReview={openReview}
+          onInbox={openInbox}
+          reviewAvailable={authReady}
+          theme={theme}
+          onThemeChange={setTheme}
+        />
+      )}
       {!authReady ? (
         <Enrollment
           phase={connection.phase}
@@ -299,6 +323,10 @@ export function App() {
             sessions.items.find((session) => session.id === selectedSessionId)?.status ?? 'unknown'
           }
           onBack={() => navigate(null)}
+          onInbox={openInbox}
+          onReview={openReview}
+          theme={theme}
+          onThemeChange={setTheme}
         />
       )}
     </div>
@@ -865,6 +893,10 @@ export function Session({
   dispatchTranscript,
   status,
   onBack,
+  onInbox,
+  onReview,
+  theme,
+  onThemeChange,
 }: {
   readonly connection: ConnectionPhase;
   readonly sessionId: string;
@@ -874,6 +906,10 @@ export function Session({
   readonly dispatchTranscript: Dispatch<Parameters<typeof transcriptReducer>[1]>;
   readonly status: SessionCardDto['status'];
   readonly onBack: () => void;
+  readonly onInbox: () => void;
+  readonly onReview: () => void;
+  readonly theme: 'system' | 'light' | 'dark';
+  readonly onThemeChange: (theme: 'system' | 'light' | 'dark') => void;
 }) {
   const cursorRef = useRef<{ epoch: string; seq: number } | null>(null);
   const frameRef = useRef<number | null>(null);
@@ -884,6 +920,22 @@ export function Session({
   const [sendingPrompt, setSendingPrompt] = useState(false);
   const [promptError, setPromptError] = useState<string | null>(null);
   const [retrySubmissionId, setRetrySubmissionId] = useState<string | null>(null);
+  const runtimeControls = useRuntime(sessionId);
+  const commandCatalog = useCommands();
+  const [stopping, setStopping] = useState(false);
+  const stopRun = () => {
+    if (stopping) return;
+    setStopping(true);
+    // Interrupt the running turn. Delivery-unknown is surfaced, never auto-retried.
+    void abortPrompt()
+      .then((result) => {
+        if (result.outcome.status !== 'aborted') {
+          setPromptError(`Stop was not confirmed (${result.outcome.status}).`);
+        }
+      })
+      .catch((cause: unknown) => setPromptError(messageFrom(cause)))
+      .finally(() => setStopping(false));
+  };
 
   useEffect(() => {
     dispatchTranscript({ type: 'select', sessionId });
@@ -1007,7 +1059,7 @@ export function Session({
     !transcript.awaitingSnapshot &&
     prompt.trim().length > 0 &&
     !sendingPrompt;
-  const sendPrompt = () => {
+  const sendPrompt = (behavior?: 'steer' | 'followUp') => {
     const message = prompt.trim();
     if (!canSubmit || message.length === 0) return;
     const submissionId = retrySubmissionId ?? `prompt_${crypto.randomUUID().replaceAll('-', '_')}`;
@@ -1029,7 +1081,7 @@ export function Session({
     setPromptError(null);
     setRetrySubmissionId(null);
     setSendingPrompt(true);
-    void submitPrompt(sessionId, submissionId, message)
+    void submitPrompt(sessionId, submissionId, message, behavior)
       .then((block) => {
         dispatchTranscript({
           type: 'promptAccepted',
@@ -1048,26 +1100,24 @@ export function Session({
   };
   return (
     <main className="session-view">
-      <div className="session-toolbar">
-        <Button className="back-button" onPress={onBack}>
-          Back to sessions
-        </Button>
-        <Freshness stale={isStale} at={transcript.updatedAt} />
-      </div>
-      <div className="session-title">
-        <div>
-          <p className="surface-kicker">Session {compactId(sessionId)}</p>
-          <h1>Live transcript</h1>
-        </div>
-        <div className={`agent-state agent-${status}`}>
-          <span className="agent-state-icon">
-            <SessionStateIcon status={status} />
+      <SessionHeader
+        onBack={onBack}
+        onInbox={onInbox}
+        onReview={onReview}
+        theme={theme}
+        onThemeChange={onThemeChange}
+        runtimeControls={runtimeControls}
+      />
+      <div className="session-statusline" role="status" aria-live="polite">
+        <span className={`agent-dot agent-${status}`} aria-hidden="true">
+          <SessionStateIcon status={status} />
+        </span>
+        <span className="session-status-label">{sessionStatusLabel(status)}</span>
+        {transcript.updatedAt !== null && (
+          <span className="session-status-time">
+            · {isStale ? 'reconnecting' : relativeTime(transcript.updatedAt)}
           </span>
-          <span>
-            <strong>{sessionStatusLabel(status)}</strong>
-            <small>{status === 'running' ? 'Agent is working' : 'Latest relay state'}</small>
-          </span>
-        </div>
+        )}
       </div>
       {transcript.error !== null && <div className="inline-alert">{transcript.error}</div>}
       {transcript.awaitingSnapshot && (
@@ -1076,42 +1126,23 @@ export function Session({
         </div>
       )}
       <TranscriptList blocks={transcript.blocks} running={status === 'running'} />
-      <form
-        className="prompt-composer"
-        onSubmit={(event) => {
-          event.preventDefault();
-          sendPrompt();
-        }}
-      >
-        <label htmlFor="session-prompt">Steer Pi</label>
-        <textarea
-          id="session-prompt"
-          value={prompt}
-          onChange={(event) => setPrompt(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              sendPrompt();
-            }
-          }}
-          disabled={connection !== 'live' || transcript.awaitingSnapshot || sendingPrompt}
-          placeholder={
-            connection === 'live' ? 'Send a prompt or steer the current turn' : 'Reconnect to send'
-          }
-          rows={3}
-        />
-        <div className="prompt-composer-footer">
-          <span>
-            {transcript.awaitingSnapshot
-              ? 'Waiting for sync reconciliation'
-              : 'Enter to send · Shift+Enter for a new line'}
-          </span>
-          <Button type="submit" isDisabled={!canSubmit}>
-            {sendingPrompt ? 'Sending' : 'Send'}
-          </Button>
-        </div>
-        {promptError !== null && <div className="inline-alert">{promptError}</div>}
-      </form>
+      <SessionComposer
+        prompt={prompt}
+        setPrompt={setPrompt}
+        onDraftChange={setPrompt}
+        sendPrompt={sendPrompt}
+        stopRun={stopRun}
+        canSubmit={canSubmit}
+        status={status}
+        connection={connection}
+        awaitingSnapshot={transcript.awaitingSnapshot}
+        sendingPrompt={sendingPrompt}
+        stopping={stopping}
+        promptError={promptError}
+        runtimeControls={runtimeControls}
+        commands={commandCatalog.commands}
+        commandsDisabled={commandCatalog.status !== 'ready'}
+      />
     </main>
   );
 }
@@ -1126,8 +1157,32 @@ export function TranscriptList({
   const scrollRef = useRef<HTMLDivElement>(null);
   const previousCountRef = useRef(blocks.length);
   const [announcement, setAnnouncement] = useState('');
+  const [atLiveEdge, setAtLiveEdge] = useState(true);
+  const [newAway, setNewAway] = useState(0);
+  const followToBottom = () => {
+    const element = scrollRef.current;
+    if (element !== null) element.scrollTop = element.scrollHeight;
+    setNewAway(0);
+  };
+  const onScroll = () => {
+    const element = scrollRef.current;
+    if (element === null) return;
+    // The reader owns the live edge: only follow new blocks when already near the bottom.
+    const nearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 96;
+    setAtLiveEdge(nearBottom);
+    if (nearBottom) setNewAway(0);
+  };
+  // Render items group consecutive routine evidence into one Activity disclosure; the flat
+  // block stream is untouched (no block is dropped or reordered — only how it renders).
+  const renderItems = useMemo(() => groupTranscript(blocks), [blocks]);
+  const turnStartIds = useMemo(() => {
+    // Mark the first block of every turn after the first so a boundary rule can space
+    // consecutive turns; the derivation never mutates or drops a block.
+    const turns = groupBlocksIntoTurns(blocks);
+    return new Set(turns.slice(1).map((turn) => turn.blocks[0]?.id));
+  }, [blocks]);
   const virtualizer = useVirtualizer({
-    count: blocks.length,
+    count: renderItems.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => 180,
     overscan: 6,
@@ -1139,9 +1194,15 @@ export function TranscriptList({
       if (completed !== undefined) {
         setAnnouncement(`${blockLabel(completed)} block completed.`);
       }
+      const element = scrollRef.current;
+      if (atLiveEdge && element !== null) {
+        element.scrollTop = element.scrollHeight;
+      } else {
+        setNewAway((count) => count + (blocks.length - previousCountRef.current));
+      }
     }
     previousCountRef.current = blocks.length;
-  }, [blocks]);
+  }, [blocks, atLiveEdge]);
 
   if (blocks.length === 0) {
     return <div className="empty-transcript">No transcript blocks are available yet.</div>;
@@ -1152,51 +1213,266 @@ export function TranscriptList({
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
-      <div className="transcript-scroll" ref={scrollRef}>
+      <div className="transcript-scroll" ref={scrollRef} onScroll={onScroll}>
         <div
           className="transcript-virtual"
           style={{ height: virtualizer.getTotalSize() + (running ? 72 : 0) }}
         >
           {virtualizer.getVirtualItems().map((virtualItem) => {
-            const block = blocks[virtualItem.index];
-            if (block === undefined) return null;
+            const item = renderItems[virtualItem.index];
+            if (item === undefined) return null;
+            const leadId = item.kind === 'block' ? item.block.id : item.blocks[0]?.id;
+            const isTurnStart = leadId !== undefined && turnStartIds.has(leadId);
             return (
               <div
-                className="virtual-row"
-                key={block.id}
+                className={isTurnStart ? 'virtual-row turn-start' : 'virtual-row'}
+                key={item.id}
                 ref={virtualizer.measureElement}
                 data-index={virtualItem.index}
                 style={{ transform: `translateY(${virtualItem.start}px)` }}
               >
-                <Block block={block} />
+                {item.kind === 'activity' ? (
+                  <ActivityGroup blocks={item.blocks} />
+                ) : (
+                  <Block block={item.block} />
+                )}
               </div>
             );
           })}
           {running && (
             <div
-              className="working-indicator"
+              className="streaming-marker"
               style={{ transform: `translateY(${virtualizer.getTotalSize()}px)` }}
             >
-              <span className="working-glyph" aria-hidden="true">
+              <span className="streaming-glyph" aria-hidden="true">
                 <i />
                 <i />
                 <i />
               </span>
-              <span>
-                <strong>Agent working</strong>
-                <small>New blocks appear as the relay settles them</small>
-              </span>
+              <span className="streaming-label">Working…</span>
             </div>
           )}
         </div>
       </div>
+      {!atLiveEdge && (
+        <button
+          type="button"
+          className="scroll-to-latest"
+          onClick={followToBottom}
+          aria-label={
+            newAway > 0
+              ? `Jump to ${newAway} new message${newAway === 1 ? '' : 's'}`
+              : 'Jump to latest'
+          }
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path
+              d="M6 9l6 6 6-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          {newAway > 0 && <span className="scroll-badge">{newAway}</span>}
+        </button>
+      )}
     </section>
   );
 }
 
-function Block({ block }: { readonly block: DisplayTranscriptBlock }) {
+function CollapsedEvidence({
+  summary,
+  children,
+}: {
+  readonly summary: string;
+  readonly children: ReactNode;
+}) {
+  // The trigger names what it reveals (e.g. "Tool call · grep") instead of a generic "Show",
+  // so routine evidence reads as a quiet, truthful disclosure beside the assistant's prose.
+  return (
+    <Disclosure defaultExpanded={false}>
+      <Heading>
+        <Button slot="trigger" className="evidence-trigger">
+          <span className="evidence-chevron" aria-hidden="true">
+            ›
+          </span>
+          <span className="evidence-summary">{summary}</span>
+        </Button>
+      </Heading>
+      <DisclosurePanel>{children}</DisclosurePanel>
+    </Disclosure>
+  );
+}
+
+// Consecutive routine evidence (thinking, tool calls/results, usage) collapses into ONE
+// "Activity" disclosure so telemetry never interrupts the assistant's answer. Tool ERRORS,
+// plans, diffs, and text stay prominent and standalone (never folded away).
+function isEvidenceBlock(block: DisplayTranscriptBlock): boolean {
+  switch (block.kind) {
+    case 'thinking':
+    case 'tool_call':
+    case 'usage':
+      return true;
+    case 'tool_result':
+      return !block.isError;
+    default:
+      return false;
+  }
+}
+
+type RenderItem =
+  | { readonly kind: 'block'; readonly id: string; readonly block: DisplayTranscriptBlock }
+  | {
+      readonly kind: 'activity';
+      readonly id: string;
+      readonly blocks: readonly DisplayTranscriptBlock[];
+    };
+
+function groupTranscript(blocks: readonly DisplayTranscriptBlock[]): RenderItem[] {
+  const items: RenderItem[] = [];
+  let run: DisplayTranscriptBlock[] = [];
+  const flush = () => {
+    const first = run[0];
+    if (first !== undefined) {
+      items.push({ kind: 'activity', id: `activity-${first.id}`, blocks: run });
+    }
+    run = [];
+  };
+  for (const block of blocks) {
+    if (isEvidenceBlock(block)) {
+      run.push(block);
+    } else {
+      flush();
+      items.push({ kind: 'block', id: block.id, block });
+    }
+  }
+  flush();
+  return items;
+}
+
+function activitySummary(blocks: readonly DisplayTranscriptBlock[]): string {
+  const tools = blocks.filter((block) => block.kind === 'tool_call').length;
+  if (tools > 0) return `Worked · ${tools} tool${tools === 1 ? '' : 's'}`;
+  if (blocks.some((block) => block.kind === 'thinking')) return 'Thinking';
+  if (blocks.some((block) => block.kind === 'usage')) return 'Usage';
+  return 'Activity';
+}
+
+function ActivityGroup({ blocks }: { readonly blocks: readonly DisplayTranscriptBlock[] }) {
+  return (
+    <div className="activity-group">
+      <Disclosure defaultExpanded={false}>
+        <Heading>
+          <Button slot="trigger" className="evidence-trigger">
+            <span className="evidence-chevron" aria-hidden="true">
+              ›
+            </span>
+            <span className="evidence-summary">{activitySummary(blocks)}</span>
+          </Button>
+        </Heading>
+        <DisclosurePanel>
+          <div className="activity-stack">
+            {blocks.map((block) => (
+              <Block key={block.id} block={block} bare />
+            ))}
+          </div>
+        </DisclosurePanel>
+      </Disclosure>
+    </div>
+  );
+}
+
+/** Under-answer actions. Capability-gated and honest: Copy renders only where the Clipboard
+ * API exists, and Share only where Web Share does — no decorative or disabled fake actions. */
+function AssistantActions({ text }: { readonly text: string }) {
+  const [copied, setCopied] = useState(false);
+  const canCopy =
+    typeof navigator !== 'undefined' && typeof navigator.clipboard?.writeText === 'function';
+  const canShare =
+    typeof navigator !== 'undefined' && typeof (navigator as Navigator).share === 'function';
+  if (!canCopy && !canShare) return null;
+  return (
+    <div className="turn-actions">
+      {canCopy && (
+        <button
+          type="button"
+          className="turn-action"
+          aria-label={copied ? 'Answer copied' : 'Copy answer'}
+          onClick={() => {
+            void navigator.clipboard
+              .writeText(text)
+              .then(() => {
+                setCopied(true);
+                window.setTimeout(() => setCopied(false), 1500);
+              })
+              .catch(() => undefined);
+          }}
+        >
+          <CopyGlyph />
+          <span>{copied ? 'Copied' : 'Copy'}</span>
+        </button>
+      )}
+      {canShare && (
+        <button
+          type="button"
+          className="turn-action"
+          aria-label="Share answer"
+          onClick={() => {
+            void (navigator as Navigator).share({ text }).catch(() => undefined);
+          }}
+        >
+          <ShareGlyph />
+          <span>Share</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function CopyGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <rect x="9" y="9" width="11" height="11" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M6 15V6a2 2 0 0 1 2-2h9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function ShareGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M12 15V4M12 4l-4 4M12 4l4 4M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function Block({
+  block,
+  bare = false,
+}: {
+  readonly block: DisplayTranscriptBlock;
+  readonly bare?: boolean;
+}) {
   let content: ReactNode;
   let label: string;
+  // Routine evidence collapses to a recoverable disclosure; high-signal blocks
+  // (text, plan, diffs, and tool errors) stay expanded and prominent.
+  let collapsible = false;
   switch (block.kind) {
     case 'text':
       label = block.role === 'user' ? 'You' : 'Assistant';
@@ -1204,18 +1480,8 @@ function Block({ block }: { readonly block: DisplayTranscriptBlock }) {
       break;
     case 'thinking':
       label = 'Thinking summary';
-      content = (
-        <Disclosure defaultExpanded={false}>
-          <Heading>
-            <Button slot="trigger" className="thinking-trigger">
-              Show summary <span aria-hidden="true">+</span>
-            </Button>
-          </Heading>
-          <DisclosurePanel>
-            <p className="block-copy quiet-copy">{block.summary}</p>
-          </DisclosurePanel>
-        </Disclosure>
-      );
+      content = <p className="block-copy quiet-copy">{block.summary}</p>;
+      collapsible = true;
       break;
     case 'plan':
       label = 'Plan / todo';
@@ -1233,10 +1499,12 @@ function Block({ block }: { readonly block: DisplayTranscriptBlock }) {
     case 'tool_call':
       label = `Tool call · ${block.toolName}`;
       content = <pre>{block.inputSummary}</pre>;
+      collapsible = true;
       break;
     case 'tool_result':
       label = `${block.isError ? 'Tool error' : 'Tool result'} · ${block.toolName}`;
       content = <pre className={block.isError ? 'error-output' : ''}>{block.output}</pre>;
+      collapsible = !block.isError;
       break;
     case 'file_diff':
       label = 'File diff';
@@ -1262,6 +1530,7 @@ function Block({ block }: { readonly block: DisplayTranscriptBlock }) {
           </span>
         </div>
       );
+      collapsible = true;
       break;
     case 'unknown':
       label = 'Unsupported block';
@@ -1272,13 +1541,29 @@ function Block({ block }: { readonly block: DisplayTranscriptBlock }) {
       );
       break;
   }
+  const roleClass = block.kind === 'text' ? ` block-role-${block.role ?? 'assistant'}` : '';
+  // Text turns imply role by placement + typography (Claude-style), and collapsible evidence
+  // carries its own labelled trigger — so the label/timestamp header only shows for the
+  // promoted, standalone blocks (plan, file diff, unsupported). When `bare`, this block is
+  // already inside an Activity disclosure: show its label and render content directly.
+  const showHeader = bare ? block.kind !== 'text' : block.kind !== 'text' && !collapsible;
+  const renderAsDisclosure = collapsible && !bare;
   return (
-    <article className={`transcript-block block-${block.kind}`}>
-      <header>
-        <span>{label}</span>
-        <time dateTime={block.occurredAt}>{formatTime(block.occurredAt)}</time>
-      </header>
-      {content}
+    <article className={`transcript-block block-${block.kind}${roleClass}${bare ? ' block-bare' : ''}`}>
+      {showHeader && (
+        <header>
+          <span>{label}</span>
+          <time dateTime={block.occurredAt}>{formatTime(block.occurredAt)}</time>
+        </header>
+      )}
+      {renderAsDisclosure ? (
+        <CollapsedEvidence summary={label}>{content}</CollapsedEvidence>
+      ) : (
+        content
+      )}
+      {!bare && block.kind === 'text' && block.role !== 'user' && (
+        <AssistantActions text={block.text} />
+      )}
     </article>
   );
 }

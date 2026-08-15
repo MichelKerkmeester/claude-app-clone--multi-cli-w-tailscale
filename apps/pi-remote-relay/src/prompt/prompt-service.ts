@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto';
 import {
   isTranscriptBlock,
   type Envelope,
+  type PromptAbortResponse,
   type PromptSubmitCommand,
   type TextBlock,
 } from '@pi-remote/pi-rpc-protocol';
@@ -69,6 +70,33 @@ export class PromptService {
     }
   }
 
+  /**
+   * Interrupt the running agent. Sent immediately (not through the settled mutation
+   * lane) so it can preempt an in-flight turn; an uncertain outcome is delivery-unknown
+   * and is never retried automatically.
+   */
+  public async abort(): Promise<PromptAbortResponse> {
+    try {
+      const response = await this.options.supervisor.send({
+        id: `abort_${randomUUID()}`,
+        type: 'abort',
+      });
+      if (response.success && response.command === 'abort') {
+        return { outcome: { status: 'aborted' } };
+      }
+      return {
+        outcome: { status: 'unavailable', reason: response.error ?? 'Pi rejected the abort.' },
+      };
+    } catch (error: unknown) {
+      return {
+        outcome: {
+          status: 'delivery-unknown',
+          reason: error instanceof Error ? error.message : 'Abort transport failed.',
+        },
+      };
+    }
+  }
+
   private async submitOne(
     command: PromptSubmitCommand,
     record: SubmissionRecord,
@@ -82,7 +110,9 @@ export class PromptService {
         id: command.submissionId,
         type: 'prompt',
         message: command.message,
-        streamingBehavior: 'steer',
+        ...(command.streamingBehavior === undefined
+          ? {}
+          : { streamingBehavior: command.streamingBehavior }),
       });
     } catch (error: unknown) {
       this.submissions.delete(command.submissionId);

@@ -15,7 +15,9 @@ import {
   isPromptSubmitCommand,
   isPushPreferences,
   isPushSubscriptionInput,
+  isRuntimeControlCommand,
   type EnrollmentRequest,
+  type RuntimeControlResponse,
   type SyncCursor,
   type SyncMessage,
 } from '@pi-remote/pi-rpc-protocol';
@@ -24,7 +26,9 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { AuthService, type ApplicationSession } from '../auth/auth-service.js';
 import type { ApprovalService } from '../approval/approval-service.js';
 import { FixedWindowRateLimiter } from '../auth/rate-limit.js';
+import type { CommandService } from '../commands/command-service.js';
 import type { SyncHub } from '../replay/sync.js';
+import type { RuntimeService } from '../runtime/runtime-service.js';
 import type { SessionCatalog } from '../sessions/catalog.js';
 import type { RelayStore } from '../store/relay-store.js';
 import type { PushService } from '../push/push-service.js';
@@ -83,6 +87,8 @@ export interface ReadOnlyServerOptions {
     readonly policyVersion: number;
   };
   readonly prompts?: PromptService;
+  readonly runtime?: RuntimeService;
+  readonly commands?: CommandService;
   readonly push?: PushService;
   readonly now?: () => number;
 }
@@ -114,7 +120,14 @@ export async function startReadOnlyServer(
     60_000,
     options.now ?? Date.now,
   );
+  const runtimeControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const activeSockets = new Set<ActiveSocket>();
+  // A runtime mutation is only valid from a device that also holds a live, authenticated
+  // sync socket — a background or stale device can never steer the host.
+  const isForegroundDevice = (deviceId: string, token: string): boolean =>
+    [...activeSockets].some(
+      (active) => active.deviceId === deviceId && active.sessionToken === token,
+    );
   const upgradingSessions = new WeakMap<WebSocket, ApplicationSession>();
   const server = createServer((request, response) => {
     void handleHttp(
@@ -125,6 +138,8 @@ export async function startReadOnlyServer(
       requestLimiter,
       enrollmentLimiter,
       promptLimiter,
+      runtimeControlLimiter,
+      isForegroundDevice,
     ).catch(() => sendJson(response, 400, { error: 'invalid_request' }));
   });
   const webSocketServer = new WebSocketServer({
@@ -263,6 +278,8 @@ async function handleHttp(
   requestLimiter: FixedWindowRateLimiter,
   enrollmentLimiter: FixedWindowRateLimiter,
   promptLimiter: FixedWindowRateLimiter,
+  runtimeControlLimiter: FixedWindowRateLimiter,
+  isForegroundDevice: (deviceId: string, token: string) => boolean,
 ): Promise<void> {
   if (
     request.socket.remoteAddress === LOOPBACK_HOST &&
@@ -523,6 +540,108 @@ async function handleHttp(
     }
     return;
   }
+  if (ingress.path === '/api/runtime/state') {
+    await requireEmptyBody(request);
+    const state = options.runtime?.getState() ?? null;
+    if (state === null) {
+      sendJson(response, 503, { error: 'runtime_unavailable' });
+      return;
+    }
+    sendJson(response, 200, { state });
+    return;
+  }
+  if (ingress.path === '/api/runtime/models') {
+    await requireEmptyBody(request);
+    const catalog = options.runtime?.getModelCatalog() ?? null;
+    if (catalog === null) {
+      sendJson(response, 503, { error: 'runtime_unavailable' });
+      return;
+    }
+    sendJson(response, 200, catalog);
+    return;
+  }
+  if (ingress.path === '/api/commands/list') {
+    await requireEmptyBody(request);
+    if (options.commands === undefined) {
+      sendJson(response, 503, { error: 'commands_unavailable' });
+      return;
+    }
+    try {
+      sendJson(response, 200, await options.commands.listCommands());
+    } catch {
+      sendJson(response, 503, { error: 'pi_unavailable' });
+    }
+    return;
+  }
+  if (ingress.path === '/api/prompt/abort') {
+    const body = await readJsonBody(request);
+    if (options.prompts === undefined || !isRecord(body) || !isOpaqueId(body.ticket)) {
+      sendJson(response, 400, { error: 'invalid_abort' });
+      return;
+    }
+    const ticketSession = auth.consumeTicket(
+      body.ticket,
+      ingress.origin,
+      ingress.principal,
+      'prompt:abort',
+    );
+    if (
+      ticketSession === null ||
+      ticketSession.token !== session.token ||
+      ticketSession.deviceId !== session.deviceId
+    ) {
+      sendJson(response, 401, { error: 'unauthorized' });
+      return;
+    }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    try {
+      const result = await options.prompts.abort();
+      sendJson(response, result.outcome.status === 'aborted' ? 202 : 503, result);
+    } catch {
+      sendJson(response, 503, { error: 'pi_unavailable' });
+    }
+    return;
+  }
+  if (ingress.path === '/api/runtime/control') {
+    const body = await readJsonBody(request);
+    if (options.runtime === undefined || !isRuntimeControlCommand(body)) {
+      sendJson(response, 400, { error: 'invalid_runtime_control' });
+      return;
+    }
+    const ticketSession = auth.consumeTicket(
+      body.ticket,
+      ingress.origin,
+      ingress.principal,
+      'runtime:control',
+    );
+    if (
+      ticketSession === null ||
+      ticketSession.token !== session.token ||
+      ticketSession.deviceId !== session.deviceId
+    ) {
+      sendJson(response, 401, { error: 'unauthorized' });
+      return;
+    }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (!runtimeControlLimiter.consume(session.deviceId)) {
+      auth.metrics.rateLimited += 1;
+      sendJson(response, 429, { error: 'rate_limited' });
+      return;
+    }
+    try {
+      const result = await options.runtime.control(body);
+      sendJson(response, statusForRuntimeOutcome(result), result);
+    } catch {
+      sendJson(response, 503, { error: 'pi_unavailable' });
+    }
+    return;
+  }
   if (ingress.path === '/api/accept-edits') {
     const body = await readJsonBody(request);
     if (
@@ -711,8 +830,25 @@ function actionForRequest(path: string): string | null {
   if (path === '/api/approvals') return 'approvals:list';
   if (path === '/api/approval/decide') return 'approval:decide';
   if (path === '/api/prompt/submit') return 'prompt:submit';
+  if (path === '/api/prompt/abort') return 'prompt:abort';
   if (path === '/api/accept-edits') return 'accept-edits:create';
+  if (path === '/api/runtime/state' || path === '/api/runtime/models') return 'runtime:read';
+  if (path === '/api/runtime/control') return 'runtime:control';
+  if (path === '/api/commands/list') return 'commands:list';
   return null;
+}
+
+function statusForRuntimeOutcome(result: RuntimeControlResponse): number {
+  switch (result.outcome.status) {
+    case 'accepted':
+      return 202;
+    case 'stale':
+      return 409;
+    case 'unsupported':
+      return 422;
+    default:
+      return 503;
+  }
 }
 
 function parseSubscribe(serialized: string): SubscribeRequest | null {

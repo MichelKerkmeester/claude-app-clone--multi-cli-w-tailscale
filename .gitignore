@@ -20,3 +20,6 @@ dist/
 deploy/serve.env
 
 .DS_Store
+
+# Local symlink to shared external subagent tooling — not part of the app.
+.pi-subagents

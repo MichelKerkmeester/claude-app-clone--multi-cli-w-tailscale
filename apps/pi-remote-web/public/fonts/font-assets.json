@@ -1,0 +1,36 @@
+{
+  "$comment": "Deterministic offline font supply chain. The vendoring step verifies each archive checksum, extracts only the named file, and records the computed SHA-256 of the committed WOFF2. No PENDING or unverified hash is permitted.",
+  "fonts": [
+    {
+      "family": "Source Serif 4",
+      "role": "display",
+      "release": "4.005R",
+      "upstreamRepo": "adobe-fonts/source-serif",
+      "releaseCommit": "2823e99",
+      "sourceUrl": "https://github.com/adobe-fonts/source-serif/releases/download/4.005R/source-serif-4.005_WOFF2.zip",
+      "archiveSha256": "af10e80dcd2296748b04cb9917db9f7ba0ae65101165fd2f0c16b9812d9abd28",
+      "extractedPath": "source-serif-4.005_WOFF2/OTF/SourceSerif4-Regular.otf.woff2",
+      "committedPath": "fonts/source-serif-4-4.005r-regular.woff2",
+      "byteLength": 107408,
+      "committedSha256": "42aa010dbb82d90764a28f6cc7d809a9395999b7390eb3b212028c6975e97402",
+      "license": "fonts/source-serif-4-OFL-1.1.txt",
+      "cssWeight": "400",
+      "amendment": "Restyle plan §4.1 pinned source-serif-4.005_Desktop.zip (sha256 549fdb8f9a682bd06944298621404969f6de77c2e422ff3b8244a1dcd6a0c425), which is TTF/OTF-only and ships no WOFF2. The WOFF2 lives in the separate source-serif-4.005_WOFF2.zip release asset (pinned here, freshly verified). The internal path is OTF/SourceSerif4-Regular.otf.woff2, not the plan's WOFF2/TTF/...ttf.woff2."
+    },
+    {
+      "family": "Inter",
+      "role": "ui",
+      "release": "v4.1",
+      "upstreamRepo": "rsms/inter",
+      "releaseCommit": "e3a3d4c",
+      "sourceUrl": "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip",
+      "archiveSha256": "9883fdd4a49d4fb66bd8177ba6625ef9a64aa45899767dde3d36aa425756b11e",
+      "extractedPath": "web/InterVariable.woff2",
+      "committedPath": "fonts/inter-4.1-roman-variable.woff2",
+      "byteLength": 352240,
+      "committedSha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+      "license": "fonts/inter-4.1-OFL-1.1.txt",
+      "cssWeight": "400 600"
+    }
+  ]
+}

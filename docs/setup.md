@@ -44,7 +44,7 @@ Loopback-only relay plus Tailscale Serve ingress equals a private, tailnet-only 
 
 ### Relay Process Boundary
 
-The relay starts `pi --mode rpc --no-session --no-tools --no-extensions`. This steering slice disables all built-in, extension, and custom tools at the Pi process boundary. It does not attach to an already-running Pi process, expose Pi session files, or check the Pi version. If `pi` cannot be started because the executable is absent, the relay replays its bundled fixture. The current health response does not distinguish live and fixture supervisor states.
+The relay supports three host-selected postures. By default it starts `pi --mode rpc --no-session --no-tools --no-extensions`; this steering slice disables all built-in, extension, and custom tools at the Pi process boundary. The allowlisted mutation posture (`PI_REMOTE_MUTATION_ENABLED=1` with one family) instead exposes a small tool family behind the approval extension. The operator-only full-access posture (`--full-access` / `PI_REMOTE_FULL_ACCESS=1`) starts `pi --mode rpc --no-session --approve` with every built-in tool and no approval extension — desktop parity, host-selected only, never enableable from the phone. In every posture the relay does not attach to an already-running Pi process, expose Pi session files, or check the Pi version. If `pi` cannot be started because the executable is absent, the relay replays its bundled fixture. The current health response does not distinguish live and fixture supervisor states.
 
 ## 2. INSTALL AND BUILD
 

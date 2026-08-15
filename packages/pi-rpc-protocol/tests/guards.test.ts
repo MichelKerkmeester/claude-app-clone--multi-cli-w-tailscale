@@ -8,14 +8,23 @@ import {
   approvalActionDigest,
   canonicalizeApprovalAction,
   enrollmentProof,
+  isAvailableModelDto,
+  isCommandCatalogDto,
+  isCommandDescriptorDto,
   isEnrollmentQr,
   isApprovalDecisionCommand,
   isEnvelope,
   isPiRpcCommand,
   isPiRpcEvent,
   isPiRpcResponse,
+  isPromptAbortResponse,
   isPromptSubmitCommand,
   isPromptSubmitResponse,
+  isRuntimeControlCommand,
+  isRuntimeControlResponse,
+  isRuntimeModelCatalogDto,
+  isRuntimeOperation,
+  isRuntimeStateDto,
   isSessionCardDto,
   isSyncMessage,
   isTranscriptBlock,
@@ -226,9 +235,219 @@ describe('protocol guards', () => {
     expect(isPromptSubmitCommand(command)).toBe(true);
     expect(isPromptSubmitCommand({ ...command, extra: true })).toBe(false);
     expect(isPromptSubmitCommand({ ...command, message: '   ' })).toBe(false);
+    expect(isPromptSubmitCommand({ ...command, streamingBehavior: 'steer' })).toBe(true);
+    expect(isPromptSubmitCommand({ ...command, streamingBehavior: 'followUp' })).toBe(true);
+    expect(isPromptSubmitCommand({ ...command, streamingBehavior: 'nope' })).toBe(false);
     expect(isPromptSubmitResponse({ accepted: true, block })).toBe(true);
     expect(isPromptSubmitResponse({ accepted: true, block: { ...block, role: 'assistant' } })).toBe(
       false,
     );
+  });
+});
+
+describe('runtime control guards', () => {
+  const state = {
+    sessionId: 'session_local',
+    revision: 3,
+    model: { provider: 'openai', id: 'gpt-4o', label: 'GPT-4o' },
+    thinkingLevel: 'high',
+    availableThinkingLevels: ['low', 'medium', 'high'],
+    mode: 'plan',
+    streaming: false,
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  } as const;
+  const descriptor = {
+    name: 'help',
+    description: null,
+    source: 'prompt',
+    enabled: true,
+    disabledReason: null,
+    requiresConfirmation: false,
+  } as const;
+
+  it('accepts well-formed model descriptors and rejects extras, path values and overlong ids', () => {
+    const model = { provider: 'openai', id: 'gpt-4o', label: 'GPT-4o' };
+    expect(isAvailableModelDto(model)).toBe(true);
+    expect(isAvailableModelDto({ ...model, extra: true })).toBe(false);
+    expect(isAvailableModelDto({ ...model, provider: 'a/b' })).toBe(false);
+    expect(isAvailableModelDto({ ...model, label: 'a\\b' })).toBe(false);
+    expect(isAvailableModelDto({ ...model, id: '' })).toBe(false);
+    expect(isAvailableModelDto({ ...model, id: 'x'.repeat(201) })).toBe(false);
+    expect(isAvailableModelDto({ ...model, provider: 42 })).toBe(false);
+  });
+
+  it('accepts authoritative runtime state and rejects bad modes, revisions and nested models', () => {
+    expect(isRuntimeStateDto(state)).toBe(true);
+    expect(isRuntimeStateDto({ ...state, mode: 'executing-plan' })).toBe(true);
+    expect(isRuntimeStateDto({ ...state, extra: true })).toBe(false);
+    expect(isRuntimeStateDto({ ...state, mode: 'idle' })).toBe(false);
+    expect(isRuntimeStateDto({ ...state, revision: -1 })).toBe(false);
+    expect(isRuntimeStateDto({ ...state, revision: 1.5 })).toBe(false);
+    expect(
+      isRuntimeStateDto({ ...state, model: { provider: 'a/b', id: 'gpt-4o', label: 'GPT-4o' } }),
+    ).toBe(false);
+    expect(isRuntimeStateDto({ ...state, thinkingLevel: '' })).toBe(false);
+    expect(isRuntimeStateDto({ ...state, availableThinkingLevels: ['low', 42] })).toBe(false);
+    expect(isRuntimeStateDto({ ...state, streaming: 'no' })).toBe(false);
+    expect(isRuntimeStateDto({ ...state, updatedAt: 'not-a-date' })).toBe(false);
+  });
+
+  it('accepts every runtime operation and rejects host-only modes and path-like ids', () => {
+    expect(isRuntimeOperation({ type: 'set_model', provider: 'openai', modelId: 'gpt-4o' })).toBe(
+      true,
+    );
+    expect(isRuntimeOperation({ type: 'set_thinking_level', level: 'high' })).toBe(true);
+    expect(isRuntimeOperation({ type: 'set_mode', mode: 'build' })).toBe(true);
+    expect(isRuntimeOperation({ type: 'set_mode', mode: 'plan' })).toBe(true);
+    expect(isRuntimeOperation({ type: 'set_mode', mode: 'executing-plan' })).toBe(false);
+    expect(isRuntimeOperation({ type: 'set_mode', mode: 'unknown' })).toBe(false);
+    expect(isRuntimeOperation({ type: 'set_model', provider: 'a/b', modelId: 'gpt-4o' })).toBe(
+      false,
+    );
+    expect(isRuntimeOperation({ type: 'set_model', provider: 'openai', modelId: 'a\\b' })).toBe(
+      false,
+    );
+    expect(
+      isRuntimeOperation({
+        type: 'set_model',
+        provider: 'openai',
+        modelId: 'gpt-4o',
+        extra: true,
+      }),
+    ).toBe(false);
+    expect(isRuntimeOperation({ type: 'set_thinking_level', level: '' })).toBe(false);
+    expect(isRuntimeOperation({ type: 'set_theme', level: 'dark' })).toBe(false);
+  });
+
+  it('accepts exact runtime control commands and rejects extras, bad revisions and bad operations', () => {
+    const command = {
+      type: 'runtime.control',
+      controlId: 'control_001',
+      sessionId: 'session_local',
+      expectedRevision: 2,
+      operation: { type: 'set_model', provider: 'openai', modelId: 'gpt-4o' },
+      ticket: 'ticket_control_001',
+    } as const;
+    expect(isRuntimeControlCommand(command)).toBe(true);
+    expect(isRuntimeControlCommand({ ...command, extra: true })).toBe(false);
+    expect(isRuntimeControlCommand({ ...command, expectedRevision: -1 })).toBe(false);
+    expect(isRuntimeControlCommand({ ...command, expectedRevision: 1.5 })).toBe(false);
+    expect(
+      isRuntimeControlCommand({
+        ...command,
+        operation: { type: 'set_mode', mode: 'executing-plan' },
+      }),
+    ).toBe(false);
+    expect(isRuntimeControlCommand({ ...command, ticket: 't!' })).toBe(false);
+    expect(isRuntimeControlCommand({ ...command, type: 'runtime.steer' })).toBe(false);
+  });
+
+  it('accepts model catalogs and rejects malformed catalog items', () => {
+    const catalog = {
+      sessionId: 'session_local',
+      runtimeRevision: 1,
+      models: [
+        { provider: 'openai', id: 'gpt-4o', label: 'GPT-4o' },
+        { provider: 'anthropic', id: 'claude-sonnet', label: 'Claude Sonnet' },
+      ],
+    } as const;
+    expect(isRuntimeModelCatalogDto(catalog)).toBe(true);
+    expect(isRuntimeModelCatalogDto({ ...catalog, extra: true })).toBe(false);
+    expect(isRuntimeModelCatalogDto({ ...catalog, runtimeRevision: -1 })).toBe(false);
+    expect(isRuntimeModelCatalogDto({ ...catalog, runtimeRevision: 1.5 })).toBe(false);
+    expect(
+      isRuntimeModelCatalogDto({ ...catalog, models: [{ ...catalog.models[0], provider: 'a/b' }] }),
+    ).toBe(false);
+  });
+
+  it('accepts command descriptors and catalogs and rejects bad sources and names', () => {
+    expect(isCommandDescriptorDto(descriptor)).toBe(true);
+    expect(
+      isCommandDescriptorDto({ ...descriptor, description: 'Shows help', source: 'extension' }),
+    ).toBe(true);
+    expect(isCommandDescriptorDto({ ...descriptor, extra: true })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, source: 'script' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: '../x' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: 'a\\b' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, enabled: 'yes' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, description: 'x'.repeat(2001) })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, disabledReason: 'x'.repeat(501) })).toBe(false);
+
+    const catalog = {
+      sessionId: 'session_local',
+      revision: 2,
+      commands: [descriptor, { ...descriptor, name: 'compact', source: 'skill' }],
+    } as const;
+    expect(isCommandCatalogDto(catalog)).toBe(true);
+    expect(isCommandCatalogDto({ ...catalog, extra: true })).toBe(false);
+    expect(isCommandCatalogDto({ ...catalog, revision: -1 })).toBe(false);
+    expect(isCommandCatalogDto({ ...catalog, revision: 2.5 })).toBe(false);
+    expect(
+      isCommandCatalogDto({ ...catalog, commands: [{ ...descriptor, source: 'script' }] }),
+    ).toBe(false);
+  });
+
+  it('accepts every runtime control outcome and rejects stray statuses and malformed outcomes', () => {
+    expect(isRuntimeControlResponse({ outcome: { status: 'accepted', state } })).toBe(true);
+    expect(isRuntimeControlResponse({ outcome: { status: 'stale', state } })).toBe(true);
+    expect(
+      isRuntimeControlResponse({ outcome: { status: 'unsupported', reason: 'no such op' } }),
+    ).toBe(true);
+    expect(
+      isRuntimeControlResponse({ outcome: { status: 'unavailable', reason: 'host offline' } }),
+    ).toBe(true);
+    expect(
+      isRuntimeControlResponse({ outcome: { status: 'delivery-unknown', reason: 'lost' } }),
+    ).toBe(true);
+
+    expect(isRuntimeControlResponse({ outcome: { status: 'accepted', state }, extra: true })).toBe(
+      false,
+    );
+    expect(isRuntimeControlResponse({ outcome: { status: 'pending' } })).toBe(false);
+    expect(isRuntimeControlResponse({ outcome: { status: 'accepted' } })).toBe(false);
+    expect(isRuntimeControlResponse({ outcome: { status: 'accepted', state, extra: true } })).toBe(
+      false,
+    );
+    expect(
+      isRuntimeControlResponse({
+        outcome: { status: 'accepted', state: { ...state, mode: 'idle' } },
+      }),
+    ).toBe(false);
+    expect(isRuntimeControlResponse({ outcome: { status: 'unsupported' } })).toBe(false);
+    expect(isRuntimeControlResponse({ outcome: { status: 'unsupported', reason: '' } })).toBe(
+      false,
+    );
+    expect(
+      isRuntimeControlResponse({ outcome: { status: 'unsupported', reason: 'x'.repeat(501) } }),
+    ).toBe(false);
+  });
+
+  it('accepts every prompt abort outcome and rejects extras and empty reasons', () => {
+    expect(isPromptAbortResponse({ outcome: { status: 'aborted' } })).toBe(true);
+    expect(
+      isPromptAbortResponse({ outcome: { status: 'unavailable', reason: 'no active prompt' } }),
+    ).toBe(true);
+    expect(isPromptAbortResponse({ outcome: { status: 'delivery-unknown', reason: 'lost' } })).toBe(
+      true,
+    );
+
+    expect(isPromptAbortResponse({ outcome: { status: 'aborted', reason: 'extra' } })).toBe(false);
+    expect(isPromptAbortResponse({ outcome: { status: 'denied' } })).toBe(false);
+    expect(isPromptAbortResponse({ outcome: { status: 'unavailable' } })).toBe(false);
+    expect(isPromptAbortResponse({ outcome: { status: 'unavailable', reason: '' } })).toBe(false);
+    expect(isPromptAbortResponse({ outcome: { status: 'aborted' }, extra: true })).toBe(false);
+  });
+
+  it('accepts the pi-facing runtime commands and rejects extra fields or missing args', () => {
+    expect(isPiRpcCommand({ type: 'get_available_models' })).toBe(true);
+    expect(isPiRpcCommand({ type: 'get_available_thinking_levels' })).toBe(true);
+    expect(isPiRpcCommand({ id: 'request_2', type: 'get_commands' })).toBe(true);
+    expect(isPiRpcCommand({ type: 'get_available_models', extra: true })).toBe(false);
+    expect(isPiRpcCommand({ type: 'set_model', provider: 'openai', modelId: 'gpt-4o' })).toBe(true);
+    expect(isPiRpcCommand({ type: 'set_model', provider: 'openai' })).toBe(false);
+    expect(isPiRpcCommand({ type: 'set_model', provider: 'openai', modelId: 42 })).toBe(false);
+    expect(isPiRpcCommand({ type: 'set_thinking_level', level: 'high' })).toBe(true);
+    expect(isPiRpcCommand({ type: 'set_thinking_level' })).toBe(false);
+    expect(isPiRpcCommand({ type: 'get_state' })).toBe(true);
   });
 });

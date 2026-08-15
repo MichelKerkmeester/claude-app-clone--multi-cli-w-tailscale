@@ -12,6 +12,7 @@ import type { ApprovalAction, ApprovalDecisionCommand } from '@pi-remote/pi-rpc-
 import Database from 'better-sqlite3';
 
 import { ApprovalService } from '../approval/approval-service.js';
+import { fullAccessPiArguments } from '../index.js';
 import { MutationPolicy } from '../policy/mutation-policy.js';
 import { SyncHub } from '../replay/sync.js';
 import { MigrationRunner } from '../store/migrations.js';
@@ -26,6 +27,8 @@ export interface RollbackDrillReport {
   readonly relaySessionsPreserved: number;
   readonly indeterminateRowsPreserved: number;
   readonly nativeSessionSentinelPreserved: true;
+  readonly fullAccessRelaunchArgs: readonly string[];
+  readonly fullAccessRelaunchNeedsMigration: false;
 }
 
 /** Exercise authority drain, backup restore and down-migration on app-local disposable state. */
@@ -145,6 +148,21 @@ export function runRollbackDrill(releaseRoot = defaultReleaseRoot()): RollbackDr
       throw new Error('Rollback touched the native-session preservation boundary.');
     }
 
+    // The full-access runtime posture adds no schema, so a rollback that redeploys the
+    // prior build relaunches it against the already-restored database with no further
+    // migration. Prove the restored state reads back exactly as a fresh full-access
+    // process would open it.
+    const fullAccessRelaunchArgs = [...fullAccessPiArguments()];
+    const relaunch = new Database(databasePath);
+    relaunch.pragma('foreign_keys = ON');
+    const relaunchSessions = relaunch
+      .prepare(`SELECT COUNT(*) AS count FROM session_catalog WHERE id = 'session_release_drill'`)
+      .get() as { count: number };
+    relaunch.close();
+    if (relaunchSessions.count !== 1) {
+      throw new Error('Full-access relaunch could not read restored session state.');
+    }
+
     return {
       schemaVersion: 1,
       status: 'PASS',
@@ -154,6 +172,8 @@ export function runRollbackDrill(releaseRoot = defaultReleaseRoot()): RollbackDr
       relaySessionsPreserved: sessions.count,
       indeterminateRowsPreserved: indeterminate.count,
       nativeSessionSentinelPreserved: true,
+      fullAccessRelaunchArgs,
+      fullAccessRelaunchNeedsMigration: false,
     };
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });

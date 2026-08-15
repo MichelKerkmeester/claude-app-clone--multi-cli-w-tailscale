@@ -23,12 +23,12 @@ Four components make up the system: the loopback relay, the shared wire protocol
 
 ### Key Statistics
 
-| Metric          | Value                                                |
-| --------------- | ---------------------------------------------------- |
-| Status          | Private deployment with operator-verified boundaries |
-| Version         | 0.1.0                                                |
-| Main audience   | One operator controlling Pi from an enrolled phone   |
-| Operating modes | Read-only, protected mutation, optional push         |
+| Metric          | Value                                                                      |
+| --------------- | -------------------------------------------------------------------------- |
+| Status          | Private deployment with operator-verified boundaries                       |
+| Version         | 0.1.0                                                                      |
+| Main audience   | One operator controlling Pi from an enrolled phone                         |
+| Operating modes | Read-only default, protected mutation, operator full-access, optional push |
 
 ### How This Compares
 
@@ -175,7 +175,7 @@ A: No. Redaction replaces paths, secrets and private text before persistence or 
 
 **Q: When does the approval extension load?**
 
-A: Only when `PI_REMOTE_MUTATION_ENABLED=1` and exactly one family is set. Otherwise the relay starts Pi with `--no-tools --no-extensions`.
+A: Only in the allowlisted mutation posture — `PI_REMOTE_MUTATION_ENABLED=1` with exactly one family set. The relay runs three distinct postures. The safe default starts Pi with `--no-tools --no-extensions` (steering only, fail-closed). The mutation posture adds the approval extension over an allowlisted tool family. The operator-only full-access posture (`--full-access` / `PI_REMOTE_FULL_ACCESS=1`) starts Pi with `--mode rpc --no-session --approve` and every built-in tool, with no approval extension — desktop parity. Only the host selects full access; the phone can never enable it.
 
 **Q: What happens when I interrupt the deployment script?**
 

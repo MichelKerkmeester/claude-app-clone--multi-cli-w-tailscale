@@ -90,7 +90,7 @@ The deployment script serves the built PWA from a second loopback process on `12
 ### Connection Facts
 
 - `runRelay` constructs `RelayStore`, `SessionCatalog`, `SyncHub`, `PushService`, `MutationPolicy`, `ApprovalService`, `RpcSupervisor`, `PromptService`, and `TranscriptProjector` in dependency order
-- `RpcSupervisor` owns exactly one Pi child. The default launch uses `--mode rpc --no-session --no-tools --no-extensions` and the mutation configuration replaces that argument set when a family is enabled
+- `RpcSupervisor` owns exactly one Pi child. The default launch uses `--mode rpc --no-session --no-tools --no-extensions` (fail-closed steering only). An allowlisted mutation family replaces that argument set, and the operator-only full-access posture (`PI_REMOTE_FULL_ACCESS=1`) instead launches `--mode rpc --no-session --approve` with every built-in tool and no approval extension. Only the host selects full access; the phone can never enable it
 - `startReadOnlyServer` binds IPv4 loopback only and rejects a non-loopback bind
 - `deploy/setup-tailscale-serve.sh` starts the relay on `127.0.0.1:4310` and the PWA preview on `127.0.0.1:4173`. It routes `/` to the preview and routes `/api` plus `/health` to the relay through the secret prefix
 - `StrictJsonlDecoder` decodes Pi stdout as UTF-8 JSONL with LF-only delimiters and a one-megabyte record limit. `RpcDemultiplexer` correlates responses by request id while asynchronous Pi events are delivered independently. `supervisor.send` serializes writes to Pi stdin
@@ -165,6 +165,12 @@ IF mutation is on with one valid family:
 → it loads extensions/pi-remote-approval/dist/index.js by explicit path
 → it passes a random per-process capability only to the owned Pi child
 → it exposes the two authority endpoints on the IPv4 loopback listener only
+
+IF full access is selected by the host (--full-access / PI_REMOTE_FULL_ACCESS=1):
+→ the relay starts Pi with --mode rpc --no-session --approve and every built-in tool
+→ no approval extension loads and no per-action gate applies (desktop parity)
+→ mutation stays off, so no extension authority secret exists
+→ only the host can select this; the phone can never enable it
 ```
 
 Disabling the switch or changing the family emits a reason through `MutationPolicy.onDisable`. `ApprovalService` revokes pending and approved leases, marks grants revoked, and aborts tracked in-flight work through their `AbortSignal`.

@@ -18,6 +18,13 @@ const MAX_RESTART_DELAY_MS = 5_000;
 
 export type SupervisorState = 'stopped' | 'starting' | 'running' | 'fixture' | 'failed';
 
+export type SupervisorLifecycleReason = 'spawn' | 'exit' | 'restart' | 'fixture' | 'failed';
+
+export interface SupervisorLifecycleEvent {
+  readonly state: SupervisorState;
+  readonly reason: SupervisorLifecycleReason;
+}
+
 export interface RpcSupervisorOptions {
   readonly command?: string;
   readonly args?: readonly string[];
@@ -40,6 +47,7 @@ export class RpcSupervisor {
   private child: ChildProcessWithoutNullStreams | null = null;
   private readonly eventListeners = new Set<(event: PiRpcEvent) => void>();
   private readonly errorListeners = new Set<(error: Error) => void>();
+  private readonly lifecycleListeners = new Set<(event: SupervisorLifecycleEvent) => void>();
   private readonly demultiplexer: RpcDemultiplexer;
   private state: SupervisorState = 'stopped';
   private restartCount = 0;
@@ -47,6 +55,7 @@ export class RpcSupervisor {
   private isStopping = false;
   private isFallbackActive = false;
   private writeChain: Promise<void> = Promise.resolve();
+  private mutationLane: Promise<unknown> = Promise.resolve();
 
   public constructor(private readonly options: RpcSupervisorOptions = {}) {
     this.demultiplexer = new RpcDemultiplexer({
@@ -119,10 +128,23 @@ export class RpcSupervisor {
     return response;
   }
 
+  /** Send a mutation only after the prior mutation response has settled. */
+  public sendSettled(command: PiRpcCommand): Promise<PiRpcResponse> {
+    const mutation = this.mutationLane.catch(() => undefined).then(() => this.send(command));
+    this.mutationLane = mutation;
+    return mutation;
+  }
+
   /** Subscribe to parsed Pi events. */
   public onEvent(listener: (event: PiRpcEvent) => void): () => void {
     this.eventListeners.add(listener);
     return () => this.eventListeners.delete(listener);
+  }
+
+  /** Subscribe to supervisor lifecycle transitions. */
+  public onLifecycle(listener: (event: SupervisorLifecycleEvent) => void): () => void {
+    this.lifecycleListeners.add(listener);
+    return () => this.lifecycleListeners.delete(listener);
   }
 
   /** Subscribe to framing, protocol and process errors. */
@@ -175,6 +197,7 @@ export class RpcSupervisor {
     });
     child.once('spawn', () => {
       this.state = 'running';
+      this.emitLifecycle({ state: this.state, reason: 'spawn' });
     });
     child.once('error', (error: NodeJS.ErrnoException) => {
       this.emitError(new Error(`Pi RPC child failed to start: ${error.message}`));
@@ -188,6 +211,7 @@ export class RpcSupervisor {
       if (this.child === child) {
         this.child = null;
       }
+      this.emitLifecycle({ state: this.state, reason: 'exit' });
       this.demultiplexer.rejectAll(
         new Error(`Pi RPC child exited with code ${String(code)} and signal ${String(signal)}.`),
       );
@@ -201,9 +225,11 @@ export class RpcSupervisor {
     const maxRestarts = this.options.maxRestarts ?? DEFAULT_MAX_RESTARTS;
     if (this.restartCount >= maxRestarts) {
       this.state = 'failed';
+      this.emitLifecycle({ state: this.state, reason: 'failed' });
       return;
     }
     this.restartCount += 1;
+    this.emitLifecycle({ state: this.state, reason: 'restart' });
     const delay = Math.min(250 * 2 ** (this.restartCount - 1), MAX_RESTART_DELAY_MS);
     setTimeout(() => this.launchChild(), delay).unref();
   }
@@ -220,8 +246,10 @@ export class RpcSupervisor {
       decoder.push(contents);
       decoder.finish();
       this.state = 'fixture';
+      this.emitLifecycle({ state: this.state, reason: 'fixture' });
     } catch (error: unknown) {
       this.state = 'failed';
+      this.emitLifecycle({ state: this.state, reason: 'failed' });
       const message = error instanceof Error ? error.message : String(error);
       this.emitError(new Error(`Recorded Pi RPC fixture failed: ${message}`));
     }
@@ -229,6 +257,12 @@ export class RpcSupervisor {
 
   private emitEvent(event: PiRpcEvent): void {
     for (const listener of this.eventListeners) {
+      listener(event);
+    }
+  }
+
+  private emitLifecycle(event: SupervisorLifecycleEvent): void {
+    for (const listener of this.lifecycleListeners) {
       listener(event);
     }
   }

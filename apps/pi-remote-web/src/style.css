@@ -1,7 +1,27 @@
 @import 'tailwindcss';
 
+/* Self-hosted, offline, integrity-manifested font faces (see public/fonts/font-assets.json).
+   Inert until a family here is referenced by an application role at the visual cutover:
+   nothing consumes 'Source Serif 4' or 'Inter' yet, so declaring them changes no rendering. */
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/source-serif-4-4.005r-regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-4.1-roman-variable.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: 'Avenir Next', Avenir, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+  --font-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Source Serif 4', Charter, Georgia, Cambria, 'Times New Roman', serif;
   --font-mono: 'SFMono-Regular', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
   --radius-control: 0.625rem;
   --radius-panel: 0.875rem;
@@ -16,32 +36,40 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --canvas: oklch(0.968 0.004 255);
-  --canvas-subtle: oklch(0.945 0.006 255);
-  --surface: oklch(0.992 0.002 255);
-  --surface-raised: oklch(1 0 0);
-  --surface-muted: oklch(0.934 0.008 255);
-  --surface-code: oklch(0.218 0.018 258);
-  --ink: oklch(0.205 0.018 258);
-  --ink-secondary: oklch(0.405 0.02 258);
-  --ink-muted: oklch(0.525 0.018 258);
-  --ink-inverse: oklch(0.975 0.004 255);
-  --line: oklch(0.875 0.01 255);
-  --line-strong: oklch(0.76 0.015 255);
-  --accent: oklch(0.56 0.19 255);
-  --accent-strong: oklch(0.46 0.19 255);
-  --accent-soft: oklch(0.925 0.035 255);
-  --accent-ink: oklch(0.34 0.16 255);
-  --success: oklch(0.48 0.13 153);
-  --success-soft: oklch(0.93 0.035 153);
-  --warning: oklch(0.51 0.13 72);
-  --warning-soft: oklch(0.94 0.045 82);
-  --danger: oklch(0.49 0.18 25);
-  --danger-soft: oklch(0.94 0.035 25);
-  --focus: oklch(0.56 0.19 255);
-  --diff-add: oklch(0.935 0.035 153);
-  --diff-remove: oklch(0.94 0.035 25);
-  --shadow-raised: 0 1px 2px oklch(0.2 0.02 258 / 0.06), 0 10px 32px oklch(0.2 0.02 258 / 0.06);
+  --canvas: #f8f8f6;
+  --canvas-subtle: #efeeeb;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-muted: #efeeeb;
+  --surface-code: #0f0f0e;
+  --ink: #121212;
+  --ink-secondary: #373734;
+  --ink-muted: #6c6a65;
+  --ink-tertiary-safe: #6c6a65;
+  --ink-disabled: #6c6a65;
+  --placeholder: #6c6a65;
+  --ink-inverse: #f8f8f6;
+  --line: #e7e6e1;
+  --line-hairline: #b7b7b5;
+  --control-border: #7b7974;
+  --line-strong: #7b7974;
+  --decoration-low: #9c9a92;
+  --accent: #d97757;
+  --accent-strong: #b85f42;
+  --accent-soft: #f3e4de;
+  --accent-ink: #8a452f;
+  --action-bg: #121212;
+  --action-fg: #f8f8f6;
+  --success: #37624a;
+  --success-soft: #e7eee9;
+  --warning: #8a452f;
+  --warning-soft: #f3e4de;
+  --danger: #8d382e;
+  --danger-soft: #f4e7e4;
+  --focus: #121212;
+  --diff-add: #e4eee7;
+  --diff-remove: #f3e5e2;
+  --shadow-raised: 0 4px 20px rgb(0 0 0 / 4%);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -67,63 +95,79 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --canvas: oklch(0.155 0.012 258);
-  --canvas-subtle: oklch(0.18 0.014 258);
-  --surface: oklch(0.205 0.016 258);
-  --surface-raised: oklch(0.235 0.018 258);
-  --surface-muted: oklch(0.265 0.018 258);
-  --surface-code: oklch(0.125 0.012 258);
-  --ink: oklch(0.945 0.008 255);
-  --ink-secondary: oklch(0.79 0.014 255);
-  --ink-muted: oklch(0.67 0.016 255);
-  --ink-inverse: oklch(0.16 0.014 258);
-  --line: oklch(0.32 0.02 258);
-  --line-strong: oklch(0.43 0.025 258);
-  --accent: oklch(0.72 0.15 252);
-  --accent-strong: oklch(0.78 0.13 252);
-  --accent-soft: oklch(0.27 0.07 255);
-  --accent-ink: oklch(0.86 0.08 252);
-  --success: oklch(0.72 0.12 153);
-  --success-soft: oklch(0.25 0.045 153);
-  --warning: oklch(0.76 0.12 80);
-  --warning-soft: oklch(0.27 0.045 80);
-  --danger: oklch(0.72 0.14 25);
-  --danger-soft: oklch(0.27 0.06 25);
-  --focus: oklch(0.78 0.14 252);
-  --diff-add: oklch(0.24 0.04 153);
-  --diff-remove: oklch(0.25 0.05 25);
-  --shadow-raised: 0 1px 2px oklch(0 0 0 / 0.25), 0 14px 40px oklch(0 0 0 / 0.2);
+  --canvas: #181715;
+  --canvas-subtle: #1f1e1b;
+  --surface: #24221f;
+  --surface-raised: #2b2925;
+  --surface-muted: #302e2a;
+  --surface-code: #0f0f0e;
+  --ink: #f4f1eb;
+  --ink-secondary: #d8d3ca;
+  --ink-muted: #b5afa5;
+  --ink-tertiary-safe: #9f998f;
+  --ink-disabled: #9f998f;
+  --placeholder: #9f998f;
+  --ink-inverse: #181715;
+  --line: #3b3934;
+  --line-hairline: #4a4741;
+  --control-border: #807a70;
+  --line-strong: #807a70;
+  --decoration-low: #777168;
+  --accent: #d97757;
+  --accent-strong: #e18b6c;
+  --accent-soft: #3a2720;
+  --accent-ink: #f0b19a;
+  --action-bg: #f4f1eb;
+  --action-fg: #181715;
+  --success: #8fc4a4;
+  --success-soft: #203129;
+  --warning: #f0b19a;
+  --warning-soft: #3a2720;
+  --danger: #ee9b91;
+  --danger-soft: #3a2522;
+  --focus: #f4f1eb;
+  --diff-add: #203129;
+  --diff-remove: #3a2522;
+  --shadow-raised: 0 4px 20px rgb(0 0 0 / 24%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root[data-theme='system'] {
     color-scheme: dark;
-    --canvas: oklch(0.155 0.012 258);
-    --canvas-subtle: oklch(0.18 0.014 258);
-    --surface: oklch(0.205 0.016 258);
-    --surface-raised: oklch(0.235 0.018 258);
-    --surface-muted: oklch(0.265 0.018 258);
-    --surface-code: oklch(0.125 0.012 258);
-    --ink: oklch(0.945 0.008 255);
-    --ink-secondary: oklch(0.79 0.014 255);
-    --ink-muted: oklch(0.67 0.016 255);
-    --ink-inverse: oklch(0.16 0.014 258);
-    --line: oklch(0.32 0.02 258);
-    --line-strong: oklch(0.43 0.025 258);
-    --accent: oklch(0.72 0.15 252);
-    --accent-strong: oklch(0.78 0.13 252);
-    --accent-soft: oklch(0.27 0.07 255);
-    --accent-ink: oklch(0.86 0.08 252);
-    --success: oklch(0.72 0.12 153);
-    --success-soft: oklch(0.25 0.045 153);
-    --warning: oklch(0.76 0.12 80);
-    --warning-soft: oklch(0.27 0.045 80);
-    --danger: oklch(0.72 0.14 25);
-    --danger-soft: oklch(0.27 0.06 25);
-    --focus: oklch(0.78 0.14 252);
-    --diff-add: oklch(0.24 0.04 153);
-    --diff-remove: oklch(0.25 0.05 25);
-    --shadow-raised: 0 1px 2px oklch(0 0 0 / 0.25), 0 14px 40px oklch(0 0 0 / 0.2);
+    --canvas: #181715;
+    --canvas-subtle: #1f1e1b;
+    --surface: #24221f;
+    --surface-raised: #2b2925;
+    --surface-muted: #302e2a;
+    --surface-code: #0f0f0e;
+    --ink: #f4f1eb;
+    --ink-secondary: #d8d3ca;
+    --ink-muted: #b5afa5;
+    --ink-tertiary-safe: #9f998f;
+    --ink-disabled: #9f998f;
+    --placeholder: #9f998f;
+    --ink-inverse: #181715;
+    --line: #3b3934;
+    --line-hairline: #4a4741;
+    --control-border: #807a70;
+    --line-strong: #807a70;
+    --decoration-low: #777168;
+    --accent: #d97757;
+    --accent-strong: #e18b6c;
+    --accent-soft: #3a2720;
+    --accent-ink: #f0b19a;
+    --action-bg: #f4f1eb;
+    --action-fg: #181715;
+    --success: #8fc4a4;
+    --success-soft: #203129;
+    --warning: #f0b19a;
+    --warning-soft: #3a2720;
+    --danger: #ee9b91;
+    --danger-soft: #3a2522;
+    --focus: #f4f1eb;
+    --diff-add: #203129;
+    --diff-remove: #3a2522;
+    --shadow-raised: 0 4px 20px rgb(0 0 0 / 24%);
   }
 }
 
@@ -146,7 +190,7 @@ body,
 
 body {
   overflow-x: hidden;
-  background: linear-gradient(180deg, var(--canvas-subtle) 0, var(--canvas) 19rem), var(--canvas);
+  background: var(--canvas);
 }
 
 button,
@@ -1226,86 +1270,437 @@ button[data-pressed]:not([data-disabled]) {
 .transcript-frame {
   position: relative;
   margin-top: var(--space-6);
-  padding-inline-start: clamp(1.4rem, 4vw, 2.4rem);
 }
 
-.prompt-composer {
+/* ── Composer: one bottom-anchored input island (Claude-style). ─────────
+   The card position, left "+" and text baseline stay fixed; only the
+   right-hand primary action changes across send / steer / stop / sending. */
+.composer-region {
   position: sticky;
   z-index: 5;
-  bottom: max(var(--space-3), env(safe-area-inset-bottom));
+  bottom: 0;
   display: grid;
   gap: var(--space-2);
   margin-top: var(--space-4);
-  padding: var(--space-3);
+  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--canvas) 66%, transparent);
+}
+
+.composer-disclaimer {
+  margin: 0;
+  padding-inline: var(--space-2);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.composer-tray {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
   border: 1px solid var(--line-strong);
-  border-radius: var(--radius-lg);
-  background: color-mix(in oklch, var(--surface-raised) 94%, transparent);
-  box-shadow: var(--shadow-raised);
-  backdrop-filter: blur(16px);
-}
-
-.prompt-composer > label {
-  color: var(--accent-ink);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.prompt-composer textarea {
-  width: 100%;
-  min-height: 4.8rem;
-  resize: vertical;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border-radius: 1.75rem;
   background: var(--surface);
+  box-shadow: var(--shadow-raised);
+}
+
+.composer-input {
+  width: 100%;
+  min-height: 1.75rem;
+  max-height: 140px;
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
   line-height: 1.5;
+  resize: none;
 }
 
-.prompt-composer textarea:disabled {
+.composer-input:focus {
+  outline: none;
+}
+
+.composer-input:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
-.prompt-composer-footer {
+.composer-input::placeholder {
+  color: var(--ink-muted);
+}
+
+.composer-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
-.prompt-composer-footer span {
-  color: var(--ink-muted);
-  font-size: 0.68rem;
+.composer-left,
+.composer-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-.prompt-composer-footer button {
-  min-width: 5.5rem;
-  min-height: 2.75rem;
-  padding-inline: var(--space-4);
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--accent);
-  color: white;
-  font-weight: 700;
+.composer-plus {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-secondary);
   cursor: pointer;
 }
 
-.prompt-composer-footer button[data-disabled] {
-  cursor: not-allowed;
-  opacity: 0.45;
+.composer-plus[data-hovered],
+.composer-plus[data-pressed] {
+  background: var(--surface-muted);
 }
 
+.composer-plus[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.composer-primary {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background var(--duration-state, 120ms) var(--ease-out, ease),
+    opacity var(--duration-state, 120ms) var(--ease-out, ease);
+}
+
+.composer-primary.is-send {
+  background: var(--accent);
+  color: #fff;
+}
+
+.composer-primary.is-send[data-hovered] {
+  background: var(--accent-strong);
+}
+
+.composer-primary.is-stop {
+  background: var(--action-bg);
+  color: var(--action-fg);
+}
+
+.composer-primary[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.composer-primary[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.composer-later {
+  min-height: 2.25rem;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-secondary);
+  font-size: 0.85rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.composer-later[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.composer-plan-chip {
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.composer-spinner {
+  animation: composer-spin 0.8s linear infinite;
+}
+
+@keyframes composer-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .composer-spinner {
+    animation: none;
+  }
+}
+
+/* Tools popover: model, effort, Build/Plan, and commands — one tap from "+". */
+.composer-tools {
+  display: grid;
+  gap: var(--space-3);
+  width: min(88vw, 20rem);
+  padding: var(--space-4);
+  outline: none;
+}
+
+.tools-group {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.tools-label {
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+  font-weight: 680;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tools-status {
+  min-height: 1rem;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+}
+
+/* ── Session header (in-session): back · centered model · overflow ─────── */
+.session-header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: 2.75rem 1fr 2.75rem;
+  align-items: center;
+  gap: var(--space-2);
+  padding: max(var(--space-2), env(safe-area-inset-top)) var(--page-gutter) var(--space-2);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklch, var(--canvas) 90%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.session-header-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-secondary);
+  cursor: pointer;
+}
+
+.session-header-icon:last-child {
+  justify-self: end;
+}
+
+.session-header-icon[data-hovered] {
+  background: var(--surface-muted);
+}
+
+.session-header-icon[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.session-model-trigger {
+  display: inline-flex;
+  justify-self: center;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.4rem 0.85rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 620;
+  cursor: pointer;
+}
+
+.session-model-trigger[data-hovered] {
+  background: var(--surface-muted);
+}
+
+.session-model-trigger[data-disabled] {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.session-model-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-statusline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-block: var(--space-2) var(--space-1);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.session-status-label {
+  font-weight: 600;
+}
+
+.agent-dot {
+  display: inline-grid;
+  place-items: center;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--ink-muted);
+}
+
+.agent-dot.agent-running {
+  color: var(--accent);
+}
+
+/* Popover sheets + every react-aria dropdown (Select / ComboBox / Dialog). */
+.session-sheet-popover,
+.composer-tools-popover {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-raised);
+}
+
+.react-aria-Popover {
+  max-width: 88vw;
+  padding: var(--space-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-raised);
+}
+
+.react-aria-ListBox {
+  display: grid;
+  gap: 2px;
+  max-height: 50vh;
+  overflow: auto;
+  outline: none;
+}
+
+.react-aria-ListBoxItem {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.react-aria-ListBoxItem[data-focused],
+.react-aria-ListBoxItem[data-hovered] {
+  background: var(--surface-muted);
+}
+
+.react-aria-ListBoxItem[data-selected] {
+  color: var(--accent-ink);
+  font-weight: 640;
+}
+
+.tools-select > button {
+  display: flex;
+  width: 100%;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.overflow-nav {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.overflow-item {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.overflow-item[data-hovered] {
+  background: var(--surface-muted);
+}
+
+/* Timeline rail line removed (§6). */
 .transcript-frame::before {
+  content: none;
+}
+
+/* Reader-controlled live edge: a pill to jump to the newest blocks when scrolled up. */
+/* Scroll-to-latest: a soft circular chevron above the composer, with an optional count. */
+.scroll-to-latest {
   position: absolute;
-  z-index: 0;
-  top: 0.7rem;
-  bottom: 0.7rem;
-  left: 0.48rem;
-  width: 1px;
-  background: linear-gradient(180deg, var(--accent), var(--line) 20%, var(--line) 85%, transparent);
-  content: '';
+  bottom: var(--space-4);
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  transform: translateX(-50%);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  color: var(--ink-secondary);
+  box-shadow: var(--shadow-raised);
+  cursor: pointer;
+}
+
+.scroll-to-latest:hover {
+  background: var(--surface-muted);
+}
+
+.scroll-badge {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  display: grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding-inline: 0.3rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .transcript-scroll {
@@ -1321,7 +1716,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 .virtual-row,
-.working-indicator {
+.streaming-marker {
   position: absolute;
   top: 0;
   left: 0;
@@ -1329,23 +1724,17 @@ button[data-pressed]:not([data-disabled]) {
   padding-bottom: var(--space-3);
 }
 
+/* Timeline rail removed — conversation hierarchy comes from turn boundaries,
+   compact user bubbles, and borderless assistant prose. */
 .virtual-row::before {
-  position: absolute;
-  top: 1rem;
-  left: calc(-1 * clamp(1.4rem, 4vw, 2.4rem) + 0.22rem);
-  width: 0.55rem;
-  height: 0.55rem;
-  border: 2px solid var(--canvas);
-  border-radius: 50%;
-  background: var(--line-strong);
-  box-shadow: 0 0 0 1px var(--line-strong);
-  content: '';
+  content: none;
 }
 
-.virtual-row:has(.block-text)::before,
-.virtual-row:has(.block-plan)::before {
-  background: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
+/* A conversational turn boundary: hairline + breathing room before each new prompt. */
+.virtual-row.turn-start {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
 }
 
 .transcript-block {
@@ -1402,34 +1791,114 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1rem;
 }
 
+/* User prompts read as compact, trailing-aligned bubbles; assistant replies are prose. */
+.transcript-block.block-role-user {
+  width: fit-content;
+  max-width: min(82%, 46ch);
+  margin-inline-start: auto;
+  border-color: var(--line);
+  border-radius: 1.15rem;
+  background: var(--surface-muted);
+}
+
+.block-role-user .block-copy {
+  padding: var(--space-2) var(--space-4);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.transcript-block.block-role-assistant {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.block-role-assistant > header {
+  padding-inline: 0;
+  border-bottom: none;
+}
+
+/* Assistant answers read as editorial serif prose — the biggest Claude-quality signal. */
+.block-role-assistant .block-copy {
+  max-width: var(--reading-width);
+  padding: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.62;
+}
+
+.block-role-assistant {
+  padding-block: var(--space-2);
+}
+
+/* Under-answer action row — quiet monochrome, like the Claude app. */
+.turn-actions {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.turn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  padding: 0.3rem 0.6rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.turn-action:hover {
+  background: var(--surface-muted);
+  color: var(--ink-secondary);
+}
+
+.turn-action:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 .quiet-copy {
   padding-top: 0;
   color: var(--ink-muted);
   font-size: 0.9rem;
 }
 
-.thinking-trigger {
-  display: flex;
-  width: 100%;
-  min-height: 2.75rem;
+/* Routine evidence: a quiet, self-describing disclosure that sits calmly beside prose. */
+.evidence-trigger {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
+  gap: var(--space-2);
+  min-height: 2.25rem;
+  padding: var(--space-1) var(--space-2);
   border: 0;
   background: transparent;
-  color: var(--ink-secondary);
-  font-size: 0.78rem;
-  font-weight: 650;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.thinking-trigger span {
+.evidence-trigger[data-hovered] .evidence-summary {
+  color: var(--ink-secondary);
+}
+
+.evidence-chevron {
+  display: inline-block;
   font-size: 1rem;
+  line-height: 1;
   transition: transform var(--duration-state) var(--ease-out);
 }
 
-.thinking-trigger[data-expanded] span {
-  transform: rotate(45deg);
+.evidence-trigger[data-expanded] .evidence-chevron {
+  transform: rotate(90deg);
 }
 
 .plan-list {
@@ -1532,53 +2001,70 @@ button[data-pressed]:not([data-disabled]) {
   font-variant-numeric: tabular-nums;
 }
 
-.working-indicator {
+/* Inline streaming marker: a small pulsing cue attached under the active answer. */
+.streaming-marker {
   display: flex;
-  min-height: 4rem;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  color: var(--accent-ink);
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
 }
 
-.working-glyph {
-  display: flex;
-  width: 2.25rem;
-  height: 2.25rem;
+.streaming-glyph {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.18rem;
-  border-radius: 50%;
-  background: var(--accent-soft);
+  gap: 0.22rem;
+  color: var(--accent);
 }
 
-.working-glyph i {
-  width: 0.22rem;
-  height: 0.22rem;
+.streaming-glyph i {
+  width: 0.3rem;
+  height: 0.3rem;
   border-radius: 50%;
   background: currentColor;
   animation: working-wave 1.1s ease-in-out infinite;
 }
 
-.working-glyph i:nth-child(2) {
+.streaming-glyph i:nth-child(2) {
   animation-delay: 120ms;
 }
-.working-glyph i:nth-child(3) {
+
+.streaming-glyph i:nth-child(3) {
   animation-delay: 240ms;
 }
 
-.working-indicator > span:last-child {
-  display: grid;
-  gap: 0.15rem;
-}
-
-.working-indicator strong {
-  font-size: 0.76rem;
-}
-
-.working-indicator small {
+.streaming-label {
   color: var(--ink-muted);
-  font-size: 0.68rem;
+  font-size: 0.85rem;
+  font-weight: 550;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streaming-glyph i {
+    animation: none;
+  }
+}
+
+/* Grouped evidence: one quiet Activity disclosure; bare children stack without card chrome. */
+.activity-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.activity-stack {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+.transcript-block.block-bare {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.block-bare > header {
+  padding-inline: 0;
 }
 
 @keyframes signal-pulse {
@@ -1730,15 +2216,6 @@ button[data-pressed]:not([data-disabled]) {
 
   .session-title {
     gap: var(--space-6);
-  }
-
-  .prompt-composer-footer {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .prompt-composer-footer button {
-    width: 100%;
   }
 
   .agent-state {

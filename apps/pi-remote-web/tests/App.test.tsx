@@ -138,8 +138,11 @@ it('renders every projected transcript block kind', () => {
 
   render(<TranscriptList blocks={projected.blocks} running={false} />);
 
+  // Assistant text implies its role by placement + serif typography — it no longer carries a
+  // "Assistant" header label. Routine evidence (thinking, tool calls/results, usage) groups
+  // under an Activity disclosure whose bare children keep their own labels, so a label may
+  // appear both as the group summary and an inner header — assert each renders at least once.
   for (const label of [
-    'Assistant',
     'Thinking summary',
     'Plan / todo',
     'Tool call · read',
@@ -147,7 +150,7 @@ it('renders every projected transcript block kind', () => {
     'File diff',
     'Usage',
   ]) {
-    expect(screen.getByText(label)).toBeInTheDocument();
+    expect(screen.getAllByText(label).length).toBeGreaterThanOrEqual(1);
   }
   expect(screen.getByText('Projected answer')).toBeInTheDocument();
   expect(screen.getByText('Projected step')).toBeInTheDocument();
@@ -189,14 +192,15 @@ it('submits the compose box through the relay command path', async () => {
     />,
   );
 
-  await user.type(screen.getByLabelText('Steer Pi'), 'Steer safely');
-  await user.click(screen.getByRole('button', { name: 'Send' }));
+  await user.type(screen.getByLabelText('Message Pi'), 'Steer safely');
+  await user.click(screen.getByRole('button', { name: 'Send message' }));
 
   await waitFor(() => expect(relay.submitPrompt).toHaveBeenCalledOnce());
   expect(relay.submitPrompt).toHaveBeenCalledWith(
     sessionId,
     expect.stringMatching(/^prompt_/u),
     'Steer safely',
+    undefined,
   );
   expect(fetchMock).toHaveBeenNthCalledWith(
     1,

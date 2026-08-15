@@ -20,7 +20,11 @@ describe('executable rollback drill', () => {
       relaySessionsPreserved: 1,
       indeterminateRowsPreserved: 1,
       nativeSessionSentinelPreserved: true,
+      fullAccessRelaunchNeedsMigration: false,
     });
     expect(report.drainedApprovalRows).toBeGreaterThanOrEqual(1);
+    // The full-access rollback path relaunches the verified desktop-parity vector and
+    // never depends on a schema migration to restore runtime state.
+    expect(report.fullAccessRelaunchArgs).toEqual(['--mode', 'rpc', '--no-session', '--approve']);
   });
 });

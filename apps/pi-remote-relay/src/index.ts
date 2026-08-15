@@ -10,11 +10,13 @@ import type { Envelope, JsonValue, PiRpcEvent } from '@pi-remote/pi-rpc-protocol
 
 import { startReadOnlyServer } from './http/server.js';
 import { ApprovalService } from './approval/approval-service.js';
+import { CommandService } from './commands/command-service.js';
 import { MutationPolicy } from './policy/mutation-policy.js';
 import { PushService, createAttentionPayload } from './push/push-service.js';
 import { PromptService } from './prompt/prompt-service.js';
 import { SyncHub } from './replay/sync.js';
 import { RpcSupervisor } from './rpc/supervisor.js';
+import { RuntimeService } from './runtime/runtime-service.js';
 import { SessionCatalog } from './sessions/catalog.js';
 import { RelayStore } from './store/relay-store.js';
 import { TranscriptProjector } from './store/transcript-projector.js';
@@ -99,6 +101,8 @@ export async function runRelay(): Promise<() => Promise<void>> {
     sessionId: SESSION_ID,
     epoch,
   });
+  const runtime = new RuntimeService(supervisor, { sessionId: SESSION_ID });
+  const commands = new CommandService(supervisor, { sessionId: SESSION_ID });
   supervisor.onEvent((event) => {
     publishPiEvent(store, syncHub, transcriptProjector, event, epoch);
     if (event.type === 'agent_start') {
@@ -129,6 +133,8 @@ export async function runRelay(): Promise<() => Promise<void>> {
         }
       : {}),
     prompts,
+    runtime,
+    commands,
     ...(push === undefined ? {} : { push }),
     port: relayPort,
   });
@@ -143,6 +149,9 @@ export async function runRelay(): Promise<() => Promise<void>> {
     process.stdout.write(`${JSON.stringify(server.auth.enrollment.createChallenge())}\n`);
   }
   await supervisor.start();
+  // Read authoritative runtime state once the child is live. In fixture or offline mode
+  // this stays not-live and the runtime endpoints report unavailable rather than guessing.
+  void runtime.hydrate().catch(() => undefined);
 
   return async () => {
     await supervisor.stop();

@@ -17,7 +17,8 @@ trigger_phrases:
 
 Current state:
 
-- Default child args are `--mode rpc --no-session --no-tools --no-extensions`
+- Default child args are `--mode rpc --no-session --no-tools --no-extensions` (the fail-closed steering-only posture)
+- An allowlisted mutation family instead launches via `mutationPiArguments` with the approval extension; the operator-only full-access posture (`PI_REMOTE_FULL_ACCESS=1`) launches `--mode rpc --no-session --approve` with every built-in tool and no approval extension. Only the host selects full access; the phone can never enable it
 - Commands are written one JSON object per line through a serialized write chain
 - stderr is counted as bytes, never parsed as protocol input
 - A missing binary (ENOENT) or `fixtureOnly` mode replays `fixtures/pi-rpc.jsonl`

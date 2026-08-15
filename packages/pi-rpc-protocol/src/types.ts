@@ -32,6 +32,8 @@ export interface PromptSubmitCommand {
   readonly sessionId: string;
   readonly message: string;
   readonly ticket: string;
+  /** Absent for an idle send; 'steer' interrupts, 'followUp' queues behind the turn. */
+  readonly streamingBehavior?: 'steer' | 'followUp';
 }
 
 export interface SteerCommand extends PiRpcCommandBase {
@@ -66,7 +68,10 @@ export type PiRpcCommand =
   | FollowUpCommand
   | AbortCommand
   | ReadStateCommand
-  | GetEntriesCommand;
+  | GetEntriesCommand
+  | RuntimeReadCommand
+  | SetModelCommand
+  | SetThinkingLevelCommand;
 
 export interface PiRpcResponse extends JsonObject {
   readonly id?: string;
@@ -427,4 +432,98 @@ export interface PushSubscriptionInput {
   readonly endpoint: string;
   readonly expirationTime: number | null;
   readonly keys: PushSubscriptionKeys;
+}
+
+// ── Runtime control (model, thinking level, plan mode) ────────────────────────
+
+export interface RuntimeReadCommand extends PiRpcCommandBase {
+  readonly type: 'get_available_models' | 'get_available_thinking_levels' | 'get_commands';
+}
+
+export interface SetModelCommand extends PiRpcCommandBase {
+  readonly type: 'set_model';
+  readonly provider: string;
+  readonly modelId: string;
+}
+
+export interface SetThinkingLevelCommand extends PiRpcCommandBase {
+  readonly type: 'set_thinking_level';
+  readonly level: string;
+}
+
+export const RUNTIME_MODES = ['build', 'plan', 'executing-plan', 'unknown'] as const;
+export type RuntimeMode = (typeof RUNTIME_MODES)[number];
+
+export interface AvailableModelDto {
+  readonly provider: string;
+  readonly id: string;
+  readonly label: string;
+}
+
+export interface RuntimeStateDto {
+  readonly sessionId: string;
+  readonly revision: number;
+  readonly model: AvailableModelDto | null;
+  readonly thinkingLevel: string;
+  readonly availableThinkingLevels: readonly string[];
+  readonly mode: RuntimeMode;
+  readonly streaming: boolean;
+  readonly updatedAt: string;
+}
+
+export type RuntimeOperation =
+  | { readonly type: 'set_model'; readonly provider: string; readonly modelId: string }
+  | { readonly type: 'set_thinking_level'; readonly level: string }
+  | { readonly type: 'set_mode'; readonly mode: 'build' | 'plan' };
+
+export interface RuntimeControlCommand {
+  readonly type: 'runtime.control';
+  readonly controlId: string;
+  readonly sessionId: string;
+  readonly expectedRevision: number;
+  readonly operation: RuntimeOperation;
+  readonly ticket: string;
+}
+
+export interface RuntimeModelCatalogDto {
+  readonly sessionId: string;
+  readonly runtimeRevision: number;
+  readonly models: readonly AvailableModelDto[];
+}
+
+export type CommandSource = 'extension' | 'prompt' | 'skill';
+
+export interface CommandDescriptorDto {
+  readonly name: string;
+  readonly description: string | null;
+  readonly source: CommandSource;
+  readonly enabled: boolean;
+  readonly disabledReason: string | null;
+  readonly requiresConfirmation: boolean;
+}
+
+export interface CommandCatalogDto {
+  readonly sessionId: string;
+  readonly revision: number;
+  readonly commands: readonly CommandDescriptorDto[];
+}
+
+export type RuntimeControlOutcome =
+  | { readonly status: 'accepted'; readonly state: RuntimeStateDto }
+  | { readonly status: 'stale'; readonly state: RuntimeStateDto }
+  | { readonly status: 'unsupported'; readonly reason: string }
+  | { readonly status: 'unavailable'; readonly reason: string }
+  | { readonly status: 'delivery-unknown'; readonly reason: string };
+
+export interface RuntimeControlResponse {
+  readonly outcome: RuntimeControlOutcome;
+}
+
+export type PromptAbortOutcome =
+  | { readonly status: 'aborted' }
+  | { readonly status: 'unavailable'; readonly reason: string }
+  | { readonly status: 'delivery-unknown'; readonly reason: string };
+
+export interface PromptAbortResponse {
+  readonly outcome: PromptAbortOutcome;
 }

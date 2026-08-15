@@ -9,15 +9,16 @@
     "extensions/*"
   ],
   "scripts": {
-    "build": "npm run build -w @pi-remote/pi-rpc-protocol && npm run build -w @pi-remote/relay && npm run build -w @pi-remote/web && npm run build -w @pi-remote/approval-extension",
+    "build": "npm run build -w @pi-remote/pi-rpc-protocol && npm run build -w @pi-remote/relay && npm run build -w @pi-remote/web && npm run build -w @pi-remote/approval-extension && npm run build -w @pi-remote/plan-extension",
     "boot": "node scripts/boot.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "typecheck": "npm run typecheck -w @pi-remote/pi-rpc-protocol && npm run typecheck -w @pi-remote/relay && npm run typecheck -w @pi-remote/web && npm run typecheck -w @pi-remote/approval-extension",
-    "test": "vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests extensions/pi-remote-approval/tests tests",
+    "typecheck": "npm run typecheck -w @pi-remote/pi-rpc-protocol && npm run typecheck -w @pi-remote/relay && npm run typecheck -w @pi-remote/web && npm run typecheck -w @pi-remote/approval-extension && npm run typecheck -w @pi-remote/plan-extension",
+    "test": "vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests extensions/pi-remote-approval/tests extensions/pi-remote-plan/tests tests",
     "test:web": "vitest run --config vitest.web.config.ts",
     "rollback:drill": "npm run build -w @pi-remote/relay && node scripts/rollback-drill.mjs",
+    "verify:runtime-boundary": "npm run build -w @pi-remote/relay && node scripts/verify-full-access-runtime.mjs",
     "release:thresholds": "node scripts/check-thresholds.mjs",
     "release:rollout": "node scripts/check-rollout.mjs",
     "release:verify": "node scripts/release-verify.mjs"

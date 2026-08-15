@@ -1,0 +1,1485 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Pi Remote Web Application Shell
+// ───────────────────────────────────────────────────────────────────
+
+import { useVirtualizer } from '@tanstack/react-virtual';
+import {
+  isOpaqueId,
+  type ApprovalCardDto,
+  type AttentionItemDto,
+  type PushPreferences,
+  type SessionCardDto,
+  type SyncMessage,
+} from '@pi-remote/pi-rpc-protocol';
+import { useEffect, useReducer, useRef, useState, type Dispatch, type ReactNode } from 'react';
+import {
+  Button,
+  Disclosure,
+  DisclosurePanel,
+  Heading,
+  Switch,
+  ToggleButton,
+} from 'react-aria-components';
+
+import { loadCache, saveCache, type ReadOnlyCache } from './cache.js';
+import {
+  enrollDevice,
+  establishSession,
+  revokeDevice,
+  logoutDevice,
+  scanQrImage,
+  type DeviceIdentity,
+} from './auth.js';
+import {
+  fetchAttention,
+  fetchPushConfig,
+  openAttentionHint,
+  subscribeToPush,
+  setPushForeground,
+  unsubscribeFromPush,
+  updatePushPreferences,
+  type PushConfig,
+} from './attention.js';
+import {
+  createAcceptEditsGrant,
+  decideApproval,
+  fetchApprovals,
+  fetchSessions,
+  fetchTranscript,
+  openSyncSocket,
+  submitPrompt,
+} from './relay.js';
+import {
+  EMPTY_TRANSCRIPT,
+  connectionReducer,
+  sessionListReducer,
+  transcriptReducer,
+  type ConnectionAction,
+  type ConnectionPhase,
+  type DisplayTranscriptBlock,
+  type SessionListState,
+  type TranscriptState,
+} from './state.js';
+
+const initialCache = loadCache();
+type ThemePreference = 'system' | 'light' | 'dark';
+
+export function App() {
+  const [device, setDevice] = useState<DeviceIdentity | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [authAttempt, setAuthAttempt] = useState(0);
+  const [selectedSessionId, setSelectedSessionId] = useState(readSessionIdFromLocation);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewFocusId, setReviewFocusId] = useState<string | null>(null);
+  const [inboxOpen, setInboxOpen] = useState(readAttentionIdFromLocation() !== null);
+  const [theme, setTheme] = useState<ThemePreference>(readThemePreference);
+  const [connection, dispatchConnection] = useReducer(connectionReducer, {
+    phase: navigator.onLine ? 'authenticating' : 'offline',
+    changedAt: new Date().toISOString(),
+    lastMessageAt: null,
+    detail: null,
+  });
+  const [sessions, dispatchSessions] = useReducer(sessionListReducer, {
+    items: initialCache?.sessions ?? [],
+    phase: initialCache === null ? 'idle' : 'ready',
+    source: initialCache === null ? 'none' : 'cache',
+    updatedAt: initialCache?.savedAt ?? null,
+    error: null,
+  });
+  const [transcript, dispatchTranscript] = useReducer(transcriptReducer, EMPTY_TRANSCRIPT);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const scheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const applyTheme = () => {
+      root.dataset.theme = theme;
+      const dark = theme === 'dark' || (theme === 'system' && scheme.matches);
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute('content', dark ? '#101319' : '#f4f5f7');
+    };
+    applyTheme();
+    try {
+      localStorage.setItem('pi-remote.theme', theme);
+    } catch {
+      // Theme selection still applies when persistent browser storage is unavailable.
+    }
+    scheme.addEventListener('change', applyTheme);
+    return () => scheme.removeEventListener('change', applyTheme);
+  }, [theme]);
+
+  useEffect(() => {
+    let stopped = false;
+    if (!navigator.onLine) return;
+    dispatchConnection({ type: 'authenticating' });
+    void establishSession()
+      .then((identity) => {
+        if (stopped) return;
+        setDevice(identity);
+        setAuthReady(identity !== null);
+        dispatchConnection(
+          identity === null ? { type: 'unenrolled' } : { type: 'connecting', reconnect: false },
+        );
+      })
+      .catch(() => {
+        if (stopped) return;
+        setAuthReady(false);
+        dispatchConnection({ type: 'error', detail: 'Device authentication failed.' });
+      });
+    return () => {
+      stopped = true;
+    };
+  }, [authAttempt]);
+
+  useEffect(() => {
+    const onPopState = () => setSelectedSessionId(readSessionIdFromLocation());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  useEffect(() => {
+    if (!authReady) return;
+    const lookupId = readAttentionIdFromLocation();
+    if (lookupId === null) return;
+    const controller = new AbortController();
+    void openAttentionHint(lookupId, controller.signal)
+      .then((resolution) => {
+        window.history.replaceState(
+          {},
+          '',
+          resolution.target === 'review'
+            ? `/?review=1&focus=${encodeURIComponent(lookupId)}`
+            : `/session/${encodeURIComponent(resolution.sessionId)}`,
+        );
+        if (resolution.target === 'review') {
+          setReviewFocusId(resolution.focusId);
+          setReviewOpen(true);
+          setInboxOpen(false);
+        } else {
+          setSelectedSessionId(resolution.sessionId);
+          setInboxOpen(false);
+        }
+      })
+      .catch(() => setInboxOpen(true));
+    return () => controller.abort();
+  }, [authReady]);
+
+  useEffect(() => {
+    if (!authReady) return;
+    const report = () => {
+      void setPushForeground(document.visibilityState === 'visible').catch(() => undefined);
+    };
+    report();
+    document.addEventListener('visibilitychange', report);
+    return () => {
+      document.removeEventListener('visibilitychange', report);
+      void setPushForeground(false).catch(() => undefined);
+    };
+  }, [authReady]);
+
+  useEffect(() => {
+    const onOnline = () => setAuthAttempt((current) => current + 1);
+    const onOffline = () => dispatchConnection({ type: 'offline' });
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    return () => {
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!authReady) return;
+    const controller = new AbortController();
+    dispatchSessions({ type: 'loading' });
+    void fetchSessions(controller.signal)
+      .then((items) => {
+        const at = new Date().toISOString();
+        dispatchSessions({ type: 'loaded', items, at });
+        if (selectedSessionId === null) dispatchConnection({ type: 'live', at });
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        dispatchSessions({ type: 'error', error: messageFrom(error) });
+        dispatchConnection({
+          type: navigator.onLine ? 'error' : 'offline',
+          ...(navigator.onLine ? { detail: 'Relay unavailable.' } : {}),
+        } as ConnectionAction);
+      });
+    return () => controller.abort();
+  }, [authReady, selectedSessionId]);
+
+  useEffect(() => {
+    if (sessions.source === 'relay') saveCache(sessions.items, transcript);
+  }, [sessions, transcript]);
+
+  function navigate(sessionId: string | null) {
+    const nextPath = sessionId === null ? '/' : `/session/${encodeURIComponent(sessionId)}`;
+    window.history.pushState({}, '', nextPath);
+    setSelectedSessionId(sessionId);
+  }
+
+  return (
+    <div className="app-shell">
+      <Header
+        connection={connection.phase}
+        onHome={() => {
+          setReviewOpen(false);
+          navigate(null);
+        }}
+        onReview={() => setReviewOpen(true)}
+        onInbox={() => {
+          setReviewOpen(false);
+          setInboxOpen(true);
+        }}
+        reviewAvailable={authReady}
+        theme={theme}
+        onThemeChange={setTheme}
+      />
+      {!authReady ? (
+        <Enrollment
+          phase={connection.phase}
+          onEnrolled={(identity) => {
+            setDevice(identity);
+            setAuthReady(true);
+            dispatchConnection({ type: 'connecting', reconnect: false });
+          }}
+        />
+      ) : reviewOpen ? (
+        <Review
+          focusId={reviewFocusId}
+          onBack={() => setReviewOpen(false)}
+          sessions={sessions.items}
+        />
+      ) : inboxOpen ? (
+        <AttentionInbox
+          onBack={() => setInboxOpen(false)}
+          onOpen={(resolution) => {
+            setInboxOpen(false);
+            if (resolution.target === 'review') {
+              setReviewFocusId(resolution.focusId);
+              setReviewOpen(true);
+            } else navigate(resolution.sessionId);
+          }}
+        />
+      ) : selectedSessionId === null ? (
+        <Home
+          cache={initialCache}
+          connection={connection.phase}
+          sessions={sessions}
+          onSelect={(sessionId) => navigate(sessionId)}
+          device={device}
+          onRevoke={() => {
+            void revokeDevice().finally(() => {
+              setAuthReady(false);
+              setDevice(null);
+              dispatchConnection({ type: 'unenrolled' });
+            });
+          }}
+          onLogout={() => {
+            void unsubscribeFromPush()
+              .catch(() => undefined)
+              .then(logoutDevice)
+              .finally(() => {
+                setAuthReady(false);
+                dispatchConnection({ type: 'authenticating' });
+                setAuthAttempt((current) => current + 1);
+              });
+          }}
+        />
+      ) : (
+        <Session
+          connection={connection.phase}
+          sessionId={selectedSessionId}
+          initialCache={initialCache}
+          transcript={transcript}
+          dispatchConnection={dispatchConnection}
+          dispatchTranscript={dispatchTranscript}
+          status={
+            sessions.items.find((session) => session.id === selectedSessionId)?.status ?? 'unknown'
+          }
+          onBack={() => navigate(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function Enrollment({
+  phase,
+  onEnrolled,
+}: {
+  readonly phase: ConnectionPhase;
+  readonly onEnrolled: (device: DeviceIdentity) => void;
+}) {
+  const [qrData, setQrData] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const submit = () => {
+    setBusy(true);
+    setError(null);
+    void enrollDevice(qrData.trim())
+      .then(async (identity) => {
+        const authenticated = await establishSession();
+        if (authenticated === null) throw new Error('Enrollment did not produce a device session.');
+        onEnrolled(identity);
+      })
+      .catch((cause: unknown) => {
+        setError(messageFrom(cause));
+      })
+      .finally(() => setBusy(false));
+  };
+
+  return (
+    <main className="enrollment-view">
+      <section className="enrollment-card">
+        <div className="surface-symbol" aria-hidden="true">
+          π
+        </div>
+        <p className="surface-kicker">Private device enrollment</p>
+        <h1>Bind this phone once</h1>
+        <p>
+          Scan or paste the relay's short-lived QR data. This device creates its own key and starts
+          in read-only mode.
+        </p>
+        <label htmlFor="qr-data">Enrollment data</label>
+        <textarea
+          id="qr-data"
+          value={qrData}
+          onChange={(event) => setQrData(event.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+          placeholder="Paste QR data"
+        />
+        <div className="enrollment-actions">
+          <label className="scan-button">
+            Scan image
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file === undefined) return;
+                void scanQrImage(file)
+                  .then(setQrData)
+                  .catch((cause: unknown) => {
+                    setError(messageFrom(cause));
+                  });
+              }}
+            />
+          </label>
+          <Button onPress={submit} isDisabled={busy || qrData.trim().length === 0}>
+            {busy ? 'Binding device' : 'Enroll device'}
+          </Button>
+        </div>
+        {error !== null && <div className="inline-alert">{error}</div>}
+        {phase === 'authenticating' && <div className="barrier-note">Checking this device</div>}
+      </section>
+    </main>
+  );
+}
+
+function Header({
+  connection,
+  onHome,
+  onReview,
+  onInbox,
+  reviewAvailable,
+  theme,
+  onThemeChange,
+}: {
+  readonly connection: ConnectionPhase;
+  readonly onHome: () => void;
+  readonly onReview: () => void;
+  readonly onInbox: () => void;
+  readonly reviewAvailable: boolean;
+  readonly theme: ThemePreference;
+  readonly onThemeChange: (theme: ThemePreference) => void;
+}) {
+  return (
+    <header className="topbar">
+      <Button className="wordmark" onPress={onHome} aria-label="Pi Remote home">
+        <span className="pi-mark" aria-hidden="true">
+          π
+        </span>
+        <span className="wordmark-copy">
+          <strong>Pi Remote</strong>
+          <small>Private relay</small>
+        </span>
+      </Button>
+      <div className="topbar-actions">
+        {reviewAvailable && (
+          <Button className="nav-button" onPress={onInbox}>
+            Inbox
+          </Button>
+        )}
+        {reviewAvailable && (
+          <Button className="nav-button" onPress={onReview}>
+            Review
+          </Button>
+        )}
+        <ThemeControl value={theme} onChange={onThemeChange} />
+        <StatusPill phase={connection} />
+      </div>
+    </header>
+  );
+}
+
+function ThemeControl({
+  value,
+  onChange,
+}: {
+  readonly value: ThemePreference;
+  readonly onChange: (value: ThemePreference) => void;
+}) {
+  return (
+    <div className="theme-control" role="group" aria-label="Color theme">
+      {(['system', 'light', 'dark'] as const).map((theme) => (
+        <ToggleButton
+          key={theme}
+          className="theme-option"
+          isSelected={value === theme}
+          onChange={(selected) => {
+            if (selected) onChange(theme);
+          }}
+          aria-label={`Use ${theme} theme`}
+        >
+          {theme === 'system' ? 'Auto' : theme === 'light' ? 'Light' : 'Dark'}
+        </ToggleButton>
+      ))}
+    </div>
+  );
+}
+
+export function Review({
+  sessions,
+  onBack,
+  focusId,
+}: {
+  readonly sessions: readonly { readonly id: string }[];
+  readonly onBack: () => void;
+  readonly focusId: string | null;
+}) {
+  const [approvals, setApprovals] = useState<readonly ApprovalCardDto[]>([]);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [grant, setGrant] = useState<{
+    readonly remainingActions: number;
+    readonly expiresAt: string;
+  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadApprovals(sessions, controller.signal)
+      .then(setApprovals)
+      .catch((cause: unknown) => {
+        if (!controller.signal.aborted) setError(messageFrom(cause));
+      });
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+      void loadApprovals(sessions)
+        .then(setApprovals)
+        .catch(() => undefined);
+    }, 1_000);
+    return () => {
+      controller.abort();
+      window.clearInterval(timer);
+    };
+  }, [sessions]);
+
+  useEffect(() => {
+    if (focusId !== null && approvals.some((approval) => approval.approvalId === focusId)) {
+      document.getElementById(`approval-${focusId}`)?.scrollIntoView({ block: 'center' });
+    }
+  }, [approvals, focusId]);
+
+  const decide = (approval: ApprovalCardDto, decision: 'approve' | 'deny') => {
+    setPendingId(approval.approvalId);
+    setError(null);
+    void decideApproval(approval, decision)
+      .then(() => loadApprovals(sessions).then(setApprovals))
+      .catch((cause: unknown) => setError(messageFrom(cause)))
+      .finally(() => setPendingId(null));
+  };
+
+  const pending = approvals.filter((approval) => approval.status === 'pending');
+  return (
+    <main className="review-view">
+      <div className="session-toolbar">
+        <Button className="back-button" onPress={onBack}>
+          Back to sessions
+        </Button>
+        <span className="review-count">{pending.length} awaiting</span>
+      </div>
+      <section className="review-heading">
+        <p className="surface-kicker">Exact-action review</p>
+        <h1>Decide with the full action in view</h1>
+        <p>
+          Each decision binds only the redacted tool input shown here. The host must still verify it
+          before execution.
+        </p>
+      </section>
+      {grant !== null && (
+        <div className="grant-banner">
+          Accept-edits grant active · {grant.remainingActions} actions remain · expires{' '}
+          {relativeTime(grant.expiresAt)}
+        </div>
+      )}
+      {error !== null && <div className="inline-alert">{error}</div>}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {pendingId === null ? '' : 'Decision submitted. Verifying at host.'}
+      </div>
+      <section className="approval-list">
+        {approvals.length === 0 ? (
+          <div className="empty-state">
+            <span className="empty-glyph" aria-hidden="true">
+              ✓
+            </span>
+            <h3>No approvals</h3>
+            <p>Protected actions appear here only after the host requests one.</p>
+          </div>
+        ) : (
+          approvals.map((approval) => {
+            const submitted = pendingId === approval.approvalId;
+            const expired = Date.parse(approval.expiresAt) <= now;
+            return (
+              <article
+                id={`approval-${approval.approvalId}`}
+                className={`approval-card approval-${approval.status}`}
+                key={approval.approvalId}
+              >
+                <header>
+                  <span>
+                    {approval.source === 'accept-edits' ? 'ACCEPT-EDITS LEASE' : 'PROTECTED ACTION'}
+                  </span>
+                  <time dateTime={approval.expiresAt}>
+                    {expired ? 'Expired' : countdown(approval.expiresAt, now)}
+                  </time>
+                </header>
+                <div className="approval-tool">
+                  <span>Tool</span>
+                  <strong>{approval.tool}</strong>
+                </div>
+                <div className="approval-arguments">
+                  <span>Relay-redacted canonical input</span>
+                  <pre>{approval.canonicalArguments}</pre>
+                </div>
+                <div className="approval-digest">
+                  Digest {approval.digest.slice(0, 12)} / {approval.digest.slice(-8)}
+                </div>
+                {approval.status === 'pending' && !expired ? (
+                  <div className="approval-actions">
+                    <Button
+                      className="deny-button"
+                      isDisabled={submitted}
+                      onPress={() => decide(approval, 'deny')}
+                    >
+                      Deny
+                    </Button>
+                    <Button isDisabled={submitted} onPress={() => decide(approval, 'approve')}>
+                      {submitted ? 'Submitted, verifying' : 'Approve once'}
+                    </Button>
+                    {['edit', 'write'].includes(approval.tool) && (
+                      <Button
+                        className="grant-button"
+                        isDisabled={submitted}
+                        onPress={() => {
+                          setPendingId(approval.approvalId);
+                          void createAcceptEditsGrant(approval, 3)
+                            .then((created) => {
+                              setGrant({
+                                remainingActions: created.remainingActions,
+                                expiresAt: created.expiresAt,
+                              });
+                            })
+                            .catch((cause: unknown) => setError(messageFrom(cause)))
+                            .finally(() => setPendingId(null));
+                        }}
+                      >
+                        Accept next 3 edits
+                      </Button>
+                    )}
+                  </div>
+                ) : approval.status === 'approved' ? (
+                  <div className="approval-result result-verifying" role="status">
+                    Submitted, verifying at host
+                  </div>
+                ) : (
+                  <div className={`approval-result result-${approval.status}`} role="status">
+                    {approval.status.replaceAll('-', ' ')}:{' '}
+                    {approval.reason ?? (expired ? 'lease-expired' : 'host-settled')}
+                  </div>
+                )}
+              </article>
+            );
+          })
+        )}
+      </section>
+    </main>
+  );
+}
+
+export function Home({
+  sessions,
+  connection,
+  cache,
+  device,
+  onSelect,
+  onRevoke,
+  onLogout,
+}: {
+  readonly sessions: SessionListState;
+  readonly connection: ConnectionPhase;
+  readonly cache: ReadOnlyCache | null;
+  readonly device: DeviceIdentity | null;
+  readonly onSelect: (sessionId: string) => void;
+  readonly onRevoke: () => void;
+  readonly onLogout: () => void;
+}) {
+  const isStale = sessions.source === 'cache' || connection !== 'live';
+  return (
+    <main className="home-view">
+      <section className="hero">
+        <div className="hero-copy-block">
+          <p className="surface-kicker">Private relay</p>
+          <h1>Your agents, within reach</h1>
+          <p className="hero-copy">
+            Follow redacted Pi activity from this device. Actions stay read-only until an exact
+            approval is requested.
+          </p>
+        </div>
+        <div className="relay-orbit" aria-hidden="true">
+          <span className="orbit-core">π</span>
+          <span className="orbit-node orbit-node-one" />
+          <span className="orbit-node orbit-node-two" />
+          <span className="orbit-node orbit-node-three" />
+        </div>
+      </section>
+
+      <section className="session-section" aria-labelledby="session-heading">
+        <div className="section-heading">
+          <div>
+            <h2 id="session-heading">Recent sessions</h2>
+            <p>Opaque identifiers only. No prompts, paths, or host context.</p>
+          </div>
+          <Freshness stale={isStale} at={sessions.updatedAt ?? cache?.savedAt ?? null} />
+        </div>
+        {sessions.items.length === 0 ? (
+          <EmptyState loading={sessions.phase === 'loading'} error={sessions.error} />
+        ) : (
+          <div className="session-grid">
+            {sessions.items.map((session) => (
+              <Button
+                className="session-card"
+                key={session.id}
+                onPress={() => onSelect(session.id)}
+              >
+                <span className={`session-state state-${session.status}`}>
+                  <SessionStateIcon status={session.status} />
+                  {sessionStatusLabel(session.status)}
+                </span>
+                <strong>{compactId(session.id)}</strong>
+                <span className="session-meta">
+                  {session.messageCount} blocks <i aria-hidden="true" />{' '}
+                  {relativeTime(session.updatedAt)}
+                </span>
+                <span className="open-arrow" aria-hidden="true">
+                  Open
+                </span>
+              </Button>
+            ))}
+          </div>
+        )}
+      </section>
+      <div className="device-footer">
+        <span>
+          {device === null ? 'Device key active' : `Host ${compactId(device.hostFingerprint)}`}
+        </span>
+        <div>
+          <Button onPress={onLogout}>Log out</Button>
+          <Button onPress={onRevoke}>Revoke this device</Button>
+        </div>
+      </div>
+      <PushSettings />
+    </main>
+  );
+}
+
+export function AttentionInbox({
+  onBack,
+  onOpen,
+}: {
+  readonly onBack: () => void;
+  readonly onOpen: (resolution: Awaited<ReturnType<typeof openAttentionHint>>) => void;
+}) {
+  const [items, setItems] = useState<readonly AttentionItemDto[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [opening, setOpening] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchAttention(controller.signal)
+      .then(setItems)
+      .catch((cause: unknown) => {
+        if (!controller.signal.aborted) setError(messageFrom(cause));
+      });
+    return () => controller.abort();
+  }, []);
+
+  return (
+    <main className="inbox-view">
+      <div className="session-toolbar">
+        <Button className="back-button" onPress={onBack}>
+          Back to sessions
+        </Button>
+        <span className="review-count">{items.length} signals</span>
+      </div>
+      <section className="inbox-heading">
+        <p className="surface-kicker">Attention inbox</p>
+        <h1>Only what needs you</h1>
+        <p>
+          Signals carry no session content. Opening one reauthenticates and fetches current relay
+          state.
+        </p>
+      </section>
+      {error !== null && <div className="inline-alert">{error}</div>}
+      <section className="attention-list" aria-live="polite">
+        {items.length === 0 ? (
+          <div className="empty-state">
+            <span className="empty-glyph" aria-hidden="true">
+              ✓
+            </span>
+            <h3>No attention needed</h3>
+            <p>This inbox remains available even when notifications are denied.</p>
+          </div>
+        ) : (
+          items.map((item) => (
+            <Button
+              className={`attention-card attention-${item.attentionClass}`}
+              key={item.lookupId}
+              isDisabled={opening === item.lookupId}
+              onPress={() => {
+                setOpening(item.lookupId);
+                setError(null);
+                void openAttentionHint(item.lookupId)
+                  .then(onOpen)
+                  .catch((cause: unknown) => setError(messageFrom(cause)))
+                  .finally(() => setOpening(null));
+              }}
+            >
+              <span className="attention-icon" aria-hidden="true">
+                {attentionIcon(item.attentionClass)}
+              </span>
+              <span>{attentionLabel(item.attentionClass)}</span>
+              <time dateTime={item.occurredAt}>{relativeTime(item.occurredAt)}</time>
+              <strong>
+                {opening === item.lookupId ? 'Reauthenticating' : 'Open current state'}
+              </strong>
+            </Button>
+          ))
+        )}
+      </section>
+    </main>
+  );
+}
+
+function PushSettings() {
+  const [config, setConfig] = useState<PushConfig | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    void fetchPushConfig()
+      .then(setConfig)
+      .catch((cause: unknown) => setError(messageFrom(cause)));
+  }, []);
+  const setPreferences = (preferences: PushPreferences) => {
+    setConfig((current) => (current === null ? current : { ...current, preferences }));
+    void updatePushPreferences(preferences).catch((cause: unknown) => setError(messageFrom(cause)));
+  };
+  return (
+    <section className="push-settings">
+      <div>
+        <p className="surface-kicker">This device</p>
+        <h2>Attention hints</h2>
+        <p>
+          Notifications never contain session content or actions. The inbox is always the fallback.
+        </p>
+      </div>
+      {error !== null && <div className="inline-alert">{error}</div>}
+      {config === null ? (
+        <span>Checking support</span>
+      ) : !config.supported || config.vapidPublicKey === null ? (
+        <span>Push is disabled at the relay. Inbox remains active.</span>
+      ) : config.preferences === null ? (
+        <Button
+          onPress={() => {
+            void subscribeToPush(config.vapidPublicKey ?? '')
+              .then((preferences) => setConfig({ ...config, preferences }))
+              .catch((cause: unknown) => setError(messageFrom(cause)));
+          }}
+        >
+          Enable notifications
+        </Button>
+      ) : (
+        <>
+          <div className="preference-grid">
+            {(['needs_input', 'finished', 'error'] as const).map((attentionClass) => (
+              <Switch
+                key={attentionClass}
+                isSelected={config.preferences?.[attentionClass] ?? false}
+                onChange={(selected) =>
+                  // Preferences are non-null here because the branch above returned early.
+                  setPreferences({ ...config.preferences!, [attentionClass]: selected })
+                }
+              >
+                <span className="switch-track" aria-hidden="true">
+                  <span />
+                </span>
+                {attentionLabel(attentionClass)}
+              </Switch>
+            ))}
+          </div>
+          <Button
+            className="push-disable"
+            onPress={() => {
+              void unsubscribeFromPush()
+                .then(() => setConfig({ ...config, preferences: null }))
+                .catch((cause: unknown) => setError(messageFrom(cause)));
+            }}
+          >
+            Disable notifications
+          </Button>
+        </>
+      )}
+    </section>
+  );
+}
+
+export function Session({
+  connection,
+  sessionId,
+  initialCache: cache,
+  transcript,
+  dispatchConnection,
+  dispatchTranscript,
+  status,
+  onBack,
+}: {
+  readonly connection: ConnectionPhase;
+  readonly sessionId: string;
+  readonly initialCache: ReadOnlyCache | null;
+  readonly transcript: TranscriptState;
+  readonly dispatchConnection: Dispatch<ConnectionAction>;
+  readonly dispatchTranscript: Dispatch<Parameters<typeof transcriptReducer>[1]>;
+  readonly status: SessionCardDto['status'];
+  readonly onBack: () => void;
+}) {
+  const cursorRef = useRef<{ epoch: string; seq: number } | null>(null);
+  const frameRef = useRef<number | null>(null);
+  const pendingMessagesRef = useRef<Array<{ readonly message: SyncMessage; readonly at: string }>>(
+    [],
+  );
+  const [prompt, setPrompt] = useState('');
+  const [sendingPrompt, setSendingPrompt] = useState(false);
+  const [promptError, setPromptError] = useState<string | null>(null);
+  const [retrySubmissionId, setRetrySubmissionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    dispatchTranscript({ type: 'select', sessionId });
+    const cached = cache?.transcripts.find((item) => item.sessionId === sessionId);
+    if (cached !== undefined) {
+      dispatchTranscript({
+        type: 'hydrate',
+        sessionId,
+        epoch: cached.epoch,
+        coversThrough: cached.coversThrough,
+        blocks: cached.blocks,
+        savedAt: cached.savedAt,
+      });
+      cursorRef.current =
+        cached.epoch === null ? null : { epoch: cached.epoch, seq: cached.coversThrough };
+    } else {
+      cursorRef.current = null;
+    }
+
+    const controller = new AbortController();
+    void fetchTranscript(sessionId, controller.signal)
+      .then((page) => {
+        dispatchTranscript({
+          type: 'page',
+          sessionId,
+          coversThrough: page.coversThrough,
+          blocks: page.items,
+          at: new Date().toISOString(),
+        });
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          dispatchTranscript({ type: 'error', error: messageFrom(error) });
+        }
+      });
+
+    let socket: WebSocket | null = null;
+    let retryTimer: number | null = null;
+    let retryCount = 0;
+    let stopped = false;
+
+    const connect = () => {
+      if (stopped || !navigator.onLine) {
+        dispatchConnection({ type: 'offline' });
+        return;
+      }
+      dispatchConnection({ type: 'connecting', reconnect: retryCount > 0 });
+      void openSyncSocket(
+        sessionId,
+        cursorRef.current,
+        (message) => {
+          const at = new Date().toISOString();
+          if (
+            message.kind === 'sync.delta' &&
+            cursorRef.current !== null &&
+            cursorRef.current.epoch !== message.epoch
+          ) {
+            cursorRef.current = null;
+            dispatchTranscript({ type: 'delta', message, at });
+            socket?.close();
+            return;
+          }
+          pendingMessagesRef.current.push({ message, at });
+          if (frameRef.current === null) {
+            frameRef.current = window.requestAnimationFrame(() => {
+              for (const pending of pendingMessagesRef.current) {
+                applySyncMessage(pending.message, pending.at, dispatchTranscript);
+              }
+              pendingMessagesRef.current = [];
+              frameRef.current = null;
+            });
+          }
+          if (message.kind !== 'sync.gap') {
+            cursorRef.current = { epoch: message.epoch, seq: message.coversThrough };
+            dispatchConnection({ type: 'live', at });
+            retryCount = 0;
+          }
+        },
+        controller.signal,
+      )
+        .then((openedSocket) => {
+          if (stopped) {
+            openedSocket.close();
+            return;
+          }
+          socket = openedSocket;
+          openedSocket.addEventListener('close', () => {
+            if (stopped) return;
+            retryCount += 1;
+            dispatchConnection({
+              type: navigator.onLine ? 'connecting' : 'offline',
+              ...(navigator.onLine ? { reconnect: true } : {}),
+            } as ConnectionAction);
+            retryTimer = window.setTimeout(connect, Math.min(1_000 * 2 ** retryCount, 15_000));
+          });
+          openedSocket.addEventListener('error', () => openedSocket.close());
+        })
+        .catch(() => {
+          if (stopped) return;
+          retryCount += 1;
+          dispatchConnection({ type: 'connecting', reconnect: true });
+          retryTimer = window.setTimeout(connect, Math.min(1_000 * 2 ** retryCount, 15_000));
+        });
+    };
+    connect();
+
+    return () => {
+      stopped = true;
+      controller.abort();
+      if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
+      pendingMessagesRef.current = [];
+      if (retryTimer !== null) window.clearTimeout(retryTimer);
+      socket?.close();
+    };
+  }, [cache, dispatchConnection, dispatchTranscript, sessionId]);
+
+  const isStale =
+    connection !== 'live' || transcript.source === 'cache' || transcript.awaitingSnapshot;
+  const canSubmit =
+    connection === 'live' &&
+    !transcript.awaitingSnapshot &&
+    prompt.trim().length > 0 &&
+    !sendingPrompt;
+  const sendPrompt = () => {
+    const message = prompt.trim();
+    if (!canSubmit || message.length === 0) return;
+    const submissionId = retrySubmissionId ?? `prompt_${crypto.randomUUID().replaceAll('-', '_')}`;
+    const optimisticId = `optimistic_${submissionId}`;
+    const occurredAt = new Date().toISOString();
+    dispatchTranscript({
+      type: 'promptOptimistic',
+      block: {
+        id: optimisticId,
+        kind: 'text',
+        role: 'user',
+        text: message,
+        revision: 1,
+        seq: transcript.coversThrough + 1,
+        occurredAt,
+      },
+    });
+    setPrompt('');
+    setPromptError(null);
+    setRetrySubmissionId(null);
+    setSendingPrompt(true);
+    void submitPrompt(sessionId, submissionId, message)
+      .then((block) => {
+        dispatchTranscript({
+          type: 'promptAccepted',
+          optimisticId,
+          block,
+          at: new Date().toISOString(),
+        });
+      })
+      .catch((cause: unknown) => {
+        dispatchTranscript({ type: 'promptRejected', optimisticId });
+        setPrompt(message);
+        setRetrySubmissionId(submissionId);
+        setPromptError(messageFrom(cause));
+      })
+      .finally(() => setSendingPrompt(false));
+  };
+  return (
+    <main className="session-view">
+      <div className="session-toolbar">
+        <Button className="back-button" onPress={onBack}>
+          Back to sessions
+        </Button>
+        <Freshness stale={isStale} at={transcript.updatedAt} />
+      </div>
+      <div className="session-title">
+        <div>
+          <p className="surface-kicker">Session {compactId(sessionId)}</p>
+          <h1>Live transcript</h1>
+        </div>
+        <div className={`agent-state agent-${status}`}>
+          <span className="agent-state-icon">
+            <SessionStateIcon status={status} />
+          </span>
+          <span>
+            <strong>{sessionStatusLabel(status)}</strong>
+            <small>{status === 'running' ? 'Agent is working' : 'Latest relay state'}</small>
+          </span>
+        </div>
+      </div>
+      {transcript.error !== null && <div className="inline-alert">{transcript.error}</div>}
+      {transcript.awaitingSnapshot && (
+        <div className="barrier-note">
+          Reconciliation barrier active. Waiting for a fresh snapshot.
+        </div>
+      )}
+      <TranscriptList blocks={transcript.blocks} running={status === 'running'} />
+      <form
+        className="prompt-composer"
+        onSubmit={(event) => {
+          event.preventDefault();
+          sendPrompt();
+        }}
+      >
+        <label htmlFor="session-prompt">Steer Pi</label>
+        <textarea
+          id="session-prompt"
+          value={prompt}
+          onChange={(event) => setPrompt(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault();
+              sendPrompt();
+            }
+          }}
+          disabled={connection !== 'live' || transcript.awaitingSnapshot || sendingPrompt}
+          placeholder={
+            connection === 'live' ? 'Send a prompt or steer the current turn' : 'Reconnect to send'
+          }
+          rows={3}
+        />
+        <div className="prompt-composer-footer">
+          <span>
+            {transcript.awaitingSnapshot
+              ? 'Waiting for sync reconciliation'
+              : 'Enter to send · Shift+Enter for a new line'}
+          </span>
+          <Button type="submit" isDisabled={!canSubmit}>
+            {sendingPrompt ? 'Sending' : 'Send'}
+          </Button>
+        </div>
+        {promptError !== null && <div className="inline-alert">{promptError}</div>}
+      </form>
+    </main>
+  );
+}
+
+export function TranscriptList({
+  blocks,
+  running,
+}: {
+  readonly blocks: readonly DisplayTranscriptBlock[];
+  readonly running: boolean;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const previousCountRef = useRef(blocks.length);
+  const [announcement, setAnnouncement] = useState('');
+  const virtualizer = useVirtualizer({
+    count: blocks.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 180,
+    overscan: 6,
+  });
+
+  useEffect(() => {
+    if (blocks.length > previousCountRef.current) {
+      const completed = blocks.at(-1);
+      if (completed !== undefined) {
+        setAnnouncement(`${blockLabel(completed)} block completed.`);
+      }
+    }
+    previousCountRef.current = blocks.length;
+  }, [blocks]);
+
+  if (blocks.length === 0) {
+    return <div className="empty-transcript">No transcript blocks are available yet.</div>;
+  }
+
+  return (
+    <section className="transcript-frame" aria-label="Typed transcript">
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
+      <div className="transcript-scroll" ref={scrollRef}>
+        <div
+          className="transcript-virtual"
+          style={{ height: virtualizer.getTotalSize() + (running ? 72 : 0) }}
+        >
+          {virtualizer.getVirtualItems().map((virtualItem) => {
+            const block = blocks[virtualItem.index];
+            if (block === undefined) return null;
+            return (
+              <div
+                className="virtual-row"
+                key={block.id}
+                ref={virtualizer.measureElement}
+                data-index={virtualItem.index}
+                style={{ transform: `translateY(${virtualItem.start}px)` }}
+              >
+                <Block block={block} />
+              </div>
+            );
+          })}
+          {running && (
+            <div
+              className="working-indicator"
+              style={{ transform: `translateY(${virtualizer.getTotalSize()}px)` }}
+            >
+              <span className="working-glyph" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+              <span>
+                <strong>Agent working</strong>
+                <small>New blocks appear as the relay settles them</small>
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Block({ block }: { readonly block: DisplayTranscriptBlock }) {
+  let content: ReactNode;
+  let label: string;
+  switch (block.kind) {
+    case 'text':
+      label = block.role === 'user' ? 'You' : 'Assistant';
+      content = <p className="block-copy">{block.text}</p>;
+      break;
+    case 'thinking':
+      label = 'Thinking summary';
+      content = (
+        <Disclosure defaultExpanded={false}>
+          <Heading>
+            <Button slot="trigger" className="thinking-trigger">
+              Show summary <span aria-hidden="true">+</span>
+            </Button>
+          </Heading>
+          <DisclosurePanel>
+            <p className="block-copy quiet-copy">{block.summary}</p>
+          </DisclosurePanel>
+        </Disclosure>
+      );
+      break;
+    case 'plan':
+      label = 'Plan / todo';
+      content = (
+        <ul className="plan-list">
+          {block.items.map((item, index) => (
+            <li key={`${block.id}-${index}`} className={item.done ? 'done' : ''}>
+              <span aria-hidden="true">{item.done ? '✓' : '○'}</span>
+              {item.text}
+            </li>
+          ))}
+        </ul>
+      );
+      break;
+    case 'tool_call':
+      label = `Tool call · ${block.toolName}`;
+      content = <pre>{block.inputSummary}</pre>;
+      break;
+    case 'tool_result':
+      label = `${block.isError ? 'Tool error' : 'Tool result'} · ${block.toolName}`;
+      content = <pre className={block.isError ? 'error-output' : ''}>{block.output}</pre>;
+      break;
+    case 'file_diff':
+      label = 'File diff';
+      content = (
+        <>
+          <p className="diff-summary">{block.summary}</p>
+          <DiffPatch patch={block.patch} />
+        </>
+      );
+      break;
+    case 'usage':
+      label = 'Usage';
+      content = (
+        <div className="usage-grid">
+          <span>
+            <strong>{formatNumber(block.inputTokens)}</strong> input
+          </span>
+          <span>
+            <strong>{formatNumber(block.outputTokens)}</strong> output
+          </span>
+          <span>
+            <strong>{formatCost(block.cost)}</strong> cost
+          </span>
+        </div>
+      );
+      break;
+    case 'unknown':
+      label = 'Unsupported block';
+      content = (
+        <p className="block-copy quiet-copy">
+          A redacted “{block.originalKind}” block cannot be displayed by this client.
+        </p>
+      );
+      break;
+  }
+  return (
+    <article className={`transcript-block block-${block.kind}`}>
+      <header>
+        <span>{label}</span>
+        <time dateTime={block.occurredAt}>{formatTime(block.occurredAt)}</time>
+      </header>
+      {content}
+    </article>
+  );
+}
+
+function DiffPatch({ patch }: { readonly patch: string }) {
+  return (
+    <pre className="diff-patch" aria-label="Redacted file diff">
+      {patch.split('\n').map((line, index) => (
+        <span
+          className={
+            line.startsWith('+')
+              ? 'diff-add'
+              : line.startsWith('-')
+                ? 'diff-remove'
+                : 'diff-context'
+          }
+          key={`${index}-${line.slice(0, 12)}`}
+        >
+          {line || ' '}
+          {'\n'}
+        </span>
+      ))}
+    </pre>
+  );
+}
+
+function StatusPill({ phase }: { readonly phase: ConnectionPhase }) {
+  const labels: Record<ConnectionPhase, string> = {
+    unenrolled: 'Enrollment required',
+    authenticating: 'Authenticating',
+    offline: 'Offline cache',
+    connecting: 'Connecting',
+    reconnecting: 'Reconnecting',
+    live: 'Relay live',
+    error: 'Relay unavailable',
+  };
+  return (
+    <span className={`status-pill status-${phase}`} role="status">
+      <i />
+      {labels[phase]}
+    </span>
+  );
+}
+
+function Freshness({ stale, at }: { readonly stale: boolean; readonly at: string | null }) {
+  return (
+    <div className={`freshness ${stale ? 'is-stale' : ''}`}>
+      <span>{stale ? 'Stale, input disabled' : 'Live, steering enabled'}</span>
+      <time dateTime={at ?? undefined}>{at === null ? 'Not synced' : relativeTime(at)}</time>
+    </div>
+  );
+}
+
+function EmptyState({
+  loading,
+  error,
+}: {
+  readonly loading: boolean;
+  readonly error: string | null;
+}) {
+  return (
+    <div className="empty-state">
+      <span className="empty-glyph" aria-hidden="true">
+        {loading ? '•••' : '○'}
+      </span>
+      <h3>{loading ? 'Reading the relay' : 'No sessions found'}</h3>
+      <p>{error ?? 'The catalog is empty. Start a local Pi session and refresh this view.'}</p>
+    </div>
+  );
+}
+
+function applySyncMessage(
+  message: SyncMessage,
+  at: string,
+  dispatch: Dispatch<Parameters<typeof transcriptReducer>[1]>,
+) {
+  switch (message.kind) {
+    case 'sync.snapshot':
+      dispatch({ type: 'snapshot', message, at });
+      break;
+    case 'sync.delta':
+      dispatch({ type: 'delta', message, at });
+      break;
+    case 'sync.gap':
+      dispatch({ type: 'gap', message });
+      break;
+  }
+}
+
+async function loadApprovals(
+  sessions: readonly { readonly id: string }[],
+  signal?: AbortSignal,
+): Promise<readonly ApprovalCardDto[]> {
+  const pages = await Promise.all(sessions.map((session) => fetchApprovals(session.id, signal)));
+  return pages.flat().sort((left, right) => right.requestedAt.localeCompare(left.requestedAt));
+}
+
+function readSessionIdFromLocation(): string | null {
+  const match = /^\/session\/([^/]+)$/.exec(window.location.pathname);
+  if (match?.[1] === undefined) return null;
+  try {
+    const sessionId = decodeURIComponent(match[1]);
+    return isOpaqueId(sessionId) ? sessionId : null;
+  } catch {
+    return null;
+  }
+}
+
+function readAttentionIdFromLocation(): string | null {
+  const match = /^\/attention\/([^/]+)$/.exec(window.location.pathname);
+  if (match?.[1] === undefined) return null;
+  try {
+    const lookupId = decodeURIComponent(match[1]);
+    return isOpaqueId(lookupId) ? lookupId : null;
+  } catch {
+    return null;
+  }
+}
+
+function attentionLabel(value: AttentionItemDto['attentionClass']): string {
+  return { needs_input: 'Needs input', finished: 'Finished', error: 'Error' }[value];
+}
+
+function attentionIcon(value: AttentionItemDto['attentionClass']): string {
+  return { needs_input: '?', finished: '✓', error: '!' }[value];
+}
+
+function sessionStatusLabel(value: SessionCardDto['status']): string {
+  return { idle: 'Settled', running: 'Working', interrupted: 'Interrupted', unknown: 'Unknown' }[
+    value
+  ];
+}
+
+function SessionStateIcon({ status }: { readonly status: SessionCardDto['status'] }) {
+  return (
+    <span className="state-icon" aria-hidden="true">
+      {status === 'idle' ? '✓' : status === 'running' ? '•' : status === 'interrupted' ? '!' : '?'}
+    </span>
+  );
+}
+
+function blockLabel(block: DisplayTranscriptBlock): string {
+  const labels: Record<DisplayTranscriptBlock['kind'], string> = {
+    text: 'Assistant response',
+    thinking: 'Thinking summary',
+    plan: 'Plan',
+    tool_call: 'Tool call',
+    tool_result: 'Tool result',
+    file_diff: 'File diff',
+    usage: 'Usage',
+    unknown: 'Unsupported',
+  };
+  return labels[block.kind];
+}
+
+function readThemePreference(): ThemePreference {
+  try {
+    const saved = localStorage.getItem('pi-remote.theme');
+    return saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
+  } catch {
+    return 'system';
+  }
+}
+
+function compactId(id: string): string {
+  return id.length <= 18 ? id : `${id.slice(0, 8)}…${id.slice(-6)}`;
+}
+
+function relativeTime(value: string): string {
+  const milliseconds = Date.now() - Date.parse(value);
+  if (!Number.isFinite(milliseconds)) return 'unknown time';
+  const minutes = Math.max(0, Math.round(milliseconds / 60_000));
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.round(hours / 24)}d ago`;
+}
+
+function formatTime(value: string): string {
+  return new Intl.DateTimeFormat(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(value));
+}
+
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat(undefined, { notation: 'compact' }).format(value);
+}
+
+function formatCost(value: number): string {
+  return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(value);
+}
+
+function messageFrom(error: unknown): string {
+  return error instanceof Error ? error.message : 'The relay request failed.';
+}
+
+function countdown(expiresAt: string, now: number): string {
+  const seconds = Math.max(0, Math.ceil((Date.parse(expiresAt) - now) / 1_000));
+  const minutes = Math.floor(seconds / 60);
+  return `${String(minutes).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')} remaining`;
+}

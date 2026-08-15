@@ -1,0 +1,24 @@
+(version 1)
+(deny default)
+
+(allow process-fork)
+(allow process-exec (literal (param "RUNNER")))
+(allow signal (target self))
+
+(allow file-read-metadata)
+(allow file-read*
+  (subpath "/System")
+  (subpath "/usr/lib")
+  (subpath "/usr/share")
+  (subpath (param "WORKSPACE")))
+(allow file-write*
+  (subpath (param "WORKSPACE")))
+
+(deny file-read*
+  (subpath (param "HOME")))
+(deny file-write*
+  (subpath "/tmp")
+  (subpath "/private")
+  (subpath "/Users"))
+(deny network*)
+(deny process-exec*)

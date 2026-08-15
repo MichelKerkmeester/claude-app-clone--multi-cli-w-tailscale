@@ -1,0 +1,3 @@
+# release:verify run outputs are reproducible artifacts, not source — ignore them
+*.json
+!.gitkeep

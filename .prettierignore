@@ -1,0 +1,12 @@
+**/coverage/
+**/dist/
+**/node_modules/
+release/evidence/
+package-lock.json
+# Runtime tooling symlinked into this app's root in the standalone deployment
+.opencode/
+.pi/
+.claude/
+.codex/
+.cursor/
+.devin/

@@ -1,0 +1,22 @@
+node_modules/
+dist/
+*.db
+*.db-shm
+*.db-wal
+
+.claude
+
+.codex
+
+.cursor
+
+.devin
+
+.opencode
+
+.pi
+
+# Deployment-local config: holds the tailnet origin. Use serve.env.example as the template.
+deploy/serve.env
+
+.DS_Store

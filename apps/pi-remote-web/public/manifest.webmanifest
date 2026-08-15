@@ -1,0 +1,18 @@
+{
+  "name": "Pi Remote",
+  "short_name": "Pi Remote",
+  "description": "A private Pi session viewer with content-free attention hints.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f5f7",
+  "theme_color": "#4b68df",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

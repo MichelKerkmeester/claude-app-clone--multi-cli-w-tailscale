@@ -1,0 +1,39 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Pi Remote Action Authorization Policy
+// ───────────────────────────────────────────────────────────────────
+
+export type AuthorizedAction =
+  | 'health:read'
+  | 'sessions:list'
+  | 'transcript:read'
+  | 'sync:read'
+  | 'ticket:create'
+  | 'session:revoke'
+  | 'device:revoke'
+  | 'approvals:list'
+  | 'approval:decide'
+  | 'accept-edits:create'
+  | 'attention:read'
+  | 'push:manage'
+  | 'prompt:submit';
+
+const AUTHORIZED_ACTIONS = new Set<string>([
+  'health:read',
+  'sessions:list',
+  'transcript:read',
+  'sync:read',
+  'ticket:create',
+  'session:revoke',
+  'device:revoke',
+  'approvals:list',
+  'approval:decide',
+  'accept-edits:create',
+  'attention:read',
+  'push:manage',
+  'prompt:submit',
+]);
+
+/** Keep unknown and tool-mutation actions denied unless explicitly authorized. */
+export function authorizeAction(action: string): action is AuthorizedAction {
+  return AUTHORIZED_ACTIONS.has(action);
+}

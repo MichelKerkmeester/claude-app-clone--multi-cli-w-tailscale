@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "stages": [
+    {
+      "id": "read-only",
+      "label": "Private read-only monitoring",
+      "killSwitch": "Remove the Tailscale Serve routes with the deployment cleanup trap and stop the loopback relay.",
+      "requires": [
+        "machine:whole-gate",
+        "machine:rollback-drill",
+        "threshold:bundleGzipBytes",
+        "threshold:replaySnapshotBytes",
+        "threshold:storageGrowthBytes",
+        "threshold:restartRecoveryMs",
+        "threshold:foregroundP95LatencyMs",
+        "threshold:streamingCadenceMs",
+        "threshold:queueMemoryBytes",
+        "threshold:wcagConformanceLevel",
+        "operator:tailscale-private-boundary",
+        "operator:physical-mobile-read-only",
+        "operator:mobile-accessibility"
+      ]
+    },
+    {
+      "id": "protected-mutation",
+      "label": "Protected mutation",
+      "killSwitch": "Set PI_REMOTE_MUTATION_ENABLED off; MutationPolicy revokes pending and approved leases and aborts the enabled command family.",
+      "requires": [
+        "machine:whole-gate",
+        "machine:rollback-drill",
+        "operator:tailscale-private-boundary",
+        "operator:containment-real-os",
+        "operator:live-pi-extension-mutation",
+        "operator:physical-mobile-mutation"
+      ]
+    },
+    {
+      "id": "optional-push",
+      "label": "Optional Web Push",
+      "killSwitch": "Remove the four push configuration values and restart; the relay then omits PushService entirely.",
+      "requires": [
+        "machine:whole-gate",
+        "operator:tailscale-private-boundary",
+        "operator:physical-mobile-push"
+      ]
+    }
+  ]
+}

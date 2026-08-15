@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "metrics": {
+    "foregroundP95LatencyMs": {
+      "comparison": "max",
+      "threshold": 250,
+      "unit": "ms",
+      "source": "operator"
+    },
+    "streamingCadenceMs": {
+      "comparison": "max",
+      "threshold": 500,
+      "unit": "ms between visible updates",
+      "source": "operator"
+    },
+    "queueMemoryBytes": {
+      "comparison": "max",
+      "threshold": 16777216,
+      "unit": "bytes",
+      "source": "operator"
+    },
+    "replaySnapshotBytes": {
+      "comparison": "max",
+      "threshold": 1048576,
+      "unit": "bytes",
+      "source": "machine"
+    },
+    "storageGrowthBytes": {
+      "comparison": "max",
+      "threshold": 4194304,
+      "unit": "bytes per 1001 writes with 1000 retained",
+      "source": "machine"
+    },
+    "restartRecoveryMs": {
+      "comparison": "max",
+      "threshold": 2000,
+      "unit": "ms",
+      "source": "machine"
+    },
+    "wcagConformanceLevel": {
+      "comparison": "min",
+      "threshold": 2,
+      "unit": "level (A=1, AA=2, AAA=3)",
+      "source": "operator"
+    },
+    "bundleGzipBytes": {
+      "comparison": "max",
+      "threshold": 153600,
+      "unit": "bytes",
+      "source": "machine"
+    }
+  }
+}

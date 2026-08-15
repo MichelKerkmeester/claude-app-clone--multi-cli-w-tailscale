@@ -1,0 +1,306 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Consolidated Fail-Closed Negative Controls
+// ───────────────────────────────────────────────────────────────────
+
+import { generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
+
+import {
+  approvalActionDigest,
+  enrollmentProof,
+  sessionProof,
+  type ApprovalAction,
+  type ApprovalDecisionCommand,
+  type DevicePublicKeyJwk,
+  type EnrollmentQr,
+} from '@pi-remote/pi-rpc-protocol';
+import { describe, expect, it } from 'vitest';
+
+import { ApprovalService } from '../../src/approval/approval-service.js';
+import { verifyFinalGate } from '../../src/approval/final-gate.js';
+import { AuthService } from '../../src/auth/auth-service.js';
+import { MutationPolicy } from '../../src/policy/mutation-policy.js';
+import { serializePushHint } from '../../src/push/push-service.js';
+import { SyncHub } from '../../src/replay/sync.js';
+import { RelayStore } from '../../src/store/relay-store.js';
+
+const ORIGIN = 'https://pi-remote.example.test';
+const PRINCIPAL = 'operator@example.test';
+const NOW = Date.parse('2026-01-01T00:00:00.000Z');
+const IDENTITY = { hostId: 'host_local', workspaceRef: 'workspace_default' } as const;
+
+// This suite keeps the fail-closed boundary visible in one machine-checkable module.
+describe('consolidated fail-closed negative controls', () => {
+  it('rejects unauthenticated, wrong-origin, replayed-ticket, revoked, and spoofed identity access', () => {
+    const auth = new AuthService({
+      origin: ORIGIN,
+      hostId: IDENTITY.hostId,
+      now: () => NOW,
+    });
+    const keys = deviceKeys();
+    const enrollment = auth.enrollment.createChallenge();
+    const enrolled = auth.enroll(enrollmentBody(enrollment, keys), ORIGIN, PRINCIPAL);
+    expect(enrolled).not.toBeNull();
+    if (enrolled === null) throw new Error('Test device enrollment failed.');
+    const challenge = auth.createSessionChallenge(enrolled.deviceId, ORIGIN, PRINCIPAL);
+    expect(challenge).not.toBeNull();
+    if (challenge === null) throw new Error('Test session challenge failed.');
+    const session = auth.createSession(
+      enrolled.deviceId,
+      challenge.challengeId,
+      signStatement(keys.privateKey, sessionProof(ORIGIN, enrolled.deviceId, challenge)),
+      ORIGIN,
+      PRINCIPAL,
+    );
+    expect(session).not.toBeNull();
+    if (session === null) throw new Error('Test application session failed.');
+
+    expect(auth.authenticate(null, ORIGIN, PRINCIPAL, 'sessions:list')).toBeNull();
+    expect(
+      auth.authenticate(session.token, 'https://wrong.example.test', PRINCIPAL, 'sessions:list'),
+    ).toBeNull();
+    expect(
+      auth.authenticate(session.token, ORIGIN, 'spoofed@example.test', 'sessions:list'),
+    ).toBeNull();
+
+    const ticket = auth.issueTicket(session);
+    expect(auth.consumeTicket(ticket.ticket, ORIGIN, PRINCIPAL)).toMatchObject({
+      token: session.token,
+    });
+    expect(auth.consumeTicket(ticket.ticket, ORIGIN, PRINCIPAL)).toBeNull();
+
+    const revokedTicket = auth.issueTicket(session);
+    expect(auth.revokeSession(session.token)).toBe(true);
+    expect(auth.authenticate(session.token, ORIGIN, PRINCIPAL, 'sessions:list')).toBeNull();
+    expect(auth.consumeTicket(revokedTicket.ticket, ORIGIN, PRINCIPAL)).toBeNull();
+  });
+
+  it('rejects stale, duplicate, expired, revoked, raced, and digest-altered approvals', () => {
+    const action = fixedAction();
+    const digest = approvalActionDigest(action);
+    const lease = {
+      principal: action.principal,
+      sessionId: action.sessionId,
+      epoch: action.epoch,
+      digest,
+      policyVersion: action.policyVersion,
+      expiresAt: '2026-01-01T00:01:00.000Z',
+      status: 'approved',
+    };
+    const check = (overrides: Partial<Parameters<typeof verifyFinalGate>[0]> = {}) =>
+      verifyFinalGate({
+        action,
+        lease,
+        currentEpoch: action.epoch,
+        currentPolicyVersion: action.policyVersion,
+        policyAllows: true,
+        now: NOW,
+        ...overrides,
+      });
+
+    expect(check({ currentEpoch: 'epoch_stale' })).toEqual({
+      allowed: false,
+      reason: 'stale-epoch',
+    });
+    expect(check({ lease: { ...lease, status: 'consumed' } })).toEqual({
+      allowed: false,
+      reason: 'duplicate',
+    });
+    expect(check({ now: Date.parse(lease.expiresAt) })).toEqual({
+      allowed: false,
+      reason: 'expired',
+    });
+    expect(check({ lease: { ...lease, status: 'revoked' } })).toEqual({
+      allowed: false,
+      reason: 'revoked',
+    });
+    expect(check({ action: { ...action, arguments: { target: 'altered' } } })).toEqual({
+      allowed: false,
+      reason: 'digest-mismatch',
+    });
+
+    const store = new RelayStore();
+    const policy = new MutationPolicy();
+    policy.enableFamily('filesystem');
+    policy.setEnabled(true);
+    const service = new ApprovalService({
+      store,
+      syncHub: new SyncHub(store),
+      policy,
+      identity: IDENTITY,
+      now: () => NOW,
+    });
+    try {
+      const card = service.request(action);
+      const command = decision(card);
+      expect(service.decide(command, 'device_one', PRINCIPAL).accepted).toBe(true);
+      expect(
+        service.decide({ ...command, idempotencyKey: 'decision_racer' }, 'device_two', PRINCIPAL),
+      ).toMatchObject({ accepted: false, result: { status: 'raced' } });
+    } finally {
+      service.close();
+      store.close();
+    }
+  });
+
+  it('mints no lease when an accept-edits decrement loses its CAS', () => {
+    const store = new RelayStore();
+    const policy = new MutationPolicy();
+    policy.enableFamily('filesystem');
+    policy.setEnabled(true);
+    const service = new ApprovalService({
+      store,
+      syncHub: new SyncHub(store),
+      policy,
+      identity: IDENTITY,
+      now: () => NOW,
+    });
+    try {
+      const grant = service.createAcceptEditsGrant({
+        principal: PRINCIPAL,
+        sessionId: 'session_local',
+        epoch: 'epoch_security',
+        allowedTools: ['edit'],
+        remainingActions: 1,
+        ttlMs: 1_000,
+      });
+      store.databaseHandle().exec(`
+        CREATE TRIGGER reject_grant_decrement
+        BEFORE UPDATE OF remaining_actions ON accept_edits_grants
+        BEGIN
+          SELECT RAISE(IGNORE);
+        END;
+      `);
+
+      expect(() => service.requestFromGrant(grant.grantId, fixedAction())).toThrow(/denied/);
+      expect(service.list('session_local', PRINCIPAL)).toEqual([]);
+      expect(service.getGrantDto(grant.grantId)).toMatchObject({
+        remainingActions: 1,
+        status: 'active',
+      });
+    } finally {
+      service.close();
+      store.close();
+    }
+  });
+
+  it('removes a secret canary and host-shaped path before durable replay', () => {
+    const canary = 'CANARY_SECRET_opaque_42';
+    const hostShapedPath = '/Users/example/private/sample.txt';
+    const store = new RelayStore();
+    try {
+      store.appendEnvelope({
+        v: 1,
+        eventId: 'event_redaction_canary',
+        kind: 'pi.tool_execution_end',
+        ...IDENTITY,
+        sessionId: 'session_local',
+        epoch: 'epoch_security',
+        seq: 1,
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        causedBy: null,
+        payload: {
+          path: hostShapedPath,
+          authorization: `Bearer ${canary}`,
+          output: `token=${canary}`,
+        },
+        redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+        replay: { eligible: true, snapshotEligible: true },
+      });
+      const durable = JSON.stringify(
+        store.createSyncPlan({
+          ...IDENTITY,
+          sessionId: 'session_local',
+        }),
+      );
+      expect(durable).not.toContain(canary);
+      expect(durable).not.toContain(hostShapedPath);
+      expect(durable).toContain('[REDACTED_SECRET]');
+      expect(durable).toContain('[REDACTED_PATH]');
+    } finally {
+      store.close();
+    }
+  });
+
+  it('keeps push bytes content-free even when the source object carries forbidden fields', () => {
+    const canary = 'CANARY_PUSH_CONTENT_opaque_19';
+    const payload = {
+      lookupId: 'hint_security',
+      attentionClass: 'needs_input',
+      generation: 1,
+      nonce: 'nonce_security',
+      transcript: canary,
+      path: '/Users/example/private/sample.txt',
+      decision: 'approve',
+    } as const;
+    const bytes = Buffer.from(serializePushHint(payload));
+    const decoded = JSON.parse(bytes.toString('utf8')) as object;
+
+    expect(Object.keys(decoded).sort()).toEqual(['attentionClass', 'lookupId']);
+    for (const forbidden of [canary, '/Users/', 'transcript', 'path', 'decision', 'approve']) {
+      expect(bytes.includes(Buffer.from(forbidden))).toBe(false);
+    }
+  });
+});
+
+function fixedAction(): ApprovalAction {
+  return {
+    principal: PRINCIPAL,
+    sessionId: 'session_local',
+    epoch: 'epoch_security',
+    tool: 'edit',
+    arguments: { target: 'opaque_target', content: 'replacement' },
+    policyVersion: 1,
+  };
+}
+
+function decision(card: {
+  readonly approvalId: string;
+  readonly epoch: string;
+  readonly revision: number;
+  readonly digest: string;
+}): ApprovalDecisionCommand {
+  return {
+    type: 'approval.decide',
+    approvalId: card.approvalId,
+    decision: 'approve',
+    idempotencyKey: 'decision_primary',
+    epoch: card.epoch,
+    revision: card.revision,
+    digest: card.digest,
+  };
+}
+
+function deviceKeys(): { publicKey: DevicePublicKeyJwk; privateKey: KeyObject } {
+  const keys = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+  const publicKey = keys.publicKey.export({ format: 'jwk' });
+  if (
+    publicKey.kty !== 'EC' ||
+    publicKey.crv !== 'P-256' ||
+    publicKey.x === undefined ||
+    publicKey.y === undefined
+  ) {
+    throw new Error('Test key export failed.');
+  }
+  return {
+    publicKey: { kty: 'EC', crv: 'P-256', x: publicKey.x, y: publicKey.y },
+    privateKey: keys.privateKey,
+  };
+}
+
+function enrollmentBody(
+  enrollment: EnrollmentQr,
+  keys: { readonly publicKey: DevicePublicKeyJwk; readonly privateKey: KeyObject },
+) {
+  return {
+    enrollment,
+    publicKey: keys.publicKey,
+    signature: signStatement(keys.privateKey, enrollmentProof(enrollment, keys.publicKey)),
+  };
+}
+
+function signStatement(privateKey: KeyObject, statement: string): string {
+  return sign('sha256', Buffer.from(statement), {
+    key: privateKey,
+    dsaEncoding: 'ieee-p1363',
+  }).toString('base64url');
+}

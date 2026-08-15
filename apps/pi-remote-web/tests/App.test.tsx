@@ -1,0 +1,284 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Pi Remote Web App Tests
+// ───────────────────────────────────────────────────────────────────
+
+import type {
+  ApprovalCardDto,
+  AttentionItemDto,
+  SessionCardDto,
+  TranscriptBlock,
+} from '@pi-remote/pi-rpc-protocol';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+
+const relay = vi.hoisted(() => ({
+  createAcceptEditsGrant: vi.fn(),
+  decideApproval: vi.fn(),
+  fetchApprovals: vi.fn(),
+  fetchTranscript: vi.fn(),
+  openSyncSocket: vi.fn(),
+  submitPrompt: vi.fn(),
+}));
+
+const attention = vi.hoisted(() => ({
+  fetchAttention: vi.fn(),
+  fetchPushConfig: vi.fn(),
+  openAttentionHint: vi.fn(),
+  subscribeToPush: vi.fn(),
+  unsubscribeFromPush: vi.fn(),
+  updatePushPreferences: vi.fn(),
+}));
+
+vi.mock('@tanstack/react-virtual', () => ({
+  useVirtualizer: ({ count }: { count: number }) => ({
+    getTotalSize: () => count * 180,
+    getVirtualItems: () =>
+      Array.from({ length: count }, (_, index) => ({ index, start: index * 180 })),
+    measureElement: () => undefined,
+  }),
+}));
+
+vi.mock('../src/relay.js', () => relay);
+vi.mock('../src/attention.js', () => ({
+  ...attention,
+  setPushForeground: vi.fn(),
+}));
+
+import { AttentionInbox, Home, Review, Session, TranscriptList } from '../src/App.js';
+import { EMPTY_TRANSCRIPT, transcriptReducer } from '../src/state.js';
+
+const occurredAt = '2026-08-13T10:00:00.000Z';
+const sessionId = 'session_web_001';
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  attention.fetchPushConfig.mockResolvedValue({
+    supported: false,
+    vapidPublicKey: null,
+    preferences: null,
+  });
+  relay.fetchTranscript.mockResolvedValue({ items: [], coversThrough: 0 });
+  relay.openSyncSocket.mockResolvedValue({
+    addEventListener: vi.fn(),
+    close: vi.fn(),
+  });
+});
+
+afterEach(() => vi.unstubAllGlobals());
+
+it('lists sessions on Home', async () => {
+  const sessions: readonly SessionCardDto[] = [
+    { id: sessionId, status: 'running', updatedAt: occurredAt, messageCount: 7 },
+  ];
+
+  render(
+    <Home
+      sessions={{
+        items: sessions,
+        phase: 'ready',
+        source: 'relay',
+        updatedAt: occurredAt,
+        error: null,
+      }}
+      connection="live"
+      cache={null}
+      device={{ deviceId: 'device_web_001', hostFingerprint: 'host_web_001' }}
+      onSelect={vi.fn()}
+      onRevoke={vi.fn()}
+      onLogout={vi.fn()}
+    />,
+  );
+
+  expect(screen.getByRole('heading', { name: 'Recent sessions' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /session_web_001/i })).toBeInTheDocument();
+  await waitFor(() => expect(attention.fetchPushConfig).toHaveBeenCalledOnce());
+});
+
+it('renders every projected transcript block kind', () => {
+  const blocks: readonly TranscriptBlock[] = [
+    block({ id: 'block_text_001', kind: 'text', text: 'Projected answer', role: 'assistant' }),
+    block({ id: 'block_thinking_001', kind: 'thinking', summary: 'Projected reasoning' }),
+    block({ id: 'block_plan_001', kind: 'plan', items: [{ text: 'Projected step', done: false }] }),
+    block({
+      id: 'block_tool_call_001',
+      kind: 'tool_call',
+      toolName: 'read',
+      inputSummary: 'projected input',
+    }),
+    block({
+      id: 'block_tool_result_001',
+      kind: 'tool_result',
+      toolName: 'read',
+      output: 'projected output',
+      isError: false,
+    }),
+    block({
+      id: 'block_file_diff_001',
+      kind: 'file_diff',
+      summary: 'Projected diff',
+      patch: '-old\n+new',
+    }),
+    block({
+      id: 'block_usage_001',
+      kind: 'usage',
+      inputTokens: 120,
+      outputTokens: 45,
+      cost: 0.02,
+    }),
+  ];
+  const selected = transcriptReducer(EMPTY_TRANSCRIPT, { type: 'select', sessionId });
+  const projected = transcriptReducer(selected, {
+    type: 'page',
+    sessionId,
+    coversThrough: blocks.length,
+    blocks,
+    at: occurredAt,
+  });
+
+  render(<TranscriptList blocks={projected.blocks} running={false} />);
+
+  for (const label of [
+    'Assistant',
+    'Thinking summary',
+    'Plan / todo',
+    'Tool call · read',
+    'Tool result · read',
+    'File diff',
+    'Usage',
+  ]) {
+    expect(screen.getByText(label)).toBeInTheDocument();
+  }
+  expect(screen.getByText('Projected answer')).toBeInTheDocument();
+  expect(screen.getByText('Projected step')).toBeInTheDocument();
+  expect(screen.getByText('projected output')).toBeInTheDocument();
+});
+
+it('submits the compose box through the relay command path', async () => {
+  const user = userEvent.setup();
+  const accepted = block({
+    id: 'block_prompt_001',
+    kind: 'text',
+    text: 'Steer safely',
+    role: 'user',
+  });
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValueOnce(
+      jsonResponse({
+        ticket: 'ticket_web_001',
+        expiresAt: '2099-08-13T10:05:00.000Z',
+      }),
+    )
+    .mockResolvedValueOnce(jsonResponse({ accepted: true, block: accepted }, 202));
+  vi.stubGlobal('fetch', fetchMock);
+  const actualRelay = await vi.importActual<typeof import('../src/relay.js')>('../src/relay.js');
+  relay.submitPrompt.mockImplementation(actualRelay.submitPrompt);
+  const dispatchTranscript = vi.fn();
+
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={dispatchTranscript}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+
+  await user.type(screen.getByLabelText('Steer Pi'), 'Steer safely');
+  await user.click(screen.getByRole('button', { name: 'Send' }));
+
+  await waitFor(() => expect(relay.submitPrompt).toHaveBeenCalledOnce());
+  expect(relay.submitPrompt).toHaveBeenCalledWith(
+    sessionId,
+    expect.stringMatching(/^prompt_/u),
+    'Steer safely',
+  );
+  expect(fetchMock).toHaveBeenNthCalledWith(
+    1,
+    '/api/auth/ticket',
+    expect.objectContaining({ credentials: 'same-origin', method: 'POST' }),
+  );
+  expect(fetchMock).toHaveBeenNthCalledWith(
+    2,
+    '/api/prompt/submit',
+    expect.objectContaining({
+      credentials: 'same-origin',
+      method: 'POST',
+      body: expect.stringContaining('ticket_web_001'),
+    }),
+  );
+  expect(dispatchTranscript).toHaveBeenCalledWith(
+    expect.objectContaining({ type: 'promptOptimistic' }),
+  );
+  expect(dispatchTranscript).toHaveBeenCalledWith(
+    expect.objectContaining({ type: 'promptAccepted', block: accepted }),
+  );
+});
+
+it('renders a pending approval and submits approve and deny decisions', async () => {
+  const user = userEvent.setup();
+  const approval: ApprovalCardDto = {
+    approvalId: 'approval_web_001',
+    sessionId,
+    epoch: 'epoch_web_001',
+    tool: 'shell',
+    canonicalArguments: '{"command":"npm test"}',
+    digest: '0123456789abcdef0123456789abcdef',
+    policyVersion: 1,
+    revision: 1,
+    requestedAt: occurredAt,
+    expiresAt: '2099-08-13T10:05:00.000Z',
+    source: 'explicit',
+    status: 'pending',
+    reason: null,
+  };
+  relay.fetchApprovals.mockResolvedValue([approval]);
+  relay.decideApproval.mockResolvedValue(undefined);
+
+  render(<Review sessions={[{ id: sessionId }]} onBack={vi.fn()} focusId={null} />);
+
+  expect(await screen.findByText('shell')).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: 'Approve once' }));
+  await waitFor(() => expect(relay.decideApproval).toHaveBeenCalledWith(approval, 'approve'));
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Deny' })).toBeEnabled());
+  await user.click(screen.getByRole('button', { name: 'Deny' }));
+  await waitFor(() => expect(relay.decideApproval).toHaveBeenCalledWith(approval, 'deny'));
+});
+
+it('renders the Attention Inbox', async () => {
+  const item: AttentionItemDto = {
+    lookupId: 'attention_web_001',
+    attentionClass: 'needs_input',
+    generation: 1,
+    nonce: 'nonce_web_001',
+    occurredAt,
+  };
+  attention.fetchAttention.mockResolvedValue([item]);
+
+  render(<AttentionInbox onBack={vi.fn()} onOpen={vi.fn()} />);
+
+  expect(screen.getByRole('heading', { name: 'Only what needs you' })).toBeInTheDocument();
+  expect(await screen.findByText('Needs input')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /open current state/i })).toBeInTheDocument();
+});
+
+function block<T extends TranscriptBlock>(value: Omit<T, 'revision' | 'seq' | 'occurredAt'>): T {
+  return {
+    ...value,
+    revision: 1,
+    seq: Number(value.id.match(/(\d+)$/u)?.[1] ?? 1),
+    occurredAt,
+  } as T;
+}
+
+function jsonResponse(value: unknown, status = 200): Response {
+  return new Response(JSON.stringify(value), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  });
+}

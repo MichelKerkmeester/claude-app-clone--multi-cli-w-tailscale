@@ -43,26 +43,23 @@ App code lives in **this repo** (`/Users/michelkerkmeester/MEGA/Development/Mobi
 Set `REPO` to a **git worktree of it** (see §5). Every dispatch runs with the child
 envelope `MK_SPEC_GATE_ENFORCE=0 AI_SESSION_CHILD=1` and terminates stdin `</dev/null`.
 
-Preference order: **DeepSeek v4 Flash first** (cheap, fast); escalate as the phase
-demands. Use all as needed.
+**Active routing (operator directive, 2026-08-16): the ChatGPT/codex (GPT) quota is
+low — route dispatches through the opencode-go gateway to preserve it.** DeepSeek v4
+Flash for mechanical/well-specified work; Luna 5.6 Max for complex reasoning. The
+codex/SOL path is **paused** — use it only if the operator re-enables GPT/codex usage.
 
 | Priority | Model | When | Command shape |
 |:--:|---|---|---|
-| **1 (preferred)** | **DeepSeek v4 Flash** via opencode-go | Well-specified, mechanical, or clearly-scoped protocol/UI phases | `opencode run --model opencode-go/deepseek-v4-flash --format json --dir "$REPO" "<prompt>" </dev/null` |
-| 2 | **GPT-5.6 SOL — high, fast** via codex | Verification-heavy or security-sensitive phases (007/008/009 lanes); or when DeepSeek output fails review | `codex exec --model gpt-5.6-sol -c model_reasoning_effort="high" -c service_tier="fast" -c approval_policy=never --sandbox workspace-write -C "$REPO" "<prompt>" </dev/null` |
-| 3 | **GPT-5.6 Luna — max, fast** via codex (or pi) | Hardest reasoning: complex state machines, cross-surface refactors | `codex exec --model gpt-5.6-luna -c model_reasoning_effort="max" -c service_tier="fast" -c approval_policy=never --sandbox workspace-write -C "$REPO" "<prompt>" </dev/null` |
+| **1** | **DeepSeek v4 Flash** via opencode-go | Well-specified, mechanical, single-file, or fixture work | `opencode run --model opencode-go/deepseek-v4-flash --format json --dir "$REPO" --auto "<prompt>" </dev/null` |
+| **2** | **Luna 5.6 Max** via opencode-go | Complex phases: multi-file features, state machines, security surfaces; or when DeepSeek stalls/fails review | `opencode run --model opencode-go/gpt-5.6-luna --variant max --format json --dir "$REPO" --auto "<prompt>" </dev/null` |
+| paused | GPT-5.6 SOL / Luna via **codex** | Only if the operator re-enables GPT/codex quota | `codex exec --model gpt-5.6-sol -c model_reasoning_effort="high" -c service_tier="fast" -c approval_policy=never --sandbox workspace-write -C "$REPO" "<prompt>" </dev/null` |
 
-Notes:
-- **DeepSeek v4 Flash is non-reasoning** (`--variant` ignored) — best for phases whose
-  `tasks.md` is already explicit. Prepend `MK_SPEC_GATE_ENFORCE=0 AI_SESSION_CHILD=1`.
-- **codex sandbox must be `workspace-write`** for implementation (default is read-only,
-  which silently no-ops file edits).
-- **Luna via pi:** cli-pi is an alternate transport for Luna. Read
-  `cli-external-orchestration/cli-pi/SKILL.md` for the exact guarded invocation before
-  using it — do not assume a pi command shape.
-- **Never dispatch to Claude / cli-claude-code for implementation** (the iron rule).
-- Confirm live model slugs with `opencode models opencode-go` / `codex` auth before a
-  first dispatch; if a model/auth is missing, ASK — never silently substitute.
+Notes (learned building feature 001):
+- **`--auto` is REQUIRED** on `opencode run` for the agent to actually write files — without it the dispatch reads/plans but lands no edits (the non-interactive permission default denies). `--auto` is opencode's analog of codex `approval_policy=never`; apply the §5 four-layer safety envelope whenever it is set.
+- **DeepSeek v4 Flash is non-reasoning and stalls on large sprawling scopes** — it over-reads and never converges (a 15-file phase burned its whole run reading, zero edits). Keep DeepSeek tasks tightly scoped and single-purpose; route multi-file/complex work to Luna Max.
+- **codex's `workspace-write` sandbox blocks binding `127.0.0.1`**, so a codex-dispatched `npm test` reports false `listen EPERM` failures on the relay's HTTP tests (~24 of them). Always re-run `npm test` yourself in the worktree (outside the sandbox) for the true result. opencode-go dispatches do not have this issue.
+- **Never dispatch to Claude / cli-claude-code for implementation** (the iron rule). Claude orchestrates and verifies only.
+- Confirm live slugs with `opencode models opencode-go` before a first dispatch; if a model/auth is missing, ASK — never silently substitute.
 
 ## 4. Build order & gates
 
@@ -103,6 +100,12 @@ A dispatched model with `workspace-write` can delete or corrupt files. Enforce a
    security posture (read-only default; one-use ticketed + revision-checked mutations
    that fail closed; redaction everywhere; host/extension-enforced plan mode; content-free
    push; phone can never enable `--full-access`) — respected, never weakened.
+
+**Worktree lifecycle & merge (learned feature 001):**
+- **Set up a fresh worktree** with `npm ci` (a bare worktree has no `node_modules`) AND symlink `.opencode` in from the main checkout (`ln -sfn "<main>/.opencode" "<wt>/.opencode"`; `.opencode` is gitignored so the symlink never shows in `git status`). Without the symlink the pre-commit **comment-hygiene checker is missing → every commit is blocked**.
+- **Allocate the worktree via** `.opencode/skills/sk-git/scripts/worktree-naming.sh create <slug> <base>` — never hand-create branches. Mind the space in the repo path (`Mobile CLI`): quote it; do not `awk '{print $1}'` the `git worktree list` output.
+- **Verify inside the worktree** (the authoritative gate): `npm run typecheck` + `npm test` + `npm run test:web`, all outside any dispatch sandbox.
+- **On merge to main:** (1) commit all phases in the worktree; (2) `git merge --ff-only <wt-branch>` from the main checkout; (3) **remove the worktree BEFORE running the main gate** — vitest's path filters substring-match the duplicate tests under `.worktrees/…` (and the `.opencode` symlink explodes it into thousands of framework tests) → hundreds of spurious failures; (4) **`npm run build` on main** to refresh dist so consumers see fresh protocol `.d.ts` (a stale `pi-rpc-protocol/dist` yields false "no exported member" typecheck errors); (5) then the clean main gate should match the worktree's.
 
 ## 6. Per-phase autonomous loop
 

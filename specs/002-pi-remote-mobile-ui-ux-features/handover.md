@@ -1,10 +1,11 @@
 # Spec 002 — Handover
 
-> **State:** research-complete, build not started. Ten research-first feature phases,
-> each with a synthesized decision + real reference screens. Packet validates
-> `Errors: 0`. All committed and pushed to `skilled/v4.0.0.0`.
-> **Resume:** read this file → `spec.md` → `roadmap.md` → the target feature's
-> `research/research.md` + `research/reference-screens.md`, then build.
+> **State:** build in progress. All 10 features are research-complete + build-ready.
+> **Feature 001 (`change-model`) is BUILT and merged to `main`** — 3 build phases, gates
+> green, true-390px light+dark screenshots. Features 002–010 pending. This packet lives in
+> the app repo (`Mobile CLI`) and is tracked on `main`.
+> **Resume:** read this file → `build-strategy.md` (the how + model roster) → the target
+> feature's `research/research.md` + its build sub-phase docs, then build.
 
 ---
 
@@ -20,9 +21,9 @@ terminal — **without** weakening the two frozen contracts:
 
 ## 2. Current state
 
-- **Done:** 10 feature phases scaffolded; per-feature research synthesized (`research.md`); real Mobbin/Refero reference screens gathered (`reference-screens.md`, 119 unique real URLs, 0 fabricated); build sub-phases scaffolded for the 8 original features (34 total); all spec-kit metadata generated; packet validates with **0 errors**.
-- **Not started:** any application code. Building the features is the next phase.
-- **Pending research:** `009-ask-question` and `010-todos` are net-new — they have reference screens + a brief but **no synthesized `research.md` yet**; their build specs come after that synthesis.
+- **Feature 001 `change-model` — SHIPPED to `main`** (commits `69c0480` → `3b5546c`): phase `002` (protocol/redaction + one-use revision-bound runtime ticket), phase `003` (RAC model-switcher sheet + full state machine), phase `004` (iPhone interaction/a11y/visual/release hardening), plus a demo-fixture sync. Verified outside the dispatch sandbox: typecheck 0, `npm test` **140/140**, `npm run test:web` **74/74**, true-390px light+dark CDP captures (no overflow at 390/320px). Operator-required residual: physical-iPhone VoiceOver/Switch-Control/Full-Keyboard-Access pass.
+- **Features 002–010 — build-ready, not started.** Each has a synthesized `research.md`, a build-ready `spec.md` + `implementation-phases.md`, and numbered build sub-phases with docs + metadata (009/010 were brought to full parity earlier this session). **40 build phases total; 3 done.**
+- **Build via `build-strategy.md`:** external models implement — opencode-go gateway (**DeepSeek v4 Flash** mechanical, **Luna 5.6 Max** complex); GPT/codex (SOL) paused for quota. Claude orchestrates + verifies and never writes application code. Per-feature isolated worktree → verify → merge to `main`.
 
 ## 3. Structure
 
@@ -86,9 +87,10 @@ terminal — **without** weakening the two frozen contracts:
 
 ## 7. Next steps
 
-1. **Finish 009/010 research:** run the synthesis pass (or a research loop) to turn each net-new feature's `reference-screens.md` + brief into a build-ready `research.md`, then author its `spec.md` + `implementation-phases.md` + build sub-phases (same pipeline as the 8 originals).
-2. **Build in order.** Suggested first: `001-change-model` (cheapest, host-authoritative hardening; its research is the most complete). Then follow the ROADMAP; build `005-file-preview` before `006`/`008` (shared viewer shell); gate `007`/`008` on the security review.
-3. For each feature: implement from its `research.md` (decision) + `reference-screens.md` (real UI patterns) + `implementation-phases.md` (phased plan); verify with typecheck + tests + true-390px CDP screenshots (light + dark) per the sibling packet's technique.
+1. **Build feature `002-change-effort`** next (build order `001 → 002 → …`; it extends feature 001's model/effort sheet). Isolated worktree off `main`, dispatch each build phase to the `build-strategy.md` §3 roster, verify (typecheck + `npm test` + `npm run test:web` + 390px CDP), merge per feature. Then `003`, `004`, `005` (viewer shell, build before `006`/`008`), etc.
+2. **Fix a known flaky test:** `apps/pi-remote-relay/tests/auth.test.ts` → "requires foreground and consumes an exact bound runtime ticket before control". After `socket.close()` it asserts the next `/api/runtime/ticket` returns 403, but only awaits the *client-side* close, so the server may not have deregistered the socket yet → intermittent 201. Fix: poll the foreground state until the server reflects the closed socket before asserting 403.
+3. **Hard security gates** (adversarial review before that feature's Phase 1): `007-media-upload`, `008-inbound-media`, `009-ask-question`.
+4. Each feature: implement from `research.md` (decision) + build sub-phase docs (phased plan); verify with typecheck + tests + true-390px light/dark CDP. The CDP capture harness (zero-dep, system Chrome over CDP) + demo-mode capture technique were built this session.
 
 ## 8. Known caveats
 

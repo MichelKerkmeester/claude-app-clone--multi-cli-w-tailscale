@@ -104,6 +104,9 @@ export function App() {
 
   useEffect(() => {
     const root = document.documentElement;
+    document
+      .querySelector('meta[name="viewport"]')
+      ?.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover');
     const scheme = window.matchMedia('(prefers-color-scheme: dark)');
     const applyTheme = () => {
       root.dataset.theme = theme;
@@ -923,6 +926,15 @@ export function Session({
   const runtimeControls = useRuntime(sessionId);
   const commandCatalog = useCommands();
   const [stopping, setStopping] = useState(false);
+
+  useEffect(() => {
+    const reconcileRuntime = () => {
+      if (document.visibilityState === 'visible') void runtimeControls.refresh('foreground');
+    };
+    document.addEventListener('visibilitychange', reconcileRuntime);
+    return () => document.removeEventListener('visibilitychange', reconcileRuntime);
+  }, [runtimeControls.refresh]);
+
   const stopRun = () => {
     if (stopping) return;
     setStopping(true);
@@ -1434,7 +1446,16 @@ function AssistantActions({ text }: { readonly text: string }) {
 function CopyGlyph() {
   return (
     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
-      <rect x="9" y="9" width="11" height="11" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <rect
+        x="9"
+        y="9"
+        width="11"
+        height="11"
+        rx="2.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
       <path
         d="M6 15V6a2 2 0 0 1 2-2h9"
         fill="none"
@@ -1549,7 +1570,9 @@ function Block({
   const showHeader = bare ? block.kind !== 'text' : block.kind !== 'text' && !collapsible;
   const renderAsDisclosure = collapsible && !bare;
   return (
-    <article className={`transcript-block block-${block.kind}${roleClass}${bare ? ' block-bare' : ''}`}>
+    <article
+      className={`transcript-block block-${block.kind}${roleClass}${bare ? ' block-bare' : ''}`}
+    >
       {showHeader && (
         <header>
           <span>{label}</span>

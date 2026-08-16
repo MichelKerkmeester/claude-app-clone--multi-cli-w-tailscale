@@ -16,8 +16,11 @@ const relay = vi.hoisted(() => ({
   createAcceptEditsGrant: vi.fn(),
   decideApproval: vi.fn(),
   fetchApprovals: vi.fn(),
+  fetchRuntimeModels: vi.fn(),
+  fetchRuntimeState: vi.fn(),
   fetchTranscript: vi.fn(),
   openSyncSocket: vi.fn(),
+  controlRuntime: vi.fn(),
   submitPrompt: vi.fn(),
 }));
 
@@ -59,13 +62,38 @@ beforeEach(() => {
     preferences: null,
   });
   relay.fetchTranscript.mockResolvedValue({ items: [], coversThrough: 0 });
+  relay.fetchRuntimeState.mockResolvedValue({
+    sessionId,
+    revision: 4,
+    model: { provider: 'alpha', id: 'alpha-current', label: 'Alpha Current' },
+    thinkingLevel: 'high',
+    availableThinkingLevels: ['off', 'high'],
+    mode: 'build',
+    streaming: false,
+    updatedAt: occurredAt,
+  });
+  relay.fetchRuntimeModels.mockResolvedValue({
+    sessionId,
+    catalogRevision: 7,
+    runtimeRevision: 4,
+    currentModel: { provider: 'alpha', id: 'alpha-current', label: 'Alpha Current' },
+    streaming: false,
+    canSetModelWhileStreaming: false,
+    models: [
+      { provider: 'alpha', id: 'alpha-current', label: 'Alpha Current' },
+      { provider: 'beta', id: 'beta-next', label: 'Beta Next' },
+    ],
+  });
   relay.openSyncSocket.mockResolvedValue({
     addEventListener: vi.fn(),
     close: vi.fn(),
   });
 });
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 it('lists sessions on Home', async () => {
   const sessions: readonly SessionCardDto[] = [
@@ -222,6 +250,31 @@ it('submits the compose box through the relay command path', async () => {
   expect(dispatchTranscript).toHaveBeenCalledWith(
     expect.objectContaining({ type: 'promptAccepted', block: accepted }),
   );
+});
+
+it('reconciles runtime state when the session returns to the foreground', async () => {
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+
+  await waitFor(() => expect(relay.fetchRuntimeModels).toHaveBeenCalledOnce());
+  const modelReadsBeforeForeground = relay.fetchRuntimeModels.mock.calls.length;
+  const stateReadsBeforeForeground = relay.fetchRuntimeState.mock.calls.length;
+  vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+  document.dispatchEvent(new Event('visibilitychange'));
+  await waitFor(() =>
+    expect(relay.fetchRuntimeModels.mock.calls.length).toBeGreaterThan(modelReadsBeforeForeground),
+  );
+  expect(relay.fetchRuntimeState.mock.calls.length).toBeGreaterThan(stateReadsBeforeForeground);
 });
 
 it('renders a pending approval and submits approve and deny decisions', async () => {

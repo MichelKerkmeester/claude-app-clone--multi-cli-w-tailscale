@@ -41,6 +41,16 @@ import { demoPostJson, demoSocket, isDemoMode } from './demo.js';
 const PAGE_LIMIT = 100;
 const MAX_PAGES = 100;
 
+export class RelayRequestError extends Error {
+  readonly code: 'access_denied' | 'request_failed';
+
+  constructor(code: 'access_denied' | 'request_failed') {
+    super(code === 'access_denied' ? 'Relay access denied.' : 'Relay request failed.');
+    this.name = 'RelayRequestError';
+    this.code = code;
+  }
+}
+
 export interface TranscriptLoad {
   readonly items: readonly TranscriptBlock[];
   readonly coversThrough: number;
@@ -164,11 +174,17 @@ export async function controlRuntime(
       ticket: ticketPayload.ticket,
     };
   }
-  const payload = await postJson('/api/runtime/control', command, signal, [202, 409, 422, 503]);
-  if (!isRuntimeControlResponse(payload)) {
-    throw new Error('Relay returned an invalid runtime control result.');
+  try {
+    const payload = await postJson('/api/runtime/control', command, signal, [202, 409, 422, 503]);
+    if (!isRuntimeControlResponse(payload)) {
+      return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
+    }
+    return payload;
+  } catch {
+    // Once the command submission starts, transport failure is terminal and ambiguous.
+    // A retry could apply the same user intent twice, so reconciliation is the only safe path.
+    return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
   }
-  return payload;
 }
 
 /** Interrupt the running agent. A fresh one-use ticket is obtained immediately before. */
@@ -325,7 +341,9 @@ async function postJson(
     ...(signal === undefined ? {} : { signal }),
   });
   if (!response.ok && !acceptedStatuses.includes(response.status)) {
-    throw new Error(`Relay returned HTTP ${response.status}.`);
+    throw new RelayRequestError(
+      response.status === 401 || response.status === 403 ? 'access_denied' : 'request_failed',
+    );
   }
   return response.status === 204 ? null : (response.json() as Promise<unknown>);
 }

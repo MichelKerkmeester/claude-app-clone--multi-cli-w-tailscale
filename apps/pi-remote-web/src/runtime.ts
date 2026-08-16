@@ -2,7 +2,7 @@
 // MODULE: Non-Optimistic Runtime Control State
 // ───────────────────────────────────────────────────────────────────
 
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 
 import type {
   AvailableModelDto,
@@ -15,6 +15,10 @@ import type {
 import { controlRuntime, fetchRuntimeModels, fetchRuntimeState } from './relay.js';
 
 export type RuntimeStatus = 'checking' | 'ready' | 'pending' | 'stale' | 'error';
+export type CatalogPhase =
+  'opening' | 'refreshing' | 'ready' | 'offline' | 'unreachable' | 'access_denied';
+export type RuntimeTerminalOutcome =
+  'stale' | 'unavailable' | 'policy_blocked' | 'delivery_unknown';
 
 export interface RuntimeUiState {
   readonly status: RuntimeStatus;
@@ -22,9 +26,11 @@ export interface RuntimeUiState {
   readonly models: readonly AvailableModelDto[];
   readonly catalogRevision: number | null;
   readonly canSetModelWhileStreaming: boolean;
+  readonly catalogPhase: CatalogPhase;
   readonly pending: RuntimeOperation | null;
   readonly error: string | null;
   readonly deliveryUnknown: boolean;
+  readonly lastOutcome: RuntimeTerminalOutcome | null;
 }
 
 export const INITIAL_RUNTIME_STATE: RuntimeUiState = {
@@ -33,19 +39,25 @@ export const INITIAL_RUNTIME_STATE: RuntimeUiState = {
   models: [],
   catalogRevision: null,
   canSetModelWhileStreaming: false,
+  catalogPhase: 'opening',
   pending: null,
   error: null,
   deliveryUnknown: false,
+  lastOutcome: null,
 };
 
 export type RuntimeAction =
-  | { readonly type: 'checking' }
+  | { readonly type: 'checking'; readonly phase: 'opening' | 'refreshing' }
   | {
       readonly type: 'hydrated';
       readonly state: RuntimeStateDto;
       readonly models: RuntimeModelCatalogDto;
     }
-  | { readonly type: 'hydrate-failed'; readonly error: string }
+  | {
+      readonly type: 'hydrate-failed';
+      readonly error: string;
+      readonly phase: 'offline' | 'unreachable' | 'access_denied';
+    }
   | { readonly type: 'control-start'; readonly operation: RuntimeOperation }
   | { readonly type: 'control-settled'; readonly response: RuntimeControlResponse };
 
@@ -55,7 +67,13 @@ export type RuntimeAction =
 export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): RuntimeUiState {
   switch (action.type) {
     case 'checking':
-      return { ...current, status: 'checking', pending: null, error: null, deliveryUnknown: false };
+      return {
+        ...current,
+        status: 'checking',
+        catalogPhase: action.phase,
+        pending: null,
+        error: null,
+      };
     case 'hydrated':
       return {
         status: 'ready',
@@ -63,12 +81,22 @@ export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): 
         models: action.models.models,
         catalogRevision: action.models.catalogRevision,
         canSetModelWhileStreaming: action.models.canSetModelWhileStreaming,
+        catalogPhase: 'ready',
         pending: null,
         error: null,
         deliveryUnknown: false,
+        lastOutcome: null,
       };
     case 'hydrate-failed':
-      return { ...current, status: 'error', error: action.error };
+      if (action.phase === 'access_denied') {
+        return {
+          ...INITIAL_RUNTIME_STATE,
+          status: 'error',
+          catalogPhase: 'access_denied',
+          error: action.error,
+        };
+      }
+      return { ...current, status: 'error', catalogPhase: action.phase, error: action.error };
     case 'control-start':
       // No state mutation here — the chosen control shows pending, nothing commits.
       return {
@@ -77,6 +105,7 @@ export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): 
         pending: action.operation,
         error: null,
         deliveryUnknown: false,
+        lastOutcome: null,
       };
     case 'control-settled':
       return settle(current, action.response);
@@ -96,6 +125,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         pending: null,
         error: null,
         deliveryUnknown: false,
+        lastOutcome: null,
       };
     case 'stale':
       // The host's current authoritative state replaces our stale view; retry is user-initiated.
@@ -106,6 +136,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         pending: null,
         error: null,
         deliveryUnknown: false,
+        lastOutcome: 'stale',
       };
     case 'unsupported':
     case 'unavailable':
@@ -116,6 +147,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         pending: null,
         error: runtimeReasonMessage(outcome.reasonCode),
         deliveryUnknown: false,
+        lastOutcome: outcome.status === 'policy_blocked' ? 'policy_blocked' : 'unavailable',
       };
     case 'delivery-unknown':
       // Terminal: reconcile before any retry; never auto-repeat the mutation.
@@ -125,6 +157,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         pending: null,
         error: runtimeReasonMessage(outcome.reasonCode),
         deliveryUnknown: true,
+        lastOutcome: 'delivery_unknown',
       };
     default:
       return current;
@@ -133,36 +166,97 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
 
 export interface RuntimeControls {
   readonly runtime: RuntimeUiState;
-  readonly refresh: () => Promise<void>;
-  readonly setModel: (provider: string, modelId: string) => Promise<void>;
-  readonly setThinkingLevel: (level: string) => Promise<void>;
-  readonly setMode: (mode: 'build' | 'plan') => Promise<void>;
+  readonly refresh: (reason?: 'initial' | 'open' | 'foreground' | 'manual') => Promise<void>;
+  readonly setModel: (provider: string, modelId: string) => Promise<RuntimeControlResponse | null>;
+  readonly setThinkingLevel: (level: string) => Promise<RuntimeControlResponse | null>;
+  readonly setMode: (mode: 'build' | 'plan') => Promise<RuntimeControlResponse | null>;
 }
 
 /** Host-authoritative runtime controls for one session; disabled outside `ready`. */
 export function useRuntime(sessionId: string): RuntimeControls {
   const [runtime, dispatch] = useReducer(runtimeReducer, INITIAL_RUNTIME_STATE);
+  const runtimeRef = useRef(runtime);
+  const catalogControllerRef = useRef<AbortController | null>(null);
+  const mutationControllerRef = useRef<AbortController | null>(null);
+  const authorityGenerationRef = useRef(0);
+  const mutationInFlightRef = useRef(false);
+  runtimeRef.current = runtime;
 
-  const refresh = useCallback(async () => {
-    dispatch({ type: 'checking' });
-    try {
-      const [state, models] = await Promise.all([fetchRuntimeState(), fetchRuntimeModels()]);
-      dispatch({ type: 'hydrated', state, models });
-    } catch (error) {
-      dispatch({ type: 'hydrate-failed', error: messageOf(error) });
-    }
-  }, []);
+  const refresh = useCallback(
+    async (reason: 'initial' | 'open' | 'foreground' | 'manual' = 'manual') => {
+      const generation = authorityGenerationRef.current + 1;
+      authorityGenerationRef.current = generation;
+      catalogControllerRef.current?.abort();
+      const controller = new AbortController();
+      catalogControllerRef.current = controller;
+      const timeout = window.setTimeout(() => controller.abort(), 8_000);
+      dispatch({
+        type: 'checking',
+        phase:
+          reason === 'initial' && runtimeRef.current.models.length === 0 ? 'opening' : 'refreshing',
+      });
+      try {
+        const [state, models] = await Promise.all([
+          fetchRuntimeState(controller.signal),
+          fetchRuntimeModels(controller.signal),
+        ]);
+        if (controller.signal.aborted || generation !== authorityGenerationRef.current) return;
+        if (state.sessionId !== sessionId || models.sessionId !== sessionId) {
+          throw new Error('Relay returned runtime data for another session.');
+        }
+        dispatch({ type: 'hydrated', state, models });
+      } catch (error) {
+        if (controller.signal.aborted || generation !== authorityGenerationRef.current) return;
+        const phase = catalogFailurePhase(error);
+        dispatch({ type: 'hydrate-failed', error: catalogFailureMessage(phase), phase });
+      } finally {
+        window.clearTimeout(timeout);
+        if (catalogControllerRef.current === controller) catalogControllerRef.current = null;
+      }
+    },
+    [sessionId],
+  );
 
   const apply = useCallback(
-    async (operation: RuntimeOperation) => {
+    async (operation: RuntimeOperation): Promise<RuntimeControlResponse | null> => {
+      const current = runtimeRef.current;
       // Only mutate from a settled, host-confirmed state with a known revision.
-      if (runtime.status !== 'ready' || runtime.state === null) {
-        return;
+      if (
+        mutationInFlightRef.current ||
+        current.status !== 'ready' ||
+        current.state === null ||
+        current.deliveryUnknown
+      ) {
+        return null;
       }
-      const expectedRevision = runtime.state.revision;
+      if (
+        operation.type === 'set_model' &&
+        current.state.streaming &&
+        !current.canSetModelWhileStreaming
+      ) {
+        return null;
+      }
+      if (
+        operation.type === 'set_model' &&
+        !current.models.some(
+          (model) =>
+            model.provider === operation.provider &&
+            model.id === operation.modelId &&
+            (model.availability ?? 'available') === 'available',
+        )
+      ) {
+        return null;
+      }
+      const expectedRevision = current.state.revision;
       const expectedCatalogRevision =
-        operation.type === 'set_model' ? (runtime.catalogRevision ?? undefined) : undefined;
-      if (operation.type === 'set_model' && expectedCatalogRevision === undefined) return;
+        operation.type === 'set_model' ? (current.catalogRevision ?? undefined) : undefined;
+      if (operation.type === 'set_model' && expectedCatalogRevision === undefined) return null;
+      const generation = authorityGenerationRef.current + 1;
+      authorityGenerationRef.current = generation;
+      mutationInFlightRef.current = true;
+      const controller = new AbortController();
+      mutationControllerRef.current = controller;
+      const timeout = window.setTimeout(() => controller.abort(), 8_000);
       dispatch({ type: 'control-start', operation });
       try {
         const response = await controlRuntime(
@@ -170,16 +264,28 @@ export function useRuntime(sessionId: string): RuntimeControls {
           expectedRevision,
           operation,
           expectedCatalogRevision,
+          controller.signal,
         );
+        if (generation !== authorityGenerationRef.current) return null;
         dispatch({ type: 'control-settled', response });
+        return response;
       } catch (error) {
+        if (generation !== authorityGenerationRef.current) return null;
+        const response: RuntimeControlResponse = {
+          outcome: { status: 'unavailable', reasonCode: 'runtime_unavailable' },
+        };
         dispatch({
           type: 'control-settled',
-          response: { outcome: { status: 'unavailable', reasonCode: 'runtime_unavailable' } },
+          response,
         });
+        return response;
+      } finally {
+        window.clearTimeout(timeout);
+        mutationInFlightRef.current = false;
+        if (mutationControllerRef.current === controller) mutationControllerRef.current = null;
       }
     },
-    [runtime.status, runtime.state, runtime.catalogRevision, sessionId],
+    [sessionId],
   );
 
   const setModel = useCallback(
@@ -196,14 +302,39 @@ export function useRuntime(sessionId: string): RuntimeControls {
   );
 
   useEffect(() => {
-    void refresh();
+    void refresh('initial');
+    return () => {
+      authorityGenerationRef.current += 1;
+      catalogControllerRef.current?.abort();
+      mutationControllerRef.current?.abort();
+    };
   }, [refresh]);
 
   return { runtime, refresh, setModel, setThinkingLevel, setMode };
 }
 
-function messageOf(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+function catalogFailurePhase(error: unknown): 'offline' | 'unreachable' | 'access_denied' {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return 'offline';
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'access_denied'
+  ) {
+    return 'access_denied';
+  }
+  return 'unreachable';
+}
+
+function catalogFailureMessage(phase: 'offline' | 'unreachable' | 'access_denied'): string {
+  switch (phase) {
+    case 'offline':
+      return 'You’re offline. Catalog browsing is read-only.';
+    case 'access_denied':
+      return 'Access expired. Reconnect to load runtime data.';
+    default:
+      return 'The host is unreachable. Try a read-only refresh.';
+  }
 }
 
 function runtimeReasonMessage(reasonCode: string): string {

@@ -3,10 +3,20 @@
 // ───────────────────────────────────────────────────────────────────
 
 import { describe, expect, it } from 'vitest';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { beforeEach, vi } from 'vitest';
 
 import type { RuntimeModelCatalogDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 
-import { INITIAL_RUNTIME_STATE, runtimeReducer } from '../src/runtime.js';
+const relay = vi.hoisted(() => ({
+  controlRuntime: vi.fn(),
+  fetchRuntimeModels: vi.fn(),
+  fetchRuntimeState: vi.fn(),
+}));
+
+vi.mock('../src/relay.js', () => relay);
+
+import { INITIAL_RUNTIME_STATE, runtimeReducer, useRuntime } from '../src/runtime.js';
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -21,12 +31,22 @@ const HOST_STATE: RuntimeStateDto = {
 
 const MODELS: RuntimeModelCatalogDto = {
   sessionId: 'session_local',
+  catalogRevision: 7,
   runtimeRevision: 4,
+  currentModel: HOST_STATE.model,
+  streaming: false,
+  canSetModelWhileStreaming: false,
   models: [
     { provider: 'deepseek', id: 'deepseek-v4-flash', label: 'DeepSeek Flash' },
     { provider: 'opencode-go', id: 'qwen3.8-max', label: 'Qwen 3.8 Max' },
   ],
 };
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  relay.fetchRuntimeState.mockResolvedValue(HOST_STATE);
+  relay.fetchRuntimeModels.mockResolvedValue(MODELS);
+});
 
 function ready() {
   return runtimeReducer(INITIAL_RUNTIME_STATE, {
@@ -84,7 +104,12 @@ describe('runtime UI state machine', () => {
     for (const status of ['unsupported', 'unavailable'] as const) {
       const settled = runtimeReducer(ready(), {
         type: 'control-settled',
-        response: { outcome: { status, reason: `${status} reason` } },
+        response: {
+          outcome:
+            status === 'unsupported'
+              ? { status, reasonCode: 'unsupported_operation' }
+              : { status, reasonCode: 'model_unavailable' },
+        },
       });
       expect(settled.status).toBe('error');
       expect(settled.state).toEqual(HOST_STATE);
@@ -95,7 +120,7 @@ describe('runtime UI state machine', () => {
   it('marks delivery-unknown terminal and never mutates state', () => {
     const settled = runtimeReducer(ready(), {
       type: 'control-settled',
-      response: { outcome: { status: 'delivery-unknown', reason: 'transport failed' } },
+      response: { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } },
     });
     expect(settled.status).toBe('error');
     expect(settled.deliveryUnknown).toBe(true);
@@ -103,8 +128,105 @@ describe('runtime UI state machine', () => {
   });
 
   it('invalidates to checking on reconnect', () => {
-    const checking = runtimeReducer(ready(), { type: 'checking' });
+    const checking = runtimeReducer(ready(), { type: 'checking', phase: 'refreshing' });
     expect(checking.status).toBe('checking');
     expect(checking.pending).toBeNull();
+  });
+
+  it('keeps delivery unknown blocked until a successful read-only reconciliation', () => {
+    const unknown = runtimeReducer(ready(), {
+      type: 'control-settled',
+      response: { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } },
+    });
+    const checking = runtimeReducer(unknown, { type: 'checking', phase: 'refreshing' });
+    expect(checking.deliveryUnknown).toBe(true);
+    expect(
+      runtimeReducer(checking, { type: 'hydrated', state: HOST_STATE, models: MODELS })
+        .deliveryUnknown,
+    ).toBe(false);
+  });
+
+  it('clears sensitive runtime catalog state on access denial', () => {
+    const denied = runtimeReducer(ready(), {
+      type: 'hydrate-failed',
+      phase: 'access_denied',
+      error: 'Access expired. Reconnect to load runtime data.',
+    });
+    expect(denied.catalogPhase).toBe('access_denied');
+    expect(denied.state).toBeNull();
+    expect(denied.models).toEqual([]);
+    expect(denied.catalogRevision).toBeNull();
+  });
+
+  it('ignores a late catalog generation after a newer refresh settles', async () => {
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.status).toBe('ready'));
+
+    let resolveOldState!: (state: RuntimeStateDto) => void;
+    let resolveOldCatalog!: (catalog: RuntimeModelCatalogDto) => void;
+    relay.fetchRuntimeState.mockImplementationOnce(
+      () => new Promise<RuntimeStateDto>((resolve) => (resolveOldState = resolve)),
+    );
+    relay.fetchRuntimeModels.mockImplementationOnce(
+      () => new Promise<RuntimeModelCatalogDto>((resolve) => (resolveOldCatalog = resolve)),
+    );
+    const oldRefresh = result.current.refresh('manual');
+
+    const newerState = { ...HOST_STATE, revision: 9 };
+    const newerCatalog = { ...MODELS, runtimeRevision: 9, catalogRevision: 8 };
+    relay.fetchRuntimeState.mockResolvedValueOnce(newerState);
+    relay.fetchRuntimeModels.mockResolvedValueOnce(newerCatalog);
+    await act(async () => result.current.refresh('foreground'));
+    expect(result.current.runtime.state?.revision).toBe(9);
+
+    await act(async () => {
+      resolveOldState({ ...HOST_STATE, revision: 5 });
+      resolveOldCatalog({ ...MODELS, runtimeRevision: 5 });
+      await oldRefresh;
+    });
+    expect(result.current.runtime.state?.revision).toBe(9);
+    expect(result.current.runtime.catalogRevision).toBe(8);
+  });
+
+  it('does not let a late mutation overwrite newer reconciled host state', async () => {
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.status).toBe('ready'));
+
+    let resolveControl!: (response: {
+      outcome: { status: 'accepted'; state: RuntimeStateDto };
+    }) => void;
+    relay.controlRuntime.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveControl = resolve)),
+    );
+    let mutation!: Promise<unknown>;
+    act(() => {
+      mutation = result.current.setModel('opencode-go', 'qwen3.8-max');
+    });
+    await waitFor(() => expect(result.current.runtime.status).toBe('pending'));
+
+    const reconciledState = { ...HOST_STATE, revision: 10 };
+    relay.fetchRuntimeState.mockResolvedValueOnce(reconciledState);
+    relay.fetchRuntimeModels.mockResolvedValueOnce({
+      ...MODELS,
+      runtimeRevision: 10,
+      catalogRevision: 9,
+    });
+    await act(async () => result.current.refresh('foreground'));
+    expect(result.current.runtime.state?.revision).toBe(10);
+
+    await act(async () => {
+      resolveControl({
+        outcome: {
+          status: 'accepted',
+          state: {
+            ...HOST_STATE,
+            revision: 5,
+            model: MODELS.models[1] ?? null,
+          },
+        },
+      });
+      await mutation;
+    });
+    expect(result.current.runtime.state?.revision).toBe(10);
   });
 });

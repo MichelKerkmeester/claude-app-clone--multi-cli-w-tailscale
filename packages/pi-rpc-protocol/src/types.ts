@@ -454,10 +454,37 @@ export interface SetThinkingLevelCommand extends PiRpcCommandBase {
 export const RUNTIME_MODES = ['build', 'plan', 'executing-plan', 'unknown'] as const;
 export type RuntimeMode = (typeof RUNTIME_MODES)[number];
 
+export const MODEL_INPUT_KINDS = ['text', 'image'] as const;
+export type ModelInputKind = (typeof MODEL_INPUT_KINDS)[number];
+
+export const MODEL_AVAILABILITIES = ['available', 'tier_locked', 'policy_blocked'] as const;
+export type ModelAvailability = (typeof MODEL_AVAILABILITIES)[number];
+
+export const MODEL_AVAILABILITY_REASON_CODES = [
+  'tier_locked',
+  'policy_blocked',
+  'unavailable',
+] as const;
+export type ModelAvailabilityReasonCode = (typeof MODEL_AVAILABILITY_REASON_CODES)[number];
+
+export interface ModelPricingDto {
+  readonly currency: string;
+  readonly inputPerMillion?: number;
+  readonly outputPerMillion?: number;
+}
+
 export interface AvailableModelDto {
   readonly provider: string;
   readonly id: string;
   readonly label: string;
+  readonly reasoning?: boolean;
+  readonly input?: readonly ModelInputKind[];
+  readonly contextWindow?: number;
+  readonly maxTokens?: number;
+  readonly tools?: boolean;
+  readonly availability?: ModelAvailability;
+  readonly availabilityReasonCode?: ModelAvailabilityReasonCode;
+  readonly pricing?: ModelPricingDto;
 }
 
 export interface RuntimeStateDto {
@@ -476,18 +503,43 @@ export type RuntimeOperation =
   | { readonly type: 'set_thinking_level'; readonly level: string }
   | { readonly type: 'set_mode'; readonly mode: 'build' | 'plan' };
 
-export interface RuntimeControlCommand {
+interface RuntimeControlCommandBase {
   readonly type: 'runtime.control';
   readonly controlId: string;
   readonly sessionId: string;
   readonly expectedRevision: number;
-  readonly operation: RuntimeOperation;
   readonly ticket: string;
+}
+
+export type RuntimeControlCommand =
+  | (RuntimeControlCommandBase & {
+      readonly expectedCatalogRevision: number;
+      readonly operation: Extract<RuntimeOperation, { readonly type: 'set_model' }>;
+    })
+  | (RuntimeControlCommandBase & {
+      readonly operation: Exclude<RuntimeOperation, { readonly type: 'set_model' }>;
+      readonly expectedCatalogRevision?: never;
+    });
+
+export interface RuntimeModelTicketRequest {
+  readonly sessionId: string;
+  readonly expectedRevision: number;
+  readonly expectedCatalogRevision: number;
+  readonly operation: Extract<RuntimeOperation, { readonly type: 'set_model' }>;
+}
+
+export interface RuntimeModelTicketResponse {
+  readonly ticket: string;
+  readonly expiresAt: string;
 }
 
 export interface RuntimeModelCatalogDto {
   readonly sessionId: string;
+  readonly catalogRevision: number;
   readonly runtimeRevision: number;
+  readonly currentModel: AvailableModelDto | null;
+  readonly streaming: boolean;
+  readonly canSetModelWhileStreaming: boolean;
   readonly models: readonly AvailableModelDto[];
 }
 
@@ -508,12 +560,33 @@ export interface CommandCatalogDto {
   readonly commands: readonly CommandDescriptorDto[];
 }
 
+export const RUNTIME_CONTROL_REASON_CODES = [
+  'stale_revision',
+  'stale_catalog',
+  'unsupported_operation',
+  'runtime_unavailable',
+  'model_unavailable',
+  'tier_locked',
+  'policy_blocked',
+  'streaming_active',
+  'host_rejected',
+  'delivery_unknown',
+] as const;
+export type RuntimeControlReasonCode = (typeof RUNTIME_CONTROL_REASON_CODES)[number];
+
 export type RuntimeControlOutcome =
   | { readonly status: 'accepted'; readonly state: RuntimeStateDto }
   | { readonly status: 'stale'; readonly state: RuntimeStateDto }
-  | { readonly status: 'unsupported'; readonly reason: string }
-  | { readonly status: 'unavailable'; readonly reason: string }
-  | { readonly status: 'delivery-unknown'; readonly reason: string };
+  | { readonly status: 'unsupported'; readonly reasonCode: 'unsupported_operation' }
+  | {
+      readonly status: 'unavailable';
+      readonly reasonCode: Exclude<
+        RuntimeControlReasonCode,
+        'unsupported_operation' | 'policy_blocked' | 'delivery_unknown'
+      >;
+    }
+  | { readonly status: 'policy_blocked'; readonly reasonCode: 'policy_blocked' }
+  | { readonly status: 'delivery-unknown'; readonly reasonCode: 'delivery_unknown' };
 
 export interface RuntimeControlResponse {
   readonly outcome: RuntimeControlOutcome;

@@ -16,6 +16,7 @@ import {
   isPushPreferences,
   isPushSubscriptionInput,
   isRuntimeControlCommand,
+  isRuntimeModelTicketRequest,
   type EnrollmentRequest,
   type RuntimeControlResponse,
   type SyncCursor,
@@ -121,6 +122,7 @@ export async function startReadOnlyServer(
     options.now ?? Date.now,
   );
   const runtimeControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
+  const runtimeTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
   const activeSockets = new Set<ActiveSocket>();
   // A runtime mutation is only valid from a device that also holds a live, authenticated
   // sync socket — a background or stale device can never steer the host.
@@ -138,6 +140,7 @@ export async function startReadOnlyServer(
       requestLimiter,
       enrollmentLimiter,
       promptLimiter,
+      runtimeTicketLimiter,
       runtimeControlLimiter,
       isForegroundDevice,
     ).catch(() => sendJson(response, 400, { error: 'invalid_request' }));
@@ -278,6 +281,7 @@ async function handleHttp(
   requestLimiter: FixedWindowRateLimiter,
   enrollmentLimiter: FixedWindowRateLimiter,
   promptLimiter: FixedWindowRateLimiter,
+  runtimeTicketLimiter: FixedWindowRateLimiter,
   runtimeControlLimiter: FixedWindowRateLimiter,
   isForegroundDevice: (deviceId: string, token: string) => boolean,
 ): Promise<void> {
@@ -560,6 +564,29 @@ async function handleHttp(
     sendJson(response, 200, catalog);
     return;
   }
+  if (ingress.path === '/api/runtime/ticket') {
+    const body = await readJsonBody(request);
+    if (options.runtime === undefined || !isRuntimeModelTicketRequest(body)) {
+      sendJson(response, 400, { error: 'invalid_runtime_ticket_request' });
+      return;
+    }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (!runtimeTicketLimiter.consume(session.deviceId)) {
+      auth.metrics.rateLimited += 1;
+      sendJson(response, 429, { error: 'rate_limited' });
+      return;
+    }
+    const reasonCode = await options.runtime.validateFreshModelTicketRequest(body);
+    if (reasonCode !== null) {
+      sendJson(response, reasonCode.startsWith('stale_') ? 409 : 422, { error: reasonCode });
+      return;
+    }
+    sendJson(response, 201, auth.issueRuntimeModelTicket(session, body));
+    return;
+  }
   if (ingress.path === '/api/commands/list') {
     await requireEmptyBody(request);
     if (options.commands === undefined) {
@@ -611,17 +638,12 @@ async function handleHttp(
       sendJson(response, 400, { error: 'invalid_runtime_control' });
       return;
     }
-    const ticketSession = auth.consumeTicket(
-      body.ticket,
-      ingress.origin,
-      ingress.principal,
-      'runtime:control',
-    );
-    if (
-      ticketSession === null ||
-      ticketSession.token !== session.token ||
-      ticketSession.deviceId !== session.deviceId
-    ) {
+    const ticketAccepted =
+      body.operation.type === 'set_model'
+        ? auth.consumeRuntimeModelTicket(body.ticket, session, body)
+        : auth.consumeTicket(body.ticket, ingress.origin, ingress.principal, 'runtime:control')
+            ?.token === session.token;
+    if (!ticketAccepted) {
       sendJson(response, 401, { error: 'unauthorized' });
       return;
     }
@@ -833,6 +855,7 @@ function actionForRequest(path: string): string | null {
   if (path === '/api/prompt/abort') return 'prompt:abort';
   if (path === '/api/accept-edits') return 'accept-edits:create';
   if (path === '/api/runtime/state' || path === '/api/runtime/models') return 'runtime:read';
+  if (path === '/api/runtime/ticket') return 'runtime-ticket:create';
   if (path === '/api/runtime/control') return 'runtime:control';
   if (path === '/api/commands/list') return 'commands:list';
   return null;
@@ -845,6 +868,7 @@ function statusForRuntimeOutcome(result: RuntimeControlResponse): number {
     case 'stale':
       return 409;
     case 'unsupported':
+    case 'policy_blocked':
       return 422;
     default:
       return 503;

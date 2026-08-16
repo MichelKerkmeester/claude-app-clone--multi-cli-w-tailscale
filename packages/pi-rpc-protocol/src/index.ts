@@ -12,7 +12,13 @@ export {
   sha256,
 } from './approval.js';
 
-export { RUNTIME_MODES } from './types.js';
+export {
+  MODEL_AVAILABILITIES,
+  MODEL_AVAILABILITY_REASON_CODES,
+  MODEL_INPUT_KINDS,
+  RUNTIME_CONTROL_REASON_CODES,
+  RUNTIME_MODES,
+} from './types.js';
 
 export {
   isEnvelope,
@@ -51,6 +57,8 @@ export {
   isRuntimeControlCommand,
   isRuntimeControlResponse,
   isRuntimeModelCatalogDto,
+  isRuntimeModelTicketRequest,
+  isRuntimeModelTicketResponse,
   isRuntimeOperation,
   isRuntimeStateDto,
   isSessionCardDto,
@@ -82,6 +90,10 @@ export type {
   AttentionItemDto,
   AttentionResolutionDto,
   AvailableModelDto,
+  ModelAvailability,
+  ModelAvailabilityReasonCode,
+  ModelInputKind,
+  ModelPricingDto,
   CommandCatalogDto,
   CommandDescriptorDto,
   CommandSource,
@@ -114,8 +126,12 @@ export type {
   RedactionMetadata,
   ReplayMetadata,
   RuntimeControlCommand,
+  RuntimeControlOutcome,
+  RuntimeControlReasonCode,
   RuntimeControlResponse,
   RuntimeModelCatalogDto,
+  RuntimeModelTicketRequest,
+  RuntimeModelTicketResponse,
   RuntimeMode,
   RuntimeOperation,
   RuntimeReadCommand,

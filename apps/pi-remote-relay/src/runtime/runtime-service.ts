@@ -6,6 +6,8 @@ import type {
   PiRpcResponse,
   RuntimeControlCommand,
   RuntimeControlResponse,
+  RuntimeControlReasonCode,
+  RuntimeModelTicketRequest,
   RuntimeMode,
   RuntimeModelCatalogDto,
   RuntimeOperation,
@@ -19,7 +21,6 @@ import { parsePlanStatus } from './plan-status.js';
 
 const IDEMPOTENCY_CAP = 256;
 const MODE_CONFIRM_TIMEOUT_MS = 4_000;
-const MAX_REASON_LENGTH = 500;
 
 export interface RuntimeServiceOptions {
   readonly sessionId: string;
@@ -32,8 +33,19 @@ interface ModeWaiter {
   readonly timer: NodeJS.Timeout;
 }
 
+type RuntimeValidationReason =
+  | 'unsupported_operation'
+  | 'model_unavailable'
+  | 'tier_locked'
+  | 'policy_blocked'
+  | 'streaming_active';
+
 /** A mutation the host delivered and explicitly rejected — never a delivery-unknown. */
-class HostRejectedError extends Error {}
+class HostRejectedError extends Error {
+  public constructor(readonly reasonCode: 'policy_blocked' | 'host_rejected') {
+    super(reasonCode);
+  }
+}
 
 /**
  * Owns per-session runtime authority in memory. Pi is the source of truth for model,
@@ -43,6 +55,7 @@ class HostRejectedError extends Error {}
  */
 export class RuntimeService {
   private revision = 0;
+  private catalogRevision = 0;
   private currentState: RuntimeStateDto | null = null;
   private modelCatalog: RuntimeModelCatalogDto | null = null;
   private mode: RuntimeMode = 'unknown';
@@ -62,6 +75,7 @@ export class RuntimeService {
         this.live = false;
         this.mode = 'unknown';
         this.currentState = null;
+        this.modelCatalog = null;
       }
     });
     supervisor.onEvent((event) => {
@@ -85,6 +99,74 @@ export class RuntimeService {
     return this.revision;
   }
 
+  public validateModelTicketRequest(
+    request: RuntimeModelTicketRequest,
+  ): RuntimeControlReasonCode | null {
+    if (
+      !this.live ||
+      this.currentState === null ||
+      this.modelCatalog === null ||
+      request.sessionId !== this.options.sessionId
+    ) {
+      return 'runtime_unavailable';
+    }
+    if (request.expectedRevision !== this.revision) return 'stale_revision';
+    if (request.expectedCatalogRevision !== this.catalogRevision) return 'stale_catalog';
+    const target = this.modelCatalog.models.find(
+      (model) =>
+        model.provider === request.operation.provider && model.id === request.operation.modelId,
+    );
+    if (target === undefined) return 'model_unavailable';
+    if (target.availability === 'policy_blocked') return 'policy_blocked';
+    if (target.availability === 'tier_locked') return 'tier_locked';
+    if (this.currentState.streaming && !this.modelCatalog.canSetModelWhileStreaming) {
+      return 'streaming_active';
+    }
+    return null;
+  }
+
+  /** Reconcile a read-only host snapshot before minting short-lived mutation authority. */
+  public async validateFreshModelTicketRequest(
+    request: RuntimeModelTicketRequest,
+  ): Promise<RuntimeControlReasonCode | null> {
+    if (!this.live || this.currentState === null || this.modelCatalog === null) {
+      return 'runtime_unavailable';
+    }
+    try {
+      const [stateResponse, modelsResponse] = await Promise.all([
+        this.supervisor.send({ type: 'get_state' }),
+        this.supervisor.send({ type: 'get_available_models' }),
+      ]);
+      const previousState = this.currentState;
+      const freshState = this.buildState(stateResponse);
+      if (!sameRuntimeState(previousState, freshState)) {
+        this.revision += 1;
+        this.buildState(stateResponse);
+      }
+      const currentState = this.currentState;
+      if (currentState === null) return 'runtime_unavailable';
+      const candidate = projectRuntimeModelCatalog(dataOf(modelsResponse), {
+        sessionId: this.options.sessionId,
+        catalogRevision: this.catalogRevision,
+        runtimeRevision: this.revision,
+        currentModel: currentState.model,
+        streaming: currentState.streaming,
+      });
+      if (candidate === null) throw new Error('host model catalog could not be projected');
+      if (!sameCatalog(this.modelCatalog, candidate)) {
+        this.refreshCatalog(dataOf(modelsResponse), currentState);
+      } else if (this.modelCatalog.runtimeRevision !== this.revision) {
+        this.modelCatalog = { ...candidate, runtimeRevision: this.revision };
+      }
+      return this.validateModelTicketRequest(request);
+    } catch {
+      this.live = false;
+      this.currentState = null;
+      this.modelCatalog = null;
+      return 'runtime_unavailable';
+    }
+  }
+
   public isLive(): boolean {
     return this.live;
   }
@@ -98,11 +180,7 @@ export class RuntimeService {
     ]);
     this.updateLevels(levelsResponse);
     const state = this.buildState(stateResponse);
-    this.modelCatalog = projectRuntimeModelCatalog(
-      dataOf(modelsResponse),
-      this.options.sessionId,
-      this.revision,
-    );
+    this.refreshCatalog(dataOf(modelsResponse), state);
     this.live = true;
     return state;
   }
@@ -115,47 +193,74 @@ export class RuntimeService {
     }
     if (!this.live || this.currentState === null) {
       return this.settle(command.controlId, {
-        outcome: { status: 'unavailable', reason: 'runtime authority is unknown' },
+        outcome: { status: 'unavailable', reasonCode: 'runtime_unavailable' },
       });
     }
-    if (command.expectedRevision !== this.revision) {
+    if (
+      command.sessionId !== this.options.sessionId ||
+      command.expectedRevision !== this.revision ||
+      (command.operation.type === 'set_model' &&
+        command.expectedCatalogRevision !== this.catalogRevision)
+    ) {
       return this.settle(command.controlId, {
         outcome: { status: 'stale', state: this.currentState },
       });
     }
-    const unsupported = this.validate(command.operation);
-    if (unsupported !== null) {
+    const validationReason = this.validate(command.operation);
+    if (validationReason !== null) {
+      if (validationReason === 'policy_blocked') {
+        return this.settle(command.controlId, {
+          outcome: { status: 'policy_blocked', reasonCode: validationReason },
+        });
+      }
+      if (validationReason === 'unsupported_operation') {
+        return this.settle(command.controlId, {
+          outcome: { status: 'unsupported', reasonCode: validationReason },
+        });
+      }
       return this.settle(command.controlId, {
-        outcome: { status: 'unsupported', reason: unsupported },
+        outcome: { status: 'unavailable', reasonCode: validationReason },
       });
     }
     try {
       const state = await this.apply(command.operation);
       return this.settle(command.controlId, { outcome: { status: 'accepted', state } });
     } catch (error) {
-      const reason = bounded(error instanceof Error ? error.message : String(error));
       if (error instanceof HostRejectedError) {
-        return this.settle(command.controlId, { outcome: { status: 'unavailable', reason } });
+        return this.settle(
+          command.controlId,
+          error.reasonCode === 'policy_blocked'
+            ? { outcome: { status: 'policy_blocked', reasonCode: 'policy_blocked' } }
+            : { outcome: { status: 'unavailable', reasonCode: 'host_rejected' } },
+        );
       }
       // Delivery may have happened before the failure. This is terminal; never retry.
       return this.settle(command.controlId, {
-        outcome: { status: 'delivery-unknown', reason },
+        outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' },
       });
     }
   }
 
-  private validate(operation: RuntimeOperation): string | null {
+  private validate(operation: RuntimeOperation): RuntimeValidationReason | null {
     if (operation.type === 'set_model') {
       const known =
         this.modelCatalog?.models.some(
           (model) => model.provider === operation.provider && model.id === operation.modelId,
         ) ?? false;
-      return known ? null : 'model is not in the current catalog';
+      if (!known) return 'model_unavailable';
+      if (this.currentState?.streaming && !this.modelCatalog?.canSetModelWhileStreaming) {
+        return 'streaming_active';
+      }
+      const target = this.modelCatalog?.models.find(
+        (model) => model.provider === operation.provider && model.id === operation.modelId,
+      );
+      if (target?.availability === 'policy_blocked') return 'policy_blocked';
+      return target?.availability === 'tier_locked' ? 'tier_locked' : null;
     }
     if (operation.type === 'set_thinking_level') {
       return this.availableThinkingLevels.includes(operation.level)
         ? null
-        : 'thinking level is not supported by the active model';
+        : 'unsupported_operation';
     }
     return null;
   }
@@ -170,11 +275,14 @@ export class RuntimeService {
         }),
       );
       // A model change can change the supported thinking levels; reconcile both.
-      const [stateResponse, levelsResponse] = await Promise.all([
+      const [stateResponse, levelsResponse, modelsResponse] = await Promise.all([
         this.supervisor.send({ type: 'get_state' }),
         this.supervisor.send({ type: 'get_available_thinking_levels' }),
+        this.supervisor.send({ type: 'get_available_models' }),
       ]);
-      return this.commit(stateResponse, levelsResponse);
+      const state = this.commit(stateResponse, levelsResponse);
+      this.refreshCatalog(dataOf(modelsResponse), state);
+      return state;
     }
     if (operation.type === 'set_thinking_level') {
       ensureAccepted(
@@ -209,6 +317,20 @@ export class RuntimeService {
     this.availableThinkingLevels = rows
       .filter((level): level is string => typeof level === 'string' && level.length > 0)
       .slice(0, 32);
+  }
+
+  private refreshCatalog(rawData: unknown, state: RuntimeStateDto): void {
+    const nextRevision = this.catalogRevision + 1;
+    const catalog = projectRuntimeModelCatalog(rawData, {
+      sessionId: this.options.sessionId,
+      catalogRevision: nextRevision,
+      runtimeRevision: this.revision,
+      currentModel: state.model,
+      streaming: state.streaming,
+    });
+    if (catalog === null) throw new Error('host model catalog could not be projected');
+    this.catalogRevision = nextRevision;
+    this.modelCatalog = catalog;
   }
 
   private buildState(stateResponse: PiRpcResponse): RuntimeStateDto {
@@ -266,7 +388,8 @@ export class RuntimeService {
 
 function ensureAccepted(response: PiRpcResponse): void {
   if (response.success !== true) {
-    throw new HostRejectedError(response.error ?? 'host rejected the mutation');
+    const normalized = response.error?.toLowerCase() ?? '';
+    throw new HostRejectedError(normalized.includes('policy') ? 'policy_blocked' : 'host_rejected');
   }
 }
 
@@ -288,6 +411,23 @@ function extractLevels(data: unknown): unknown[] {
   return [];
 }
 
-function bounded(value: string): string {
-  return value.length > MAX_REASON_LENGTH ? `${value.slice(0, MAX_REASON_LENGTH)}…` : value;
+function sameRuntimeState(left: RuntimeStateDto, right: RuntimeStateDto): boolean {
+  return (
+    JSON.stringify(left.model) === JSON.stringify(right.model) &&
+    left.thinkingLevel === right.thinkingLevel &&
+    JSON.stringify(left.availableThinkingLevels) ===
+      JSON.stringify(right.availableThinkingLevels) &&
+    left.mode === right.mode &&
+    left.streaming === right.streaming
+  );
+}
+
+function sameCatalog(left: RuntimeModelCatalogDto, right: RuntimeModelCatalogDto): boolean {
+  return (
+    left.sessionId === right.sessionId &&
+    JSON.stringify(left.currentModel) === JSON.stringify(right.currentModel) &&
+    left.streaming === right.streaming &&
+    left.canSetModelWhileStreaming === right.canSetModelWhileStreaming &&
+    JSON.stringify(left.models) === JSON.stringify(right.models)
+  );
 }

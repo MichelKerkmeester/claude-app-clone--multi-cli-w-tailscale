@@ -18,6 +18,7 @@ export type AuthorizedAction =
   | 'prompt:submit'
   | 'prompt:abort'
   | 'runtime:read'
+  | 'runtime-ticket:create'
   | 'runtime:control'
   | 'commands:list';
 
@@ -37,6 +38,7 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   'prompt:submit',
   'prompt:abort',
   'runtime:read',
+  'runtime-ticket:create',
   'runtime:control',
   'commands:list',
 ]);

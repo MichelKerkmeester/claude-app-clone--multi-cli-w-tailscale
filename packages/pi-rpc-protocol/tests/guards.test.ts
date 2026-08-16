@@ -23,6 +23,8 @@ import {
   isRuntimeControlCommand,
   isRuntimeControlResponse,
   isRuntimeModelCatalogDto,
+  isRuntimeModelTicketRequest,
+  isRuntimeModelTicketResponse,
   isRuntimeOperation,
   isRuntimeStateDto,
   isSessionCardDto,
@@ -266,14 +268,32 @@ describe('runtime control guards', () => {
   } as const;
 
   it('accepts well-formed model descriptors and rejects extras, path values and overlong ids', () => {
-    const model = { provider: 'openai', id: 'gpt-4o', label: 'GPT-4o' };
+    const model = {
+      provider: 'openai',
+      id: 'gpt-4o',
+      label: 'GPT-4o',
+      reasoning: true,
+      input: ['text', 'image'],
+      contextWindow: 128_000,
+      maxTokens: 16_384,
+      tools: true,
+      availability: 'available',
+      availabilityReasonCode: 'unavailable',
+      pricing: { currency: 'USD', inputPerMillion: 2.5, outputPerMillion: 10 },
+    };
     expect(isAvailableModelDto(model)).toBe(true);
     expect(isAvailableModelDto({ ...model, extra: true })).toBe(false);
     expect(isAvailableModelDto({ ...model, provider: 'a/b' })).toBe(false);
-    expect(isAvailableModelDto({ ...model, label: 'a\\b' })).toBe(false);
+    expect(isAvailableModelDto({ ...model, label: 'a\\b' })).toBe(true);
     expect(isAvailableModelDto({ ...model, id: '' })).toBe(false);
     expect(isAvailableModelDto({ ...model, id: 'x'.repeat(201) })).toBe(false);
     expect(isAvailableModelDto({ ...model, provider: 42 })).toBe(false);
+    expect(isAvailableModelDto({ ...model, availabilityReasonCode: 'raw host error' })).toBe(false);
+    expect(isAvailableModelDto({ ...model, contextWindow: 1.5 })).toBe(false);
+    expect(isAvailableModelDto({ ...model, pricing: { currency: 'USD', secret: 'x' } })).toBe(
+      false,
+    );
+    expect(isAvailableModelDto({ ...model, label: 'x'.repeat(201) })).toBe(false);
   });
 
   it('accepts authoritative runtime state and rejects bad modes, revisions and nested models', () => {
@@ -325,6 +345,7 @@ describe('runtime control guards', () => {
       controlId: 'control_001',
       sessionId: 'session_local',
       expectedRevision: 2,
+      expectedCatalogRevision: 4,
       operation: { type: 'set_model', provider: 'openai', modelId: 'gpt-4o' },
       ticket: 'ticket_control_001',
     } as const;
@@ -332,6 +353,10 @@ describe('runtime control guards', () => {
     expect(isRuntimeControlCommand({ ...command, extra: true })).toBe(false);
     expect(isRuntimeControlCommand({ ...command, expectedRevision: -1 })).toBe(false);
     expect(isRuntimeControlCommand({ ...command, expectedRevision: 1.5 })).toBe(false);
+    expect(isRuntimeControlCommand({ ...command, expectedCatalogRevision: -1 })).toBe(false);
+    expect(isRuntimeControlCommand({ ...command, expectedCatalogRevision: 1.5 })).toBe(false);
+    const { expectedCatalogRevision: _missing, ...missingCatalogRevision } = command;
+    expect(isRuntimeControlCommand(missingCatalogRevision)).toBe(false);
     expect(
       isRuntimeControlCommand({
         ...command,
@@ -345,7 +370,11 @@ describe('runtime control guards', () => {
   it('accepts model catalogs and rejects malformed catalog items', () => {
     const catalog = {
       sessionId: 'session_local',
+      catalogRevision: 2,
       runtimeRevision: 1,
+      currentModel: { provider: 'retired', id: 'old-model', label: 'Retired Model' },
+      streaming: true,
+      canSetModelWhileStreaming: false,
       models: [
         { provider: 'openai', id: 'gpt-4o', label: 'GPT-4o' },
         { provider: 'anthropic', id: 'claude-sonnet', label: 'Claude Sonnet' },
@@ -355,9 +384,42 @@ describe('runtime control guards', () => {
     expect(isRuntimeModelCatalogDto({ ...catalog, extra: true })).toBe(false);
     expect(isRuntimeModelCatalogDto({ ...catalog, runtimeRevision: -1 })).toBe(false);
     expect(isRuntimeModelCatalogDto({ ...catalog, runtimeRevision: 1.5 })).toBe(false);
+    expect(isRuntimeModelCatalogDto({ ...catalog, catalogRevision: -1 })).toBe(false);
+    expect(isRuntimeModelCatalogDto({ ...catalog, catalogRevision: 1.5 })).toBe(false);
     expect(
       isRuntimeModelCatalogDto({ ...catalog, models: [{ ...catalog.models[0], provider: 'a/b' }] }),
     ).toBe(false);
+  });
+
+  it('accepts exact runtime model ticket payloads and rejects malformed bindings', () => {
+    const request = {
+      sessionId: 'session_local',
+      expectedRevision: 3,
+      expectedCatalogRevision: 7,
+      operation: { type: 'set_model', provider: 'openai', modelId: 'gpt-4o' },
+    } as const;
+    expect(isRuntimeModelTicketRequest(request)).toBe(true);
+    expect(isRuntimeModelTicketRequest({ ...request, extra: true })).toBe(false);
+    expect(isRuntimeModelTicketRequest({ ...request, expectedRevision: -1 })).toBe(false);
+    expect(isRuntimeModelTicketRequest({ ...request, expectedCatalogRevision: 2.5 })).toBe(false);
+    expect(
+      isRuntimeModelTicketRequest({
+        ...request,
+        operation: { type: 'set_model', provider: '../openai', modelId: 'gpt-4o' },
+      }),
+    ).toBe(false);
+    expect(
+      isRuntimeModelTicketRequest({
+        ...request,
+        operation: { type: 'set_thinking_level', level: 'high' },
+      }),
+    ).toBe(false);
+    expect(
+      isRuntimeModelTicketResponse({
+        ticket: 'runtime_ticket_001',
+        expiresAt: '2026-01-01T00:00:10.000Z',
+      }),
+    ).toBe(true);
   });
 
   it('accepts command descriptors and catalogs and rejects bad sources and names', () => {
@@ -391,13 +453,24 @@ describe('runtime control guards', () => {
     expect(isRuntimeControlResponse({ outcome: { status: 'accepted', state } })).toBe(true);
     expect(isRuntimeControlResponse({ outcome: { status: 'stale', state } })).toBe(true);
     expect(
-      isRuntimeControlResponse({ outcome: { status: 'unsupported', reason: 'no such op' } }),
+      isRuntimeControlResponse({
+        outcome: { status: 'unsupported', reasonCode: 'unsupported_operation' },
+      }),
     ).toBe(true);
     expect(
-      isRuntimeControlResponse({ outcome: { status: 'unavailable', reason: 'host offline' } }),
+      isRuntimeControlResponse({
+        outcome: { status: 'unavailable', reasonCode: 'runtime_unavailable' },
+      }),
     ).toBe(true);
     expect(
-      isRuntimeControlResponse({ outcome: { status: 'delivery-unknown', reason: 'lost' } }),
+      isRuntimeControlResponse({
+        outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' },
+      }),
+    ).toBe(true);
+    expect(
+      isRuntimeControlResponse({
+        outcome: { status: 'policy_blocked', reasonCode: 'policy_blocked' },
+      }),
     ).toBe(true);
 
     expect(isRuntimeControlResponse({ outcome: { status: 'accepted', state }, extra: true })).toBe(
@@ -414,11 +487,10 @@ describe('runtime control guards', () => {
       }),
     ).toBe(false);
     expect(isRuntimeControlResponse({ outcome: { status: 'unsupported' } })).toBe(false);
-    expect(isRuntimeControlResponse({ outcome: { status: 'unsupported', reason: '' } })).toBe(
-      false,
-    );
     expect(
-      isRuntimeControlResponse({ outcome: { status: 'unsupported', reason: 'x'.repeat(501) } }),
+      isRuntimeControlResponse({
+        outcome: { status: 'unsupported', reasonCode: 'not_allowlisted' },
+      }),
     ).toBe(false);
   });
 
@@ -446,6 +518,12 @@ describe('runtime control guards', () => {
     expect(isPiRpcCommand({ type: 'set_model', provider: 'openai', modelId: 'gpt-4o' })).toBe(true);
     expect(isPiRpcCommand({ type: 'set_model', provider: 'openai' })).toBe(false);
     expect(isPiRpcCommand({ type: 'set_model', provider: 'openai', modelId: 42 })).toBe(false);
+    expect(
+      isPiRpcCommand({ type: 'set_model', provider: 'openai', modelId: 'gpt-4o', secret: 'x' }),
+    ).toBe(false);
+    expect(isPiRpcCommand({ type: 'set_model', provider: '../openai', modelId: 'gpt-4o' })).toBe(
+      false,
+    );
     expect(isPiRpcCommand({ type: 'set_thinking_level', level: 'high' })).toBe(true);
     expect(isPiRpcCommand({ type: 'set_thinking_level' })).toBe(false);
     expect(isPiRpcCommand({ type: 'get_state' })).toBe(true);

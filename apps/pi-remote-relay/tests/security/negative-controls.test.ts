@@ -74,6 +74,84 @@ describe('consolidated fail-closed negative controls', () => {
     expect(auth.consumeTicket(revokedTicket.ticket, ORIGIN, PRINCIPAL)).toBeNull();
   });
 
+  it('binds runtime tickets to one exact model command and consumes substitutions', () => {
+    let now = NOW;
+    const auth = new AuthService({
+      origin: ORIGIN,
+      hostId: IDENTITY.hostId,
+      now: () => now,
+      runtimeTicketTtlMs: 5,
+    });
+    const keys = deviceKeys();
+    const enrollment = auth.enrollment.createChallenge();
+    const enrolled = auth.enroll(enrollmentBody(enrollment, keys), ORIGIN, PRINCIPAL);
+    if (enrolled === null) throw new Error('Test device enrollment failed.');
+    const challenge = auth.createSessionChallenge(enrolled.deviceId, ORIGIN, PRINCIPAL);
+    if (challenge === null) throw new Error('Test session challenge failed.');
+    const session = auth.createSession(
+      enrolled.deviceId,
+      challenge.challengeId,
+      signStatement(keys.privateKey, sessionProof(ORIGIN, enrolled.deviceId, challenge)),
+      ORIGIN,
+      PRINCIPAL,
+    );
+    if (session === null) throw new Error('Test application session failed.');
+    const binding = {
+      sessionId: 'session_local',
+      expectedRevision: 2,
+      expectedCatalogRevision: 5,
+      operation: { type: 'set_model', provider: 'openai', modelId: 'gpt-5' },
+    } as const;
+    const ticket = auth.issueRuntimeModelTicket(session, binding);
+    const substituted = {
+      type: 'runtime.control',
+      controlId: 'control_substitute',
+      ...binding,
+      operation: { ...binding.operation, modelId: 'gpt-5-mini' },
+      ticket: ticket.ticket,
+    } as const;
+    expect(auth.consumeRuntimeModelTicket(ticket.ticket, session, substituted)).toBe(false);
+    expect(auth.consumeRuntimeModelTicket(ticket.ticket, session, substituted)).toBe(false);
+
+    const exactTicket = auth.issueRuntimeModelTicket(session, binding);
+    const exact = {
+      type: 'runtime.control',
+      controlId: 'control_exact',
+      ...binding,
+      ticket: exactTicket.ticket,
+    } as const;
+    expect(auth.consumeRuntimeModelTicket(exactTicket.ticket, session, exact)).toBe(true);
+    expect(auth.consumeRuntimeModelTicket(exactTicket.ticket, session, exact)).toBe(false);
+
+    const sessionBoundTicket = auth.issueRuntimeModelTicket(session, binding);
+    expect(
+      auth.consumeRuntimeModelTicket(
+        sessionBoundTicket.ticket,
+        { ...session, token: 'session_other' },
+        { ...exact, ticket: sessionBoundTicket.ticket },
+      ),
+    ).toBe(false);
+    expect(
+      auth.consumeRuntimeModelTicket(sessionBoundTicket.ticket, session, {
+        ...exact,
+        ticket: sessionBoundTicket.ticket,
+      }),
+    ).toBe(true);
+
+    const expiredTicket = auth.issueRuntimeModelTicket(session, binding);
+    now += 6;
+    expect(
+      auth.consumeRuntimeModelTicket(expiredTicket.ticket, session, {
+        ...exact,
+        ticket: expiredTicket.ticket,
+      }),
+    ).toBe(false);
+    expect(
+      auth.authenticate(session.token, ORIGIN, PRINCIPAL, 'runtime-ticket:create'),
+    ).not.toBeNull();
+    expect(auth.authenticate(session.token, ORIGIN, PRINCIPAL, 'runtime:full-access')).toBeNull();
+  });
+
   it('rejects stale, duplicate, expired, revoked, raced, and digest-altered approvals', () => {
     const action = fixedAction();
     const digest = approvalActionDigest(action);

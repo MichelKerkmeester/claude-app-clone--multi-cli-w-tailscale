@@ -10,11 +10,14 @@ import type {
   Envelope,
   JsonObject,
   JsonValue,
+  ModelPricingDto,
   RuntimeMode,
   RuntimeModelCatalogDto,
   RuntimeStateDto,
 } from '@pi-remote/pi-rpc-protocol';
 import {
+  MODEL_AVAILABILITIES,
+  MODEL_AVAILABILITY_REASON_CODES,
   isCommandCatalogDto,
   isRuntimeModelCatalogDto,
   isRuntimeStateDto,
@@ -132,8 +135,13 @@ const COMMAND_CATALOG_CAP = 500;
 /** Project a raw pi model list into the bounded, path-free browser catalog. */
 export function projectRuntimeModelCatalog(
   rawData: unknown,
-  sessionId: string,
-  runtimeRevision: number,
+  options: {
+    readonly sessionId: string;
+    readonly catalogRevision: number;
+    readonly runtimeRevision: number;
+    readonly currentModel: AvailableModelDto | null;
+    readonly streaming: boolean;
+  },
 ): RuntimeModelCatalogDto | null {
   const rows = extractRows(rawData, 'models');
   if (rows === null) {
@@ -149,7 +157,15 @@ export function projectRuntimeModelCatalog(
       models.push(model);
     }
   }
-  const dto = { sessionId, runtimeRevision, models };
+  const dto = {
+    sessionId: options.sessionId,
+    catalogRevision: options.catalogRevision,
+    runtimeRevision: options.runtimeRevision,
+    currentModel: options.currentModel,
+    streaming: options.streaming,
+    canSetModelWhileStreaming: isPlainObject(rawData) && rawData.canSetModelWhileStreaming === true,
+    models,
+  };
   return isRuntimeModelCatalogDto(dto) ? dto : null;
 }
 
@@ -207,7 +223,7 @@ export function projectRuntimeState(
   return isRuntimeStateDto(dto) ? dto : null;
 }
 
-function projectAvailableModel(row: unknown): AvailableModelDto | null {
+export function projectAvailableModel(row: unknown): AvailableModelDto | null {
   if (!isPlainObject(row)) {
     return null;
   }
@@ -216,7 +232,32 @@ function projectAvailableModel(row: unknown): AvailableModelDto | null {
   if (provider === null || id === null) {
     return null;
   }
-  return { provider, id, label: pathFreeToken(row.label, 200) ?? id };
+  const label = safeDisplayString(row.label, 200) ?? id;
+  const availability = enumValue(row.availability, MODEL_AVAILABILITIES);
+  const availabilityReasonCode = enumValue(
+    row.availabilityReasonCode,
+    MODEL_AVAILABILITY_REASON_CODES,
+  );
+  const rawInput = Array.isArray(row.input) ? row.input : undefined;
+  const input = rawInput
+    ? [...new Set(rawInput.filter((kind) => kind === 'text' || kind === 'image'))].slice(0, 2)
+    : undefined;
+  const pricing = projectPricing(row.pricing);
+  const contextWindow = boundedPositiveInteger(row.contextWindow);
+  const maxTokens = boundedPositiveInteger(row.maxTokens);
+  return {
+    provider,
+    id,
+    label,
+    ...(typeof row.reasoning === 'boolean' ? { reasoning: row.reasoning } : {}),
+    ...(input !== undefined && input.length === rawInput?.length ? { input } : {}),
+    ...(contextWindow === null ? {} : { contextWindow }),
+    ...(maxTokens === null ? {} : { maxTokens }),
+    ...(typeof row.tools === 'boolean' ? { tools: row.tools } : {}),
+    ...(availability === null ? {} : { availability }),
+    ...(availabilityReasonCode === null ? {} : { availabilityReasonCode }),
+    ...(pricing === null ? {} : { pricing }),
+  };
 }
 
 function projectCommandDescriptor(row: unknown): CommandDescriptorDto | null {
@@ -263,8 +304,64 @@ function boundedString(value: unknown, max: number): string | null {
 
 function pathFreeToken(value: unknown, max: number): string | null {
   const token = boundedToken(value, max);
-  if (token === null || token.includes('/') || token.includes('\\')) {
+  if (
+    token === null ||
+    token === '.' ||
+    token === '..' ||
+    token.includes('/') ||
+    token.includes('\\') ||
+    /[\u0000-\u001f\u007f-\u009f]/u.test(token)
+  ) {
     return null;
   }
   return token;
+}
+
+function safeDisplayString(value: unknown, max: number): string | null {
+  if (typeof value !== 'string') return null;
+  const sanitized = value
+    .replace(/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/gu, '')
+    .trim();
+  if (
+    sanitized.length === 0 ||
+    sanitized.length > max ||
+    /(?:https?|file):\/\/|(?:^|\s)\/(?:Users|home|private|tmp|var|etc|opt|usr|Volumes)\/|\b[A-Za-z]:\\|\b(?:api[_-]?key|authorization|cookie|password|secret|token)\s*[:=]|\bBearer\s+/iu.test(
+      sanitized,
+    )
+  ) {
+    return null;
+  }
+  return sanitized;
+}
+
+function boundedPositiveInteger(value: unknown): number | null {
+  return typeof value === 'number' &&
+    Number.isSafeInteger(value) &&
+    value > 0 &&
+    value <= 1_000_000_000
+    ? value
+    : null;
+}
+
+function boundedNonNegativeNumber(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1_000_000_000
+    ? value
+    : null;
+}
+
+function enumValue<T extends string>(value: unknown, values: readonly T[]): T | null {
+  return typeof value === 'string' && values.includes(value as T) ? (value as T) : null;
+}
+
+function projectPricing(value: unknown): ModelPricingDto | null {
+  if (!isPlainObject(value)) return null;
+  const currency = pathFreeToken(value.currency, 12);
+  if (currency === null || !/^[A-Z]{3}$/.test(currency)) return null;
+  const inputPerMillion = boundedNonNegativeNumber(value.inputPerMillion);
+  const outputPerMillion = boundedNonNegativeNumber(value.outputPerMillion);
+  return {
+    currency,
+    ...(inputPerMillion === null ? {} : { inputPerMillion }),
+    ...(outputPerMillion === null ? {} : { outputPerMillion }),
+  };
 }

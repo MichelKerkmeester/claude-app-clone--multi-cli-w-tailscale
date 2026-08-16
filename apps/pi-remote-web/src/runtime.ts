@@ -20,6 +20,8 @@ export interface RuntimeUiState {
   readonly status: RuntimeStatus;
   readonly state: RuntimeStateDto | null;
   readonly models: readonly AvailableModelDto[];
+  readonly catalogRevision: number | null;
+  readonly canSetModelWhileStreaming: boolean;
   readonly pending: RuntimeOperation | null;
   readonly error: string | null;
   readonly deliveryUnknown: boolean;
@@ -29,6 +31,8 @@ export const INITIAL_RUNTIME_STATE: RuntimeUiState = {
   status: 'checking',
   state: null,
   models: [],
+  catalogRevision: null,
+  canSetModelWhileStreaming: false,
   pending: null,
   error: null,
   deliveryUnknown: false,
@@ -57,6 +61,8 @@ export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): 
         status: 'ready',
         state: action.state,
         models: action.models.models,
+        catalogRevision: action.models.catalogRevision,
+        canSetModelWhileStreaming: action.models.canSetModelWhileStreaming,
         pending: null,
         error: null,
         deliveryUnknown: false,
@@ -103,11 +109,12 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
       };
     case 'unsupported':
     case 'unavailable':
+    case 'policy_blocked':
       return {
         ...current,
         status: 'error',
         pending: null,
-        error: outcome.reason,
+        error: runtimeReasonMessage(outcome.reasonCode),
         deliveryUnknown: false,
       };
     case 'delivery-unknown':
@@ -116,7 +123,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         ...current,
         status: 'error',
         pending: null,
-        error: outcome.reason,
+        error: runtimeReasonMessage(outcome.reasonCode),
         deliveryUnknown: true,
       };
     default:
@@ -153,18 +160,26 @@ export function useRuntime(sessionId: string): RuntimeControls {
         return;
       }
       const expectedRevision = runtime.state.revision;
+      const expectedCatalogRevision =
+        operation.type === 'set_model' ? (runtime.catalogRevision ?? undefined) : undefined;
+      if (operation.type === 'set_model' && expectedCatalogRevision === undefined) return;
       dispatch({ type: 'control-start', operation });
       try {
-        const response = await controlRuntime(sessionId, expectedRevision, operation);
+        const response = await controlRuntime(
+          sessionId,
+          expectedRevision,
+          operation,
+          expectedCatalogRevision,
+        );
         dispatch({ type: 'control-settled', response });
       } catch (error) {
         dispatch({
           type: 'control-settled',
-          response: { outcome: { status: 'unavailable', reason: messageOf(error) } },
+          response: { outcome: { status: 'unavailable', reasonCode: 'runtime_unavailable' } },
         });
       }
     },
-    [runtime.status, runtime.state, sessionId],
+    [runtime.status, runtime.state, runtime.catalogRevision, sessionId],
   );
 
   const setModel = useCallback(
@@ -189,4 +204,20 @@ export function useRuntime(sessionId: string): RuntimeControls {
 
 function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function runtimeReasonMessage(reasonCode: string): string {
+  const messages: Readonly<Record<string, string>> = {
+    stale_revision: 'The host runtime changed. Refresh and choose again.',
+    stale_catalog: 'The model catalog changed. Refresh and choose again.',
+    unsupported_operation: 'This runtime operation is not supported.',
+    runtime_unavailable: 'The host runtime is unavailable.',
+    model_unavailable: 'That model is no longer available.',
+    tier_locked: 'That model is unavailable for the active account tier.',
+    policy_blocked: 'The host policy blocked this model.',
+    streaming_active: 'Model switching is unavailable during the current turn.',
+    host_rejected: 'The host rejected the model change.',
+    delivery_unknown: 'The outcome is unknown. Refresh before trying another change.',
+  };
+  return messages[reasonCode] ?? 'The runtime request could not be completed.';
 }

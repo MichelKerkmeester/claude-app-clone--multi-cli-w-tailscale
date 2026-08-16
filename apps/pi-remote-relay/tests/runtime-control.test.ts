@@ -37,6 +37,7 @@ class FakeSupervisor {
     { provider: 'opencode-go', id: 'qwen3.8-max', label: 'Qwen 3.8 Max' },
   ];
   public rejectSettled = false;
+  public hostReject = false;
   public settledCount = 0;
   public readonly settled: PiRpcCommand[] = [];
   private readonly lifecycleListeners = new Set<(event: SupervisorLifecycleEvent) => void>();
@@ -89,6 +90,14 @@ class FakeSupervisor {
       case 'get_available_models':
         return ok(this.models);
       case 'set_model': {
+        if (this.hostReject) {
+          return {
+            type: 'response',
+            command: 'set_model',
+            success: false,
+            error: 'policy denied /Users/private token=SECRET',
+          };
+        }
         const c = command as unknown as { provider: string; modelId: string };
         this.model = { provider: c.provider, id: c.modelId, label: c.modelId };
         // A model change narrows the supported thinking levels.
@@ -123,14 +132,16 @@ function control(
   expectedRevision: number,
   controlId = 'control_1',
 ): RuntimeControlCommand {
-  return {
+  const base = {
     type: 'runtime.control',
     controlId,
     sessionId: SESSION,
     expectedRevision,
-    operation,
     ticket: 'ticket_abcdef',
-  };
+  } as const;
+  return operation.type === 'set_model'
+    ? { ...base, expectedCatalogRevision: 1, operation }
+    : { ...base, operation };
 }
 
 describe('runtime authority core', () => {
@@ -168,6 +179,53 @@ describe('runtime authority core', () => {
     expect(fake.settledCount).toBe(0);
   });
 
+  it('rejects a stale catalog revision and exact-target mismatch without host delivery', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await svc.hydrate();
+    const staleCatalog = {
+      ...control({ type: 'set_model', provider: 'opencode-go', modelId: 'qwen3.8-max' }, 0),
+      expectedCatalogRevision: 0,
+    };
+    expect((await svc.control(staleCatalog)).outcome.status).toBe('stale');
+    expect(
+      (
+        await svc.control(
+          control(
+            { type: 'set_model', provider: 'opencode-go', modelId: 'substitute' },
+            0,
+            'c_sub',
+          ),
+        )
+      ).outcome,
+    ).toEqual({ status: 'unavailable', reasonCode: 'model_unavailable' });
+    expect(fake.settledCount).toBe(0);
+  });
+
+  it('rechecks the host catalog before ticket issuance and advances only changed authority', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await svc.hydrate();
+    const request = {
+      sessionId: SESSION,
+      expectedRevision: 0,
+      expectedCatalogRevision: 1,
+      operation: { type: 'set_model', provider: 'opencode-go', modelId: 'qwen3.8-max' },
+    } as const;
+    expect(await svc.validateFreshModelTicketRequest(request)).toBeNull();
+    expect(svc.getModelCatalog()?.catalogRevision).toBe(1);
+
+    fake.models.push({ provider: 'openai', id: 'gpt-5', label: 'GPT-5' });
+    expect(await svc.validateFreshModelTicketRequest(request)).toBe('stale_catalog');
+    expect(svc.getModelCatalog()?.catalogRevision).toBe(2);
+
+    fake.model = { provider: 'opencode-go', id: 'qwen3.8-max', label: 'Qwen 3.8 Max' };
+    expect(
+      await svc.validateFreshModelTicketRequest({ ...request, expectedCatalogRevision: 2 }),
+    ).toBe('stale_revision');
+    expect(svc.getRevision()).toBe(1);
+  });
+
   it('rejects unsupported model and unsupported thinking level, sending no pi command', async () => {
     const fake = new FakeSupervisor();
     const svc = service(fake);
@@ -180,7 +238,7 @@ describe('runtime authority core', () => {
       control({ type: 'set_thinking_level', level: 'ultra' }, 0, 'c_b'),
     );
 
-    expect(badModel.outcome.status).toBe('unsupported');
+    expect(badModel.outcome.status).toBe('unavailable');
     expect(badLevel.outcome.status).toBe('unsupported');
     expect(fake.settledCount).toBe(0);
   });
@@ -241,7 +299,29 @@ describe('runtime authority core', () => {
     const response = await svc.control(control({ type: 'set_thinking_level', level: 'max' }, 0));
 
     expect(response.outcome.status).toBe('delivery-unknown');
+    expect(response.outcome).toEqual({
+      status: 'delivery-unknown',
+      reasonCode: 'delivery_unknown',
+    });
     expect(svc.getRevision()).toBe(0);
+    expect(fake.settledCount).toBe(1);
+    expect(await svc.control(control({ type: 'set_thinking_level', level: 'max' }, 0))).toBe(
+      response,
+    );
+    expect(fake.settledCount).toBe(1);
+  });
+
+  it('maps host rejection to a bounded policy code without exposing the raw host error', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await svc.hydrate();
+    fake.hostReject = true;
+    const response = await svc.control(
+      control({ type: 'set_model', provider: 'opencode-go', modelId: 'qwen3.8-max' }, 0),
+    );
+    expect(response.outcome).toEqual({ status: 'policy_blocked', reasonCode: 'policy_blocked' });
+    expect(JSON.stringify(response)).not.toContain('/Users/private');
+    expect(fake.settledCount).toBe(1);
   });
 });
 
@@ -273,13 +353,26 @@ describe('runtime redaction projectors', () => {
           {
             provider: 'deepseek',
             id: 'deepseek-v4-flash',
+            label: 'DeepSeek Flash',
+            reasoning: true,
+            input: ['text', 'image'],
+            contextWindow: 128_000,
+            maxTokens: 8_192,
+            tools: true,
+            availability: 'available',
+            pricing: { currency: 'USD', inputPerMillion: 1.25, secret: 'drop-me' },
             path: '/opt/models/x',
             authorization: 'Bearer y',
           },
         ],
       },
-      SESSION,
-      3,
+      {
+        sessionId: SESSION,
+        catalogRevision: 4,
+        runtimeRevision: 3,
+        currentModel: state?.model ?? null,
+        streaming: true,
+      },
     );
     const commands = projectCommandCatalog(
       {
@@ -315,6 +408,24 @@ describe('runtime redaction projectors', () => {
       label: 'DeepSeek',
     });
     expect(models?.models).toHaveLength(1);
+    expect(models?.models[0]).toEqual({
+      provider: 'deepseek',
+      id: 'deepseek-v4-flash',
+      label: 'DeepSeek Flash',
+      reasoning: true,
+      input: ['text', 'image'],
+      contextWindow: 128_000,
+      maxTokens: 8_192,
+      tools: true,
+      availability: 'available',
+      pricing: { currency: 'USD', inputPerMillion: 1.25 },
+    });
+    expect(models).toMatchObject({
+      catalogRevision: 4,
+      runtimeRevision: 3,
+      streaming: true,
+      canSetModelWhileStreaming: false,
+    });
     // The path-like command name was dropped; only the safe descriptor survives.
     expect(commands?.commands).toHaveLength(1);
     expect(commands?.commands[0]?.name).toBe('plan');

@@ -10,6 +10,7 @@ import {
   isPromptAbortResponse,
   isRuntimeControlResponse,
   isRuntimeModelCatalogDto,
+  isRuntimeModelTicketResponse,
   isRuntimeStateDto,
   isSessionCardDto,
   isPromptSubmitResponse,
@@ -21,6 +22,7 @@ import {
   type RuntimeControlCommand,
   type RuntimeControlResponse,
   type RuntimeModelCatalogDto,
+  type RuntimeModelTicketRequest,
   type RuntimeOperation,
   type RuntimeStateDto,
   type SessionCardDto,
@@ -120,20 +122,48 @@ export async function controlRuntime(
   sessionId: string,
   expectedRevision: number,
   operation: RuntimeOperation,
+  expectedCatalogRevision?: number,
   signal?: AbortSignal,
 ): Promise<RuntimeControlResponse> {
-  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
-  if (!isWebSocketTicketResponse(ticketPayload)) {
-    throw new Error('Relay returned an invalid command ticket.');
+  const controlId = `control_${crypto.randomUUID().replaceAll('-', '_')}`;
+  let command: RuntimeControlCommand;
+  if (operation.type === 'set_model') {
+    if (expectedCatalogRevision === undefined) {
+      throw new Error('A catalog revision is required to switch models.');
+    }
+    const ticketRequest: RuntimeModelTicketRequest = {
+      sessionId,
+      expectedRevision,
+      expectedCatalogRevision,
+      operation,
+    };
+    const ticketPayload = await postJson('/api/runtime/ticket', ticketRequest, signal, [201]);
+    if (!isRuntimeModelTicketResponse(ticketPayload)) {
+      throw new Error('Relay returned an invalid runtime ticket.');
+    }
+    command = {
+      type: 'runtime.control',
+      controlId,
+      sessionId,
+      expectedRevision,
+      expectedCatalogRevision,
+      operation,
+      ticket: ticketPayload.ticket,
+    };
+  } else {
+    const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
+    if (!isWebSocketTicketResponse(ticketPayload)) {
+      throw new Error('Relay returned an invalid command ticket.');
+    }
+    command = {
+      type: 'runtime.control',
+      controlId,
+      sessionId,
+      expectedRevision,
+      operation,
+      ticket: ticketPayload.ticket,
+    };
   }
-  const command: RuntimeControlCommand = {
-    type: 'runtime.control',
-    controlId: `control_${crypto.randomUUID().replaceAll('-', '_')}`,
-    sessionId,
-    expectedRevision,
-    operation,
-    ticket: ticketPayload.ticket,
-  };
   const payload = await postJson('/api/runtime/control', command, signal, [202, 409, 422, 503]);
   if (!isRuntimeControlResponse(payload)) {
     throw new Error('Relay returned an invalid runtime control result.');

@@ -36,6 +36,9 @@ import type {
   PromptSubmitResponse,
   RuntimeControlCommand,
   RuntimeControlResponse,
+  RuntimeControlReasonCode,
+  RuntimeModelTicketRequest,
+  RuntimeModelTicketResponse,
   RuntimeModelCatalogDto,
   RuntimeMode,
   RuntimeOperation,
@@ -51,7 +54,13 @@ import type {
   WebSocketTicketResponse,
 } from './types.js';
 
-import { RUNTIME_MODES } from './types.js';
+import {
+  MODEL_AVAILABILITIES,
+  MODEL_AVAILABILITY_REASON_CODES,
+  MODEL_INPUT_KINDS,
+  RUNTIME_CONTROL_REASON_CODES,
+  RUNTIME_MODES,
+} from './types.js';
 
 const APPROVAL_RESULT_STATUSES = new Set([
   'approved',
@@ -222,11 +231,16 @@ export function isPiRpcCommand(value: unknown): value is PiRpcCommand {
   }
   if (value.type === 'set_model') {
     return (
-      typeof value.provider === 'string' && typeof value.modelId === 'string' && isJsonValue(value)
+      hasRequiredAndOptionalKeys(value, ['type', 'provider', 'modelId'], ['id']) &&
+      isPathFreeToken(value.provider, 200) &&
+      isPathFreeToken(value.modelId, 200)
     );
   }
   if (value.type === 'set_thinking_level') {
-    return typeof value.level === 'string' && isJsonValue(value);
+    return (
+      hasRequiredAndOptionalKeys(value, ['type', 'level'], ['id']) &&
+      isNonEmptyBoundedString(value.level, 64)
+    );
   }
   return (
     [
@@ -686,17 +700,56 @@ function isExactOrigin(value: unknown): value is string {
 // ── Runtime control (model, thinking level, plan mode) ────────────────────────
 
 const RUNTIME_MODE_SET = new Set<RuntimeMode>(RUNTIME_MODES);
+const MODEL_INPUT_KIND_SET = new Set<string>(MODEL_INPUT_KINDS);
+const MODEL_AVAILABILITY_SET = new Set<string>(MODEL_AVAILABILITIES);
+const MODEL_AVAILABILITY_REASON_CODE_SET = new Set<string>(MODEL_AVAILABILITY_REASON_CODES);
+const RUNTIME_CONTROL_REASON_CODE_SET = new Set<RuntimeControlReasonCode>(
+  RUNTIME_CONTROL_REASON_CODES,
+);
 const COMMAND_SOURCES = new Set<CommandSource>(['extension', 'prompt', 'skill']);
 
 /** Narrow an unknown value to a bounded model descriptor (no path separators). */
 export function isAvailableModelDto(value: unknown): value is AvailableModelDto {
-  return (
-    isRecord(value) &&
-    hasOnlyKeys(value, ['provider', 'id', 'label']) &&
-    isPathFreeToken(value.provider, 200) &&
-    isPathFreeToken(value.id, 200) &&
-    isPathFreeToken(value.label, 200)
-  );
+  if (
+    !isRecord(value) ||
+    !hasRequiredAndOptionalKeys(
+      value,
+      ['provider', 'id', 'label'],
+      [
+        'reasoning',
+        'input',
+        'contextWindow',
+        'maxTokens',
+        'tools',
+        'availability',
+        'availabilityReasonCode',
+        'pricing',
+      ],
+    ) ||
+    !isPathFreeToken(value.provider, 200) ||
+    !isPathFreeToken(value.id, 200) ||
+    !isSafeDisplayString(value.label, 200) ||
+    (value.reasoning !== undefined && typeof value.reasoning !== 'boolean') ||
+    (value.input !== undefined &&
+      (!Array.isArray(value.input) ||
+        value.input.length > MODEL_INPUT_KINDS.length ||
+        new Set(value.input).size !== value.input.length ||
+        !value.input.every(
+          (kind) => typeof kind === 'string' && MODEL_INPUT_KIND_SET.has(kind),
+        ))) ||
+    (value.contextWindow !== undefined && !isBoundedPositiveInteger(value.contextWindow)) ||
+    (value.maxTokens !== undefined && !isBoundedPositiveInteger(value.maxTokens)) ||
+    (value.tools !== undefined && typeof value.tools !== 'boolean') ||
+    (value.availability !== undefined &&
+      (typeof value.availability !== 'string' ||
+        !MODEL_AVAILABILITY_SET.has(value.availability))) ||
+    (value.availabilityReasonCode !== undefined &&
+      (typeof value.availabilityReasonCode !== 'string' ||
+        !MODEL_AVAILABILITY_REASON_CODE_SET.has(value.availabilityReasonCode)))
+  ) {
+    return false;
+  }
+  return value.pricing === undefined || isModelPricingDto(value.pricing);
 }
 
 /** Narrow an unknown value to the authoritative runtime state snapshot. */
@@ -751,8 +804,31 @@ export function isRuntimeOperation(value: unknown): value is RuntimeOperation {
 
 /** Narrow an unknown value to a correlated runtime control command. */
 export function isRuntimeControlCommand(value: unknown): value is RuntimeControlCommand {
+  if (
+    !isRecord(value) ||
+    value.type !== 'runtime.control' ||
+    !isOpaqueId(value.controlId) ||
+    !isOpaqueId(value.sessionId) ||
+    !isNonNegativeSafeInteger(value.expectedRevision) ||
+    !isRuntimeOperation(value.operation) ||
+    !isOpaqueId(value.ticket)
+  ) {
+    return false;
+  }
+  if (value.operation.type === 'set_model') {
+    return (
+      hasOnlyKeys(value, [
+        'type',
+        'controlId',
+        'sessionId',
+        'expectedRevision',
+        'expectedCatalogRevision',
+        'operation',
+        'ticket',
+      ]) && isNonNegativeSafeInteger(value.expectedCatalogRevision)
+    );
+  }
   return (
-    isRecord(value) &&
     hasOnlyKeys(value, [
       'type',
       'controlId',
@@ -760,13 +836,31 @@ export function isRuntimeControlCommand(value: unknown): value is RuntimeControl
       'expectedRevision',
       'operation',
       'ticket',
-    ]) &&
-    value.type === 'runtime.control' &&
-    isOpaqueId(value.controlId) &&
+    ]) && value.expectedCatalogRevision === undefined
+  );
+}
+
+/** Narrow an unknown value to an exact set-model ticket request. */
+export function isRuntimeModelTicketRequest(value: unknown): value is RuntimeModelTicketRequest {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['sessionId', 'expectedRevision', 'expectedCatalogRevision', 'operation']) &&
     isOpaqueId(value.sessionId) &&
     isNonNegativeSafeInteger(value.expectedRevision) &&
-    isRuntimeOperation(value.operation) &&
-    isOpaqueId(value.ticket)
+    isNonNegativeSafeInteger(value.expectedCatalogRevision) &&
+    isRecord(value.operation) &&
+    value.operation.type === 'set_model' &&
+    isRuntimeOperation(value.operation)
+  );
+}
+
+/** Narrow an unknown value to a short-lived runtime ticket response. */
+export function isRuntimeModelTicketResponse(value: unknown): value is RuntimeModelTicketResponse {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['ticket', 'expiresAt']) &&
+    isOpaqueId(value.ticket) &&
+    isTimestamp(value.expiresAt)
   );
 }
 
@@ -774,10 +868,23 @@ export function isRuntimeControlCommand(value: unknown): value is RuntimeControl
 export function isRuntimeModelCatalogDto(value: unknown): value is RuntimeModelCatalogDto {
   return (
     isRecord(value) &&
-    hasOnlyKeys(value, ['sessionId', 'runtimeRevision', 'models']) &&
+    hasOnlyKeys(value, [
+      'sessionId',
+      'catalogRevision',
+      'runtimeRevision',
+      'currentModel',
+      'streaming',
+      'canSetModelWhileStreaming',
+      'models',
+    ]) &&
     isOpaqueId(value.sessionId) &&
+    isNonNegativeSafeInteger(value.catalogRevision) &&
     isNonNegativeSafeInteger(value.runtimeRevision) &&
+    (value.currentModel === null || isAvailableModelDto(value.currentModel)) &&
+    typeof value.streaming === 'boolean' &&
+    typeof value.canSetModelWhileStreaming === 'boolean' &&
     Array.isArray(value.models) &&
+    value.models.length <= 200 &&
     value.models.every(isAvailableModelDto)
   );
 }
@@ -826,14 +933,32 @@ export function isRuntimeControlResponse(value: unknown): value is RuntimeContro
       hasOnlyKeys(value.outcome, ['status', 'state']) && isRuntimeStateDto(value.outcome.state)
     );
   }
-  if (
-    value.outcome.status === 'unsupported' ||
-    value.outcome.status === 'unavailable' ||
-    value.outcome.status === 'delivery-unknown'
-  ) {
+  if (value.outcome.status === 'unsupported') {
     return (
-      hasOnlyKeys(value.outcome, ['status', 'reason']) &&
-      isNonEmptyBoundedString(value.outcome.reason, 500)
+      hasOnlyKeys(value.outcome, ['status', 'reasonCode']) &&
+      value.outcome.reasonCode === 'unsupported_operation'
+    );
+  }
+  if (value.outcome.status === 'policy_blocked') {
+    return (
+      hasOnlyKeys(value.outcome, ['status', 'reasonCode']) &&
+      value.outcome.reasonCode === 'policy_blocked'
+    );
+  }
+  if (value.outcome.status === 'delivery-unknown') {
+    return (
+      hasOnlyKeys(value.outcome, ['status', 'reasonCode']) &&
+      value.outcome.reasonCode === 'delivery_unknown'
+    );
+  }
+  if (value.outcome.status === 'unavailable') {
+    return (
+      hasOnlyKeys(value.outcome, ['status', 'reasonCode']) &&
+      typeof value.outcome.reasonCode === 'string' &&
+      RUNTIME_CONTROL_REASON_CODE_SET.has(value.outcome.reasonCode as RuntimeControlReasonCode) &&
+      value.outcome.reasonCode !== 'unsupported_operation' &&
+      value.outcome.reasonCode !== 'policy_blocked' &&
+      value.outcome.reasonCode !== 'delivery_unknown'
     );
   }
   return false;
@@ -873,7 +998,52 @@ function isPathFreeToken(value: unknown, maxLength: number): value is string {
     typeof value === 'string' &&
     value.length > 0 &&
     value.length <= maxLength &&
+    value !== '.' &&
+    value !== '..' &&
     !value.includes('/') &&
-    !value.includes('\\')
+    !value.includes('\\') &&
+    !/[\u0000-\u001f\u007f-\u009f]/u.test(value)
+  );
+}
+
+function isSafeDisplayString(value: unknown, maxLength: number): value is string {
+  return (
+    isNonEmptyBoundedString(value, maxLength) &&
+    !/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(value) &&
+    !/(?:https?|file):\/\/|(?:^|\s)\/(?:Users|home|private|tmp|var|etc|opt|usr|Volumes)\/|\b[A-Za-z]:\\|\b(?:api[_-]?key|authorization|cookie|password|secret|token)\s*[:=]|\bBearer\s+/iu.test(
+      value,
+    )
+  );
+}
+
+function isBoundedPositiveInteger(value: unknown): value is number {
+  return isPositiveInteger(value) && value <= 1_000_000_000;
+}
+
+function isModelPricingDto(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    hasRequiredAndOptionalKeys(value, ['currency'], ['inputPerMillion', 'outputPerMillion']) &&
+    typeof value.currency === 'string' &&
+    /^[A-Z]{3}$/.test(value.currency) &&
+    (value.inputPerMillion === undefined || isBoundedNonNegativeNumber(value.inputPerMillion)) &&
+    (value.outputPerMillion === undefined || isBoundedNonNegativeNumber(value.outputPerMillion))
+  );
+}
+
+function hasRequiredAndOptionalKeys(
+  value: Record<string, unknown>,
+  required: readonly string[],
+  optional: readonly string[],
+): boolean {
+  const allowed = new Set([...required, ...optional]);
+  return (
+    Object.keys(value).every((key) => allowed.has(key)) && required.every((key) => key in value)
+  );
+}
+
+function isBoundedNonNegativeNumber(value: unknown): value is number {
+  return (
+    typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1_000_000_000
   );
 }

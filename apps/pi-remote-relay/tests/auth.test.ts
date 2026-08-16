@@ -10,6 +10,9 @@ import {
   type DevicePublicKeyJwk,
   type EnrollmentQr,
   type SessionChallengeResponse,
+  type RuntimeControlCommand,
+  type RuntimeModelTicketRequest,
+  type RuntimeStateDto,
   type WebSocketTicketResponse,
   type Envelope,
 } from '@pi-remote/pi-rpc-protocol';
@@ -22,6 +25,7 @@ import { SyncHub } from '../src/replay/sync.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
 import { PushService, createAttentionPayload } from '../src/push/push-service.js';
+import type { RuntimeService } from '../src/runtime/runtime-service.js';
 
 const ORIGIN = 'https://pi-remote.example.ts.net';
 const PRINCIPAL = 'operator@example.com';
@@ -170,6 +174,154 @@ describe('authenticated tailnet boundary', () => {
     harness.setNow(Date.parse(expired.expiresAt) + 1);
     expect(await rejectedWebSocketStatus(harness, expired.ticket)).toBe(401);
     socket.close();
+  });
+
+  it('requires foreground and consumes an exact bound runtime ticket before control', async () => {
+    const state: RuntimeStateDto = {
+      sessionId: 'session_local',
+      revision: 2,
+      model: { provider: 'openai', id: 'gpt-4o', label: 'GPT-4o' },
+      thinkingLevel: 'high',
+      availableThinkingLevels: ['high'],
+      mode: 'plan',
+      streaming: false,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    };
+    let controls = 0;
+    const runtime = {
+      getState: () => state,
+      getModelCatalog: () => ({
+        sessionId: 'session_local',
+        catalogRevision: 3,
+        runtimeRevision: 2,
+        currentModel: state.model,
+        streaming: false,
+        canSetModelWhileStreaming: false,
+        models: [
+          state.model,
+          { provider: 'openai', id: 'gpt-5', label: 'GPT-5', availability: 'available' },
+        ],
+      }),
+      validateModelTicketRequest: (request: RuntimeModelTicketRequest) => {
+        if (request.expectedRevision !== 2) return 'stale_revision';
+        if (request.expectedCatalogRevision !== 3) return 'stale_catalog';
+        return request.operation.provider === 'openai' && request.operation.modelId === 'gpt-5'
+          ? null
+          : 'model_unavailable';
+      },
+      validateFreshModelTicketRequest: async (request: RuntimeModelTicketRequest) => {
+        if (request.expectedRevision !== 2) return 'stale_revision';
+        if (request.expectedCatalogRevision !== 3) return 'stale_catalog';
+        return request.operation.provider === 'openai' && request.operation.modelId === 'gpt-5'
+          ? null
+          : 'model_unavailable';
+      },
+      control: async (_command: RuntimeControlCommand) => {
+        controls += 1;
+        return { outcome: { status: 'accepted', state } } as const;
+      },
+    } as unknown as RuntimeService;
+    const harness = await createHarness(runtime);
+    const authorized = await authorize(harness);
+    const binding = {
+      sessionId: 'session_local',
+      expectedRevision: 2,
+      expectedCatalogRevision: 3,
+      operation: { type: 'set_model', provider: 'openai', modelId: 'gpt-5' },
+    } as const;
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/runtime/ticket', {
+          headers: authorizedHeaders(authorized.cookie),
+          body: binding,
+        })
+      ).status,
+    ).toBe(403);
+
+    const socket = await connectWebSocket(
+      harness,
+      (await issueTicket(harness, authorized.cookie)).ticket,
+    );
+    const ticketResponse = await post(harness.ingressUrl, '/api/runtime/ticket', {
+      headers: authorizedHeaders(authorized.cookie),
+      body: binding,
+    });
+    expect(ticketResponse.status).toBe(201);
+    const ticket = (await ticketResponse.json()) as { ticket: string };
+    const substituted = {
+      type: 'runtime.control',
+      controlId: 'control_substitution',
+      ...binding,
+      operation: { ...binding.operation, modelId: 'gpt-4o' },
+      ticket: ticket.ticket,
+    } as const;
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/runtime/control', {
+          headers: authorizedHeaders(authorized.cookie),
+          body: substituted,
+        })
+      ).status,
+    ).toBe(401);
+    expect(controls).toBe(0);
+
+    const exactTicketResponse = await post(harness.ingressUrl, '/api/runtime/ticket', {
+      headers: authorizedHeaders(authorized.cookie),
+      body: binding,
+    });
+    const exactTicket = (await exactTicketResponse.json()) as { ticket: string };
+    const exact = {
+      type: 'runtime.control',
+      controlId: 'control_exact',
+      ...binding,
+      ticket: exactTicket.ticket,
+    } as const;
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/runtime/control', {
+          headers: authorizedHeaders(authorized.cookie),
+          body: exact,
+        })
+      ).status,
+    ).toBe(202);
+    expect(controls).toBe(1);
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/runtime/control', {
+          headers: authorizedHeaders(authorized.cookie),
+          body: exact,
+        })
+      ).status,
+    ).toBe(401);
+    expect(controls).toBe(1);
+
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/runtime/ticket', {
+          headers: authorizedHeaders(authorized.cookie),
+          body: { ...binding, expectedCatalogRevision: 2 },
+        })
+      ).status,
+    ).toBe(409);
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/runtime/ticket', {
+          headers: authorizedHeaders(authorized.cookie),
+          body: { ...binding, operation: { ...binding.operation, modelId: 'unknown' } },
+        })
+      ).status,
+    ).toBe(422);
+    const closed = nextClose(socket);
+    socket.close();
+    await closed;
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/runtime/ticket', {
+          headers: authorizedHeaders(authorized.cookie),
+          body: binding,
+        })
+      ).status,
+    ).toBe(403);
   });
 
   it('rejects missing and wrong WebSocket Origin without consuming the ticket', async () => {
@@ -358,7 +510,7 @@ describe('authenticated tailnet boundary', () => {
   });
 });
 
-async function createHarness(): Promise<Harness> {
+async function createHarness(runtime?: RuntimeService): Promise<Harness> {
   let now = Date.parse('2026-01-01T00:00:00.000Z');
   const store = new RelayStore();
   const catalog = new SessionCatalog(store);
@@ -388,6 +540,7 @@ async function createHarness(): Promise<Harness> {
     publicOrigin: ORIGIN,
     serveSecret: SERVE_SECRET,
     auth,
+    ...(runtime === undefined ? {} : { runtime }),
     push,
     now: () => now,
     port: 0,

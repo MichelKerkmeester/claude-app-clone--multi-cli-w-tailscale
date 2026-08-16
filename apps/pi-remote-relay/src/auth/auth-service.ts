@@ -9,6 +9,9 @@ import {
   type EnrollmentRequest,
   type EnrollmentResponse,
   type SessionChallengeResponse,
+  type RuntimeControlCommand,
+  type RuntimeModelTicketRequest,
+  type RuntimeModelTicketResponse,
   type WebSocketTicketResponse,
 } from '@pi-remote/pi-rpc-protocol';
 
@@ -17,6 +20,7 @@ import { authorizeAction, type AuthorizedAction } from './policy.js';
 
 const DEFAULT_SESSION_TTL_MS = 15 * 60_000;
 const DEFAULT_TICKET_TTL_MS = 20_000;
+const DEFAULT_RUNTIME_TICKET_TTL_MS = 10_000;
 const DEFAULT_CHALLENGE_TTL_MS = 60_000;
 
 interface PendingSessionChallenge extends SessionChallengeResponse {
@@ -43,6 +47,16 @@ interface WebSocketTicket extends WebSocketTicketResponse {
   consumed: boolean;
 }
 
+interface RuntimeModelTicket extends RuntimeModelTicketResponse {
+  readonly sessionToken: string;
+  readonly deviceId: string;
+  readonly principal: string;
+  readonly origin: string;
+  readonly action: 'runtime:control';
+  readonly binding: RuntimeModelTicketRequest;
+  consumed: boolean;
+}
+
 export interface AuthMetrics {
   bootstrap: number;
   sessionsCreated: number;
@@ -62,6 +76,7 @@ export interface AuthServiceOptions {
   readonly sessionChallengeTtlMs?: number;
   readonly sessionTtlMs?: number;
   readonly ticketTtlMs?: number;
+  readonly runtimeTicketTtlMs?: number;
 }
 
 /** Coordinate device proof, short sessions, one-use tickets and revocation. */
@@ -70,9 +85,11 @@ export class AuthService {
   private readonly sessionChallengeTtlMs: number;
   private readonly sessionTtlMs: number;
   private readonly ticketTtlMs: number;
+  private readonly runtimeTicketTtlMs: number;
   private readonly sessionChallenges = new Map<string, PendingSessionChallenge>();
   private readonly sessions = new Map<string, ApplicationSession>();
   private readonly tickets = new Map<string, WebSocketTicket>();
+  private readonly runtimeTickets = new Map<string, RuntimeModelTicket>();
   private readonly revocationListeners = new Set<
     (deviceId: string, sessionToken?: string) => void
   >();
@@ -93,6 +110,7 @@ export class AuthService {
     this.sessionChallengeTtlMs = options.sessionChallengeTtlMs ?? DEFAULT_CHALLENGE_TTL_MS;
     this.sessionTtlMs = options.sessionTtlMs ?? DEFAULT_SESSION_TTL_MS;
     this.ticketTtlMs = options.ticketTtlMs ?? DEFAULT_TICKET_TTL_MS;
+    this.runtimeTicketTtlMs = options.runtimeTicketTtlMs ?? DEFAULT_RUNTIME_TICKET_TTL_MS;
     this.enrollment = new EnrollmentRegistry({
       origin: options.origin,
       hostId: options.hostId,
@@ -243,6 +261,68 @@ export class AuthService {
     return session;
   }
 
+  public issueRuntimeModelTicket(
+    session: ApplicationSession,
+    binding: RuntimeModelTicketRequest,
+  ): RuntimeModelTicketResponse {
+    this.prune();
+    const ticket: RuntimeModelTicket = {
+      ticket: opaqueId('runtime_ticket'),
+      expiresAt: new Date(this.now() + this.runtimeTicketTtlMs).toISOString(),
+      sessionToken: session.token,
+      deviceId: session.deviceId,
+      principal: session.principal,
+      origin: session.origin,
+      action: 'runtime:control',
+      binding: {
+        sessionId: binding.sessionId,
+        expectedRevision: binding.expectedRevision,
+        expectedCatalogRevision: binding.expectedCatalogRevision,
+        operation: {
+          type: 'set_model',
+          provider: binding.operation.provider,
+          modelId: binding.operation.modelId,
+        },
+      },
+      consumed: false,
+    };
+    this.runtimeTickets.set(ticket.ticket, ticket);
+    this.metrics.ticketsIssued += 1;
+    return { ticket: ticket.ticket, expiresAt: ticket.expiresAt };
+  }
+
+  public consumeRuntimeModelTicket(
+    ticketId: string,
+    session: ApplicationSession,
+    command: RuntimeControlCommand,
+  ): boolean {
+    this.prune();
+    const ticket = this.runtimeTickets.get(ticketId);
+    if (
+      ticket === undefined ||
+      ticket.consumed ||
+      Date.parse(ticket.expiresAt) <= this.now() ||
+      ticket.sessionToken !== session.token ||
+      ticket.deviceId !== session.deviceId ||
+      ticket.origin !== session.origin ||
+      ticket.principal !== session.principal ||
+      ticket.action !== 'runtime:control'
+    ) {
+      return false;
+    }
+    ticket.consumed = true;
+    this.runtimeTickets.delete(ticketId);
+    this.metrics.ticketsConsumed += 1;
+    return (
+      command.operation.type === 'set_model' &&
+      command.sessionId === ticket.binding.sessionId &&
+      command.expectedRevision === ticket.binding.expectedRevision &&
+      command.expectedCatalogRevision === ticket.binding.expectedCatalogRevision &&
+      command.operation.provider === ticket.binding.operation.provider &&
+      command.operation.modelId === ticket.binding.operation.modelId
+    );
+  }
+
   public revokeSession(sessionToken: string): boolean {
     const session = this.sessions.get(sessionToken);
     if (session === undefined || session.revoked) return false;
@@ -285,6 +365,14 @@ export class AuthService {
         this.tickets.delete(id);
       }
     }
+    for (const [id, ticket] of this.runtimeTickets) {
+      if (
+        ticket.deviceId === deviceId &&
+        (sessionToken === undefined || ticket.sessionToken === sessionToken)
+      ) {
+        this.runtimeTickets.delete(id);
+      }
+    }
   }
 
   private emitRevocation(deviceId: string, sessionToken?: string): void {
@@ -300,6 +388,9 @@ export class AuthService {
     }
     for (const [id, ticket] of this.tickets) {
       if (ticket.consumed || Date.parse(ticket.expiresAt) <= now) this.tickets.delete(id);
+    }
+    for (const [id, ticket] of this.runtimeTickets) {
+      if (ticket.consumed || Date.parse(ticket.expiresAt) <= now) this.runtimeTickets.delete(id);
     }
     for (const [id, session] of this.sessions) {
       if (session.revoked || Date.parse(session.expiresAt) <= now) this.sessions.delete(id);

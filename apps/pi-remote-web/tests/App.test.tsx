@@ -9,7 +9,7 @@ import type {
   TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 import { readFileSync } from 'node:fs';
-import { render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
@@ -92,6 +92,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  cleanup();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -283,6 +284,49 @@ it('reconciles runtime state when the session returns to the foreground', async 
     expect(relay.fetchRuntimeModels.mock.calls.length).toBeGreaterThan(modelReadsBeforeForeground),
   );
   expect(relay.fetchRuntimeState.mock.calls.length).toBeGreaterThan(stateReadsBeforeForeground);
+});
+
+it('opens one shared sheet from the header and RuntimeStrip with the correct initial section', async () => {
+  const user = userEvent.setup();
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+
+  await waitFor(() => expect(relay.fetchRuntimeModels).toHaveBeenCalledOnce());
+
+  // The header opens the one dialog at the model section.
+  await user.click(screen.getByRole('button', { name: /Model, Alpha Current, alpha/ }));
+  const dialog = await screen.findByRole('dialog');
+  expect(dialog).toHaveAttribute('id', 'model-effort-dialog');
+  expect(screen.getByRole('listbox', { name: 'Available models' })).toBeInTheDocument();
+  expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+  expect(screen.getAllByRole('dialog')).toHaveLength(1);
+
+  await user.click(screen.getByRole('button', { name: 'Close sheet' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+  // RuntimeStrip opens the SAME dialog at the effort section.
+  await user.click(screen.getByRole('button', { name: 'Thinking effort, High' }));
+  const effortDialog = await screen.findByRole('dialog');
+  expect(effortDialog).toHaveAttribute('id', 'model-effort-dialog');
+  expect(screen.getByRole('radiogroup')).toBeInTheDocument();
+  expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  expect(screen.getAllByRole('dialog')).toHaveLength(1);
+  const radios = screen.getAllByRole('radio');
+  expect(radios.map((radio) => radio.getAttribute('aria-label')?.split(',')[0])).toEqual([
+    'Off',
+    'High',
+  ]);
+  expect(screen.getByRole('radio', { name: 'High, Confirmed' })).toBeChecked();
 });
 
 it('renders a pending approval and submits approve and deny decisions', async () => {

@@ -6,9 +6,10 @@ import type {
 import { readFileSync } from 'node:fs';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ModelSwitcherSheet } from '../src/ModelSwitcherSheet.js';
+import { ModelEffortSheet } from '../src/ModelEffortSheet.js';
 import { SessionHeader } from '../src/SessionHeader.js';
 import { controlRuntime } from '../src/relay.js';
 import type { RuntimeControls, RuntimeUiState } from '../src/runtime.js';
@@ -48,24 +49,11 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('ModelSwitcherSheet', () => {
+describe('ModelEffortSheet (model section)', () => {
   it('contains focus, initially focuses the current row, and restores the trigger without scrolling', async () => {
     const user = userEvent.setup();
     const controls = runtimeControls(readyRuntime(models(7)));
-    const view = render(
-      <>
-        <button type="button">Outside before</button>
-        <SessionHeader
-          onBack={vi.fn()}
-          onInbox={vi.fn()}
-          onReview={vi.fn()}
-          theme="light"
-          onThemeChange={vi.fn()}
-          runtimeControls={controls}
-        />
-        <button type="button">Outside after</button>
-      </>,
-    );
+    const view = render(<HeaderHarness controls={controls} />);
 
     const trigger = screen.getByRole('button', { name: /Model, Alpha Current, alpha/ });
     await user.click(trigger);
@@ -78,7 +66,7 @@ describe('ModelSwitcherSheet', () => {
     expect(screen.getByRole('dialog')).toContainElement(document.activeElement as HTMLElement);
 
     const focus = vi.spyOn(trigger, 'focus');
-    await user.click(screen.getByRole('button', { name: 'Close model switcher' }));
+    await user.click(screen.getByRole('button', { name: 'Close sheet' }));
     await waitFor(() => expect(trigger).toHaveFocus());
     expect(focus).toHaveBeenCalledWith({ preventScroll: true });
     view.unmount();
@@ -90,6 +78,7 @@ describe('ModelSwitcherSheet', () => {
     renderSheet(models(7), setModel);
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getByRole('dialog')).toHaveAttribute('id', 'model-effort-dialog');
     expect(document.querySelectorAll('.react-aria-Popover')).toHaveLength(0);
     expect(screen.getByRole('listbox', { name: 'Available models' })).toBeInTheDocument();
     const current = screen.getByRole('option', { name: /Alpha Current/ });
@@ -173,7 +162,7 @@ describe('ModelSwitcherSheet', () => {
     expect(screen.getByRole('option', { name: /Beta Next/ })).toHaveAccessibleDescription(
       /Applying/,
     );
-    expect(screen.getByRole('button', { name: 'Close model switcher' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Close sheet' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
     fireEvent.keyDown(target, { key: 'Escape' });
     const overlay = document.querySelector<HTMLElement>('.model-sheet-overlay');
@@ -259,7 +248,7 @@ describe('ModelSwitcherSheet', () => {
       logicalPixels(screen.getByRole('button', { name: 'Cancel' }), 'min-block-size'),
     ).toBeGreaterThanOrEqual(44);
     expect(
-      logicalPixels(screen.getByRole('button', { name: 'Close model switcher' }), 'min-block-size'),
+      logicalPixels(screen.getByRole('button', { name: 'Close sheet' }), 'min-block-size'),
     ).toBeGreaterThanOrEqual(44);
     expect(
       logicalPixels(screen.getByRole('option', { name: /Alpha Current/ }), 'min-block-size'),
@@ -278,7 +267,7 @@ describe('ModelSwitcherSheet', () => {
     const css = readFileSync('apps/pi-remote-web/src/style.css', 'utf8');
     expect(css).toMatch(/\.model-sheet-row-id[\s\S]*?unicode-bidi: isolate;/u);
     expect(css).toMatch(
-      /max-block-size: calc\(var\(--visual-viewport-height, 100dvh\) \* 0\.92\);/u,
+      /max-block-size: calc\(var\(--visual-viewport-height, 100dvh\) \* 0\.75\);/u,
     );
     expect(css).toContain('padding-block-end: max(16px, env(safe-area-inset-bottom));');
     expect(css).toMatch(
@@ -287,7 +276,7 @@ describe('ModelSwitcherSheet', () => {
     expect(css).toMatch(
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.model-sheet-overlay button:active[\s\S]*?transform: none/u,
     );
-    expect(css).toMatch(/\.model-sheet-skeleton \{\s*animation: none/u);
+    expect(css).toMatch(/\.model-sheet-skeleton,[\s\S]*?animation: none/u);
     expect(css).toMatch(/\.model-sheet-modal,[\s\S]*?\{\s*animation: none/u);
     document.documentElement.style.removeProperty('zoom');
   });
@@ -467,11 +456,11 @@ describe('ModelSwitcherSheet', () => {
     if (_name === 'delivery unknown') {
       expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive');
     }
-    await user.click(screen.getByRole('button', { name: 'Close model switcher' }));
+    await user.click(screen.getByRole('button', { name: 'Close sheet' }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('updates the header only after the host-confirmed response resolves', async () => {
+  it('updates the header readouts only after the host-confirmed response resolves', async () => {
     const user = userEvent.setup();
     const controls = (runtime: RuntimeUiState): RuntimeControls => ({
       runtime,
@@ -488,13 +477,16 @@ describe('ModelSwitcherSheet', () => {
         theme="light"
         onThemeChange={vi.fn()}
         runtimeControls={controls(runtime)}
+        sheetOpen={false}
+        onOpenModelSheet={vi.fn()}
+        modelTriggerRef={{ current: null }}
       />
     );
 
     const view = render(header(readyRuntime(models(7))));
     await user.click(screen.getByRole('button', { name: /Model, Alpha Current, alpha/ }));
-    await user.click(screen.getByRole('option', { name: /Beta Next/ }));
     expect(document.querySelector('.session-model-name')).toHaveTextContent('Alpha Current');
+    expect(document.querySelector('.session-effort-name')).toHaveTextContent('High');
     view.rerender(
       header({
         ...readyRuntime(models(7)),
@@ -503,26 +495,64 @@ describe('ModelSwitcherSheet', () => {
       }),
     );
     expect(document.querySelector('.session-model-name')).toHaveTextContent('Alpha Current');
-    view.rerender(header(readyRuntime(models(7), { ...HOST_STATE, revision: 5, model: TARGET })));
-    expect(document.querySelector('.session-model-name')).toHaveTextContent('Beta Next');
+    expect(document.querySelector('.session-effort-name')).toHaveTextContent('High');
     view.rerender(
       header(
         readyRuntime(models(7), {
           ...HOST_STATE,
           revision: 5,
           model: TARGET,
+          thinkingLevel: 'max',
+        }),
+      ),
+    );
+    expect(document.querySelector('.session-model-name')).toHaveTextContent('Beta Next');
+    expect(document.querySelector('.session-effort-name')).toHaveTextContent('Max');
+    view.rerender(
+      header(
+        readyRuntime(models(7), {
+          ...HOST_STATE,
+          revision: 5,
+          model: TARGET,
+          thinkingLevel: 'max',
           mode: 'plan',
         }),
       ),
     );
     expect(screen.getByLabelText('Plan mode')).toHaveTextContent('Plan');
-    expect(
-      screen.getByRole('button', { name: 'Thinking effort', hidden: true }),
-    ).toBeInTheDocument();
     const css = readFileSync('apps/pi-remote-web/src/style.css', 'utf8');
     expect(css).toMatch(/\.session-model-name[\s\S]*?animation: model-header-accepted 150ms/u);
   });
 });
+
+function HeaderHarness({ controls }: { readonly controls: RuntimeControls }) {
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  return (
+    <>
+      <button type="button">Outside before</button>
+      <SessionHeader
+        onBack={vi.fn()}
+        onInbox={vi.fn()}
+        onReview={vi.fn()}
+        theme="light"
+        onThemeChange={vi.fn()}
+        runtimeControls={controls}
+        sheetOpen={open}
+        onOpenModelSheet={() => setOpen(true)}
+        modelTriggerRef={triggerRef}
+      />
+      <button type="button">Outside after</button>
+      <ModelEffortSheet
+        isOpen={open}
+        onOpenChange={setOpen}
+        initialSection="model"
+        runtimeControls={controls}
+        triggerRef={triggerRef}
+      />
+    </>
+  );
+}
 
 function models(count: number): readonly AvailableModelDto[] {
   const extras = Array.from({ length: Math.max(0, count - 2) }, (_, index) => ({
@@ -563,9 +593,10 @@ function renderSheet(
     setModel,
   };
   return render(
-    <ModelSwitcherSheet
+    <ModelEffortSheet
       isOpen
       onOpenChange={onOpenChange}
+      initialSection="model"
       runtimeControls={controls}
       triggerRef={{ current: null }}
     />,

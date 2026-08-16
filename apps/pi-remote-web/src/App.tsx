@@ -19,6 +19,7 @@ import {
   useState,
   type Dispatch,
   type ReactNode,
+  type RefObject,
 } from 'react';
 import {
   Button,
@@ -69,6 +70,8 @@ import {
   type SessionListState,
   type TranscriptState,
 } from './state.js';
+import { ModelEffortSheet, type EffortSheetSection } from './ModelEffortSheet.js';
+import { RuntimeStrip } from './RuntimeStrip.js';
 import { SessionComposer } from './SessionComposer.js';
 import { SessionHeader } from './SessionHeader.js';
 import { useCommands } from './commands.js';
@@ -927,6 +930,20 @@ export function Session({
   const commandCatalog = useCommands();
   const [stopping, setStopping] = useState(false);
 
+  // One shared sheet per session view: the header opens the model section,
+  // RuntimeStrip the effort section, and focus returns to whichever trigger
+  // opened it. The sheet holds no committed runtime state itself.
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetSection, setSheetSection] = useState<EffortSheetSection>('model');
+  const activeSheetTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const headerTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const stripTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const openSheet = (section: EffortSheetSection, trigger: RefObject<HTMLButtonElement | null>) => {
+    activeSheetTriggerRef.current = trigger.current;
+    setSheetSection(section);
+    setSheetOpen(true);
+  };
+
   useEffect(() => {
     const reconcileRuntime = () => {
       if (document.visibilityState === 'visible') void runtimeControls.refresh('foreground');
@@ -1135,6 +1152,9 @@ export function Session({
         theme={theme}
         onThemeChange={onThemeChange}
         runtimeControls={runtimeControls}
+        sheetOpen={sheetOpen}
+        onOpenModelSheet={() => openSheet('model', headerTriggerRef)}
+        modelTriggerRef={headerTriggerRef}
       />
       <div className="session-statusline" role="status" aria-live="polite">
         <span className={`agent-dot agent-${status}`} aria-hidden="true">
@@ -1154,6 +1174,12 @@ export function Session({
         </div>
       )}
       <TranscriptList blocks={transcript.blocks} running={status === 'running'} />
+      <RuntimeStrip
+        controls={runtimeControls}
+        sheetOpen={sheetOpen}
+        onOpenEffortSheet={() => openSheet('effort', stripTriggerRef)}
+        effortTriggerRef={stripTriggerRef}
+      />
       <SessionComposer
         prompt={prompt}
         setPrompt={setPrompt}
@@ -1170,6 +1196,13 @@ export function Session({
         runtimeControls={runtimeControls}
         commands={commandCatalog.commands}
         commandsDisabled={commandCatalog.status !== 'ready'}
+      />
+      <ModelEffortSheet
+        isOpen={sheetOpen}
+        onOpenChange={setSheetOpen}
+        initialSection={sheetSection}
+        runtimeControls={runtimeControls}
+        triggerRef={activeSheetTriggerRef}
       />
     </main>
   );

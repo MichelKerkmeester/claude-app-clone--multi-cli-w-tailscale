@@ -1,24 +1,24 @@
 # Checklist — Canonical sheet, effort rows, and shared entry points
 
-- [ ] Header opens one controlled sheet at the Model section.
-- [ ] RuntimeStrip opens the same controlled sheet at the Effort section.
-- [ ] The DOM contains one top-level `role="dialog"` and no effort-specific second overlay.
-- [ ] The effort group renders exactly the host-advertised order and subset for three-, five-, and seven-level fixtures.
-- [ ] Known IDs use the exact bounded local labels and descriptions.
-- [ ] Unknown IDs remain internally selectable but raw IDs are absent from visible and accessible copy.
-- [ ] No `Default`, cost, rank, latency, quality, or raw host metadata marker appears.
-- [ ] Radio rows have descriptions, 44px targets, visible focus, and keyboard selection behavior.
-- [ ] Header and RuntimeStrip readouts show confirmed values only and use separate spans/localized accessible names.
-- [ ] No local committed model or effort state exists in the sheet, header, or RuntimeStrip.
-- [ ] The confirmed row remains checked during pending.
-- [ ] Only the requested row shows its pending indicator.
-- [ ] Pending sets `aria-busy`, keeps radios focusable/read-only, and shows bounded status copy.
-- [ ] Closing the sheet while pending leaves the mutation running.
-- [ ] Streaming, empty, off-only, inconsistent, offline, foreground-required, rate-limited, host-unavailable, stale, unsupported, and delivery-unknown fixtures remain distinct.
-- [ ] Build/Plan behavior and host authority remain unchanged.
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npm test` exits 0.
-- [ ] `npm run test:web` exits 0, including protocol/relay security and runtime lifecycle suites.
-- [ ] CDP captures are taken at exactly 390 CSS px in light and dark themes.
-- [ ] Closed, Model-open, three-level Effort-open, and seven two-line-row views show no horizontal overflow or clipped safe-area content.
-- [ ] The Effort section has no nested effort overlay.
+- [x] Header opens one controlled sheet at the Model section. — `App.test.tsx` integration test (header → `id="model-effort-dialog"`, model section).
+- [x] RuntimeStrip opens the same controlled sheet at the Effort section. — `App.test.tsx` (RuntimeStrip reopens the SAME dialog at the effort section).
+- [x] The DOM contains one top-level `role="dialog"` and no effort-specific second overlay. — `App.test.tsx`/`ModelEffortSheet.test.tsx` (exactly 1 dialog, 0 popovers).
+- [x] The effort group renders exactly the host-advertised order and subset for three-, five-, and seven-level fixtures. — `EffortRadioGroup.test.tsx`.
+- [x] Known IDs use the exact bounded local labels and descriptions. — `effort.ts` catalog (7 known IDs) + tests.
+- [x] Unknown IDs remain internally selectable but raw IDs are absent from visible and accessible copy. — `effort.ts` bounded-ordinal formatting; tested.
+- [x] No `Default`, cost, rank, latency, quality, or raw host metadata marker appears. — catalog carries labels/descriptions only; tested.
+- [x] Radio rows have descriptions, 44px targets, visible focus, and keyboard selection behavior. — `EffortRadioGroup.test.tsx` + computed-style/contrast tests.
+- [x] Header and RuntimeStrip readouts show confirmed values only and use separate spans/localized accessible names. — `SessionHeader.test.tsx`/`RuntimeStrip.test.tsx`.
+- [x] No local committed model or effort state exists in the sheet, header, or RuntimeStrip. — sheet holds only transient draft/search/section; no ticket/control minting in the UI (verified in code); `ModelEffortSheet.test.tsx` "moves the check only when host-confirmed state changes".
+- [x] The confirmed row remains checked during pending. — same test.
+- [x] Only the requested row shows its pending indicator. — `EffortRadioGroup.test.tsx` pending test.
+- [x] Pending sets `aria-busy`, keeps radios focusable/read-only, and shows bounded status copy. — same.
+- [x] Closing the sheet while pending leaves the mutation running. — `ModelEffortSheet.test.tsx` pending-dismissal test.
+- [x] Streaming, empty, off-only, inconsistent, offline, foreground-required, rate-limited, host-unavailable, stale, unsupported, and delivery-unknown fixtures remain distinct. — edge-state tests over the phase-2 hook states.
+- [x] Build/Plan behavior and host authority remain unchanged. — no protocol/relay/policy source touched; phase-2 runtime hook unchanged.
+- [x] `npm run typecheck` exits 0. — verified (worktree).
+- [x] `npm test` exits 0. — verified 147/147 on a clean run; the pre-existing flaky `auth.test.ts` foreground test intermittently reports 146/147 (documented socket-close race, unrelated to this web-only phase — proven by isolated re-run 12/12).
+- [x] `npm run test:web` exits 0, including protocol/relay security and runtime lifecycle suites. — verified, 143 passed (143) (+41 new).
+- [ ] CDP captures are taken at exactly 390 CSS px in light and dark themes. — DEFERRED to the feature-002 visual checkpoint (after phase `005`, the a11y/visual-hardening phase, when the effort sheet is visually final). Harness is built; the effort sheet is now the first VISIBLE feature-002 change, so its captures land at that checkpoint.
+- [ ] Closed, Model-open, three-level Effort-open, and seven two-line-row views show no horizontal overflow or clipped safe-area content. — DEFERRED with the CDP capture above; component-level 44px/overflow/one-dialog proxies pass in jsdom now.
+- [x] The Effort section has no nested effort overlay. — `ModelEffortSheet.test.tsx` (radiogroup, no listbox/popover in the effort section).

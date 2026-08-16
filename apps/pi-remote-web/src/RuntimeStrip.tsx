@@ -1,93 +1,68 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Host-Backed Runtime Control Strip (Model / Effort / Build·Plan)
 // ───────────────────────────────────────────────────────────────────
+// The compact composer-adjacent strip. The confirmed model reads as a
+// static span, the confirmed effort is a summary trigger that opens the
+// shared sheet at the effort section, and Build/Plan stays a separate
+// host-confirmed toggle. No picker or mutation implementation lives
+// here: the sheet owns the surface and the runtime hook owns mutations.
 
-import {
-  Button,
-  ListBox,
-  ListBoxItem,
-  Popover,
-  Select,
-  ToggleButton,
-  ToggleButtonGroup,
-} from 'react-aria-components';
-import type { Key } from 'react-aria-components';
+import { Button, ToggleButton, ToggleButtonGroup } from 'react-aria-components';
+import type { RefObject } from 'react';
 
+import { effortTriggerName, effortTriggerText } from './effort.js';
 import type { RuntimeControls } from './runtime.js';
 
-const EFFORT_LABELS: Readonly<Record<string, string>> = {
-  off: 'Off',
-  minimal: 'Minimal',
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  xhigh: 'Extra high',
-  max: 'Max',
-};
+export interface RuntimeStripProps {
+  readonly controls: RuntimeControls;
+  /** Whether the shared model/effort sheet is open (for aria-expanded). */
+  readonly sheetOpen: boolean;
+  /** Opens the shared sheet at the effort section. */
+  readonly onOpenEffortSheet: () => void;
+  /** Attached to the effort trigger so the sheet can restore focus to it. */
+  readonly effortTriggerRef: RefObject<HTMLButtonElement | null>;
+}
 
 /**
- * The three host-authoritative controls. Every label reflects host-confirmed state
- * only; a mutation shows pending on its own control and never an optimistic value, and
- * all controls disable whenever authority is not `ready`.
+ * The three host-authoritative controls. Every label reflects host-confirmed
+ * state only; a mutation shows pending on the sheet and never an optimistic
+ * value, and the Build/Plan toggle disables whenever authority is not `ready`.
  */
-export function RuntimeStrip({ controls }: { readonly controls: RuntimeControls }) {
-  const { runtime, setModel, setThinkingLevel, setMode } = controls;
+export function RuntimeStrip({
+  controls,
+  sheetOpen,
+  onOpenEffortSheet,
+  effortTriggerRef,
+}: RuntimeStripProps) {
+  const { runtime, setMode } = controls;
   const state = runtime.state;
   const disabled = runtime.status !== 'ready' || state === null;
-  const pending = runtime.pending;
 
   const modelLabel = state?.model?.label ?? '—';
-  const modelIndex = state?.model
-    ? runtime.models.findIndex(
-        (m) => m.provider === state.model?.provider && m.id === state.model?.id,
-      )
-    : -1;
+  const effortText = effortTriggerText(state?.thinkingLevel, state?.availableThinkingLevels ?? []);
   const planActive = state?.mode === 'plan' || state?.mode === 'executing-plan';
 
   return (
     <div className="runtime-strip" role="group" aria-label="Runtime controls">
-      <Select
-        aria-label="Model"
-        className="runtime-control runtime-model"
-        isDisabled={disabled}
-        selectedKey={modelIndex >= 0 ? String(modelIndex) : null}
-        onSelectionChange={(key: Key | null) => {
-          const chosen = key === null ? undefined : runtime.models[Number(key)];
-          if (chosen) void setModel(chosen.provider, chosen.id);
-        }}
-      >
-        <Button>{`Model · ${modelLabel}`}</Button>
-        <Popover>
-          <ListBox>
-            {runtime.models.map((model, index) => (
-              <ListBoxItem key={`${model.provider}|${model.id}`} id={String(index)}>
-                {model.label}
-              </ListBoxItem>
-            ))}
-          </ListBox>
-        </Popover>
-      </Select>
+      <span className="runtime-readout runtime-model-readout">
+        <span className="runtime-readout-label">Model</span>
+        <span className="runtime-readout-value">{modelLabel}</span>
+      </span>
 
-      <Select
-        aria-label="Effort"
-        className="runtime-control runtime-effort"
-        isDisabled={disabled || (state?.availableThinkingLevels.length ?? 0) === 0}
-        selectedKey={state?.thinkingLevel ?? null}
-        onSelectionChange={(key: Key | null) => {
-          if (key !== null) void setThinkingLevel(String(key));
-        }}
+      <Button
+        ref={effortTriggerRef}
+        className="runtime-effort-trigger"
+        aria-label={effortTriggerName(effortText)}
+        aria-haspopup="dialog"
+        aria-expanded={sheetOpen}
+        aria-controls="model-effort-dialog"
+        onPress={onOpenEffortSheet}
+        style={{ minBlockSize: '44px' }}
       >
-        <Button>{`Effort · ${effortLabel(state?.thinkingLevel)}`}</Button>
-        <Popover>
-          <ListBox>
-            {(state?.availableThinkingLevels ?? []).map((level) => (
-              <ListBoxItem key={level} id={level}>
-                {effortLabel(level)}
-              </ListBoxItem>
-            ))}
-          </ListBox>
-        </Popover>
-      </Select>
+        <span className="runtime-readout-label">Effort</span>
+        <span className="runtime-readout-value">{effortText}</span>
+        <ChevronUpGlyph />
+      </Button>
 
       <ToggleButtonGroup
         className="runtime-control runtime-mode"
@@ -109,15 +84,10 @@ export function RuntimeStrip({ controls }: { readonly controls: RuntimeControls 
       </ToggleButtonGroup>
 
       <span className="runtime-status" role="status" aria-live="polite">
-        {statusHint(runtime.status, pending !== null)}
+        {statusHint(runtime.status, runtime.pending !== null)}
       </span>
     </div>
   );
-}
-
-function effortLabel(level: string | undefined): string {
-  if (level === undefined || level.length === 0) return '—';
-  return EFFORT_LABELS[level] ?? level;
 }
 
 function statusHint(status: RuntimeControls['runtime']['status'], hasPending: boolean): string {
@@ -133,4 +103,19 @@ function statusHint(status: RuntimeControls['runtime']['status'], hasPending: bo
     default:
       return '';
   }
+}
+
+function ChevronUpGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
+      <path
+        d="M6 15l6-6 6 6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }

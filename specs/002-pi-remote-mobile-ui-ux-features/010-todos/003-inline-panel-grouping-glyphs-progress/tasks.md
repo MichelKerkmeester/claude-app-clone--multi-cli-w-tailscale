@@ -1,0 +1,12 @@
+# Tasks — Inline todo panel, grouping, state glyphs, and progress
+- [ ] Add pure grouping, ordering, group-heading, count, empty-plan, all-done, stale, and unavailable helpers to `apps/pi-remote-web/src/todo-model.ts`.
+- [ ] Add validated snapshot state, active `planId`, projection revision, local section collapse, refresh state, and unsupported-host handling to `apps/pi-remote-web/src/todo-state.ts`.
+- [ ] Pass `todo.snapshot.v1` envelopes through the authenticated read-only flow in `apps/pi-remote-web/src/relay.ts` without treating them as transcript blocks or sending todo commands.
+- [ ] Implement `TodoPanel`, `TodoPanelHeader`, `TodoProgressHairline`, `TodoStateSection`, `TodoTaskRow`, `TodoStateGlyph`, `TodoUpdatedLabel`, `TodoAllDoneLine`, `TodoLiveRegion`, and `TodoProjectionBlock` in `apps/pi-remote-web/src/TodoPanel.tsx`.
+- [ ] Keep `TodoTaskRow` static and use React Aria `Disclosure`, `DisclosurePanel`, and `Button` only for local collapse and refresh controls in `apps/pi-remote-web/src/TodoPanel.tsx`.
+- [ ] Mount `TodoProjectionBlock` beside routine activity and outside the activity disclosure in `apps/pi-remote-web/src/App.tsx`.
+- [ ] Route todo state separately from transcript state in `apps/pi-remote-web/src/state.ts` while reusing the existing transcript layout primitives.
+- [ ] Apply the frozen parchment, carbon-ink, clay, Inter, Source Serif 4, focus, separator, radius, safe-area, and motion tokens in `apps/pi-remote-web/src/style.css`.
+- [ ] Add static-row, group, count, glyph, all-done, collapse, refresh, and no-mutation coverage to `apps/pi-remote-web/tests/TodoPanel.test.tsx`.
+- [ ] Add snapshot normalization, plan identity, host ordering, counts, all-done replacement, and unsupported-host coverage to `apps/pi-remote-web/tests/todo-state.test.ts`.
+- [ ] Extend `apps/pi-remote-web/tests/App.test.tsx` and `apps/pi-remote-web/tests/contrast.test.tsx` for collapsed activity, transcript integration, panel borders, glyphs, focus rings, and light/dark contrast.

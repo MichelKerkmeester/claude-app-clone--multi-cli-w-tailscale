@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model",
+  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model",
+  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features",
+  "children_ids": [
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/001-research",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/002-protocol-redaction-runtime-authority",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/003-functional-model-switcher-sheet",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/004-iphone-accessibility-release-hardening",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/001-research",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/002-protocol-redaction-runtime-authority",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/003-functional-model-switcher-sheet",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/004-iphone-accessibility-release-hardening"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "f1 \u2014 change the active ai model"
+    ],
+    "key_topics": [
+      "change",
+      "active",
+      "model",
+      "f1-change-model",
+      "synthesis"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "research.md",
+        "kind": "doc",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Kimi Code",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Switch Control",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Full Keyboard Access",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Dynamic Type",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Page Zoom",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Decision Replace",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Source Serif",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Search Use",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Use React",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Inline Retry",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "F1 \u2014 Change the active AI model",
+    "created_at": "2026-08-16T07:15:02.969Z",
+    "last_save_at": "2026-08-16T11:59:18.469Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "source_fingerprint": "sha256:a1a835dfd334eb47aa7d83911f2a46236aec7b7008bad34b1cfd5d9019dd5deb",
+    "source_doc_hashes": {
+      "spec.md": "cdfb1e656a86246d0df8fc702dc3edff01b1601b9672f311e02c105c9ebf7241",
+      "research/research.md": "ed4016b55c6a739ce6d2d2693b0c34c3ccfe6d531353dd17022e89e9c83245cb"
+    },
+    "last_active_child_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model/001-research",
+    "last_active_at": null
+  }
+}

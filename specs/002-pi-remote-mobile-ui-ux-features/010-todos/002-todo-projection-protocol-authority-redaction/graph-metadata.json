@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos/002-todo-projection-protocol-authority-redaction",
+  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos/002-todo-projection-protocol-authority-redaction",
+  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "phase",
+      "todo",
+      "projection",
+      "protocol",
+      "host",
+      "authority",
+      "redaction",
+      "plan",
+      "tasks",
+      "checklist"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary This",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Goal The",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "closed",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "stable",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem & Goal",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach Define",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Steps",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Files to change",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification gate",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "valid",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase 1 \u2014 Todo projection protocol, host authority, and redaction",
+    "created_at": "2026-08-16T11:07:31.840Z",
+    "last_save_at": "2026-08-16T11:59:30.922Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:dde0a4f8daa7cae5a324c201a7668fe932acbe5f140dc86d6703d038133b9730",
+    "source_doc_hashes": {
+      "spec.md": "4a667fa9e0a2a44da24a933fa3739bdfa89817997b99eeb3d1085f3fb7161bf7",
+      "plan.md": "f31057a6c8d0176069797f7db82f781c57d65901c0f939ffad796fc436778b29",
+      "tasks.md": "44c3ea59ae4774188e2c76a1ae5e700fef0bebebf0a2334b2f511ebf0a37aeca",
+      "checklist.md": "6de56efe6c6e1a74cd43c203d161a655f45dd851bdf2ba4970465a851a0789a0"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

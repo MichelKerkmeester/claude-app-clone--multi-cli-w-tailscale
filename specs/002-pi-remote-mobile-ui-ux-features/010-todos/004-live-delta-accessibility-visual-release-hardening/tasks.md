@@ -1,0 +1,13 @@
+# Tasks — Live delta updates, accessibility, visual, and iPhone/PWA release hardening
+- [ ] Extend `apps/pi-remote-web/src/todo-state.ts` with stale-delta rejection, matching `baseRevision` checks, refresh preservation, host removals, newer task-revision upserts, and plan replacement.
+- [ ] Update `apps/pi-remote-web/src/relay.ts` to recover from revision gaps through read-only authenticated re-subscription without adding a todo command or mutation route.
+- [ ] Keep transcript cursor state and todo projection revision state independent in `apps/pi-remote-web/src/state.ts`.
+- [ ] Complete `useTodoProjection`, `useTodoSync`, `useTodoViewState`, `useTodoRevision`, and `useTodoAnnouncement` behavior across `apps/pi-remote-web/src/todo-state.ts` and `apps/pi-remote-web/src/TodoPanel.tsx`.
+- [ ] Add stable opaque task keys, scoped polite announcements, host timestamp semantics, quiet all-done restoration, and no-auto-scroll behavior to `apps/pi-remote-web/src/TodoPanel.tsx`.
+- [ ] Add reduced-motion, RTL logical properties, dynamic text sizing, safe-area padding, sticky bounded-panel headers, AA-safe focus and secondary text, and no-layout-animation behavior to `apps/pi-remote-web/src/style.css`.
+- [ ] Inspect `apps/pi-remote-web/src/cache.ts` and `apps/pi-remote-web/public/service-worker.js` to prevent raw titles, detail, groups, paths, secrets, and transcript content from persistence.
+- [ ] Extend `apps/pi-remote-relay/src/push/push-service.ts` and `apps/pi-remote-relay/tests/push.test.ts` to keep any projection wake signal content-free.
+- [ ] Extend `apps/pi-remote-relay/src/index.ts` and `apps/pi-remote-relay/tests/sync.test.ts` for absent-capability handling and older-client tolerance of unknown todo envelopes.
+- [ ] Add stale, base-mismatch, identity, announcement, reduced-motion, all-done restoration, RTL, text-size, and no-auto-scroll coverage to `apps/pi-remote-web/tests/todo-state.test.ts` and `apps/pi-remote-web/tests/TodoPanel.test.tsx`.
+- [ ] Extend `apps/pi-remote-web/tests/App.test.tsx` and `apps/pi-remote-web/tests/contrast.test.tsx` for collapsed activity, focus visibility, theme contrast, and dynamic layout.
+- [ ] Re-run `apps/pi-remote-relay/tests/security/negative-controls.test.ts` and `apps/pi-remote-relay/tests/redaction.test.ts`, and verify `extensions/pi-remote-plan/src/index.ts` remains authoritative for plan mode and `--full-access`.

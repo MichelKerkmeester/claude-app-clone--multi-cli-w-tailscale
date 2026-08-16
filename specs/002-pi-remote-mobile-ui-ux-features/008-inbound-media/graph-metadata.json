@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media",
+  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media",
+  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features",
+  "children_ids": [
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/001-research",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/002-protocol-capability-boundary",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/003-ticketed-publication-sanitization-storage",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/004-exact-read-viewer-foundation",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/005-transcript-inline-image-card",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/006-fullscreen-privacy-accessibility",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/001-research",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/002-protocol-capability-boundary",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/003-ticketed-publication-sanitization-storage",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/004-exact-read-viewer-foundation",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/005-transcript-inline-image-card",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/006-fullscreen-privacy-accessibility",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "f8 \u2014 inbound media preview"
+    ],
+    "key_topics": [
+      "inbound",
+      "media",
+      "preview",
+      "f8-inbound-media",
+      "synthesis"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "research.md",
+        "kind": "doc",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Inbound Media Preview",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Inbound Media Preview One",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "React Aria",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Copy Image",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Goal Let",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Decision Build",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "React Strict Mode",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Protocol The",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Live Photo",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "F8 \u2014 Inbound Media Preview",
+    "created_at": "2026-08-16T07:15:19.350Z",
+    "last_save_at": "2026-08-16T11:59:27.884Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "source_fingerprint": "sha256:00e20f6a2f7d3ba388f91d088b03bf087e7a56412ae538fe2adffc77535de8cf",
+    "source_doc_hashes": {
+      "spec.md": "a406bdb5c2be2231476039f67b12d56abe654b33307e8b36675da99439d6548c",
+      "research/research.md": "acf16d2574e807bcb8b7c7467b68402f4454161ce1167d712ed5ab1bb0af34f4"
+    },
+    "last_active_child_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/001-research",
+    "last_active_at": null
+  }
+}

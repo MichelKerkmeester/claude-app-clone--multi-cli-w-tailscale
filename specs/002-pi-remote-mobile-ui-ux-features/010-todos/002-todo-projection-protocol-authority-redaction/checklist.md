@@ -1,0 +1,11 @@
+# Checklist — Todo projection protocol, host authority, and redaction
+- [ ] `npm run typecheck` exits 0.
+- [ ] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0.
+- [ ] Valid snapshot and delta fixtures pass guards with the exact closed state set and supported envelope kinds.
+- [ ] Unknown states, duplicate identities, invalid order values, malformed timestamps, missing fields, and invalid revisions are rejected without fabricated fallback values.
+- [ ] Subscription and reconnect tests prove that a complete snapshot is published.
+- [ ] Base-revision mismatch tests prove that the relay preserves the last valid view and does not invent or merge a delta chain.
+- [ ] Redaction, persistence, replay, logging, and push assertions prove that task detail and raw titles or groups do not cross the approved boundary.
+- [ ] Capability tests prove `todoProjection: 1` is advertised and absent capability is treated as unsupported.
+- [ ] The projection is strictly read-only: no checkbox mutation, todo mutation RPC, HTTP mutation route, ticket, approval, or phone-originated todo command exists.
+- [ ] Authority tests prove todo state is not inferred from transcript content and existing plan-mode and `--full-access` boundaries remain unchanged.

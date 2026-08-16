@@ -1,0 +1,13 @@
+# Checklist — Live delta updates, accessibility, visual, and iPhone/PWA release hardening
+- [ ] `npm run typecheck` exits 0.
+- [ ] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0.
+- [ ] `npm run test:web` exits 0.
+- [ ] `npm run build` exits 0.
+- [ ] True 390px CDP smoke tests pass in both light and dark themes with a background delta while scrolled, collapsed activity, focus navigation, safe-area padding, RTL, increased text size, and reduced motion.
+- [ ] A valid delta updates only the affected row and derived counts while unaffected task DOM identities remain stable.
+- [ ] Stale deltas and malformed projections are rejected without changing rendered content or revision; base mismatch preserves the last valid view and starts read-only refresh.
+- [ ] Plan changes replace the projection, all-done rendering is quiet, and a new pending, active, or blocked task restores grouped rendering and recomputes progress.
+- [ ] One concise polite announcement exposes the redacted title and localized state, while provenance, group counts, disclosure state, refresh name, and exact timestamps are available to assistive technology.
+- [ ] Reduced motion removes pulses and layout transitions, and background updates do not change transcript scroll position or move focus.
+- [ ] RTL, browser text scaling, safe-area padding, wrapped titles, and 44pt controls remain usable without horizontal overflow; light and dark contrast meet WCAG AA with clay as the only todo accent.
+- [ ] Push payloads, browser cache, service-worker storage, transcript JSON, and diagnostic logs contain no raw detail, titles, groups, paths, secrets, or transcript content, and older clients and hosts preserve existing transcript behavior.

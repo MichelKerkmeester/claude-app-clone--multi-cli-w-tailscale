@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question",
+  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question",
+  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features",
+  "children_ids": [
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/001-research",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/003-inline-card-options-freetext-state-machine",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/001-research",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/003-inline-card-options-freetext-state-machine",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "f9 \u2014 ask-question"
+    ],
+    "key_topics": [
+      "ask-question",
+      "f9-ask-question",
+      "synthesis"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "research.md",
+        "kind": "doc",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Question One",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Before Phase",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Decision Build",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Use React Aria Components",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Source Serif",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "React Aria Components",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pressing Return",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Use Source Serif",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "F9 \u2014 Ask-Question",
+    "created_at": "2026-08-16T08:23:20.243Z",
+    "last_save_at": "2026-08-16T12:37:15.196Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "source_fingerprint": "sha256:542aa47e7f89873ac3392185647641d88ffe268af335e86b814f7083cdf2c9d5",
+    "source_doc_hashes": {
+      "spec.md": "4bccc45307b57015c6ee661f705846d03f8c06b18d4329ade1a82f37a37664b5",
+      "research/research.md": "a6f3aaee617454a1a2a11212eda16c7dfa7632d8b9210666b486b1781c05d490"
+    },
+    "last_active_child_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+    "last_active_at": null
+  }
+}

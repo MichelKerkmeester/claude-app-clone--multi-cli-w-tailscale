@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "phase",
+      "ask-question",
+      "protocol",
+      "host",
+      "authority",
+      "redaction",
+      "plan",
+      "tasks",
+      "checklist"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary This",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Goal The",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Confirmed Pi",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "fail-closed",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem & Goal",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach Build",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "request-shape",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Steps",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Files to change",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification gate",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "presentation",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "strict",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "explicit",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "pre-consumption",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "security",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase 1 \u2014 Ask-question protocol, host authority, and redaction",
+    "created_at": "2026-08-16T11:03:09.399Z",
+    "last_save_at": "2026-08-16T12:37:15.362Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:583212b00e492f9f8a74f86c3a1736a4bde21b50b92325cef01ac55437b3343d",
+    "source_doc_hashes": {
+      "spec.md": "1d9dead636e1a63f83a9618cf92b084da57c824db03158f96a8e909b49fd532f",
+      "plan.md": "469aaa591ac008cf7ff19b6932f5efcbfb4dd278e60dfbe59b16e222391ce79e",
+      "tasks.md": "1cb1f4e8866160c4ab407800a4e52d7f7a3525ceb7a257e90d4468d0c5a93fb8",
+      "checklist.md": "7d256926d695f0ac4844069cbf26ccd9e39618e2d85a34262da9f22c9669421c"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

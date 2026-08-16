@@ -1,0 +1,13 @@
+# Checklist — Inline todo panel, grouping, glyphs, and progress
+- [ ] `npm run typecheck` exits 0.
+- [ ] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0.
+- [ ] `npm run test:web` exits 0.
+- [ ] True 390px CDP checks pass in both light and dark themes.
+- [ ] The eight-task fixture renders `3/8` with a visible clay progress hairline.
+- [ ] Four-state fixtures render correct localized headings and counts while preserving host order and optional group subheadings.
+- [ ] Collapsing `ActivityGroup` leaves `TodoProjectionBlock` visible in the DOM and viewport.
+- [ ] Task rows have no checkbox, switch, link, button, drag attribute, or mutation handler.
+- [ ] Disclosure and refresh controls have correct accessible names, keyboard behavior, and 44pt-equivalent targets.
+- [ ] All-done rendering shows only `All done · N/N` for the task body, and unsupported or empty states do not fabricate rows.
+- [ ] Light and dark screenshots use only the frozen typography, parchment, carbon-ink, and clay tokens with no added status colors or floating card treatment.
+- [ ] The true 390px layout has wrapped titles, safe-area padding, no clipped content, no horizontal overflow, and no unsafe control placement.

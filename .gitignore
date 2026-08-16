@@ -23,3 +23,7 @@ deploy/serve.env
 
 # Local symlink to shared external subagent tooling — not part of the app.
 .pi-subagents
+
+# Track spec packets in this app repo (override ~/.gitignore_global /specs)
+!/specs
+!/specs/**

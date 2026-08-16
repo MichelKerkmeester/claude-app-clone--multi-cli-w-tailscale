@@ -1,0 +1,24 @@
+{
+  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+  "description": "Phase 1 \u2014 Ask-question protocol, host authority, and redaction",
+  "keywords": [
+    "phase",
+    "1",
+    "ask-question",
+    "protocol",
+    "host",
+    "authority",
+    "redaction"
+  ],
+  "lastUpdated": "2026-08-16T12:00:00.000Z",
+  "specId": "002",
+  "folderSlug": "ask-question-protocol-authority-redaction",
+  "parentChain": [
+    "app-mobile-cli",
+    "002-pi-remote-mobile-ui-ux-features",
+    "009-ask-question"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "3"
+}

@@ -1,0 +1,25 @@
+{
+  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos/002-todo-projection-protocol-authority-redaction",
+  "description": "Phase 1 \u2014 Todo projection protocol, host authority, and redaction",
+  "keywords": [
+    "phase",
+    "1",
+    "todo",
+    "projection",
+    "protocol",
+    "host",
+    "authority",
+    "redaction"
+  ],
+  "lastUpdated": "2026-08-16T12:00:00.000Z",
+  "specId": "002",
+  "folderSlug": "todo-projection-protocol-authority-redaction",
+  "parentChain": [
+    "app-mobile-cli",
+    "002-pi-remote-mobile-ui-ux-features",
+    "010-todos"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "3"
+}

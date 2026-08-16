@@ -1,0 +1,13 @@
+# Tasks — Todo projection protocol, host authority, and redaction
+- [ ] Add projection DTOs, closed states, revisions, and the `todoProjection: 1` capability to `packages/pi-rpc-protocol/src/types.ts`.
+- [ ] Add exact-key and value guards for projection identities, states, order, timestamps, revisions, base revisions, and removals in `packages/pi-rpc-protocol/src/guards.ts`.
+- [ ] Export the new projection types and guards from `packages/pi-rpc-protocol/src/index.ts`.
+- [ ] Extend `packages/pi-rpc-protocol/tests/guards.test.ts` with valid, malformed, stale-shape, duplicate-ID, unknown-state, revision, and capability fixtures.
+- [ ] Implement `apps/pi-remote-relay/src/store/todo-projector.ts` as a host-only adapter with stable opaque IDs, host order, allowlisted fields, redaction, detail disposal, snapshots, and deltas.
+- [ ] Wire `apps/pi-remote-relay/src/index.ts` and `apps/pi-remote-relay/src/rpc/supervisor.ts` to the authoritative source without deriving todos from transcript content.
+- [ ] Apply canonical redaction and prevent enrichment or reconstruction in `apps/pi-remote-relay/src/store/redaction.ts` and `apps/pi-remote-relay/src/store/relay-store.ts`.
+- [ ] Reuse `apps/pi-remote-relay/src/replay/sync.ts` for authenticated snapshots, replay barriers, reconnects, and live projection delivery.
+- [ ] Advertise the capability from `apps/pi-remote-relay/src/http/server.ts` without adding a todo HTTP mutation route.
+- [ ] Preserve the content-free boundary in `apps/pi-remote-relay/src/push/push-service.ts` for any projection-available wake signal.
+- [ ] Add projection coverage in `apps/pi-remote-relay/tests/todo-projection.test.ts` and extend `apps/pi-remote-relay/tests/redaction.test.ts`, `apps/pi-remote-relay/tests/sync.test.ts`, `apps/pi-remote-relay/tests/security/negative-controls.test.ts`, and `apps/pi-remote-relay/tests/push.test.ts`.
+- [ ] Confirm `apps/pi-remote-relay/src/store/transcript-projector.ts` does not infer todo state from legacy `PlanBlock` data and that no todo mutation RPC or route exists.

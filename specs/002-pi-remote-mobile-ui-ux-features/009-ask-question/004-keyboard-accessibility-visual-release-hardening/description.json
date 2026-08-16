@@ -1,0 +1,26 @@
+{
+  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening",
+  "description": "Phase 3 \u2014 Keyboard and thumb navigation, accessibility, visual, and iPhone/PWA release hardening",
+  "keywords": [
+    "phase",
+    "3",
+    "keyboard",
+    "thumb",
+    "navigation",
+    "accessibility",
+    "visual",
+    "iphonepwa",
+    "release"
+  ],
+  "lastUpdated": "2026-08-16T12:00:00.000Z",
+  "specId": "004",
+  "folderSlug": "keyboard-accessibility-visual-release-hardening",
+  "parentChain": [
+    "app-mobile-cli",
+    "002-pi-remote-mobile-ui-ux-features",
+    "009-ask-question"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "3"
+}

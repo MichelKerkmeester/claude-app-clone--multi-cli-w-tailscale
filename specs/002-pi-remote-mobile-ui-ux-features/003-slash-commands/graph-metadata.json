@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands",
+  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands",
+  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features",
+  "children_ids": [
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/001-research",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/002-versioned-catalog-authority",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/003-shared-command-engine",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/005-explicit-send-pwa-hardening",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/001-research",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/002-versioned-catalog-authority",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/003-shared-command-engine",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
+    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/005-explicit-send-pwa-hardening"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "f3 \u2014 typed \u201c/\u201d commands"
+    ],
+    "key_topics": [
+      "typed",
+      "commands",
+      "f3-slash-commands",
+      "synthesis"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "research.md",
+        "kind": "doc",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Commands One",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Decision Build",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Explicit Send",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Kimi Code",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "React Aria",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Cache Storage",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Zero Pi",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Use React Aria",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "F3 \u2014 Typed \u201c/\u201d Commands",
+    "created_at": "2026-08-16T07:15:07.443Z",
+    "last_save_at": "2026-08-16T11:59:20.975Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "source_fingerprint": "sha256:bccab385685014766f496453421016f378f462547b5641fa4322861273f39b87",
+    "source_doc_hashes": {
+      "spec.md": "11b30eea12e3f8e2d9af32db053dcfff2024b0ab408083d0867739f1904a8b72",
+      "research/research.md": "3eb71834f7d440cd79eafc90ff3972fb5910a2f1e3afd2a99dd7324426ff0c4d"
+    },
+    "last_active_child_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/001-research",
+    "last_active_at": null
+  }
+}

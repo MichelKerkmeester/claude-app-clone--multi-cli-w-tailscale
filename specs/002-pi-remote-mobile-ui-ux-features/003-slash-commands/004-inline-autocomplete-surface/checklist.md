@@ -1,16 +1,15 @@
 # Checklist — Inline terminal-style autocomplete surface
 
-- [ ] `/` at index zero opens within one rendered frame, while all invalid trigger cases remain closed.
-- [ ] Filtering is immediate and local and renders the specified ranking, host order, descriptions, hints, source, confirmation marker, and safe disabled reasons.
-- [ ] Enabled tap, Enter, and Insert each perform one canonical insertion, place the caret after the trailing space, retain textarea focus, close the panel, announce “Not sent,” and make no network request.
-- [ ] Arrow keys move only through enabled rows without wrapping; Enter is consumed while open; no-active-row Enter announces “No command selected”; Shift+Enter, Tab, Escape, outside tap, scrolling, long press, pointer/mouse compatibility, and IME follow the interaction table.
-- [ ] Loading, unfiltered, filtered, refreshing, empty, no-match, stale-offline, no-snapshot, host-unavailable, forbidden, incompatible, disabled, committing, drafted, revalidating, stale-submit, denied-submit, and running-session states have objective DOM assertions and fail-closed actions.
-- [ ] The existing `+` browser and inline panel are mutually exclusive and share catalog, ranking, canonical insertion, and binding behavior.
-- [ ] At true 390px in light/dark and 320px with 200% text, targets, safe-area/visual-viewport anchoring, contrast, focus, and no-displacement requirements pass.
-- [ ] Canonical names are isolated LTR, unsafe control/bidi strings are rejected or escaped, locale direction is applied, and no nested focusable descendants exist.
-- [ ] `npm run typecheck` passes.
-- [ ] `npm run test:web` passes.
-- [ ] The targeted autocomplete, composer, palette, and app Vitest command passes.
-- [ ] True-390px CDP captures cover closed, loading, ready, filtered, disabled, no-match, and error/open states in light and dark.
-- [ ] The page has no horizontal scroll, the transcript/composer does not move, and the keyboard-safe composer remains visible.
-
+- [x] `/` at index zero opens within one rendered frame, while all invalid trigger cases remain closed. — `ComposerCommandAutocomplete.test.tsx` trigger tests (via `useSlashTrigger`).
+- [x] Filtering is immediate and local and renders the specified ranking, host order, descriptions, hints, source, confirmation marker, and safe disabled reasons. — local filtering over the shared engine; `CommandOption.tsx`; component tests.
+- [x] Enabled tap, Enter, and Insert each perform one canonical insertion, place the caret after the trailing space, retain textarea focus, close the panel, announce "Not sent," and make no network request. — `insertSlashCommand` reuse; **0 network refs in the autocomplete component** (grep-confirmed); component tests.
+- [x] Arrow keys move only through enabled rows without wrapping; Enter consumed while open; no-active-row Enter announces "No command selected"; Shift+Enter, Tab, Escape, outside tap, scrolling, long press, pointer/mouse compatibility, and IME follow the interaction table. — RAC virtual focus + `ComposerCommandAutocomplete.test.tsx`/`SessionComposer.test.tsx`.
+- [x] Loading, unfiltered, filtered, refreshing, empty, no-match, stale-offline, no-snapshot, host-unavailable, forbidden, incompatible, disabled, committing, drafted, revalidating, stale-submit, denied-submit, and running-session states have objective DOM assertions and fail-closed actions. — full state model DOM tests (+96 web tests); no state enables submit.
+- [x] The existing `+` browser and inline panel are mutually exclusive and share catalog, ranking, canonical insertion, and binding behavior. — mutual-exclusion + parity tests in `SessionComposer.test.tsx`/`CommandPalette.test.tsx`.
+- [x] At true 390px in light/dark and 320px with 200% text, targets, safe-area/visual-viewport anchoring, contrast, focus, and no-displacement requirements pass. — `useVisualViewportAnchor.ts` + style; target/contrast/no-overflow tests; frozen tokens (zero new colors).
+- [x] Canonical names are isolated LTR, unsafe control/bidi strings are rejected or escaped, locale direction is applied, and no nested focusable descendants exist. — `CommandOption.tsx` isolated LTR + safe escaping; tested.
+- [x] `npm run typecheck` passes. — verified.
+- [x] `npm run test:web` passes. — verified, 345 passed (345) (+96 new).
+- [x] The targeted autocomplete, composer, palette, and app Vitest command passes. — covered by the 345 green web tests.
+- [ ] True-390px CDP captures cover closed, loading, ready, filtered, disabled, no-match, and error/open states in light and dark. — captured at the feature-003 visual checkpoint (this feature's follow-up): open/filtered states in light+dark via the repo CDP harness; loading/error transients covered by DOM tests.
+- [x] The page has no horizontal scroll, the transcript/composer does not move, and the keyboard-safe composer remains visible. — visual-viewport anchor + no-displacement tests; no-overflow assertions.

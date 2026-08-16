@@ -3173,3 +3173,227 @@ button[data-pressed]:not([data-disabled]) {
     transform: none;
   }
 }
+
+/* ── Inline slash autocomplete surface ────────────────────────────────
+   A nonmodal card anchored above the composer tray. Open/close/filter are
+   instant (terminal interaction); only the active-row wash may transition
+   for 80ms, and the global reduced-motion rule above zeroes that too.
+   The card is an overlay, so it displaces nothing. Tokens are the frozen
+   panel palette, scoped the same way the model sheet scopes its own. */
+.slash-surface {
+  display: contents;
+}
+
+.slash-panel {
+  --slash-raised: #ffffff;
+  --slash-ink: #24221f;
+  --slash-muted: #6c6a65;
+  --slash-accent: #8a452f;
+  --slash-ui-accent: #b85f42;
+  --slash-selection: #f3e4de;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  inline-size: var(--trigger-width, min(calc(100vw - 24px), 40rem));
+  min-inline-size: 0;
+  max-inline-size: calc(100vw - 24px);
+  max-block-size: min(280px, calc(var(--visual-viewport-height, 100dvh) * 0.4));
+  padding: 4px;
+  overflow: hidden;
+  border: 1px solid var(--slash-ink);
+  border-radius: var(--radius-panel);
+  background: var(--slash-raised);
+  color: var(--slash-ink);
+  box-shadow: var(--shadow-raised);
+  font-family: var(--font-sans);
+}
+
+:root[data-theme='dark'] .slash-panel {
+  --slash-raised: #2d2a26;
+  --slash-ink: #f8f8f6;
+  --slash-muted: #9f998f;
+  --slash-accent: #f0b19a;
+  --slash-ui-accent: #f0b19a;
+  --slash-selection: #3a2720;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='system'] .slash-panel {
+    --slash-raised: #2d2a26;
+    --slash-ink: #f8f8f6;
+    --slash-muted: #9f998f;
+    --slash-accent: #f0b19a;
+    --slash-ui-accent: #f0b19a;
+    --slash-selection: #3a2720;
+  }
+}
+
+.slash-status {
+  padding: 8px 12px;
+  color: var(--slash-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.slash-status.is-error {
+  color: var(--slash-accent);
+  font-weight: 600;
+}
+
+.slash-list {
+  flex: 0 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.slash-option {
+  display: grid;
+  gap: 2px;
+  min-block-size: 56px;
+  padding: 9px 9px 9px 12px;
+  border-inline-start: 3px solid transparent;
+  border-radius: 10px;
+  color: var(--slash-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: pointer;
+  transition: background-color 80ms linear;
+}
+
+.slash-option[data-focused] {
+  background: var(--slash-selection);
+  border-inline-start-color: var(--slash-ink);
+  outline: 2px solid var(--slash-ink);
+  outline-offset: -2px;
+}
+
+.slash-option[aria-disabled='true'] {
+  cursor: default;
+}
+
+.slash-name-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  min-inline-size: 0;
+}
+
+.slash-name {
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+
+.slash-match {
+  font-weight: 700;
+}
+
+.slash-option[aria-disabled='true'] .slash-name {
+  color: var(--slash-muted);
+}
+
+.slash-hint {
+  color: var(--slash-muted);
+  font-size: 12px;
+  line-height: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.slash-desc,
+.slash-disabled-reason {
+  overflow-wrap: anywhere;
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--slash-muted);
+}
+
+.slash-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--slash-muted);
+}
+
+.slash-confirm {
+  color: var(--slash-accent);
+  font-weight: 650;
+}
+
+.slash-skeletons {
+  display: grid;
+  gap: 4px;
+  padding: 4px;
+}
+
+.slash-skeleton {
+  block-size: 56px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--slash-ink) 7%, transparent);
+}
+
+.slash-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 4px 0;
+}
+
+.slash-running-note {
+  padding-inline: 8px;
+  color: var(--slash-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.slash-retry {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding-inline: 14px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--slash-selection);
+  color: var(--slash-accent);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background-color 80ms linear,
+    color 80ms linear;
+}
+
+.slash-retry[data-hovered] {
+  background: color-mix(in srgb, var(--slash-selection) 60%, var(--slash-raised));
+}
+
+.slash-retry[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slash-option,
+  .slash-retry {
+    transition: none;
+  }
+}
+
+/* The completion card is an overlay above the composer: while it is open it
+   must never sit under the scroll-to-latest pill, and the pill stays out of
+   the accessibility tree while hidden. */
+body:has(.slash-panel) .scroll-to-latest {
+  visibility: hidden;
+  pointer-events: none;
+}

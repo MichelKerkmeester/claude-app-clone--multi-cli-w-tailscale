@@ -10,7 +10,7 @@ import type {
   TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 import { readFileSync } from 'node:fs';
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
@@ -354,6 +354,112 @@ it('inserts a command through the + browser without any ticket, prompt, or mutat
   expect(relay.submitPrompt).not.toHaveBeenCalled();
   expect(relay.controlRuntime).not.toHaveBeenCalled();
   expect(relay.createAcceptEditsGrant).not.toHaveBeenCalled();
+  // Route parity: the + browser produces the exact same "Not sent"
+  // announcement as the inline surface.
+  expect(await screen.findByText('Inserted slash command plan. Not sent.')).toBeInTheDocument();
+});
+
+it('Enter with the inline surface open inserts locally and never submits; the next Enter is the explicit send', async () => {
+  const user = userEvent.setup();
+  relay.submitPrompt.mockResolvedValue(
+    block({ id: 'block_prompt_001', kind: 'text', text: 'ok', role: 'user' }),
+  );
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  await user.type(composer, '/');
+  const listbox = await screen.findByRole('listbox', { name: 'Available host commands' });
+  expect(within(listbox).getAllByRole('option')).toHaveLength(2);
+
+  await user.keyboard('{Enter}');
+  await waitFor(() => expect(composer).toHaveValue('/plan '));
+  await waitFor(() => expect(composer.selectionStart).toBe(6));
+  expect(document.activeElement).toBe(composer);
+  expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  expect(relay.submitPrompt).not.toHaveBeenCalled();
+  // Opening, filtering, and inserting made zero network requests beyond the
+  // single prefetched catalog read.
+  expect(relay.fetchCommands).toHaveBeenCalledOnce();
+
+  // A second Enter follows the composer's explicit submission policy; the
+  // app trims the canonical token before sending.
+  await user.keyboard('{Enter}');
+  await waitFor(() => expect(relay.submitPrompt).toHaveBeenCalledTimes(1));
+  expect(relay.submitPrompt).toHaveBeenCalledWith(sessionId, expect.any(String), '/plan', undefined);
+});
+
+it('keeps the inline surface closed for every invalid slash trigger', async () => {
+  const user = userEvent.setup();
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  const composer = screen.getByLabelText('Message Pi');
+  await user.type(composer, 'hello /');
+  expect(
+    screen.queryByRole('listbox', { name: 'Available host commands' }),
+  ).not.toBeInTheDocument();
+});
+
+it('the inline panel and the + browser are mutually exclusive', async () => {
+  const user = userEvent.setup();
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+
+  // Panel open → tapping + closes it and opens the tools browser.
+  await user.type(composer, '/');
+  await screen.findByRole('listbox', { name: 'Available host commands' });
+  await user.click(screen.getByRole('button', { name: 'Mode and commands' }));
+  await waitFor(() =>
+    expect(screen.queryByRole('listbox', { name: 'Available host commands' })).not.toBeInTheDocument(),
+  );
+  expect(screen.getByRole('combobox', { name: 'Insert a command' })).toBeInTheDocument();
+
+  // The gate holds even with a live trigger and a focused composer.
+  composer.focus();
+  expect(
+    screen.queryByRole('listbox', { name: 'Available host commands' }),
+  ).not.toBeInTheDocument();
+
+  // Tapping the composer dismisses the browser and the inline surface returns.
+  await user.click(composer);
+  await waitFor(() =>
+    expect(screen.queryByRole('combobox', { name: 'Insert a command' })).not.toBeInTheDocument(),
+  );
+  expect(await screen.findByRole('listbox', { name: 'Available host commands' })).toBeInTheDocument();
 });
 
 it('reconciles runtime state when the session returns to the foreground', async () => {

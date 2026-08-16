@@ -122,4 +122,23 @@ describe('CommandPalette', () => {
     render(<CommandPalette catalog={catalogState(COMMANDS)} onInsert={vi.fn()} isDisabled />);
     expect(screen.getByRole('combobox')).toBeDisabled();
   });
+
+  it('rows are text-only with no nested interactive descendants', async () => {
+    render(<CommandPalette catalog={catalogState(COMMANDS)} onInsert={vi.fn()} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Show commands' }));
+    for (const option of screen.getAllByRole('option')) {
+      expect(option.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0);
+      expect(option.querySelector('.command-name')?.textContent).toMatch(/^\/[a-z]+$/u);
+    }
+  });
+
+  it('selecting a row is a local insertion request: no catalog reads and no transport', async () => {
+    const catalog = catalogState(COMMANDS);
+    const onInsert = vi.fn();
+    render(<CommandPalette catalog={catalog} onInsert={onInsert} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Show commands' }));
+    await userEvent.click(screen.getByRole('option', { name: /plan/ }));
+    expect(catalog.refresh).not.toHaveBeenCalled();
+    expect(onInsert).toHaveBeenCalledTimes(1);
+  });
 });

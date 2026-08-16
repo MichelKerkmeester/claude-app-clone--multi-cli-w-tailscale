@@ -146,6 +146,19 @@ export async function fetchSessions(signal: AbortSignal): Promise<readonly Sessi
   return payload.sessions;
 }
 
+/**
+ * Request ONE fresh one-use relay ticket. Every write path mints its own
+ * ticket immediately before submission; tickets are never cached, replayed,
+ * or persisted. A malformed ticket response is rejected outright.
+ */
+export async function requestTicket(signal?: AbortSignal): Promise<string> {
+  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
+  if (!isWebSocketTicketResponse(ticketPayload)) {
+    throw new Error('Relay returned an invalid command ticket.');
+  }
+  return ticketPayload.ticket;
+}
+
 export async function submitPrompt(
   sessionId: string,
   submissionId: string,
@@ -153,10 +166,7 @@ export async function submitPrompt(
   streamingBehavior?: 'steer' | 'followUp',
   signal?: AbortSignal,
 ): Promise<TextBlock> {
-  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
-  if (!isWebSocketTicketResponse(ticketPayload)) {
-    throw new Error('Relay returned an invalid command ticket.');
-  }
+  const ticket = await requestTicket(signal);
   const payload = await postJson(
     '/api/prompt/submit',
     {
@@ -164,7 +174,7 @@ export async function submitPrompt(
       submissionId,
       sessionId,
       message,
-      ticket: ticketPayload.ticket,
+      ticket,
       ...(streamingBehavior === undefined ? {} : { streamingBehavior }),
     },
     signal,
@@ -180,7 +190,9 @@ export async function submitPrompt(
  * Submit one explicit slash command. A fresh one-use ticket is obtained
  * immediately before the write, and the relay revalidates the bound host,
  * session, and catalog revisions before any forwarding; stale and denied
- * outcomes throw typed errors and are never retried automatically.
+ * outcomes throw typed errors and are never retried automatically. The
+ * request body is built from guarded parts only, and the response must be
+ * either an accepted prompt projection or a typed issue response.
  */
 export async function submitSlashCommand(
   sessionId: string,
@@ -189,10 +201,7 @@ export async function submitSlashCommand(
   binding: CommandBindingDto,
   signal?: AbortSignal,
 ): Promise<TextBlock> {
-  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
-  if (!isWebSocketTicketResponse(ticketPayload)) {
-    throw new Error('Relay returned an invalid command ticket.');
-  }
+  const ticket = await requestTicket(signal);
   const payload = await postJson(
     '/api/prompt/submit',
     {
@@ -200,7 +209,7 @@ export async function submitSlashCommand(
       submissionId,
       sessionId,
       message,
-      ticket: ticketPayload.ticket,
+      ticket,
       command: binding,
     },
     signal,
@@ -345,17 +354,13 @@ export async function controlRuntime(
         ticket: ticketPayload.ticket,
       };
     } else {
-      const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
-      if (!isWebSocketTicketResponse(ticketPayload)) {
-        throw new Error('Relay returned an invalid command ticket.');
-      }
       command = {
         type: 'runtime.control',
         controlId,
         sessionId,
         expectedRevision,
         operation,
-        ticket: ticketPayload.ticket,
+        ticket: await requestTicket(signal),
       };
     }
     controlStarted = true;
@@ -398,16 +403,8 @@ function runtimeIssueForTransportError(error: unknown): RuntimeIssueCode | null 
 
 /** Interrupt the running agent. A fresh one-use ticket is obtained immediately before. */
 export async function abortPrompt(signal?: AbortSignal): Promise<PromptAbortResponse> {
-  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
-  if (!isWebSocketTicketResponse(ticketPayload)) {
-    throw new Error('Relay returned an invalid command ticket.');
-  }
-  const payload = await postJson(
-    '/api/prompt/abort',
-    { ticket: ticketPayload.ticket },
-    signal,
-    [202, 503],
-  );
+  const ticket = await requestTicket(signal);
+  const payload = await postJson('/api/prompt/abort', { ticket }, signal, [202, 503]);
   if (!isPromptAbortResponse(payload)) {
     throw new Error('Relay returned an invalid abort result.');
   }
@@ -506,13 +503,10 @@ export async function openSyncSocket(
   if ((await establishSession()) === null) {
     throw new Error('Device enrollment is required before opening the read-only stream.');
   }
-  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
-  if (!isWebSocketTicketResponse(ticketPayload)) {
-    throw new Error('Relay returned an invalid WebSocket ticket.');
-  }
+  const ticket = await requestTicket(signal);
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const url = new URL(`${protocol}//${window.location.host}/api/sync`);
-  url.searchParams.set('ticket', ticketPayload.ticket);
+  url.searchParams.set('ticket', ticket);
   const socket = new WebSocket(url);
   socket.addEventListener('open', () => {
     socket.send(

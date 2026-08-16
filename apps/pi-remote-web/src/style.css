@@ -3397,3 +3397,73 @@ body:has(.slash-panel) .scroll-to-latest {
   visibility: hidden;
   pointer-events: none;
 }
+
+/* ── Installed-PWA safe-area hardening ───────────────────────────────
+   With viewport-fit=cover the layout extends under the notch and rounded
+   corners in landscape; interactive islands keep clear of the insets while
+   portrait (all-zero insets) renders exactly as before. */
+.composer-tray {
+  margin-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
+}
+
+.slash-panel {
+  inline-size: var(
+    --trigger-width,
+    min(calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)), 40rem)
+  );
+  max-inline-size: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
+}
+
+/* ── High-contrast preference: borders carry the hierarchy the palette
+   otherwise implies with fill, using the frozen tokens unchanged. ─── */
+@media (prefers-contrast: more) {
+  .composer-tray,
+  .composer-plus,
+  .session-card,
+  .approval-card,
+  .attention-card,
+  .slash-panel {
+    border-color: var(--line-strong);
+  }
+
+  .slash-option[data-focused] {
+    outline-width: 3px;
+  }
+}
+
+/* ── Forced-colors (Windows high contrast): the scoped slash palette and
+   card surfaces yield to system colors so every interactive edge stays
+   visible under the user's chosen scheme. ─────────────────────────── */
+@media (forced-colors: active) {
+  .composer-tray,
+  .composer-plus,
+  .session-card,
+  .approval-card,
+  .attention-card,
+  .slash-panel {
+    border-color: CanvasText;
+  }
+
+  .slash-panel,
+  .slash-option {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .slash-option[data-focused] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+    border-inline-start-color: Highlight;
+  }
+
+  .slash-retry {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: Highlight;
+  }
+
+  .slash-status.is-error,
+  .slash-running-note {
+    color: CanvasText;
+  }
+}

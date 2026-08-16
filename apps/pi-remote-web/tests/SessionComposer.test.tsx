@@ -15,7 +15,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
 import { SessionComposer } from '../src/SessionComposer.js';
-import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/commands.js';
+import type {
+  HostCommandCatalogState,
+  ScopedCommandSnapshot,
+  SelectedCommandBinding,
+} from '../src/commands.js';
 import { INITIAL_RUNTIME_STATE, type RuntimeControls } from '../src/runtime.js';
 
 afterEach(cleanup);
@@ -57,6 +61,15 @@ function catalogState(
   return { status, snapshot, commands: snapshot?.commands ?? [], refresh: vi.fn() };
 }
 
+/** A binding that matches the catalogState snapshot exactly. */
+const PLAN_BINDING: SelectedCommandBinding = {
+  hostEpoch: 'epoch_web_001',
+  sessionId: 'session_web_001',
+  name: 'plan',
+  sessionRevision: 2,
+  catalogRevision: 3,
+};
+
 function runtimeControls(): RuntimeControls {
   return {
     runtime: INITIAL_RUNTIME_STATE,
@@ -70,25 +83,39 @@ function runtimeControls(): RuntimeControls {
 interface HarnessProps {
   readonly catalog?: HostCommandCatalogState;
   readonly sendPrompt?: ReturnType<typeof vi.fn>;
+  readonly sendSlashDraft?: ReturnType<typeof vi.fn>;
   readonly onInsertCommand?: ReturnType<typeof vi.fn>;
   readonly status?: 'idle' | 'running' | 'interrupted' | 'unknown';
   readonly canSubmit?: boolean;
+  readonly binding?: SelectedCommandBinding | null;
+  readonly slashSubmitting?: boolean;
+  readonly runtimeAuthority?: boolean;
+  readonly runtimeRunning?: boolean;
+  readonly initialPrompt?: string;
 }
 
 function Harness({
   catalog = catalogState(),
   sendPrompt = vi.fn(),
+  sendSlashDraft = vi.fn(),
   onInsertCommand = vi.fn(),
   status = 'idle',
   canSubmit = true,
+  binding: initialBinding = null,
+  slashSubmitting = false,
+  runtimeAuthority = true,
+  runtimeRunning = false,
+  initialPrompt = '',
 }: HarnessProps) {
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState(initialPrompt);
+  const [binding, setBinding] = useState<SelectedCommandBinding | null>(initialBinding);
   return (
     <SessionComposer
       prompt={prompt}
       setPrompt={(updater) => setPrompt((current) => updater(current))}
       onDraftChange={(value) => setPrompt(value)}
       sendPrompt={sendPrompt}
+      sendSlashDraft={sendSlashDraft}
       stopRun={vi.fn()}
       canSubmit={canSubmit}
       status={status}
@@ -99,13 +126,21 @@ function Harness({
       promptError={null}
       runtimeControls={runtimeControls()}
       catalog={catalog}
-      onInsertCommand={onInsertCommand}
+      binding={binding}
+      slashSubmitting={slashSubmitting}
+      runtimeAuthority={runtimeAuthority}
+      runtimeRunning={runtimeRunning}
+      onInsertCommand={(name, inserted) => {
+        setBinding(inserted);
+        onInsertCommand(name, inserted);
+      }}
     />
   );
 }
 
 function renderComposer(props: HarnessProps = {}) {
   const sendPrompt = props.sendPrompt ?? vi.fn();
+  const sendSlashDraft = props.sendSlashDraft ?? vi.fn();
   const onInsertCommand = props.onInsertCommand ?? vi.fn();
   const catalog = props.catalog ?? catalogState();
   const result = render(
@@ -113,10 +148,11 @@ function renderComposer(props: HarnessProps = {}) {
       {...props}
       catalog={catalog}
       sendPrompt={sendPrompt}
+      sendSlashDraft={sendSlashDraft}
       onInsertCommand={onInsertCommand}
     />,
   );
-  return { ...result, sendPrompt, onInsertCommand, catalog };
+  return { ...result, sendPrompt, sendSlashDraft, onInsertCommand, catalog };
 }
 
 /** Type committed text and keep the textarea selection facts in sync. */
@@ -277,25 +313,130 @@ describe('insertion', () => {
 
   it('typing after the token then pressing Enter follows the explicit send gate (no double insert)', async () => {
     const user = userEvent.setup();
-    const { sendPrompt } = renderComposer();
+    const { sendPrompt, sendSlashDraft } = renderComposer();
     const { composer } = await openPanel(user);
     await user.keyboard('{Enter}');
     expect(composer.value).toBe('/plan ');
-    // A second Enter with the panel closed is the composer's explicit send.
+    // A second Enter with the panel closed routes the drafted command to the
+    // explicit slash lane, never to the ordinary text lane.
     await user.keyboard('{Enter}');
-    expect(sendPrompt).toHaveBeenCalledTimes(1);
+    expect(sendSlashDraft).toHaveBeenCalledTimes(1);
+    expect(sendPrompt).not.toHaveBeenCalled();
   });
 
   it('editing arguments keeps the draft; the panel does not reopen for a caret past the token', async () => {
     const user = userEvent.setup();
-    const { sendPrompt } = renderComposer();
+    const { sendPrompt, sendSlashDraft } = renderComposer();
     const { composer } = await openPanel(user);
     await user.keyboard('{Enter}');
     await user.type(composer, 'careful');
     expect(composer.value).toBe('/plan careful');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     await user.keyboard('{Enter}');
-    expect(sendPrompt).toHaveBeenCalledTimes(1);
+    expect(sendSlashDraft).toHaveBeenCalledTimes(1);
+    expect(sendPrompt).not.toHaveBeenCalled();
+  });
+});
+
+describe('explicit slash send gating', () => {
+  it('a slash draft without a binding fails closed: disabled Send and a reselection hint', async () => {
+    const user = userEvent.setup();
+    const { sendPrompt, sendSlashDraft } = renderComposer();
+    const composer = await typeDraft(user, '/plan ');
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+    await user.keyboard('{Enter}');
+    expect(statusText()).toBe('Choose a command from the list, then send it.');
+    expect(composer.value).toBe('/plan ');
+    expect(sendSlashDraft).not.toHaveBeenCalled();
+    expect(sendPrompt).not.toHaveBeenCalled();
+  });
+
+  it('a bound slash draft sends through the explicit slash lane from the primary action', async () => {
+    const user = userEvent.setup();
+    const { sendPrompt, sendSlashDraft } = renderComposer({ binding: PLAN_BINDING });
+    const composer = await typeDraft(user, '/plan careful');
+    const send = screen.getByRole('button', { name: 'Send command' });
+    expect(send).toBeEnabled();
+    await user.click(send);
+    expect(sendSlashDraft).toHaveBeenCalledTimes(1);
+    expect(sendPrompt).not.toHaveBeenCalled();
+    // The composer never touches the draft; preservation is the App's job.
+    expect(composer.value).toBe('/plan careful');
+  });
+
+  it('a running turn disables slash Send, hides Later, and never steers a slash draft', async () => {
+    const user = userEvent.setup();
+    const { sendPrompt, sendSlashDraft } = renderComposer({
+      status: 'running',
+      binding: PLAN_BINDING,
+    });
+    const composer = await typeDraft(user, '/plan ');
+    expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'Later' })).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Pi is running — commands can be sent after this turn ends.'),
+    ).toBeInTheDocument();
+    await user.keyboard('{Enter}');
+    expect(statusText()).toBe('Pi is running — commands can be sent after this turn ends.');
+    expect(composer.value).toBe('/plan ');
+    expect(sendSlashDraft).not.toHaveBeenCalled();
+    expect(sendPrompt).not.toHaveBeenCalled();
+  });
+
+  it('disables slash Send when the host runtime snapshot reports streaming', async () => {
+    const user = userEvent.setup();
+    const { sendSlashDraft } = renderComposer({ runtimeRunning: true, binding: PLAN_BINDING });
+    const composer = await typeDraft(user, '/plan ');
+    expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+    await user.keyboard('{Enter}');
+    expect(statusText()).toBe('Pi is running — commands can be sent after this turn ends.');
+    expect(composer.value).toBe('/plan ');
+    expect(sendSlashDraft).not.toHaveBeenCalled();
+  });
+
+  it('missing running-state authority disables slash Send (never guesses)', async () => {
+    const user = userEvent.setup();
+    const { sendPrompt, sendSlashDraft } = renderComposer({
+      runtimeAuthority: false,
+      binding: PLAN_BINDING,
+    });
+    const composer = await typeDraft(user, '/plan ');
+    expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+    await user.keyboard('{Enter}');
+    expect(statusText()).toBe('Reconnecting to check what can be sent.');
+    expect(composer.value).toBe('/plan ');
+    expect(sendSlashDraft).not.toHaveBeenCalled();
+    expect(sendPrompt).not.toHaveBeenCalled();
+  });
+
+  it('shows bounded revalidation progress and freezes the tray while slashSubmitting', async () => {
+    const user = userEvent.setup();
+    const { sendSlashDraft } = renderComposer({
+      slashSubmitting: true,
+      binding: PLAN_BINDING,
+      initialPrompt: '/plan ',
+    });
+    const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+    expect(composer).toHaveValue('/plan ');
+    expect(screen.getByText('Checking the command with the relay…')).toBeInTheDocument();
+    expect(composer).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+    await user.keyboard('{Enter}');
+    expect(sendSlashDraft).not.toHaveBeenCalled();
+  });
+
+  it('keeps ordinary running behavior unchanged: steer and Later, never slash', async () => {
+    const user = userEvent.setup();
+    const { sendPrompt, sendSlashDraft } = renderComposer({ status: 'running' });
+    await typeDraft(user, 'hello');
+    const steer = screen.getByRole('button', { name: 'Steer the current turn' });
+    await user.click(steer);
+    expect(sendPrompt).toHaveBeenCalledWith('steer');
+    const later = screen.getByRole('button', { name: 'Later' });
+    await user.click(later);
+    expect(sendPrompt).toHaveBeenCalledWith('followUp');
+    expect(sendSlashDraft).not.toHaveBeenCalled();
   });
 });
 

@@ -69,6 +69,10 @@ export function useVisualViewportAnchor(
       if (document.visibilityState === 'visible') schedule();
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
+    // An installed PWA restored from the iOS page cache fires pageshow
+    // without a visual-viewport resize; the anchor budget must remeasure
+    // so the panel never renders against a stale height.
+    window.addEventListener('pageshow', schedule);
 
     // The first measurement runs immediately so the panel never renders
     // against a stale budget.
@@ -84,6 +88,7 @@ export function useVisualViewportAnchor(
       window.removeEventListener('orientationchange', schedule);
       window.removeEventListener('focus', schedule);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pageshow', schedule);
     };
   }, [anchorRef]);
 

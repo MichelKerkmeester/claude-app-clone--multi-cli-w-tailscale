@@ -50,6 +50,8 @@ export interface SessionComposerProps {
   readonly setPrompt: (updater: (current: string) => string) => void;
   readonly onDraftChange: (value: string) => void;
   readonly sendPrompt: (behavior?: 'steer' | 'followUp') => void;
+  /** The explicit slash submission lane; Enter/Send route here for slash drafts. */
+  readonly sendSlashDraft: () => void;
   readonly stopRun: () => void;
   readonly canSubmit: boolean;
   readonly status: 'idle' | 'running' | 'interrupted' | 'unknown';
@@ -60,6 +62,14 @@ export interface SessionComposerProps {
   readonly promptError: string | null;
   readonly runtimeControls: RuntimeControls;
   readonly catalog: HostCommandCatalogState;
+  /** The current draft's binding, or null while none exists for this draft. */
+  readonly binding: SelectedCommandBinding | null;
+  /** True while one explicit slash Send is revalidating at the relay. */
+  readonly slashSubmitting: boolean;
+  /** Host-confirmed running/plan snapshot present (never guessed). */
+  readonly runtimeAuthority: boolean;
+  /** Authoritative host running state from the runtime snapshot. */
+  readonly runtimeRunning: boolean;
   readonly onInsertCommand: (name: string, binding: SelectedCommandBinding) => void;
 }
 
@@ -68,6 +78,7 @@ export function SessionComposer({
   setPrompt,
   onDraftChange,
   sendPrompt,
+  sendSlashDraft,
   stopRun,
   canSubmit,
   status,
@@ -78,9 +89,21 @@ export function SessionComposer({
   promptError,
   runtimeControls,
   catalog,
+  binding,
+  slashSubmitting,
+  runtimeAuthority,
+  runtimeRunning,
   onInsertCommand,
 }: SessionComposerProps) {
-  const running = status === 'running';
+  // A turn is running when either the relay session card or the host-
+  // confirmed runtime snapshot says so; both are authoritative sources and
+  // the OR is deliberately conservative for the slash gate.
+  const running = status === 'running' || runtimeRunning;
+  // A leading-slash draft is a command draft: it must never fall through to
+  // the ordinary text lane, and never convert to steer/followUp.
+  const slashDraft = prompt.trim().startsWith('/');
+  const slashSendable =
+    slashDraft && binding !== null && runtimeAuthority && !running && canSubmit && !slashSubmitting;
   const hasText = prompt.trim().length > 0;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const trayRef = useRef<HTMLFormElement>(null);
@@ -191,7 +214,28 @@ export function SessionComposer({
     element.style.height = `${Math.min(element.scrollHeight, MAX_TRAY_HEIGHT_PX)}px`;
   };
 
-  const submit = () => sendPrompt(running ? 'steer' : undefined);
+  // Explicit send routing: a slash draft goes through the ticketed slash
+  // lane (or fails closed with a disclosed reason); ordinary drafts keep
+  // the unchanged send/steer behavior. A slash draft is never converted to
+  // steer/followUp and never falls back to the text lane.
+  const submit = () => {
+    if (slashDraft) {
+      if (!slashSendable) {
+        setAnnouncement(
+          binding === null
+            ? 'Choose a command from the list, then send it.'
+            : running
+              ? 'Pi is running — commands can be sent after this turn ends.'
+              : 'Reconnecting to check what can be sent.',
+        );
+        return;
+      }
+      setAnnouncement('Checking the command before sending…');
+      sendSlashDraft();
+      return;
+    }
+    sendPrompt(running ? 'steer' : undefined);
+  };
 
   // The palette path appends at the draft end (shared insertion reducer).
   const insertCommand = (name: string, binding: SelectedCommandBinding) => {
@@ -297,9 +341,21 @@ export function SessionComposer({
         ? 'Steer Pi, or send after this turn'
         : 'Reply to Pi';
 
-  const disclaimer = awaitingSnapshot
-    ? 'Syncing with the relay…'
-    : 'Pi can make mistakes · actions stay read-only';
+  // Bounded revalidation progress lives in the composer disclaimer; it is a
+  // fixed local string and never carries command content.
+  const disclaimer = slashSubmitting
+    ? 'Checking the command with the relay…'
+    : awaitingSnapshot
+      ? 'Syncing with the relay…'
+      : slashDraft
+        ? binding === null
+          ? 'Choose a command from the list, then send it.'
+          : running
+            ? 'Pi is running — commands can be sent after this turn ends.'
+            : runtimeAuthority
+              ? 'Pi can make mistakes · actions stay read-only'
+              : 'Reconnecting to check what can be sent.'
+        : 'Pi can make mistakes · actions stay read-only';
 
   // Stop is the primary action only when a turn is running and the draft is empty;
   // any draft makes the primary Send (idle) or Steer (running). With the inline
@@ -379,7 +435,7 @@ export function SessionComposer({
             window.setTimeout(() => setIsComposing(false), 0);
           }}
           onKeyDown={onKeyDown}
-          disabled={connection !== 'live' || awaitingSnapshot || sendingPrompt}
+          disabled={connection !== 'live' || awaitingSnapshot || sendingPrompt || slashSubmitting}
           placeholder={placeholder}
         />
         <div className="composer-bar">
@@ -392,7 +448,7 @@ export function SessionComposer({
             />
           </div>
           <div className="composer-right">
-            {running && hasText && (
+            {running && hasText && !slashDraft && (
               <Button
                 type="button"
                 className="composer-later"
@@ -424,6 +480,15 @@ export function SessionComposer({
                 }}
               >
                 <SendGlyph />
+              </Button>
+            ) : slashDraft ? (
+              <Button
+                type="submit"
+                className="composer-primary is-send"
+                aria-label="Send command"
+                isDisabled={!slashSendable}
+              >
+                {slashSubmitting ? <SpinnerGlyph /> : <SendGlyph />}
               </Button>
             ) : (
               <Button

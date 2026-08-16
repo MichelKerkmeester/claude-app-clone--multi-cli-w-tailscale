@@ -250,7 +250,12 @@ export function bindingFor(
   };
 }
 
-/** Fail-closed binding validity: a binding is only current for its exact scope. */
+/**
+ * Fail-closed binding validity: a binding is only current for its exact
+ * scope, and only while its canonical row still exists as an ENABLED entry
+ * in the committed snapshot. A refresh that disables the command ages the
+ * binding out just like a revision bump.
+ */
 export function bindingMatchesSnapshot(
   binding: SelectedCommandBinding | null,
   snapshot: ScopedCommandSnapshot | null,
@@ -262,6 +267,6 @@ export function bindingMatchesSnapshot(
     binding.sessionId === snapshot.sessionId &&
     binding.sessionRevision === snapshot.sessionRevision &&
     binding.catalogRevision === snapshot.catalogRevision &&
-    snapshot.commands.some((command) => command.name === binding.name)
+    snapshot.commands.some((command) => command.name === binding.name && command.enabled)
   );
 }

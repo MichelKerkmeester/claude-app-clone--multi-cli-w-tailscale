@@ -34,6 +34,7 @@ describe('recorded Pi RPC relay flow', () => {
     });
     const optimistic = transcriptReducer(selected, {
       type: 'promptOptimistic',
+      sessionId: IDENTITY.sessionId,
       block: {
         id: 'optimistic_prompt_001',
         kind: 'text',
@@ -49,6 +50,7 @@ describe('recorded Pi RPC relay flow', () => {
 
     const accepted = transcriptReducer(optimistic, {
       type: 'promptAccepted',
+      sessionId: IDENTITY.sessionId,
       optimisticId: 'optimistic_prompt_001',
       block: {
         id: 'block_prompt_001',

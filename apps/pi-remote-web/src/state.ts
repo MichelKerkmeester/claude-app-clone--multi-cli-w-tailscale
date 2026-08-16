@@ -147,14 +147,19 @@ export type TranscriptAction =
   | { readonly type: 'snapshot'; readonly message: SyncSnapshot; readonly at: string }
   | { readonly type: 'delta'; readonly message: SyncDelta; readonly at: string }
   | { readonly type: 'gap'; readonly message: SyncGap }
-  | { readonly type: 'promptOptimistic'; readonly block: TranscriptBlock }
+  | {
+      readonly type: 'promptOptimistic';
+      readonly sessionId: string;
+      readonly block: TranscriptBlock;
+    }
   | {
       readonly type: 'promptAccepted';
+      readonly sessionId: string;
       readonly optimisticId: string;
       readonly block: TranscriptBlock;
       readonly at: string;
     }
-  | { readonly type: 'promptRejected'; readonly optimisticId: string }
+  | { readonly type: 'promptRejected'; readonly sessionId: string; readonly optimisticId: string }
   | { readonly type: 'error'; readonly error: string };
 
 export const EMPTY_TRANSCRIPT: TranscriptState = {
@@ -265,12 +270,17 @@ export function transcriptReducer(
             : null,
       };
     case 'promptOptimistic':
+      // A submission belongs to the session that started it: a settlement
+      // arriving after a session switch can never touch another session's
+      // transcript rows.
+      if (state.sessionId !== action.sessionId) return state;
       return {
         ...state,
         blocks: normalizeBlocks([...state.blocks, action.block]),
         pendingPromptIds: [...state.pendingPromptIds, action.block.id],
       };
     case 'promptAccepted':
+      if (state.sessionId !== action.sessionId) return state;
       return {
         ...state,
         blocks: normalizeBlocks([
@@ -282,6 +292,7 @@ export function transcriptReducer(
         updatedAt: action.at,
       };
     case 'promptRejected':
+      if (state.sessionId !== action.sessionId) return state;
       return {
         ...state,
         blocks: state.blocks.filter((block) => block.id !== action.optimisticId),

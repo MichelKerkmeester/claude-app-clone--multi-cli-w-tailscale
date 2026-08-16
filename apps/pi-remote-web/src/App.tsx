@@ -81,6 +81,7 @@ import {
 } from './commands.js';
 import { bindingAfterDraftChange } from './insertSlashCommand.js';
 import { runtimeAnnouncement, useRuntime, type RuntimeUiState } from './runtime.js';
+import { submitSlashDraft, type SlashSubmitFailureCode } from './submitSlashDraft.js';
 import { groupBlocksIntoTurns } from './turns.js';
 
 const initialCache = loadCache();
@@ -935,6 +936,9 @@ export function Session({
   const commandCatalog = useHostCommandCatalog(sessionId, connection);
   const [stopping, setStopping] = useState(false);
   const [binding, setBinding] = useState<SelectedCommandBinding | null>(null);
+  // Bounded revalidation progress for one explicit slash Send; the flag is
+  // local state only and never carries command content.
+  const [slashSubmitting, setSlashSubmitting] = useState(false);
 
   // One shared sheet per session view: the header opens the model section,
   // RuntimeStrip the effort section, and focus returns to whichever trigger
@@ -972,10 +976,17 @@ export function Session({
   }, [runtimeControls.refresh, commandCatalog.refresh]);
 
   // A binding is only valid for the exact scope it was created in; any
-  // session, host-epoch, or revision change clears it so Send must re-resolve.
+  // session, host-epoch, or revision change clears it so Send must
+  // re-resolve. The session guard runs on the same commit as the switch so
+  // another session can never retain this session's binding, even for one
+  // render.
   useEffect(() => {
-    setBinding((current) => (bindingMatchesSnapshot(current, commandCatalog.snapshot) ? current : null));
-  }, [commandCatalog.snapshot]);
+    setBinding((current) => {
+      if (current === null) return null;
+      if (current.sessionId !== sessionId) return null;
+      return bindingMatchesSnapshot(current, commandCatalog.snapshot) ? current : null;
+    });
+  }, [commandCatalog.snapshot, sessionId]);
 
   // Draft edits re-evaluate the binding: token edits clear it, argument edits
   // retain it.
@@ -1133,7 +1144,17 @@ export function Session({
     connection === 'live' &&
     !transcript.awaitingSnapshot &&
     prompt.trim().length > 0 &&
-    !sendingPrompt;
+    !sendingPrompt &&
+    !slashSubmitting;
+  // Running/plan authority comes only from a host-confirmed runtime
+  // snapshot. Without it the client never guesses whether a turn is running
+  // and slash Send stays disabled; plan-mode policy itself remains
+  // host/extension enforced.
+  const runtimeState = runtimeControls.runtime.state;
+  const runtimeAuthority =
+    runtimeState !== null &&
+    (runtimeControls.runtime.status === 'ready' || runtimeControls.runtime.status === 'pending');
+  const runtimeRunning = runtimeState !== null && runtimeState.streaming === true;
   const sendPrompt = (behavior?: 'steer' | 'followUp') => {
     const message = prompt.trim();
     if (!canSubmit || message.length === 0) return;
@@ -1142,6 +1163,7 @@ export function Session({
     const occurredAt = new Date().toISOString();
     dispatchTranscript({
       type: 'promptOptimistic',
+      sessionId,
       block: {
         id: optimisticId,
         kind: 'text',
@@ -1160,18 +1182,63 @@ export function Session({
       .then((block) => {
         dispatchTranscript({
           type: 'promptAccepted',
+          sessionId,
           optimisticId,
           block,
           at: new Date().toISOString(),
         });
       })
       .catch((cause: unknown) => {
-        dispatchTranscript({ type: 'promptRejected', optimisticId });
+        dispatchTranscript({ type: 'promptRejected', sessionId, optimisticId });
         setPrompt(message);
         setRetrySubmissionId(submissionId);
         setPromptError(messageFrom(cause));
       })
       .finally(() => setSendingPrompt(false));
+  };
+  // One explicit slash Send: revalidate the current binding, spend one
+  // fresh ticket and one expected-revision envelope, and reconcile without
+  // retry. Every failure preserves the drafted message, clears the unsafe
+  // binding (so the next Send requires reselection), and maps to bounded
+  // local copy; a stale race additionally refreshes the catalog.
+  const sendSlashDraft = () => {
+    const message = prompt.trim();
+    if (binding === null || slashSubmitting || message.length === 0 || !canSubmit) return;
+    setSlashSubmitting(true);
+    setPromptError(null);
+    void submitSlashDraft({
+      sessionId,
+      draft: message,
+      binding,
+      snapshot: commandCatalog.snapshot,
+      connection,
+      awaitingSnapshot: transcript.awaitingSnapshot,
+      runtimeAuthority,
+      running: runtimeRunning,
+    })
+      .then((outcome) => {
+        if (outcome.status === 'accepted') {
+          // Optimistic transcript behavior applies only after the host
+          // accepted the explicit submission; the authoritative block lands
+          // directly.
+          dispatchTranscript({
+            type: 'promptAccepted',
+            sessionId,
+            optimisticId: outcome.block.id,
+            block: outcome.block,
+            at: new Date().toISOString(),
+          });
+          setPrompt('');
+          setBinding(null);
+          return;
+        }
+        // Fail closed: keep the draft, drop the unsafe binding, and never
+        // retry. A stale race also refreshes the catalog for reselection.
+        setBinding(null);
+        if (outcome.code === 'stale') void commandCatalog.refresh('manual');
+        setPromptError(slashFailureMessage(outcome.code));
+      })
+      .finally(() => setSlashSubmitting(false));
   };
   return (
     <main className="session-view">
@@ -1216,6 +1283,7 @@ export function Session({
         setPrompt={setPrompt}
         onDraftChange={handleDraftChange}
         sendPrompt={sendPrompt}
+        sendSlashDraft={sendSlashDraft}
         stopRun={stopRun}
         canSubmit={canSubmit}
         status={status}
@@ -1226,6 +1294,10 @@ export function Session({
         promptError={promptError}
         runtimeControls={runtimeControls}
         catalog={commandCatalog}
+        binding={binding}
+        slashSubmitting={slashSubmitting}
+        runtimeAuthority={runtimeAuthority}
+        runtimeRunning={runtimeRunning}
         onInsertCommand={insertCommand}
       />
       <ModelEffortSheet
@@ -1883,6 +1955,32 @@ function formatCost(value: number): string {
 
 function messageFrom(error: unknown): string {
   return error instanceof Error ? error.message : 'The relay request failed.';
+}
+
+/** Bounded local copy for every fail-closed slash outcome; never host text. */
+function slashFailureMessage(code: SlashSubmitFailureCode): string {
+  switch (code) {
+    case 'invalid-draft':
+      return 'Choose a command from the list, then send it.';
+    case 'not-live':
+      return 'Reconnect, then choose a command again.';
+    case 'no-running-authority':
+      return 'Pi is not reachable right now. Reconnect to send a command.';
+    case 'running':
+      return 'Pi is running. Commands can be sent after this turn ends.';
+    case 'stale':
+      return 'Commands changed on the host. Choose the command again.';
+    case 'denied':
+      return 'That command is not available right now. Choose it again to retry.';
+    case 'forbidden':
+      return 'Commands are not available for this device.';
+    case 'unavailable':
+      return 'Pi is not responding. Your draft is saved.';
+    case 'incompatible':
+      return 'The phone and host versions do not agree. Your draft is saved.';
+    case 'delivery-unknown':
+      return 'The command may have reached Pi; nothing was retried. Choose it again to resend.';
+  }
 }
 
 function countdown(expiresAt: string, now: number): string {

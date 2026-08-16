@@ -10,17 +10,22 @@ import {
   sessionProof,
   type ApprovalAction,
   type ApprovalDecisionCommand,
+  type CommandBindingDto,
   type DevicePublicKeyJwk,
   type EnrollmentQr,
+  type PiRpcCommand,
+  type PiRpcResponse,
 } from '@pi-remote/pi-rpc-protocol';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { ApprovalService } from '../../src/approval/approval-service.js';
 import { verifyFinalGate } from '../../src/approval/final-gate.js';
 import { AuthService } from '../../src/auth/auth-service.js';
+import { CommandService } from '../../src/commands/command-service.js';
 import { MutationPolicy } from '../../src/policy/mutation-policy.js';
 import { serializePushHint } from '../../src/push/push-service.js';
 import { SyncHub } from '../../src/replay/sync.js';
+import type { RpcSupervisor } from '../../src/rpc/supervisor.js';
 import { RelayStore } from '../../src/store/relay-store.js';
 import { projectCommandCatalog } from '../../src/store/redaction.js';
 
@@ -377,7 +382,88 @@ describe('consolidated fail-closed negative controls', () => {
       expect(bytes.includes(Buffer.from(forbidden))).toBe(false);
     }
   });
+
+  it('revalidates slash bindings fail-closed on every identity or availability mismatch', async () => {
+    const supervisor = new FakeCommandSupervisor();
+    const service = new CommandService(supervisor as unknown as RpcSupervisor, {
+      sessionId: 'session_local',
+      hostEpoch: 'epoch_security',
+    });
+    const snapshot = await service.listCommands();
+    const binding: CommandBindingDto = {
+      hostEpoch: snapshot.hostEpoch,
+      name: 'plan',
+      sessionRevision: snapshot.sessionRevision,
+      catalogRevision: snapshot.catalogRevision,
+    };
+
+    expect(await service.revalidateSlashSubmission(binding)).toBe('allowed');
+
+    // A different host generation can never authorize a submission.
+    expect(await service.revalidateSlashSubmission({ ...binding, hostEpoch: 'epoch_other' })).toBe(
+      'stale_catalog',
+    );
+    // A settled-availability transition ages out the session revision.
+    service.setAvailability('running');
+    service.setAvailability('idle');
+    expect(await service.revalidateSlashSubmission(binding)).toBe('stale_catalog');
+    // A running turn denies even a binding re-read under the running
+    // revision (an older binding would already be stale).
+    service.setAvailability('running');
+    const runningBinding = await currentBinding(service);
+    expect(await service.revalidateSlashSubmission(runningBinding)).toBe('command_denied');
+    // Hidden and unknown names are denied.
+    service.setAvailability('idle');
+    const idleBinding = await currentBinding(service);
+    expect(await service.revalidateSlashSubmission({ ...idleBinding, name: 'login' })).toBe(
+      'command_denied',
+    );
+    expect(await service.revalidateSlashSubmission({ ...idleBinding, name: 'nope' })).toBe(
+      'command_denied',
+    );
+    // A catalog that changed between binding and submission is stale.
+    supervisor.rawCommands = [{ name: 'compact', description: 'Compact', source: 'prompt' }];
+    expect(await service.revalidateSlashSubmission(idleBinding)).toBe('stale_catalog');
+    // Host invalidation kills every prior binding outright.
+    service.invalidate();
+    expect(await service.revalidateSlashSubmission(idleBinding)).toBe('stale_catalog');
+    // None of the denials ever forwarded a prompt: only catalog reads ran.
+    expect(supervisor.send.mock.calls.every(([command]) => command.type === 'get_commands')).toBe(
+      true,
+    );
+  });
 });
+
+/** One raw host command set behind a catalog-only supervisor. */
+class FakeCommandSupervisor {
+  public rawCommands: readonly unknown[] = [
+    { name: 'plan', description: 'Toggle plan mode', source: 'extension' },
+    { name: 'login', description: 'Authenticate', source: 'prompt' },
+  ];
+
+  public readonly send = vi.fn(async (command: PiRpcCommand): Promise<PiRpcResponse> => {
+    if (command.type === 'get_commands') {
+      return {
+        id: command.id,
+        type: 'response',
+        command: 'get_commands',
+        success: true,
+        data: { commands: this.rawCommands },
+      };
+    }
+    return { id: command.id, type: 'response', command: command.type, success: true };
+  });
+}
+
+async function currentBinding(service: CommandService): Promise<CommandBindingDto> {
+  const fresh = await service.listCommands();
+  return {
+    hostEpoch: fresh.hostEpoch,
+    name: 'plan',
+    sessionRevision: fresh.sessionRevision,
+    catalogRevision: fresh.catalogRevision,
+  };
+}
 
 function fixedAction(): ApprovalAction {
   return {

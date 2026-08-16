@@ -24,8 +24,32 @@ const relay = vi.hoisted(() => {
       this.code = code;
     }
   }
+  class SlashSubmitError extends Error {
+    readonly reasonCode: 'stale_catalog' | 'command_denied';
+
+    constructor(reasonCode: 'stale_catalog' | 'command_denied') {
+      super(reasonCode);
+      this.name = 'SlashSubmitError';
+      this.reasonCode = reasonCode;
+    }
+  }
+  class RelayRequestError extends Error {
+    readonly code: 'access_denied' | 'request_failed';
+    readonly status: number | null;
+    readonly retryAfterMs: number | null;
+
+    constructor(code: 'access_denied' | 'request_failed', status: number | null = null) {
+      super(code);
+      this.name = 'RelayRequestError';
+      this.code = code;
+      this.status = status;
+      this.retryAfterMs = null;
+    }
+  }
   return {
     CatalogLifecycleError,
+    SlashSubmitError,
+    RelayRequestError,
     createAcceptEditsGrant: vi.fn(),
     decideApproval: vi.fn(),
     fetchApprovals: vi.fn(),
@@ -35,7 +59,9 @@ const relay = vi.hoisted(() => {
     fetchTranscript: vi.fn(),
     openSyncSocket: vi.fn(),
     controlRuntime: vi.fn(),
+    requestTicket: vi.fn(),
     submitPrompt: vi.fn(),
+    submitSlashCommand: vi.fn(),
   };
 });
 
@@ -103,6 +129,10 @@ beforeEach(() => {
     preferences: null,
   });
   relay.fetchTranscript.mockResolvedValue({ items: [], coversThrough: 0 });
+  relay.requestTicket.mockResolvedValue('ticket_app_001');
+  relay.submitSlashCommand.mockResolvedValue(
+    block({ id: 'block_slash_001', kind: 'text', text: '/plan', role: 'user' }),
+  );
   relay.fetchRuntimeState.mockResolvedValue({
     sessionId,
     revision: 4,
@@ -359,11 +389,8 @@ it('inserts a command through the + browser without any ticket, prompt, or mutat
   expect(await screen.findByText('Inserted slash command plan. Not sent.')).toBeInTheDocument();
 });
 
-it('Enter with the inline surface open inserts locally and never submits; the next Enter is the explicit send', async () => {
+it('Enter with the inline surface open inserts locally and never submits; the next Enter is the explicit slash send', async () => {
   const user = userEvent.setup();
-  relay.submitPrompt.mockResolvedValue(
-    block({ id: 'block_prompt_001', kind: 'text', text: 'ok', role: 'user' }),
-  );
   render(
     <Session
       connection="live"
@@ -378,6 +405,8 @@ it('Enter with the inline surface open inserts locally and never submits; the ne
   );
 
   await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  // The slash lane only opens with host-confirmed running/plan authority.
+  await waitFor(() => expect(screen.getByRole('radio', { name: 'Build' })).toBeEnabled());
   const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
   await user.type(composer, '/');
   const listbox = await screen.findByRole('listbox', { name: 'Available host commands' });
@@ -389,15 +418,282 @@ it('Enter with the inline surface open inserts locally and never submits; the ne
   expect(document.activeElement).toBe(composer);
   expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   expect(relay.submitPrompt).not.toHaveBeenCalled();
+  expect(relay.requestTicket).not.toHaveBeenCalled();
   // Opening, filtering, and inserting made zero network requests beyond the
   // single prefetched catalog read.
   expect(relay.fetchCommands).toHaveBeenCalledOnce();
 
-  // A second Enter follows the composer's explicit submission policy; the
-  // app trims the canonical token before sending.
+  // A second Enter follows the explicit submission policy: the drafted
+  // command goes through the ticketed slash lane with the current binding —
+  // one fresh ticket and one expected-revision envelope, never the text lane.
   await user.keyboard('{Enter}');
-  await waitFor(() => expect(relay.submitPrompt).toHaveBeenCalledTimes(1));
-  expect(relay.submitPrompt).toHaveBeenCalledWith(sessionId, expect.any(String), '/plan', undefined);
+  await waitFor(() => expect(relay.requestTicket).toHaveBeenCalledTimes(1));
+  expect(relay.submitSlashCommand).toHaveBeenCalledTimes(1);
+  expect(relay.submitSlashCommand).toHaveBeenCalledWith(
+    sessionId,
+    expect.stringMatching(/^slash_/u),
+    '/plan',
+    {
+      hostEpoch: 'epoch_web_001',
+      sessionId,
+      name: 'plan',
+      sessionRevision: 2,
+      catalogRevision: 3,
+    },
+    undefined,
+  );
+  expect(relay.submitPrompt).not.toHaveBeenCalled();
+});
+
+it('sends a drafted slash command exactly once and reconciles only after acceptance', async () => {
+  const user = userEvent.setup();
+  const dispatchTranscript = vi.fn();
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={dispatchTranscript}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  await waitFor(() => expect(screen.getAllByText('Alpha Current').length).toBeGreaterThan(0));
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  await user.type(composer, '/');
+  await screen.findByRole('listbox', { name: 'Available host commands' });
+  await user.keyboard('{Enter}');
+  await waitFor(() => expect(composer).toHaveValue('/plan '));
+  await user.keyboard('{Enter}');
+
+  await waitFor(() => expect(relay.requestTicket).toHaveBeenCalledTimes(1));
+  expect(relay.submitSlashCommand).toHaveBeenCalledTimes(1);
+  expect(relay.submitPrompt).not.toHaveBeenCalled();
+  // Optimistic transcript behavior applies only after acceptance: the
+  // authoritative block lands directly and the draft clears.
+  await waitFor(() =>
+    expect(dispatchTranscript).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'promptAccepted', sessionId }),
+    ),
+  );
+  expect(dispatchTranscript).not.toHaveBeenCalledWith(
+    expect.objectContaining({ type: 'promptOptimistic' }),
+  );
+  await waitFor(() => expect(composer).toHaveValue(''));
+});
+
+it('a stale race preserves the draft, clears the binding, refreshes the catalog, and never retries', async () => {
+  const user = userEvent.setup();
+  relay.submitSlashCommand.mockRejectedValueOnce(new relay.SlashSubmitError('stale_catalog'));
+  const dispatchTranscript = vi.fn();
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={dispatchTranscript}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  await waitFor(() => expect(screen.getAllByText('Alpha Current').length).toBeGreaterThan(0));
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  await user.type(composer, '/');
+  await screen.findByRole('listbox', { name: 'Available host commands' });
+  await user.keyboard('{Enter}');
+  await waitFor(() => expect(composer).toHaveValue('/plan '));
+  await user.keyboard('{Enter}');
+
+  await waitFor(() => expect(relay.requestTicket).toHaveBeenCalledTimes(1));
+  expect(relay.submitSlashCommand).toHaveBeenCalledTimes(1);
+  // The draft survives the race…
+  expect(composer).toHaveValue('/plan ');
+  // …the catalog is refreshed for reselection…
+  await waitFor(() => expect(relay.fetchCommands.mock.calls.length).toBeGreaterThan(1));
+  expect(
+    await screen.findByText('Commands changed on the host. Choose the command again.'),
+  ).toBeInTheDocument();
+  expect(dispatchTranscript).not.toHaveBeenCalledWith(
+    expect.objectContaining({ type: 'promptAccepted' }),
+  );
+  // …and no retry is possible: the unsafe binding is gone, so the next
+  // Enter cannot re-submit anything.
+  await user.keyboard('{Enter}');
+  expect(relay.requestTicket).toHaveBeenCalledTimes(1);
+  expect(relay.submitSlashCommand).toHaveBeenCalledTimes(1);
+  expect(relay.submitPrompt).not.toHaveBeenCalled();
+});
+
+it('a denied command preserves the draft and never retries or falls back to text', async () => {
+  const user = userEvent.setup();
+  relay.submitSlashCommand.mockRejectedValueOnce(new relay.SlashSubmitError('command_denied'));
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  await waitFor(() => expect(screen.getAllByText('Alpha Current').length).toBeGreaterThan(0));
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  await user.type(composer, '/');
+  await screen.findByRole('listbox', { name: 'Available host commands' });
+  await user.keyboard('{Enter}');
+  await waitFor(() => expect(composer).toHaveValue('/plan '));
+  await user.keyboard('{Enter}');
+
+  await waitFor(() => expect(relay.requestTicket).toHaveBeenCalledTimes(1));
+  expect(relay.submitSlashCommand).toHaveBeenCalledTimes(1);
+  expect(composer).toHaveValue('/plan ');
+  expect(
+    await screen.findByText('That command is not available right now. Choose it again to retry.'),
+  ).toBeInTheDocument();
+  // Denied outcomes do not refresh the catalog and are never retried or
+  // converted to the ordinary text lane.
+  const readsAfterDenial = relay.fetchCommands.mock.calls.length;
+  await user.keyboard('{Enter}');
+  expect(relay.requestTicket).toHaveBeenCalledTimes(1);
+  expect(relay.submitSlashCommand).toHaveBeenCalledTimes(1);
+  expect(relay.submitPrompt).not.toHaveBeenCalled();
+  expect(relay.fetchCommands.mock.calls.length).toBe(readsAfterDenial);
+});
+
+it('a running turn never steers a slash draft; ordinary text still steers', async () => {
+  const user = userEvent.setup();
+  relay.fetchRuntimeState.mockResolvedValue({
+    sessionId,
+    revision: 4,
+    model: { provider: 'alpha', id: 'alpha-current', label: 'Alpha Current' },
+    thinkingLevel: 'high',
+    availableThinkingLevels: ['off', 'high'],
+    mode: 'build',
+    streaming: true,
+    updatedAt: occurredAt,
+  });
+  relay.submitPrompt.mockResolvedValue(
+    block({ id: 'block_prompt_001', kind: 'text', text: 'ok', role: 'user' }),
+  );
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="running"
+      onBack={vi.fn()}
+    />,
+  );
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  await waitFor(() => expect(screen.getAllByText('Alpha Current').length).toBeGreaterThan(0));
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  // Ordinary text keeps the unchanged steer path while running.
+  await user.type(composer, 'hello');
+  await user.click(screen.getByRole('button', { name: 'Steer the current turn' }));
+  await waitFor(() =>
+    expect(relay.submitPrompt).toHaveBeenCalledWith(
+      sessionId,
+      expect.stringMatching(/^prompt_/u),
+      'hello',
+      'steer',
+    ),
+  );
+  // The slash draft inserts locally, but Send is disabled while running and
+  // the Later conversion is absent.
+  await user.clear(composer);
+  await user.type(composer, '/');
+  await screen.findByRole('listbox', { name: 'Available host commands' });
+  await user.keyboard('{Enter}');
+  await waitFor(() => expect(composer).toHaveValue('/plan '));
+  expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+  expect(screen.queryByRole('button', { name: 'Later' })).not.toBeInTheDocument();
+  await user.keyboard('{Enter}');
+  expect(relay.requestTicket).not.toHaveBeenCalled();
+  expect(relay.submitSlashCommand).not.toHaveBeenCalled();
+  expect(relay.submitPrompt).toHaveBeenCalledTimes(1);
+});
+
+it('missing running-state authority disables slash Send (never guesses)', async () => {
+  const user = userEvent.setup();
+  relay.fetchRuntimeState.mockRejectedValue(new Error('relay unreachable'));
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  await waitFor(() => expect(relay.fetchRuntimeState).toHaveBeenCalled());
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  await user.type(composer, '/');
+  await screen.findByRole('listbox', { name: 'Available host commands' });
+  await user.keyboard('{Enter}');
+  await waitFor(() => expect(composer).toHaveValue('/plan '));
+  expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+  await user.keyboard('{Enter}');
+  expect(relay.requestTicket).not.toHaveBeenCalled();
+  expect(relay.submitSlashCommand).not.toHaveBeenCalled();
+});
+
+it('a session switch clears the binding: no cross-session slash submit', async () => {
+  const user = userEvent.setup();
+  const { rerender } = render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  await waitFor(() => expect(screen.getAllByText('Alpha Current').length).toBeGreaterThan(0));
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  await user.type(composer, '/');
+  await screen.findByRole('listbox', { name: 'Available host commands' });
+  await user.keyboard('{Enter}');
+  await waitFor(() => expect(composer).toHaveValue('/plan '));
+
+  rerender(
+    <Session
+      connection="live"
+      sessionId="session_other"
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId: 'session_other', source: 'none' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+  // The drafted token survives, but the binding cannot survive the switch:
+  // Send is fail-closed and nothing reaches the relay.
+  expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+  await user.keyboard('{Enter}');
+  expect(relay.requestTicket).not.toHaveBeenCalled();
+  expect(relay.submitSlashCommand).not.toHaveBeenCalled();
 });
 
 it('keeps the inline surface closed for every invalid slash trigger', async () => {

@@ -12,6 +12,7 @@
 // the real deployment's authority and redaction are untouched.
 
 import type { DeviceIdentity } from './auth.js';
+import type { AvailableModelDto } from '@pi-remote/pi-rpc-protocol';
 
 // Opaque ids must match the protocol guard pattern ^[A-Za-z0-9][A-Za-z0-9_-]{2,127}$.
 const SESSION_IDLE = 'demo-session-refactor';
@@ -147,23 +148,116 @@ const SESSIONS: readonly DemoSession[] = [
   { id: SESSION_RUNNING, status: 'running', blocks: TRIAGE_BLOCKS },
 ];
 
-interface DemoModel {
-  readonly provider: string;
-  readonly id: string;
-  readonly label: string;
-}
-
-const DEFAULT_MODEL: DemoModel = {
+const DEFAULT_MODEL: AvailableModelDto = {
   provider: 'anthropic',
   id: 'claude-opus-4-8',
   label: 'Claude Opus 4.8',
+  reasoning: true,
+  input: ['text', 'image'],
+  contextWindow: 400_000,
+  maxTokens: 128_000,
+  tools: true,
+  availability: 'available',
+  pricing: { currency: 'USD', inputPerMillion: 15, outputPerMillion: 75 },
 };
 
-const MODELS: readonly DemoModel[] = [
+const MODELS: readonly AvailableModelDto[] = [
   DEFAULT_MODEL,
-  { provider: 'anthropic', id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6' },
-  { provider: 'openai', id: 'gpt-5-6-luna', label: 'GPT-5.6 Luna' },
-  { provider: 'deepseek', id: 'deepseek-v4-flash', label: 'DeepSeek v4 Flash' },
+  {
+    provider: 'anthropic',
+    id: 'claude-sonnet-4-6',
+    label: 'Claude Sonnet 4.6',
+    reasoning: true,
+    input: ['text', 'image'],
+    contextWindow: 200_000,
+    maxTokens: 64_000,
+    tools: true,
+    availability: 'available',
+    pricing: { currency: 'USD', inputPerMillion: 3, outputPerMillion: 15 },
+  },
+  {
+    provider: 'anthropic',
+    id: 'claude-haiku-4-5',
+    label: 'Claude Haiku 4.5',
+    input: ['text', 'image'],
+    contextWindow: 200_000,
+    maxTokens: 32_000,
+    tools: true,
+    availability: 'available',
+    pricing: { currency: 'USD', inputPerMillion: 1, outputPerMillion: 5 },
+  },
+  {
+    provider: 'openai',
+    id: 'gpt-5-6-luna',
+    label: 'GPT-5.6 Luna',
+    reasoning: true,
+    input: ['text', 'image'],
+    contextWindow: 400_000,
+    maxTokens: 64_000,
+    tools: true,
+    availability: 'available',
+    pricing: { currency: 'USD', inputPerMillion: 5, outputPerMillion: 20 },
+  },
+  {
+    provider: 'openai',
+    id: 'gpt-5-6-flash',
+    label: 'GPT-5.6 Flash',
+    input: ['text'],
+    contextWindow: 128_000,
+    maxTokens: 32_000,
+    tools: true,
+    availability: 'tier_locked',
+    availabilityReasonCode: 'tier_locked',
+    pricing: { currency: 'USD', inputPerMillion: 1.25, outputPerMillion: 10 },
+  },
+  {
+    provider: 'openai',
+    id: 'gpt-5-6-nano',
+    label: 'GPT-5.6 Nano',
+    input: ['text'],
+    contextWindow: 128_000,
+    maxTokens: 16_000,
+    tools: false,
+    availability: 'available',
+    pricing: { currency: 'USD', inputPerMillion: 0.4, outputPerMillion: 2 },
+  },
+  {
+    provider: 'deepseek',
+    id: 'deepseek-v4-flash',
+    label: 'DeepSeek v4 Flash',
+    reasoning: true,
+    input: ['text', 'image'],
+    contextWindow: 128_000,
+    maxTokens: 32_000,
+    tools: true,
+    availability: 'available',
+    pricing: { currency: 'USD', inputPerMillion: 0.5, outputPerMillion: 1.5 },
+  },
+  {
+    provider: 'deepseek',
+    id: 'deepseek-v4-r1',
+    label: 'DeepSeek v4 R1',
+    reasoning: true,
+    input: ['text'],
+    contextWindow: 256_000,
+    maxTokens: 64_000,
+    tools: true,
+    availability: 'policy_blocked',
+    availabilityReasonCode: 'policy_blocked',
+    pricing: { currency: 'USD', inputPerMillion: 0.8, outputPerMillion: 2.4 },
+  },
+  {
+    provider: 'google',
+    id: 'gemini-3-pro',
+    label: 'Gemini 3 Pro',
+    reasoning: true,
+    input: ['text', 'image'],
+    contextWindow: 1_000_000,
+    maxTokens: 128_000,
+    tools: true,
+    availability: 'available',
+    pricing: { currency: 'USD', inputPerMillion: 5, outputPerMillion: 10 },
+  },
 ];
 
 const THINKING_LEVELS = ['off', 'high', 'max'];
@@ -181,16 +275,38 @@ const COMMANDS = [
   requiresConfirmation: false,
 }));
 
+// The catalog revision identifies the host's model membership, which the demo
+// fixture never changes, so it stays constant while the runtime revision
+// advances with every accepted control mutation.
+const CATALOG_REVISION = 1;
+
 // Mutable per-session runtime so the Model/Effort/Build·Plan controls actually
 // move and stick under the non-optimistic reducer (revision advances on commit).
 interface DemoRuntime {
   revision: number;
-  model: DemoModel;
+  model: AvailableModelDto;
   thinkingLevel: string;
   mode: 'build' | 'plan';
 }
 
 const runtimeBySession = new Map<string, DemoRuntime>();
+
+// One-use model-switch tickets mirror the relay's ticket authority: a ticket is
+// minted per set_model intent and consumed (or expired) when control presents it.
+interface DemoRuntimeTicket {
+  readonly sessionId: string;
+  readonly expectedRevision: number;
+  readonly expectedCatalogRevision: number;
+  readonly operation: {
+    readonly type: 'set_model';
+    readonly provider: string;
+    readonly modelId: string;
+  };
+  readonly expiresAt: number;
+}
+
+let runtimeTicketCounter = 0;
+const runtimeTickets = new Map<string, DemoRuntimeTicket>();
 
 function runtimeFor(sessionId: string): DemoRuntime {
   const existing = runtimeBySession.get(sessionId);
@@ -219,17 +335,53 @@ function runtimeStateDto(sessionId: string) {
   };
 }
 
-function applyControl(sessionId: string, expectedRevision: number, operation: Record<string, unknown>) {
+function applyControl(
+  sessionId: string,
+  expectedRevision: number,
+  operation: Record<string, unknown>,
+  ticket: string | undefined,
+  expectedCatalogRevision: number | undefined,
+) {
   const state = runtimeFor(sessionId);
-  if (expectedRevision !== state.revision) {
-    return { outcome: { status: 'stale', state: runtimeStateDto(sessionId) } };
-  }
   if (operation.type === 'set_model') {
+    const issued = ticket !== undefined ? runtimeTickets.get(ticket) : undefined;
+    if (ticket !== undefined) runtimeTickets.delete(ticket);
+    if (
+      issued === undefined ||
+      issued.sessionId !== sessionId ||
+      issued.expiresAt <= Date.now()
+    ) {
+      return { outcome: { status: 'unavailable', reasonCode: 'host_rejected' } };
+    }
+    if (expectedRevision !== state.revision) {
+      return { outcome: { status: 'stale', state: runtimeStateDto(sessionId) } };
+    }
+    if (expectedCatalogRevision !== CATALOG_REVISION) {
+      return { outcome: { status: 'unavailable', reasonCode: 'stale_catalog' } };
+    }
     const next = MODELS.find(
       (model) => model.provider === operation.provider && model.id === operation.modelId,
     );
-    if (next !== undefined) state.model = next;
-  } else if (operation.type === 'set_thinking_level' && typeof operation.level === 'string') {
+    if (next === undefined) {
+      return { outcome: { status: 'unavailable', reasonCode: 'model_unavailable' } };
+    }
+    const availability = next.availability ?? 'available';
+    if (availability !== 'available') {
+      return {
+        outcome: {
+          status: 'unavailable',
+          reasonCode: availability === 'tier_locked' ? 'tier_locked' : 'policy_blocked',
+        },
+      };
+    }
+    state.model = next;
+    state.revision += 1;
+    return { outcome: { status: 'accepted', state: runtimeStateDto(sessionId) } };
+  }
+  if (expectedRevision !== state.revision) {
+    return { outcome: { status: 'stale', state: runtimeStateDto(sessionId) } };
+  }
+  if (operation.type === 'set_thinking_level' && typeof operation.level === 'string') {
     if (THINKING_LEVELS.includes(operation.level)) state.thinkingLevel = operation.level;
   } else if (operation.type === 'set_mode' && (operation.mode === 'build' || operation.mode === 'plan')) {
     state.mode = operation.mode;
@@ -272,12 +424,41 @@ export function demoPostJson(path: string, body: unknown): unknown {
       return { ticket: 'demo-ticket-0001', expiresAt: new Date(Date.now() + 60_000).toISOString() };
     case '/api/runtime/state':
       return { state: runtimeStateDto(String(request.sessionId ?? SESSION_IDLE)) };
-    case '/api/runtime/models':
+    case '/api/runtime/models': {
+      const sessionId = String(request.sessionId ?? SESSION_IDLE);
+      const state = runtimeFor(sessionId);
       return {
-        sessionId: SESSION_IDLE,
-        runtimeRevision: runtimeFor(SESSION_IDLE).revision,
+        sessionId,
+        catalogRevision: CATALOG_REVISION,
+        runtimeRevision: state.revision,
+        currentModel: state.model,
+        streaming: sessionId === SESSION_RUNNING,
+        canSetModelWhileStreaming: false,
         models: MODELS,
       };
+    }
+    case '/api/runtime/ticket': {
+      const operation = request.operation as Record<string, unknown> | undefined;
+      if (
+        operation?.type !== 'set_model' ||
+        typeof operation.provider !== 'string' ||
+        typeof operation.modelId !== 'string' ||
+        typeof request.sessionId !== 'string' ||
+        typeof request.expectedRevision !== 'number' ||
+        typeof request.expectedCatalogRevision !== 'number'
+      ) {
+        return {};
+      }
+      const ticket = `demo-runtime-ticket-${(runtimeTicketCounter += 1)}`;
+      runtimeTickets.set(ticket, {
+        sessionId: request.sessionId,
+        expectedRevision: request.expectedRevision,
+        expectedCatalogRevision: request.expectedCatalogRevision,
+        operation: { type: 'set_model', provider: operation.provider, modelId: operation.modelId },
+        expiresAt: Date.now() + 10_000,
+      });
+      return { ticket, expiresAt: new Date(Date.now() + 10_000).toISOString() };
+    }
     case '/api/commands/list':
       return { sessionId: SESSION_IDLE, revision: 1, commands: COMMANDS };
     case '/api/runtime/control':
@@ -285,6 +466,10 @@ export function demoPostJson(path: string, body: unknown): unknown {
         String(request.sessionId ?? SESSION_IDLE),
         Number(request.expectedRevision ?? 0),
         (request.operation ?? {}) as Record<string, unknown>,
+        typeof request.ticket === 'string' ? request.ticket : undefined,
+        typeof request.expectedCatalogRevision === 'number'
+          ? request.expectedCatalogRevision
+          : undefined,
       );
     case '/api/prompt/abort':
       return { outcome: { status: 'aborted' } };

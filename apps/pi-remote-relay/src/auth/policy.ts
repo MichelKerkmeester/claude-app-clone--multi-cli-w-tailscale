@@ -20,6 +20,7 @@ export type AuthorizedAction =
   | 'runtime:read'
   | 'runtime-ticket:create'
   | 'runtime:control'
+  | 'plan:control'
   | 'commands:list'
   | 'commands:submit';
 
@@ -41,6 +42,7 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   'runtime:read',
   'runtime-ticket:create',
   'runtime:control',
+  'plan:control',
   'commands:list',
   // The slash submission lane is authorized separately from ordinary prompt
   // submission so either can be denied without touching the other.

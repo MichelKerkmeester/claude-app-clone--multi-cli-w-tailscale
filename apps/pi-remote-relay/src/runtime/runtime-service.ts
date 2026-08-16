@@ -5,6 +5,9 @@
 import type {
   PiRpcCommand,
   PiRpcResponse,
+  PlanControlCommand,
+  PlanControlResponse,
+  PlanSnapshotDto,
   RuntimeControlCommand,
   RuntimeControlResponse,
   RuntimeControlReasonCode,
@@ -15,18 +18,26 @@ import type {
   RuntimeOperation,
   RuntimeSnapshotDto,
   RuntimeStateDto,
+  SetModeCommand,
+  ExecutePlanCommand,
 } from '@pi-remote/pi-rpc-protocol';
-import { isRuntimeSnapshotDto } from '@pi-remote/pi-rpc-protocol';
+import { isRuntimeSnapshotDto, isRuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 
 import type { RpcSupervisor } from '../rpc/supervisor.js';
 import {
+  projectPlanSnapshot,
   projectRuntimeModelCatalog,
   projectRuntimeSnapshot,
   projectRuntimeState,
   projectRuntimeThinkingLevels,
 } from '../store/redaction.js';
 
-import { parsePlanStatus } from './plan-status.js';
+import {
+  isPlanArtifactPublication,
+  parsePlanArtifact,
+  parsePlanStatus,
+  type ParsedPlanArtifact,
+} from './plan-status.js';
 
 const IDEMPOTENCY_CAP = 256;
 const MODE_CONFIRM_TIMEOUT_MS = 4_000;
@@ -72,14 +83,19 @@ export class RuntimeIssueError extends Error {
 export class RuntimeService {
   private revision = 0;
   private catalogRevision = 0;
+  private planRevision = 0;
   private currentState: RuntimeStateDto | null = null;
   private modelCatalog: RuntimeModelCatalogDto | null = null;
   private mode: RuntimeMode = 'unknown';
+  private planArtifact: ParsedPlanArtifact | null = null;
+  private planArtifactOccurredAt: string | null = null;
   private availableThinkingLevels: readonly string[] = [];
   private live = false;
   private hydration: Promise<RuntimeSnapshotDto> | null = null;
   private lifecycleGeneration = 0;
+  private mutationLane: Promise<unknown> = Promise.resolve();
   private readonly idempotency = new Map<string, RuntimeControlResponse>();
+  private readonly planIdempotency = new Map<string, PlanControlResponse>();
   private modeWaiters: ModeWaiter[] = [];
   private readonly now: () => number;
 
@@ -99,6 +115,20 @@ export class RuntimeService {
       if (parsed !== null) {
         this.mode = parsed;
         this.resolveModeWaiters();
+      }
+      if (isPlanArtifactPublication(event)) {
+        // The host is the only source of plan bindings; a malformed publication
+        // drops the binding instead of guessing a plan to execute.
+        this.planArtifact = parsePlanArtifact(event);
+        if (this.planArtifact !== null) {
+          this.planRevision = this.planArtifact.planRevision;
+          this.planArtifactOccurredAt = new Date(this.now()).toISOString();
+        } else {
+          this.planArtifactOccurredAt = null;
+        }
+        // The plan projection rides inside the runtime state DTO without
+        // advancing the independent runtime revision.
+        this.refreshPlanProjection();
       }
     });
   }
@@ -230,6 +260,7 @@ export class RuntimeService {
 
     const provisionalCatalogRevision =
       this.modelCatalog === null ? Math.max(1, this.catalogRevision + 1) : this.catalogRevision;
+    const plan = this.planSnapshot();
     const provisional = projectRuntimeSnapshot(
       dataOf(stateResponse),
       levels,
@@ -240,6 +271,7 @@ export class RuntimeService {
         catalogRevision: provisionalCatalogRevision,
         mode: this.mode,
         updatedAt: new Date(this.now()).toISOString(),
+        plan,
       },
     );
     if (provisional === null) throw new RuntimeIssueError('invalid-response');
@@ -263,6 +295,7 @@ export class RuntimeService {
       catalogRevision: nextCatalogRevision,
       mode: this.mode,
       updatedAt: new Date(this.now()).toISOString(),
+      plan,
     });
     if (snapshot === null) throw new RuntimeIssueError('invalid-response');
     if (generation !== this.lifecycleGeneration) {
@@ -298,14 +331,55 @@ export class RuntimeService {
     this.currentState = null;
     this.modelCatalog = null;
     this.availableThinkingLevels = [];
+    // Host authority loss also invalidates any plan binding it issued.
+    this.planArtifact = null;
+    this.planArtifactOccurredAt = null;
+    this.planRevision = 0;
   }
 
-  /** The single guarded mutation entrypoint. Fails closed and is idempotent by controlId. */
-  public async control(command: RuntimeControlCommand): Promise<RuntimeControlResponse> {
+  /**
+   * The single guarded mutation entrypoint. Fails closed, is idempotent by
+   * controlId, and serializes every mutation through one single-flight lane so
+   * a second client acting on the same revision is answered stale, never
+   * double-dispatched.
+   */
+  public control(command: RuntimeControlCommand): Promise<RuntimeControlResponse> {
     const settled = this.idempotency.get(command.controlId);
     if (settled !== undefined) {
-      return settled;
+      return Promise.resolve(settled);
     }
+    return this.enqueueMutation(() => {
+      const replayed = this.idempotency.get(command.controlId);
+      if (replayed !== undefined) {
+        return Promise.resolve(replayed);
+      }
+      return this.executeControl(command);
+    });
+  }
+
+  /** Plan-mode and reviewed-plan execution share the same guarded mutation lane. */
+  public planControl(command: PlanControlCommand): Promise<PlanControlResponse> {
+    const settled = this.planIdempotency.get(command.controlId);
+    if (settled !== undefined) {
+      return Promise.resolve(settled);
+    }
+    return this.enqueueMutation(() => {
+      const replayed = this.planIdempotency.get(command.controlId);
+      if (replayed !== undefined) {
+        return Promise.resolve(replayed);
+      }
+      return this.executePlanControl(command);
+    });
+  }
+
+  /** Serialize every host mutation so revisions advance without interleaving. */
+  private enqueueMutation<T>(run: () => Promise<T>): Promise<T> {
+    const pending = this.mutationLane.catch(() => undefined).then(run);
+    this.mutationLane = pending;
+    return pending;
+  }
+
+  private async executeControl(command: RuntimeControlCommand): Promise<RuntimeControlResponse> {
     if (!this.live || this.currentState === null) {
       return this.settle(command.controlId, {
         outcome: {
@@ -386,6 +460,109 @@ export class RuntimeService {
         },
       });
     }
+  }
+
+  /**
+   * Guarded plan-mode control. Every check below runs before any host dispatch;
+   * a timeout or transport failure is terminal delivery-unknown, never retried.
+   */
+  private async executePlanControl(command: PlanControlCommand): Promise<PlanControlResponse> {
+    if (!this.live || this.currentState === null) {
+      return this.settlePlan(command.controlId, {
+        outcome: {
+          status: 'unavailable',
+          reasonCode: 'runtime_unavailable',
+          issueCode: 'host-unavailable',
+        },
+      });
+    }
+    if (command.expectedRuntimeRevision !== this.revision) {
+      return this.settlePlan(command.controlId, {
+        outcome: { status: 'stale', state: this.currentState },
+      });
+    }
+    if (command.type === 'set_mode') {
+      return this.applyModeSwitch(command);
+    }
+    if (!this.isExecutablePlanBinding(command)) {
+      return this.settlePlan(command.controlId, {
+        outcome: { status: 'stale', state: this.currentState },
+      });
+    }
+    return this.applyPlanExecution(command);
+  }
+
+  /** The exact plan binding, current Plan mode and post-run contract must all hold. */
+  private isExecutablePlanBinding(command: ExecutePlanCommand): boolean {
+    return (
+      command.postRunMode === 'plan' &&
+      this.mode === 'plan' &&
+      this.planArtifact !== null &&
+      this.planArtifact.validity === 'valid' &&
+      command.planId === this.planArtifact.planId &&
+      command.expectedPlanRevision === this.planRevision &&
+      command.planToken === this.planArtifact.planToken
+    );
+  }
+
+  private async applyModeSwitch(command: SetModeCommand): Promise<PlanControlResponse> {
+    try {
+      ensureAccepted(
+        await this.supervisor.sendSettled({
+          type: 'prompt',
+          message: command.target === 'plan' ? '/plan on' : '/plan off',
+        }),
+      );
+      await this.waitForMode(command.target);
+      const state = this.commit(await this.supervisor.send({ type: 'get_state' }), null);
+      return this.settlePlan(command.controlId, { outcome: { status: 'accepted', state } });
+    } catch (error) {
+      return this.settlePlanControlFailure(command.controlId, error);
+    }
+  }
+
+  private async applyPlanExecution(command: ExecutePlanCommand): Promise<PlanControlResponse> {
+    try {
+      ensureAccepted(
+        await this.supervisor.sendSettled({ type: 'prompt', message: '/plan execute' }),
+      );
+      await this.waitForMode('executing-plan');
+      const state = this.commit(await this.supervisor.send({ type: 'get_state' }), null);
+      return this.settlePlan(command.controlId, { outcome: { status: 'accepted', state } });
+    } catch (error) {
+      return this.settlePlanControlFailure(command.controlId, error);
+    }
+  }
+
+  private settlePlanControlFailure(controlId: string, error: unknown): PlanControlResponse {
+    if (error instanceof HostRejectedError) {
+      return this.settlePlan(
+        controlId,
+        error.reasonCode === 'policy_blocked'
+          ? {
+              outcome: {
+                status: 'policy_blocked',
+                reasonCode: 'policy_blocked',
+                issueCode: 'unsupported',
+              },
+            }
+          : {
+              outcome: {
+                status: 'unavailable',
+                reasonCode: 'host_rejected',
+                issueCode: 'host-unavailable',
+              },
+            },
+      );
+    }
+    // Delivery may have happened before the failure. This is terminal; never retry.
+    return this.settlePlan(controlId, {
+      outcome: {
+        status: 'delivery-unknown',
+        reasonCode: 'delivery_unknown',
+        issueCode: 'delivery-unknown',
+      },
+    });
   }
 
   private validate(operation: RuntimeOperation): RuntimeValidationReason | null {
@@ -493,12 +670,28 @@ export class RuntimeService {
       mode: this.mode,
       availableThinkingLevels: this.availableThinkingLevels,
       updatedAt: new Date(this.now()).toISOString(),
+      plan: this.planSnapshot(),
     });
     if (state === null) {
       throw new Error('host runtime state could not be projected');
     }
     this.currentState = state;
     return state;
+  }
+
+  /** The token-free plan projection; the opaque binding stays relay-side only. */
+  private planSnapshot(): PlanSnapshotDto {
+    return projectPlanSnapshot(
+      this.planArtifact,
+      this.planArtifactOccurredAt ?? new Date(this.now()).toISOString(),
+    );
+  }
+
+  /** Refresh the plan projection in the published state without a revision bump. */
+  private refreshPlanProjection(): void {
+    if (this.currentState === null) return;
+    const state: RuntimeStateDto = { ...this.currentState, plan: this.planSnapshot() };
+    this.currentState = isRuntimeStateDto(state) ? state : this.currentState;
   }
 
   private waitForMode(target: RuntimeMode): Promise<void> {
@@ -528,15 +721,23 @@ export class RuntimeService {
   }
 
   private settle(controlId: string, response: RuntimeControlResponse): RuntimeControlResponse {
-    if (this.idempotency.size >= IDEMPOTENCY_CAP) {
-      const oldest = this.idempotency.keys().next().value;
-      if (oldest !== undefined) {
-        this.idempotency.delete(oldest);
-      }
-    }
-    this.idempotency.set(controlId, response);
-    return response;
+    return storeSettled(this.idempotency, controlId, response);
   }
+
+  private settlePlan(controlId: string, response: PlanControlResponse): PlanControlResponse {
+    return storeSettled(this.planIdempotency, controlId, response);
+  }
+}
+
+function storeSettled<K, V>(map: Map<K, V>, key: K, value: V): V {
+  if (map.size >= IDEMPOTENCY_CAP) {
+    const oldest = map.keys().next().value;
+    if (oldest !== undefined) {
+      map.delete(oldest);
+    }
+  }
+  map.set(key, value);
+  return value;
 }
 
 function ensureAccepted(response: PiRpcResponse): void {

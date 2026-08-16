@@ -12,6 +12,7 @@ import {
   isApprovalAuthorityRequest,
   isApprovalDecisionCommand,
   isOpaqueId,
+  isPlanControlCommand,
   isPromptSubmitCommand,
   isPushPreferences,
   isPushSubscriptionInput,
@@ -20,6 +21,7 @@ import {
   isRuntimeModelTicketRequest,
   isRuntimeSnapshotDto,
   type EnrollmentRequest,
+  type PlanControlResponse,
   type RuntimeIssueCode,
   type RuntimeControlResponse,
   type SyncCursor,
@@ -128,6 +130,7 @@ export async function startReadOnlyServer(
   const runtimeControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const runtimeTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
   const runtimeReconcileLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
+  const planControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const activeSockets = new Set<ActiveSocket>();
   // A runtime mutation is only valid from a device that also holds a live, authenticated
   // sync socket — a background or stale device can never steer the host.
@@ -148,6 +151,7 @@ export async function startReadOnlyServer(
       runtimeTicketLimiter,
       runtimeControlLimiter,
       runtimeReconcileLimiter,
+      planControlLimiter,
       isForegroundDevice,
     ).catch(() => sendJson(response, 400, { error: 'invalid_request' }));
   });
@@ -290,6 +294,7 @@ async function handleHttp(
   runtimeTicketLimiter: FixedWindowRateLimiter,
   runtimeControlLimiter: FixedWindowRateLimiter,
   runtimeReconcileLimiter: FixedWindowRateLimiter,
+  planControlLimiter: FixedWindowRateLimiter,
   isForegroundDevice: (deviceId: string, token: string) => boolean,
 ): Promise<void> {
   if (
@@ -527,7 +532,12 @@ async function handleHttp(
     // A bound slash submission consumes its one-use ticket through its own
     // authorized action, so the lane can be denied independently.
     const action = body.command === undefined ? 'prompt:submit' : 'commands:submit';
-    const ticketSession = auth.consumeTicket(body.ticket, ingress.origin, ingress.principal, action);
+    const ticketSession = auth.consumeTicket(
+      body.ticket,
+      ingress.origin,
+      ingress.principal,
+      action,
+    );
     if (
       ticketSession === null ||
       ticketSession.token !== session.token ||
@@ -706,7 +716,40 @@ async function handleHttp(
     }
     try {
       const result = await options.runtime.control(body);
-      sendJson(response, statusForRuntimeOutcome(result), result);
+      sendJson(response, statusForControlOutcome(result), result);
+    } catch {
+      sendRuntimeIssue(response, 'host-unavailable');
+    }
+    return;
+  }
+  if (ingress.path === '/api/plan/control') {
+    const body = await readJsonBody(request);
+    if (options.runtime === undefined || !isPlanControlCommand(body)) {
+      sendJson(response, 400, { error: 'invalid_plan_control' });
+      return;
+    }
+    // Both plan operations are one-use-ticketed, session-bound controls: the
+    // ticket binds the request to the authenticated session and foreground
+    // principal before any host dispatch is possible.
+    const ticketAccepted =
+      auth.consumeTicket(body.oneUseTicket, ingress.origin, ingress.principal, 'plan:control')
+        ?.token === session.token;
+    if (!ticketAccepted) {
+      sendJson(response, 401, { error: 'unauthorized' });
+      return;
+    }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (!planControlLimiter.consume(session.deviceId)) {
+      auth.metrics.rateLimited += 1;
+      sendJson(response, 429, { error: 'rate_limited' });
+      return;
+    }
+    try {
+      const result = await options.runtime.planControl(body);
+      sendJson(response, statusForControlOutcome(result), result);
     } catch {
       sendRuntimeIssue(response, 'host-unavailable');
     }
@@ -911,11 +954,12 @@ function actionForRequest(path: string): string | null {
   }
   if (path === '/api/runtime/ticket') return 'runtime-ticket:create';
   if (path === '/api/runtime/control') return 'runtime:control';
+  if (path === '/api/plan/control') return 'plan:control';
   if (path === '/api/commands/list') return 'commands:list';
   return null;
 }
 
-function statusForRuntimeOutcome(result: RuntimeControlResponse): number {
+function statusForControlOutcome(result: RuntimeControlResponse | PlanControlResponse): number {
   switch (result.outcome.status) {
     case 'accepted':
       return 202;

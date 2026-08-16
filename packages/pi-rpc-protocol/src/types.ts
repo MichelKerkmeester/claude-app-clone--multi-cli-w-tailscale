@@ -502,6 +502,8 @@ export interface RuntimeStateDto {
   readonly mode: RuntimeMode;
   readonly streaming: boolean;
   readonly updatedAt: string;
+  /** Relay-side plan projection; absent means the host has not published one. */
+  readonly plan?: PlanSnapshotDto;
 }
 
 export type RuntimeOperation =
@@ -659,6 +661,105 @@ export type RuntimeControlOutcome =
 
 export interface RuntimeControlResponse {
   readonly outcome: RuntimeControlOutcome;
+}
+
+// ── Plan mode and reviewed-plan execution control ────────────────────────────
+
+export const PLAN_VALIDITY_VALUES = ['none', 'valid', 'superseded', 'invalid'] as const;
+export type PlanValidityValue = (typeof PLAN_VALIDITY_VALUES)[number];
+
+/**
+ * Bounded, redacted plan artifact projection. The raw host artifact is never a
+ * DTO: only these allowlisted fields cross the relay, and the opaque plan token
+ * is bound by value only inside guarded control requests.
+ */
+export interface PlanArtifactDto extends JsonObject {
+  readonly planId: string;
+  readonly planRevision: number;
+  readonly title: string;
+  readonly summary: string;
+  readonly stepCount: number;
+  readonly approachCount: number;
+  readonly validity: Exclude<PlanValidityValue, 'none'>;
+  readonly occurredAt: string;
+}
+
+/** The relay's authoritative plan projection attached to runtime state. */
+export interface PlanSnapshotDto extends JsonObject {
+  readonly planId: string | null;
+  readonly planRevision: number;
+  readonly validity: PlanValidityValue;
+  readonly artifact: PlanArtifactDto | null;
+}
+
+/** Host-confirmed mode switch request; never a prompt-channel message. */
+export interface SetModeCommand extends JsonObject {
+  readonly type: 'set_mode';
+  readonly target: 'build' | 'plan';
+  readonly expectedRuntimeRevision: number;
+  readonly controlId: string;
+  readonly oneUseTicket: string;
+}
+
+/**
+ * Reviewed-plan execution request. The token is an opaque host-issued binding
+ * echoed by the phone; the exact plan binding, runtime revision and
+ * postRunMode contract are all guarded before any host dispatch.
+ */
+export interface ExecutePlanCommand extends JsonObject {
+  readonly type: 'execute_plan';
+  readonly planId: string;
+  readonly expectedPlanRevision: number;
+  readonly planToken: string;
+  readonly selectedApproachId?: string;
+  readonly expectedRuntimeRevision: number;
+  readonly postRunMode: 'plan';
+  readonly controlId: string;
+  readonly oneUseTicket: string;
+}
+
+export type PlanControlCommand = SetModeCommand | ExecutePlanCommand;
+
+export const PLAN_CONTROL_REASON_CODES = [
+  'stale_revision',
+  'stale_plan',
+  'unsupported_operation',
+  'runtime_unavailable',
+  'host_rejected',
+  'policy_blocked',
+  'delivery_unknown',
+] as const;
+export type PlanControlReasonCode = (typeof PLAN_CONTROL_REASON_CODES)[number];
+
+export type PlanControlOutcome =
+  | { readonly status: 'accepted'; readonly state: RuntimeStateDto }
+  | { readonly status: 'stale'; readonly state: RuntimeStateDto }
+  | {
+      readonly status: 'unsupported';
+      readonly reasonCode: 'unsupported_operation';
+      readonly issueCode?: 'unsupported';
+    }
+  | {
+      readonly status: 'unavailable';
+      readonly reasonCode: Exclude<
+        PlanControlReasonCode,
+        'unsupported_operation' | 'policy_blocked' | 'delivery_unknown'
+      >;
+      readonly issueCode?: RuntimeIssueCode;
+    }
+  | {
+      readonly status: 'policy_blocked';
+      readonly reasonCode: 'policy_blocked';
+      readonly issueCode?: 'unsupported';
+    }
+  | {
+      readonly status: 'delivery-unknown';
+      readonly reasonCode: 'delivery_unknown';
+      readonly issueCode?: 'delivery-unknown';
+    };
+
+export interface PlanControlResponse {
+  readonly outcome: PlanControlOutcome;
 }
 
 export type PromptAbortOutcome =

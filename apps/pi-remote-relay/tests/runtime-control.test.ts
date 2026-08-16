@@ -5,11 +5,14 @@
 import { describe, expect, it } from 'vitest';
 
 import type {
+  ExecutePlanCommand,
   PiRpcCommand,
   PiRpcEvent,
   PiRpcResponse,
+  PlanControlCommand,
   RuntimeControlCommand,
   RuntimeOperation,
+  SetModeCommand,
 } from '@pi-remote/pi-rpc-protocol';
 import { isRuntimeSnapshotDto, isRuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 
@@ -20,6 +23,8 @@ import {
   projectRuntimeState,
 } from '../src/store/redaction.js';
 import { RuntimeIssueError, RuntimeService } from '../src/runtime/runtime-service.js';
+
+const PLAN_TOKEN = 'token_plan_binding_abcdef0123456789';
 
 const SESSION = 'session_local';
 
@@ -83,6 +88,33 @@ class FakeSupervisor {
     }
   }
 
+  public emitPlanArtifact(
+    options: Partial<{
+      planId: string;
+      planRevision: number;
+      planToken: string;
+      validity: 'valid' | 'superseded' | 'invalid';
+    }> = {},
+  ): void {
+    for (const listener of this.eventListeners) {
+      listener({
+        type: 'extension_ui_request',
+        method: 'setPlan',
+        statusKey: 'pi-remote-plan-artifact',
+        plan: {
+          planId: options.planId ?? 'plan_007',
+          planRevision: options.planRevision ?? 1,
+          planToken: options.planToken ?? PLAN_TOKEN,
+          validity: options.validity ?? 'valid',
+          title: 'Harden the relay boundary',
+          summary: 'Redacted outline only',
+          stepCount: 4,
+          approachCount: 2,
+        },
+      } as unknown as PiRpcEvent);
+    }
+  }
+
   private respond(command: PiRpcCommand): PiRpcResponse {
     if (
       command.type === 'get_state' ||
@@ -126,8 +158,20 @@ class FakeSupervisor {
         this.thinkingLevel = (command as unknown as { level: string }).level;
         return ok({});
       case 'prompt': {
-        const mode =
-          (command as unknown as { message: string }).message === '/plan on' ? 'plan' : 'build';
+        if (this.hostReject) {
+          return {
+            type: 'response',
+            command: 'prompt',
+            success: false,
+            error: 'policy denied /Users/private token=SECRET',
+          };
+        }
+        const message = (command as unknown as { message: string }).message;
+        if (message === '/plan execute') {
+          queueMicrotask(() => this.emitPlanStatus('executing-plan'));
+          return ok({});
+        }
+        const mode = message === '/plan on' ? 'plan' : 'build';
         queueMicrotask(() => this.emitPlanStatus(mode));
         return ok({});
       }
@@ -159,6 +203,42 @@ function control(
   return operation.type === 'set_model'
     ? { ...base, expectedCatalogRevision: 1, operation }
     : { ...base, operation };
+}
+
+function setModeCommand(
+  target: 'build' | 'plan',
+  expectedRevision: number,
+  controlId = 'plan_control_1',
+): SetModeCommand {
+  return {
+    type: 'set_mode',
+    target,
+    expectedRuntimeRevision: expectedRevision,
+    controlId,
+    oneUseTicket: 'ticket_plan_mode_abcdef',
+  };
+}
+
+function executePlanCommand(options: Partial<ExecutePlanCommand> = {}): ExecutePlanCommand {
+  return {
+    type: 'execute_plan',
+    planId: 'plan_007',
+    expectedPlanRevision: 1,
+    planToken: PLAN_TOKEN,
+    expectedRuntimeRevision: 1,
+    postRunMode: 'plan',
+    controlId: 'plan_exec_1',
+    oneUseTicket: 'ticket_plan_exec_abcdef',
+    ...options,
+  };
+}
+
+/** The host-published preconditions for one reviewed-plan execution. */
+async function readyForExecution(fake: FakeSupervisor, svc: RuntimeService): Promise<void> {
+  await svc.hydrate();
+  fake.emitPlanArtifact();
+  const mode = await svc.planControl(setModeCommand('plan', 0, 'plan_mode_entry'));
+  expect(mode.outcome.status).toBe('accepted');
 }
 
 describe('runtime authority core', () => {
@@ -485,5 +565,184 @@ describe('runtime redaction projectors', () => {
     // The path-like command name was dropped; only the safe descriptor survives.
     expect(commands?.commands).toHaveLength(1);
     expect(commands?.commands[0]?.name).toBe('plan');
+  });
+});
+
+describe('plan control authority', () => {
+  it('accepts a host-confirmed mode switch and projects a token-free plan snapshot', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await svc.hydrate();
+    fake.emitPlanArtifact();
+
+    const response = await svc.planControl(setModeCommand('plan', 0));
+
+    expect(response.outcome.status).toBe('accepted');
+    if (response.outcome.status !== 'accepted') throw new Error('unreachable');
+    expect(response.outcome.state.mode).toBe('plan');
+    expect(response.outcome.state.revision).toBe(1);
+    expect(response.outcome.state.plan).toEqual({
+      planId: 'plan_007',
+      planRevision: 1,
+      validity: 'valid',
+      artifact: {
+        planId: 'plan_007',
+        planRevision: 1,
+        title: 'Harden the relay boundary',
+        summary: 'Redacted outline only',
+        stepCount: 4,
+        approachCount: 2,
+        validity: 'valid',
+        occurredAt: '2026-01-01T00:00:00.000Z',
+      },
+    });
+    expect(JSON.stringify(response)).not.toContain(PLAN_TOKEN);
+  });
+
+  it('executes only the exact reviewed-plan binding and returns to the plan contract', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await readyForExecution(fake, svc);
+
+    const response = await svc.planControl(executePlanCommand());
+
+    expect(response.outcome.status).toBe('accepted');
+    if (response.outcome.status !== 'accepted') throw new Error('unreachable');
+    expect(response.outcome.state.mode).toBe('executing-plan');
+    expect(response.outcome.state.revision).toBe(2);
+    expect(fake.settledCount).toBe(2);
+    expect(JSON.stringify(response)).not.toContain(PLAN_TOKEN);
+  });
+
+  it('rejects a mismatched plan binding, wrong token, or missing plan mode without dispatch', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await readyForExecution(fake, svc);
+
+    const cases: ExecutePlanCommand[] = [
+      executePlanCommand({ planId: 'plan_other', controlId: 'c_a' }),
+      executePlanCommand({ expectedPlanRevision: 9, controlId: 'c_b' }),
+      executePlanCommand({ planToken: 'token_wrong_binding_0000000000000', controlId: 'c_c' }),
+      executePlanCommand({ postRunMode: 'build', controlId: 'c_d' }),
+    ];
+    for (const command of cases) {
+      const response = await svc.planControl(command);
+      expect(response.outcome.status).toBe('stale');
+      expect(fake.settledCount).toBe(1);
+    }
+  });
+
+  it('fails closed when the host has not published a valid plan artifact', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await svc.hydrate();
+    fake.emitPlanArtifact({ validity: 'superseded' });
+    await svc.planControl(setModeCommand('plan', 0, 'plan_mode_superseded'));
+
+    const stale = await svc.planControl(executePlanCommand({ controlId: 'c_no_plan' }));
+    expect(stale.outcome.status).toBe('stale');
+    expect(fake.settledCount).toBe(1);
+
+    // A malformed artifact publication drops the binding entirely.
+    fake.emitPlanArtifact({ planToken: 'short' } as never);
+    const dropped = await svc.planControl(
+      executePlanCommand({ controlId: 'c_dropped', expectedRuntimeRevision: 1 }),
+    );
+    expect(dropped.outcome.status).toBe('stale');
+    expect(svc.getState()?.plan).toEqual({
+      planId: null,
+      planRevision: 0,
+      validity: 'none',
+      artifact: null,
+    });
+    expect(fake.settledCount).toBe(1);
+  });
+
+  it('lets ten repeated submissions with one control ID produce one host mutation', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await readyForExecution(fake, svc);
+
+    const command = executePlanCommand();
+    const settled = await svc.planControl(command);
+    const repeats = await Promise.all(Array.from({ length: 9 }, () => svc.planControl(command)));
+    expect(repeats.every((response) => response === settled)).toBe(true);
+    expect(fake.settledCount).toBe(2);
+    expect(repeats.every((response) => JSON.stringify(response).includes('accepted'))).toBe(true);
+  });
+
+  it('answers two clients acting on one revision with one accepted and one stale', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await svc.hydrate();
+
+    const [first, second] = await Promise.all([
+      svc.planControl(setModeCommand('plan', 0, 'client_a')),
+      svc.planControl(setModeCommand('plan', 0, 'client_b')),
+    ]);
+
+    const statuses = [first.outcome.status, second.outcome.status].sort();
+    expect(statuses).toEqual(['accepted', 'stale']);
+    expect(fake.settledCount).toBe(1);
+    expect(svc.getRevision()).toBe(1);
+  });
+
+  it('reports delivery-unknown on transport failure without any automatic second request', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await readyForExecution(fake, svc);
+
+    fake.rejectSettled = true;
+    const response = await svc.planControl(executePlanCommand({ controlId: 'c_delivery' }));
+
+    expect(response.outcome).toEqual({
+      status: 'delivery-unknown',
+      reasonCode: 'delivery_unknown',
+      issueCode: 'delivery-unknown',
+    });
+    expect(fake.settledCount).toBe(2);
+    // Replaying the same control ID returns the settled outcome and never retries.
+    expect(await svc.planControl(executePlanCommand({ controlId: 'c_delivery' }))).toBe(response);
+    expect(fake.settledCount).toBe(2);
+    // A fresh control ID also does not auto-retry the failed mutation.
+    expect(
+      (await svc.planControl(executePlanCommand({ controlId: 'c_delivery_2' }))).outcome.status,
+    ).toBe('delivery-unknown');
+    expect(fake.settledCount).toBe(3);
+  });
+
+  it('rejects stale runtime revisions and unavailable hosts with no pi dispatch', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await readyForExecution(fake, svc);
+
+    const stale = await svc.planControl(setModeCommand('plan', 9, 'c_stale'));
+    expect(stale.outcome.status).toBe('stale');
+    expect(fake.settledCount).toBe(1);
+
+    const unavailable = service(new FakeSupervisor());
+    const blocked = await unavailable.planControl(setModeCommand('plan', 0, 'c_unavail'));
+    expect(blocked.outcome).toEqual({
+      status: 'unavailable',
+      reasonCode: 'runtime_unavailable',
+      issueCode: 'host-unavailable',
+    });
+  });
+
+  it('maps a host rejection to a bounded policy outcome without exposing the raw error', async () => {
+    const fake = new FakeSupervisor();
+    const svc = service(fake);
+    await readyForExecution(fake, svc);
+
+    fake.hostReject = true;
+    const response = await svc.planControl(executePlanCommand({ controlId: 'c_reject' }));
+
+    expect(response.outcome).toEqual({
+      status: 'policy_blocked',
+      reasonCode: 'policy_blocked',
+      issueCode: 'unsupported',
+    });
+    expect(JSON.stringify(response)).not.toContain('/Users/private');
+    expect(JSON.stringify(response)).not.toContain('SECRET');
   });
 });

@@ -15,9 +15,18 @@ import {
   isEnrollmentQr,
   isApprovalDecisionCommand,
   isEnvelope,
+  isExecutePlanCommand,
+  isSetModeCommand,
+  isOpaqueToken,
   isPiRpcCommand,
   isPiRpcEvent,
   isPiRpcResponse,
+  isPlanArtifactDto,
+  isPlanControlCommand,
+  isPlanControlReasonCode,
+  isPlanControlResponse,
+  isPlanSnapshotDto,
+  isPlanValidityValue,
   isPromptAbortResponse,
   isPromptSubmitCommand,
   isPromptSubmitResponse,
@@ -37,6 +46,8 @@ import {
   isSlashSubmitIssueResponse,
   isSyncMessage,
   isTranscriptBlock,
+  PLAN_CONTROL_REASON_CODES,
+  PLAN_VALIDITY_VALUES,
   RUNTIME_ISSUE_CODES,
   SLASH_SUBMIT_ISSUE_CODES,
   sha256,
@@ -615,9 +626,9 @@ describe('runtime control guards', () => {
   });
 
   it('accepts opt-in aliases and argument hints only when bounded, unique, and safe', () => {
-    expect(
-      isCommandDescriptorDto({ ...descriptor, aliases: ['p'], argumentHint: 'on|off' }),
-    ).toBe(true);
+    expect(isCommandDescriptorDto({ ...descriptor, aliases: ['p'], argumentHint: 'on|off' })).toBe(
+      true,
+    );
     expect(isCommandDescriptorDto({ ...descriptor, aliases: ['p', 'planx'] })).toBe(true);
     expect(isCommandDescriptorDto({ ...descriptor, aliases: [] })).toBe(false);
     expect(isCommandDescriptorDto({ ...descriptor, aliases: ['p', 'p'] })).toBe(false);
@@ -750,5 +761,188 @@ describe('runtime control guards', () => {
     expect(isPiRpcCommand({ type: 'set_thinking_level', level: 'high' })).toBe(true);
     expect(isPiRpcCommand({ type: 'set_thinking_level' })).toBe(false);
     expect(isPiRpcCommand({ type: 'get_state' })).toBe(true);
+  });
+});
+
+describe('plan control guards', () => {
+  const artifact = {
+    planId: 'plan_001',
+    planRevision: 2,
+    title: 'Migrate the relay store',
+    summary: 'Redacted outline of the migration steps',
+    stepCount: 6,
+    approachCount: 2,
+    validity: 'valid',
+    occurredAt: '2026-01-01T00:00:00.000Z',
+  } as const;
+  const snapshot = {
+    planId: 'plan_001',
+    planRevision: 2,
+    validity: 'valid',
+    artifact,
+  } as const;
+  const setMode = {
+    type: 'set_mode',
+    target: 'plan',
+    expectedRuntimeRevision: 3,
+    controlId: 'control_plan_001',
+    oneUseTicket: 'ticket_plan_mode_abcdef',
+  } as const;
+  const executePlan = {
+    type: 'execute_plan',
+    planId: 'plan_001',
+    expectedPlanRevision: 2,
+    planToken: 'token_plan_binding_abcdef0123456789',
+    expectedRuntimeRevision: 3,
+    postRunMode: 'plan',
+    controlId: 'control_exec_001',
+    oneUseTicket: 'ticket_plan_exec_abcdef',
+  } as const;
+
+  it('accepts bounded plan artifacts and rejects extras, host-only values and unbounded fields', () => {
+    expect(isPlanArtifactDto(artifact)).toBe(true);
+    expect(isPlanArtifactDto({ ...artifact, extra: true })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, planToken: 'token_secret' })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, planId: 'a/b' })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, planId: '' })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, planRevision: -1 })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, planRevision: 1.5 })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, title: 'x'.repeat(501) })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, summary: '/Users/secret' })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, stepCount: 10_001 })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, approachCount: 101 })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, stepCount: -1 })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, validity: 'none' })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, validity: 'ready' })).toBe(false);
+    expect(isPlanArtifactDto({ ...artifact, occurredAt: 'not-a-date' })).toBe(false);
+  });
+
+  it('accepts consistent plan snapshots and rejects mismatched or token-bearing ones', () => {
+    expect(isPlanSnapshotDto(snapshot)).toBe(true);
+    expect(isPlanSnapshotDto({ ...snapshot, planId: null, artifact: null })).toBe(true);
+    expect(isPlanSnapshotDto({ ...snapshot, extra: true })).toBe(false);
+    expect(isPlanSnapshotDto({ ...snapshot, planToken: 'token_secret' })).toBe(false);
+    expect(isPlanSnapshotDto({ ...snapshot, planRevision: -1 })).toBe(false);
+    expect(isPlanSnapshotDto({ ...snapshot, planId: 'plan_other', artifact })).toBe(false);
+    expect(isPlanSnapshotDto({ ...snapshot, planRevision: 3, artifact })).toBe(false);
+    expect(isPlanSnapshotDto({ ...snapshot, validity: 'superseded', artifact })).toBe(false);
+    expect(isPlanSnapshotDto({ ...snapshot, planId: 'plan_001', artifact: null })).toBe(false);
+    expect(
+      isPlanSnapshotDto({ planId: 'plan_001', planRevision: 2, validity: 'valid', artifact: null }),
+    ).toBe(false);
+  });
+
+  it('accepts an exact set_mode request and rejects extras, bad targets and short tickets', () => {
+    expect(isSetModeCommand(setMode)).toBe(true);
+    expect(isSetModeCommand({ ...setMode, target: 'build' })).toBe(true);
+    expect(isSetModeCommand({ ...setMode, extra: true })).toBe(false);
+    expect(isSetModeCommand({ ...setMode, target: 'executing-plan' })).toBe(false);
+    expect(isSetModeCommand({ ...setMode, target: 'unknown' })).toBe(false);
+    expect(isSetModeCommand({ ...setMode, expectedRuntimeRevision: -1 })).toBe(false);
+    expect(isSetModeCommand({ ...setMode, expectedRuntimeRevision: 1.5 })).toBe(false);
+    expect(isSetModeCommand({ ...setMode, controlId: '' })).toBe(false);
+    expect(isSetModeCommand({ ...setMode, oneUseTicket: 'short' })).toBe(false);
+    expect(isSetModeCommand({ ...setMode, oneUseTicket: 'ticket has spaces' })).toBe(false);
+    expect(isSetModeCommand({ ...setMode, type: 'runtime.control' })).toBe(false);
+  });
+
+  it('rejects execute_plan without postRunMode plan, with extra keys or weak tokens', () => {
+    expect(isExecutePlanCommand(executePlan)).toBe(true);
+    expect(isExecutePlanCommand({ ...executePlan, selectedApproachId: 'approach_2' })).toBe(true);
+    expect(isExecutePlanCommand({ ...executePlan, extra: true })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, postRunMode: 'build' })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, postRunMode: undefined })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, planToken: 'token_short' })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, planToken: 42 })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, planId: 'plan/1' })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, expectedPlanRevision: -1 })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, expectedRuntimeRevision: 1.5 })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, selectedApproachId: '../escape' })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, controlId: 'x' })).toBe(false);
+    expect(isExecutePlanCommand({ ...executePlan, type: 'set_mode' })).toBe(false);
+  });
+
+  it('narrows plan control commands and validates the fail-closed outcome family', () => {
+    expect(isPlanControlCommand(setMode)).toBe(true);
+    expect(isPlanControlCommand(executePlan)).toBe(true);
+    expect(isPlanControlCommand({ ...executePlan, postRunMode: 'build' })).toBe(false);
+    expect(isPlanControlCommand({ type: 'set_theme' })).toBe(false);
+    expect(isOpaqueToken('ticket_plan_mode_abcdef')).toBe(true);
+    expect(isOpaqueToken('t!')).toBe(false);
+    expect(isOpaqueToken('/etc/passwd')).toBe(false);
+
+    const state = {
+      sessionId: 'session_local',
+      revision: 4,
+      model: { provider: 'openai', id: 'gpt-4o', label: 'GPT-4o' },
+      thinkingLevel: 'high',
+      availableThinkingLevels: ['high'],
+      mode: 'executing-plan',
+      streaming: false,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      plan: snapshot,
+    } as const;
+    expect(isRuntimeStateDto(state)).toBe(true);
+    expect(isRuntimeStateDto({ ...state, plan: { ...snapshot, planToken: 'x' } })).toBe(false);
+
+    expect(isPlanControlResponse({ outcome: { status: 'accepted', state } })).toBe(true);
+    expect(isPlanControlResponse({ outcome: { status: 'stale', state } })).toBe(true);
+    expect(
+      isPlanControlResponse({
+        outcome: { status: 'unsupported', reasonCode: 'unsupported_operation' },
+      }),
+    ).toBe(true);
+    expect(
+      isPlanControlResponse({
+        outcome: { status: 'unavailable', reasonCode: 'runtime_unavailable' },
+      }),
+    ).toBe(true);
+    expect(
+      isPlanControlResponse({
+        outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' },
+      }),
+    ).toBe(true);
+    expect(
+      isPlanControlResponse({
+        outcome: { status: 'policy_blocked', reasonCode: 'policy_blocked' },
+      }),
+    ).toBe(true);
+    expect(isPlanControlResponse({ outcome: { status: 'pending' } })).toBe(false);
+    expect(isPlanControlResponse({ outcome: { status: 'accepted', state }, extra: true })).toBe(
+      false,
+    );
+    expect(
+      isPlanControlResponse({
+        outcome: { status: 'unavailable', reasonCode: 'stale_catalog' },
+      }),
+    ).toBe(false);
+    expect(
+      isPlanControlResponse({
+        outcome: { status: 'unavailable', reasonCode: 'stale_plan' },
+      }),
+    ).toBe(true);
+    expect(
+      isPlanControlResponse({
+        outcome: { status: 'unsupported', reasonCode: 'unsupported_operation', issueCode: 'raw' },
+      }),
+    ).toBe(false);
+  });
+
+  it('pins the validity and reason code families', () => {
+    expect(PLAN_VALIDITY_VALUES).toEqual(['none', 'valid', 'superseded', 'invalid']);
+    expect(PLAN_VALIDITY_VALUES.every(isPlanValidityValue)).toBe(true);
+    expect(isPlanValidityValue('ready')).toBe(false);
+    expect(isPlanValidityValue(42)).toBe(false);
+    expect(PLAN_CONTROL_REASON_CODES).toEqual([
+      'stale_revision',
+      'stale_plan',
+      'unsupported_operation',
+      'runtime_unavailable',
+      'host_rejected',
+      'policy_blocked',
+      'delivery_unknown',
+    ]);
+    expect(PLAN_CONTROL_REASON_CODES.every(isPlanControlReasonCode)).toBe(true);
+    expect(isPlanControlReasonCode('stale_catalog')).toBe(false);
   });
 });

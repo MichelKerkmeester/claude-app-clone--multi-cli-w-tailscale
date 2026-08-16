@@ -32,6 +32,12 @@ import type {
   PiRpcEvent,
   PiRpcEventType,
   PiRpcResponse,
+  PlanArtifactDto,
+  PlanControlCommand,
+  PlanControlReasonCode,
+  PlanControlResponse,
+  PlanSnapshotDto,
+  PlanValidityValue,
   PromptAbortResponse,
   PromptSubmitCommand,
   PromptSubmitResponse,
@@ -50,6 +56,8 @@ import type {
   RuntimeStateDto,
   SessionCardDto,
   SessionChallengeResponse,
+  SetModeCommand,
+  ExecutePlanCommand,
   PushHintPayload,
   PushPreferences,
   PushSubscriptionInput,
@@ -65,6 +73,8 @@ import {
   MODEL_AVAILABILITIES,
   MODEL_AVAILABILITY_REASON_CODES,
   MODEL_INPUT_KINDS,
+  PLAN_CONTROL_REASON_CODES,
+  PLAN_VALIDITY_VALUES,
   RUNTIME_CONTROL_REASON_CODES,
   RUNTIME_ISSUE_CODES,
   RUNTIME_MODES,
@@ -111,6 +121,7 @@ const RPC_EVENT_TYPES = new Set<PiRpcEventType>([
 ]);
 
 const OPAQUE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{2,127}$/;
+const OPAQUE_TOKEN_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{15,255}$/;
 const ATTENTION_CLASSES = new Set<AttentionClass>(['needs_input', 'finished', 'error']);
 
 /** Return whether a value can be serialized as JSON without coercion. */
@@ -133,6 +144,11 @@ export function isJsonValue(value: unknown): value is JsonValue {
 /** Return whether a string is suitable as an opaque wire identifier. */
 export function isOpaqueId(value: unknown): value is string {
   return typeof value === 'string' && OPAQUE_ID_PATTERN.test(value);
+}
+
+/** Return whether a string is a long opaque secret-bearing token, never a path. */
+export function isOpaqueToken(value: unknown): value is string {
+  return typeof value === 'string' && OPAQUE_TOKEN_PATTERN.test(value);
 }
 
 export function isAttentionClass(value: unknown): value is AttentionClass {
@@ -770,16 +786,20 @@ export function isAvailableModelDto(value: unknown): value is AvailableModelDto 
 export function isRuntimeStateDto(value: unknown): value is RuntimeStateDto {
   return (
     isRecord(value) &&
-    hasOnlyKeys(value, [
-      'sessionId',
-      'revision',
-      'model',
-      'thinkingLevel',
-      'availableThinkingLevels',
-      'mode',
-      'streaming',
-      'updatedAt',
-    ]) &&
+    hasRequiredAndOptionalKeys(
+      value,
+      [
+        'sessionId',
+        'revision',
+        'model',
+        'thinkingLevel',
+        'availableThinkingLevels',
+        'mode',
+        'streaming',
+        'updatedAt',
+      ],
+      ['plan'],
+    ) &&
     isOpaqueId(value.sessionId) &&
     isNonNegativeSafeInteger(value.revision) &&
     (value.model === null || isAvailableModelDto(value.model)) &&
@@ -791,7 +811,8 @@ export function isRuntimeStateDto(value: unknown): value is RuntimeStateDto {
     typeof value.mode === 'string' &&
     RUNTIME_MODE_SET.has(value.mode as RuntimeMode) &&
     typeof value.streaming === 'boolean' &&
-    isTimestamp(value.updatedAt)
+    isTimestamp(value.updatedAt) &&
+    (value.plan === undefined || isPlanSnapshotDto(value.plan))
   );
 }
 
@@ -1069,6 +1090,172 @@ export function isPromptAbortResponse(value: unknown): value is PromptAbortRespo
   return false;
 }
 
+// ── Plan mode and reviewed-plan execution control ────────────────────────────
+
+const PLAN_VALIDITY_VALUE_SET = new Set<PlanValidityValue>(PLAN_VALIDITY_VALUES);
+const PLAN_CONTROL_REASON_CODE_SET = new Set<PlanControlReasonCode>(PLAN_CONTROL_REASON_CODES);
+const PLAN_TITLE_CAP = 500;
+const PLAN_SUMMARY_CAP = 2_000;
+const PLAN_STEP_CAP = 10_000;
+const PLAN_APPROACH_CAP = 100;
+
+/** Narrow an unknown value to one of the pinned plan validity values. */
+export function isPlanValidityValue(value: unknown): value is PlanValidityValue {
+  return typeof value === 'string' && PLAN_VALIDITY_VALUE_SET.has(value as PlanValidityValue);
+}
+
+/** Narrow an unknown value to one of the fixed plan control reason codes. */
+export function isPlanControlReasonCode(value: unknown): value is PlanControlReasonCode {
+  return (
+    typeof value === 'string' && PLAN_CONTROL_REASON_CODE_SET.has(value as PlanControlReasonCode)
+  );
+}
+
+/** Narrow an unknown value to the bounded, token-free plan artifact projection. */
+export function isPlanArtifactDto(value: unknown): value is PlanArtifactDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'planId',
+      'planRevision',
+      'title',
+      'summary',
+      'stepCount',
+      'approachCount',
+      'validity',
+      'occurredAt',
+    ]) &&
+    isOpaqueId(value.planId) &&
+    isNonNegativeSafeInteger(value.planRevision) &&
+    isSafeDisplayString(value.title, PLAN_TITLE_CAP) &&
+    isSafeDisplayString(value.summary, PLAN_SUMMARY_CAP) &&
+    isBoundedNonNegativeInteger(value.stepCount, PLAN_STEP_CAP) &&
+    isBoundedNonNegativeInteger(value.approachCount, PLAN_APPROACH_CAP) &&
+    typeof value.validity === 'string' &&
+    PLAN_VALIDITY_VALUE_SET.has(value.validity as PlanValidityValue) &&
+    value.validity !== 'none' &&
+    isTimestamp(value.occurredAt)
+  );
+}
+
+/** Narrow an unknown value to a consistent relay plan snapshot projection. */
+export function isPlanSnapshotDto(value: unknown): value is PlanSnapshotDto {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, ['planId', 'planRevision', 'validity', 'artifact']) ||
+    (value.planId !== null && !isOpaqueId(value.planId)) ||
+    !isNonNegativeSafeInteger(value.planRevision) ||
+    !isPlanValidityValue(value.validity) ||
+    (value.artifact !== null && !isPlanArtifactDto(value.artifact))
+  ) {
+    return false;
+  }
+  if (value.artifact === null) {
+    return value.planId === null;
+  }
+  return (
+    value.planId !== null &&
+    value.artifact.planId === value.planId &&
+    value.artifact.planRevision === value.planRevision &&
+    value.artifact.validity === value.validity
+  );
+}
+
+const SET_MODE_KEYS = ['type', 'target', 'expectedRuntimeRevision', 'controlId', 'oneUseTicket'];
+
+/** Narrow an unknown value to the exact host-confirmed mode switch request. */
+export function isSetModeCommand(value: unknown): value is SetModeCommand {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, SET_MODE_KEYS) &&
+    value.type === 'set_mode' &&
+    (value.target === 'build' || value.target === 'plan') &&
+    isNonNegativeSafeInteger(value.expectedRuntimeRevision) &&
+    isOpaqueId(value.controlId) &&
+    isOpaqueToken(value.oneUseTicket)
+  );
+}
+
+const EXECUTE_PLAN_KEYS = [
+  'type',
+  'planId',
+  'expectedPlanRevision',
+  'planToken',
+  'selectedApproachId',
+  'expectedRuntimeRevision',
+  'postRunMode',
+  'controlId',
+  'oneUseTicket',
+];
+
+/** Narrow an unknown value to the exact reviewed-plan execution request. */
+export function isExecutePlanCommand(value: unknown): value is ExecutePlanCommand {
+  return (
+    isRecord(value) &&
+    Object.keys(value).every((key) => EXECUTE_PLAN_KEYS.includes(key)) &&
+    value.type === 'execute_plan' &&
+    isOpaqueId(value.planId) &&
+    isNonNegativeSafeInteger(value.expectedPlanRevision) &&
+    isOpaqueToken(value.planToken) &&
+    (value.selectedApproachId === undefined || isOpaqueId(value.selectedApproachId)) &&
+    isNonNegativeSafeInteger(value.expectedRuntimeRevision) &&
+    // Execution always returns to the reviewed, read-only plan contract.
+    value.postRunMode === 'plan' &&
+    isOpaqueId(value.controlId) &&
+    isOpaqueToken(value.oneUseTicket)
+  );
+}
+
+/** Narrow an unknown value to one of the two guarded plan control commands. */
+export function isPlanControlCommand(value: unknown): value is PlanControlCommand {
+  return isSetModeCommand(value) || isExecutePlanCommand(value);
+}
+
+/** Narrow an unknown value to a fail-closed plan control response. */
+export function isPlanControlResponse(value: unknown): value is PlanControlResponse {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['outcome']) || !isRecord(value.outcome)) {
+    return false;
+  }
+  if (value.outcome.status === 'accepted' || value.outcome.status === 'stale') {
+    return (
+      hasOnlyKeys(value.outcome, ['status', 'state']) && isRuntimeStateDto(value.outcome.state)
+    );
+  }
+  if (value.outcome.status === 'unsupported') {
+    return (
+      hasRequiredAndOptionalKeys(value.outcome, ['status', 'reasonCode'], ['issueCode']) &&
+      value.outcome.reasonCode === 'unsupported_operation' &&
+      (value.outcome.issueCode === undefined || value.outcome.issueCode === 'unsupported')
+    );
+  }
+  if (value.outcome.status === 'policy_blocked') {
+    return (
+      hasRequiredAndOptionalKeys(value.outcome, ['status', 'reasonCode'], ['issueCode']) &&
+      value.outcome.reasonCode === 'policy_blocked' &&
+      (value.outcome.issueCode === undefined || value.outcome.issueCode === 'unsupported')
+    );
+  }
+  if (value.outcome.status === 'delivery-unknown') {
+    return (
+      hasRequiredAndOptionalKeys(value.outcome, ['status', 'reasonCode'], ['issueCode']) &&
+      value.outcome.reasonCode === 'delivery_unknown' &&
+      (value.outcome.issueCode === undefined || value.outcome.issueCode === 'delivery-unknown')
+    );
+  }
+  if (value.outcome.status === 'unavailable') {
+    return (
+      hasRequiredAndOptionalKeys(value.outcome, ['status', 'reasonCode'], ['issueCode']) &&
+      typeof value.outcome.reasonCode === 'string' &&
+      PLAN_CONTROL_REASON_CODE_SET.has(value.outcome.reasonCode as PlanControlReasonCode) &&
+      value.outcome.reasonCode !== 'unsupported_operation' &&
+      value.outcome.reasonCode !== 'policy_blocked' &&
+      value.outcome.reasonCode !== 'delivery_unknown' &&
+      (value.outcome.issueCode === undefined || isRuntimeIssueCode(value.outcome.issueCode))
+    );
+  }
+  return false;
+}
+
 function isNonNegativeSafeInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
@@ -1125,6 +1312,10 @@ function isSafeDisplayString(value: unknown, maxLength: number): value is string
 
 function isBoundedPositiveInteger(value: unknown): value is number {
   return isPositiveInteger(value) && value <= 1_000_000_000;
+}
+
+function isBoundedNonNegativeInteger(value: unknown, maximum: number): value is number {
+  return isNonNegativeSafeInteger(value) && value <= maximum;
 }
 
 function isModelPricingDto(value: unknown): boolean {

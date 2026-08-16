@@ -11,6 +11,7 @@ import type {
   JsonObject,
   JsonValue,
   ModelPricingDto,
+  PlanSnapshotDto,
   RuntimeMode,
   RuntimeModelCatalogDto,
   RuntimeSnapshotDto,
@@ -20,14 +21,26 @@ import {
   MODEL_AVAILABILITIES,
   MODEL_AVAILABILITY_REASON_CODES,
   isCommandCatalogDto,
+  isPlanSnapshotDto,
   isRuntimeModelCatalogDto,
   isRuntimeSnapshotDto,
   isRuntimeStateDto,
 } from '@pi-remote/pi-rpc-protocol';
 
+import type { ParsedPlanArtifact } from '../runtime/plan-status.js';
+
 const REDACTION_POLICY_VERSION = 1 as const;
 const PATH_KEYS = new Set(['cwd', 'fulloutputpath', 'path', 'sessionfile', 'workspacepath']);
-const SECRET_KEYS = new Set(['apikey', 'authorization', 'cookie', 'password', 'secret', 'token']);
+const SECRET_KEYS = new Set([
+  'apikey',
+  'authorization',
+  'cookie',
+  'password',
+  'secret',
+  'token',
+  // Any spelling of the opaque plan binding key is a secret until proven otherwise.
+  'plantoken',
+]);
 const PRIVATE_TEXT_KEYS = new Set(['prompt']);
 const SECRET_ASSIGNMENT_PATTERN =
   /\b(api[_-]?key|authorization|cookie|password|secret|token)\s*[:=]\s*[^\s,;]+/gi;
@@ -220,6 +233,7 @@ export function projectRuntimeState(
     readonly mode: RuntimeMode;
     readonly availableThinkingLevels: readonly string[];
     readonly updatedAt: string;
+    readonly plan?: PlanSnapshotDto;
   },
 ): RuntimeStateDto | null {
   if (!isPlainObject(rawState)) {
@@ -237,6 +251,7 @@ export function projectRuntimeState(
     mode: options.mode,
     streaming: rawState.streaming === true,
     updatedAt: options.updatedAt,
+    ...(options.plan === undefined ? {} : { plan: options.plan }),
   };
   return isRuntimeStateDto(dto) ? dto : null;
 }
@@ -259,6 +274,7 @@ export function projectRuntimeSnapshot(
     readonly catalogRevision: number;
     readonly mode: RuntimeMode;
     readonly updatedAt: string;
+    readonly plan?: PlanSnapshotDto;
   },
 ): RuntimeSnapshotDto | null {
   const availableThinkingLevels = projectRuntimeThinkingLevels(rawLevels);
@@ -269,6 +285,7 @@ export function projectRuntimeSnapshot(
     mode: options.mode,
     availableThinkingLevels,
     updatedAt: options.updatedAt,
+    ...(options.plan === undefined ? {} : { plan: options.plan }),
   });
   if (state === null) return null;
   const models = projectRuntimeModelCatalog(rawModels, {
@@ -281,6 +298,58 @@ export function projectRuntimeSnapshot(
   if (models === null) return null;
   const snapshot = { sessionId: options.sessionId, state, models };
   return isRuntimeSnapshotDto(snapshot) ? snapshot : null;
+}
+
+/**
+ * Project the relay's in-memory plan state into the token-free browser snapshot.
+ * The opaque plan binding never crosses this projector; only the allowlisted
+ * redacted fields survive.
+ */
+export function projectPlanSnapshot(
+  parsed: ParsedPlanArtifact | null,
+  occurredAt: string,
+): PlanSnapshotDto {
+  if (parsed === null) {
+    return { planId: null, planRevision: 0, validity: 'none', artifact: null };
+  }
+  const snapshot: PlanSnapshotDto = {
+    planId: parsed.planId,
+    planRevision: parsed.planRevision,
+    validity: parsed.validity,
+    artifact: {
+      planId: parsed.planId,
+      planRevision: parsed.planRevision,
+      title: parsed.title,
+      summary: parsed.summary,
+      stepCount: parsed.stepCount,
+      approachCount: parsed.approachCount,
+      validity: parsed.validity,
+      occurredAt,
+    },
+  };
+  return isPlanSnapshotDto(snapshot)
+    ? snapshot
+    : { planId: null, planRevision: 0, validity: 'none', artifact: null };
+}
+
+/**
+ * True when a transcript block is the projection residue of a plan-mode control
+ * publication. Such blocks are control-plane, never user content, so they are
+ * suppressed before persistence, replay, sync or broadcast.
+ */
+export function isControlPlaneProjection(payload: unknown): boolean {
+  if (
+    !isPlainObject(payload) ||
+    payload.kind !== 'plan' ||
+    !Array.isArray(payload.items) ||
+    payload.items.length !== 1 ||
+    !isPlainObject(payload.items[0]) ||
+    payload.items[0].done !== false
+  ) {
+    return false;
+  }
+  const text = payload.items[0].text;
+  return typeof text === 'string' && /^Extension requested setStatus$/.test(text);
 }
 
 export function projectAvailableModel(row: unknown): AvailableModelDto | null {

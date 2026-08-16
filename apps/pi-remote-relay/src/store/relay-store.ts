@@ -16,7 +16,7 @@ import type {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { MigrationRunner } from './migrations.js';
-import { redactEnvelope } from './redaction.js';
+import { isControlPlaneProjection, redactEnvelope } from './redaction.js';
 
 const DEFAULT_RETENTION_EVENTS = 1_000;
 const MAX_RETENTION_EVENTS = 10_000;
@@ -86,6 +86,10 @@ export class RelayStore {
       throw new TypeError('Relay refused an invalid envelope before persistence.');
     }
     const envelope = redactEnvelope(candidate);
+    if (envelope.kind === 'transcript.block' && isControlPlaneProjection(envelope.payload)) {
+      // Control-plane residue is never persisted, replayed, synced or broadcast.
+      return { inserted: false, envelope };
+    }
     const transaction = this.database.transaction((): AppendResult => {
       const duplicate = this.findDuplicate(envelope);
       if (duplicate !== null) {

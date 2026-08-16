@@ -22,6 +22,7 @@ import { MutationPolicy } from '../../src/policy/mutation-policy.js';
 import { serializePushHint } from '../../src/push/push-service.js';
 import { SyncHub } from '../../src/replay/sync.js';
 import { RelayStore } from '../../src/store/relay-store.js';
+import { projectCommandCatalog } from '../../src/store/redaction.js';
 
 const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
@@ -297,6 +298,64 @@ describe('consolidated fail-closed negative controls', () => {
     } finally {
       store.close();
     }
+  });
+
+  it('projects command catalogs without host internals or unsafe names', () => {
+    const canary = 'CANARY_COMMAND_SECRET_opaque_7';
+    const catalog = projectCommandCatalog(
+      {
+        commands: [
+          {
+            name: 'plan',
+            description: 'Toggle plan',
+            source: 'extension',
+            path: '/Users/example/private/plan.ts',
+            filename: 'plan.ts',
+            location: '/src/plan.ts:12',
+            prompt: 'secret prompt body',
+          },
+          { name: 'compact', description: `token=${canary}`, source: 'prompt' },
+          { name: 'admin', description: 'Admin', source: 'prompt', apiKey: `sk-${canary}` },
+          { name: '/usr/bin/evil', description: 'path name', source: 'prompt' },
+          { name: 'bidi\u202e', description: 'bidi', source: 'prompt' },
+          { name: 'ctl\u0007', description: 'control', source: 'prompt' },
+          { name: '!bash', description: 'bang', source: 'prompt' },
+        ],
+      },
+      'session_local',
+      1,
+      { hostEpoch: 'epoch_security', sessionRevision: 0 },
+    );
+    expect(catalog).not.toBeNull();
+    const serialized = JSON.stringify(catalog);
+    for (const forbidden of [
+      '/Users/',
+      'plan.ts',
+      'location',
+      '/src/plan.ts',
+      'prompt body',
+      canary,
+      'sk-',
+      '/usr/bin/evil',
+      'bidi',
+      'ctl',
+      '!bash',
+      'filename',
+      'apiKey',
+      'path',
+    ]) {
+      expect(serialized.includes(forbidden)).toBe(false);
+    }
+    // Only canonical, safe descriptors survive; secrets and paths never become copy.
+    expect(catalog?.commands.map((command) => command.name)).toEqual(['plan', 'compact', 'admin']);
+    expect(catalog?.commands[0]).toMatchObject({
+      description: 'Toggle plan',
+      enabled: true,
+      requiresConfirmation: false,
+    });
+    // The secret-bearing description is redacted to null rather than leaked.
+    expect(catalog?.commands[1]?.description).toBeNull();
+    expect(catalog?.commands[2]).toMatchObject({ name: 'admin', description: 'Admin' });
   });
 
   it('keeps push bytes content-free even when the source object carries forbidden fields', () => {

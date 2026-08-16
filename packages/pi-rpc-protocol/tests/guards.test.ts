@@ -9,6 +9,7 @@ import {
   canonicalizeApprovalAction,
   enrollmentProof,
   isAvailableModelDto,
+  isCommandBindingDto,
   isCommandCatalogDto,
   isCommandDescriptorDto,
   isEnrollmentQr,
@@ -32,9 +33,12 @@ import {
   isRuntimeSnapshotDto,
   isRuntimeStateDto,
   isSessionCardDto,
+  isSlashSubmitIssueCode,
+  isSlashSubmitIssueResponse,
   isSyncMessage,
   isTranscriptBlock,
   RUNTIME_ISSUE_CODES,
+  SLASH_SUBMIT_ISSUE_CODES,
   sha256,
 } from '../src/index.js';
 
@@ -532,17 +536,131 @@ describe('runtime control guards', () => {
     expect(isCommandDescriptorDto({ ...descriptor, disabledReason: 'x'.repeat(501) })).toBe(false);
 
     const catalog = {
+      hostEpoch: 'epoch_001',
       sessionId: 'session_local',
-      revision: 2,
+      sessionRevision: 2,
+      catalogRevision: 3,
       commands: [descriptor, { ...descriptor, name: 'compact', source: 'skill' }],
     } as const;
     expect(isCommandCatalogDto(catalog)).toBe(true);
+    // The pre-versioning shape is a stale/incompatible shape and is rejected whole.
+    expect(
+      isCommandCatalogDto({ sessionId: 'session_local', revision: 2, commands: catalog.commands }),
+    ).toBe(false);
     expect(isCommandCatalogDto({ ...catalog, extra: true })).toBe(false);
-    expect(isCommandCatalogDto({ ...catalog, revision: -1 })).toBe(false);
-    expect(isCommandCatalogDto({ ...catalog, revision: 2.5 })).toBe(false);
+    expect(isCommandCatalogDto({ ...catalog, sessionRevision: -1 })).toBe(false);
+    expect(isCommandCatalogDto({ ...catalog, catalogRevision: 2.5 })).toBe(false);
+    expect(isCommandCatalogDto({ ...catalog, hostEpoch: 42 })).toBe(false);
     expect(
       isCommandCatalogDto({ ...catalog, commands: [{ ...descriptor, source: 'script' }] }),
     ).toBe(false);
+  });
+
+  it('accepts exact slash bindings and rejects unknown, non-canonical, and stale shapes', () => {
+    const binding = {
+      hostEpoch: 'epoch_001',
+      name: 'review:1',
+      sessionRevision: 2,
+      catalogRevision: 3,
+    } as const;
+    expect(isCommandBindingDto(binding)).toBe(true);
+    expect(isCommandBindingDto({ ...binding, extra: true })).toBe(false);
+    expect(isCommandBindingDto({ ...binding, name: '../review' })).toBe(false);
+    expect(isCommandBindingDto({ ...binding, name: '/review' })).toBe(false);
+    expect(isCommandBindingDto({ ...binding, name: 'review cmd' })).toBe(false);
+    expect(isCommandBindingDto({ ...binding, sessionRevision: -1 })).toBe(false);
+    expect(isCommandBindingDto({ ...binding, catalogRevision: 1.5 })).toBe(false);
+    expect(isCommandBindingDto({ ...binding, hostEpoch: 7 })).toBe(false);
+  });
+
+  it('accepts slash submissions only with a valid binding and never with steering', () => {
+    const command = {
+      type: 'prompt.submit',
+      submissionId: 'prompt_slash_001',
+      sessionId: 'session_local',
+      message: '/plan on',
+      ticket: 'ticket_prompt_001',
+      command: { hostEpoch: 'epoch_001', name: 'plan', sessionRevision: 2, catalogRevision: 3 },
+    } as const;
+    expect(isPromptSubmitCommand(command)).toBe(true);
+    expect(isPromptSubmitCommand({ ...command, streamingBehavior: 'steer' })).toBe(false);
+    expect(isPromptSubmitCommand({ ...command, streamingBehavior: 'followUp' })).toBe(false);
+    // An undefined binding serializes as absent and reads as an ordinary prompt.
+    expect(isPromptSubmitCommand({ ...command, command: undefined })).toBe(true);
+    expect(
+      isPromptSubmitCommand({ ...command, command: { ...command.command, name: '../plan' } }),
+    ).toBe(false);
+    expect(
+      isPromptSubmitCommand({ ...command, command: { ...command.command, sessionRevision: -1 } }),
+    ).toBe(false);
+    expect(
+      isPromptSubmitCommand({ ...command, command: { ...command.command, extra: true } }),
+    ).toBe(false);
+    // Without a binding the ordinary prompt shape keeps steering.
+    const { command: _binding, ...ordinary } = command;
+    expect(isPromptSubmitCommand({ ...ordinary, streamingBehavior: 'followUp' })).toBe(true);
+    expect(isPromptSubmitCommand({ ...ordinary, streamingBehavior: 'steer' })).toBe(true);
+    expect(isPromptSubmitCommand(ordinary)).toBe(true);
+  });
+
+  it('rejects control, bidi, path-like, and oversized descriptor names', () => {
+    expect(isCommandDescriptorDto({ ...descriptor, name: 'plan\u0007' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: 'plan\u001b' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: 'plan\u202e' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: '../plan' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: 'plan$' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: '!bash' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: 'x'.repeat(201) })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, name: 'plan cmd' })).toBe(false);
+  });
+
+  it('accepts opt-in aliases and argument hints only when bounded, unique, and safe', () => {
+    expect(
+      isCommandDescriptorDto({ ...descriptor, aliases: ['p'], argumentHint: 'on|off' }),
+    ).toBe(true);
+    expect(isCommandDescriptorDto({ ...descriptor, aliases: ['p', 'planx'] })).toBe(true);
+    expect(isCommandDescriptorDto({ ...descriptor, aliases: [] })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, aliases: ['p', 'p'] })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, aliases: ['/p'] })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, aliases: ['p ', 'q'] })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, aliases: Array(17).fill('a') })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, argumentHint: 'x'.repeat(501) })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, argumentHint: '/Users/x' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, argumentHint: 'Bearer sk-LEAK' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, argumentHint: '' })).toBe(false);
+    expect(isCommandDescriptorDto({ ...descriptor, argumentHint: null })).toBe(true);
+  });
+
+  it('keeps cross-session rejection at the relay boundary, not in the shape guard', () => {
+    const catalog = {
+      hostEpoch: 'epoch_001',
+      sessionId: 'session_other',
+      sessionRevision: 0,
+      catalogRevision: 1,
+      commands: [descriptor],
+    } as const;
+    // The guard validates shape only; the relay rejects foreign sessions before Pi.
+    expect(isCommandCatalogDto(catalog)).toBe(true);
+    const command = {
+      type: 'prompt.submit',
+      submissionId: 'prompt_cross_session',
+      sessionId: 'session_other',
+      message: '/plan on',
+      ticket: 'ticket_prompt_001',
+      command: { hostEpoch: 'epoch_001', name: 'plan', sessionRevision: 0, catalogRevision: 1 },
+    } as const;
+    expect(isPromptSubmitCommand(command)).toBe(true);
+  });
+
+  it('accepts only the fixed slash submission issue codes and exact response shapes', () => {
+    expect(SLASH_SUBMIT_ISSUE_CODES).toEqual(['stale_catalog', 'command_denied']);
+    expect(SLASH_SUBMIT_ISSUE_CODES.every(isSlashSubmitIssueCode)).toBe(true);
+    expect(isSlashSubmitIssueCode('raw host rejection')).toBe(false);
+    expect(isSlashSubmitIssueCode('stale')).toBe(false);
+    expect(isSlashSubmitIssueResponse({ error: 'stale_catalog' })).toBe(true);
+    expect(isSlashSubmitIssueResponse({ error: 'command_denied' })).toBe(true);
+    expect(isSlashSubmitIssueResponse({ error: 'stale_catalog', reason: 'x' })).toBe(false);
+    expect(isSlashSubmitIssueResponse({ error: 'pi_unavailable' })).toBe(false);
   });
 
   it('accepts every runtime control outcome and rejects stray statuses and malformed outcomes', () => {

@@ -19,6 +19,7 @@ export {
   RUNTIME_CONTROL_REASON_CODES,
   RUNTIME_ISSUE_CODES,
   RUNTIME_MODES,
+  SLASH_SUBMIT_ISSUE_CODES,
 } from './types.js';
 
 export {
@@ -39,6 +40,7 @@ export {
   isAttentionItemDto,
   isAttentionResolutionDto,
   isAvailableModelDto,
+  isCommandBindingDto,
   isCommandCatalogDto,
   isCommandDescriptorDto,
   isDevicePublicKeyJwk,
@@ -68,6 +70,8 @@ export {
   isRuntimeStateDto,
   isSessionCardDto,
   isSessionChallengeResponse,
+  isSlashSubmitIssueCode,
+  isSlashSubmitIssueResponse,
   isSyncMessage,
   isTranscriptBlock,
   isTranscriptPageDto,
@@ -99,6 +103,7 @@ export type {
   ModelAvailabilityReasonCode,
   ModelInputKind,
   ModelPricingDto,
+  CommandBindingDto,
   CommandCatalogDto,
   CommandDescriptorDto,
   CommandSource,
@@ -147,6 +152,8 @@ export type {
   RuntimeStateDto,
   SessionCardDto,
   SessionChallengeResponse,
+  SlashSubmitIssueCode,
+  SlashSubmitIssueResponse,
   SteerCommand,
   SyncCursor,
   SyncDelta,

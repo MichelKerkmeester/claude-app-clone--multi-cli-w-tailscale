@@ -133,6 +133,10 @@ function markRedaction(state: RedactionState, reason: string): void {
 
 const MODEL_CATALOG_CAP = 200;
 const COMMAND_CATALOG_CAP = 500;
+const COMMAND_ALIAS_CAP = 16;
+// Identity used only by legacy projector callers that predate versioned catalogs;
+// the command service always passes the live host epoch.
+const DEFAULT_COMMAND_HOST_EPOCH = 'epoch_host_local';
 
 /** Project a raw pi model list into the bounded, path-free browser catalog. */
 export function projectRuntimeModelCatalog(
@@ -171,11 +175,17 @@ export function projectRuntimeModelCatalog(
   return isRuntimeModelCatalogDto(dto) ? dto : null;
 }
 
-/** Project a raw pi command list into the bounded, path-free browser catalog. */
+/**
+ * Project a raw pi command list into the bounded, path-free, versioned browser
+ * catalog. The command service supplies the live host epoch and session revision;
+ * the legacy positional form keeps pre-versioning callers working with the
+ * placeholder identity above.
+ */
 export function projectCommandCatalog(
   rawData: unknown,
   sessionId: string,
   revision: number,
+  options: { readonly hostEpoch?: string; readonly sessionRevision?: number } = {},
 ): CommandCatalogDto | null {
   const rows = extractRows(rawData, 'commands');
   if (rows === null) {
@@ -191,7 +201,13 @@ export function projectCommandCatalog(
       commands.push(descriptor);
     }
   }
-  const dto = { sessionId, revision, commands };
+  const dto: CommandCatalogDto = {
+    hostEpoch: options.hostEpoch ?? DEFAULT_COMMAND_HOST_EPOCH,
+    sessionId,
+    sessionRevision: options.sessionRevision ?? 0,
+    catalogRevision: revision,
+    commands,
+  };
   return isCommandCatalogDto(dto) ? dto : null;
 }
 
@@ -308,20 +324,53 @@ function projectCommandDescriptor(row: unknown): CommandDescriptorDto | null {
   if (!isPlainObject(row)) {
     return null;
   }
-  const name = pathFreeToken(row.name, 200);
+  const name = canonicalCommandName(row.name);
   if (name === null) {
     return null;
   }
   const source: CommandSource =
     row.source === 'extension' || row.source === 'skill' ? row.source : 'prompt';
+  const aliases = projectAliases(row.aliases);
+  const argumentHint =
+    row.argumentHint === undefined ? undefined : safeDisplayString(row.argumentHint, 500);
   return {
     name,
-    description: boundedString(row.description, 2_000),
+    description: safeDisplayString(row.description, 2_000),
     source,
     enabled: row.enabled !== false,
-    disabledReason: boundedString(row.disabledReason, 500),
+    disabledReason: safeDisplayString(row.disabledReason, 500),
     requiresConfirmation: row.requiresConfirmation === true,
+    ...(aliases === null ? {} : { aliases }),
+    ...(argumentHint === null || argumentHint === undefined ? {} : { argumentHint }),
   };
+}
+
+/** Keep only canonical, unique aliases; drop the field when none survive. */
+function projectAliases(value: unknown): readonly string[] | null {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+  const aliases: string[] = [];
+  for (const alias of value) {
+    if (aliases.length >= COMMAND_ALIAS_CAP) {
+      break;
+    }
+    const name = canonicalCommandName(alias);
+    if (name !== null && !aliases.includes(name)) {
+      aliases.push(name);
+    }
+  }
+  return aliases.length === 0 ? null : aliases;
+}
+
+/** One canonical command token: no leading slash, whitespace, path, or control/bidi characters. */
+function canonicalCommandName(value: unknown): string | null {
+  return typeof value === 'string' &&
+    value.length > 0 &&
+    value.length <= 200 &&
+    /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u.test(value)
+    ? value
+    : null;
 }
 
 function extractRows(data: unknown, key: string): unknown[] | null {
@@ -349,10 +398,6 @@ function runtimeLevelToken(value: unknown): string | null {
     /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u.test(value)
     ? value
     : null;
-}
-
-function boundedString(value: unknown, max: number): string | null {
-  return typeof value === 'string' && value.length <= max ? value : null;
 }
 
 function pathFreeToken(value: unknown, max: number): string | null {

@@ -18,9 +18,11 @@ import {
   isRuntimeStateDto,
   isSessionCardDto,
   isPromptSubmitResponse,
+  isSlashSubmitIssueResponse,
   isSyncMessage,
   isTranscriptPageDto,
   isWebSocketTicketResponse,
+  type CommandBindingDto,
   type CommandCatalogDto,
   type PromptAbortResponse,
   type RuntimeControlCommand,
@@ -35,6 +37,7 @@ import {
   type AcceptEditsGrantDto,
   type ApprovalCardDto,
   type ApprovalDecision,
+  type SlashSubmitIssueCode,
   type SyncCursor,
   type SyncMessage,
   type TranscriptBlock,
@@ -78,6 +81,17 @@ export class RuntimeRelayError extends Error {
     this.name = 'RuntimeRelayError';
     this.issueCode = issueCode;
     this.retryAfterMs = retryAfterMs;
+  }
+}
+
+/** A slash submission the relay rejected; never retried and never forwarded. */
+export class SlashSubmitError extends Error {
+  readonly reasonCode: SlashSubmitIssueCode;
+
+  constructor(reasonCode: SlashSubmitIssueCode) {
+    super(reasonCode === 'stale_catalog' ? 'Commands changed on the host.' : 'Command is not available.');
+    this.name = 'SlashSubmitError';
+    this.reasonCode = reasonCode;
   }
 }
 
@@ -136,6 +150,41 @@ export async function submitPrompt(
     throw new Error('Relay returned an invalid prompt acknowledgement.');
   }
   return payload.block;
+}
+
+/**
+ * Submit one explicit slash command. A fresh one-use ticket is obtained
+ * immediately before the write, and the relay revalidates the bound host,
+ * session, and catalog revisions before any forwarding; stale and denied
+ * outcomes throw typed errors and are never retried automatically.
+ */
+export async function submitSlashCommand(
+  sessionId: string,
+  submissionId: string,
+  message: string,
+  binding: CommandBindingDto,
+  signal?: AbortSignal,
+): Promise<TextBlock> {
+  const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
+  if (!isWebSocketTicketResponse(ticketPayload)) {
+    throw new Error('Relay returned an invalid command ticket.');
+  }
+  const payload = await postJson(
+    '/api/prompt/submit',
+    {
+      type: 'prompt.submit',
+      submissionId,
+      sessionId,
+      message,
+      ticket: ticketPayload.ticket,
+      command: binding,
+    },
+    signal,
+    [202, 403, 409],
+  );
+  if (isPromptSubmitResponse(payload)) return payload.block;
+  if (isSlashSubmitIssueResponse(payload)) throw new SlashSubmitError(payload.error);
+  throw new Error('Relay returned an invalid slash submission response.');
 }
 
 export async function fetchRuntimeState(signal?: AbortSignal): Promise<RuntimeStateDto> {

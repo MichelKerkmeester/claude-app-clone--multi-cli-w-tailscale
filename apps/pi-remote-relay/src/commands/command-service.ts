@@ -1,11 +1,15 @@
 // ───────────────────────────────────────────────────────────────────
-// MODULE: Filtered Command Catalog Service
+// MODULE: Versioned Command Catalog Authority
 // ───────────────────────────────────────────────────────────────────
 
+import { randomUUID } from 'node:crypto';
+
 import type {
+  CommandBindingDto,
   CommandCatalogDto,
   CommandDescriptorDto,
   PiRpcResponse,
+  SlashSubmitIssueCode,
 } from '@pi-remote/pi-rpc-protocol';
 
 import type { RpcSupervisor } from '../rpc/supervisor.js';
@@ -17,50 +21,115 @@ import { projectCommandCatalog } from '../store/redaction.js';
 const PRIVILEGED_COMMAND_PATTERN =
   /credential|password|secret|token|api[-_]?key|authoriz|login|logout|session|reload|share|install|uninstall|package|trust|revoke|reset|delete|shutdown|exit|quit/i;
 
+export type CommandAvailability = 'idle' | 'running';
+
+/** Fail-closed verdict for one explicit slash submission binding. */
+export type SlashSubmissionVerdict = 'allowed' | SlashSubmitIssueCode;
+
 export interface CommandServiceOptions {
   readonly sessionId: string;
+  /** Explicit host generation identity; omitted only in tests. */
+  readonly hostEpoch?: string;
 }
 
-/** Expose only a safe, redacted slice of the host command catalog. */
+/**
+ * The relay's sole authority for what a phone may discover and submit as a slash
+ * command. Snapshots are complete replacements bound to the live host epoch,
+ * session revision, and catalog revision; there is no fallback catalog and a
+ * submission that cannot be proven current and allowed is denied before Pi sees it.
+ */
 export class CommandService {
-  private revision = 0;
+  private hostEpoch: string;
+  private sessionRevision = 0;
+  private catalogRevision = 0;
+  private availability: CommandAvailability = 'idle';
+  private snapshot: CommandCatalogDto | null = null;
   private allowedNames = new Set<string>();
 
   public constructor(
     private readonly supervisor: RpcSupervisor,
     private readonly options: CommandServiceOptions,
-  ) {}
+  ) {
+    this.hostEpoch = options.hostEpoch ?? `epoch_${randomUUID()}`;
+  }
 
-  /** Fetch, redact, and safe-filter the host commands, bumping the catalog revision. */
+  /** Fetch, redact, safe-filter, and atomically replace the complete catalog snapshot. */
   public async listCommands(): Promise<CommandCatalogDto> {
-    const revision = this.revision;
     const response = await this.supervisor.send({ type: 'get_commands' });
-    const projected = projectCommandCatalog(dataOf(response), this.options.sessionId, revision);
+    const projected = projectCommandCatalog(dataOf(response), this.options.sessionId, this.catalogRevision, {
+      hostEpoch: this.hostEpoch,
+      sessionRevision: this.sessionRevision,
+    });
     if (projected === null) {
       throw new Error('host command catalog could not be projected');
     }
     const commands = projected.commands.filter(isSafeCommand);
-    this.revision = revision + 1;
+    if (this.snapshot === null || !sameCommandSet(this.snapshot.commands, commands)) {
+      this.catalogRevision += 1;
+    }
+    this.snapshot = {
+      hostEpoch: this.hostEpoch,
+      sessionId: this.options.sessionId,
+      sessionRevision: this.sessionRevision,
+      catalogRevision: this.catalogRevision,
+      commands,
+    };
     this.allowedNames = new Set(commands.map((command) => command.name));
-    return { sessionId: this.options.sessionId, revision, commands };
+    return this.snapshot;
+  }
+
+  /** The last complete bounded snapshot, or null before the first host read. */
+  public getSnapshot(): CommandCatalogDto | null {
+    return this.snapshot;
+  }
+
+  public getAvailability(): CommandAvailability {
+    return this.availability;
+  }
+
+  /** Record a settled-availability transition; every change ages out prior bindings. */
+  public setAvailability(availability: CommandAvailability): void {
+    if (this.availability !== availability) {
+      this.availability = availability;
+      this.sessionRevision += 1;
+    }
+  }
+
+  /** Drop everything a previous host generation proved; nothing may outlive it. */
+  public invalidate(): void {
+    this.hostEpoch = `epoch_${randomUUID()}`;
+    this.snapshot = null;
+    this.allowedNames.clear();
+    this.availability = 'idle';
   }
 
   /**
-   * Revalidate a leading-slash prompt against the freshly filtered catalog. A slash
-   * command the phone may not see must never be smuggled through the prompt path.
+   * Fail-closed revalidation for one explicit slash submission. A mismatch in host
+   * epoch, session revision, or the fresh catalog revision is stale; an unknown,
+   * hidden, or currently-unsafe name is denied. Neither outcome reaches Pi.
    */
-  public async isSlashCommandAllowed(name: string): Promise<boolean> {
-    await this.listCommands();
-    return this.allowedNames.has(name);
+  public async revalidateSlashSubmission(binding: CommandBindingDto): Promise<SlashSubmissionVerdict> {
+    if (binding.hostEpoch !== this.hostEpoch) return 'stale_catalog';
+    if (binding.sessionRevision !== this.sessionRevision) return 'stale_catalog';
+    if (this.availability !== 'idle') return 'command_denied';
+    const snapshot = await this.listCommands();
+    // The availability check must also hold after the fresh read completes.
+    if (this.availability !== 'idle') return 'command_denied';
+    if (binding.catalogRevision !== snapshot.catalogRevision) return 'stale_catalog';
+    if (!this.allowedNames.has(binding.name)) return 'command_denied';
+    return 'allowed';
   }
 }
 
 function isSafeCommand(descriptor: CommandDescriptorDto): boolean {
-  const name = descriptor.name;
-  if (name.length === 0 || name.startsWith('!') || name.includes('$') || name.includes(' ')) {
-    return false;
-  }
-  return !PRIVILEGED_COMMAND_PATTERN.test(name);
+  return !PRIVILEGED_COMMAND_PATTERN.test(descriptor.name);
+}
+
+function sameCommandSet(
+  left: readonly CommandDescriptorDto[],
+  right: readonly CommandDescriptorDto[],
+): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
 }
 
 function dataOf(response: PiRpcResponse): unknown {

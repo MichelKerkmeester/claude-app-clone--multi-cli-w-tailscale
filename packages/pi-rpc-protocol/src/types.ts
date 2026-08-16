@@ -34,6 +34,12 @@ export interface PromptSubmitCommand {
   readonly ticket: string;
   /** Absent for an idle send; 'steer' interrupts, 'followUp' queues behind the turn. */
   readonly streamingBehavior?: 'steer' | 'followUp';
+  /**
+   * Present only for an explicit slash submission. The relay revalidates the
+   * bound name and host/session/catalog revisions against the live catalog
+   * before forwarding; a bound submission is never steered or queued.
+   */
+  readonly command?: CommandBindingDto;
 }
 
 export interface SteerCommand extends PiRpcCommandBase {
@@ -571,18 +577,43 @@ export interface RuntimeIssueDto {
 export type CommandSource = 'extension' | 'prompt' | 'skill';
 
 export interface CommandDescriptorDto {
+  /** Canonical command identity; never a path, label, or free-form token. */
   readonly name: string;
   readonly description: string | null;
   readonly source: CommandSource;
   readonly enabled: boolean;
   readonly disabledReason: string | null;
   readonly requiresConfirmation: boolean;
+  /**
+   * Opt-in authoritative metadata. Absent unless the relay's allowlisted
+   * projection lets host data through; never inferred from descriptions.
+   */
+  readonly aliases?: readonly string[];
+  readonly argumentHint?: string | null;
 }
 
+/** One complete, relay-filtered command snapshot bound to host and session identity. */
 export interface CommandCatalogDto {
+  readonly hostEpoch: string;
   readonly sessionId: string;
-  readonly revision: number;
+  readonly sessionRevision: number;
+  readonly catalogRevision: number;
   readonly commands: readonly CommandDescriptorDto[];
+}
+
+/** The explicit binding a slash submission carries for fail-closed revalidation. */
+export interface CommandBindingDto {
+  readonly hostEpoch: string;
+  readonly name: string;
+  readonly sessionRevision: number;
+  readonly catalogRevision: number;
+}
+
+export const SLASH_SUBMIT_ISSUE_CODES = ['stale_catalog', 'command_denied'] as const;
+export type SlashSubmitIssueCode = (typeof SLASH_SUBMIT_ISSUE_CODES)[number];
+
+export interface SlashSubmitIssueResponse {
+  readonly error: SlashSubmitIssueCode;
 }
 
 export const RUNTIME_CONTROL_REASON_CODES = [

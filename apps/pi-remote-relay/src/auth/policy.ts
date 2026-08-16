@@ -20,7 +20,8 @@ export type AuthorizedAction =
   | 'runtime:read'
   | 'runtime-ticket:create'
   | 'runtime:control'
-  | 'commands:list';
+  | 'commands:list'
+  | 'commands:submit';
 
 const AUTHORIZED_ACTIONS = new Set<string>([
   'health:read',
@@ -41,6 +42,9 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   'runtime-ticket:create',
   'runtime:control',
   'commands:list',
+  // The slash submission lane is authorized separately from ordinary prompt
+  // submission so either can be denied without touching the other.
+  'commands:submit',
 ]);
 
 /** Keep unknown and tool-mutation actions denied unless explicitly authorized. */

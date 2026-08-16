@@ -9,9 +9,11 @@ import {
   type Envelope,
   type PromptAbortResponse,
   type PromptSubmitCommand,
+  type SlashSubmitIssueCode,
   type TextBlock,
 } from '@pi-remote/pi-rpc-protocol';
 
+import type { CommandService, SlashSubmissionVerdict } from '../commands/command-service.js';
 import type { SyncHub } from '../replay/sync.js';
 import type { RpcSupervisor } from '../rpc/supervisor.js';
 import type { RelayStore } from '../store/relay-store.js';
@@ -26,7 +28,16 @@ interface PromptServiceOptions {
   readonly workspaceRef: string;
   readonly sessionId: string;
   readonly epoch: string;
+  readonly commands?: CommandService;
   readonly now?: () => Date;
+}
+
+/** A slash submission that failed revalidation; never retried and never forwarded. */
+export class SlashSubmissionError extends Error {
+  public constructor(readonly reason: SlashSubmitIssueCode) {
+    super(reason);
+    this.name = 'SlashSubmissionError';
+  }
 }
 
 interface SubmissionRecord {
@@ -46,6 +57,10 @@ export class PromptService {
   public constructor(private readonly options: PromptServiceOptions) {}
 
   public async submit(command: PromptSubmitCommand, deviceId: string): Promise<TextBlock> {
+    if (command.command !== undefined) {
+      const verdict = await this.revalidateSlash(command);
+      if (verdict !== 'allowed') throw new SlashSubmissionError(verdict);
+    }
     const existing = this.submissions.get(command.submissionId);
     if (existing !== undefined) {
       if (existing.deviceId !== deviceId || existing.message !== command.message) {
@@ -110,9 +125,10 @@ export class PromptService {
         id: command.submissionId,
         type: 'prompt',
         message: command.message,
-        ...(command.streamingBehavior === undefined
-          ? {}
-          : { streamingBehavior: command.streamingBehavior }),
+        // A bound slash submission is explicit and is never steered or queued.
+        ...(command.command === undefined && command.streamingBehavior !== undefined
+          ? { streamingBehavior: command.streamingBehavior }
+          : {}),
       });
     } catch (error: unknown) {
       this.submissions.delete(command.submissionId);
@@ -169,6 +185,21 @@ export class PromptService {
     return committed.payload;
   }
 
+  /**
+   * Fail-closed slash gate before any forwarding. Cross-session, non-matching
+   * message prefixes, and missing authority are denied without a host read; the
+   * catalog revalidation itself is the only Pi RPC a stale check may cause.
+   */
+  private async revalidateSlash(command: PromptSubmitCommand): Promise<SlashSubmissionVerdict> {
+    const binding = command.command;
+    if (binding === undefined) return 'allowed';
+    if (command.sessionId !== this.options.sessionId) return 'stale_catalog';
+    const service = this.options.commands;
+    if (service === undefined) return 'command_denied';
+    if (!slashMessageMatches(command.message, binding.name)) return 'command_denied';
+    return service.revalidateSlashSubmission(binding);
+  }
+
   private pruneSubmissions(): void {
     while (this.submissions.size > MAX_SUBMISSION_RECORDS) {
       const removable = [...this.submissions].find(([, record]) => record.state !== 'processing');
@@ -176,4 +207,9 @@ export class PromptService {
       this.submissions.delete(removable[0]);
     }
   }
+}
+
+/** The forwarded body must be exactly the bound command, with or without arguments. */
+function slashMessageMatches(message: string, name: string): boolean {
+  return message === `/${name}` || message.startsWith(`/${name} `);
 }

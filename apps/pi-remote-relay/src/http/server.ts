@@ -36,7 +36,7 @@ import { RuntimeIssueError, type RuntimeService } from '../runtime/runtime-servi
 import type { SessionCatalog } from '../sessions/catalog.js';
 import type { RelayStore } from '../store/relay-store.js';
 import type { PushService } from '../push/push-service.js';
-import type { PromptService } from '../prompt/prompt-service.js';
+import { SlashSubmissionError, type PromptService } from '../prompt/prompt-service.js';
 
 const LOOPBACK_HOST = '127.0.0.1';
 const DEFAULT_PORT = 4_310;
@@ -524,12 +524,10 @@ async function handleHttp(
       sendJson(response, 400, { error: 'invalid_prompt' });
       return;
     }
-    const ticketSession = auth.consumeTicket(
-      body.ticket,
-      ingress.origin,
-      ingress.principal,
-      'prompt:submit',
-    );
+    // A bound slash submission consumes its one-use ticket through its own
+    // authorized action, so the lane can be denied independently.
+    const action = body.command === undefined ? 'prompt:submit' : 'commands:submit';
+    const ticketSession = auth.consumeTicket(body.ticket, ingress.origin, ingress.principal, action);
     if (
       ticketSession === null ||
       ticketSession.token !== session.token ||
@@ -546,7 +544,14 @@ async function handleHttp(
     try {
       const block = await options.prompts.submit(body, session.deviceId);
       sendJson(response, 202, { accepted: true, block });
-    } catch {
+    } catch (error: unknown) {
+      if (error instanceof SlashSubmissionError) {
+        // Typed stale/denied outcomes carry no host detail and are never retried.
+        sendJson(response, error.reason === 'stale_catalog' ? 409 : 403, {
+          error: error.reason,
+        });
+        return;
+      }
       sendJson(response, 503, { error: 'pi_unavailable' });
     }
     return;

@@ -91,6 +91,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
           }
         : {}),
   });
+  const commands = new CommandService(supervisor, { sessionId: SESSION_ID });
   const prompts = new PromptService({
     store,
     syncHub,
@@ -100,15 +101,24 @@ export async function runRelay(): Promise<() => Promise<void>> {
     workspaceRef: WORKSPACE_REF,
     sessionId: SESSION_ID,
     epoch,
+    commands,
   });
   const runtime = new RuntimeService(supervisor, { sessionId: SESSION_ID });
-  const commands = new CommandService(supervisor, { sessionId: SESSION_ID });
+  // A restarted host gets a new epoch: every prior catalog snapshot and binding
+  // dies with it, so nothing from the old generation can authorize a submission.
+  supervisor.onLifecycle((event) => {
+    if (event.reason === 'exit' || event.reason === 'restart' || event.reason === 'failed') {
+      commands.invalidate();
+    }
+  });
   supervisor.onEvent((event) => {
     publishPiEvent(store, syncHub, transcriptProjector, event, epoch);
     if (event.type === 'agent_start') {
       catalog.register(SESSION_ID, 'running', 0);
+      commands.setAvailability('running');
     } else if (event.type === 'agent_settled') {
       catalog.register(SESSION_ID, 'idle', 0);
+      commands.setAvailability('idle');
     }
   });
 

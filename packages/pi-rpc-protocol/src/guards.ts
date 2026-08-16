@@ -19,6 +19,7 @@ import type {
   ApprovalResultPayload,
   ApplicationSessionResponse,
   AvailableModelDto,
+  CommandBindingDto,
   CommandCatalogDto,
   CommandDescriptorDto,
   CommandSource,
@@ -52,6 +53,8 @@ import type {
   PushHintPayload,
   PushPreferences,
   PushSubscriptionInput,
+  SlashSubmitIssueCode,
+  SlashSubmitIssueResponse,
   SyncMessage,
   TranscriptBlock,
   TranscriptPageDto,
@@ -65,6 +68,7 @@ import {
   RUNTIME_CONTROL_REASON_CODES,
   RUNTIME_ISSUE_CODES,
   RUNTIME_MODES,
+  SLASH_SUBMIT_ISSUE_CODES,
 } from './types.js';
 
 const APPROVAL_RESULT_STATUSES = new Set([
@@ -267,6 +271,7 @@ const PROMPT_SUBMIT_KEYS = new Set([
   'message',
   'ticket',
   'streamingBehavior',
+  'command',
 ]);
 
 export function isPromptSubmitCommand(value: unknown): value is PromptSubmitCommand {
@@ -279,9 +284,11 @@ export function isPromptSubmitCommand(value: unknown): value is PromptSubmitComm
     typeof value.message === 'string' &&
     value.message.trim().length > 0 &&
     isOpaqueId(value.ticket) &&
+    (value.command === undefined || isCommandBindingDto(value.command)) &&
+    // A bound slash submission is explicit and is never steered or queued implicitly.
     (value.streamingBehavior === undefined ||
-      value.streamingBehavior === 'steer' ||
-      value.streamingBehavior === 'followUp')
+      (value.command === undefined &&
+        (value.streamingBehavior === 'steer' || value.streamingBehavior === 'followUp')))
   );
 }
 
@@ -713,6 +720,7 @@ const RUNTIME_CONTROL_REASON_CODE_SET = new Set<RuntimeControlReasonCode>(
 );
 const RUNTIME_ISSUE_CODE_SET = new Set<RuntimeIssueCode>(RUNTIME_ISSUE_CODES);
 const COMMAND_SOURCES = new Set<CommandSource>(['extension', 'prompt', 'skill']);
+const SLASH_SUBMIT_ISSUE_CODE_SET = new Set<string>(SLASH_SUBMIT_ISSUE_CODES);
 
 /** Narrow an unknown value to a bounded model descriptor (no path separators). */
 export function isAvailableModelDto(value: unknown): value is AvailableModelDto {
@@ -928,38 +936,75 @@ export function isRuntimeIssueDto(value: unknown): value is RuntimeIssueDto {
   );
 }
 
-/** Narrow an unknown value to a bounded command descriptor. */
+/** Narrow an unknown value to a bounded, canonical command descriptor. */
 export function isCommandDescriptorDto(value: unknown): value is CommandDescriptorDto {
   return (
     isRecord(value) &&
-    hasOnlyKeys(value, [
-      'name',
-      'description',
-      'source',
-      'enabled',
-      'disabledReason',
-      'requiresConfirmation',
-    ]) &&
-    isPathFreeToken(value.name, 200) &&
-    (value.description === null || isBoundedString(value.description, 2_000)) &&
+    hasRequiredAndOptionalKeys(
+      value,
+      ['name', 'description', 'source', 'enabled', 'disabledReason', 'requiresConfirmation'],
+      ['aliases', 'argumentHint'],
+    ) &&
+    isCanonicalCommandName(value.name) &&
+    (value.description === null || isSafeDisplayString(value.description, 2_000)) &&
     typeof value.source === 'string' &&
     COMMAND_SOURCES.has(value.source as CommandSource) &&
     typeof value.enabled === 'boolean' &&
-    (value.disabledReason === null || isBoundedString(value.disabledReason, 500)) &&
-    typeof value.requiresConfirmation === 'boolean'
+    (value.disabledReason === null || isSafeDisplayString(value.disabledReason, 500)) &&
+    typeof value.requiresConfirmation === 'boolean' &&
+    (value.aliases === undefined ||
+      (Array.isArray(value.aliases) &&
+        value.aliases.length > 0 &&
+        value.aliases.length <= 16 &&
+        new Set(value.aliases).size === value.aliases.length &&
+        value.aliases.every(isCanonicalCommandName))) &&
+    (value.argumentHint === undefined ||
+      value.argumentHint === null ||
+      isSafeDisplayString(value.argumentHint, 500))
   );
 }
 
-/** Narrow an unknown value to a bounded command catalog. */
+/** Narrow an unknown value to a bounded, versioned command catalog. */
 export function isCommandCatalogDto(value: unknown): value is CommandCatalogDto {
   return (
     isRecord(value) &&
-    hasOnlyKeys(value, ['sessionId', 'revision', 'commands']) &&
+    hasOnlyKeys(value, [
+      'hostEpoch',
+      'sessionId',
+      'sessionRevision',
+      'catalogRevision',
+      'commands',
+    ]) &&
+    isOpaqueId(value.hostEpoch) &&
     isOpaqueId(value.sessionId) &&
-    isNonNegativeSafeInteger(value.revision) &&
+    isNonNegativeSafeInteger(value.sessionRevision) &&
+    isNonNegativeSafeInteger(value.catalogRevision) &&
     Array.isArray(value.commands) &&
+    value.commands.length <= 500 &&
     value.commands.every(isCommandDescriptorDto)
   );
+}
+
+/** Narrow an unknown value to an exact slash submission binding. */
+export function isCommandBindingDto(value: unknown): value is CommandBindingDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['hostEpoch', 'name', 'sessionRevision', 'catalogRevision']) &&
+    isOpaqueId(value.hostEpoch) &&
+    isCanonicalCommandName(value.name) &&
+    isNonNegativeSafeInteger(value.sessionRevision) &&
+    isNonNegativeSafeInteger(value.catalogRevision)
+  );
+}
+
+/** Narrow one of the fixed slash submission issue codes. */
+export function isSlashSubmitIssueCode(value: unknown): value is SlashSubmitIssueCode {
+  return typeof value === 'string' && SLASH_SUBMIT_ISSUE_CODE_SET.has(value);
+}
+
+/** Narrow a browser-visible slash submission issue response. */
+export function isSlashSubmitIssueResponse(value: unknown): value is SlashSubmitIssueResponse {
+  return isRecord(value) && hasOnlyKeys(value, ['error']) && isSlashSubmitIssueCode(value.error);
 }
 
 /** Narrow an unknown value to a fail-closed runtime control response. */
@@ -1041,6 +1086,16 @@ function isRuntimeLevelToken(value: unknown): value is string {
     typeof value === 'string' &&
     value.length > 0 &&
     value.length <= 64 &&
+    /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u.test(value)
+  );
+}
+
+function isCanonicalCommandName(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value.length > 0 &&
+    value.length <= 200 &&
+    // One canonical token: no leading slash, whitespace, path, control, or bidi characters.
     /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u.test(value)
   );
 }

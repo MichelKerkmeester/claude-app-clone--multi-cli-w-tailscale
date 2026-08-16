@@ -1,3 +1,15 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: One Canonical Model + Effort Sheet
+// ───────────────────────────────────────────────────────────────────
+// The single controlled sheet for both runtime surfaces: the model
+// picker from the shipped model switcher plus the effort radio group.
+// The header opens it at the model section and RuntimeStrip at the
+// effort section; both share one top-level dialog, hydrate on open, and
+// route every mutation through the runtime hook. The sheet holds no
+// committed model or effort state — only transient draft/search/section
+// UI state — so dismissing it while a guarded mutation is pending never
+// cancels the request.
+
 import type { AvailableModelDto, RuntimeControlResponse } from '@pi-remote/pi-rpc-protocol';
 import {
   useDeferredValue,
@@ -26,6 +38,12 @@ import {
   SearchField,
 } from 'react-aria-components';
 
+import { EffortRadioGroup } from './EffortRadioGroup.js';
+import {
+  applyingEffortMessage,
+  effortConfirmedMessage,
+  effortStrings,
+} from './effort.js';
 import {
   displayModelText,
   filterAndRankModels,
@@ -45,26 +63,35 @@ import {
   noModelMatchMessage,
   runtimeOutcomeMessage,
 } from './model-switcher-strings.js';
-import type { RuntimeControls } from './runtime.js';
+import type { RuntimeControls, RuntimePhase, RuntimeUiState } from './runtime.js';
+import { runtimeIssueMessage } from './runtime-issues.js';
 
 const SEARCH_THRESHOLD = 8;
 const SWIPE_DISMISS_RATIO = 0.3;
 const SWIPE_DISMISS_VELOCITY = 1_200;
+const EMPTY_LEVELS: readonly string[] = [];
 
-export interface ModelSwitcherSheetProps {
+export type EffortSheetSection = 'model' | 'effort';
+
+export interface ModelEffortSheetProps {
   readonly isOpen: boolean;
   readonly onOpenChange: (open: boolean) => void;
+  /** Section shown when the sheet opens; the header opens "model", RuntimeStrip "effort". */
+  readonly initialSection: EffortSheetSection;
   readonly runtimeControls: RuntimeControls;
+  /** The trigger that opened the sheet; focus returns here on close. */
   readonly triggerRef: RefObject<HTMLButtonElement | null>;
 }
 
-export function ModelSwitcherSheet({
+export function ModelEffortSheet({
   isOpen,
   onOpenChange,
+  initialSection,
   runtimeControls,
   triggerRef,
-}: ModelSwitcherSheetProps) {
-  const { runtime, refresh, setModel } = runtimeControls;
+}: ModelEffortSheetProps) {
+  const { runtime, refresh, setModel, setThinkingLevel } = runtimeControls;
+  const [section, setSection] = useState<EffortSheetSection>(initialSection);
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query);
   const [draftKey, setDraftKey] = useState<string | null>(null);
@@ -72,7 +99,6 @@ export function ModelSwitcherSheet({
   const [terminalBlocked, setTerminalBlocked] = useState(false);
   const [mutationMessage, setMutationMessage] = useState('');
   const [announcement, setAnnouncement] = useState('');
-  const [isAssertive, setIsAssertive] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isSnapping, setIsSnapping] = useState(false);
@@ -85,22 +111,28 @@ export function ModelSwitcherSheet({
     readonly startedAt: number;
   } | null>(null);
   const snapTimerRef = useRef<number | null>(null);
+  // The last announced effort-pending level; guards the one polite status
+  // region so a settled outcome is announced exactly once per transition.
+  const prevEffortPendingRef = useRef<string | null>(null);
   const current = runtime.state?.model ?? null;
   const currentKey = current === null ? null : modelKey(current);
+  const confirmedEffort = runtime.state?.thinkingLevel ?? null;
   const showSearch = runtime.models.length >= SEARCH_THRESHOLD;
 
   useEffect(() => {
     if (!isOpen) return;
+    setSection(initialSection);
     setQuery('');
     setDraftKey(null);
     setTerminalBlocked(false);
     setMutationMessage('');
-    setIsAssertive(false);
+    setAnnouncement('');
+    prevEffortPendingRef.current = null;
     setDragOffset(0);
     setIsDragging(false);
     setIsSnapping(false);
     void refresh('open');
-  }, [isOpen, refresh]);
+  }, [isOpen, refresh, initialSection]);
 
   useEffect(
     () => () => {
@@ -153,14 +185,34 @@ export function ModelSwitcherSheet({
   }, [isOpen, runtime.models.length, showSearch, visibleModels.length]);
 
   useEffect(() => {
-    if (!isOpen || runtime.catalogPhase !== 'ready') return;
+    if (!isOpen || section !== 'model' || runtime.catalogPhase !== 'ready') return;
     const focusTimer = window.setTimeout(() => {
       dialogRef.current
         ?.querySelector<HTMLElement>('.model-sheet-row[aria-current="true"]:not([data-disabled])')
         ?.focus({ preventScroll: true });
     }, 0);
     return () => window.clearTimeout(focusTimer);
-  }, [currentKey, isOpen, runtime.catalogPhase]);
+  }, [currentKey, isOpen, runtime.catalogPhase, section]);
+
+  useEffect(() => {
+    if (!isOpen || section !== 'effort') return;
+    const focusTimer = window.setTimeout(() => {
+      const confirmedRow = dialogRef.current?.querySelector<HTMLElement>(
+        '.effort-radio-row[data-selected="true"]:not([data-disabled])',
+      );
+      const fallbackRow =
+        confirmedRow === null
+          ? dialogRef.current?.querySelector<HTMLElement>('.effort-radio-row:not([data-disabled])') ??
+            null
+          : null;
+      // The row label is not focusable; the native radio input inside it is.
+      const target =
+        (confirmedRow ?? fallbackRow)?.querySelector<HTMLElement>('input[type="radio"]') ??
+        (confirmedRow ?? fallbackRow);
+      target?.focus({ preventScroll: true });
+    }, 0);
+    return () => window.clearTimeout(focusTimer);
+  }, [confirmedEffort, isOpen, section]);
 
   const restoreTriggerFocus = () => {
     window.setTimeout(() => triggerRef.current?.focus({ preventScroll: true }), 0);
@@ -222,7 +274,7 @@ export function ModelSwitcherSheet({
     snapTimerRef.current = window.setTimeout(() => setIsSnapping(false), 220);
   };
   const handleSheetKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape' && query.length > 0 && !isCommitting) {
+    if (event.key === 'Escape' && section === 'model' && query.length > 0 && !isCommitting) {
       event.preventDefault();
       event.stopPropagation();
       setQuery('');
@@ -231,7 +283,7 @@ export function ModelSwitcherSheet({
       event.preventDefault();
       event.stopPropagation();
       close();
-    } else if (event.key === '/' && showSearch && event.target !== searchRef.current) {
+    } else if (event.key === '/' && section === 'model' && showSearch && event.target !== searchRef.current) {
       event.preventDefault();
       searchRef.current?.focus();
     }
@@ -272,7 +324,7 @@ export function ModelSwitcherSheet({
       case 'delivery-unknown':
         setTerminalBlocked(true);
         setMutationMessage(runtimeOutcomeMessage(response.outcome));
-        setIsAssertive(true);
+        setAnnouncement(modelStatusAnnouncement(runtimeOutcomeMessage(response.outcome)));
         break;
       default:
         setTerminalBlocked(true);
@@ -280,6 +332,58 @@ export function ModelSwitcherSheet({
         setAnnouncement(modelStatusAnnouncement(runtimeOutcomeMessage(response.outcome)));
     }
   };
+
+  // Any in-flight mutation makes the group read-only (focusable, inert);
+  // only a missing ready authority or a phase that forbids mutation
+  // disables the rows outright.
+  const anyPending = runtime.phase === 'pending' && runtime.pending !== null;
+  const isEffortPending = anyPending && runtime.pending?.type === 'set_thinking_level';
+  const pendingEffortLevel = isEffortPending ? runtime.pending.level : null;
+  const effortGroupDisabled =
+    (runtime.status !== 'ready' && !anyPending) ||
+    runtime.phase === 'ready-off-only' ||
+    runtime.phase === 'ready-empty' ||
+    runtime.phase === 'inconsistent-state';
+  const requestEffort = (level: string) => {
+    const state = runtime.state;
+    if (state === null || state.thinkingLevel === level) return;
+    if (anyPending || effortGroupDisabled) return;
+    void setThinkingLevel(level);
+  };
+
+  // Effort outcomes announce exactly once through the single polite status
+  // region: applying when the request goes in flight, then the bounded
+  // accepted, stale, or failure copy when it settles. The ref marks the
+  // in-flight window so the region never re-announces on re-renders.
+  const levels = runtime.state?.availableThinkingLevels ?? EMPTY_LEVELS;
+  useEffect(() => {
+    if (!isOpen) return;
+    const nowPending = isEffortPending ? pendingEffortLevel : null;
+    const prevPending = prevEffortPendingRef.current;
+    prevEffortPendingRef.current = nowPending;
+    if (nowPending !== null && nowPending !== prevPending) {
+      setAnnouncement(applyingEffortMessage(nowPending, levels));
+      return;
+    }
+    if (prevPending === null || nowPending !== null) return;
+    switch (runtime.phase) {
+      case 'accepted':
+      case 'ready-adjustable':
+      case 'ready-off-only':
+      case 'ready-empty':
+        setAnnouncement(
+          effortConfirmedMessage(runtime.state?.thinkingLevel ?? prevPending, levels),
+        );
+        break;
+      case 'stale':
+        setAnnouncement(effortStrings.stale);
+        break;
+      default: {
+        const message = effortSectionStatus(runtime, levels);
+        if (message !== null) setAnnouncement(message);
+      }
+    }
+  }, [isEffortPending, isOpen, levels, pendingEffortLevel, runtime.phase, runtime.state?.thinkingLevel]);
 
   const list = (
     <ModelList
@@ -331,8 +435,8 @@ export function ModelSwitcherSheet({
         >
           <Dialog
             ref={dialogRef}
-            id="model-switcher-dialog"
-            aria-labelledby="model-switcher-title"
+            id="model-effort-dialog"
+            aria-labelledby="model-effort-title"
             className="model-sheet-dialog"
           >
             <div className="model-sheet-content" onKeyDownCapture={handleSheetKeyDown}>
@@ -346,12 +450,14 @@ export function ModelSwitcherSheet({
               >
                 <div className="model-sheet-grabber" aria-hidden="true" />
                 <header className="model-sheet-header">
-                  <Heading id="model-switcher-title" slot="title" className="model-sheet-title">
-                    {modelSwitcherStrings.title}
+                  <Heading id="model-effort-title" slot="title" className="model-sheet-title">
+                    {section === 'model'
+                      ? modelSwitcherStrings.title
+                      : effortStrings.thinkingEffort}
                   </Heading>
                   <Button
                     className="model-sheet-close"
-                    aria-label={modelSwitcherStrings.close}
+                    aria-label={effortStrings.closeSheet}
                     onPress={close}
                     isDisabled={isCommitting}
                     style={{ minBlockSize: '44px' }}
@@ -361,83 +467,221 @@ export function ModelSwitcherSheet({
                 </header>
               </div>
 
-              {streamingBlocked && (
-                <p className="model-sheet-policy">{modelSwitcherStrings.streamingBlocked}</p>
-              )}
+              {section === 'model' ? (
+                <>
+                  {streamingBlocked && (
+                    <p className="model-sheet-policy">{modelSwitcherStrings.streamingBlocked}</p>
+                  )}
 
-              {runtime.catalogPhase === 'opening' && runtime.models.length === 0 ? (
-                <div
-                  className="model-sheet-skeletons"
-                  aria-label={modelSwitcherStrings.loading}
-                  aria-busy="true"
-                >
-                  {Array.from({ length: 4 }, (_, index) => (
-                    <div className="model-sheet-skeleton" key={index} />
-                  ))}
-                </div>
-              ) : showSearch ? (
-                <Autocomplete inputValue={query} onInputChange={setQuery} filter={() => true}>
-                  <SearchField className="model-sheet-search">
-                    <Label>{modelSwitcherStrings.searchLabel}</Label>
-                    <div className="model-sheet-search-control">
-                      <SearchGlyph />
-                      <Input
-                        ref={searchRef}
-                        autoCapitalize="none"
-                        autoCorrect="off"
-                        spellCheck={false}
-                        enterKeyHint="search"
-                        placeholder={modelSwitcherStrings.searchPlaceholder}
-                      />
-                      <Button
-                        slot="clear"
-                        aria-label={modelSwitcherStrings.clearSearch}
-                        className="model-sheet-search-clear"
-                        style={{ minBlockSize: '44px' }}
-                      >
-                        {modelSwitcherStrings.clearSearchVisible}
-                      </Button>
+                  {runtime.catalogPhase === 'opening' && runtime.models.length === 0 ? (
+                    <div
+                      className="model-sheet-skeletons"
+                      aria-label={modelSwitcherStrings.loading}
+                      aria-busy="true"
+                    >
+                      {Array.from({ length: 4 }, (_, index) => (
+                        <div className="model-sheet-skeleton" key={index} />
+                      ))}
                     </div>
-                  </SearchField>
-                  {list}
-                </Autocomplete>
-              ) : (
-                list
-              )}
+                  ) : showSearch ? (
+                    <Autocomplete inputValue={query} onInputChange={setQuery} filter={() => true}>
+                      <SearchField className="model-sheet-search">
+                        <Label>{modelSwitcherStrings.searchLabel}</Label>
+                        <div className="model-sheet-search-control">
+                          <SearchGlyph />
+                          <Input
+                            ref={searchRef}
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                            spellCheck={false}
+                            enterKeyHint="search"
+                            placeholder={modelSwitcherStrings.searchPlaceholder}
+                          />
+                          <Button
+                            slot="clear"
+                            aria-label={modelSwitcherStrings.clearSearch}
+                            className="model-sheet-search-clear"
+                            style={{ minBlockSize: '44px' }}
+                          >
+                            {modelSwitcherStrings.clearSearchVisible}
+                          </Button>
+                        </div>
+                      </SearchField>
+                      {list}
+                    </Autocomplete>
+                  ) : (
+                    list
+                  )}
 
-              <CatalogStatus runtime={runtime} onRefresh={() => void refresh('manual')} />
-              <p
-                className={`model-sheet-mutation${runtime.deliveryUnknown || isAssertive ? ' is-barrier' : ''}`}
-                role={runtime.deliveryUnknown || isAssertive ? 'alert' : undefined}
-                aria-live={runtime.deliveryUnknown || isAssertive ? 'assertive' : undefined}
-              >
-                {mutationMessage ||
-                  (runtime.catalogPhase === 'refreshing' ? modelSwitcherStrings.refreshing : '')}
-              </p>
-              <footer className="model-sheet-footer">
-                <Button
-                  className="model-sheet-cancel"
-                  onPress={close}
-                  isDisabled={isCommitting}
-                  style={{ minBlockSize: '48px' }}
-                >
-                  {modelSwitcherStrings.cancel}
-                </Button>
-                <Button
-                  className="model-sheet-switch"
-                  onPress={() => void commit()}
-                  isDisabled={!canCommit}
-                  style={{ minBlockSize: '48px' }}
-                >
-                  {isCommitting ? modelSwitcherStrings.applying : modelSwitcherStrings.switchModel}
-                </Button>
-              </footer>
+                  <CatalogStatus runtime={runtime} onRefresh={() => void refresh('manual')} />
+                  <p
+                    className={`model-sheet-mutation${runtime.deliveryUnknown ? ' is-barrier' : ''}`}
+                  >
+                    {mutationMessage ||
+                      (runtime.catalogPhase === 'refreshing' ? modelSwitcherStrings.refreshing : '')}
+                  </p>
+                  <div className="model-sheet-nav">
+                    <Button
+                      className="model-sheet-nav-button"
+                      onPress={() => setSection('effort')}
+                      style={{ minBlockSize: '44px' }}
+                    >
+                      {effortStrings.thinkingEffort}
+                      <ChevronRightGlyph />
+                    </Button>
+                  </div>
+                  <footer className="model-sheet-footer">
+                    <Button
+                      className="model-sheet-cancel"
+                      onPress={close}
+                      isDisabled={isCommitting}
+                      style={{ minBlockSize: '48px' }}
+                    >
+                      {modelSwitcherStrings.cancel}
+                    </Button>
+                    <Button
+                      className="model-sheet-switch"
+                      onPress={() => void commit()}
+                      isDisabled={!canCommit}
+                      style={{ minBlockSize: '48px' }}
+                    >
+                      {isCommitting ? modelSwitcherStrings.applying : modelSwitcherStrings.switchModel}
+                    </Button>
+                  </footer>
+                </>
+              ) : (
+                <EffortSection
+                  runtime={runtime}
+                  isPending={anyPending}
+                  pendingLevel={pendingEffortLevel}
+                  confirmed={confirmedEffort}
+                  groupDisabled={effortGroupDisabled}
+                  onSelect={requestEffort}
+                  onReconcile={() => void refresh('manual')}
+                  onBackToModel={() => setSection('model')}
+                />
+              )}
             </div>
           </Dialog>
         </Modal>
       </ModalOverlay>
     </>
   );
+}
+
+function EffortSection({
+  runtime,
+  isPending,
+  pendingLevel,
+  confirmed,
+  groupDisabled,
+  onSelect,
+  onReconcile,
+  onBackToModel,
+}: {
+  readonly runtime: RuntimeUiState;
+  readonly isPending: boolean;
+  readonly pendingLevel: string | null;
+  readonly confirmed: string | null;
+  readonly groupDisabled: boolean;
+  readonly onSelect: (level: string) => void;
+  readonly onReconcile: () => void;
+  readonly onBackToModel: () => void;
+}) {
+  const levels = runtime.state?.availableThinkingLevels ?? [];
+  const status = effortSectionStatus(runtime, levels);
+  const showReconcile = RECONCILE_PHASES.has(runtime.phase ?? 'checking');
+
+  return (
+    <section className="effort-sheet-section" aria-label={effortStrings.thinkingEffort}>
+      {status !== null && (
+        <p id="effort-sheet-status" className="effort-sheet-status">
+          {status}
+        </p>
+      )}
+      {showReconcile && (
+        <div className="effort-sheet-reconcile">
+          <Button
+            className="effort-sheet-reconcile-button"
+            onPress={onReconcile}
+            style={{ minBlockSize: '44px' }}
+          >
+            {effortStrings.reconcile}
+          </Button>
+        </div>
+      )}
+      {levels.length > 0 && (
+        <div className="effort-radio-scroll">
+          <EffortRadioGroup
+            levels={levels}
+            confirmed={confirmed}
+            pendingLevel={pendingLevel}
+            isPending={isPending}
+            isDisabled={groupDisabled}
+            labelledBy="model-effort-title"
+            {...(status === null ? {} : { describedBy: 'effort-sheet-status' })}
+            onSelect={onSelect}
+          />
+        </div>
+      )}
+      <div className="effort-sheet-nav">
+        <Button
+          className="effort-sheet-nav-button"
+          onPress={onBackToModel}
+          style={{ minBlockSize: '44px' }}
+        >
+          <ChevronLeftGlyph />
+          {effortStrings.changeModel}
+        </Button>
+      </div>
+    </section>
+  );
+}
+
+const RECONCILE_PHASES: ReadonlySet<RuntimePhase> = new Set([
+  'ready-empty',
+  'unsupported',
+  'offline',
+  'foreground-required',
+  'rate-limited',
+  'host-unavailable',
+  'delivery-unknown',
+  'inconsistent-state',
+]);
+
+function effortSectionStatus(runtime: RuntimeUiState, levels: readonly string[]): string | null {
+  switch (runtime.phase) {
+    case 'checking':
+      return effortStrings.checking;
+    case 'streaming':
+      return effortStrings.streaming;
+    case 'ready-off-only':
+      return effortStrings.offOnly;
+    case 'ready-empty':
+      return effortStrings.empty;
+    case 'pending':
+      return runtime.pending?.type === 'set_thinking_level'
+        ? applyingEffortMessage(runtime.pending.level, levels)
+        : null;
+    case 'stale':
+      return effortStrings.stale;
+    case 'unsupported':
+      return runtimeIssueMessage('unsupported');
+    case 'offline':
+      return runtimeIssueMessage('offline');
+    case 'foreground-required':
+      return runtimeIssueMessage('foreground-required');
+    case 'rate-limited':
+      return runtimeIssueMessage('rate-limited');
+    case 'host-unavailable':
+      return runtimeIssueMessage('host-unavailable');
+    case 'delivery-unknown':
+      return runtimeIssueMessage('delivery-unknown');
+    case 'inconsistent-state':
+      return runtimeIssueMessage('invalid-response');
+    default:
+      return null;
+  }
 }
 
 function ModelList({
@@ -613,7 +857,7 @@ function CatalogStatus({
   }
   if (runtime.catalogPhase === 'access_denied') {
     return (
-      <div className="model-sheet-catalog-state" role="alert">
+      <div className="model-sheet-catalog-state">
         {modelSwitcherStrings.accessExpired}{' '}
         <Button onPress={onRefresh} style={{ minBlockSize: '44px' }}>
           {modelSwitcherStrings.reconnect}
@@ -662,6 +906,36 @@ function CheckGlyph() {
     <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
       <path
         d="m3 8 3 3 7-7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronLeftGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M15 5l-7 7 7 7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronRightGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M9 5l7 7-7 7"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"

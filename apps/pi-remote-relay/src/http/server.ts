@@ -15,9 +15,12 @@ import {
   isPromptSubmitCommand,
   isPushPreferences,
   isPushSubscriptionInput,
+  isRuntimeIssueCode,
   isRuntimeControlCommand,
   isRuntimeModelTicketRequest,
+  isRuntimeSnapshotDto,
   type EnrollmentRequest,
+  type RuntimeIssueCode,
   type RuntimeControlResponse,
   type SyncCursor,
   type SyncMessage,
@@ -29,7 +32,7 @@ import type { ApprovalService } from '../approval/approval-service.js';
 import { FixedWindowRateLimiter } from '../auth/rate-limit.js';
 import type { CommandService } from '../commands/command-service.js';
 import type { SyncHub } from '../replay/sync.js';
-import type { RuntimeService } from '../runtime/runtime-service.js';
+import { RuntimeIssueError, type RuntimeService } from '../runtime/runtime-service.js';
 import type { SessionCatalog } from '../sessions/catalog.js';
 import type { RelayStore } from '../store/relay-store.js';
 import type { PushService } from '../push/push-service.js';
@@ -42,6 +45,7 @@ const MAX_WS_MESSAGE_BYTES = 65_536;
 const MAX_CONNECTIONS = 32;
 const MAX_CONNECTIONS_PER_DEVICE = 4;
 const MAX_PROMPTS_PER_MINUTE = 20;
+const RUNTIME_RECONCILE_RETRY_AFTER_SECONDS = '1';
 const DEFAULT_PAGE_LIMIT = 50;
 const SESSION_COOKIE = '__Host-pi_remote_session';
 const TAILSCALE_IDENTITY_HEADERS = [
@@ -123,6 +127,7 @@ export async function startReadOnlyServer(
   );
   const runtimeControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const runtimeTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
+  const runtimeReconcileLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const activeSockets = new Set<ActiveSocket>();
   // A runtime mutation is only valid from a device that also holds a live, authenticated
   // sync socket — a background or stale device can never steer the host.
@@ -142,6 +147,7 @@ export async function startReadOnlyServer(
       promptLimiter,
       runtimeTicketLimiter,
       runtimeControlLimiter,
+      runtimeReconcileLimiter,
       isForegroundDevice,
     ).catch(() => sendJson(response, 400, { error: 'invalid_request' }));
   });
@@ -283,6 +289,7 @@ async function handleHttp(
   promptLimiter: FixedWindowRateLimiter,
   runtimeTicketLimiter: FixedWindowRateLimiter,
   runtimeControlLimiter: FixedWindowRateLimiter,
+  runtimeReconcileLimiter: FixedWindowRateLimiter,
   isForegroundDevice: (deviceId: string, token: string) => boolean,
 ): Promise<void> {
   if (
@@ -554,6 +561,42 @@ async function handleHttp(
     sendJson(response, 200, { state });
     return;
   }
+  if (ingress.path === '/api/runtime/reconcile') {
+    if (options.runtime === undefined) {
+      discardRequest(request);
+      sendRuntimeIssue(response, 'host-unavailable');
+      return;
+    }
+    if (!runtimeReconcileLimiter.consume(session.deviceId)) {
+      auth.metrics.rateLimited += 1;
+      discardRequest(request);
+      sendJson(
+        response,
+        429,
+        { error: 'rate-limited' },
+        { 'retry-after': RUNTIME_RECONCILE_RETRY_AFTER_SECONDS },
+      );
+      return;
+    }
+    try {
+      await requireEmptyBody(request);
+    } catch {
+      sendRuntimeIssue(response, 'invalid-response', 400);
+      return;
+    }
+    try {
+      const snapshot = await options.runtime.hydrate();
+      if (!isRuntimeSnapshotDto(snapshot)) {
+        sendRuntimeIssue(response, 'invalid-response', 502);
+        return;
+      }
+      sendJson(response, 200, snapshot);
+    } catch (error: unknown) {
+      const issueCode = runtimeIssueCode(error);
+      sendRuntimeIssue(response, issueCode);
+    }
+    return;
+  }
   if (ingress.path === '/api/runtime/models') {
     await requireEmptyBody(request);
     const catalog = options.runtime?.getModelCatalog() ?? null;
@@ -660,7 +703,7 @@ async function handleHttp(
       const result = await options.runtime.control(body);
       sendJson(response, statusForRuntimeOutcome(result), result);
     } catch {
-      sendJson(response, 503, { error: 'pi_unavailable' });
+      sendRuntimeIssue(response, 'host-unavailable');
     }
     return;
   }
@@ -854,7 +897,13 @@ function actionForRequest(path: string): string | null {
   if (path === '/api/prompt/submit') return 'prompt:submit';
   if (path === '/api/prompt/abort') return 'prompt:abort';
   if (path === '/api/accept-edits') return 'accept-edits:create';
-  if (path === '/api/runtime/state' || path === '/api/runtime/models') return 'runtime:read';
+  if (
+    path === '/api/runtime/state' ||
+    path === '/api/runtime/models' ||
+    path === '/api/runtime/reconcile'
+  ) {
+    return 'runtime:read';
+  }
   if (path === '/api/runtime/ticket') return 'runtime-ticket:create';
   if (path === '/api/runtime/control') return 'runtime:control';
   if (path === '/api/commands/list') return 'commands:list';
@@ -870,6 +919,37 @@ function statusForRuntimeOutcome(result: RuntimeControlResponse): number {
     case 'unsupported':
     case 'policy_blocked':
       return 422;
+    case 'unavailable':
+      return result.outcome.issueCode === 'unsupported' ? 422 : 503;
+    default:
+      return 503;
+  }
+}
+
+function sendRuntimeIssue(
+  response: ServerResponse,
+  issueCode: RuntimeIssueCode,
+  statusCode = statusForRuntimeIssue(issueCode),
+): void {
+  sendJson(response, statusCode, { error: issueCode });
+}
+
+function runtimeIssueCode(error: unknown): RuntimeIssueCode {
+  if (error instanceof RuntimeIssueError) return error.issueCode;
+  if (isRecord(error) && isRuntimeIssueCode(error.issueCode)) return error.issueCode;
+  return 'host-unavailable';
+}
+
+function statusForRuntimeIssue(issueCode: RuntimeIssueCode): number {
+  switch (issueCode) {
+    case 'unsupported':
+      return 422;
+    case 'invalid-response':
+      return 502;
+    case 'foreground-required':
+      return 403;
+    case 'rate-limited':
+      return 429;
     default:
       return 503;
   }

@@ -37,11 +37,15 @@ import type {
   RuntimeControlCommand,
   RuntimeControlResponse,
   RuntimeControlReasonCode,
+  RuntimeIssueCode,
+  RuntimeIssueDto,
+  RuntimeIssueResponse,
   RuntimeModelTicketRequest,
   RuntimeModelTicketResponse,
   RuntimeModelCatalogDto,
   RuntimeMode,
   RuntimeOperation,
+  RuntimeSnapshotDto,
   RuntimeStateDto,
   SessionCardDto,
   SessionChallengeResponse,
@@ -59,6 +63,7 @@ import {
   MODEL_AVAILABILITY_REASON_CODES,
   MODEL_INPUT_KINDS,
   RUNTIME_CONTROL_REASON_CODES,
+  RUNTIME_ISSUE_CODES,
   RUNTIME_MODES,
 } from './types.js';
 
@@ -706,6 +711,7 @@ const MODEL_AVAILABILITY_REASON_CODE_SET = new Set<string>(MODEL_AVAILABILITY_RE
 const RUNTIME_CONTROL_REASON_CODE_SET = new Set<RuntimeControlReasonCode>(
   RUNTIME_CONTROL_REASON_CODES,
 );
+const RUNTIME_ISSUE_CODE_SET = new Set<RuntimeIssueCode>(RUNTIME_ISSUE_CODES);
 const COMMAND_SOURCES = new Set<CommandSource>(['extension', 'prompt', 'skill']);
 
 /** Narrow an unknown value to a bounded model descriptor (no path separators). */
@@ -769,9 +775,11 @@ export function isRuntimeStateDto(value: unknown): value is RuntimeStateDto {
     isOpaqueId(value.sessionId) &&
     isNonNegativeSafeInteger(value.revision) &&
     (value.model === null || isAvailableModelDto(value.model)) &&
-    isNonEmptyBoundedString(value.thinkingLevel, 64) &&
+    isRuntimeLevelToken(value.thinkingLevel) &&
     Array.isArray(value.availableThinkingLevels) &&
-    value.availableThinkingLevels.every((level) => isNonEmptyBoundedString(level, 64)) &&
+    value.availableThinkingLevels.length <= 32 &&
+    new Set(value.availableThinkingLevels).size === value.availableThinkingLevels.length &&
+    value.availableThinkingLevels.every(isRuntimeLevelToken) &&
     typeof value.mode === 'string' &&
     RUNTIME_MODE_SET.has(value.mode as RuntimeMode) &&
     typeof value.streaming === 'boolean' &&
@@ -792,7 +800,7 @@ export function isRuntimeOperation(value: unknown): value is RuntimeOperation {
     );
   }
   if (value.type === 'set_thinking_level') {
-    return hasOnlyKeys(value, ['type', 'level']) && isNonEmptyBoundedString(value.level, 64);
+    return hasOnlyKeys(value, ['type', 'level']) && isRuntimeLevelToken(value.level);
   }
   if (value.type === 'set_mode') {
     return (
@@ -889,6 +897,37 @@ export function isRuntimeModelCatalogDto(value: unknown): value is RuntimeModelC
   );
 }
 
+/** Narrow an atomic, session-bound runtime state and model catalog snapshot. */
+export function isRuntimeSnapshotDto(value: unknown): value is RuntimeSnapshotDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['sessionId', 'state', 'models']) &&
+    isOpaqueId(value.sessionId) &&
+    isRuntimeStateDto(value.state) &&
+    isRuntimeModelCatalogDto(value.models) &&
+    value.state.sessionId === value.sessionId &&
+    value.models.sessionId === value.sessionId &&
+    value.state.revision === value.models.runtimeRevision
+  );
+}
+
+/** Narrow one of the fixed runtime issue codes. */
+export function isRuntimeIssueCode(value: unknown): value is RuntimeIssueCode {
+  return typeof value === 'string' && RUNTIME_ISSUE_CODE_SET.has(value as RuntimeIssueCode);
+}
+
+/** Narrow a browser-visible runtime HTTP issue response. */
+export function isRuntimeIssueResponse(value: unknown): value is RuntimeIssueResponse {
+  return isRecord(value) && hasOnlyKeys(value, ['error']) && isRuntimeIssueCode(value.error);
+}
+
+/** Narrow an internal typed runtime issue DTO. */
+export function isRuntimeIssueDto(value: unknown): value is RuntimeIssueDto {
+  return (
+    isRecord(value) && hasOnlyKeys(value, ['issueCode']) && isRuntimeIssueCode(value.issueCode)
+  );
+}
+
 /** Narrow an unknown value to a bounded command descriptor. */
 export function isCommandDescriptorDto(value: unknown): value is CommandDescriptorDto {
   return (
@@ -935,30 +974,34 @@ export function isRuntimeControlResponse(value: unknown): value is RuntimeContro
   }
   if (value.outcome.status === 'unsupported') {
     return (
-      hasOnlyKeys(value.outcome, ['status', 'reasonCode']) &&
-      value.outcome.reasonCode === 'unsupported_operation'
+      hasRequiredAndOptionalKeys(value.outcome, ['status', 'reasonCode'], ['issueCode']) &&
+      value.outcome.reasonCode === 'unsupported_operation' &&
+      (value.outcome.issueCode === undefined || value.outcome.issueCode === 'unsupported')
     );
   }
   if (value.outcome.status === 'policy_blocked') {
     return (
-      hasOnlyKeys(value.outcome, ['status', 'reasonCode']) &&
-      value.outcome.reasonCode === 'policy_blocked'
+      hasRequiredAndOptionalKeys(value.outcome, ['status', 'reasonCode'], ['issueCode']) &&
+      value.outcome.reasonCode === 'policy_blocked' &&
+      (value.outcome.issueCode === undefined || value.outcome.issueCode === 'unsupported')
     );
   }
   if (value.outcome.status === 'delivery-unknown') {
     return (
-      hasOnlyKeys(value.outcome, ['status', 'reasonCode']) &&
-      value.outcome.reasonCode === 'delivery_unknown'
+      hasRequiredAndOptionalKeys(value.outcome, ['status', 'reasonCode'], ['issueCode']) &&
+      value.outcome.reasonCode === 'delivery_unknown' &&
+      (value.outcome.issueCode === undefined || value.outcome.issueCode === 'delivery-unknown')
     );
   }
   if (value.outcome.status === 'unavailable') {
     return (
-      hasOnlyKeys(value.outcome, ['status', 'reasonCode']) &&
+      hasRequiredAndOptionalKeys(value.outcome, ['status', 'reasonCode'], ['issueCode']) &&
       typeof value.outcome.reasonCode === 'string' &&
       RUNTIME_CONTROL_REASON_CODE_SET.has(value.outcome.reasonCode as RuntimeControlReasonCode) &&
       value.outcome.reasonCode !== 'unsupported_operation' &&
       value.outcome.reasonCode !== 'policy_blocked' &&
-      value.outcome.reasonCode !== 'delivery_unknown'
+      value.outcome.reasonCode !== 'delivery_unknown' &&
+      (value.outcome.issueCode === undefined || isRuntimeIssueCode(value.outcome.issueCode))
     );
   }
   return false;
@@ -991,6 +1034,15 @@ function isBoundedString(value: unknown, maxLength: number): value is string {
 
 function isNonEmptyBoundedString(value: unknown, maxLength: number): value is string {
   return typeof value === 'string' && value.length > 0 && value.length <= maxLength;
+}
+
+function isRuntimeLevelToken(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value.length > 0 &&
+    value.length <= 64 &&
+    /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u.test(value)
+  );
 }
 
 function isPathFreeToken(value: unknown, maxLength: number): value is string {

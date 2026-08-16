@@ -2,38 +2,24 @@
 // MODULE: Session Header (quiet, model-centered top bar)
 // ───────────────────────────────────────────────────────────────────
 // In-session the chrome goes quiet: a back control, the host-confirmed
-// model name + chevron centered as the anchor, a separate effort control,
-// and one overflow that holds the app navigation (Inbox,
-// Review) and the theme control — so nothing competes with the transcript.
+// model + effort readout centered as one trigger into the shared sheet,
+// and one overflow that holds the app navigation (Inbox, Review) and
+// the theme control — so nothing competes with the transcript.
 
 import {
   Button,
   Dialog,
   DialogTrigger,
-  ListBox,
-  ListBoxItem,
   Popover,
-  Select,
   ToggleButton,
 } from 'react-aria-components';
-import type { Key } from 'react-aria-components';
-import { useRef, useState } from 'react';
+import type { RefObject } from 'react';
 
-import { ModelSwitcherSheet } from './ModelSwitcherSheet.js';
-import { modelSwitcherStrings, modelTriggerName } from './model-switcher-strings.js';
+import { modelEffortTriggerName, effortTriggerText } from './effort.js';
+import { modelSwitcherStrings } from './model-switcher-strings.js';
 import type { RuntimeControls } from './runtime.js';
 
 type ThemePreference = 'system' | 'light' | 'dark';
-
-const EFFORT_LABELS: Readonly<Record<string, string>> = {
-  off: 'Off',
-  minimal: 'Minimal',
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  xhigh: 'Extra high',
-  max: 'Max',
-};
 
 export interface SessionHeaderProps {
   readonly onBack: () => void;
@@ -42,6 +28,12 @@ export interface SessionHeaderProps {
   readonly theme: ThemePreference;
   readonly onThemeChange: (theme: ThemePreference) => void;
   readonly runtimeControls: RuntimeControls;
+  /** Whether the shared model/effort sheet is open (for aria-expanded). */
+  readonly sheetOpen: boolean;
+  /** Opens the shared sheet at the model section. */
+  readonly onOpenModelSheet: () => void;
+  /** Attached to the readout trigger so the sheet can restore focus to it. */
+  readonly modelTriggerRef: RefObject<HTMLButtonElement | null>;
 }
 
 export function SessionHeader({
@@ -51,14 +43,15 @@ export function SessionHeader({
   theme,
   onThemeChange,
   runtimeControls,
+  sheetOpen,
+  onOpenModelSheet,
+  modelTriggerRef,
 }: SessionHeaderProps) {
-  const { runtime, setThinkingLevel } = runtimeControls;
+  const { runtime } = runtimeControls;
   const state = runtime.state;
-  const disabled = runtime.status !== 'ready' || state === null;
   const modelLabel = state?.model?.label ?? 'Model';
   const modelProvider = state?.model?.provider ?? 'unknown provider';
-  const [modelSheetOpen, setModelSheetOpen] = useState(false);
-  const modelTriggerRef = useRef<HTMLButtonElement>(null);
+  const effortText = effortTriggerText(state?.thinkingLevel, state?.availableThinkingLevels ?? []);
 
   return (
     <>
@@ -71,11 +64,11 @@ export function SessionHeader({
           <Button
             ref={modelTriggerRef}
             className="session-model-trigger"
-            aria-label={modelTriggerName(modelLabel, modelProvider)}
+            aria-label={modelEffortTriggerName(modelLabel, modelProvider, effortText)}
             aria-haspopup="dialog"
-            aria-expanded={modelSheetOpen}
-            aria-controls="model-switcher-dialog"
-            onPress={() => setModelSheetOpen(true)}
+            aria-expanded={sheetOpen}
+            aria-controls="model-effort-dialog"
+            onPress={onOpenModelSheet}
             style={{ minBlockSize: '44px' }}
           >
             <span
@@ -83,6 +76,15 @@ export function SessionHeader({
               className="session-model-name"
             >
               {modelLabel}
+            </span>
+            <span className="session-header-sep" aria-hidden="true">
+              ·
+            </span>
+            <span
+              key={`effort:${state?.thinkingLevel ?? ''}`}
+              className="session-effort-name"
+            >
+              {effortText}
             </span>
             <ChevronDownGlyph />
           </Button>
@@ -96,30 +98,6 @@ export function SessionHeader({
               {modelSwitcherStrings.planBadge}
             </span>
           )}
-
-          <Select
-            aria-label={modelSwitcherStrings.thinkingEffort}
-            className="session-effort-select"
-            isDisabled={disabled || (state?.availableThinkingLevels.length ?? 0) === 0}
-            selectedKey={state?.thinkingLevel ?? null}
-            onSelectionChange={(key: Key | null) => {
-              if (key !== null) void setThinkingLevel(String(key));
-            }}
-          >
-            <Button style={{ minBlockSize: '44px' }}>
-              <span className="session-effort-label">{modelSwitcherStrings.effort}</span>
-              <span>{effortLabel(state?.thinkingLevel)}</span>
-            </Button>
-            <Popover>
-              <ListBox>
-                {(state?.availableThinkingLevels ?? []).map((level) => (
-                  <ListBoxItem key={level} id={level}>
-                    {effortLabel(level)}
-                  </ListBoxItem>
-                ))}
-              </ListBox>
-            </Popover>
-          </Select>
         </div>
 
         <DialogTrigger>
@@ -161,19 +139,8 @@ export function SessionHeader({
           </Popover>
         </DialogTrigger>
       </header>
-      <ModelSwitcherSheet
-        isOpen={modelSheetOpen}
-        onOpenChange={setModelSheetOpen}
-        runtimeControls={runtimeControls}
-        triggerRef={modelTriggerRef}
-      />
     </>
   );
-}
-
-function effortLabel(level: string | undefined): string {
-  if (level === undefined || level.length === 0) return '—';
-  return EFFORT_LABELS[level] ?? level;
 }
 
 function ChevronLeftGlyph() {

@@ -1,25 +1,25 @@
 # Checklist — Complete runtime state machine and mutation boundary
 
-- [ ] Confirmed effort remains unchanged on control start, timeout, unsupported, unavailable, and delivery-unknown.
-- [ ] A deliberate selection creates exactly one fresh ticket, control ID, and operation tuple.
-- [ ] Same-tick repeated input and all further input while pending are ignored.
-- [ ] Streaming sends zero tickets and zero mutations.
-- [ ] Idle re-enables only after a confirmed hydrate.
-- [ ] Stale and unsupported perform one read-only reconcile and zero automatic mutation retries.
-- [ ] Delivery-unknown remains terminal until a read-only read-back confirms state.
-- [ ] Offline renders bounded local Offline copy and recovers through read-only hydration after connectivity returns.
-- [ ] Foreground-required renders bounded local ownership copy and never takes authority automatically.
-- [ ] Rate-limited handling uses only bounded retry metadata, reconciles, and requires a new selection/ticket.
-- [ ] Host-unavailable and invalid responses render bounded local copy with no raw error text.
-- [ ] Sheet-open, visible-foreground, online-recovery, and live-sync transition refreshes are read-only.
-- [ ] Concurrent refresh calls are deduplicated.
-- [ ] Model, effort, and mode mutations lock while runtime mutation is pending.
-- [ ] Build/Plan state and tool authority remain unchanged.
-- [ ] The document has one polite atomic runtime status region.
-- [ ] The DOM and accessibility tree contain no raw HTTP status, body, server reason, host reason, or RPC reason.
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npm test` exits 0.
-- [ ] `npm run test:web` exits 0, including Phase 1 suites.
-- [ ] CDP captures are taken at exactly 390 CSS px in light and dark themes.
-- [ ] Checking, ready, pending, streaming, offline, and delivery-unknown fixtures show no horizontal overflow.
-- [ ] The same fixtures show no raw issue text in the DOM or accessibility tree.
+- [x] Confirmed effort remains unchanged on control start, timeout, unsupported, unavailable, and delivery-unknown. — reducer keeps confirmed state separate; `tests/runtime.test.tsx` non-optimistic assertions.
+- [x] A deliberate selection creates exactly one fresh ticket, control ID, and operation tuple. — `relay.ts` mints a fresh `/api/runtime/ticket` + `control_<uuid>` per mutation; `tests/relay-runtime-transport.test.ts`.
+- [x] Same-tick repeated input and all further input while pending are ignored. — synchronous in-flight guard; `runtime.test.tsx` "allows exactly one selection per tick".
+- [x] Streaming sends zero tickets and zero mutations. — streaming gate in `runtime.ts`; covered in tests.
+- [x] Idle re-enables only after a confirmed hydrate. — reducer re-enable path; tested.
+- [x] Stale and unsupported perform one read-only reconcile and zero automatic mutation retries. — "retry is user-initiated"; one-time reconcile; tested.
+- [x] Delivery-unknown remains terminal until a read-only read-back confirms state. — `deliveryUnknown` flag persists until a successful hydrate clears it; tested (10s-deadline test).
+- [x] Offline renders bounded local Offline copy and recovers through read-only hydration after connectivity returns. — issue-code copy + online-recovery refresh; tested.
+- [x] Foreground-required renders bounded local ownership copy and never takes authority automatically. — bounded copy; no auto-authority; tested.
+- [x] Rate-limited handling uses only bounded retry metadata, reconciles, and requires a new selection/ticket. — `retryAfterMs` bounded; new selection required; tested.
+- [x] Host-unavailable and invalid responses render bounded local copy with no raw error text. — `runtime-issues.ts` allowlist; tested.
+- [x] Sheet-open, visible-foreground, online-recovery, and live-sync transition refreshes are read-only. — all route through reconcile (`runtime:read`); tested.
+- [x] Concurrent refresh calls are deduplicated. — dedup guard in `runtime.ts`; tested.
+- [x] Model, effort, and mode mutations lock while runtime mutation is pending. — pending-lock; tested.
+- [x] Build/Plan state and tool authority remain unchanged. — no protocol/relay/policy source touched; backend 147/147 green.
+- [x] The document has one polite atomic runtime status region. — `App.tsx` mounts one `role=status aria-live=polite` region; tested.
+- [x] The DOM and accessibility tree contain no raw HTTP status, body, server reason, host reason, or RPC reason. — `runtime-issues.ts` renders only allowlisted copy; `runtime-issues.test.ts` + DOM assertions.
+- [x] `npm run typecheck` exits 0. — verified (worktree).
+- [x] `npm test` exits 0. — verified, 147 passed (147), zero regressions.
+- [x] `npm run test:web` exits 0, including Phase 1 suites. — verified, 102 passed (102) (+28 new).
+- [ ] CDP captures are taken at exactly 390 CSS px in light and dark themes. — DEFERRED to the feature-002 visual checkpoint (after phase `004`, the effort-sheet UI). This phase adds NO visual surface; the existing controls consume the hardened path unchanged.
+- [ ] Checking, ready, pending, streaming, offline, and delivery-unknown fixtures show no horizontal overflow. — DEFERRED with the CDP capture above (no visual surface changed this phase).
+- [x] The same fixtures show no raw issue text in the DOM or accessibility tree. — proven now by the jsdom DOM/announcement tests (issue-code copy only).

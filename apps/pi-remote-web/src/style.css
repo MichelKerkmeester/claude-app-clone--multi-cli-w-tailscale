@@ -1560,24 +1560,24 @@ button[data-pressed]:not([data-disabled]) {
   overflow: hidden;
 }
 
-.session-effort-select > button {
-  display: inline-flex;
-  min-block-size: 44px;
-  align-items: center;
-  gap: 0.3rem;
-  padding-inline: 0.65rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--ink-secondary);
-  font-size: 0.75rem;
-  cursor: pointer;
-}
-
-.session-model-trigger[data-focus-visible],
-.session-effort-select > button[data-focus-visible] {
+.session-model-trigger[data-focus-visible] {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+
+.session-header-sep {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.session-effort-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-secondary);
+  font-size: 0.8rem;
+  font-weight: 560;
 }
 
 .session-plan-badge {
@@ -1590,14 +1590,6 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--accent-ink);
   font-size: 0.68rem;
   font-weight: 700;
-}
-
-.session-effort-label {
-  color: var(--ink-muted);
-  font-size: 0.65rem;
-  font-weight: 650;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
 }
 
 /* The model catalog is host-authored, so the sheet contains and wraps every value. */
@@ -1645,9 +1637,9 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 .model-sheet-modal {
-  inline-size: min(100%, 430px);
+  inline-size: min(92vw, 24rem);
   max-inline-size: 100vw;
-  max-block-size: calc(var(--visual-viewport-height, 100dvh) * 0.92);
+  max-block-size: calc(var(--visual-viewport-height, 100dvh) * 0.75);
   overflow: hidden;
   border-radius: 24px 24px 0 0;
   background: var(--model-sheet-raised);
@@ -1677,6 +1669,7 @@ button[data-pressed]:not([data-disabled]) {
   overflow: hidden;
   outline: none;
   padding-block-end: max(16px, env(safe-area-inset-bottom));
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
   font-family: var(--font-sans);
 }
 
@@ -1886,7 +1879,11 @@ button[data-pressed]:not([data-disabled]) {
 .model-sheet-close[data-focus-visible],
 .model-sheet-cancel[data-focus-visible],
 .model-sheet-switch[data-focus-visible],
-.model-sheet-search-clear[data-focus-visible] {
+.model-sheet-search-clear[data-focus-visible],
+.model-sheet-nav-button[data-focus-visible],
+.effort-sheet-nav-button[data-focus-visible],
+.effort-sheet-reconcile-button[data-focus-visible],
+.model-sheet-catalog-state button[data-focus-visible] {
   outline-color: var(--model-sheet-ui-accent);
   outline-style: solid;
   outline-width: 2px;
@@ -2075,7 +2072,9 @@ button[data-pressed]:not([data-disabled]) {
   .model-sheet-modal.is-dragging,
   .model-sheet-modal.is-snapping,
   .model-sheet-overlay[data-exiting] .model-sheet-modal,
-  .model-sheet-skeleton {
+  .model-sheet-skeleton,
+  .effort-spinner,
+  .effort-state-confirmed {
     animation: none;
   }
 
@@ -2099,12 +2098,315 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* ── Effort section: one full-width radio row per host-advertised level ── */
+.effort-sheet-section {
+  display: flex;
+  min-inline-size: 0;
+  min-block-size: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.effort-sheet-status {
+  flex: 0 0 auto;
+  margin: 0;
+  padding-block: 0.5rem;
+  padding-inline: var(--space-4);
+  color: var(--model-sheet-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.effort-sheet-reconcile {
+  flex: 0 0 auto;
+  padding-inline: var(--space-4);
+}
+
+.effort-sheet-reconcile-button {
+  min-block-size: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--model-sheet-accent);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.effort-radio-scroll {
+  min-inline-size: 0;
+  min-block-size: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding-block: 0 var(--space-2);
+  padding-inline: var(--space-3);
+}
+
+.effort-radio-group {
+  display: grid;
+  min-inline-size: 0;
+  gap: 2px;
+  outline: none;
+}
+
+.effort-radio-row {
+  display: grid;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.25rem var(--space-2);
+  align-content: center;
+  padding-block: 0.5rem;
+  padding-inline: var(--space-3);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  color: var(--model-sheet-ink);
+  cursor: pointer;
+  outline: none;
+}
+
+.effort-radio-row[data-hovered],
+.effort-radio-row[data-focused] {
+  background: var(--model-sheet-selection);
+}
+
+.effort-radio-row[data-selected] {
+  border-color: var(--model-sheet-ui-accent);
+  background: var(--model-sheet-selection);
+}
+
+.effort-radio-row[data-focus-visible] {
+  outline-color: var(--model-sheet-ui-accent);
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: 2px;
+}
+
+.effort-radio-row[data-disabled] {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.effort-radio-row-main,
+.effort-radio-row-states {
+  display: flex;
+  min-inline-size: 0;
+  align-items: center;
+}
+
+.effort-radio-row-main {
+  flex-wrap: wrap;
+  gap: 0.2rem var(--space-2);
+}
+
+.effort-radio-row-label {
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.effort-radio-row-states {
+  justify-content: flex-end;
+  gap: 0.35rem;
+  color: var(--model-sheet-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.effort-state-confirmed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+  animation: effort-check-in 120ms ease-out;
+}
+
+.effort-state-requested {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.effort-spinner {
+  animation: composer-spin 0.8s linear infinite;
+}
+
+.effort-radio-row-description {
+  grid-column: 1 / -1;
+  color: var(--model-sheet-muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+/* Muted copy on the soft selection wash drops below 4.5:1 in the bone
+   theme, so selected/focused/hovered rows promote descriptions and IDs
+   to the ink token; the accent states column already passes there. */
+.model-sheet-row[data-hovered] .model-sheet-row-id,
+.model-sheet-row[data-hovered] .model-sheet-row-description,
+.model-sheet-row[data-focused] .model-sheet-row-id,
+.model-sheet-row[data-focused] .model-sheet-row-description,
+.model-sheet-row[data-selected] .model-sheet-row-id,
+.model-sheet-row[data-selected] .model-sheet-row-description,
+.effort-radio-row[data-hovered] .effort-radio-row-description,
+.effort-radio-row[data-focused] .effort-radio-row-description,
+.effort-radio-row[data-selected] .effort-radio-row-description {
+  color: var(--model-sheet-ink);
+}
+
+@keyframes effort-check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Section navigation between the model picker and the effort radio group. */
+.model-sheet-nav,
+.effort-sheet-nav {
+  display: flex;
+  min-inline-size: 0;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding-block: var(--space-1) var(--space-2);
+}
+
+.effort-sheet-nav {
+  justify-content: flex-start;
+  padding-inline: var(--space-4);
+}
+
+.model-sheet-nav-button,
+.effort-sheet-nav-button {
+  display: inline-flex;
+  min-block-size: 44px;
+  align-items: center;
+  gap: 0.3rem;
+  padding-inline: 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--model-sheet-accent);
+  font-size: 0.85rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.model-sheet-nav-button[data-hovered],
+.effort-sheet-nav-button[data-hovered] {
+  color: var(--model-sheet-ink);
+}
+
+/* Section nav arrows are physical drawings; mirror them under an RTL
+   document so "back" keeps pointing at the section that precedes it. */
+[dir='rtl'] .model-sheet-nav-button svg,
+[dir='rtl'] .effort-sheet-nav-button svg {
+  transform: scaleX(-1);
+}
+
+/* ── Runtime strip: composer-adjacent confirmed readouts + shared trigger ── */
+.runtime-strip {
+  display: flex;
+  min-inline-size: 0;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-block: var(--space-2) 0;
+  padding-inline: var(--page-gutter);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.runtime-readout {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.runtime-readout-label {
+  color: var(--ink-muted);
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.runtime-readout-value {
+  color: var(--ink-secondary);
+  font-weight: 620;
+}
+
+.runtime-effort-trigger {
+  display: inline-flex;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  align-items: center;
+  gap: 0.35rem;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-secondary);
+  cursor: pointer;
+}
+
+.runtime-effort-trigger[data-hovered] {
+  background: var(--surface-muted);
+}
+
+.runtime-effort-trigger[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.runtime-control.runtime-mode {
+  display: inline-flex;
+  padding: 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.runtime-mode .react-aria-ToggleButton {
+  min-block-size: 2rem;
+  padding-inline: 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 620;
+  cursor: pointer;
+}
+
+.runtime-mode .react-aria-ToggleButton[data-selected] {
+  background: var(--ink);
+  color: var(--ink-inverse);
+}
+
+.runtime-mode .react-aria-ToggleButton[data-disabled] {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.runtime-status {
+  min-block-size: 1rem;
+  white-space: nowrap;
+}
+
 @media (max-width: 360px) {
   .session-model-trigger {
     padding-inline: 0.55rem;
   }
 
-  .session-effort-label {
+  .session-header-sep {
     display: none;
   }
 
@@ -2113,7 +2415,10 @@ button[data-pressed]:not([data-disabled]) {
   .model-sheet-policy,
   .model-sheet-catalog-state,
   .model-sheet-mutation,
-  .model-sheet-footer {
+  .model-sheet-footer,
+  .effort-sheet-status,
+  .effort-sheet-reconcile,
+  .effort-sheet-nav {
     padding-inline: var(--space-3);
   }
 }

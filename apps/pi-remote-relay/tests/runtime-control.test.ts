@@ -11,7 +11,7 @@ import type {
   RuntimeControlCommand,
   RuntimeOperation,
 } from '@pi-remote/pi-rpc-protocol';
-import { isRuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
+import { isRuntimeSnapshotDto, isRuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 
 import type { RpcSupervisor, SupervisorLifecycleEvent } from '../src/rpc/supervisor.js';
 import {
@@ -19,7 +19,7 @@ import {
   projectRuntimeModelCatalog,
   projectRuntimeState,
 } from '../src/store/redaction.js';
-import { RuntimeService } from '../src/runtime/runtime-service.js';
+import { RuntimeIssueError, RuntimeService } from '../src/runtime/runtime-service.js';
 
 const SESSION = 'session_local';
 
@@ -38,6 +38,8 @@ class FakeSupervisor {
   ];
   public rejectSettled = false;
   public hostReject = false;
+  public readFailure: PiRpcCommand['type'] | null = null;
+  public readCount = 0;
   public settledCount = 0;
   public readonly settled: PiRpcCommand[] = [];
   private readonly lifecycleListeners = new Set<(event: SupervisorLifecycleEvent) => void>();
@@ -82,6 +84,21 @@ class FakeSupervisor {
   }
 
   private respond(command: PiRpcCommand): PiRpcResponse {
+    if (
+      command.type === 'get_state' ||
+      command.type === 'get_available_thinking_levels' ||
+      command.type === 'get_available_models'
+    ) {
+      this.readCount += 1;
+      if (this.readFailure === command.type) {
+        return {
+          type: 'response',
+          command: command.type,
+          success: false,
+          error: 'raw host failure /Users/private secret=LEAK',
+        };
+      }
+    }
     switch (command.type) {
       case 'get_state':
         return ok({ thinkingLevel: this.thinkingLevel, model: this.model, streaming: false });
@@ -145,6 +162,36 @@ function control(
 }
 
 describe('runtime authority core', () => {
+  it('deduplicates concurrent read-only hydration and preserves advertised level order', async () => {
+    const fake = new FakeSupervisor();
+    fake.levels = ['max', 'off', 'high'];
+    const svc = service(fake);
+    const first = svc.hydrate();
+    const second = svc.hydrate();
+
+    expect(second).toBe(first);
+    const snapshot = await first;
+    expect(isRuntimeSnapshotDto(snapshot)).toBe(true);
+    expect(snapshot.state.availableThinkingLevels).toEqual(['max', 'off', 'high']);
+    expect(fake.readCount).toBe(3);
+  });
+
+  it('maps unsupported host reads to a fixed issue code and invalidates runtime authority', async () => {
+    const fake = new FakeSupervisor();
+    fake.readFailure = 'get_available_thinking_levels';
+    const svc = service(fake);
+
+    await expect(svc.hydrate()).rejects.toMatchObject({ issueCode: 'unsupported' });
+    try {
+      await svc.hydrate();
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(RuntimeIssueError);
+      expect(JSON.stringify(error)).not.toContain('raw host failure');
+    }
+    expect(svc.isLive()).toBe(false);
+    expect(svc.getState()).toBeNull();
+  });
+
   it('accepts a valid set_model, increments revision, and reconciles thinking levels', async () => {
     const fake = new FakeSupervisor();
     const svc = service(fake);
@@ -198,7 +245,11 @@ describe('runtime authority core', () => {
           ),
         )
       ).outcome,
-    ).toEqual({ status: 'unavailable', reasonCode: 'model_unavailable' });
+    ).toEqual({
+      status: 'unavailable',
+      reasonCode: 'model_unavailable',
+      issueCode: 'unsupported',
+    });
     expect(fake.settledCount).toBe(0);
   });
 
@@ -302,6 +353,7 @@ describe('runtime authority core', () => {
     expect(response.outcome).toEqual({
       status: 'delivery-unknown',
       reasonCode: 'delivery_unknown',
+      issueCode: 'delivery-unknown',
     });
     expect(svc.getRevision()).toBe(0);
     expect(fake.settledCount).toBe(1);
@@ -319,7 +371,11 @@ describe('runtime authority core', () => {
     const response = await svc.control(
       control({ type: 'set_model', provider: 'opencode-go', modelId: 'qwen3.8-max' }, 0),
     );
-    expect(response.outcome).toEqual({ status: 'policy_blocked', reasonCode: 'policy_blocked' });
+    expect(response.outcome).toEqual({
+      status: 'policy_blocked',
+      reasonCode: 'policy_blocked',
+      issueCode: 'unsupported',
+    });
     expect(JSON.stringify(response)).not.toContain('/Users/private');
     expect(fake.settledCount).toBe(1);
   });

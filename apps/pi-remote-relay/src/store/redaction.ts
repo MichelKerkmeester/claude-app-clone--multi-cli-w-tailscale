@@ -13,6 +13,7 @@ import type {
   ModelPricingDto,
   RuntimeMode,
   RuntimeModelCatalogDto,
+  RuntimeSnapshotDto,
   RuntimeStateDto,
 } from '@pi-remote/pi-rpc-protocol';
 import {
@@ -20,6 +21,7 @@ import {
   MODEL_AVAILABILITY_REASON_CODES,
   isCommandCatalogDto,
   isRuntimeModelCatalogDto,
+  isRuntimeSnapshotDto,
   isRuntimeStateDto,
 } from '@pi-remote/pi-rpc-protocol';
 
@@ -212,15 +214,57 @@ export function projectRuntimeState(
     sessionId: options.sessionId,
     revision: options.revision,
     model,
-    thinkingLevel: boundedToken(rawState.thinkingLevel, 64) ?? 'unknown',
+    thinkingLevel: runtimeLevelToken(rawState.thinkingLevel) ?? 'unknown',
     availableThinkingLevels: options.availableThinkingLevels
-      .filter((level): level is string => boundedToken(level, 64) !== null)
+      .filter((level): level is string => runtimeLevelToken(level) !== null)
       .slice(0, 32),
     mode: options.mode,
     streaming: rawState.streaming === true,
     updatedAt: options.updatedAt,
   };
   return isRuntimeStateDto(dto) ? dto : null;
+}
+
+/** Project Pi's advertised thinking-level order without inventing client levels. */
+export function projectRuntimeThinkingLevels(rawData: unknown): readonly string[] | null {
+  const rows = extractRows(rawData, 'levels');
+  if (rows === null) return null;
+  return rows.filter((level): level is string => runtimeLevelToken(level) !== null).slice(0, 32);
+}
+
+/** Project the three Pi reads into one session-bound, browser-safe snapshot. */
+export function projectRuntimeSnapshot(
+  rawState: unknown,
+  rawLevels: unknown,
+  rawModels: unknown,
+  options: {
+    readonly sessionId: string;
+    readonly revision: number;
+    readonly catalogRevision: number;
+    readonly mode: RuntimeMode;
+    readonly updatedAt: string;
+  },
+): RuntimeSnapshotDto | null {
+  const availableThinkingLevels = projectRuntimeThinkingLevels(rawLevels);
+  if (availableThinkingLevels === null) return null;
+  const state = projectRuntimeState(rawState, {
+    sessionId: options.sessionId,
+    revision: options.revision,
+    mode: options.mode,
+    availableThinkingLevels,
+    updatedAt: options.updatedAt,
+  });
+  if (state === null) return null;
+  const models = projectRuntimeModelCatalog(rawModels, {
+    sessionId: options.sessionId,
+    catalogRevision: options.catalogRevision,
+    runtimeRevision: options.revision,
+    currentModel: state.model,
+    streaming: state.streaming,
+  });
+  if (models === null) return null;
+  const snapshot = { sessionId: options.sessionId, state, models };
+  return isRuntimeSnapshotDto(snapshot) ? snapshot : null;
 }
 
 export function projectAvailableModel(row: unknown): AvailableModelDto | null {
@@ -296,6 +340,15 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 function boundedToken(value: unknown, max: number): string | null {
   return typeof value === 'string' && value.length > 0 && value.length <= max ? value : null;
+}
+
+function runtimeLevelToken(value: unknown): string | null {
+  return typeof value === 'string' &&
+    value.length > 0 &&
+    value.length <= 64 &&
+    /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u.test(value)
+    ? value
+    : null;
 }
 
 function boundedString(value: unknown, max: number): string | null {

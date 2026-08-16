@@ -543,6 +543,31 @@ export interface RuntimeModelCatalogDto {
   readonly models: readonly AvailableModelDto[];
 }
 
+export interface RuntimeSnapshotDto {
+  readonly sessionId: string;
+  readonly state: RuntimeStateDto;
+  readonly models: RuntimeModelCatalogDto;
+}
+
+export const RUNTIME_ISSUE_CODES = [
+  'unsupported',
+  'host-unavailable',
+  'foreground-required',
+  'rate-limited',
+  'delivery-unknown',
+  'invalid-response',
+  'offline',
+] as const;
+export type RuntimeIssueCode = (typeof RUNTIME_ISSUE_CODES)[number];
+
+export interface RuntimeIssueResponse {
+  readonly error: RuntimeIssueCode;
+}
+
+export interface RuntimeIssueDto {
+  readonly issueCode: RuntimeIssueCode;
+}
+
 export type CommandSource = 'extension' | 'prompt' | 'skill';
 
 export interface CommandDescriptorDto {
@@ -577,16 +602,29 @@ export type RuntimeControlReasonCode = (typeof RUNTIME_CONTROL_REASON_CODES)[num
 export type RuntimeControlOutcome =
   | { readonly status: 'accepted'; readonly state: RuntimeStateDto }
   | { readonly status: 'stale'; readonly state: RuntimeStateDto }
-  | { readonly status: 'unsupported'; readonly reasonCode: 'unsupported_operation' }
+  | {
+      readonly status: 'unsupported';
+      readonly reasonCode: 'unsupported_operation';
+      readonly issueCode?: 'unsupported';
+    }
   | {
       readonly status: 'unavailable';
       readonly reasonCode: Exclude<
         RuntimeControlReasonCode,
         'unsupported_operation' | 'policy_blocked' | 'delivery_unknown'
       >;
+      readonly issueCode?: RuntimeIssueCode;
     }
-  | { readonly status: 'policy_blocked'; readonly reasonCode: 'policy_blocked' }
-  | { readonly status: 'delivery-unknown'; readonly reasonCode: 'delivery_unknown' };
+  | {
+      readonly status: 'policy_blocked';
+      readonly reasonCode: 'policy_blocked';
+      readonly issueCode?: 'unsupported';
+    }
+  | {
+      readonly status: 'delivery-unknown';
+      readonly reasonCode: 'delivery_unknown';
+      readonly issueCode?: 'delivery-unknown';
+    };
 
 export interface RuntimeControlResponse {
   readonly outcome: RuntimeControlOutcome;

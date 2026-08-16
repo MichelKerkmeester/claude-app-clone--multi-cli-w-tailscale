@@ -9,8 +9,12 @@ import {
   isCommandCatalogDto,
   isPromptAbortResponse,
   isRuntimeControlResponse,
+  isRuntimeIssueCode,
+  isRuntimeIssueDto,
+  isRuntimeIssueResponse,
   isRuntimeModelCatalogDto,
   isRuntimeModelTicketResponse,
+  isRuntimeSnapshotDto,
   isRuntimeStateDto,
   isSessionCardDto,
   isPromptSubmitResponse,
@@ -21,9 +25,11 @@ import {
   type PromptAbortResponse,
   type RuntimeControlCommand,
   type RuntimeControlResponse,
+  type RuntimeIssueCode,
   type RuntimeModelCatalogDto,
   type RuntimeModelTicketRequest,
   type RuntimeOperation,
+  type RuntimeSnapshotDto,
   type RuntimeStateDto,
   type SessionCardDto,
   type AcceptEditsGrantDto,
@@ -43,11 +49,23 @@ const MAX_PAGES = 100;
 
 export class RelayRequestError extends Error {
   readonly code: 'access_denied' | 'request_failed';
+  readonly status: number | null;
 
-  constructor(code: 'access_denied' | 'request_failed') {
+  constructor(code: 'access_denied' | 'request_failed', status: number | null = null) {
     super(code === 'access_denied' ? 'Relay access denied.' : 'Relay request failed.');
     this.name = 'RelayRequestError';
     this.code = code;
+    this.status = status;
+  }
+}
+
+export class RuntimeRelayError extends Error {
+  readonly issueCode: RuntimeIssueCode;
+
+  constructor(issueCode: RuntimeIssueCode) {
+    super(issueCode);
+    this.name = 'RuntimeRelayError';
+    this.issueCode = issueCode;
   }
 }
 
@@ -112,6 +130,46 @@ export async function fetchRuntimeModels(signal?: AbortSignal): Promise<RuntimeM
     throw new Error('Relay returned an invalid model catalog.');
   }
   return payload;
+}
+
+export async function fetchRuntimeSnapshot(signal?: AbortSignal): Promise<RuntimeSnapshotDto> {
+  if (isDemoMode()) {
+    const [state, models] = await Promise.all([
+      fetchRuntimeState(signal),
+      fetchRuntimeModels(signal),
+    ]);
+    const snapshot = { sessionId: state.sessionId, state, models };
+    if (isRuntimeSnapshotDto(snapshot)) return snapshot;
+    throw new RuntimeRelayError('invalid-response');
+  }
+  try {
+    const payload = await postJson(
+      '/api/runtime/reconcile',
+      undefined,
+      signal,
+      [422, 429, 502, 503],
+    );
+    if (isRuntimeSnapshotDto(payload)) return payload;
+    if (isRuntimeIssueResponse(payload)) throw new RuntimeRelayError(payload.error);
+    if (isRuntimeIssueDto(payload)) throw new RuntimeRelayError(payload.issueCode);
+    throw new RuntimeRelayError('invalid-response');
+  } catch (error: unknown) {
+    throw new RuntimeRelayError(normalizeRuntimeIssue(error));
+  }
+}
+
+export function normalizeRuntimeIssue(error: unknown): RuntimeIssueCode {
+  if (error instanceof RuntimeRelayError) return error.issueCode;
+  if (error instanceof RelayRequestError) {
+    if (error.status === 422) return 'unsupported';
+    if (error.status === 429) return 'rate-limited';
+    if (error.status === 403) return 'foreground-required';
+    if (error.status !== null && error.status >= 500) return 'host-unavailable';
+  }
+  if (error instanceof SyntaxError) return 'invalid-response';
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return 'offline';
+  if (isRecord(error) && isRuntimeIssueCode(error.issueCode)) return error.issueCode;
+  return 'host-unavailable';
 }
 
 export async function fetchCommands(signal?: AbortSignal): Promise<CommandCatalogDto> {
@@ -343,6 +401,7 @@ async function postJson(
   if (!response.ok && !acceptedStatuses.includes(response.status)) {
     throw new RelayRequestError(
       response.status === 401 || response.status === 403 ? 'access_denied' : 'request_failed',
+      response.status,
     );
   }
   return response.status === 204 ? null : (response.json() as Promise<unknown>);

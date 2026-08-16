@@ -22,14 +22,19 @@ import {
   isPromptSubmitResponse,
   isRuntimeControlCommand,
   isRuntimeControlResponse,
+  isRuntimeIssueCode,
+  isRuntimeIssueDto,
+  isRuntimeIssueResponse,
   isRuntimeModelCatalogDto,
   isRuntimeModelTicketRequest,
   isRuntimeModelTicketResponse,
   isRuntimeOperation,
+  isRuntimeSnapshotDto,
   isRuntimeStateDto,
   isSessionCardDto,
   isSyncMessage,
   isTranscriptBlock,
+  RUNTIME_ISSUE_CODES,
   sha256,
 } from '../src/index.js';
 
@@ -391,6 +396,97 @@ describe('runtime control guards', () => {
     ).toBe(false);
   });
 
+  it('accepts three-, five-, and seven-level session snapshots in host order', () => {
+    const levels = [
+      ['low', 'medium', 'high'],
+      ['off', 'minimal', 'low', 'medium', 'high'],
+      ['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
+    ] as const;
+    const snapshots = levels.map((availableThinkingLevels) => ({
+      sessionId: 'session_local',
+      state: { ...state, availableThinkingLevels },
+      models: {
+        sessionId: 'session_local',
+        catalogRevision: 4,
+        runtimeRevision: state.revision,
+        currentModel: state.model,
+        streaming: state.streaming,
+        canSetModelWhileStreaming: false,
+        models: [state.model],
+      },
+    }));
+
+    expect(snapshots.every(isRuntimeSnapshotDto)).toBe(true);
+    expect(snapshots[2]?.state.availableThinkingLevels).toEqual(levels[2]);
+  });
+
+  it('rejects malformed snapshots and every non-allowlisted runtime issue', () => {
+    const snapshot = {
+      sessionId: 'session_local',
+      state,
+      models: {
+        sessionId: 'session_local',
+        catalogRevision: 4,
+        runtimeRevision: state.revision,
+        currentModel: state.model,
+        streaming: state.streaming,
+        canSetModelWhileStreaming: false,
+        models: [state.model],
+      },
+    } as const;
+
+    expect(RUNTIME_ISSUE_CODES).toEqual([
+      'unsupported',
+      'host-unavailable',
+      'foreground-required',
+      'rate-limited',
+      'delivery-unknown',
+      'invalid-response',
+      'offline',
+    ]);
+    expect(RUNTIME_ISSUE_CODES.every(isRuntimeIssueCode)).toBe(true);
+    expect(isRuntimeIssueCode('raw host rejection')).toBe(false);
+    expect(isRuntimeIssueResponse({ error: 'host-unavailable' })).toBe(true);
+    expect(isRuntimeIssueResponse({ error: 'host-unavailable', reason: 'raw' })).toBe(false);
+    expect(isRuntimeIssueResponse({ error: 'raw host rejection' })).toBe(false);
+    expect(isRuntimeIssueDto({ issueCode: 'invalid-response' })).toBe(true);
+    expect(isRuntimeIssueDto({ issueCode: 'invalid-response', extra: true })).toBe(false);
+
+    expect(isRuntimeSnapshotDto(snapshot)).toBe(true);
+    expect(isRuntimeSnapshotDto({ ...snapshot, extra: true })).toBe(false);
+    expect(isRuntimeSnapshotDto({ ...snapshot, sessionId: 'session_other' })).toBe(false);
+    expect(
+      isRuntimeSnapshotDto({
+        ...snapshot,
+        models: { ...snapshot.models, sessionId: 'session_other' },
+      }),
+    ).toBe(false);
+    expect(
+      isRuntimeSnapshotDto({
+        ...snapshot,
+        models: { ...snapshot.models, runtimeRevision: state.revision + 1 },
+      }),
+    ).toBe(false);
+    expect(
+      isRuntimeSnapshotDto({
+        ...snapshot,
+        state: { ...state, revision: 1.5 },
+      }),
+    ).toBe(false);
+    expect(
+      isRuntimeSnapshotDto({
+        ...snapshot,
+        state: { ...state, availableThinkingLevels: ['x'.repeat(65)] },
+      }),
+    ).toBe(false);
+    expect(
+      isRuntimeSnapshotDto({
+        ...snapshot,
+        state: { ...state, availableThinkingLevels: ['high', 'high'] },
+      }),
+    ).toBe(false);
+  });
+
   it('accepts exact runtime model ticket payloads and rejects malformed bindings', () => {
     const request = {
       sessionId: 'session_local',
@@ -459,7 +555,11 @@ describe('runtime control guards', () => {
     ).toBe(true);
     expect(
       isRuntimeControlResponse({
-        outcome: { status: 'unavailable', reasonCode: 'runtime_unavailable' },
+        outcome: {
+          status: 'unavailable',
+          reasonCode: 'runtime_unavailable',
+          issueCode: 'host-unavailable',
+        },
       }),
     ).toBe(true);
     expect(
@@ -490,6 +590,11 @@ describe('runtime control guards', () => {
     expect(
       isRuntimeControlResponse({
         outcome: { status: 'unsupported', reasonCode: 'not_allowlisted' },
+      }),
+    ).toBe(false);
+    expect(
+      isRuntimeControlResponse({
+        outcome: { status: 'unsupported', reasonCode: 'unsupported_operation', issueCode: 'raw' },
       }),
     ).toBe(false);
   });

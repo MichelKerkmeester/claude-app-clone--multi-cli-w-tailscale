@@ -3,19 +3,28 @@
 // ───────────────────────────────────────────────────────────────────
 
 import type {
+  PiRpcCommand,
   PiRpcResponse,
   RuntimeControlCommand,
   RuntimeControlResponse,
   RuntimeControlReasonCode,
+  RuntimeIssueCode,
   RuntimeModelTicketRequest,
   RuntimeMode,
   RuntimeModelCatalogDto,
   RuntimeOperation,
+  RuntimeSnapshotDto,
   RuntimeStateDto,
 } from '@pi-remote/pi-rpc-protocol';
+import { isRuntimeSnapshotDto } from '@pi-remote/pi-rpc-protocol';
 
 import type { RpcSupervisor } from '../rpc/supervisor.js';
-import { projectRuntimeModelCatalog, projectRuntimeState } from '../store/redaction.js';
+import {
+  projectRuntimeModelCatalog,
+  projectRuntimeSnapshot,
+  projectRuntimeState,
+  projectRuntimeThinkingLevels,
+} from '../store/redaction.js';
 
 import { parsePlanStatus } from './plan-status.js';
 
@@ -47,6 +56,13 @@ class HostRejectedError extends Error {
   }
 }
 
+export class RuntimeIssueError extends Error {
+  public constructor(readonly issueCode: RuntimeIssueCode) {
+    super(issueCode);
+    this.name = 'RuntimeIssueError';
+  }
+}
+
 /**
  * Owns per-session runtime authority in memory. Pi is the source of truth for model,
  * thinking level, streaming, and plan mode; this service only mirrors host-confirmed
@@ -61,6 +77,8 @@ export class RuntimeService {
   private mode: RuntimeMode = 'unknown';
   private availableThinkingLevels: readonly string[] = [];
   private live = false;
+  private hydration: Promise<RuntimeSnapshotDto> | null = null;
+  private lifecycleGeneration = 0;
   private readonly idempotency = new Map<string, RuntimeControlResponse>();
   private modeWaiters: ModeWaiter[] = [];
   private readonly now: () => number;
@@ -72,10 +90,8 @@ export class RuntimeService {
     this.now = options.now ?? ((): number => Date.now());
     supervisor.onLifecycle((event) => {
       if (event.reason === 'exit' || event.reason === 'restart' || event.reason === 'failed') {
-        this.live = false;
-        this.mode = 'unknown';
-        this.currentState = null;
-        this.modelCatalog = null;
+        this.lifecycleGeneration += 1;
+        this.invalidateRuntime();
       }
     });
     supervisor.onEvent((event) => {
@@ -93,6 +109,16 @@ export class RuntimeService {
 
   public getModelCatalog(): RuntimeModelCatalogDto | null {
     return this.modelCatalog;
+  }
+
+  public getSnapshot(): RuntimeSnapshotDto | null {
+    if (this.currentState === null || this.modelCatalog === null) return null;
+    const snapshot = {
+      sessionId: this.options.sessionId,
+      state: this.currentState,
+      models: this.modelCatalog,
+    };
+    return isRuntimeSnapshotDto(snapshot) ? snapshot : null;
   }
 
   public getRevision(): number {
@@ -171,18 +197,107 @@ export class RuntimeService {
     return this.live;
   }
 
-  /** Read authoritative host state; leaves the service not-live if any read fails. */
-  public async hydrate(): Promise<RuntimeStateDto> {
+  /** Read and atomically publish the authoritative host snapshot. */
+  public hydrate(): Promise<RuntimeSnapshotDto> {
+    if (this.hydration !== null) return this.hydration;
+    const generation = this.lifecycleGeneration;
+    const pending = this.readSnapshot(generation).catch((error: unknown) => {
+      const issue =
+        error instanceof RuntimeIssueError ? error : new RuntimeIssueError('host-unavailable');
+      this.invalidateRuntime();
+      throw issue;
+    });
+    this.hydration = pending;
+    const clear = (): void => {
+      if (this.hydration === pending) this.hydration = null;
+    };
+    void pending.then(clear, clear);
+    return pending;
+  }
+
+  public hydrateSnapshot(): Promise<RuntimeSnapshotDto> {
+    return this.hydrate();
+  }
+
+  private async readSnapshot(generation: number): Promise<RuntimeSnapshotDto> {
     const [stateResponse, levelsResponse, modelsResponse] = await Promise.all([
-      this.supervisor.send({ type: 'get_state' }),
-      this.supervisor.send({ type: 'get_available_thinking_levels' }),
-      this.supervisor.send({ type: 'get_available_models' }),
+      this.readHost({ type: 'get_state' }, 'host-unavailable'),
+      this.readHost({ type: 'get_available_thinking_levels' }, 'unsupported'),
+      this.readHost({ type: 'get_available_models' }, 'host-unavailable'),
     ]);
-    this.updateLevels(levelsResponse);
-    const state = this.buildState(stateResponse);
-    this.refreshCatalog(dataOf(modelsResponse), state);
+    const levels = projectRuntimeThinkingLevels(dataOf(levelsResponse));
+    if (levels === null) throw new RuntimeIssueError('invalid-response');
+
+    const provisionalCatalogRevision =
+      this.modelCatalog === null ? Math.max(1, this.catalogRevision + 1) : this.catalogRevision;
+    const provisional = projectRuntimeSnapshot(
+      dataOf(stateResponse),
+      levels,
+      dataOf(modelsResponse),
+      {
+        sessionId: this.options.sessionId,
+        revision: this.revision,
+        catalogRevision: provisionalCatalogRevision,
+        mode: this.mode,
+        updatedAt: new Date(this.now()).toISOString(),
+      },
+    );
+    if (provisional === null) throw new RuntimeIssueError('invalid-response');
+
+    const stateChanged =
+      this.currentState === null || !sameRuntimeState(this.currentState, provisional.state);
+    const nextRevision = stateChanged
+      ? this.revision + (this.currentState === null ? 0 : 1)
+      : this.revision;
+    const catalogChanged =
+      this.modelCatalog === null || !sameCatalog(this.modelCatalog, provisional.models);
+    const nextCatalogRevision =
+      this.modelCatalog === null
+        ? Math.max(1, this.catalogRevision + 1)
+        : catalogChanged
+          ? this.catalogRevision + 1
+          : this.catalogRevision;
+    const snapshot = projectRuntimeSnapshot(dataOf(stateResponse), levels, dataOf(modelsResponse), {
+      sessionId: this.options.sessionId,
+      revision: nextRevision,
+      catalogRevision: nextCatalogRevision,
+      mode: this.mode,
+      updatedAt: new Date(this.now()).toISOString(),
+    });
+    if (snapshot === null) throw new RuntimeIssueError('invalid-response');
+    if (generation !== this.lifecycleGeneration) {
+      throw new RuntimeIssueError('host-unavailable');
+    }
+
+    this.availableThinkingLevels = snapshot.state.availableThinkingLevels;
+    this.revision = nextRevision;
+    this.catalogRevision = nextCatalogRevision;
+    this.currentState = snapshot.state;
+    this.modelCatalog = snapshot.models;
     this.live = true;
-    return state;
+    return snapshot;
+  }
+
+  private async readHost(
+    command: PiRpcCommand,
+    failureCode: RuntimeIssueCode,
+  ): Promise<PiRpcResponse> {
+    try {
+      const response = await this.supervisor.send(command);
+      if (response.success !== true) throw new RuntimeIssueError(failureCode);
+      return response;
+    } catch (error: unknown) {
+      if (error instanceof RuntimeIssueError) throw error;
+      throw new RuntimeIssueError(failureCode);
+    }
+  }
+
+  private invalidateRuntime(): void {
+    this.live = false;
+    this.mode = 'unknown';
+    this.currentState = null;
+    this.modelCatalog = null;
+    this.availableThinkingLevels = [];
   }
 
   /** The single guarded mutation entrypoint. Fails closed and is idempotent by controlId. */
@@ -193,7 +308,11 @@ export class RuntimeService {
     }
     if (!this.live || this.currentState === null) {
       return this.settle(command.controlId, {
-        outcome: { status: 'unavailable', reasonCode: 'runtime_unavailable' },
+        outcome: {
+          status: 'unavailable',
+          reasonCode: 'runtime_unavailable',
+          issueCode: 'host-unavailable',
+        },
       });
     }
     if (
@@ -210,16 +329,28 @@ export class RuntimeService {
     if (validationReason !== null) {
       if (validationReason === 'policy_blocked') {
         return this.settle(command.controlId, {
-          outcome: { status: 'policy_blocked', reasonCode: validationReason },
+          outcome: {
+            status: 'policy_blocked',
+            reasonCode: validationReason,
+            issueCode: 'unsupported',
+          },
         });
       }
       if (validationReason === 'unsupported_operation') {
         return this.settle(command.controlId, {
-          outcome: { status: 'unsupported', reasonCode: validationReason },
+          outcome: {
+            status: 'unsupported',
+            reasonCode: validationReason,
+            issueCode: 'unsupported',
+          },
         });
       }
       return this.settle(command.controlId, {
-        outcome: { status: 'unavailable', reasonCode: validationReason },
+        outcome: {
+          status: 'unavailable',
+          reasonCode: validationReason,
+          issueCode: 'unsupported',
+        },
       });
     }
     try {
@@ -230,13 +361,29 @@ export class RuntimeService {
         return this.settle(
           command.controlId,
           error.reasonCode === 'policy_blocked'
-            ? { outcome: { status: 'policy_blocked', reasonCode: 'policy_blocked' } }
-            : { outcome: { status: 'unavailable', reasonCode: 'host_rejected' } },
+            ? {
+                outcome: {
+                  status: 'policy_blocked',
+                  reasonCode: 'policy_blocked',
+                  issueCode: 'unsupported',
+                },
+              }
+            : {
+                outcome: {
+                  status: 'unavailable',
+                  reasonCode: 'host_rejected',
+                  issueCode: 'host-unavailable',
+                },
+              },
         );
       }
       // Delivery may have happened before the failure. This is terminal; never retry.
       return this.settle(command.controlId, {
-        outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' },
+        outcome: {
+          status: 'delivery-unknown',
+          reasonCode: 'delivery_unknown',
+          issueCode: 'delivery-unknown',
+        },
       });
     }
   }
@@ -306,17 +453,23 @@ export class RuntimeService {
   ): RuntimeStateDto {
     this.revision += 1;
     this.updateLevels(levelsResponse);
-    return this.buildState(stateResponse);
+    const state = this.buildState(stateResponse);
+    if (this.modelCatalog !== null) {
+      this.modelCatalog = {
+        ...this.modelCatalog,
+        runtimeRevision: this.revision,
+        currentModel: state.model,
+        streaming: state.streaming,
+      };
+    }
+    return state;
   }
 
   private updateLevels(levelsResponse: PiRpcResponse | null): void {
     if (levelsResponse === null) {
       return;
     }
-    const rows = extractLevels(dataOf(levelsResponse));
-    this.availableThinkingLevels = rows
-      .filter((level): level is string => typeof level === 'string' && level.length > 0)
-      .slice(0, 32);
+    this.availableThinkingLevels = projectRuntimeThinkingLevels(dataOf(levelsResponse)) ?? [];
   }
 
   private refreshCatalog(rawData: unknown, state: RuntimeStateDto): void {
@@ -395,20 +548,6 @@ function ensureAccepted(response: PiRpcResponse): void {
 
 function dataOf(response: PiRpcResponse): unknown {
   return response.success === true ? response.data : undefined;
-}
-
-function extractLevels(data: unknown): unknown[] {
-  if (Array.isArray(data)) {
-    return data;
-  }
-  if (
-    data !== null &&
-    typeof data === 'object' &&
-    Array.isArray((data as { levels?: unknown }).levels)
-  ) {
-    return (data as { levels: unknown[] }).levels;
-  }
-  return [];
 }
 
 function sameRuntimeState(left: RuntimeStateDto, right: RuntimeStateDto): boolean {

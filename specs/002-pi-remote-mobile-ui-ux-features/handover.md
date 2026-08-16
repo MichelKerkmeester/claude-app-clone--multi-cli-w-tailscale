@@ -1,11 +1,12 @@
 # Spec 002 — Handover
 
 > **State:** build in progress. All 10 features are research-complete + build-ready.
-> **Feature 001 (`change-model`) is BUILT and merged to `main`** — 3 build phases, gates
-> green, true-390px light+dark screenshots. Features 002–010 pending. This packet lives in
-> the app repo (`Mobile CLI`) and is tracked on `main`.
-> **Resume:** read this file → `build-strategy.md` (the how + model roster) → the target
-> feature's `research/research.md` + its build sub-phase docs, then build.
+> **Features 001 (`change-model`), 002 (`change-effort`), and 003 (`slash-commands`) are
+> BUILT and merged to `main`** (11 build phases; `main` at `0408c3c`). Features 004–010
+> pending. This packet lives in the app repo (`Mobile CLI`), tracked on `main`.
+> **Resume:** read this file → `build-strategy.md` (the how + model roster — note the live
+> route is Devin + DeepSeek v4 Flash Max dangerous-mode) → the target feature's
+> `research/research.md` + its build sub-phase docs, then build.
 
 ---
 
@@ -21,9 +22,12 @@ terminal — **without** weakening the two frozen contracts:
 
 ## 2. Current state
 
-- **Feature 001 `change-model` — SHIPPED to `main`** (commits `69c0480` → `3b5546c`): phase `002` (protocol/redaction + one-use revision-bound runtime ticket), phase `003` (RAC model-switcher sheet + full state machine), phase `004` (iPhone interaction/a11y/visual/release hardening), plus a demo-fixture sync. Verified outside the dispatch sandbox: typecheck 0, `npm test` **140/140**, `npm run test:web` **74/74**, true-390px light+dark CDP captures (no overflow at 390/320px). Operator-required residual: physical-iPhone VoiceOver/Switch-Control/Full-Keyboard-Access pass.
-- **Features 002–010 — build-ready, not started.** Each has a synthesized `research.md`, a build-ready `spec.md` + `implementation-phases.md`, and numbered build sub-phases with docs + metadata (009/010 were brought to full parity earlier this session). **40 build phases total; 3 done.**
-- **Build via `build-strategy.md`:** external models implement — opencode-go gateway (**DeepSeek v4 Flash** mechanical, **Luna 5.6 Max** complex); GPT/codex (SOL) paused for quota. Claude orchestrates + verifies and never writes application code. Per-feature isolated worktree → verify → merge to `main`.
+- **Feature 001 `change-model` — SHIPPED to `main`** (`69c0480`→`3b5546c`): bound-ticket protocol/redaction, RAC model-switcher sheet + state machine, iPhone a11y/visual hardening, demo-fixture sync. Verified: typecheck 0, test 140, test:web 74; light+dark 390px screenshots delivered.
+- **Feature 002 `change-effort` — SHIPPED to `main`** (merged at `84b7433`): typed host snapshot + redacted reconcile, complete runtime state machine + mutation boundary, canonical model+effort sheet with effort radio group, a11y/visual hardening. Verified: typecheck 0, test 147, test:web 176; effort-sheet light+dark 390px screenshots delivered.
+- **Feature 003 `slash-commands` — SHIPPED to `main`** (merged at `0408c3c`): versioned catalog authority + fail-closed slash submission, shared in-memory catalog + pure engine, inline autocomplete surface, explicit-Send integration + PWA hardening. Verified: typecheck 0, **test 168/168**, **test:web 358/358**. Autocomplete screenshots DEFERRED to a batched visual pass (needs a `demo.ts` command-catalog fixture sync; functional rendering proven by 358 DOM tests).
+- **Features 004–010 — build-ready, not started.** Each has synthesized `research.md`, build-ready `spec.md` + `implementation-phases.md`, and numbered build sub-phases. **40 build phases total; 11 done.**
+- **Live build route (see `build-strategy.md` §3 session note):** opencode-go hit its 429 weekly cap and the DeepSeek direct API is 402/no-balance, so the working route is **DeepSeek v4 Flash Max via the Devin CLI, `--permission-mode dangerous --respect-workspace-trust false`** (operator-approved; worktree-isolated). Prefer Luna Max via opencode-go once the weekly limit resets. Claude orchestrates + verifies, never writes app code. Per-feature isolated worktree → verify → merge to `main`.
+- **Known flaky test:** `apps/pi-remote-relay/tests/auth.test.ts` "requires foreground..." intermittently fails on a socket-close race (client-close awaited but server hasn't deregistered the socket → 201 instead of 403). Re-run gives the truth; documented in §7. Not yet fixed.
 
 ## 3. Structure
 

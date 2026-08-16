@@ -1669,6 +1669,7 @@ button[data-pressed]:not([data-disabled]) {
   overflow: hidden;
   outline: none;
   padding-block-end: max(16px, env(safe-area-inset-bottom));
+  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
   font-family: var(--font-sans);
 }
 
@@ -1878,7 +1879,11 @@ button[data-pressed]:not([data-disabled]) {
 .model-sheet-close[data-focus-visible],
 .model-sheet-cancel[data-focus-visible],
 .model-sheet-switch[data-focus-visible],
-.model-sheet-search-clear[data-focus-visible] {
+.model-sheet-search-clear[data-focus-visible],
+.model-sheet-nav-button[data-focus-visible],
+.effort-sheet-nav-button[data-focus-visible],
+.effort-sheet-reconcile-button[data-focus-visible],
+.model-sheet-catalog-state button[data-focus-visible] {
   outline-color: var(--model-sheet-ui-accent);
   outline-style: solid;
   outline-width: 2px;
@@ -2166,7 +2171,7 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--model-sheet-selection);
 }
 
-.effort-radio-row[data-checked] {
+.effort-radio-row[data-selected] {
   border-color: var(--model-sheet-ui-accent);
   background: var(--model-sheet-selection);
 }
@@ -2235,6 +2240,21 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.35;
 }
 
+/* Muted copy on the soft selection wash drops below 4.5:1 in the bone
+   theme, so selected/focused/hovered rows promote descriptions and IDs
+   to the ink token; the accent states column already passes there. */
+.model-sheet-row[data-hovered] .model-sheet-row-id,
+.model-sheet-row[data-hovered] .model-sheet-row-description,
+.model-sheet-row[data-focused] .model-sheet-row-id,
+.model-sheet-row[data-focused] .model-sheet-row-description,
+.model-sheet-row[data-selected] .model-sheet-row-id,
+.model-sheet-row[data-selected] .model-sheet-row-description,
+.effort-radio-row[data-hovered] .effort-radio-row-description,
+.effort-radio-row[data-focused] .effort-radio-row-description,
+.effort-radio-row[data-selected] .effort-radio-row-description {
+  color: var(--model-sheet-ink);
+}
+
 @keyframes effort-check-in {
   from {
     opacity: 0;
@@ -2280,6 +2300,13 @@ button[data-pressed]:not([data-disabled]) {
 .model-sheet-nav-button[data-hovered],
 .effort-sheet-nav-button[data-hovered] {
   color: var(--model-sheet-ink);
+}
+
+/* Section nav arrows are physical drawings; mirror them under an RTL
+   document so "back" keeps pointing at the section that precedes it. */
+[dir='rtl'] .model-sheet-nav-button svg,
+[dir='rtl'] .effort-sheet-nav-button svg {
+  transform: scaleX(-1);
 }
 
 /* ── Runtime strip: composer-adjacent confirmed readouts + shared trigger ── */

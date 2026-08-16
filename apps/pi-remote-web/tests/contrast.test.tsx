@@ -110,3 +110,44 @@ describe('frozen model-switcher palette meets WCAG contrast', () => {
     expect(contrast('#d97757', '#f8f8f6')).toBeLessThan(NORMAL_TEXT);
   });
 });
+
+// The exact frozen effort-sheet tokens as applied in style.css. Text pairs
+// target 4.5:1, non-text indicators (focus ring, checked border, check mark)
+// target 3:1. The selection-wash pairs prove the muted-on-selection fix:
+// descriptions and IDs promote to ink on selected/focused/hovered rows.
+const EFFORT_SHEET_LIGHT: readonly Pair[] = [
+  { name: 'carbon on raised sheet', fg: '#24221f', bg: '#ffffff', min: NORMAL_TEXT },
+  { name: 'muted on raised sheet', fg: '#6c6a65', bg: '#ffffff', min: NORMAL_TEXT },
+  { name: 'AA text accent on raised sheet', fg: '#8a452f', bg: '#ffffff', min: NORMAL_TEXT },
+  { name: 'AA text accent on selection', fg: '#8a452f', bg: '#f3e4de', min: NORMAL_TEXT },
+  { name: 'carbon on selection (promoted row copy)', fg: '#24221f', bg: '#f3e4de', min: NORMAL_TEXT },
+  { name: 'AA UI accent border on raised sheet', fg: '#b85f42', bg: '#ffffff', min: LARGE_OR_NON_TEXT },
+  { name: 'AA UI accent border on selection', fg: '#b85f42', bg: '#f3e4de', min: LARGE_OR_NON_TEXT },
+  { name: 'AA focus ring on raised sheet', fg: '#b85f42', bg: '#ffffff', min: LARGE_OR_NON_TEXT },
+];
+
+const EFFORT_SHEET_DARK: readonly Pair[] = [
+  { name: 'text on raised sheet', fg: '#f8f8f6', bg: '#2d2a26', min: NORMAL_TEXT },
+  { name: 'muted on raised sheet', fg: '#9f998f', bg: '#2d2a26', min: NORMAL_TEXT },
+  { name: 'muted on selection', fg: '#9f998f', bg: '#3a2720', min: NORMAL_TEXT },
+  { name: 'accent text on raised sheet', fg: '#f0b19a', bg: '#2d2a26', min: NORMAL_TEXT },
+  { name: 'accent on selection', fg: '#f0b19a', bg: '#3a2720', min: NORMAL_TEXT },
+  { name: 'accent focus ring on raised sheet', fg: '#f0b19a', bg: '#2d2a26', min: LARGE_OR_NON_TEXT },
+];
+
+describe('frozen effort-sheet palette meets WCAG contrast', () => {
+  for (const pair of EFFORT_SHEET_LIGHT) {
+    it(`light: ${pair.name} ≥ ${pair.min}:1`, () => {
+      expect(contrast(pair.fg, pair.bg)).toBeGreaterThanOrEqual(pair.min);
+    });
+  }
+  for (const pair of EFFORT_SHEET_DARK) {
+    it(`dark: ${pair.name} ≥ ${pair.min}:1`, () => {
+      expect(contrast(pair.fg, pair.bg)).toBeGreaterThanOrEqual(pair.min);
+    });
+  }
+
+  it('raw clay fails 3:1 against bone, so it can never be the sole indicator', () => {
+    expect(contrast('#d97757', '#f8f8f6')).toBeLessThan(LARGE_OR_NON_TEXT);
+  });
+});

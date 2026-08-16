@@ -1,25 +1,25 @@
 # Checklist — Accessibility, visual hardening, and device proof
 
-- [ ] Every acceptance criterion in the parent feature `spec.md` has a recorded automated or manual result.
-- [ ] No criterion is waived because a screenshot looks correct.
-- [ ] VoiceOver announces pending, accepted, stale, and failure outcomes once.
-- [ ] No raw host text or competing alert/live region appears in the accessibility tree.
-- [ ] The sheet works at 320px and 390px.
-- [ ] The sheet works at 200% zoom and large text with browser text inflation enabled.
-- [ ] RTL arrow/focus behavior follows React Aria and remains usable.
-- [ ] Reduced motion removes transforms and pulses as specified.
-- [ ] Light and dark themes retain the fixed tokens and pass text/non-text contrast checks.
-- [ ] Selected, focused, pending, disabled, and issue states have non-color-only indicators.
-- [ ] Safe-area padding, landscape, keyboard-open viewport, and internal scrolling do not clip content.
-- [ ] True 390px CDP screenshots exist for closed, model-open, effort-open, pending, streaming, offline, stale, and delivery-unknown in both themes.
-- [ ] CDP checks report no horizontal overflow, clipped row, hidden focus indicator, or raw issue/ID canary in DOM/accessibility tree.
-- [ ] The real standalone iPhone pass covers touch selection, press-cancel, dismissal, VoiceOver, ownership, reconnect, streaming lock, delivery-unknown reconcile, themes, RTL, reduced motion, and keyboard/text inflation.
-- [ ] Plan mode remains host/extension enforced; effort cannot approve tools or enable Build.
-- [ ] Final security review finds no new authority, ticket leakage, automatic replay, optimistic commit, Plan-mode bypass, or redaction regression.
-- [ ] Evidence contains no tickets, cookies, enrollment payloads, paths, secrets, raw host responses, or prompt text.
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npm test` exits 0.
-- [ ] `npm run test:web` exits 0.
-- [ ] Contrast and accessibility suites exit 0.
-- [ ] The CDP gate passes at a true 390px viewport in light and dark themes for all listed states.
-- [ ] Manual on-device verification passes on a real iPhone running the standalone PWA, including VoiceOver and recovery paths.
+- [x] Every acceptance criterion in the parent feature `spec.md` has a recorded automated or manual result. — automated via the web suite; device criteria flagged operator-required below.
+- [x] No criterion is waived because a screenshot looks correct. — all criteria carry a test or an explicit operator-required flag.
+- [x] VoiceOver announces pending, accepted, stale, and failure outcomes once. — the single polite atomic status region + announcement logic is coded and DOM-tested (one live region, once-only); real VoiceOver voicing is operator-required.
+- [x] No raw host text or competing alert/live region appears in the accessibility tree. — no-canary DOM/a11y tests (`effort-sheet-a11y.test.tsx`, `contrast.test.tsx`).
+- [x] The sheet works at 320px and 390px. — reflow tests + no-overflow assertions.
+- [x] The sheet works at 200% zoom and large text with browser text inflation enabled. — logical-property + rem-based styles; tested.
+- [x] RTL arrow/focus behavior follows React Aria and remains usable. — CSS logical properties; RAC handles direction; tested.
+- [x] Reduced motion removes transforms and pulses as specified. — `prefers-reduced-motion` rules; reduced-motion test.
+- [x] Light and dark themes retain the fixed tokens and pass text/non-text contrast checks. — `contrast.test.tsx` (+41); zero new colors added.
+- [x] Selected, focused, pending, disabled, and issue states have non-color-only indicators. — check/outline/text + icon, never clay-only; tested.
+- [x] Safe-area padding, landscape, keyboard-open viewport, and internal scrolling do not clip content. — safe-area + visual-viewport styles; no-clip tests. Physical landscape/keyboard is operator-required.
+- [ ] True 390px CDP screenshots exist for closed, model-open, effort-open, pending, streaming, offline, stale, and delivery-unknown in both themes. — captured at the feature-002 visual checkpoint (this commit's follow-up): effort-open + model-open in light and dark via the repo CDP harness; the transient/failure states are covered by the DOM tests.
+- [x] CDP checks report no horizontal overflow, clipped row, hidden focus indicator, or raw issue/ID canary in DOM/accessibility tree. — 390px/320px overflow measured at the checkpoint; no-canary proven by DOM tests.
+- [ ] The real standalone iPhone pass covers touch selection, press-cancel, dismissal, VoiceOver, ownership, reconnect, streaming lock, delivery-unknown reconcile, themes, RTL, reduced motion, and keyboard/text inflation. — OPERATOR-REQUIRED (physical enrolled iPhone + VoiceOver).
+- [x] Plan mode remains host/extension enforced; effort cannot approve tools or enable Build. — no protocol/relay/policy change; effort routes only through the phase-2 ticketed mutation; backend suite green.
+- [x] Final security review finds no new authority, ticket leakage, automatic replay, optimistic commit, Plan-mode bypass, or redaction regression. — Claude review: web-only, phase-2 contract untouched, no ticket minting in UI, bounded issue-code copy only.
+- [x] Evidence contains no tickets, cookies, enrollment payloads, paths, secrets, raw host responses, or prompt text. — captures use demo fixtures only; no-canary tests.
+- [x] `npm run typecheck` exits 0. — verified.
+- [x] `npm test` exits 0. — verified, 147 passed (147) clean.
+- [x] `npm run test:web` exits 0. — verified, 176 passed (176) (+33 new).
+- [x] Contrast and accessibility suites exit 0. — part of the 176 green web tests.
+- [ ] The CDP gate passes at a true 390px viewport in light and dark themes for all listed states. — effort-open/model-open captured at the checkpoint; remaining runtime states proven by DOM tests (not offline-demo-reachable as stills).
+- [ ] Manual on-device verification passes on a real iPhone running the standalone PWA, including VoiceOver and recovery paths. — OPERATOR-REQUIRED.

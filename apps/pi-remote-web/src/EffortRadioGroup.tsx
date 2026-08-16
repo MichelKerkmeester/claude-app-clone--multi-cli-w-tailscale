@@ -30,6 +30,8 @@ export interface EffortRadioGroupProps {
   readonly isDisabled: boolean;
   /** Id of the visible section heading that names this group. */
   readonly labelledBy: string;
+  /** Id of the visible status line that describes the current group state, when present. */
+  readonly describedBy?: string;
   /** Explicit row selection: the only path that may request a mutation. */
   readonly onSelect: (level: string) => void;
 }
@@ -41,11 +43,13 @@ export function EffortRadioGroup({
   isPending,
   isDisabled,
   labelledBy,
+  describedBy,
   onSelect,
 }: EffortRadioGroupProps) {
   return (
     <RadioGroup
       aria-labelledby={labelledBy}
+      {...(describedBy === undefined ? {} : { 'aria-describedby': describedBy })}
       ref={(element) => {
         // The group's own aria-busy state: pending rows are read-only but
         // the group stays focusable, so busy marks the in-flight window.

@@ -41,6 +41,7 @@ import {
 import { EffortRadioGroup } from './EffortRadioGroup.js';
 import {
   applyingEffortMessage,
+  effortConfirmedMessage,
   effortStrings,
 } from './effort.js';
 import {
@@ -68,6 +69,7 @@ import { runtimeIssueMessage } from './runtime-issues.js';
 const SEARCH_THRESHOLD = 8;
 const SWIPE_DISMISS_RATIO = 0.3;
 const SWIPE_DISMISS_VELOCITY = 1_200;
+const EMPTY_LEVELS: readonly string[] = [];
 
 export type EffortSheetSection = 'model' | 'effort';
 
@@ -97,7 +99,6 @@ export function ModelEffortSheet({
   const [terminalBlocked, setTerminalBlocked] = useState(false);
   const [mutationMessage, setMutationMessage] = useState('');
   const [announcement, setAnnouncement] = useState('');
-  const [isAssertive, setIsAssertive] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isSnapping, setIsSnapping] = useState(false);
@@ -110,6 +111,9 @@ export function ModelEffortSheet({
     readonly startedAt: number;
   } | null>(null);
   const snapTimerRef = useRef<number | null>(null);
+  // The last announced effort-pending level; guards the one polite status
+  // region so a settled outcome is announced exactly once per transition.
+  const prevEffortPendingRef = useRef<string | null>(null);
   const current = runtime.state?.model ?? null;
   const currentKey = current === null ? null : modelKey(current);
   const confirmedEffort = runtime.state?.thinkingLevel ?? null;
@@ -122,7 +126,8 @@ export function ModelEffortSheet({
     setDraftKey(null);
     setTerminalBlocked(false);
     setMutationMessage('');
-    setIsAssertive(false);
+    setAnnouncement('');
+    prevEffortPendingRef.current = null;
     setDragOffset(0);
     setIsDragging(false);
     setIsSnapping(false);
@@ -193,12 +198,18 @@ export function ModelEffortSheet({
     if (!isOpen || section !== 'effort') return;
     const focusTimer = window.setTimeout(() => {
       const confirmedRow = dialogRef.current?.querySelector<HTMLElement>(
-        '.effort-radio-row[data-checked="true"]:not([data-disabled])',
+        '.effort-radio-row[data-selected="true"]:not([data-disabled])',
       );
-      (confirmedRow ??
-        dialogRef.current?.querySelector<HTMLElement>('.effort-radio-row:not([data-disabled])'))?.focus(
-        { preventScroll: true },
-      );
+      const fallbackRow =
+        confirmedRow === null
+          ? dialogRef.current?.querySelector<HTMLElement>('.effort-radio-row:not([data-disabled])') ??
+            null
+          : null;
+      // The row label is not focusable; the native radio input inside it is.
+      const target =
+        (confirmedRow ?? fallbackRow)?.querySelector<HTMLElement>('input[type="radio"]') ??
+        (confirmedRow ?? fallbackRow);
+      target?.focus({ preventScroll: true });
     }, 0);
     return () => window.clearTimeout(focusTimer);
   }, [confirmedEffort, isOpen, section]);
@@ -313,7 +324,7 @@ export function ModelEffortSheet({
       case 'delivery-unknown':
         setTerminalBlocked(true);
         setMutationMessage(runtimeOutcomeMessage(response.outcome));
-        setIsAssertive(true);
+        setAnnouncement(modelStatusAnnouncement(runtimeOutcomeMessage(response.outcome)));
         break;
       default:
         setTerminalBlocked(true);
@@ -339,6 +350,40 @@ export function ModelEffortSheet({
     if (anyPending || effortGroupDisabled) return;
     void setThinkingLevel(level);
   };
+
+  // Effort outcomes announce exactly once through the single polite status
+  // region: applying when the request goes in flight, then the bounded
+  // accepted, stale, or failure copy when it settles. The ref marks the
+  // in-flight window so the region never re-announces on re-renders.
+  const levels = runtime.state?.availableThinkingLevels ?? EMPTY_LEVELS;
+  useEffect(() => {
+    if (!isOpen) return;
+    const nowPending = isEffortPending ? pendingEffortLevel : null;
+    const prevPending = prevEffortPendingRef.current;
+    prevEffortPendingRef.current = nowPending;
+    if (nowPending !== null && nowPending !== prevPending) {
+      setAnnouncement(applyingEffortMessage(nowPending, levels));
+      return;
+    }
+    if (prevPending === null || nowPending !== null) return;
+    switch (runtime.phase) {
+      case 'accepted':
+      case 'ready-adjustable':
+      case 'ready-off-only':
+      case 'ready-empty':
+        setAnnouncement(
+          effortConfirmedMessage(runtime.state?.thinkingLevel ?? prevPending, levels),
+        );
+        break;
+      case 'stale':
+        setAnnouncement(effortStrings.stale);
+        break;
+      default: {
+        const message = effortSectionStatus(runtime, levels);
+        if (message !== null) setAnnouncement(message);
+      }
+    }
+  }, [isEffortPending, isOpen, levels, pendingEffortLevel, runtime.phase, runtime.state?.thinkingLevel]);
 
   const list = (
     <ModelList
@@ -470,9 +515,7 @@ export function ModelEffortSheet({
 
                   <CatalogStatus runtime={runtime} onRefresh={() => void refresh('manual')} />
                   <p
-                    className={`model-sheet-mutation${runtime.deliveryUnknown || isAssertive ? ' is-barrier' : ''}`}
-                    role={runtime.deliveryUnknown || isAssertive ? 'alert' : undefined}
-                    aria-live={runtime.deliveryUnknown || isAssertive ? 'assertive' : undefined}
+                    className={`model-sheet-mutation${runtime.deliveryUnknown ? ' is-barrier' : ''}`}
                   >
                     {mutationMessage ||
                       (runtime.catalogPhase === 'refreshing' ? modelSwitcherStrings.refreshing : '')}
@@ -551,7 +594,11 @@ function EffortSection({
 
   return (
     <section className="effort-sheet-section" aria-label={effortStrings.thinkingEffort}>
-      {status !== null && <p className="effort-sheet-status">{status}</p>}
+      {status !== null && (
+        <p id="effort-sheet-status" className="effort-sheet-status">
+          {status}
+        </p>
+      )}
       {showReconcile && (
         <div className="effort-sheet-reconcile">
           <Button
@@ -572,6 +619,7 @@ function EffortSection({
             isPending={isPending}
             isDisabled={groupDisabled}
             labelledBy="model-effort-title"
+            {...(status === null ? {} : { describedBy: 'effort-sheet-status' })}
             onSelect={onSelect}
           />
         </div>
@@ -809,7 +857,7 @@ function CatalogStatus({
   }
   if (runtime.catalogPhase === 'access_denied') {
     return (
-      <div className="model-sheet-catalog-state" role="alert">
+      <div className="model-sheet-catalog-state">
         {modelSwitcherStrings.accessExpired}{' '}
         <Button onPress={onRefresh} style={{ minBlockSize: '44px' }}>
           {modelSwitcherStrings.reconnect}

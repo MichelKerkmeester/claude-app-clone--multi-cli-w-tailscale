@@ -407,7 +407,7 @@ describe('ModelEffortSheet (model section)', () => {
     expect(screen.getByRole('button', { name: 'Switch model' })).toBeEnabled();
   });
 
-  it('uses an alert for access loss without exposing the host error', () => {
+  it('surfaces access loss as visible bounded copy with no alert region and no host error', () => {
     renderSheet(models(7), vi.fn<RuntimeControls['setModel']>(), vi.fn(), {
       ...readyRuntime(models(7)),
       status: 'error',
@@ -415,7 +415,8 @@ describe('ModelEffortSheet (model section)', () => {
       error: 'sensitive-host-error',
     });
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Access expired.');
+    expect(screen.getByText('Access expired.')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(screen.queryByText('sensitive-host-error')).not.toBeInTheDocument();
   });
 
@@ -454,7 +455,15 @@ describe('ModelEffortSheet (model section)', () => {
     expect(setModel).toHaveBeenCalledOnce();
     expect(screen.getByRole('button', { name: 'Switch model' })).toBeDisabled();
     if (_name === 'delivery unknown') {
-      expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive');
+      // The barrier stays visible copy only; the polite atomic status region
+      // carries the one announcement and no competing alert exists.
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      const announcer = document.querySelector('[data-live-announcer="true"]');
+      expect(announcer).not.toBeNull();
+      expect(announcer).toHaveAttribute('aria-live', 'polite');
+      expect(announcer).toHaveTextContent(
+        'Outcome unknown · Reconcile before switching again.',
+      );
     }
     await user.click(screen.getByRole('button', { name: 'Close sheet' }));
     expect(onOpenChange).toHaveBeenCalledWith(false);

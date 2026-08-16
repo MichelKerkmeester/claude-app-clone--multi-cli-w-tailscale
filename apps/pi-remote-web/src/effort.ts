@@ -124,6 +124,11 @@ export function applyingEffortMessage(level: string, advertised: readonly string
   return `${effortStrings.applying} ${effortRowName(level, advertised)}…`;
 }
 
+/** Accepted announcement for a confirmed level; bounded exactly like every row name. */
+export function effortConfirmedMessage(level: string, advertised: readonly string[]): string {
+  return `${effortStrings.thinkingEffort} set to ${effortRowName(level, advertised)}.`;
+}
+
 /** Localized accessible name for one effort row, states included. */
 export function effortRowAccessibleName(
   level: string,

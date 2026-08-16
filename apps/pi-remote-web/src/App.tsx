@@ -72,7 +72,7 @@ import {
 import { SessionComposer } from './SessionComposer.js';
 import { SessionHeader } from './SessionHeader.js';
 import { useCommands } from './commands.js';
-import { useRuntime } from './runtime.js';
+import { runtimeAnnouncement, useRuntime, type RuntimeUiState } from './runtime.js';
 import { groupBlocksIntoTurns } from './turns.js';
 
 const initialCache = loadCache();
@@ -932,8 +932,23 @@ export function Session({
       if (document.visibilityState === 'visible') void runtimeControls.refresh('foreground');
     };
     document.addEventListener('visibilitychange', reconcileRuntime);
-    return () => document.removeEventListener('visibilitychange', reconcileRuntime);
+    const onOnline = () => void runtimeControls.refresh('online');
+    window.addEventListener('online', onOnline);
+    return () => {
+      document.removeEventListener('visibilitychange', reconcileRuntime);
+      window.removeEventListener('online', onOnline);
+    };
   }, [runtimeControls.refresh]);
+
+  useEffect(() => {
+    // The sync stream reaching live is read-only refresh authority. While the
+    // initial hydrate is still checking, that hydrate already covers the moment.
+    // Deps are keyed on the connection phase value on purpose: a live stream
+    // that stays live must not re-trigger hydration on every sync message.
+    if (connection === 'live' && runtimeControls.runtime.phase !== 'checking') {
+      void runtimeControls.refresh('live');
+    }
+  }, [connection, runtimeControls.refresh]);
 
   const stopRun = () => {
     if (stopping) return;
@@ -1112,6 +1127,7 @@ export function Session({
   };
   return (
     <main className="session-view">
+      <RuntimeStatusRegion runtime={runtimeControls.runtime} />
       <SessionHeader
         onBack={onBack}
         onInbox={onInbox}
@@ -1156,6 +1172,25 @@ export function Session({
         commandsDisabled={commandCatalog.status !== 'ready'}
       />
     </main>
+  );
+}
+
+/**
+ * The one document-level polite atomic runtime status region. Confirmations
+ * and failures announce through this single region so announcements survive
+ * sheet dismissal without competing live regions; copy is bounded local text.
+ */
+export function RuntimeStatusRegion({ runtime }: { readonly runtime: RuntimeUiState }) {
+  return (
+    <div
+      className="sr-only"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      data-runtime-announcer="true"
+    >
+      {runtimeAnnouncement(runtime)}
+    </div>
   );
 }
 

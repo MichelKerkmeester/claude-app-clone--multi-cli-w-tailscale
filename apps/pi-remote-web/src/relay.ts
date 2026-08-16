@@ -47,26 +47,48 @@ import { demoPostJson, demoSocket, isDemoMode } from './demo.js';
 const PAGE_LIMIT = 100;
 const MAX_PAGES = 100;
 
+// Retry metadata is bounded before it can reach UI state: only integer
+// delta-seconds are accepted, and any delay beyond the cap is clamped.
+const MAX_RETRY_AFTER_MS = 60_000;
+
 export class RelayRequestError extends Error {
   readonly code: 'access_denied' | 'request_failed';
   readonly status: number | null;
+  readonly retryAfterMs: number | null;
 
-  constructor(code: 'access_denied' | 'request_failed', status: number | null = null) {
+  constructor(
+    code: 'access_denied' | 'request_failed',
+    status: number | null = null,
+    retryAfterMs: number | null = null,
+  ) {
     super(code === 'access_denied' ? 'Relay access denied.' : 'Relay request failed.');
     this.name = 'RelayRequestError';
     this.code = code;
     this.status = status;
+    this.retryAfterMs = retryAfterMs;
   }
 }
 
 export class RuntimeRelayError extends Error {
   readonly issueCode: RuntimeIssueCode;
+  readonly retryAfterMs: number | null;
 
-  constructor(issueCode: RuntimeIssueCode) {
+  constructor(issueCode: RuntimeIssueCode, retryAfterMs: number | null = null) {
     super(issueCode);
     this.name = 'RuntimeRelayError';
     this.issueCode = issueCode;
+    this.retryAfterMs = retryAfterMs;
   }
+}
+
+/** Parse a Retry-After header into clamped milliseconds, or null when unbounded. */
+export function parseBoundedRetryAfter(value: string | null): number | null {
+  if (value === null) return null;
+  const match = /^(\d{1,5})$/.exec(value.trim());
+  if (match === null) return null;
+  const seconds = Number(match[1]);
+  if (!Number.isInteger(seconds) || seconds < 0) return null;
+  return Math.min(seconds * 1_000, MAX_RETRY_AFTER_MS);
 }
 
 export interface TranscriptLoad {
@@ -154,7 +176,8 @@ export async function fetchRuntimeSnapshot(signal?: AbortSignal): Promise<Runtim
     if (isRuntimeIssueDto(payload)) throw new RuntimeRelayError(payload.issueCode);
     throw new RuntimeRelayError('invalid-response');
   } catch (error: unknown) {
-    throw new RuntimeRelayError(normalizeRuntimeIssue(error));
+    const retryAfterMs = error instanceof RelayRequestError ? error.retryAfterMs : null;
+    throw new RuntimeRelayError(normalizeRuntimeIssue(error), retryAfterMs);
   }
 }
 
@@ -168,8 +191,18 @@ export function normalizeRuntimeIssue(error: unknown): RuntimeIssueCode {
   }
   if (error instanceof SyntaxError) return 'invalid-response';
   if (typeof navigator !== 'undefined' && !navigator.onLine) return 'offline';
+  if (isAbortError(error)) return 'host-unavailable';
   if (isRecord(error) && isRuntimeIssueCode(error.issueCode)) return error.issueCode;
   return 'host-unavailable';
+}
+
+function isAbortError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'name' in error &&
+    (error as { readonly name?: unknown }).name === 'AbortError'
+  );
 }
 
 export async function fetchCommands(signal?: AbortSignal): Promise<CommandCatalogDto> {
@@ -182,7 +215,8 @@ export async function fetchCommands(signal?: AbortSignal): Promise<CommandCatalo
 
 /**
  * Send one host-confirmed runtime mutation. A fresh one-use ticket is obtained
- * immediately before the write, and every settled outcome — including stale,
+ * immediately before the write, and a unique control ID is minted per attempt;
+ * neither is cached or persisted. Every settled outcome — including stale,
  * unsupported, and delivery-unknown — is returned rather than thrown, so the UI can
  * reconcile without ever inventing an optimistic committed value or auto-retrying.
  */
@@ -194,55 +228,82 @@ export async function controlRuntime(
   signal?: AbortSignal,
 ): Promise<RuntimeControlResponse> {
   const controlId = `control_${crypto.randomUUID().replaceAll('-', '_')}`;
-  let command: RuntimeControlCommand;
-  if (operation.type === 'set_model') {
-    if (expectedCatalogRevision === undefined) {
-      throw new Error('A catalog revision is required to switch models.');
-    }
-    const ticketRequest: RuntimeModelTicketRequest = {
-      sessionId,
-      expectedRevision,
-      expectedCatalogRevision,
-      operation,
-    };
-    const ticketPayload = await postJson('/api/runtime/ticket', ticketRequest, signal, [201]);
-    if (!isRuntimeModelTicketResponse(ticketPayload)) {
-      throw new Error('Relay returned an invalid runtime ticket.');
-    }
-    command = {
-      type: 'runtime.control',
-      controlId,
-      sessionId,
-      expectedRevision,
-      expectedCatalogRevision,
-      operation,
-      ticket: ticketPayload.ticket,
-    };
-  } else {
-    const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
-    if (!isWebSocketTicketResponse(ticketPayload)) {
-      throw new Error('Relay returned an invalid command ticket.');
-    }
-    command = {
-      type: 'runtime.control',
-      controlId,
-      sessionId,
-      expectedRevision,
-      operation,
-      ticket: ticketPayload.ticket,
-    };
-  }
+  let controlStarted = false;
   try {
+    let command: RuntimeControlCommand;
+    if (operation.type === 'set_model') {
+      if (expectedCatalogRevision === undefined) {
+        throw new Error('A catalog revision is required to switch models.');
+      }
+      const ticketRequest: RuntimeModelTicketRequest = {
+        sessionId,
+        expectedRevision,
+        expectedCatalogRevision,
+        operation,
+      };
+      const ticketPayload = await postJson('/api/runtime/ticket', ticketRequest, signal, [201]);
+      if (!isRuntimeModelTicketResponse(ticketPayload)) {
+        throw new Error('Relay returned an invalid runtime ticket.');
+      }
+      command = {
+        type: 'runtime.control',
+        controlId,
+        sessionId,
+        expectedRevision,
+        expectedCatalogRevision,
+        operation,
+        ticket: ticketPayload.ticket,
+      };
+    } else {
+      const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
+      if (!isWebSocketTicketResponse(ticketPayload)) {
+        throw new Error('Relay returned an invalid command ticket.');
+      }
+      command = {
+        type: 'runtime.control',
+        controlId,
+        sessionId,
+        expectedRevision,
+        operation,
+        ticket: ticketPayload.ticket,
+      };
+    }
+    controlStarted = true;
     const payload = await postJson('/api/runtime/control', command, signal, [202, 409, 422, 503]);
     if (!isRuntimeControlResponse(payload)) {
       return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
     }
     return payload;
-  } catch {
+  } catch (error: unknown) {
+    if (!controlStarted) {
+      // The mutation never reached the host: map transport blocks to bounded
+      // issues. An ambiguous failure here is still safe to redact.
+      const issueCode = runtimeIssueForTransportError(error);
+      return {
+        outcome: {
+          status: 'unavailable',
+          reasonCode: 'runtime_unavailable',
+          ...(issueCode === null ? {} : { issueCode }),
+        },
+      };
+    }
     // Once the command submission starts, transport failure is terminal and ambiguous.
     // A retry could apply the same user intent twice, so reconciliation is the only safe path.
     return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
   }
+}
+
+function runtimeIssueForTransportError(error: unknown): RuntimeIssueCode | null {
+  if (error instanceof RelayRequestError) {
+    if (error.status === 403) return 'foreground-required';
+    if (error.status === 429) return 'rate-limited';
+    if (error.status !== null && error.status >= 500) return 'host-unavailable';
+    return 'host-unavailable';
+  }
+  if (error instanceof SyntaxError) return 'invalid-response';
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return 'offline';
+  if (isRecord(error) && isRuntimeIssueCode(error.issueCode)) return error.issueCode;
+  return null;
 }
 
 /** Interrupt the running agent. A fresh one-use ticket is obtained immediately before. */
@@ -402,6 +463,7 @@ async function postJson(
     throw new RelayRequestError(
       response.status === 401 || response.status === 403 ? 'access_denied' : 'request_failed',
       response.status,
+      response.status === 429 ? parseBoundedRetryAfter(response.headers.get('retry-after')) : null,
     );
   }
   return response.status === 204 ? null : (response.json() as Promise<unknown>);

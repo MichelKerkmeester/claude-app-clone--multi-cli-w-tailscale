@@ -8,6 +8,7 @@ import type {
   SessionCardDto,
   TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
+import { readFileSync } from 'node:fs';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
@@ -121,6 +122,13 @@ it('lists sessions on Home', async () => {
   expect(screen.getByRole('heading', { name: 'Recent sessions' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /session_web_001/i })).toBeInTheDocument();
   await waitFor(() => expect(attention.fetchPushConfig).toHaveBeenCalledOnce());
+});
+
+it('opts the installed PWA viewport into safe-area coverage', () => {
+  const html = readFileSync('apps/pi-remote-web/index.html', 'utf8');
+  expect(html).toMatch(
+    /<meta name="viewport" content="width=device-width, initial-scale=1\.0, viewport-fit=cover" \/>/u,
+  );
 });
 
 it('renders every projected transcript block kind', () => {

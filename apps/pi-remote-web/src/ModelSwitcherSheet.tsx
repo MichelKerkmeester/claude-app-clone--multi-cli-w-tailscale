@@ -5,7 +5,9 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
   type RefObject,
 } from 'react';
 import {
@@ -34,9 +36,20 @@ import {
   modelKey,
   organizeModelCatalog,
 } from './model-catalog.js';
+import {
+  modelCountMessage,
+  modelRowName,
+  modelStatusAnnouncement,
+  modelSwitcherStrings,
+  modelSwitchedMessage,
+  noModelMatchMessage,
+  runtimeOutcomeMessage,
+} from './model-switcher-strings.js';
 import type { RuntimeControls } from './runtime.js';
 
 const SEARCH_THRESHOLD = 8;
+const SWIPE_DISMISS_RATIO = 0.3;
+const SWIPE_DISMISS_VELOCITY = 1_200;
 
 export interface ModelSwitcherSheetProps {
   readonly isOpen: boolean;
@@ -59,8 +72,19 @@ export function ModelSwitcherSheet({
   const [terminalBlocked, setTerminalBlocked] = useState(false);
   const [mutationMessage, setMutationMessage] = useState('');
   const [announcement, setAnnouncement] = useState('');
+  const [isAssertive, setIsAssertive] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSnapping, setIsSnapping] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{
+    readonly pointerId: number;
+    readonly startY: number;
+    readonly startedAt: number;
+  } | null>(null);
+  const snapTimerRef = useRef<number | null>(null);
   const current = runtime.state?.model ?? null;
   const currentKey = current === null ? null : modelKey(current);
   const showSearch = runtime.models.length >= SEARCH_THRESHOLD;
@@ -71,8 +95,19 @@ export function ModelSwitcherSheet({
     setDraftKey(null);
     setTerminalBlocked(false);
     setMutationMessage('');
+    setIsAssertive(false);
+    setDragOffset(0);
+    setIsDragging(false);
+    setIsSnapping(false);
     void refresh('open');
   }, [isOpen, refresh]);
+
+  useEffect(
+    () => () => {
+      if (snapTimerRef.current !== null) window.clearTimeout(snapTimerRef.current);
+    },
+    [],
+  );
 
   const visibleModels = useMemo(
     () => filterAndRankModels(runtime.models, deferredQuery),
@@ -114,14 +149,17 @@ export function ModelSwitcherSheet({
 
   useEffect(() => {
     if (!isOpen || !showSearch) return;
-    setAnnouncement(resultCountMessage(visibleModels.length, runtime.models.length));
+    setAnnouncement(modelCountMessage(visibleModels.length, runtime.models.length));
   }, [isOpen, runtime.models.length, showSearch, visibleModels.length]);
 
   useEffect(() => {
     if (!isOpen || runtime.catalogPhase !== 'ready') return;
-    dialogRef.current
-      ?.querySelector<HTMLElement>('.model-sheet-row[aria-current="true"]:not([data-disabled])')
-      ?.focus();
+    const focusTimer = window.setTimeout(() => {
+      dialogRef.current
+        ?.querySelector<HTMLElement>('.model-sheet-row[aria-current="true"]:not([data-disabled])')
+        ?.focus({ preventScroll: true });
+    }, 0);
+    return () => window.clearTimeout(focusTimer);
   }, [currentKey, isOpen, runtime.catalogPhase]);
 
   const restoreTriggerFocus = () => {
@@ -129,8 +167,59 @@ export function ModelSwitcherSheet({
   };
   const close = () => {
     if (isCommitting) return;
+    dragRef.current = null;
+    setDragOffset(0);
+    setIsDragging(false);
     onOpenChange(false);
     restoreTriggerFocus();
+  };
+  const beginSwipe = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (isCommitting || event.button !== 0) return;
+    if (
+      event.target instanceof Element &&
+      event.target.closest('button, input, [role="button"]') !== null
+    )
+      return;
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startY: event.clientY,
+      startedAt: performance.now(),
+    };
+    setIsSnapping(false);
+    setIsDragging(true);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+  const moveSwipe = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (drag === null || drag.pointerId !== event.pointerId || isCommitting) return;
+    event.preventDefault();
+    setDragOffset(Math.max(0, event.clientY - drag.startY));
+  };
+  const endSwipe = (event: ReactPointerEvent<HTMLDivElement>, canDismiss: boolean) => {
+    const drag = dragRef.current;
+    if (drag === null || drag.pointerId !== event.pointerId) return;
+    const travel = Math.max(0, event.clientY - drag.startY);
+    const elapsed = Math.max(1, performance.now() - drag.startedAt);
+    const velocity = (travel / elapsed) * 1_000;
+    const sheetHeight = modalRef.current?.getBoundingClientRect().height ?? 0;
+    dragRef.current = null;
+    setIsDragging(false);
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (
+      canDismiss &&
+      !isCommitting &&
+      ((sheetHeight > 0 && travel > sheetHeight * SWIPE_DISMISS_RATIO) ||
+        velocity >= SWIPE_DISMISS_VELOCITY)
+    ) {
+      close();
+      return;
+    }
+    setDragOffset(0);
+    setIsSnapping(true);
+    if (snapTimerRef.current !== null) window.clearTimeout(snapTimerRef.current);
+    snapTimerRef.current = window.setTimeout(() => setIsSnapping(false), 220);
   };
   const handleSheetKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape' && query.length > 0 && !isCommitting) {
@@ -150,11 +239,13 @@ export function ModelSwitcherSheet({
   const commit = async () => {
     if (!canCommit || draft === null) return;
     setIsCommitting(true);
-    setMutationMessage('Applying…');
+    setMutationMessage(modelSwitcherStrings.applying);
+    setAnnouncement(modelSwitcherStrings.applying);
     const response = await setModel(draft.provider, draft.id);
     setIsCommitting(false);
     if (response === null) {
-      setMutationMessage('Host state changed. Choose again.');
+      setMutationMessage(modelSwitcherStrings.hostChanged);
+      setAnnouncement(modelStatusAnnouncement(modelSwitcherStrings.hostChanged));
       setDraftKey(null);
       return;
     }
@@ -163,26 +254,30 @@ export function ModelSwitcherSheet({
   const handleOutcome = (response: RuntimeControlResponse, target: AvailableModelDto) => {
     switch (response.outcome.status) {
       case 'accepted':
-        setAnnouncement(`Model switched to ${displayModelText(target.label)}.`);
+        setAnnouncement(modelSwitchedMessage(displayModelText(target.label)));
         onOpenChange(false);
         restoreTriggerFocus();
         break;
       case 'stale':
         setTerminalBlocked(true);
         setDraftKey(null);
-        setMutationMessage('Host state changed. Choose again.');
+        setMutationMessage(runtimeOutcomeMessage(response.outcome));
+        setAnnouncement(modelStatusAnnouncement(runtimeOutcomeMessage(response.outcome)));
         break;
       case 'policy_blocked':
         setTerminalBlocked(true);
-        setMutationMessage('Blocked by host policy.');
+        setMutationMessage(runtimeOutcomeMessage(response.outcome));
+        setAnnouncement(modelStatusAnnouncement(runtimeOutcomeMessage(response.outcome)));
         break;
       case 'delivery-unknown':
         setTerminalBlocked(true);
-        setMutationMessage('Outcome unknown · Reconcile before switching again.');
+        setMutationMessage(runtimeOutcomeMessage(response.outcome));
+        setIsAssertive(true);
         break;
       default:
         setTerminalBlocked(true);
-        setMutationMessage(runtime.error ?? 'That model is unavailable. Choose another model.');
+        setMutationMessage(runtimeOutcomeMessage(response.outcome));
+        setAnnouncement(modelStatusAnnouncement(runtimeOutcomeMessage(response.outcome)));
     }
   };
 
@@ -205,7 +300,13 @@ export function ModelSwitcherSheet({
 
   return (
     <>
-      <span className="sr-only" role="status" aria-live="polite">
+      <span
+        className="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-live-announcer="true"
+      >
         {announcement}
       </span>
       <ModalOverlay
@@ -217,7 +318,17 @@ export function ModelSwitcherSheet({
         isDismissable={!isCommitting}
         isKeyboardDismissDisabled={isCommitting}
       >
-        <Modal className="model-sheet-modal" style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
+        <Modal
+          ref={modalRef}
+          className={`model-sheet-modal${isDragging ? ' is-dragging' : ''}${isSnapping ? ' is-snapping' : ''}`}
+          style={
+            {
+              '--model-sheet-drag-offset': `${dragOffset}px`,
+              maxWidth: '100vw',
+              overflowX: 'hidden',
+            } as CSSProperties
+          }
+        >
           <Dialog
             ref={dialogRef}
             id="model-switcher-dialog"
@@ -225,29 +336,41 @@ export function ModelSwitcherSheet({
             className="model-sheet-dialog"
           >
             <div className="model-sheet-content" onKeyDownCapture={handleSheetKeyDown}>
-              <div className="model-sheet-grabber" aria-hidden="true" />
-              <header className="model-sheet-header">
-                <Heading id="model-switcher-title" slot="title" className="model-sheet-title">
-                  Change model
-                </Heading>
-                <Button
-                  className="model-sheet-close"
-                  aria-label="Close model switcher"
-                  onPress={close}
-                  isDisabled={isCommitting}
-                >
-                  <CloseGlyph />
-                </Button>
-              </header>
+              <div
+                className="model-sheet-drag-region"
+                data-testid="model-sheet-drag-region"
+                onPointerDown={beginSwipe}
+                onPointerMove={moveSwipe}
+                onPointerUp={(event) => endSwipe(event, true)}
+                onPointerCancel={(event) => endSwipe(event, false)}
+              >
+                <div className="model-sheet-grabber" aria-hidden="true" />
+                <header className="model-sheet-header">
+                  <Heading id="model-switcher-title" slot="title" className="model-sheet-title">
+                    {modelSwitcherStrings.title}
+                  </Heading>
+                  <Button
+                    className="model-sheet-close"
+                    aria-label={modelSwitcherStrings.close}
+                    onPress={close}
+                    isDisabled={isCommitting}
+                    style={{ minBlockSize: '44px' }}
+                  >
+                    <CloseGlyph />
+                  </Button>
+                </header>
+              </div>
 
               {streamingBlocked && (
-                <p className="model-sheet-policy">
-                  Available after the current turn. You can still browse and select a model.
-                </p>
+                <p className="model-sheet-policy">{modelSwitcherStrings.streamingBlocked}</p>
               )}
 
               {runtime.catalogPhase === 'opening' && runtime.models.length === 0 ? (
-                <div className="model-sheet-skeletons" aria-label="Loading models" aria-busy="true">
+                <div
+                  className="model-sheet-skeletons"
+                  aria-label={modelSwitcherStrings.loading}
+                  aria-busy="true"
+                >
                   {Array.from({ length: 4 }, (_, index) => (
                     <div className="model-sheet-skeleton" key={index} />
                   ))}
@@ -255,7 +378,7 @@ export function ModelSwitcherSheet({
               ) : showSearch ? (
                 <Autocomplete inputValue={query} onInputChange={setQuery} filter={() => true}>
                   <SearchField className="model-sheet-search">
-                    <Label>Search models</Label>
+                    <Label>{modelSwitcherStrings.searchLabel}</Label>
                     <div className="model-sheet-search-control">
                       <SearchGlyph />
                       <Input
@@ -264,10 +387,15 @@ export function ModelSwitcherSheet({
                         autoCorrect="off"
                         spellCheck={false}
                         enterKeyHint="search"
-                        placeholder="Provider, model, or ID"
+                        placeholder={modelSwitcherStrings.searchPlaceholder}
                       />
-                      <Button aria-label="Clear model search" className="model-sheet-search-clear">
-                        Clear
+                      <Button
+                        slot="clear"
+                        aria-label={modelSwitcherStrings.clearSearch}
+                        className="model-sheet-search-clear"
+                        style={{ minBlockSize: '44px' }}
+                      >
+                        {modelSwitcherStrings.clearSearchVisible}
                       </Button>
                     </div>
                   </SearchField>
@@ -279,24 +407,29 @@ export function ModelSwitcherSheet({
 
               <CatalogStatus runtime={runtime} onRefresh={() => void refresh('manual')} />
               <p
-                className={`model-sheet-mutation${runtime.deliveryUnknown ? ' is-barrier' : ''}`}
-                role={runtime.deliveryUnknown ? 'alert' : 'status'}
-                aria-live={runtime.deliveryUnknown ? 'assertive' : 'polite'}
+                className={`model-sheet-mutation${runtime.deliveryUnknown || isAssertive ? ' is-barrier' : ''}`}
+                role={runtime.deliveryUnknown || isAssertive ? 'alert' : undefined}
+                aria-live={runtime.deliveryUnknown || isAssertive ? 'assertive' : undefined}
               >
                 {mutationMessage ||
-                  runtime.error ||
-                  (runtime.catalogPhase === 'refreshing' ? 'Refreshing…' : '')}
+                  (runtime.catalogPhase === 'refreshing' ? modelSwitcherStrings.refreshing : '')}
               </p>
               <footer className="model-sheet-footer">
-                <Button className="model-sheet-cancel" onPress={close} isDisabled={isCommitting}>
-                  Cancel
+                <Button
+                  className="model-sheet-cancel"
+                  onPress={close}
+                  isDisabled={isCommitting}
+                  style={{ minBlockSize: '48px' }}
+                >
+                  {modelSwitcherStrings.cancel}
                 </Button>
                 <Button
                   className="model-sheet-switch"
                   onPress={() => void commit()}
                   isDisabled={!canCommit}
+                  style={{ minBlockSize: '48px' }}
                 >
-                  {isCommitting ? 'Applying…' : 'Switch model'}
+                  {isCommitting ? modelSwitcherStrings.applying : modelSwitcherStrings.switchModel}
                 </Button>
               </footer>
             </div>
@@ -326,25 +459,23 @@ function ModelList({
 }) {
   const rows = catalog.groups.reduce((count, group) => count + group.models.length, 0);
   if (total === 0) {
-    return (
-      <p className="model-sheet-empty">No models configured. Configure a provider on the host.</p>
-    );
+    return <p className="model-sheet-empty">{modelSwitcherStrings.noModels}</p>;
   }
   if (rows === 0 && catalog.retiredCurrent === null) {
-    return <p className="model-sheet-empty">No models match “{displayModelText(query)}”.</p>;
+    return <p className="model-sheet-empty">{noModelMatchMessage(displayModelText(query))}</p>;
   }
 
   return (
     <ListBox
-      aria-label="Available models"
+      aria-label={modelSwitcherStrings.availableModels}
       className="model-sheet-list"
-      style={{ overflowX: 'hidden' }}
+      style={{ overflowX: 'hidden', overscrollBehaviorY: 'contain' }}
       selectionMode="single"
       selectedKeys={draftKey === null ? new Set() : new Set([draftKey])}
     >
       {catalog.retiredCurrent !== null && (
         <ListBoxSection id="current-model-section">
-          <Header>Current model</Header>
+          <Header>{modelSwitcherStrings.currentSection}</Header>
           <ModelRow
             model={catalog.retiredCurrent}
             currentKey={currentKey}
@@ -393,21 +524,36 @@ function ModelRow({
   const key = modelKey(model);
   const isCurrent = key === currentKey;
   const isDraft = key === draftKey;
-  const reason = isRetired ? 'No longer available' : modelAvailabilityMessage(model);
+  const reason = isRetired ? modelSwitcherStrings.retired : modelAvailabilityMessage(model);
   const capabilities = modelCapabilities(model);
   const descriptionId = `model-description-${modelDomId(key)}`;
+  const isApplying = isCommitting && isDraft;
+  const accessibleName = modelRowName({
+    label: displayModelText(model.label),
+    provider: displayModelText(model.provider),
+    id: displayModelText(model.id),
+    capabilities,
+    availability: reason ?? modelSwitcherStrings.available,
+    isCurrent,
+    isSelected: isDraft,
+    isApplying,
+  });
   return (
     <ListBoxItem
       ref={(element) => {
         if (isCurrent) element?.setAttribute('aria-current', 'true');
         else element?.removeAttribute('aria-current');
+        if (isApplying) element?.setAttribute('aria-busy', 'true');
+        else element?.removeAttribute('aria-busy');
+        element?.setAttribute('aria-describedby', descriptionId);
       }}
       id={key}
       textValue={`${displayModelText(model.label)} ${displayModelText(model.provider)} ${displayModelText(model.id)}`}
+      aria-label={accessibleName}
       className="model-sheet-row"
+      style={{ minBlockSize: '64px' }}
       isDisabled={isCommitting || isRetired || !isModelAvailable(model)}
       aria-describedby={descriptionId}
-      aria-busy={isCommitting && isDraft ? 'true' : undefined}
       onAction={() => onStage(model)}
       onKeyDown={(event) => {
         if ((event.key === 'Enter' || event.key === ' ') && !isCommitting) {
@@ -426,18 +572,20 @@ function ModelRow({
         {isCurrent && (
           <span className="model-state-current">
             <CheckGlyph />
-            Current
+            {modelSwitcherStrings.current}
           </span>
         )}
-        {isDraft && <span className="model-state-selected">Selected</span>}
+        {isDraft && <span className="model-state-selected">{modelSwitcherStrings.selected}</span>}
       </span>
       <span id={descriptionId} className="model-sheet-row-description">
         <span>{displayModelText(model.provider)}</span>
         {capabilities.map((capability) => (
           <span key={capability}>{capability}</span>
         ))}
-        {reason !== null && <span className="model-state-unavailable">{reason}</span>}
-        {isCommitting && isDraft && <span>Applying…</span>}
+        <span className={reason === null ? 'sr-only' : 'model-state-unavailable'}>
+          {reason ?? modelSwitcherStrings.available}
+        </span>
+        {isApplying && <span>{modelSwitcherStrings.applying}</span>}
       </span>
     </ListBoxItem>
   );
@@ -451,30 +599,29 @@ function CatalogStatus({
   readonly onRefresh: () => void;
 }) {
   if (runtime.catalogPhase === 'offline') {
-    return (
-      <p className="model-sheet-catalog-state">You’re offline. Catalog browsing is read-only.</p>
-    );
+    return <p className="model-sheet-catalog-state">{modelSwitcherStrings.offline}</p>;
   }
   if (runtime.catalogPhase === 'unreachable') {
     return (
       <div className="model-sheet-catalog-state">
-        Host unreachable. <Button onPress={onRefresh}>Retry refresh</Button>
+        {modelSwitcherStrings.unreachable}{' '}
+        <Button onPress={onRefresh} style={{ minBlockSize: '44px' }}>
+          {modelSwitcherStrings.retryRefresh}
+        </Button>
       </div>
     );
   }
   if (runtime.catalogPhase === 'access_denied') {
     return (
       <div className="model-sheet-catalog-state" role="alert">
-        Access expired. <Button onPress={onRefresh}>Reconnect</Button>
+        {modelSwitcherStrings.accessExpired}{' '}
+        <Button onPress={onRefresh} style={{ minBlockSize: '44px' }}>
+          {modelSwitcherStrings.reconnect}
+        </Button>
       </div>
     );
   }
   return null;
-}
-
-function resultCountMessage(visible: number, total: number): string {
-  const category = new Intl.PluralRules().select(visible);
-  return `${visible} of ${total} ${category === 'one' ? 'model' : 'models'}`;
 }
 
 function modelDomId(value: string): string {

@@ -1,8 +1,6 @@
 @import 'tailwindcss';
 
-/* Self-hosted, offline, integrity-manifested font faces (see public/fonts/font-assets.json).
-   Inert until a family here is referenced by an application role at the visual cutover:
-   nothing consumes 'Source Serif 4' or 'Inter' yet, so declaring them changes no rendering. */
+/* Self-hosted fonts keep the interface typography available in an offline-installed PWA. */
 @font-face {
   font-family: 'Source Serif 4';
   src: url('/fonts/source-serif-4-4.005r-regular.woff2') format('woff2');
@@ -1519,6 +1517,9 @@ button[data-pressed]:not([data-disabled]) {
 
 .session-model-trigger {
   display: inline-flex;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  flex: 1 1 auto;
   justify-self: center;
   align-items: center;
   gap: 0.35rem;
@@ -1531,6 +1532,7 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1rem;
   font-weight: 620;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .session-model-trigger[data-hovered] {
@@ -1546,6 +1548,7 @@ button[data-pressed]:not([data-disabled]) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  animation: model-header-accepted 150ms ease-out;
 }
 
 .session-runtime-controls {
@@ -1554,11 +1557,12 @@ button[data-pressed]:not([data-disabled]) {
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
+  overflow: hidden;
 }
 
 .session-effort-select > button {
   display: inline-flex;
-  min-height: 2.5rem;
+  min-block-size: 44px;
   align-items: center;
   gap: 0.3rem;
   padding-inline: 0.65rem;
@@ -1568,6 +1572,24 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink-secondary);
   font-size: 0.75rem;
   cursor: pointer;
+}
+
+.session-model-trigger[data-focus-visible],
+.session-effort-select > button[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.session-plan-badge {
+  flex: 0 0 auto;
+  padding-block: 0.2rem;
+  padding-inline: 0.45rem;
+  border: 1px solid var(--accent-strong);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.68rem;
+  font-weight: 700;
 }
 
 .session-effort-label {
@@ -1598,6 +1620,10 @@ button[data-pressed]:not([data-disabled]) {
   animation: model-sheet-backdrop-in 180ms ease-out;
 }
 
+.model-sheet-overlay[data-exiting] {
+  animation: model-sheet-backdrop-out 220ms ease-in;
+}
+
 :root[data-theme='dark'] .model-sheet-overlay {
   --model-sheet-raised: #2d2a26;
   --model-sheet-ink: #f8f8f6;
@@ -1621,12 +1647,26 @@ button[data-pressed]:not([data-disabled]) {
 .model-sheet-modal {
   inline-size: min(100%, 430px);
   max-inline-size: 100vw;
-  max-block-size: min(92dvh, calc(var(--visual-viewport-height, 100dvh) * 0.92));
+  max-block-size: calc(var(--visual-viewport-height, 100dvh) * 0.92);
   overflow: hidden;
   border-radius: 24px 24px 0 0;
   background: var(--model-sheet-raised);
   color: var(--model-sheet-ink);
+  transform: translateY(var(--model-sheet-drag-offset, 0));
   animation: model-sheet-in 280ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.model-sheet-modal.is-dragging {
+  animation: none;
+  transition: none;
+}
+
+.model-sheet-modal.is-snapping {
+  transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.model-sheet-overlay[data-exiting] .model-sheet-modal {
+  animation: model-sheet-out 220ms ease-in;
 }
 
 .model-sheet-dialog {
@@ -1642,6 +1682,17 @@ button[data-pressed]:not([data-disabled]) {
 
 .model-sheet-content {
   display: contents;
+}
+
+.model-sheet-drag-region {
+  flex: 0 0 auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.model-sheet-drag-region:active {
+  cursor: grabbing;
 }
 
 .model-sheet-grabber {
@@ -1760,7 +1811,14 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1rem;
 }
 
+.model-sheet-search-control:focus-within {
+  outline: 2px solid var(--model-sheet-ui-accent);
+  outline-offset: 2px;
+}
+
 .model-sheet-search-clear {
+  min-inline-size: 44px;
+  min-block-size: 44px;
   align-self: stretch;
   padding-inline: var(--space-3);
   border: 0;
@@ -1829,7 +1887,9 @@ button[data-pressed]:not([data-disabled]) {
 .model-sheet-cancel[data-focus-visible],
 .model-sheet-switch[data-focus-visible],
 .model-sheet-search-clear[data-focus-visible] {
-  outline: 2px solid var(--model-sheet-ui-accent);
+  outline-color: var(--model-sheet-ui-accent);
+  outline-style: solid;
+  outline-width: 2px;
   outline-offset: 2px;
 }
 
@@ -1923,7 +1983,7 @@ button[data-pressed]:not([data-disabled]) {
 .model-sheet-footer {
   display: grid;
   flex: 0 0 auto;
-  grid-template-columns: 1fr 1.35fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
   gap: var(--space-2);
   padding-block-start: var(--space-2);
   padding-inline: var(--space-4);
@@ -1932,10 +1992,12 @@ button[data-pressed]:not([data-disabled]) {
 
 .model-sheet-cancel,
 .model-sheet-switch {
+  min-inline-size: 0;
   min-block-size: 48px;
   border-radius: 12px;
   font-weight: 680;
   cursor: pointer;
+  overflow-wrap: anywhere;
 }
 
 .model-sheet-cancel {
@@ -1974,6 +2036,57 @@ button[data-pressed]:not([data-disabled]) {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes model-sheet-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes model-sheet-out {
+  from {
+    transform: translateY(var(--model-sheet-drag-offset, 0));
+    opacity: 1;
+  }
+  to {
+    transform: translateY(36px);
+    opacity: 0;
+  }
+}
+
+@keyframes model-header-accepted {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .model-sheet-overlay,
+  .model-sheet-overlay[data-exiting],
+  .model-sheet-modal,
+  .model-sheet-modal.is-dragging,
+  .model-sheet-modal.is-snapping,
+  .model-sheet-overlay[data-exiting] .model-sheet-modal,
+  .model-sheet-skeleton {
+    animation: none;
+  }
+
+  .model-sheet-modal,
+  .model-sheet-modal.is-dragging,
+  .model-sheet-modal.is-snapping,
+  .model-sheet-overlay[data-exiting] .model-sheet-modal,
+  .model-sheet-overlay button:active:not(:disabled),
+  .model-sheet-overlay button[data-pressed]:not([data-disabled]) {
+    transform: none;
+    transition: none;
   }
 }
 

@@ -20,6 +20,7 @@ import type { Key } from 'react-aria-components';
 import { useRef, useState } from 'react';
 
 import { ModelSwitcherSheet } from './ModelSwitcherSheet.js';
+import { modelSwitcherStrings, modelTriggerName } from './model-switcher-strings.js';
 import type { RuntimeControls } from './runtime.js';
 
 type ThemePreference = 'system' | 'light' | 'dark';
@@ -70,18 +71,34 @@ export function SessionHeader({
           <Button
             ref={modelTriggerRef}
             className="session-model-trigger"
-            aria-label={`Model, ${modelLabel}, ${modelProvider}`}
+            aria-label={modelTriggerName(modelLabel, modelProvider)}
             aria-haspopup="dialog"
             aria-expanded={modelSheetOpen}
             aria-controls="model-switcher-dialog"
             onPress={() => setModelSheetOpen(true)}
+            style={{ minBlockSize: '44px' }}
           >
-            <span className="session-model-name">{modelLabel}</span>
+            <span
+              key={`${state?.model?.provider ?? ''}:${state?.model?.id ?? ''}`}
+              className="session-model-name"
+            >
+              {modelLabel}
+            </span>
             <ChevronDownGlyph />
           </Button>
 
+          {state?.mode === 'plan' && (
+            <span
+              className="session-plan-badge"
+              role="status"
+              aria-label={modelSwitcherStrings.planMode}
+            >
+              {modelSwitcherStrings.planBadge}
+            </span>
+          )}
+
           <Select
-            aria-label="Thinking effort"
+            aria-label={modelSwitcherStrings.thinkingEffort}
             className="session-effort-select"
             isDisabled={disabled || (state?.availableThinkingLevels.length ?? 0) === 0}
             selectedKey={state?.thinkingLevel ?? null}
@@ -89,8 +106,8 @@ export function SessionHeader({
               if (key !== null) void setThinkingLevel(String(key));
             }}
           >
-            <Button>
-              <span className="session-effort-label">Effort</span>
+            <Button style={{ minBlockSize: '44px' }}>
+              <span className="session-effort-label">{modelSwitcherStrings.effort}</span>
               <span>{effortLabel(state?.thinkingLevel)}</span>
             </Button>
             <Popover>

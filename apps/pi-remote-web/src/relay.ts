@@ -84,6 +84,30 @@ export class RuntimeRelayError extends Error {
   }
 }
 
+export type CatalogLifecycleCode = 'unavailable' | 'forbidden' | 'incompatible';
+
+/** A guarded command-catalog read failure, classified for fail-closed UI states. */
+export class CatalogLifecycleError extends Error {
+  readonly code: CatalogLifecycleCode;
+
+  constructor(code: CatalogLifecycleCode) {
+    super(catalogLifecycleMessage(code));
+    this.name = 'CatalogLifecycleError';
+    this.code = code;
+  }
+}
+
+function catalogLifecycleMessage(code: CatalogLifecycleCode): string {
+  switch (code) {
+    case 'forbidden':
+      return 'Commands are not available for this device.';
+    case 'incompatible':
+      return 'The phone and host versions do not agree.';
+    default:
+      return 'Pi is not responding.';
+  }
+}
+
 /** A slash submission the relay rejected; never retried and never forwarded. */
 export class SlashSubmitError extends Error {
   readonly reasonCode: SlashSubmitIssueCode;
@@ -254,10 +278,27 @@ function isAbortError(error: unknown): boolean {
   );
 }
 
+/**
+ * Read the relay-filtered command catalog for the current host epoch and
+ * session. Transport failures are classified so the lifecycle can fail closed
+ * without guessing why a read failed; malformed payloads are rejected outright
+ * and never partially rendered.
+ */
 export async function fetchCommands(signal?: AbortSignal): Promise<CommandCatalogDto> {
-  const payload = await postJson('/api/commands/list', undefined, signal);
+  let payload: unknown;
+  try {
+    payload = await postJson('/api/commands/list', undefined, signal);
+  } catch (error: unknown) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof RelayRequestError) {
+      if (error.status === 401 || error.status === 403) throw new CatalogLifecycleError('forbidden');
+      throw new CatalogLifecycleError('unavailable');
+    }
+    if (error instanceof SyntaxError) throw new CatalogLifecycleError('incompatible');
+    throw new CatalogLifecycleError('unavailable');
+  }
   if (!isCommandCatalogDto(payload)) {
-    throw new Error('Relay returned an invalid command catalog.');
+    throw new CatalogLifecycleError('incompatible');
   }
   return payload;
 }

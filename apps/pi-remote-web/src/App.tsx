@@ -74,7 +74,12 @@ import { ModelEffortSheet, type EffortSheetSection } from './ModelEffortSheet.js
 import { RuntimeStrip } from './RuntimeStrip.js';
 import { SessionComposer } from './SessionComposer.js';
 import { SessionHeader } from './SessionHeader.js';
-import { useCommands } from './commands.js';
+import {
+  bindingMatchesSnapshot,
+  useHostCommandCatalog,
+  type SelectedCommandBinding,
+} from './commands.js';
+import { bindingAfterDraftChange } from './insertSlashCommand.js';
 import { runtimeAnnouncement, useRuntime, type RuntimeUiState } from './runtime.js';
 import { groupBlocksIntoTurns } from './turns.js';
 
@@ -927,8 +932,9 @@ export function Session({
   const [promptError, setPromptError] = useState<string | null>(null);
   const [retrySubmissionId, setRetrySubmissionId] = useState<string | null>(null);
   const runtimeControls = useRuntime(sessionId);
-  const commandCatalog = useCommands();
+  const commandCatalog = useHostCommandCatalog(sessionId, connection);
   const [stopping, setStopping] = useState(false);
+  const [binding, setBinding] = useState<SelectedCommandBinding | null>(null);
 
   // One shared sheet per session view: the header opens the model section,
   // RuntimeStrip the effort section, and focus returns to whichever trigger
@@ -948,14 +954,39 @@ export function Session({
     const reconcileRuntime = () => {
       if (document.visibilityState === 'visible') void runtimeControls.refresh('foreground');
     };
+    const reconcileCatalog = () => {
+      if (document.visibilityState === 'visible') void commandCatalog.refresh('foreground');
+    };
     document.addEventListener('visibilitychange', reconcileRuntime);
-    const onOnline = () => void runtimeControls.refresh('online');
+    document.addEventListener('visibilitychange', reconcileCatalog);
+    const onOnline = () => {
+      void runtimeControls.refresh('online');
+      void commandCatalog.refresh('online');
+    };
     window.addEventListener('online', onOnline);
     return () => {
       document.removeEventListener('visibilitychange', reconcileRuntime);
+      document.removeEventListener('visibilitychange', reconcileCatalog);
       window.removeEventListener('online', onOnline);
     };
-  }, [runtimeControls.refresh]);
+  }, [runtimeControls.refresh, commandCatalog.refresh]);
+
+  // A binding is only valid for the exact scope it was created in; any
+  // session, host-epoch, or revision change clears it so Send must re-resolve.
+  useEffect(() => {
+    setBinding((current) => (bindingMatchesSnapshot(current, commandCatalog.snapshot) ? current : null));
+  }, [commandCatalog.snapshot]);
+
+  // Draft edits re-evaluate the binding: token edits clear it, argument edits
+  // retain it.
+  const handleDraftChange = (value: string) => {
+    setPrompt(value);
+    setBinding(bindingAfterDraftChange({ previousDraft: prompt, nextDraft: value, binding }));
+  };
+
+  const insertCommand = (name: string, inserted: SelectedCommandBinding) => {
+    setBinding(inserted);
+  };
 
   useEffect(() => {
     // The sync stream reaching live is read-only refresh authority. While the
@@ -1183,7 +1214,7 @@ export function Session({
       <SessionComposer
         prompt={prompt}
         setPrompt={setPrompt}
-        onDraftChange={setPrompt}
+        onDraftChange={handleDraftChange}
         sendPrompt={sendPrompt}
         stopRun={stopRun}
         canSubmit={canSubmit}
@@ -1194,8 +1225,8 @@ export function Session({
         stopping={stopping}
         promptError={promptError}
         runtimeControls={runtimeControls}
-        commands={commandCatalog.commands}
-        commandsDisabled={commandCatalog.status !== 'ready'}
+        catalog={commandCatalog}
+        onInsertCommand={insertCommand}
       />
       <ModelEffortSheet
         isOpen={sheetOpen}

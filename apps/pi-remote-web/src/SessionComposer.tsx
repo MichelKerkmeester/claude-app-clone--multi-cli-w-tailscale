@@ -9,23 +9,22 @@
 // no voice/mic control because speech capture is not implemented, and no
 // decorative disabled actions. Runtime labels stay host-confirmed.
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Button,
-  ComboBox,
   Dialog,
   DialogTrigger,
-  Input,
-  ListBox,
-  ListBoxItem,
   Popover,
   ToggleButton,
   ToggleButtonGroup,
 } from 'react-aria-components';
-import type { Key } from 'react-aria-components';
 
-import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
-
+import { CommandPalette } from './CommandPalette.js';
+import type {
+  HostCommandCatalogState,
+  SelectedCommandBinding,
+} from './commands.js';
+import { insertSlashCommand } from './insertSlashCommand.js';
 import type { RuntimeControls } from './runtime.js';
 
 const MAX_TRAY_HEIGHT_PX = 140;
@@ -44,8 +43,8 @@ export interface SessionComposerProps {
   readonly stopping: boolean;
   readonly promptError: string | null;
   readonly runtimeControls: RuntimeControls;
-  readonly commands: readonly CommandDescriptorDto[];
-  readonly commandsDisabled: boolean;
+  readonly catalog: HostCommandCatalogState;
+  readonly onInsertCommand: (name: string, binding: SelectedCommandBinding) => void;
 }
 
 export function SessionComposer({
@@ -62,12 +61,26 @@ export function SessionComposer({
   stopping,
   promptError,
   runtimeControls,
-  commands,
-  commandsDisabled,
+  catalog,
+  onInsertCommand,
 }: SessionComposerProps) {
   const running = status === 'running';
   const hasText = prompt.trim().length > 0;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [announcement, setAnnouncement] = useState('');
+  const pendingCaretRef = useRef<number | null>(null);
+
+  // Caret placement runs after the controlled draft has rendered, so the
+  // textarea DOM already contains the inserted token when the range is set.
+  useEffect(() => {
+    const offset = pendingCaretRef.current;
+    if (offset === null) return;
+    pendingCaretRef.current = null;
+    const element = textareaRef.current;
+    if (element === null) return;
+    element.focus({ preventScroll: true });
+    element.setSelectionRange(offset, offset);
+  }, [prompt]);
 
   const grow = () => {
     const element = textareaRef.current;
@@ -77,6 +90,24 @@ export function SessionComposer({
   };
 
   const submit = () => sendPrompt(running ? 'steer' : undefined);
+
+  // The one shared insertion path: replace the complete token range (the
+  // palette appends at the draft end) with the canonical command, record the
+  // binding, and announce that nothing was sent. Zero network work.
+  const insertCommand = (name: string, binding: SelectedCommandBinding) => {
+    const result = insertSlashCommand({
+      draft: prompt,
+      selectionStart: 0,
+      selectionEnd: 0,
+      commandName: name,
+      binding,
+      replaceRange: { start: prompt.length, end: prompt.length },
+    });
+    pendingCaretRef.current = result.caretOffset;
+    setPrompt(() => result.draft);
+    setAnnouncement(result.announcement);
+    onInsertCommand(name, binding);
+  };
   const placeholder =
     connection !== 'live'
       ? 'Reconnect to send'
@@ -97,6 +128,9 @@ export function SessionComposer({
     <div className="composer-region">
       {promptError !== null && <div className="inline-alert">{promptError}</div>}
       <p className="composer-disclaimer">{disclaimer}</p>
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
       <form
         className="composer-tray"
         onSubmit={(event) => {
@@ -129,9 +163,8 @@ export function SessionComposer({
           <div className="composer-left">
             <ComposerTools
               runtimeControls={runtimeControls}
-              commands={commands}
-              commandsDisabled={commandsDisabled}
-              onInsert={(text) => setPrompt((current) => current + text)}
+              catalog={catalog}
+              onInsert={insertCommand}
             />
           </div>
           <div className="composer-right">
@@ -176,14 +209,12 @@ export function SessionComposer({
  * to stack in the reading path, now one tap away and out of the transcript. */
 function ComposerTools({
   runtimeControls,
-  commands,
-  commandsDisabled,
+  catalog,
   onInsert,
 }: {
   readonly runtimeControls: RuntimeControls;
-  readonly commands: readonly CommandDescriptorDto[];
-  readonly commandsDisabled: boolean;
-  readonly onInsert: (text: string) => void;
+  readonly catalog: HostCommandCatalogState;
+  readonly onInsert: (name: string, binding: SelectedCommandBinding) => void;
 }) {
   const { runtime, setMode } = runtimeControls;
   const state = runtime.state;
@@ -221,34 +252,7 @@ function ComposerTools({
 
           <section className="tools-group">
             <span className="tools-label">Commands</span>
-            <ComboBox
-              aria-label="Insert a command"
-              className="command-palette"
-              isDisabled={commandsDisabled}
-              menuTrigger="focus"
-              allowsEmptyCollection
-              selectedKey={null}
-              onSelectionChange={(key: Key | null) => {
-                if (key !== null) onInsert(`/${String(key)} `);
-              }}
-            >
-              <Input placeholder="/ command" />
-              <Button aria-label="Show commands">/</Button>
-              <Popover>
-                <ListBox
-                  renderEmptyState={() => <span className="command-empty">No commands</span>}
-                >
-                  {commands.map((command) => (
-                    <ListBoxItem key={command.name} id={command.name} textValue={command.name}>
-                      <span className="command-name">{`/${command.name}`}</span>
-                      {command.description !== null && (
-                        <span className="command-desc">{command.description}</span>
-                      )}
-                    </ListBoxItem>
-                  ))}
-                </ListBox>
-              </Popover>
-            </ComboBox>
+            <CommandPalette catalog={catalog} onInsert={onInsert} isDisabled={catalog.snapshot === null} />
           </section>
 
           <span className="tools-status" role="status" aria-live="polite">

@@ -5,25 +5,39 @@
 import type {
   ApprovalCardDto,
   AttentionItemDto,
+  CommandCatalogDto,
   SessionCardDto,
   TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 import { readFileSync } from 'node:fs';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
-const relay = vi.hoisted(() => ({
-  createAcceptEditsGrant: vi.fn(),
-  decideApproval: vi.fn(),
-  fetchApprovals: vi.fn(),
-  fetchRuntimeModels: vi.fn(),
-  fetchRuntimeState: vi.fn(),
-  fetchTranscript: vi.fn(),
-  openSyncSocket: vi.fn(),
-  controlRuntime: vi.fn(),
-  submitPrompt: vi.fn(),
-}));
+const relay = vi.hoisted(() => {
+  class CatalogLifecycleError extends Error {
+    readonly code: 'unavailable' | 'forbidden' | 'incompatible';
+
+    constructor(code: 'unavailable' | 'forbidden' | 'incompatible') {
+      super('catalog lifecycle failure');
+      this.name = 'CatalogLifecycleError';
+      this.code = code;
+    }
+  }
+  return {
+    CatalogLifecycleError,
+    createAcceptEditsGrant: vi.fn(),
+    decideApproval: vi.fn(),
+    fetchApprovals: vi.fn(),
+    fetchCommands: vi.fn(),
+    fetchRuntimeModels: vi.fn(),
+    fetchRuntimeState: vi.fn(),
+    fetchTranscript: vi.fn(),
+    openSyncSocket: vi.fn(),
+    controlRuntime: vi.fn(),
+    submitPrompt: vi.fn(),
+  };
+});
 
 const attention = vi.hoisted(() => ({
   fetchAttention: vi.fn(),
@@ -55,8 +69,34 @@ import { EMPTY_TRANSCRIPT, transcriptReducer } from '../src/state.js';
 const occurredAt = '2026-08-13T10:00:00.000Z';
 const sessionId = 'session_web_001';
 
+const catalogFixture: CommandCatalogDto = {
+  hostEpoch: 'epoch_web_001',
+  sessionId,
+  sessionRevision: 2,
+  catalogRevision: 3,
+  commands: [
+    {
+      name: 'plan',
+      description: 'Toggle plan mode',
+      source: 'extension',
+      enabled: true,
+      disabledReason: null,
+      requiresConfirmation: false,
+    },
+    {
+      name: 'model',
+      description: 'Pick a model',
+      source: 'prompt',
+      enabled: true,
+      disabledReason: null,
+      requiresConfirmation: false,
+    },
+  ],
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
+  relay.fetchCommands.mockResolvedValue(catalogFixture);
   attention.fetchPushConfig.mockResolvedValue({
     supported: false,
     vapidPublicKey: null,
@@ -259,6 +299,61 @@ it('submits the compose box through the relay command path', async () => {
   expect(dispatchTranscript).toHaveBeenCalledWith(
     expect.objectContaining({ type: 'promptAccepted', block: accepted }),
   );
+});
+
+it('prefetches the shared command catalog once for a live session', async () => {
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  // The committed snapshot is fresh, so a foreground return performs no read.
+  await act(async () => {
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+    document.dispatchEvent(new Event('visibilitychange'));
+    await Promise.resolve();
+  });
+  expect(relay.fetchCommands).toHaveBeenCalledOnce();
+});
+
+it('inserts a command through the + browser without any ticket, prompt, or mutation request', async () => {
+  const user = userEvent.setup();
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+    />,
+  );
+
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  await user.click(screen.getByRole('button', { name: 'Mode and commands' }));
+  await waitFor(() =>
+    expect(screen.getByRole('combobox', { name: 'Insert a command' })).toBeEnabled(),
+  );
+  await user.click(screen.getByRole('button', { name: 'Show commands' }));
+  await user.click(screen.getByRole('option', { name: /plan/ }));
+
+  const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  await waitFor(() => expect(composer).toHaveValue('/plan '));
+  expect(composer.selectionStart).toBe(6);
+  expect(relay.submitPrompt).not.toHaveBeenCalled();
+  expect(relay.controlRuntime).not.toHaveBeenCalled();
+  expect(relay.createAcceptEditsGrant).not.toHaveBeenCalled();
 });
 
 it('reconciles runtime state when the session returns to the foreground', async () => {

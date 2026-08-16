@@ -2,12 +2,16 @@
 // MODULE: Command Palette Tests
 // ───────────────────────────────────────────────────────────────────
 
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
+import {
+  type HostCommandCatalogState,
+  type ScopedCommandSnapshot,
+} from '../src/commands.js';
 import { CommandPalette } from '../src/CommandPalette.js';
 
 afterEach(cleanup);
@@ -31,19 +35,91 @@ const COMMANDS: readonly CommandDescriptorDto[] = [
   },
 ];
 
+function catalogState(commands: readonly CommandDescriptorDto[]): HostCommandCatalogState {
+  const snapshot: ScopedCommandSnapshot = {
+    hostEpoch: 'epoch_web_001',
+    sessionId: 'session_web_001',
+    sessionRevision: 2,
+    catalogRevision: 3,
+    commands,
+    fetchedAt: Date.now(),
+  };
+  return { status: 'ready', snapshot, commands, refresh: vi.fn() };
+}
+
+function optionNames(): readonly (string | null)[] {
+  return screen
+    .getAllByRole('option')
+    .map((option) => option.querySelector('.command-name')?.textContent ?? null);
+}
+
 describe('CommandPalette', () => {
-  it('inserts the selected command into the draft and never submits', async () => {
+  it('inserts the selected command with a scoped binding and never submits', async () => {
     const onInsert = vi.fn();
-    render(<CommandPalette commands={COMMANDS} onInsert={onInsert} />);
+    render(<CommandPalette catalog={catalogState(COMMANDS)} onInsert={onInsert} />);
 
     await userEvent.click(screen.getByRole('button', { name: 'Show commands' }));
     await userEvent.click(screen.getByRole('option', { name: /plan/ }));
 
-    expect(onInsert).toHaveBeenCalledWith('/plan ');
+    expect(onInsert).toHaveBeenCalledWith('plan', {
+      hostEpoch: 'epoch_web_001',
+      sessionId: 'session_web_001',
+      name: 'plan',
+      sessionRevision: 2,
+      catalogRevision: 3,
+    });
+  });
+
+  it('filters locally through the shared ranking, exact name first', async () => {
+    const onInsert = vi.fn();
+    const commands = [
+      { ...COMMANDS[0]!, name: 'plan-mode' },
+      { ...COMMANDS[0]!, name: 'plan' },
+      COMMANDS[1]!,
+    ];
+    render(<CommandPalette catalog={catalogState(commands)} onInsert={onInsert} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show commands' }));
+    await userEvent.type(screen.getByRole('combobox'), 'plan');
+
+    expect(optionNames()).toEqual(['/plan', '/plan-mode']);
+  });
+
+  it('never autocorrects a typo: an unmatched query shows the empty state', async () => {
+    render(<CommandPalette catalog={catalogState(COMMANDS)} onInsert={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show commands' }));
+    await userEvent.type(screen.getByRole('combobox'), 'plna');
+
+    expect(screen.getByText('No commands')).toBeInTheDocument();
+    const listbox = screen.getByRole('listbox');
+    expect(within(listbox).queryByText(/^\//)).not.toBeInTheDocument();
+  });
+
+  it('keeps the host order with an empty query', async () => {
+    render(<CommandPalette catalog={catalogState(COMMANDS)} onInsert={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show commands' }));
+
+    expect(optionNames()).toEqual(['/plan', '/model']);
+  });
+
+  it('never inserts a disabled row', async () => {
+    const onInsert = vi.fn();
+    const commands: readonly CommandDescriptorDto[] = [
+      { ...COMMANDS[0]!, enabled: false, disabledReason: 'Unavailable: demo' },
+      COMMANDS[1]!,
+    ];
+    render(<CommandPalette catalog={catalogState(commands)} onInsert={onInsert} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show commands' }));
+    await userEvent.click(screen.getByRole('option', { name: /plan/ }));
+
+    expect(onInsert).not.toHaveBeenCalled();
   });
 
   it('disables the input when authority is unavailable', () => {
-    render(<CommandPalette commands={COMMANDS} onInsert={vi.fn()} isDisabled />);
+    render(<CommandPalette catalog={catalogState(COMMANDS)} onInsert={vi.fn()} isDisabled />);
     expect(screen.getByRole('combobox')).toBeDisabled();
   });
 });

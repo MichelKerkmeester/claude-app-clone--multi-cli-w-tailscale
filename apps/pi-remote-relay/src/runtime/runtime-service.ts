@@ -34,6 +34,7 @@ import {
 
 import {
   isPlanArtifactPublication,
+  isPlanExtensionError,
   parsePlanArtifact,
   parsePlanStatus,
   type ParsedPlanArtifact,
@@ -115,6 +116,13 @@ export class RuntimeService {
       if (parsed !== null) {
         this.mode = parsed;
         this.resolveModeWaiters();
+        this.refreshModeProjection();
+      }
+      if (isPlanExtensionError(event)) {
+        // An unhealthy extension never reads as Build; the mode degrades to
+        // unknown until the host publishes a healthy mode again.
+        this.mode = 'unknown';
+        this.refreshModeProjection();
       }
       if (isPlanArtifactPublication(event)) {
         // The host is the only source of plan bindings; a malformed publication
@@ -691,6 +699,16 @@ export class RuntimeService {
   private refreshPlanProjection(): void {
     if (this.currentState === null) return;
     const state: RuntimeStateDto = { ...this.currentState, plan: this.planSnapshot() };
+    this.currentState = isRuntimeStateDto(state) ? state : this.currentState;
+  }
+
+  /**
+   * Mirror a host-confirmed mode event into the published state without a
+   * revision bump; the revision only advances when the relay itself commits.
+   */
+  private refreshModeProjection(): void {
+    if (this.currentState === null) return;
+    const state: RuntimeStateDto = { ...this.currentState, mode: this.mode };
     this.currentState = isRuntimeStateDto(state) ? state : this.currentState;
   }
 

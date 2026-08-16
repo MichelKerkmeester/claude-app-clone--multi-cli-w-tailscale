@@ -57,6 +57,12 @@ export class PromptService {
   public constructor(private readonly options: PromptServiceOptions) {}
 
   public async submit(command: PromptSubmitCommand, deviceId: string): Promise<TextBlock> {
+    if (isPlanControlMessage(command.message)) {
+      // Plan control is a host-authoritative operation. A leading /plan token
+      // must never become a host prompt, transcript block, or model-visible
+      // message, so it is rejected before any forwarding or recording.
+      throw new SlashSubmissionError('command_denied');
+    }
     if (command.command !== undefined) {
       const verdict = await this.revalidateSlash(command);
       if (verdict !== 'allowed') throw new SlashSubmissionError(verdict);
@@ -212,4 +218,14 @@ export class PromptService {
 /** The forwarded body must be exactly the bound command, with or without arguments. */
 function slashMessageMatches(message: string, name: string): boolean {
   return message === `/${name}` || message.startsWith(`/${name} `);
+}
+
+/**
+ * True when the first token after leading-whitespace normalization is the plan
+ * control command. Any argument form (`/plan on|off|execute`) is caught by the
+ * token match, and the check is case-sensitive like pi's own command matching.
+ */
+function isPlanControlMessage(message: string): boolean {
+  const firstToken = message.trimStart().split(/\s+/, 1)[0];
+  return firstToken === '/plan';
 }

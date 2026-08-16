@@ -46,7 +46,11 @@ function service(fake: FakeSupervisor): CommandService {
 }
 
 function binding(
-  catalog: { readonly hostEpoch: string; readonly sessionRevision: number; readonly catalogRevision: number },
+  catalog: {
+    readonly hostEpoch: string;
+    readonly sessionRevision: number;
+    readonly catalogRevision: number;
+  },
   name: string,
 ): CommandBindingDto {
   return {
@@ -63,14 +67,15 @@ describe('versioned command catalog authority', () => {
     const catalog = await service(fake).listCommands();
 
     const names = catalog.commands.map((command) => command.name);
-    expect(names).toEqual(['plan', 'model']);
+    expect(names).toEqual(['model']);
     expect(catalog.hostEpoch).toBe(HOST_EPOCH);
     expect(catalog.sessionId).toBe(SESSION);
     expect(catalog.sessionRevision).toBe(0);
     // The first snapshot allocates the initial catalog revision.
     expect(catalog.catalogRevision).toBe(1);
-    // Privileged, bang, and path-like commands are all hidden.
+    // The plan control command, privileged, bang, and path-like commands are all hidden.
     for (const hidden of [
+      'plan',
       'login',
       'reload',
       'share-session',
@@ -85,6 +90,26 @@ describe('versioned command catalog authority', () => {
     expect(serialized.includes('/x/plan.ts')).toBe(false);
     expect(serialized.includes('path')).toBe(false);
     expect(serialized.includes('Authenticate')).toBe(false);
+  });
+
+  it('hides the extension plan control command while retaining safe non-control commands', async () => {
+    const fake = new FakeSupervisor();
+    fake.rawData = {
+      commands: [
+        { name: 'plan', description: 'Toggle plan mode', source: 'extension' },
+        { name: 'review', description: 'Review changes', source: 'extension' },
+        { name: 'model', description: 'Pick a model', source: 'prompt' },
+        { name: 'compact', description: 'Compact context', source: 'prompt' },
+      ],
+    };
+    const svc = service(fake);
+    const catalog = await svc.listCommands();
+    const names = catalog.commands.map((command) => command.name);
+
+    expect(names).toEqual(['review', 'model', 'compact']);
+    expect(names).not.toContain('plan');
+    expect(await svc.revalidateSlashSubmission(binding(catalog, 'plan'))).toBe('command_denied');
+    expect(await svc.revalidateSlashSubmission(binding(catalog, 'review'))).toBe('allowed');
   });
 
   it('projects aliases and argument hints only when the host metadata is safe', async () => {
@@ -154,16 +179,16 @@ describe('versioned command catalog authority', () => {
     expect(svc.getAvailability()).toBe('idle');
     const afterTransitions = await svc.listCommands();
     expect(afterTransitions.sessionRevision).toBe(2);
-    expect(await svc.revalidateSlashSubmission(binding(first, 'plan'))).toBe('stale_catalog');
+    expect(await svc.revalidateSlashSubmission(binding(first, 'model'))).toBe('stale_catalog');
 
     svc.invalidate();
     expect(svc.getSnapshot()).toBeNull();
     expect(svc.getAvailability()).toBe('idle');
-    expect(await svc.revalidateSlashSubmission(binding(first, 'plan'))).toBe('stale_catalog');
+    expect(await svc.revalidateSlashSubmission(binding(first, 'model'))).toBe('stale_catalog');
 
     const reloaded = await svc.listCommands();
     expect(reloaded.hostEpoch).not.toBe(HOST_EPOCH);
-    expect(await svc.revalidateSlashSubmission(binding(reloaded, 'plan'))).toBe('allowed');
+    expect(await svc.revalidateSlashSubmission(binding(reloaded, 'model'))).toBe('allowed');
   });
 
   it('revalidates a current binding as allowed and denies stale or hidden names', async () => {
@@ -171,14 +196,15 @@ describe('versioned command catalog authority', () => {
     const svc = service(fake);
     const catalog = await svc.listCommands();
 
-    expect(await svc.revalidateSlashSubmission(binding(catalog, 'plan'))).toBe('allowed');
+    expect(await svc.revalidateSlashSubmission(binding(catalog, 'model'))).toBe('allowed');
+    expect(await svc.revalidateSlashSubmission(binding(catalog, 'plan'))).toBe('command_denied');
     expect(await svc.revalidateSlashSubmission(binding(catalog, 'login'))).toBe('command_denied');
     expect(await svc.revalidateSlashSubmission(binding(catalog, 'unknown-command'))).toBe(
       'command_denied',
     );
 
     fake.rawData = { commands: [{ name: 'compact', source: 'prompt' }] };
-    expect(await svc.revalidateSlashSubmission(binding(catalog, 'plan'))).toBe('stale_catalog');
+    expect(await svc.revalidateSlashSubmission(binding(catalog, 'model'))).toBe('stale_catalog');
     const reloaded = await svc.listCommands();
     expect(await svc.revalidateSlashSubmission(binding(reloaded, 'compact'))).toBe('allowed');
   });
@@ -191,7 +217,7 @@ describe('versioned command catalog authority', () => {
     svc.setAvailability('running');
     // A binding that is current under the running session revision is still denied.
     const runningCatalog = await svc.listCommands();
-    expect(await svc.revalidateSlashSubmission(binding(runningCatalog, 'plan'))).toBe(
+    expect(await svc.revalidateSlashSubmission(binding(runningCatalog, 'model'))).toBe(
       'command_denied',
     );
     // The denial is decided without another host read.

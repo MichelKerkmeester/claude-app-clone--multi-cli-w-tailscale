@@ -392,7 +392,7 @@ describe('consolidated fail-closed negative controls', () => {
     const snapshot = await service.listCommands();
     const binding: CommandBindingDto = {
       hostEpoch: snapshot.hostEpoch,
-      name: 'plan',
+      name: 'compact',
       sessionRevision: snapshot.sessionRevision,
       catalogRevision: snapshot.catalogRevision,
     };
@@ -438,6 +438,7 @@ describe('consolidated fail-closed negative controls', () => {
 class FakeCommandSupervisor {
   public rawCommands: readonly unknown[] = [
     { name: 'plan', description: 'Toggle plan mode', source: 'extension' },
+    { name: 'compact', description: 'Compact context', source: 'prompt' },
     { name: 'login', description: 'Authenticate', source: 'prompt' },
   ];
 
@@ -459,7 +460,7 @@ async function currentBinding(service: CommandService): Promise<CommandBindingDt
   const fresh = await service.listCommands();
   return {
     hostEpoch: fresh.hostEpoch,
-    name: 'plan',
+    name: 'compact',
     sessionRevision: fresh.sessionRevision,
     catalogRevision: fresh.catalogRevision,
   };

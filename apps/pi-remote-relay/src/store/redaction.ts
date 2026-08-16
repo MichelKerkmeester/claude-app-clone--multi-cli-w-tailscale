@@ -349,7 +349,7 @@ export function isControlPlaneProjection(payload: unknown): boolean {
     return false;
   }
   const text = payload.items[0].text;
-  return typeof text === 'string' && /^Extension requested setStatus$/.test(text);
+  return typeof text === 'string' && /^Extension requested (?:setStatus|setPlan)$/.test(text);
 }
 
 export function projectAvailableModel(row: unknown): AvailableModelDto | null {

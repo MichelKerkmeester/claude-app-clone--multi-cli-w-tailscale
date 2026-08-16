@@ -21,6 +21,11 @@ import { projectCommandCatalog } from '../store/redaction.js';
 const PRIVILEGED_COMMAND_PATTERN =
   /credential|password|secret|token|api[-_]?key|authoriz|login|logout|session|reload|share|install|uninstall|package|trust|revoke|reset|delete|shutdown|exit|quit/i;
 
+// The extension's plan control command is host-authoritative: entering, leaving,
+// or executing a plan must go through the ticketed plan-control lane, never the
+// phone slash catalog. Safe non-control commands stay discoverable.
+const PLAN_CONTROL_COMMAND_NAMES = new Set(['plan']);
+
 export type CommandAvailability = 'idle' | 'running';
 
 /** Fail-closed verdict for one explicit slash submission binding. */
@@ -56,10 +61,15 @@ export class CommandService {
   /** Fetch, redact, safe-filter, and atomically replace the complete catalog snapshot. */
   public async listCommands(): Promise<CommandCatalogDto> {
     const response = await this.supervisor.send({ type: 'get_commands' });
-    const projected = projectCommandCatalog(dataOf(response), this.options.sessionId, this.catalogRevision, {
-      hostEpoch: this.hostEpoch,
-      sessionRevision: this.sessionRevision,
-    });
+    const projected = projectCommandCatalog(
+      dataOf(response),
+      this.options.sessionId,
+      this.catalogRevision,
+      {
+        hostEpoch: this.hostEpoch,
+        sessionRevision: this.sessionRevision,
+      },
+    );
     if (projected === null) {
       throw new Error('host command catalog could not be projected');
     }
@@ -108,7 +118,9 @@ export class CommandService {
    * epoch, session revision, or the fresh catalog revision is stale; an unknown,
    * hidden, or currently-unsafe name is denied. Neither outcome reaches Pi.
    */
-  public async revalidateSlashSubmission(binding: CommandBindingDto): Promise<SlashSubmissionVerdict> {
+  public async revalidateSlashSubmission(
+    binding: CommandBindingDto,
+  ): Promise<SlashSubmissionVerdict> {
     if (binding.hostEpoch !== this.hostEpoch) return 'stale_catalog';
     if (binding.sessionRevision !== this.sessionRevision) return 'stale_catalog';
     if (this.availability !== 'idle') return 'command_denied';
@@ -122,7 +134,10 @@ export class CommandService {
 }
 
 function isSafeCommand(descriptor: CommandDescriptorDto): boolean {
-  return !PRIVILEGED_COMMAND_PATTERN.test(descriptor.name);
+  return (
+    !PLAN_CONTROL_COMMAND_NAMES.has(descriptor.name) &&
+    !PRIVILEGED_COMMAND_PATTERN.test(descriptor.name)
+  );
 }
 
 function sameCommandSet(

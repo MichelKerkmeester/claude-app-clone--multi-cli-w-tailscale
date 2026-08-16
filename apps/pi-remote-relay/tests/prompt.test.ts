@@ -200,6 +200,64 @@ describe('live prompt command transport', () => {
     expect(harness.send).toHaveBeenCalledTimes(20);
   });
 
+  it('rejects leading /plan control variants before any host prompt is sent', async () => {
+    const harness = await createHarness();
+    const authorized = await authorize(harness);
+
+    const variants = [
+      '/plan',
+      '/plan on',
+      '/plan off',
+      '/plan execute',
+      '  /plan on',
+      '\t/plan execute',
+    ];
+    for (const [index, message] of variants.entries()) {
+      const ticket = await issueTicket(harness, authorized.cookie);
+      const response = await submit(harness, authorized.cookie, {
+        submissionId: `plan_control_reject_${index}`,
+        message,
+        ticket: ticket.ticket,
+      });
+      expect(response.status).toBe(403);
+      expect(await response.json()).toEqual({ error: 'command_denied' });
+    }
+    // No Pi prompt was ever sent, and nothing became transcript residue.
+    expect(harness.send).not.toHaveBeenCalled();
+    const durable = JSON.stringify(
+      harness.store.createSyncPlan({
+        hostId: 'host_local',
+        workspaceRef: 'workspace_default',
+        sessionId: SESSION_ID,
+      }),
+    );
+    expect(durable).not.toContain('/plan');
+  });
+
+  it('forwards ordinary prose and non-leading /plan tokens unchanged', async () => {
+    const harness = await createHarness();
+    const authorized = await authorize(harness);
+
+    for (const [index, message] of [
+      'hello',
+      '/planning next steps',
+      'explain the /plan command',
+    ].entries()) {
+      const ticket = await issueTicket(harness, authorized.cookie);
+      const response = await submit(harness, authorized.cookie, {
+        submissionId: `plan_prose_${index}`,
+        message,
+        ticket: ticket.ticket,
+      });
+      expect(response.status).toBe(202);
+    }
+    expect(harness.send.mock.calls.map(([command]) => command)).toEqual([
+      { id: 'plan_prose_0', type: 'prompt', message: 'hello' },
+      { id: 'plan_prose_1', type: 'prompt', message: '/planning next steps' },
+      { id: 'plan_prose_2', type: 'prompt', message: 'explain the /plan command' },
+    ]);
+  });
+
   it('allows only the named steering action while tool mutation remains disabled', () => {
     const mutation = new MutationPolicy();
 

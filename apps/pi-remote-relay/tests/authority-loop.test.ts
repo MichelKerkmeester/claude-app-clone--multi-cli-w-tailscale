@@ -12,7 +12,12 @@ import {
   type DevicePublicKeyJwk,
   type Envelope,
   type EnrollmentQr,
+  type ExecutePlanCommand,
+  type PiRpcCommand,
+  type PiRpcEvent,
+  type PiRpcResponse,
   type SessionChallengeResponse,
+  type SetModeCommand,
 } from '@pi-remote/pi-rpc-protocol';
 import {
   createFinalBoundaryHandler,
@@ -26,6 +31,8 @@ import { bindPushNotifications, mutationPiArguments } from '../src/index.js';
 import { MutationPolicy } from '../src/policy/mutation-policy.js';
 import { PushService } from '../src/push/push-service.js';
 import { SyncHub } from '../src/replay/sync.js';
+import type { RpcSupervisor, SupervisorLifecycleEvent } from '../src/rpc/supervisor.js';
+import { RuntimeService } from '../src/runtime/runtime-service.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
 
@@ -210,6 +217,240 @@ describe('live protected-mutation authority loop', () => {
     expect(() => harness.approvals.request(actionFor(INPUT))).toThrow(/revoked/);
   });
 });
+
+describe('plan authority lifecycle loop', () => {
+  it('derives plan-ready only from structured artifact events, never from prose or tool events', async () => {
+    const fake = new PlanFakeSupervisor();
+    const runtime = new RuntimeService(fake as unknown as RpcSupervisor, {
+      sessionId: SESSION_ID,
+    });
+    await runtime.hydrate();
+
+    expect(runtime.getState()?.plan).toEqual({
+      planId: null,
+      planRevision: 0,
+      validity: 'none',
+      artifact: null,
+    });
+
+    // Prose and tool activity never mint a plan binding.
+    fake.emit({ type: 'agent_start' });
+    fake.emit({
+      type: 'message_start',
+      message: {
+        role: 'assistant',
+        content: [{ type: 'text', text: 'Here is my plan: rewrite everything.' }],
+      },
+    });
+    expect(runtime.getState()?.plan?.validity).toBe('none');
+
+    fake.emitPlanArtifact({ planRevision: 1, validity: 'valid' });
+    expect(runtime.getState()?.plan?.planRevision).toBe(1);
+    expect(runtime.getState()?.plan?.validity).toBe('valid');
+
+    fake.emitPlanArtifact({ planRevision: 2, validity: 'valid' });
+    expect(runtime.getState()?.plan?.planRevision).toBe(2);
+
+    // A malformed publication drops the binding instead of guessing a plan.
+    fake.emitPlanArtifact({ planToken: 'short' });
+    expect(runtime.getState()?.plan?.validity).toBe('none');
+  });
+
+  it('invalidates the old artifact before a replacement is accepted', async () => {
+    const fake = new PlanFakeSupervisor();
+    const runtime = new RuntimeService(fake as unknown as RpcSupervisor, {
+      sessionId: SESSION_ID,
+    });
+    await runtime.hydrate();
+    fake.emitPlanArtifact({ planRevision: 1, validity: 'valid' });
+
+    const entered = await runtime.planControl(enterPlanControl('c_enter', 0));
+    expect(entered.outcome.status).toBe('accepted');
+    expect(entered.outcome).toMatchObject({ state: { mode: 'plan', revision: 1 } });
+
+    // Feedback invalidates the reviewed binding: its Execute is stale and
+    // never dispatched before the replacement artifact is accepted.
+    fake.emitPlanArtifact({ planRevision: 1, validity: 'superseded' });
+    expect(runtime.getState()?.plan?.validity).toBe('superseded');
+    expect((await runtime.planControl(executePlanControl(1, 'c_stale'))).outcome.status).toBe(
+      'stale',
+    );
+    expect(fake.settled).toHaveLength(1);
+
+    fake.emitPlanArtifact({ planRevision: 2, validity: 'valid' });
+    expect((await runtime.planControl(executePlanControl(1, 'c_stale_again'))).outcome.status).toBe(
+      'stale',
+    );
+    const executed = await runtime.planControl(executePlanControl(2, 'c_execute'));
+    expect(executed.outcome.status).toBe('accepted');
+    if (executed.outcome.status !== 'accepted') throw new Error('expected accepted execute');
+    expect(executed.outcome.state.mode).toBe('executing-plan');
+    expect(executed.outcome.state.revision).toBe(2);
+    expect(fake.settled.map((command) => command)).toEqual([
+      { type: 'prompt', message: '/plan on' },
+      { type: 'prompt', message: '/plan execute' },
+    ]);
+  });
+
+  it('maps unhealthy extension state to unknown and never to Build', async () => {
+    const fake = new PlanFakeSupervisor();
+    const runtime = new RuntimeService(fake as unknown as RpcSupervisor, {
+      sessionId: SESSION_ID,
+    });
+    await runtime.hydrate();
+    fake.emitPlanStatus('plan');
+    expect(runtime.getState()?.mode).toBe('plan');
+
+    // A restoration-failure status and any extension error degrade to unknown.
+    fake.emitPlanStatus('error');
+    expect(runtime.getState()?.mode).toBe('unknown');
+    fake.emitExtensionError('Plan safety could not be verified');
+    expect(runtime.getState()?.mode).toBe('unknown');
+    fake.emitExtensionError('unrelated extension failure');
+    expect(runtime.getState()?.mode).toBe('unknown');
+
+    // Only an explicit healthy publication restores a known mode.
+    fake.emitPlanStatus('build');
+    expect(runtime.getState()?.mode).toBe('build');
+    expect(JSON.stringify(runtime.getState())).not.toContain('unrelated');
+  });
+
+  it('mirrors host-confirmed mode events into state without advancing the runtime revision', async () => {
+    const fake = new PlanFakeSupervisor();
+    const runtime = new RuntimeService(fake as unknown as RpcSupervisor, {
+      sessionId: SESSION_ID,
+    });
+    await runtime.hydrate();
+    const before = runtime.getRevision();
+    expect(before).toBe(0);
+
+    fake.emitPlanStatus('plan');
+    expect(runtime.getState()?.mode).toBe('plan');
+    expect(runtime.getRevision()).toBe(before);
+
+    fake.emitPlanStatus('build');
+    expect(runtime.getState()?.mode).toBe('build');
+    expect(runtime.getRevision()).toBe(before);
+
+    // A relay commit advances the revision; events alone never do.
+    await runtime.planControl(enterPlanControl('c_commit', 0));
+    expect(runtime.getRevision()).toBe(before + 1);
+  });
+});
+
+class PlanFakeSupervisor {
+  public readonly settled: PiRpcCommand[] = [];
+  private readonly lifecycleListeners = new Set<(event: SupervisorLifecycleEvent) => void>();
+  private readonly eventListeners = new Set<(event: PiRpcEvent) => void>();
+
+  public onLifecycle(listener: (event: SupervisorLifecycleEvent) => void): () => void {
+    this.lifecycleListeners.add(listener);
+    return () => this.lifecycleListeners.delete(listener);
+  }
+
+  public onEvent(listener: (event: PiRpcEvent) => void): () => void {
+    this.eventListeners.add(listener);
+    return () => this.eventListeners.delete(listener);
+  }
+
+  public send(command: PiRpcCommand): Promise<PiRpcResponse> {
+    if (command.type === 'get_state') {
+      return Promise.resolve(ok({ thinkingLevel: 'high', model: MODEL, streaming: false }));
+    }
+    if (command.type === 'get_available_thinking_levels') {
+      return Promise.resolve(ok(['off', 'high', 'max']));
+    }
+    if (command.type === 'get_available_models') {
+      return Promise.resolve(ok([MODEL]));
+    }
+    return Promise.reject(new Error(`unexpected command ${command.type}`));
+  }
+
+  public sendSettled(command: PiRpcCommand): Promise<PiRpcResponse> {
+    this.settled.push(command);
+    if (command.type !== 'prompt') {
+      return Promise.reject(new Error(`unexpected mutation ${command.type}`));
+    }
+    const message = (command as unknown as { message: string }).message;
+    if (message === '/plan execute') {
+      queueMicrotask(() => this.emitPlanStatus('executing-plan'));
+    } else {
+      queueMicrotask(() => this.emitPlanStatus(message === '/plan on' ? 'plan' : 'build'));
+    }
+    return Promise.resolve(ok({}));
+  }
+
+  public emit(event: unknown): void {
+    for (const listener of this.eventListeners) {
+      listener(event as PiRpcEvent);
+    }
+  }
+
+  public emitPlanStatus(mode: 'build' | 'plan' | 'executing-plan'): void {
+    this.emit({
+      type: 'extension_ui_request',
+      method: 'setStatus',
+      statusKey: 'pi-remote-plan-mode',
+      statusText: mode,
+    });
+  }
+
+  public emitExtensionError(error: string): void {
+    this.emit({ type: 'extension_error', error });
+  }
+
+  public emitPlanArtifact(options: {
+    readonly planRevision: number;
+    readonly validity: 'valid' | 'superseded';
+    readonly planToken?: string;
+  }): void {
+    this.emit({
+      type: 'extension_ui_request',
+      method: 'setPlan',
+      statusKey: 'pi-remote-plan-artifact',
+      plan: {
+        planId: 'plan_007',
+        planRevision: options.planRevision,
+        planToken: options.planToken ?? PLAN_TOKEN,
+        validity: options.validity,
+        title: 'Harden the relay boundary',
+        summary: 'Redacted outline only',
+        stepCount: 4,
+        approachCount: 2,
+      },
+    });
+  }
+}
+
+const PLAN_TOKEN = 'token_plan_binding_abcdef0123456789';
+const MODEL = { provider: 'deepseek', id: 'deepseek-v4-flash', label: 'DeepSeek Flash' };
+
+function ok(data: unknown): PiRpcResponse {
+  return { type: 'response', command: 'x', success: true, data: data as PiRpcResponse['data'] };
+}
+
+function enterPlanControl(controlId: string, expectedRuntimeRevision: number): SetModeCommand {
+  return {
+    type: 'set_mode',
+    target: 'plan',
+    expectedRuntimeRevision,
+    controlId,
+    oneUseTicket: 'ticket_plan_mode_abcdef',
+  };
+}
+
+function executePlanControl(expectedPlanRevision: number, controlId: string): ExecutePlanCommand {
+  return {
+    type: 'execute_plan',
+    planId: 'plan_007',
+    expectedPlanRevision,
+    planToken: PLAN_TOKEN,
+    expectedRuntimeRevision: 1,
+    postRunMode: 'plan',
+    controlId,
+    oneUseTicket: 'ticket_plan_exec_abcdef',
+  };
+}
 
 const AUTHORITY_SECRET = randomBytes(32).toString('base64url');
 

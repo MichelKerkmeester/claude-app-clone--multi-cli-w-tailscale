@@ -34,7 +34,7 @@ const EPOCH = 'epoch_slash_transport';
 const SESSION_ID = 'session_local';
 
 const RAW_COMMANDS = [
-  { name: 'plan', description: 'Toggle plan mode', source: 'extension' },
+  { name: 'compact', description: 'Compact context', source: 'prompt' },
   { name: 'model', description: 'Pick a model', source: 'prompt' },
   { name: 'login', description: 'Authenticate', source: 'prompt' },
 ];
@@ -87,9 +87,9 @@ describe('slash submission transport', () => {
 
     const response = await submit(harness, authorized.cookie, {
       submissionId: 'slash_valid_001',
-      message: '/plan on',
+      message: '/compact',
       ticket: ticket.ticket,
-      binding: bindingOf(catalog, 'plan'),
+      binding: bindingOf(catalog, 'compact'),
     });
     expect(response.status).toBe(202);
     const payload = (await response.json()) as { accepted: boolean; block: { role: string } };
@@ -100,28 +100,30 @@ describe('slash submission transport', () => {
     const sent = harness.supervisor.send.mock.calls.map(([command]) => command);
     expect(sent.filter((command) => command.type === 'get_commands')).toHaveLength(2);
     const forwarded = sent.filter((command) => command.type === 'prompt');
-    expect(forwarded).toEqual([{ id: 'slash_valid_001', type: 'prompt', message: '/plan on' }]);
+    expect(forwarded).toEqual([{ id: 'slash_valid_001', type: 'prompt', message: '/compact' }]);
   });
 
   it('rejects a stale catalog before forwarding and never retries', async () => {
     const harness = await createHarness();
     const authorized = await authorize(harness);
     const catalog = await fetchCatalog(harness, authorized.cookie);
-    harness.supervisor.rawCommands = [{ name: 'compact', description: 'Compact', source: 'prompt' }];
+    harness.supervisor.rawCommands = [
+      { name: 'compact', description: 'Compact', source: 'prompt' },
+    ];
     const ticket = await issueTicket(harness, authorized.cookie);
 
     const response = await submit(harness, authorized.cookie, {
       submissionId: 'slash_stale_001',
-      message: '/plan on',
+      message: '/compact',
       ticket: ticket.ticket,
-      binding: bindingOf(catalog, 'plan'),
+      binding: bindingOf(catalog, 'compact'),
     });
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({ error: 'stale_catalog' });
     expect(harness.supervisor.send).toHaveBeenCalledTimes(2);
-    expect(harness.supervisor.send.mock.calls.every(([command]) => command.type === 'get_commands')).toBe(
-      true,
-    );
+    expect(
+      harness.supervisor.send.mock.calls.every(([command]) => command.type === 'get_commands'),
+    ).toBe(true);
   });
 
   it('rejects a stale session revision with zero Pi RPCs', async () => {
@@ -134,9 +136,9 @@ describe('slash submission transport', () => {
 
     const response = await submit(harness, authorized.cookie, {
       submissionId: 'slash_session_stale',
-      message: '/plan on',
+      message: '/compact',
       ticket: ticket.ticket,
-      binding: bindingOf(catalog, 'plan'),
+      binding: bindingOf(catalog, 'compact'),
     });
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({ error: 'stale_catalog' });
@@ -163,6 +165,26 @@ describe('slash submission transport', () => {
     expect(harness.supervisor.send).toHaveBeenCalledTimes(2);
   });
 
+  it('rejects a forged plan-control binding with zero Pi RPCs', async () => {
+    const harness = await createHarness();
+    const authorized = await authorize(harness);
+    const catalog = await fetchCatalog(harness, authorized.cookie);
+    const ticket = await issueTicket(harness, authorized.cookie);
+
+    // Plan control is host-authoritative: even a bound /plan submission is
+    // rejected at the prompt boundary before any revalidation or forwarding.
+    const response = await submit(harness, authorized.cookie, {
+      submissionId: 'slash_plan_forged',
+      message: '/plan on',
+      ticket: ticket.ticket,
+      binding: bindingOf(catalog, 'compact'),
+    });
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ error: 'command_denied' });
+    // Only the catalog read that produced the binding ever reached Pi.
+    expect(harness.supervisor.send).toHaveBeenCalledTimes(1);
+  });
+
   it('rejects a cross-session submission with zero Pi RPCs', async () => {
     const harness = await createHarness();
     const authorized = await authorize(harness);
@@ -175,9 +197,9 @@ describe('slash submission transport', () => {
         type: 'prompt.submit',
         submissionId: 'slash_cross_session',
         sessionId: 'session_other',
-        message: '/plan on',
+        message: '/compact',
         ticket: ticket.ticket,
-        command: bindingOf(catalog, 'plan'),
+        command: bindingOf(catalog, 'compact'),
       },
     });
     expect(response.status).toBe(409);
@@ -195,7 +217,7 @@ describe('slash submission transport', () => {
       submissionId: 'slash_mismatch',
       message: '/login now',
       ticket: ticket.ticket,
-      binding: bindingOf(catalog, 'plan'),
+      binding: bindingOf(catalog, 'compact'),
     });
     expect(response.status).toBe(403);
     expect(await response.json()).toEqual({ error: 'command_denied' });
@@ -213,9 +235,9 @@ describe('slash submission transport', () => {
 
     const response = await submit(harness, authorized.cookie, {
       submissionId: 'slash_running',
-      message: '/plan on',
+      message: '/compact',
       ticket: ticket.ticket,
-      binding: bindingOf(runningCatalog, 'plan'),
+      binding: bindingOf(runningCatalog, 'compact'),
     });
     expect(response.status).toBe(403);
     expect(await response.json()).toEqual({ error: 'command_denied' });
@@ -238,10 +260,10 @@ describe('slash submission transport', () => {
         type: 'prompt.submit',
         submissionId: 'slash_steer_shape',
         sessionId: SESSION_ID,
-        message: '/plan on',
+        message: '/compact',
         ticket: ticket.ticket,
         streamingBehavior: 'steer',
-        command: bindingOf(catalog, 'plan'),
+        command: bindingOf(catalog, 'compact'),
       },
     });
     expect(response.status).toBe(400);
@@ -262,9 +284,9 @@ describe('slash submission transport', () => {
       (
         await submit(harness, authorized.cookie, {
           submissionId: 'slash_ticket_once',
-          message: '/plan on',
+          message: '/compact',
           ticket: ticket.ticket,
-          binding: bindingOf(catalog, 'plan'),
+          binding: bindingOf(catalog, 'compact'),
         })
       ).status,
     ).toBe(202);
@@ -272,13 +294,15 @@ describe('slash submission transport', () => {
       (
         await submit(harness, authorized.cookie, {
           submissionId: 'slash_ticket_replay',
-          message: '/plan on',
+          message: '/compact',
           ticket: ticket.ticket,
-          binding: bindingOf(catalog, 'plan'),
+          binding: bindingOf(catalog, 'compact'),
         })
       ).status,
     ).toBe(401);
-    const forwarded = harness.supervisor.send.mock.calls.filter(([command]) => command.type === 'prompt');
+    const forwarded = harness.supervisor.send.mock.calls.filter(
+      ([command]) => command.type === 'prompt',
+    );
     expect(forwarded).toHaveLength(1);
   });
 
@@ -363,14 +387,19 @@ async function fetchCatalog(harness: Harness, cookie: string): Promise<CommandCa
   expect(response.status).toBe(200);
   const catalog = (await response.json()) as CommandCatalogDto;
   expect(catalog.sessionId).toBe(SESSION_ID);
-  expect(catalog.commands.map((command) => command.name)).toEqual(['plan', 'model']);
+  expect(catalog.commands.map((command) => command.name)).toEqual(['compact', 'model']);
   return catalog;
 }
 
 function bindingOf(
   catalog: CommandCatalogDto,
   name: string,
-): { readonly hostEpoch: string; readonly name: string; readonly sessionRevision: number; readonly catalogRevision: number } {
+): {
+  readonly hostEpoch: string;
+  readonly name: string;
+  readonly sessionRevision: number;
+  readonly catalogRevision: number;
+} {
   return {
     hostEpoch: catalog.hostEpoch,
     name,

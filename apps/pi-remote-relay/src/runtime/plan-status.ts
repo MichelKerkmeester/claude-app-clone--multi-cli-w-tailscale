@@ -26,6 +26,14 @@ export interface ParsedPlanArtifact {
 }
 
 /**
+ * True when the record is an extension runtime error. Extension health is
+ * host-authoritative: an unhealthy extension must never read as Build.
+ */
+export function isPlanExtensionError(record: unknown): boolean {
+  return isRecord(record) && record.type === 'extension_error';
+}
+
+/**
  * Parse the only mode/status publication the relay trusts. Every other shape is
  * ignored (null) or mapped to `unknown`; a malformed or unhealthy status can
  * never be read as Build.

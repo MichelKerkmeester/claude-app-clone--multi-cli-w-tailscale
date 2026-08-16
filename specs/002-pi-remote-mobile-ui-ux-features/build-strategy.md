@@ -50,6 +50,8 @@ quota — Luna via pi's `openai-codex` provider would drain that quota, so keep 
 opencode-go). DeepSeek is the fallback when Luna stalls/fails review, or for cheap
 mechanical single-file work, dispatched through the pi CLI's own `deepseek` provider.
 
+> **Session note (mid-feature-002): opencode-go + direct routes went dark; Devin is the live route.** opencode-go hit its **429 weekly usage cap** (Luna AND DeepSeek unavailable until reset — and the opencode CLI *hangs* on the 429 instead of erroring; pi surfaces it cleanly). The pi `--provider deepseek` direct API returned **402 Insufficient Balance**. codex/GPT stays paused. The one funded, working route is **DeepSeek v4 Flash Max via the Devin CLI** (bills on the Devin account): `devin -p --model deepseek-v4-flash-max --permission-mode dangerous --respect-workspace-trust false -- "<prompt>"`. `--respect-workspace-trust false` is required (print mode can't show the trust prompt); Devin's lighter modes fail non-interactively (`accept-edits` rejects git/shell, `smart` is off-plan, `--sandbox` hangs), so **`dangerous` is the only autonomous mode that works and needs explicit operator approval** (granted this session; blast radius contained to the disposable worktree). Devin also carries `gpt-5-6-luna-max`. Devin is NOT sandboxed, so its `npm test` binds loopback — results are real. Prefer Luna Max again once opencode-go resets.
+
 | Priority | Model | When | Command shape |
 |:--:|---|---|---|
 | **1 (primary)** | **Luna 5.6 Max** via opencode-go | Most phases: features, state machines, security surfaces, protocol/relay | `opencode run --model opencode-go/gpt-5.6-luna --variant max --format json --dir "$REPO" --auto "<prompt>" </dev/null` |

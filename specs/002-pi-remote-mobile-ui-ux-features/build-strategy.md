@@ -43,23 +43,25 @@ App code lives in **this repo** (`/Users/michelkerkmeester/MEGA/Development/Mobi
 Set `REPO` to a **git worktree of it** (see §5). Every dispatch runs with the child
 envelope `MK_SPEC_GATE_ENFORCE=0 AI_SESSION_CHILD=1` and terminates stdin `</dev/null`.
 
-**Active routing (operator directive, 2026-08-16): the ChatGPT/codex (GPT) quota is
-low — route dispatches through the opencode-go gateway to preserve it.** DeepSeek v4
-Flash for mechanical/well-specified work; Luna 5.6 Max for complex reasoning. The
-codex/SOL path is **paused** — use it only if the operator re-enables GPT/codex usage.
+**Active routing (operator directive, updated): lean on Luna 5.6 Max as the PRIMARY
+model; fall back to DeepSeek v4 Flash via `cli-pi`.** Luna runs through the opencode-go
+gateway (a separate quota from ChatGPT/codex, which stays **paused** for its low GPT
+quota — Luna via pi's `openai-codex` provider would drain that quota, so keep Luna on
+opencode-go). DeepSeek is the fallback when Luna stalls/fails review, or for cheap
+mechanical single-file work, dispatched through the pi CLI's own `deepseek` provider.
 
 | Priority | Model | When | Command shape |
 |:--:|---|---|---|
-| **1** | **DeepSeek v4 Flash** via opencode-go | Well-specified, mechanical, single-file, or fixture work | `opencode run --model opencode-go/deepseek-v4-flash --format json --dir "$REPO" --auto "<prompt>" </dev/null` |
-| **2** | **Luna 5.6 Max** via opencode-go | Complex phases: multi-file features, state machines, security surfaces; or when DeepSeek stalls/fails review | `opencode run --model opencode-go/gpt-5.6-luna --variant max --format json --dir "$REPO" --auto "<prompt>" </dev/null` |
+| **1 (primary)** | **Luna 5.6 Max** via opencode-go | Most phases: features, state machines, security surfaces, protocol/relay | `opencode run --model opencode-go/gpt-5.6-luna --variant max --format json --dir "$REPO" --auto "<prompt>" </dev/null` |
+| **2 (fallback)** | **DeepSeek v4 Flash** via **cli-pi** | Luna stalls/fails review; or cheap mechanical/single-file/fixture work | `MK_SPEC_GATE_ENFORCE=0 AI_SESSION_CHILD=1 pi -p "<prompt>" --provider deepseek --model deepseek-v4-flash --thinking max --mode text --offline > out.log 2> err.log` |
 | paused | GPT-5.6 SOL / Luna via **codex** | Only if the operator re-enables GPT/codex quota | `codex exec --model gpt-5.6-sol -c model_reasoning_effort="high" -c service_tier="fast" -c approval_policy=never --sandbox workspace-write -C "$REPO" "<prompt>" </dev/null` |
 
-Notes (learned building feature 001):
-- **`--auto` is REQUIRED** on `opencode run` for the agent to actually write files — without it the dispatch reads/plans but lands no edits (the non-interactive permission default denies). `--auto` is opencode's analog of codex `approval_policy=never`; apply the §5 four-layer safety envelope whenever it is set.
-- **DeepSeek v4 Flash is non-reasoning and stalls on large sprawling scopes** — it over-reads and never converges (a 15-file phase burned its whole run reading, zero edits). Keep DeepSeek tasks tightly scoped and single-purpose; route multi-file/complex work to Luna Max.
-- **codex's `workspace-write` sandbox blocks binding `127.0.0.1`**, so a codex-dispatched `npm test` reports false `listen EPERM` failures on the relay's HTTP tests (~24 of them). Always re-run `npm test` yourself in the worktree (outside the sandbox) for the true result. opencode-go dispatches do not have this issue.
+Notes (learned building features 001–002):
+- **`--auto` is REQUIRED** on `opencode run` for the agent to actually write files — without it the dispatch reads/plans but lands no edits. `--auto` is opencode's analog of codex `approval_policy=never`; apply the §5 four-layer safety envelope whenever it is set.
+- **cli-pi gotchas** (constitutional: read `cli-external-orchestration/cli-pi/SKILL.md` before any pi dispatch): `--offline` is MANDATORY (without it pi hangs 2+ min on network probes); the **exit code is never an auth signal** — grep the captured output for `No API key found`, never trust exit 0/1; pi's default `--provider` is `google` (unauthenticated here) so always pass `--provider deepseek`; DeepSeek v4 Flash is a **reasoning** model pinned to `--thinking max`. **Dispatch pi from a directory WITHOUT a `.pi/` dir** (the feature worktree lacks it; the main checkout has one) so cli-pi's conservative self-invocation heuristic does not refuse.
+- **DeepSeek v4 Flash stalls on large sprawling scopes** — it over-reads and never converges (a 15-file phase burned its whole run reading, zero edits). Keep DeepSeek tasks tightly scoped and single-purpose; Luna Max owns multi-file/complex work.
+- **codex's `workspace-write` sandbox blocks binding `127.0.0.1`** → a codex-dispatched `npm test` shows false `listen EPERM` failures on the relay HTTP tests. Re-run `npm test` yourself in the worktree. opencode-go and pi dispatches do not have this issue.
 - **Never dispatch to Claude / cli-claude-code for implementation** (the iron rule). Claude orchestrates and verifies only.
-- Confirm live slugs with `opencode models opencode-go` before a first dispatch; if a model/auth is missing, ASK — never silently substitute.
 
 ## 4. Build order & gates
 

@@ -36,4 +36,23 @@ describe('SafeMarkdown', () => {
     expect(container.innerHTML).not.toContain('dangerouslySetInnerHTML');
     expect(parseSafeMarkdown('```bash\nincomplete')).toBeNull();
   });
+
+  it('presents ANSI and bidi controls as read-only markers without exposing controls to the DOM', () => {
+    const source = 'prefix \u001b[31mred\u001b[0m \u202ehidden order';
+    const { container } = render(<SafeMarkdown source={source} ariaLabel="Control-safe text" />);
+    const content = screen.getByLabelText('Control-safe text');
+
+    expect(content).toHaveAttribute('data-control-presentation', 'readonly');
+    expect(content.textContent).toContain('␛[31m');
+    expect(content.textContent).toContain('⟦RLO⟧');
+    expect(content.textContent).not.toContain('\u001b');
+    expect(content.textContent).not.toContain('\u202e');
+    expect(container.querySelector('script, style, iframe, form, img, audio, video')).toBeNull();
+  });
+
+  it('fails closed for obfuscated schemes and raw markup comments', () => {
+    expect(parseSafeMarkdown('[unsafe](java\nscript:alert(1))')).toBeNull();
+    expect(parseSafeMarkdown('[unsafe](data%3Atext/html%2Cnope)')).toBeNull();
+    expect(parseSafeMarkdown('<!-- remote-looking markup -->')).toBeNull();
+  });
 });

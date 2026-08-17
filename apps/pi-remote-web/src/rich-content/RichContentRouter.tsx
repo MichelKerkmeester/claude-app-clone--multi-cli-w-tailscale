@@ -1,11 +1,9 @@
+import { useEffect } from 'react';
 import type { DisplayTranscriptBlock } from '../state.js';
 import { useOptionalArtifactViewer } from '../artifacts/ArtifactViewerProvider.js';
 import { CodeCard } from './CodeCard.js';
 import { CommandOutputCard } from './CommandOutputCard.js';
-import {
-  createInMemoryArtifactDocument,
-  type F6RichBlock,
-} from './F6ViewerAdapter.js';
+import { createInMemoryArtifactDocument, type F6RichBlock } from './F6ViewerAdapter.js';
 import { RichBlockFrame } from './RichBlockFrame.js';
 import {
   type NormalizedActivityBlock,
@@ -22,21 +20,22 @@ import { TextArtifactCard } from './TextArtifactCard.js';
 
 export interface RichContentRouterProps {
   readonly block: NormalizedTranscriptBlock;
-  readonly onOpen?: (block: F6RichBlock) => void;
+  readonly onOpen?: (block: F6RichBlock, trigger?: HTMLButtonElement | null) => void;
 }
 
 export function RichContentRouter({ block, onOpen }: RichContentRouterProps) {
   const viewer = useOptionalArtifactViewer();
   const canOpen = onOpen !== undefined || viewer !== null;
-  const open = (richBlock: F6RichBlock) => {
+  useEffect(() => {
+    if (onOpen !== undefined || viewer === null || !isRichCardBlock(block)) return;
+    viewer.updateInMemory(createInMemoryArtifactDocument(block));
+  }, [block, onOpen, viewer]);
+  const open = (richBlock: F6RichBlock, trigger: HTMLButtonElement | null = null) => {
     if (onOpen !== undefined) {
-      onOpen(richBlock);
+      onOpen(richBlock, trigger);
       return;
     }
-    viewer?.openInMemory(
-      createInMemoryArtifactDocument(richBlock),
-      null,
-    );
+    viewer?.openInMemory(createInMemoryArtifactDocument(richBlock), trigger);
   };
 
   switch (block.kind) {
@@ -44,21 +43,21 @@ export function RichContentRouter({ block, onOpen }: RichContentRouterProps) {
       return (
         <CommandOutputCard
           block={block}
-          {...(canOpen ? { onOpen: () => open(block) } : {})}
+          {...(canOpen ? { onOpen: (trigger) => open(block, trigger ?? null) } : {})}
         />
       );
     case 'code':
       return (
         <CodeCard
           block={block}
-          {...(canOpen ? { onOpen: () => open(block) } : {})}
+          {...(canOpen ? { onOpen: (trigger) => open(block, trigger ?? null) } : {})}
         />
       );
     case 'text-artifact':
       return (
         <TextArtifactCard
           block={block}
-          {...(canOpen ? { onOpen: () => open(block) } : {})}
+          {...(canOpen ? { onOpen: (trigger) => open(block, trigger ?? null) } : {})}
         />
       );
     case 'prose':
@@ -72,9 +71,9 @@ export function RichContentRouter({ block, onOpen }: RichContentRouterProps) {
   }
 }
 
-export function isNormalizedRichContentBlock(
-  value: unknown,
-): value is NormalizedTranscriptBlock {
+// These pure guards are exported for transcript projection and security tests.
+// eslint-disable-next-line react-refresh/only-export-components
+export function isNormalizedRichContentBlock(value: unknown): value is NormalizedTranscriptBlock {
   if (typeof value !== 'object' || value === null) return false;
   const kind = (value as { readonly kind?: unknown }).kind;
   return (
@@ -88,10 +87,10 @@ export function isNormalizedRichContentBlock(
   );
 }
 
-export function isRichCardBlock(block: NormalizedTranscriptBlock): block is
-  | NormalizedCommandBlock
-  | NormalizedCodeBlock
-  | NormalizedTextArtifactBlock {
+// eslint-disable-next-line react-refresh/only-export-components
+export function isRichCardBlock(
+  block: NormalizedTranscriptBlock,
+): block is NormalizedCommandBlock | NormalizedCodeBlock | NormalizedTextArtifactBlock {
   return block.kind === 'command' || block.kind === 'code' || block.kind === 'text-artifact';
 }
 
@@ -137,7 +136,9 @@ function DiffBlock({ block }: { readonly block: NormalizedDiffBlock }) {
   const source = block.sourceBlock as DisplayTranscriptBlock & { readonly patch?: unknown };
   return (
     <RichBlockFrame title="File diff" eyebrow="Diff" className="rich-diff-card">
-      <pre className="rich-shell-well">{typeof source.patch === 'string' ? source.patch : 'Diff unavailable'}</pre>
+      <pre className="rich-shell-well">
+        {typeof source.patch === 'string' ? source.patch : 'Diff unavailable'}
+      </pre>
     </RichBlockFrame>
   );
 }
@@ -162,4 +163,3 @@ function activitySource(block: DisplayTranscriptBlock): string {
   }
   return 'Activity is available only as a bounded redacted summary.';
 }
-

@@ -1,6 +1,10 @@
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useArtifactViewer, ArtifactViewerProvider, type ArtifactViewerContextValue } from '../src/artifacts/ArtifactViewerProvider.js';
+import {
+  useArtifactViewer,
+  ArtifactViewerProvider,
+  type ArtifactViewerContextValue,
+} from '../src/artifacts/ArtifactViewerProvider.js';
 import { createInMemoryArtifactDocument } from '../src/rich-content/F6ViewerAdapter.js';
 import {
   normalizeTranscriptBlocks,
@@ -33,9 +37,7 @@ function codeBlock(): NormalizedCodeBlock {
         text: '```typescript\nconst exact = "redacted";\n```',
       },
     ],
-  }).filter(
-    (candidate): candidate is NormalizedCodeBlock => candidate.kind === 'code',
-  );
+  }).filter((candidate): candidate is NormalizedCodeBlock => candidate.kind === 'code');
   if (block === undefined) throw new Error('Expected code block.');
   return block;
 }
@@ -63,6 +65,32 @@ describe('F6ViewerAdapter', () => {
       __piRemoteArtifactBlockId: block.blockId,
     });
     expect(fetchSpy).not.toHaveBeenCalled();
+
+    const historyState = window.history.state;
+    act(() =>
+      api?.openInMemory(
+        {
+          ...memoryDocument,
+          revision: 2,
+          text: 'const updated = "still redacted";',
+        },
+        null,
+      ),
+    );
+    expect(globalThis.document.querySelectorAll('[role="dialog"]')).toHaveLength(1);
+    expect(window.history.state).toEqual(historyState);
+    expect(screen.getByText('const updated = "still redacted";')).toBeInTheDocument();
+
+    act(() =>
+      api?.updateInMemory({
+        ...memoryDocument,
+        revision: 3,
+        text: '',
+        sourceState: 'source-removed',
+      }),
+    );
+    expect(screen.getByText('const updated = "still redacted";')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(/source was removed/u);
 
     act(() => api?.close('close'));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());

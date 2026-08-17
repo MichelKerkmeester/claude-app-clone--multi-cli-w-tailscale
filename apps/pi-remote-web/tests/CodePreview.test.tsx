@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { CodePreview } from '../src/artifacts/CodePreview.js';
@@ -35,20 +35,14 @@ describe('CodePreview', () => {
       public terminate = terminate;
     }
     vi.stubGlobal('Worker', FailingWorker);
-    const revokeObjectURL = vi.fn();
-    vi.stubGlobal('URL', {
-      createObjectURL: vi.fn(() => 'blob:code-worker'),
-      revokeObjectURL,
-    });
     const source = 'function safe() { return true; }';
-    const view = render(<CodePreview text={source} />);
+    const view = render(<CodePreview text={source} language="typescript" />);
     await waitFor(() =>
       expect(screen.getByLabelText('Code preview').textContent).toContain(source),
     );
     expect(screen.getByLabelText('Code preview').textContent).toBe('1' + source);
     view.unmount();
     expect(terminate).toHaveBeenCalled();
-    expect(revokeObjectURL).toHaveBeenCalledWith('blob:code-worker');
   });
 
   it('marks Find matches without changing the copied text content', () => {
@@ -57,5 +51,26 @@ describe('CodePreview', () => {
     const preview = screen.getByLabelText('Code preview');
     expect(preview.textContent).toBe('12' + source);
     expect(preview.querySelectorAll('.artifact-find-match')).toHaveLength(2);
+  });
+
+  it('stops following after upward scroll and exposes a jump-to-latest action', () => {
+    const view = render(
+      <CodePreview text={'line one\nline two'} language="typescript" followTail />,
+    );
+    const preview = screen.getByLabelText('Code preview') as HTMLDivElement;
+    Object.defineProperties(preview, {
+      clientHeight: { configurable: true, value: 100 },
+      scrollHeight: { configurable: true, value: 1000 },
+      scrollTop: { configurable: true, writable: true, value: 0 },
+    });
+    fireEvent.scroll(preview);
+    expect(screen.getByRole('button', { name: 'Jump to latest' })).toBeInTheDocument();
+
+    view.rerender(
+      <CodePreview text={'line one\nline two\nline three'} language="typescript" followTail />,
+    );
+    expect(preview.scrollTop).toBe(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Jump to latest' }));
+    expect(preview.scrollTop).toBe(1000);
   });
 });

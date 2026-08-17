@@ -13,7 +13,6 @@ import {
   isPlanSnapshotDto,
   type Envelope,
   type PiRpcEvent,
-  type PlanSnapshotDto,
 } from '@pi-remote/pi-rpc-protocol';
 
 import { publishPiEvent } from '../src/index.js';
@@ -234,6 +233,30 @@ describe('canonical redaction', () => {
     } finally {
       store.close();
     }
+  });
+
+  it('redacts rich canonical source before it can become a renderer or worker input', () => {
+    const canary = 'rich-source-secret-001';
+    const redacted = redactEnvelope(
+      envelopeWith({
+        id: 'rich-source-block',
+        revision: 4,
+        seq: 4,
+        kind: 'text_artifact',
+        label: 'document',
+        source: `token=${canary} path=/Users/alice/private.txt \u001b[31m\u202e`,
+        redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+      }),
+    );
+    const serialized = JSON.stringify(redacted);
+
+    expect(serialized).not.toContain(canary);
+    expect(serialized).not.toContain('/Users/alice');
+    expect(serialized).not.toContain('\u001b');
+    expect(serialized).not.toContain('\u202e');
+    expect(serialized).toContain('[REDACTED_SECRET]');
+    expect(serialized).toContain('[REDACTED_PATH]');
+    expect(serialized).toContain('[REDACTED_CONTROL]');
   });
 
   it('strips the raw plan binding before any persistence, replay or broadcast', () => {

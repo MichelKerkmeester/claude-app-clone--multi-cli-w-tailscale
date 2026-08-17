@@ -257,6 +257,26 @@ describe('protocol guards', () => {
     expect(isRichTranscriptBlock(legacy)).toBe(false);
   });
 
+  it('keeps rich records opaque and rejects authority-bearing renderer fields', () => {
+    const canonical = {
+      id: 'block_rich_opaque',
+      revision: 2,
+      seq: 2,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'text_artifact',
+      label: 'document',
+      source: '[REDACTED_SECRET] [REDACTED_PATH]',
+      redaction: { policyVersion: 1, fieldsRedacted: 2, reasons: ['secret', 'path'] },
+    } as const;
+
+    expect(isTextArtifactBlock(canonical)).toBe(true);
+    expect(isRichTranscriptBlock(canonical)).toBe(true);
+    expect(isTranscriptBlock({ ...canonical, ticket: 'ticket_rich_001' })).toBe(false);
+    expect(isTranscriptBlock({ ...canonical, mutationTicket: 'ticket_rich_002' })).toBe(false);
+    expect(isTranscriptBlock({ ...canonical, fetchUrl: '/api/rich-content' })).toBe(false);
+    expect(isTranscriptBlock({ ...canonical, source: 'x'.repeat(256 * 1024 + 1) })).toBe(false);
+  });
+
   it('accepts exact relay artifact descriptors and rejects unsafe state combinations', () => {
     const ready = {
       id: 'block_preview_001',
@@ -520,6 +540,7 @@ describe('runtime control guards', () => {
     expect(isRuntimeControlCommand({ ...command, expectedCatalogRevision: -1 })).toBe(false);
     expect(isRuntimeControlCommand({ ...command, expectedCatalogRevision: 1.5 })).toBe(false);
     const { expectedCatalogRevision: _missing, ...missingCatalogRevision } = command;
+    void _missing;
     expect(isRuntimeControlCommand(missingCatalogRevision)).toBe(false);
     expect(
       isRuntimeControlCommand({
@@ -753,6 +774,7 @@ describe('runtime control guards', () => {
     ).toBe(false);
     // Without a binding the ordinary prompt shape keeps steering.
     const { command: _binding, ...ordinary } = command;
+    void _binding;
     expect(isPromptSubmitCommand({ ...ordinary, streamingBehavior: 'followUp' })).toBe(true);
     expect(isPromptSubmitCommand({ ...ordinary, streamingBehavior: 'steer' })).toBe(true);
     expect(isPromptSubmitCommand(ordinary)).toBe(true);

@@ -11,19 +11,15 @@ import type {
 } from './normalizeTranscriptBlocks.js';
 
 export type F6RichBlock =
-  | NormalizedCommandBlock
-  | NormalizedCodeBlock
-  | NormalizedTextArtifactBlock;
+  NormalizedCommandBlock | NormalizedCodeBlock | NormalizedTextArtifactBlock;
 
-export function createInMemoryArtifactDocument(
-  block: F6RichBlock,
-): InMemoryArtifactDocument {
+// The document projection is exported for read-only adapter and security tests.
+// eslint-disable-next-line react-refresh/only-export-components
+export function createInMemoryArtifactDocument(block: F6RichBlock): InMemoryArtifactDocument {
   if (block.kind === 'command') {
     const command = block.canonicalCommand ?? 'Command unavailable';
     const output = block.canonicalOutput;
-    const text = output === null
-      ? `$ ${command}\n`
-      : `$ ${command}\n\n${output}`;
+    const text = output === null ? `$ ${command}\n` : `$ ${command}\n\n${output}`;
     return {
       kind: 'in-memory',
       id: block.blockId,
@@ -33,6 +29,15 @@ export function createInMemoryArtifactDocument(
       summary: `${lifecycleLabel(block.lifecycle)} · ${block.outputCompleteness === 'complete' ? 'Complete output' : 'Current output'}`,
       language: 'bash',
       redaction: 'applied',
+      revision: block.revision,
+      live: block.lifecycle === 'running',
+      sourceState: block.resultMissing
+        ? 'terminal-without-result'
+        : block.source === 'cache' && block.lifecycle === 'running'
+          ? 'connection-lost'
+          : block.source === 'cache'
+            ? 'stale-cache'
+            : 'current',
     };
   }
   if (block.kind === 'code') {
@@ -45,6 +50,8 @@ export function createInMemoryArtifactDocument(
       summary: `${block.languageLabel} · ${block.canonicalSource.split(/\r?\n/u).length} lines`,
       ...(block.language === null ? {} : { language: block.language }),
       redaction: 'applied',
+      revision: block.revision,
+      sourceState: block.source === 'cache' ? 'stale-cache' : 'current',
     };
   }
   return {
@@ -55,9 +62,12 @@ export function createInMemoryArtifactDocument(
     text: block.canonicalSource,
     summary: `${textArtifactLabel(block.label)} · ${block.canonicalSource.split(/\r?\n/u).length} lines`,
     redaction: 'applied',
+    revision: block.revision,
+    sourceState: block.source === 'cache' ? 'stale-cache' : 'current',
   };
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useF6ViewerAdapter() {
   const viewer = useArtifactViewer();
   return useCallback(
@@ -68,14 +78,25 @@ export function useF6ViewerAdapter() {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
+export function useReconcileF6Viewer() {
+  const viewer = useArtifactViewer();
+  return useCallback(
+    (block: F6RichBlock) => {
+      viewer.updateInMemory(createInMemoryArtifactDocument(block));
+    },
+    [viewer],
+  );
+}
+
 export interface F6ViewerAdapterProps {
   readonly block: F6RichBlock;
-  readonly children: (open: () => void) => ReactNode;
+  readonly children: (open: (trigger?: HTMLButtonElement | null) => void) => ReactNode;
 }
 
 export function F6ViewerAdapter({ block, children }: F6ViewerAdapterProps) {
   const open = useF6ViewerAdapter();
-  return <>{children(() => open(block))}</>;
+  return <>{children((trigger) => open(block, trigger ?? null))}</>;
 }
 
 function lifecycleLabel(value: NormalizedCommandBlock['lifecycle']): string {

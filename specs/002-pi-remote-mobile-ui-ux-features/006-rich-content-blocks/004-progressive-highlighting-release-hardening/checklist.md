@@ -1,20 +1,20 @@
 # Checklist — Progressive highlighting, accessibility, and release hardening
 
-- [ ] Plaintext first paint and worker/highlighter failure remain readable, selectable, and copyable for every supported and unsupported language.
-- [ ] Highlighting is skipped above the configured cutoff, receives no unredacted content, persists no source/token output, and cannot let stale worker output overwrite a newer revision.
-- [ ] Deterministic fixtures reach every command, code, artifact, viewer, cache, connection-loss, truncation, malformed, and fallback state with the specified labels/actions.
-- [ ] Streaming has stable geometry, no continuous accessibility announcements, no forced tail movement after upward scroll, and correct 96px follow/jump behavior.
-- [ ] F6 history contains only an opaque block ID; open/close/replay/revision changes restore focus and scroll, avoid duplicate entries, and make no network or mutation request.
-- [ ] Dangerous Markdown/HTML/URL/ANSI/bidi input cannot create executable DOM, unsafe styles, navigation, remote fetches, or misleading accessible output.
-- [ ] Light/dark, 320px/390px/430px, portrait/landscape, RTL, 200% text, external keyboard, VoiceOver, Voice Control, and reduced-motion checks pass with the fixed design system and WCAG AA.
-- [ ] Repeated large-block open/close cycles release worker, timer, listener, history, selection, and source-cache resources without monotonic memory or live-DOM growth.
-- [ ] Negative controls find no Run, Retry, Edit, Approve, Apply, Download, Publish, Open-on-host, Share-file, raw-HTML, filesystem, mutation-ticket, or rich-content fetch path.
-- [ ] Release evidence includes typecheck, tests, lint, build, true-390px light/dark screenshots, automated accessibility/security results, and oldest-supported-iPhone sign-off.
-- [ ] `npm run typecheck` passes.
-- [ ] `npm test` passes.
-- [ ] `npm run test:web` passes.
-- [ ] `npm run lint` passes.
-- [ ] `npm run build` passes.
-- [ ] Every `rich-release` CDP run reports exactly 390 CSS pixels and the inspected captures show no clipped safe-area controls, page overflow, contrast failure, syntax-token failure, live-edge jump, or modal focus escape.
-- [ ] The oldest-supported-iPhone checklist passes in Safari and installed-PWA standalone mode, portrait and landscape, including VoiceOver, Voice Control, external keyboard, native selection, Back/edge-back, suspension/bfcache recovery, relay loss, RTL, 200% text, reduced motion, streaming, large code, and repeated viewer cycles.
-- [ ] Security/privacy release review covers worker messages/caches, raw-DOM prevention, bidi/ANSI handling, Universal Clipboard disclosure, F6 history, app-switcher/bfcache exposure, and absence of host or mutation authority.
+- [x] Plaintext first paint and worker/highlighter failure remain readable, selectable, and copyable for every supported and unsupported language. — plaintext-first; 'skipped'/'failed'/'plaintext'/no-Worker → plaintext; Copy verbatim.
+- [x] Highlighting is skipped above the configured cutoff, receives no unredacted content, persists no source/token output, and cannot let stale worker output overwrite a newer revision. — 20k-char/1k-line cutoff before dispatch; worker gets only redacted source + metadata; memory-only, cleared on disposal; stale request/revision dropped.
+- [x] Deterministic fixtures reach every command, code, artifact, viewer, cache, connection-loss, truncation, malformed, and fallback state with the specified labels/actions. — `rich-release` demo + CDP state matrix.
+- [x] Streaming has stable geometry, no continuous accessibility announcements, no forced tail movement after upward scroll, and correct 96px follow/jump behavior. — live-edge follow + jump-to-latest; tests.
+- [x] F6 history contains only an opaque block ID; open/close/replay/revision changes restore focus and scroll, avoid duplicate entries, and make no network or mutation request. — F6ViewerAdapter reuses the single viewer; opaque-id history; no-network tests.
+- [x] Dangerous Markdown/HTML/URL/ANSI/bidi input cannot create executable DOM, unsafe styles, navigation, remote fetches, or misleading accessible output. — SafeMarkdown hardened; no `dangerouslySetInnerHTML`; SafeMarkdown tests.
+- [~] Light/dark, 320px/390px/430px, portrait/landscape, RTL, 200% text, external keyboard, VoiceOver, Voice Control, and reduced-motion checks pass with the fixed design system and WCAG AA. — light/dark/390px/200%/reduced-motion/contrast automated (CDP + contrast.test); **portrait/landscape, VoiceOver, Voice Control, external keyboard remain OPERATOR-REQUIRED (physical device).**
+- [x] Repeated large-block open/close cycles release worker, timer, listener, history, selection, and source-cache resources without monotonic memory or live-DOM growth. — `getHighlightResourceStats` + no-growth worker-lifecycle test.
+- [x] Negative controls find no Run, Retry, Edit, Approve, Apply, Download, Publish, Open-on-host, Share-file, raw-HTML, filesystem, mutation-ticket, or rich-content fetch path. — relay security-negative-controls + rich-content scan; no such path.
+- [~] Release evidence includes typecheck, tests, lint, build, true-390px light/dark screenshots, automated accessibility/security results, and oldest-supported-iPhone sign-off. — all automated evidence present; **oldest-iPhone sign-off OPERATOR-REQUIRED.**
+- [x] `npm run typecheck` passes. — exit 0.
+- [x] `npm test` passes. — exit 0, 261 passed (32 files).
+- [x] `npm run test:web` passes. — exit 0, 545 passed (44 files).
+- [~] `npm run lint` passes. — phase-3 files are lint-clean (scoped `eslint` exit 0); repo-wide `eslint .` still fails on ~45 PRE-EXISTING errors in unmodified files (no phase-3 file among them) — same class as the documented prettier debt; out of phase-3 scope, flagged for a dedicated cleanup.
+- [x] `npm run build` passes. — exit 0 (worker bundles).
+- [x] Every `rich-release` CDP run reports exactly 390 CSS pixels and the inspected captures show no clipped safe-area controls, page overflow, contrast failure, syntax-token failure, live-edge jump, or modal focus escape. — light+dark exit 0, 390 CSS px, inspected.
+- [ ] **OPERATOR-REQUIRED** — The oldest-supported-iPhone checklist passes in Safari and installed-PWA standalone mode, portrait and landscape, including VoiceOver, Voice Control, external keyboard, native selection, Back/edge-back, suspension/bfcache recovery, relay loss, RTL, 200% text, reduced motion, streaming, large code, and repeated viewer cycles. — cannot run headlessly.
+- [x] Security/privacy release review covers worker messages/caches, raw-DOM prevention, bidi/ANSI handling, Universal Clipboard disclosure, F6 history, app-switcher/bfcache exposure, and absence of host or mutation authority. — Claude read the diffs; PASS (see implementation-summary).

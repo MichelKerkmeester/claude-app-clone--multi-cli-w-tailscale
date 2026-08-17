@@ -34,18 +34,36 @@ interface CodeNode {
   readonly source: string;
 }
 
-type SafeMarkdownNode =
-  | ParagraphNode
-  | HeadingNode
-  | QuoteNode
-  | ListNode
-  | TableNode
-  | CodeNode;
+type SafeMarkdownNode = ParagraphNode | HeadingNode | QuoteNode | ListNode | TableNode | CodeNode;
 
 const RAW_HTML_PATTERN =
   /<\s*\/?\s*(?:script|style|form|input|textarea|button|img|iframe|frame|object|embed|audio|video|source|svg|link|meta|base)\b|<\s*\/?\s*[a-z][^>]*>/iu;
+const RAW_MARKUP_PATTERN = /<!--[\s\S]*?-->|<!doctype\b|<!\[cdata\[/iu;
 const UNSAFE_SCHEME_PATTERN = /(?:javascript|vbscript|data|file|blob):/iu;
 const MARKDOWN_DESTINATION_PATTERN = /!?\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+["'][^"']*["'])?\s*\)/gu;
+const ANY_MARKDOWN_DESTINATION_PATTERN =
+  /!?\[[^\]\r\n]*\]\(\s*<?([^)\r\n>]*)>?(?:\s+["'][^"']*["'])?\s*\)/gu;
+const ANSI_ESCAPE = String.fromCharCode(0x1b);
+const ANSI_BELL = String.fromCharCode(0x07);
+const ANSI_SEQUENCE_PATTERN = new RegExp(
+  `${ANSI_ESCAPE}(?:\\[[0-?]*[ -/]*[@-~]|\\][^${ANSI_BELL}]*(?:${ANSI_BELL}|${ANSI_ESCAPE}\\\\))`,
+  'gu',
+);
+const ASCII_CONTROL_CLASS = [
+  characterRange(0x00, 0x08),
+  characterRange(0x0b, 0x0c),
+  characterRange(0x0e, 0x1f),
+  characterRange(0x7f, 0x9f),
+].join('');
+const BIDI_CONTROL_CLASS = [
+  characterRange(0x061c, 0x061c),
+  characterRange(0x200e, 0x200f),
+  characterRange(0x202a, 0x202e),
+  characterRange(0x2066, 0x2069),
+].join('');
+const CONTROL_CHARACTER_PATTERN = new RegExp(`[${ASCII_CONTROL_CLASS}${BIDI_CONTROL_CLASS}]`, 'u');
+const BIDI_CONTROL_PATTERN = new RegExp(`[${BIDI_CONTROL_CLASS}]`, 'gu');
+const ASCII_CONTROL_PATTERN = new RegExp(`[${ASCII_CONTROL_CLASS}]`, 'gu');
 const FENCE_PATTERN = /^ {0,3}(`{3,}|~{3,})([^\r\n]*)\r?$/u;
 
 export interface SafeMarkdownProps {
@@ -62,9 +80,22 @@ export function SafeMarkdown({
   const ast = parseSafeMarkdown(source);
   const classes = `safe-markdown${className.length > 0 ? ` ${className}` : ''}`;
   if (ast === null) {
+    const controlPresentation = presentInvisibleCharacters(source);
     return (
-      <div className={`${classes} safe-markdown-fallback`} aria-label={ariaLabel} dir="auto">
-        {source}
+      <div
+        className={`${classes} safe-markdown-fallback`}
+        aria-label={ariaLabel}
+        dir="auto"
+        data-control-presentation={controlPresentation.changed ? 'readonly' : undefined}
+        data-verbatim-copy="canonical-source"
+      >
+        {controlPresentation.changed ? (
+          <span title="Control characters are shown as visible markers">
+            {controlPresentation.value}
+          </span>
+        ) : (
+          source
+        )}
       </div>
     );
   }
@@ -75,6 +106,8 @@ export function SafeMarkdown({
   );
 }
 
+// The parser is exported so security tests can verify the fail-closed AST boundary.
+// eslint-disable-next-line react-refresh/only-export-components
 export function parseSafeMarkdown(source: string): readonly SafeMarkdownNode[] | null {
   if (isUnsafeMarkdown(source)) return null;
   const lines = source.split(/\r?\n/u);
@@ -95,7 +128,12 @@ export function parseSafeMarkdown(source: string): readonly SafeMarkdownNode[] |
       let closed = false;
       while (cursor < lines.length) {
         const candidate = lines[cursor] ?? '';
-        if (new RegExp(`^ {0,3}${escapeRegExp(marker.charAt(0))}{${marker.length},}[ \\t]*$`, 'u').test(candidate)) {
+        if (
+          new RegExp(
+            `^ {0,3}${escapeRegExp(marker.charAt(0))}{${marker.length},}[ \\t]*$`,
+            'u',
+          ).test(candidate)
+        ) {
           closed = true;
           break;
         }
@@ -204,7 +242,9 @@ function renderNode(node: SafeMarkdownNode, key: number): ReactNode {
           <thead>
             <tr>
               {node.headings.map((heading, index) => (
-                <th key={`${key}-heading-${index}`}>{renderInline(heading, `${key}-th-${index}`)}</th>
+                <th key={`${key}-heading-${index}`}>
+                  {renderInline(heading, `${key}-th-${index}`)}
+                </th>
               ))}
             </tr>
           </thead>
@@ -234,7 +274,8 @@ function renderInline(source: string, keyPrefix: string): ReactNode {
   const nodes: ReactNode[] = [];
   let remaining = source;
   let index = 0;
-  const tokenPattern = /(`[^`\n]*`|\*\*[^*\n]+\*\*|__[^_\n]+__|~~[^~\n]+~~|\*[^*\n]+\*|_[^_\n]+_|!?\[[^\]\n]+\]\([^)\n]+\))/u;
+  const tokenPattern =
+    /(`[^`\n]*`|\*\*[^*\n]+\*\*|__[^_\n]+__|~~[^~\n]+~~|\*[^*\n]+\*|_[^_\n]+_|!?\[[^\]\n]+\]\([^)\n]+\))/u;
   while (remaining.length > 0) {
     const match = tokenPattern.exec(remaining);
     if (match === null) {
@@ -245,13 +286,9 @@ function renderInline(source: string, keyPrefix: string): ReactNode {
     if (start > 0) nodes.push(remaining.slice(0, start));
     const token = match[0];
     if (token.startsWith('`')) {
-      nodes.push(
-        <code key={`${keyPrefix}-code-${index}`}>{token.slice(1, -1)}</code>,
-      );
+      nodes.push(<code key={`${keyPrefix}-code-${index}`}>{token.slice(1, -1)}</code>);
     } else if (token.startsWith('**') || token.startsWith('__')) {
-      nodes.push(
-        <strong key={`${keyPrefix}-strong-${index}`}>{token.slice(2, -2)}</strong>,
-      );
+      nodes.push(<strong key={`${keyPrefix}-strong-${index}`}>{token.slice(2, -2)}</strong>);
     } else if (token.startsWith('~~')) {
       nodes.push(<del key={`${keyPrefix}-del-${index}`}>{token.slice(2, -2)}</del>);
     } else if (token.startsWith('*') || token.startsWith('_')) {
@@ -270,12 +307,82 @@ function renderInline(source: string, keyPrefix: string): ReactNode {
 }
 
 function isUnsafeMarkdown(source: string): boolean {
-  if (RAW_HTML_PATTERN.test(source) || UNSAFE_SCHEME_PATTERN.test(source)) return true;
-  for (const match of source.matchAll(MARKDOWN_DESTINATION_PATTERN)) {
-    const destination = match[1] ?? '';
-    if (UNSAFE_SCHEME_PATTERN.test(destination)) return true;
+  if (
+    RAW_HTML_PATTERN.test(source) ||
+    RAW_MARKUP_PATTERN.test(source) ||
+    CONTROL_CHARACTER_PATTERN.test(source) ||
+    UNSAFE_SCHEME_PATTERN.test(normalizeForSchemeCheck(source))
+  ) {
+    return true;
+  }
+  for (const pattern of [MARKDOWN_DESTINATION_PATTERN, ANY_MARKDOWN_DESTINATION_PATTERN]) {
+    for (const match of source.matchAll(pattern)) {
+      const destination = match[1] ?? '';
+      if (UNSAFE_SCHEME_PATTERN.test(normalizeForSchemeCheck(destination))) return true;
+    }
   }
   return false;
+}
+
+function normalizeForSchemeCheck(value: string): string {
+  const schemeControlPattern = new RegExp(
+    `[${characterRange(0x00, 0x20)}${characterRange(0x7f, 0x9f)}]`,
+    'gu',
+  );
+  let normalized = value.replace(schemeControlPattern, '').toLocaleLowerCase();
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const decoded = decodeURIComponent(normalized);
+      if (decoded === normalized) break;
+      normalized = decoded;
+    } catch {
+      break;
+    }
+  }
+  return normalized;
+}
+
+function presentInvisibleCharacters(value: string): {
+  readonly value: string;
+  readonly changed: boolean;
+} {
+  let changed = false;
+  const presented = value
+    .replace(ANSI_SEQUENCE_PATTERN, (sequence) => {
+      changed = true;
+      return `␛${sequence.slice(1)}`;
+    })
+    .replace(BIDI_CONTROL_PATTERN, (control) => {
+      changed = true;
+      const labels: Readonly<Record<string, string>> = {
+        '\u061c': '⟦ALM⟧',
+        '\u200e': '⟦LRM⟧',
+        '\u200f': '⟦RLM⟧',
+        '\u202a': '⟦LRE⟧',
+        '\u202b': '⟦RLE⟧',
+        '\u202c': '⟦PDF⟧',
+        '\u202d': '⟦LRO⟧',
+        '\u202e': '⟦RLO⟧',
+        '\u2066': '⟦LRI⟧',
+        '\u2067': '⟦RLI⟧',
+        '\u2068': '⟦FSI⟧',
+        '\u2069': '⟦PDI⟧',
+      };
+      return labels[control] ?? '⟦BIDI⟧';
+    })
+    .replace(ASCII_CONTROL_PATTERN, (control) => {
+      changed = true;
+      const code = control.charCodeAt(0);
+      return code <= 0x1f
+        ? `␀${code.toString(16).toUpperCase()}`
+        : `␦${code.toString(16).toUpperCase()}`;
+    });
+  return { value: presented, changed };
+}
+
+function characterRange(start: number, end: number): string {
+  const first = String.fromCharCode(start);
+  return start === end ? first : `${first}-${String.fromCharCode(end)}`;
 }
 
 function listStart(line: string): { readonly ordered: boolean; readonly text: string } | null {

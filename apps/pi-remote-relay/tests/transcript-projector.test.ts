@@ -4,6 +4,7 @@
 
 import {
   isRichTranscriptBlock,
+  type Envelope,
   type PiRpcEvent,
   type TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
@@ -13,6 +14,7 @@ import { publishPiEvent } from '../src/index.js';
 import { SyncHub } from '../src/replay/sync.js';
 import { RelayStore } from '../src/store/relay-store.js';
 import { TranscriptProjector } from '../src/store/transcript-projector.js';
+import { redactEnvelope } from '../src/store/redaction.js';
 
 const IDENTITY = {
   hostId: 'host_local',
@@ -289,6 +291,64 @@ describe('Pi transcript projector', () => {
     expect(call?.id).toBe(start[0]?.id);
     expect(end[0]?.revision).toBe(2);
     expect(end[0]?.id).toBe(update[0]?.id);
+  });
+
+  it('preserves truncation state while redacting streamed secrets from every revision', () => {
+    const projector = new TranscriptProjector();
+    let sequence = 1;
+    const canary = 'token=projector-rich-secret';
+    const projectNext = (event: PiRpcEvent) =>
+      projector.project(event, {
+        occurredAt: OCCURRED_AT,
+        nextSequence: () => sequence++,
+      });
+
+    const start = projectNext({
+      type: 'tool_execution_start',
+      toolCallId: 'call_truncated_rich',
+      toolName: 'bash',
+      args: { command: `printf ${canary}` },
+      metadata: { shellKind: 'bash', lifecycle: 'running', terminalCheckpoint: 'started' },
+    })[0];
+    const terminal = projectNext({
+      type: 'tool_execution_end',
+      toolCallId: 'call_truncated_rich',
+      toolName: 'bash',
+      result: { content: [{ type: 'text', text: `retained ${canary}` }] },
+      isError: false,
+      metadata: {
+        shellKind: 'bash',
+        lifecycle: 'completed',
+        terminalCheckpoint: 'terminal',
+        outputCompleteness: 'upstream-truncated',
+      },
+    })[0];
+
+    expect(start).toMatchObject({ kind: 'tool_call', lifecycle: 'running' });
+    expect(terminal).toMatchObject({
+      kind: 'tool_result',
+      lifecycle: 'completed',
+      outputCompleteness: 'upstream-truncated',
+    });
+    const redacted = [start, terminal].map(
+      (block, index) =>
+        redactEnvelope({
+          v: 1,
+          eventId: `event_truncated_${index}`,
+          kind: 'transcript.block',
+          ...IDENTITY,
+          epoch: EPOCH,
+          seq: index + 1,
+          occurredAt: OCCURRED_AT,
+          causedBy: null,
+          payload: block,
+          redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+          replay: { eligible: true, snapshotEligible: true },
+        } as Envelope).payload,
+    );
+    expect(JSON.stringify(redacted)).not.toContain(canary);
+    expect(isRichTranscriptBlock(start)).toBe(true);
+    expect(isRichTranscriptBlock(terminal)).toBe(true);
   });
 
   it('carries identity through assistant tool-call revisions, tool results and Bash updates', () => {

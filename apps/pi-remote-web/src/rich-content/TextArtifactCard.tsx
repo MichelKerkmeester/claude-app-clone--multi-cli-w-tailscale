@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Button } from 'react-aria-components';
 
 import type { NormalizedTextArtifactBlock } from './normalizeTranscriptBlocks.js';
@@ -6,7 +7,7 @@ import { useCopyFeedback } from './useCopyFeedback.js';
 
 export interface TextArtifactCardProps {
   readonly block: NormalizedTextArtifactBlock;
-  readonly onOpen?: () => void;
+  readonly onOpen?: (trigger?: HTMLButtonElement | null) => void;
 }
 
 const PREVIEW_LINES = 6;
@@ -17,6 +18,7 @@ export function TextArtifactCard({ block, onOpen }: TextArtifactCardProps) {
   const preview = lines.slice(0, PREVIEW_LINES).join('\n');
   const trustedLabel = textArtifactLabel(block.label);
   const canOpen = block.settled && block.canonicalSource.length > 0 && onOpen !== undefined;
+  const openButtonRef = useRef<HTMLButtonElement>(null);
   return (
     <RichBlockFrame
       title={trustedLabel}
@@ -38,7 +40,11 @@ export function TextArtifactCard({ block, onOpen }: TextArtifactCardProps) {
               </Button>
             )}
             {canOpen && (
-              <Button className="rich-block-action" onPress={onOpen}>
+              <Button
+                ref={openButtonRef}
+                className="rich-block-action"
+                onPress={() => onOpen?.(openButtonRef.current)}
+              >
                 Open full screen
               </Button>
             )}
@@ -50,9 +56,7 @@ export function TextArtifactCard({ block, onOpen }: TextArtifactCardProps) {
         <pre>{preview}</pre>
       </div>
       {lines.length > PREVIEW_LINES && (
-        <p className="rich-continuation">
-          {lines.length - PREVIEW_LINES} more lines
-        </p>
+        <p className="rich-continuation">{lines.length - PREVIEW_LINES} more lines</p>
       )}
       <p className="rich-copy-status" role="status" aria-live="polite">
         {feedback.announcement}
@@ -61,9 +65,7 @@ export function TextArtifactCard({ block, onOpen }: TextArtifactCardProps) {
   );
 }
 
-function textArtifactLabel(
-  value: NormalizedTextArtifactBlock['label'],
-): string {
+function textArtifactLabel(value: NormalizedTextArtifactBlock['label']): string {
   switch (value) {
     case 'prompt':
       return 'Prompt';

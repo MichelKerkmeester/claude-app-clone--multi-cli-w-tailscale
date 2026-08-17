@@ -38,6 +38,16 @@ const READ_ONLY_SERVER_SOURCE = readFileSync(
   new URL('../../src/http/server.ts', import.meta.url),
   'utf8',
 );
+const READ_ONLY_RICH_SOURCES = [
+  '../../../pi-remote-web/src/rich-content/CodeCard.tsx',
+  '../../../pi-remote-web/src/rich-content/CommandOutputCard.tsx',
+  '../../../pi-remote-web/src/rich-content/F6ViewerAdapter.tsx',
+  '../../../pi-remote-web/src/rich-content/SafeMarkdown.tsx',
+  '../../../pi-remote-web/src/rich-content/highlight.worker.ts',
+  '../../../pi-remote-web/src/rich-content/useHighlightedCode.ts',
+  '../../../pi-remote-web/src/artifacts/ArtifactViewerProvider.tsx',
+  '../../../pi-remote-web/src/artifacts/CodePreview.tsx',
+].map((path) => readFileSync(new URL(path, import.meta.url), 'utf8'));
 
 // This suite keeps the fail-closed boundary visible in one machine-checkable module.
 describe('consolidated fail-closed negative controls', () => {
@@ -321,6 +331,33 @@ describe('consolidated fail-closed negative controls', () => {
     expect(READ_ONLY_SERVER_SOURCE).not.toMatch(
       /(?:writeFile|appendFile|unlink|mkdir|execFile|spawn|child_process)/u,
     );
+  });
+
+  it('keeps rich rendering read-only with no forbidden action, HTML, filesystem, or fetch path', () => {
+    const source = READ_ONLY_RICH_SOURCES.join('\n');
+    for (const forbidden of [
+      /\bRun\b/u,
+      /\bRetry\b/u,
+      /\bEdit\b/u,
+      /\bApprove\b/u,
+      /\bApply\b/u,
+      /\bDownload\b/u,
+      /\bPublish\b/u,
+      /Open-on-host/u,
+      /Share-file/u,
+      /dangerouslySetInnerHTML/u,
+      /\binnerHTML\b/u,
+      /\b(?:readFile|writeFile|appendFile|unlink|mkdir|readdir)\b/u,
+      /\bmutation-ticket\b/u,
+      /\brich-content-fetch\b/u,
+      /\bfetch\s*\(/u,
+      /\bXMLHttpRequest\b/u,
+    ]) {
+      expect(source).not.toMatch(forbidden);
+    }
+    expect(source).toContain('postMessage');
+    expect(source).toContain('worker.terminate()');
+    expect(source).toContain('sourceState');
   });
 
   it('projects command catalogs without host internals or unsafe names', () => {

@@ -186,6 +186,75 @@ describe('recorded Pi RPC relay flow', () => {
       store.close();
     }
   });
+
+  it('replays a redacted rich stream with higher revisions without granting new authority', () => {
+    const store = new RelayStore();
+    try {
+      const hub = new SyncHub(store);
+      const projector = new TranscriptProjector();
+      const canary = 'recorded-rich-secret';
+      const events: readonly PiRpcEvent[] = [
+        {
+          type: 'tool_execution_start',
+          toolCallId: 'call_recorded_rich',
+          toolName: 'bash',
+          args: { command: `printf token=${canary}` },
+          metadata: {
+            shellKind: 'bash',
+            lifecycle: 'running',
+            terminalCheckpoint: 'started',
+          },
+        },
+        {
+          type: 'tool_execution_update',
+          toolCallId: 'call_recorded_rich',
+          toolName: 'bash',
+          partialResult: { content: [{ type: 'text', text: `tail token=${canary}` }] },
+          metadata: {
+            shellKind: 'bash',
+            lifecycle: 'running',
+            terminalCheckpoint: 'streaming',
+            outputCompleteness: 'unknown',
+          },
+        },
+        {
+          type: 'tool_execution_end',
+          toolCallId: 'call_recorded_rich',
+          toolName: 'bash',
+          result: { content: [{ type: 'text', text: `done token=${canary}` }] },
+          isError: false,
+          metadata: {
+            shellKind: 'bash',
+            lifecycle: 'completed',
+            terminalCheckpoint: 'terminal',
+            outputCompleteness: 'complete',
+          },
+        },
+      ];
+      let sequence = 0;
+      for (const event of events) {
+        publishPiEvent(store, hub, projector, event, EPOCH);
+        sequence += 1;
+      }
+
+      const page = store.getTranscriptPage(IDENTITY);
+      const richItems = page.items.filter(
+        (item) => item.kind === 'tool_call' || item.kind === 'tool_result',
+      );
+      expect(richItems.length).toBeGreaterThanOrEqual(3);
+      expect(richItems.every(isTranscriptBlock)).toBe(true);
+      expect(new Set(richItems.map((item) => item.id)).size).toBeGreaterThanOrEqual(2);
+      expect(richItems.some((item) => item.revision >= 2)).toBe(true);
+
+      const replay = JSON.stringify(store.createSyncPlan(IDENTITY));
+      expect(replay).not.toContain(canary);
+      expect(replay).toContain('[REDACTED_SECRET]');
+      expect(replay).not.toMatch(/rich-content-fetch|mutation-ticket/u);
+      expect(sequence).toBe(events.length);
+    } finally {
+      store.close();
+    }
+  });
 });
 
 function envelope(event: PiRpcEvent, seq: number): Envelope {

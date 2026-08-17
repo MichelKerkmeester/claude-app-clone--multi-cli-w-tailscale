@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Button } from 'react-aria-components';
 
 import type { NormalizedCommandBlock } from './normalizeTranscriptBlocks.js';
@@ -6,21 +7,75 @@ import { useCopyFeedback } from './useCopyFeedback.js';
 
 export interface CommandOutputCardProps {
   readonly block: NormalizedCommandBlock;
-  readonly onOpen?: () => void;
+  readonly onOpen?: (trigger?: HTMLButtonElement | null) => void;
 }
 
 const OUTPUT_PREVIEW_LINES = 8;
 
+export interface CommandSnapshot {
+  readonly blockId: string;
+  readonly revision: number;
+  readonly command: string | null;
+  readonly output: string | null;
+}
+
+// The pure reconciliation helper is exported for deterministic streaming tests.
+// eslint-disable-next-line react-refresh/only-export-components
+export function reconcileCommandSnapshot(
+  previous: CommandSnapshot | null,
+  block: NormalizedCommandBlock,
+): CommandSnapshot {
+  const current: CommandSnapshot = {
+    blockId: block.blockId,
+    revision: block.revision,
+    command: block.canonicalCommand,
+    output: block.canonicalOutput,
+  };
+  if (
+    previous !== null &&
+    previous.blockId === current.blockId &&
+    current.revision < previous.revision
+  ) {
+    return previous;
+  }
+  if (
+    previous === null ||
+    previous.blockId !== block.blockId ||
+    (current.command !== null && current.command !== previous.command) ||
+    (current.output !== null && current.output !== previous.output)
+  ) {
+    return current;
+  }
+  return {
+    ...current,
+    command: current.command ?? previous.command,
+    output: current.output ?? previous.output,
+  };
+}
+
 export function CommandOutputCard({ block, onOpen }: CommandOutputCardProps) {
   const feedback = useCopyFeedback();
-  const output = block.canonicalOutput;
-  const command = block.canonicalCommand;
+  const snapshotRef = useRef<CommandSnapshot | null>(null);
+  const snapshot = reconcileCommandSnapshot(snapshotRef.current, block);
+  snapshotRef.current = snapshot;
+  const output = snapshot.output;
+  const command = snapshot.command;
   const outputLines = output === null ? [] : displayLines(output);
   const previewLines = outputLines.slice(-OUTPUT_PREVIEW_LINES);
   const clippedLines = Math.max(0, outputLines.length - previewLines.length);
   const outputUnit = block.outputCompleteness === 'complete' ? 'output' : 'current output';
   const lifecycleLabel = lifecycleText(block.lifecycle);
   const canOpen = command !== null || output !== null;
+  const showingLastTrustworthySnapshot = block.canonicalOutput === null && snapshot.output !== null;
+  const stateLabels = [
+    block.source === 'cache' ? 'Stale cache' : null,
+    block.source === 'cache' && block.lifecycle === 'running' ? 'Connection lost' : null,
+    block.resultMissing || (block.terminalCheckpoint === 'terminal' && output === null)
+      ? 'Terminal without result'
+      : null,
+    showingLastTrustworthySnapshot ? 'Last trustworthy snapshot' : null,
+  ].filter((label): label is string => label !== null);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <RichBlockFrame
@@ -30,8 +85,9 @@ export function CommandOutputCard({ block, onOpen }: CommandOutputCardProps) {
         block.shellKind === 'bash' ? 'Bash' : 'Shell',
         `Call ${block.callId}`,
         `${outputLines.length} output lines`,
+        ...stateLabels,
       ]}
-      status={lifecycleLabel}
+      status={[...stateLabels, lifecycleLabel].join(' · ')}
       redaction={block.redaction}
       className="rich-command-card"
       actions={
@@ -56,7 +112,11 @@ export function CommandOutputCard({ block, onOpen }: CommandOutputCardProps) {
               </Button>
             )}
             {canOpen && onOpen !== undefined && (
-              <Button className="rich-block-action" onPress={onOpen}>
+              <Button
+                ref={openButtonRef}
+                className="rich-block-action"
+                onPress={() => onOpen?.(openButtonRef.current)}
+              >
                 Open full screen
               </Button>
             )}
@@ -82,6 +142,7 @@ export function CommandOutputCard({ block, onOpen }: CommandOutputCardProps) {
         </pre>
         <p className="rich-output-meta">
           {outputLines.length} lines · {outputCompletenessText(block.outputCompleteness)}
+          {showingLastTrustworthySnapshot ? ' · Last trustworthy redacted snapshot' : ''}
         </p>
       </section>
       <p className="rich-copy-status" role="status" aria-live="polite">
@@ -112,9 +173,7 @@ function lifecycleText(value: NormalizedCommandBlock['lifecycle']): string {
   }
 }
 
-function outputCompletenessText(
-  value: NormalizedCommandBlock['outputCompleteness'],
-): string {
+function outputCompletenessText(value: NormalizedCommandBlock['outputCompleteness']): string {
   switch (value) {
     case 'complete':
       return 'Complete';

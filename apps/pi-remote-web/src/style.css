@@ -1871,6 +1871,197 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* Rich content release hardening: bounded reading surfaces keep text selectable,
+   directional prose stable, and interactive targets usable at narrow widths. */
+.rich-block-frame,
+.rich-block-content,
+.rich-prose-block,
+.safe-markdown,
+.safe-markdown-fallback,
+.artifact-viewer-dialog,
+.artifact-viewer-content,
+.artifact-preview-region {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.rich-prose-block,
+.safe-markdown,
+.safe-markdown-fallback {
+  direction: auto;
+  text-align: start;
+  unicode-bidi: plaintext;
+}
+
+.rich-shell-well,
+.rich-code-preview,
+.safe-markdown-code,
+.artifact-code-preview,
+.artifact-diff-preview,
+.artifact-text-preview,
+.artifact-markdown-code {
+  overscroll-behavior: contain;
+}
+
+.rich-code-preview,
+.artifact-code-preview,
+.artifact-diff-preview,
+.artifact-text-preview,
+.artifact-markdown-code {
+  overflow-anchor: none;
+}
+
+.rich-block-action,
+.artifact-control-button,
+.artifact-stale-action,
+.artifact-jump-latest {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+}
+
+.rich-block-action:focus-visible,
+.artifact-control-button:focus-visible,
+.artifact-stale-action:focus-visible,
+.artifact-jump-latest:focus-visible,
+.artifact-find-control input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--accent);
+}
+
+.artifact-code-token.is-keyword,
+.artifact-code-token.is-boolean,
+.artifact-code-token.is-tag,
+.artifact-code-token.is-heading,
+.artifact-code-token.is-ansi {
+  color: #f0b19a;
+}
+
+.artifact-code-token.is-string,
+.artifact-code-token.is-number {
+  color: #d97757;
+}
+
+.artifact-code-token.is-comment {
+  color: #9f998f;
+}
+
+.artifact-code-token.is-diff-add,
+.artifact-code-token.is-diff-remove {
+  color: #f0b19a;
+}
+
+.artifact-code-viewer {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.artifact-code-preview {
+  max-block-size: min(70dvh, 42rem);
+  overscroll-behavior-inline: contain;
+  overscroll-behavior-block: contain;
+  scrollbar-gutter: stable;
+}
+
+.artifact-jump-latest {
+  position: sticky;
+  inset-block-end: var(--space-3);
+  z-index: 1;
+  display: block;
+  margin-block-start: calc(var(--space-4) * -1);
+  margin-inline: auto;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--action-bg);
+  color: var(--action-fg);
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+
+.artifact-jump-latest:hover {
+  background: var(--accent-strong);
+  color: var(--ink-inverse);
+}
+
+.artifact-viewer-modal {
+  padding-block-end: max(var(--space-4), env(safe-area-inset-bottom, 0px));
+  padding-inline: max(var(--space-3), env(safe-area-inset-left, 0px))
+    max(var(--space-3), env(safe-area-inset-right, 0px));
+}
+
+.artifact-viewer-content {
+  max-block-size: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+
+.artifact-markdown-code,
+.artifact-code-preview,
+.artifact-diff-preview {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.safe-markdown-fallback[data-control-presentation='readonly'] {
+  border-inline-start: 3px solid var(--accent-strong);
+  padding-inline-start: var(--space-3);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 20rem) {
+  .rich-block-frame {
+    padding: var(--space-3);
+  }
+
+  .rich-block-header,
+  .rich-block-actions,
+  .rich-command-region-heading {
+    align-items: stretch;
+  }
+
+  .rich-block-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rich-block-action,
+  .artifact-jump-latest {
+    inline-size: 100%;
+  }
+
+  .artifact-viewer-modal {
+    padding-inline: var(--space-2);
+  }
+
+  .artifact-preview-controls {
+    flex-wrap: wrap;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 30rem) {
+  .artifact-viewer-modal {
+    max-block-size: 100dvh;
+  }
+
+  .artifact-viewer-content {
+    max-block-size: 76dvh;
+  }
+
+  .rich-block-frame {
+    margin-block: var(--space-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rich-block-action,
+  .artifact-control-button,
+  .artifact-stale-action,
+  .artifact-jump-latest,
+  .artifact-code-preview {
+    transition-duration: 100ms;
+    scroll-behavior: auto;
+  }
+}
+
 .rich-block-frame {
   min-inline-size: 0;
   inline-size: 100%;
@@ -2445,7 +2636,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 .artifact-code-token.is-keyword {
-  color: #8a452f;
+  color: #f0b19a;
 }
 
 .artifact-code-token.is-string,

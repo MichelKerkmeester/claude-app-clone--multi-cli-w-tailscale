@@ -210,3 +210,35 @@ describe('plan-mode hardening style contract', () => {
     );
   });
 });
+
+describe('rich-content release style contract', () => {
+  const syntaxPairs: readonly Pair[] = [
+    { name: 'syntax keyword', fg: '#f0b19a', bg: '#24221f', min: NORMAL_TEXT },
+    { name: 'syntax string', fg: '#d97757', bg: '#24221f', min: NORMAL_TEXT },
+    { name: 'syntax comment', fg: '#9f998f', bg: '#24221f', min: NORMAL_TEXT },
+    { name: 'syntax plain', fg: '#f8f8f6', bg: '#24221f', min: NORMAL_TEXT },
+  ];
+
+  for (const pair of syntaxPairs) {
+    it(`${pair.name} meets ${pair.min}:1 against the code well`, () => {
+      expect(contrast(pair.fg, pair.bg)).toBeGreaterThanOrEqual(pair.min);
+    });
+  }
+
+  it('keeps rich surfaces bounded and usable at release widths', () => {
+    expect(STYLE).toMatch(/min-width: 320px/u);
+    expect(STYLE).toMatch(/@media \(max-width: 20rem\)/u);
+    expect(STYLE).toMatch(/@media \(orientation: landscape\)/u);
+    expect(STYLE).toMatch(/overscroll-behavior: contain/u);
+    expect(STYLE).toMatch(/env\(safe-area-inset-bottom/u);
+    expect(STYLE).toMatch(/min-block-size: 44px/u);
+    expect(STYLE).toMatch(/box-shadow: 0 0 0 5px var\(--accent\)/u);
+  });
+
+  it('keeps control presentation read-only and motion bounded', () => {
+    expect(STYLE).toMatch(/data-control-presentation='readonly'/u);
+    expect(STYLE).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?transition-duration: 100ms;/u,
+    );
+  });
+});

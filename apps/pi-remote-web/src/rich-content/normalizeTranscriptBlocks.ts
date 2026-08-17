@@ -236,7 +236,7 @@ export function normalizeTranscript(
       args.sessionId,
       call,
       result,
-      call === undefined ? result?.source ?? args.source ?? 'relay' : call.source,
+      call === undefined ? (result?.source ?? args.source ?? 'relay') : call.source,
     );
     pairedIds.add(callId);
     ordered.push({ order: order++, value: normalized });
@@ -333,7 +333,10 @@ function toSet(
 function latestByBlockIdentity(
   blocks: readonly TranscriptInputBlock[],
 ): readonly { readonly block: TranscriptInputBlock; readonly index: number }[] {
-  const latest = new Map<string, { readonly block: TranscriptInputBlock; readonly index: number }>();
+  const latest = new Map<
+    string,
+    { readonly block: TranscriptInputBlock; readonly index: number }
+  >();
   blocks.forEach((block, index) => {
     const id = readBlockId(block);
     if (id === null) return;
@@ -363,15 +366,17 @@ function normalizeNonShellBlock(
 ): readonly NormalizedTranscriptBlock[] {
   const base = baseFields(sessionId, sourceBlock, source);
   if (isTextArtifactBlock(protocolBlock) && source !== 'optimistic') {
-    return [{
-      ...base,
-      kind: 'text-artifact',
-      canonicalSource: protocolBlock.source,
-      label: protocolBlock.label,
-      settled: true,
-      explicit: true,
-      sourceBlock: asDisplayBlock(sourceBlock),
-    }];
+    return [
+      {
+        ...base,
+        kind: 'text-artifact',
+        canonicalSource: protocolBlock.source,
+        label: protocolBlock.label,
+        settled: true,
+        explicit: true,
+        sourceBlock: asDisplayBlock(sourceBlock),
+      },
+    ];
   }
   if (isTextBlock(protocolBlock)) {
     const settled = isSettled(sourceBlock, options);
@@ -382,22 +387,29 @@ function normalizeNonShellBlock(
       return segments.flatMap((segment): readonly NormalizedTranscriptBlock[] => {
         if (segment.kind === 'code') {
           const blockId = fenceBlockIdentity(sourceId, segment.ordinal);
-          return [{
-            ...base,
-            blockId,
-            sourceBlockId: sourceId,
-            kind: 'code' as const,
-            canonicalSource: segment.source,
-            language: segment.language,
-            languageLabel: segment.language === null ? 'Code' : segment.language,
-            fenceOrdinal: segment.ordinal,
-            settled,
-            incomplete: segment.incomplete,
-            sourceBlock: asDisplayBlock(sourceBlock),
-          }];
+          return [
+            {
+              ...base,
+              blockId,
+              sourceBlockId: sourceId,
+              kind: 'code' as const,
+              canonicalSource: segment.source,
+              language: segment.language,
+              languageLabel: segment.language === null ? 'Code' : segment.language,
+              fenceOrdinal: segment.ordinal,
+              settled,
+              incomplete: segment.incomplete,
+              sourceBlock: asDisplayBlock(sourceBlock),
+            },
+          ];
         }
         if (segment.source.length === 0) return [];
-        const segmentBlock = segmentTextBlock(sourceBlock, segment.source, sourceId, segment.ordinal);
+        const segmentBlock = segmentTextBlock(
+          sourceBlock,
+          segment.source,
+          sourceId,
+          segment.ordinal,
+        );
         return [normalizeProse(sessionId, segmentBlock, segmentBlock, source, settled)];
       });
     }
@@ -408,15 +420,17 @@ function normalizeNonShellBlock(
       segments[0]?.kind === 'prose' &&
       isLongText(protocolBlock.text)
     ) {
-      return [{
-        ...base,
-        kind: 'text-artifact',
-        canonicalSource: protocolBlock.text,
-        label: 'long-text',
-        settled,
-        explicit: false,
-        sourceBlock: asDisplayBlock(sourceBlock),
-      }];
+      return [
+        {
+          ...base,
+          kind: 'text-artifact',
+          canonicalSource: protocolBlock.text,
+          label: 'long-text',
+          settled,
+          explicit: false,
+          sourceBlock: asDisplayBlock(sourceBlock),
+        },
+      ];
     }
     return [normalizeProse(sessionId, sourceBlock, protocolBlock, source, settled)];
   }
@@ -424,21 +438,25 @@ function normalizeNonShellBlock(
     return [normalizeActivity(sessionId, sourceBlock, source)];
   }
   if (isFileDiffLike(protocolBlock)) {
-    return [{
-      ...base,
-      kind: 'diff',
-      sourceBlock: asDisplayBlock(sourceBlock),
-    }];
+    return [
+      {
+        ...base,
+        kind: 'diff',
+        sourceBlock: asDisplayBlock(sourceBlock),
+      },
+    ];
   }
   if (isActivityKind(protocolBlock)) {
     return [normalizeActivity(sessionId, sourceBlock, source)];
   }
-  return [{
-    ...base,
-    kind: 'fallback',
-    originalKind: readKind(sourceBlock) ?? 'unknown',
-    sourceBlock: asDisplayBlock(sourceBlock),
-  }];
+  return [
+    {
+      ...base,
+      kind: 'fallback',
+      originalKind: readKind(sourceBlock) ?? 'unknown',
+      sourceBlock: asDisplayBlock(sourceBlock),
+    },
+  ];
 }
 
 function normalizeFallback(
@@ -532,7 +550,10 @@ function normalizeCommand(
     blockId,
     sourceBlockId: sourceBlock.id,
     revision: Math.max(callBlock?.revision ?? 0, resultBlock?.revision ?? 0),
-    sequence: Math.min(callBlock?.seq ?? Number.MAX_SAFE_INTEGER, resultBlock?.seq ?? Number.MAX_SAFE_INTEGER),
+    sequence: Math.min(
+      callBlock?.seq ?? Number.MAX_SAFE_INTEGER,
+      resultBlock?.seq ?? Number.MAX_SAFE_INTEGER,
+    ),
     source,
     redaction,
     kind: 'command',
@@ -548,9 +569,7 @@ function normalizeCommand(
     isError: resultBlock?.isError ?? lifecycle === 'failed',
     pendingCall: callBlock === undefined,
     resultMissing:
-      callBlock !== undefined &&
-      resultBlock === undefined &&
-      terminalCheckpoint === 'terminal',
+      callBlock !== undefined && resultBlock === undefined && terminalCheckpoint === 'terminal',
     commandBlockId: callBlock?.id ?? null,
     resultBlockId: resultBlock?.id ?? null,
     commandRedaction,
@@ -586,7 +605,14 @@ function splitFencedCode(text: string): readonly FenceSegment[] {
   const flushProse = () => {
     if (prose.length === 0) return;
     const value = prose.join('\n');
-    if (value.length > 0) segments.push({ kind: 'prose', source: value, language: null, ordinal: -1, incomplete: false });
+    if (value.length > 0)
+      segments.push({
+        kind: 'prose',
+        source: value,
+        language: null,
+        ordinal: -1,
+        incomplete: false,
+      });
     prose = [];
   };
   while (index < lines.length) {
@@ -604,7 +630,11 @@ function splitFencedCode(text: string): readonly FenceSegment[] {
     let closed = false;
     while (closeIndex < lines.length) {
       const candidate = lines[closeIndex] ?? '';
-      if (new RegExp(`^ {0,3}${escapeRegExp(marker.charAt(0))}{${marker.length},}[ \\t]*$`, 'u').test(candidate)) {
+      if (
+        new RegExp(`^ {0,3}${escapeRegExp(marker.charAt(0))}{${marker.length},}[ \\t]*$`, 'u').test(
+          candidate,
+        )
+      ) {
         closed = true;
         break;
       }
@@ -628,7 +658,9 @@ function splitFencedCode(text: string): readonly FenceSegment[] {
     index = closeIndex + 1;
   }
   flushProse();
-  return segments.length === 0 ? [{ kind: 'prose', source: text, language: null, ordinal: -1, incomplete: false }] : segments;
+  return segments.length === 0
+    ? [{ kind: 'prose', source: text, language: null, ordinal: -1, incomplete: false }]
+    : segments;
 }
 
 function isLongText(value: string): boolean {
@@ -668,13 +700,21 @@ function isFileDiffLike(value: unknown): boolean {
 function isActivityKind(value: unknown): boolean {
   if (typeof value !== 'object' || value === null) return false;
   const kind = (value as { readonly kind?: unknown }).kind;
-  return kind === 'thinking' || kind === 'plan' || kind === 'tool_call' || kind === 'tool_result' || kind === 'usage';
+  return (
+    kind === 'thinking' ||
+    kind === 'plan' ||
+    kind === 'tool_call' ||
+    kind === 'tool_result' ||
+    kind === 'usage'
+  );
 }
 
 function toProtocolBlock(block: TranscriptInputBlock): unknown {
   if (typeof block !== 'object' || block === null) return block;
   const value = block as unknown as Record<string, unknown>;
-  const { provenance: _provenance, richEligible: _richEligible, ...protocolBlock } = value;
+  const protocolBlock = { ...value };
+  delete protocolBlock.provenance;
+  delete protocolBlock.richEligible;
   return protocolBlock;
 }
 
@@ -686,10 +726,16 @@ function asDisplayBlock(block: TranscriptInputBlock): DisplayTranscriptBlock {
 }
 
 function blockSource(block: TranscriptInputBlock): RichContentSource | undefined {
+  if (readRedaction(block)?.reasons.includes('cache')) return 'cache';
   const value = block as unknown as { readonly provenance?: unknown };
-  return value.provenance === 'relay' || value.provenance === 'cache' || value.provenance === 'optimistic'
-    ? value.provenance
-    : undefined;
+  if (
+    value.provenance === 'relay' ||
+    value.provenance === 'cache' ||
+    value.provenance === 'optimistic'
+  ) {
+    return value.provenance;
+  }
+  return undefined;
 }
 
 function readRedaction(block: TranscriptInputBlock): RedactionMetadata | null {
@@ -699,7 +745,11 @@ function readRedaction(block: TranscriptInputBlock): RedactionMetadata | null {
 
 function isRedactionMetadataLike(value: unknown): value is RedactionMetadata {
   if (typeof value !== 'object' || value === null) return false;
-  const metadata = value as { readonly policyVersion?: unknown; readonly fieldsRedacted?: unknown; readonly reasons?: unknown };
+  const metadata = value as {
+    readonly policyVersion?: unknown;
+    readonly fieldsRedacted?: unknown;
+    readonly reasons?: unknown;
+  };
   return (
     metadata.policyVersion === 1 &&
     typeof metadata.fieldsRedacted === 'number' &&
@@ -715,7 +765,9 @@ function readBlockId(block: TranscriptInputBlock): string | null {
 
 function readRevision(block: TranscriptInputBlock): number {
   const value = block as unknown as { readonly revision?: unknown };
-  return typeof value.revision === 'number' && Number.isSafeInteger(value.revision) ? value.revision : 1;
+  return typeof value.revision === 'number' && Number.isSafeInteger(value.revision)
+    ? value.revision
+    : 1;
 }
 
 function readSequence(block: TranscriptInputBlock): number {

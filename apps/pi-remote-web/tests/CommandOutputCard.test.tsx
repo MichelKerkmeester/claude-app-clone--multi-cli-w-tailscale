@@ -2,7 +2,10 @@ import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { CommandOutputCard } from '../src/rich-content/CommandOutputCard.js';
+import {
+  CommandOutputCard,
+  reconcileCommandSnapshot,
+} from '../src/rich-content/CommandOutputCard.js';
 import {
   normalizeTranscriptBlocks,
   type NormalizedCommandBlock,
@@ -35,7 +38,8 @@ function commandBlock(): NormalizedCommandBlock {
         occurredAt: '2026-08-17T04:00:01.000Z',
         kind: 'tool_result',
         toolName: 'bash',
-        output: 'line one\nline two\nline three\nline four\nline five\nline six\nline seven\nline eight\nfinal exact line\n',
+        output:
+          'line one\nline two\nline three\nline four\nline five\nline six\nline seven\nline eight\nfinal exact line\n',
         isError: false,
         callId: 'call-command-001',
         shellKind: 'bash',
@@ -77,6 +81,7 @@ describe('CommandOutputCard', () => {
       'line one\nline two\nline three\nline four\nline five\nline six\nline seven\nline eight\nfinal exact line\n',
     );
     expect(onOpen).toHaveBeenCalledTimes(1);
+    expect(onOpen.mock.calls[0]?.[0]).toBeInstanceOf(HTMLButtonElement);
   });
 
   it('hides copy actions when Clipboard API is unavailable', () => {
@@ -88,5 +93,25 @@ describe('CommandOutputCard', () => {
     expect(screen.queryByRole('button', { name: 'Copy command' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Copy output' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Open full screen' })).toBeInTheDocument();
+  });
+
+  it('keeps the last trustworthy snapshot when an older revision arrives', () => {
+    const current = commandBlock();
+    const snapshot = reconcileCommandSnapshot(null, current);
+    const stale = {
+      ...current,
+      revision: 0,
+      canonicalCommand: 'stale command',
+      canonicalOutput: 'stale output',
+    };
+
+    expect(reconcileCommandSnapshot(snapshot, stale)).toBe(snapshot);
+  });
+
+  it('labels cached running output as a connection-loss snapshot', () => {
+    const block = { ...commandBlock(), source: 'cache' as const, lifecycle: 'running' as const };
+    render(<CommandOutputCard block={block} />);
+    expect(screen.getAllByText(/Connection lost/u).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Stale cache/u).length).toBeGreaterThan(0);
   });
 });

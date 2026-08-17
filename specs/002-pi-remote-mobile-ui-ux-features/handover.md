@@ -1,13 +1,19 @@
 # Spec 002 — Handover (detailed)
 
-> **State:** build in progress, 6/10 features shipped.
-> **Features 001–006 are BUILT, VERIFIED, and merged to `main`** — `001-change-model`,
-> `002-change-effort`, `003-slash-commands`, `004-plan-mode-tab`, `005-file-preview`,
-> `006-rich-content-blocks` (**23 of 40 build phases**; `main` at `07bd02f`, feature-006 merge
-> `5925ff7`). **Feature `007-media-upload` is GATE-CLEARED** (adversarial security review done +
-> committed `07bd02f`) but **NOT built** — build it next, starting at its Phase 1. Features 008–010 pending.
-> A sibling **`specs/003-pi-remote-design-system/`** packet (designer-editable design system; planning
-> scaffold only; committed `2899db2`) also lives on `main`.
+> **State:** build in progress, 7/10 features shipped.
+> **Features 001–007 are BUILT and VERIFIED on `main`** — 001–006 (see below) plus
+> **`007-media-upload` (all 5 build phases; `main` at `5cf46e6`)**: P1 protocol+gate `9b3e94a`,
+> P2 ticketed binary ingress + WASM-isolated decoder `dc8f753`, P3 Pi image bridge + redacted transcript
+> `6a83eb6`, P4 local composer draft UI `7cd4896`, P5 end-to-end lane `5cf46e6`. Each phase was verified
+> outside the codex sandbox (build+typecheck+`npm test`+`npm run test:web`, delta vs baseline) + Claude
+> security sign-off + flag-off 390px light/dark CDP; hard-gated P2/P3/P5 each got a per-phase adversarial
+> review. **`PI_REMOTE_MEDIA_ENABLED` stays OFF — enablement is operator/environment-gated** (needs an
+> image-capable pinned Pi for the persistence/echo probe + a physical-iPhone device matrix; installed pi
+> 0.84.2 rejects image RPC). The engineering is complete up to the flag; flipping it is an operator action.
+> Decoder architecture (operator-approved): WASM codecs (`@jsquash/jpeg|png|webp`, exact-pinned) for
+> JPEG/PNG/WebP; the relay rejects raw HEIC and the composer converts HEIC→JPEG client-side.
+> Features **008–010 pending** (008/009 hard-gated). A sibling **`specs/003-pi-remote-design-system/`**
+> packet (planning scaffold only; `2899db2`) also lives on `main`.
 > **Resume ladder:** this file → `build-strategy.md` (§3 model roster + the dispatch how-to) →
 > the target feature's `spec.md` + `implementation-phases.md` + `research/research.md` → its build
 > sub-phase docs. Then run the build loop in §4 below.

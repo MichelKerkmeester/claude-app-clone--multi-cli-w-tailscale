@@ -3,6 +3,7 @@
 // ───────────────────────────────────────────────────────────────────
 
 import { generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 
 import {
   approvalActionDigest,
@@ -33,6 +34,10 @@ const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
 const NOW = Date.parse('2026-01-01T00:00:00.000Z');
 const IDENTITY = { hostId: 'host_local', workspaceRef: 'workspace_default' } as const;
+const READ_ONLY_SERVER_SOURCE = readFileSync(
+  new URL('../../src/http/server.ts', import.meta.url),
+  'utf8',
+);
 
 // This suite keeps the fail-closed boundary visible in one machine-checkable module.
 describe('consolidated fail-closed negative controls', () => {
@@ -303,6 +308,19 @@ describe('consolidated fail-closed negative controls', () => {
     } finally {
       store.close();
     }
+  });
+
+  it('keeps the transcript and sync transports read-only with no rich endpoint or host operation', () => {
+    expect(READ_ONLY_SERVER_SOURCE).toContain("ingress.path !== '/api/sync'");
+    expect(READ_ONLY_SERVER_SOURCE).toContain(
+      'const transcriptMatch = /^\\/api\\/sessions\\/([^/]+)\\/transcript$/.exec',
+    );
+    expect(READ_ONLY_SERVER_SOURCE).not.toMatch(
+      /\/api\/rich|rich-content|host-file|mutation-ticket/u,
+    );
+    expect(READ_ONLY_SERVER_SOURCE).not.toMatch(
+      /(?:writeFile|appendFile|unlink|mkdir|execFile|spawn|child_process)/u,
+    );
   });
 
   it('projects command catalogs without host internals or unsafe names', () => {

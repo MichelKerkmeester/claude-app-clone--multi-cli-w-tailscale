@@ -1,0 +1,154 @@
+{
+  "policyVersion": 1,
+  "fixtures": [
+    {
+      "name": "bash-success",
+      "event": {
+        "type": "tool_execution_start",
+        "toolCallId": "call_fixture_success",
+        "toolName": "bash",
+        "args": { "command": "printf SENTINEL_PATH /Users/fixture/private.txt" },
+        "metadata": {
+          "shellKind": "bash",
+          "lifecycle": "running",
+          "terminalCheckpoint": "started"
+        }
+      },
+      "expectedMarkers": ["[REDACTED_PATH]"]
+    },
+    {
+      "name": "bash-streaming",
+      "event": {
+        "type": "tool_execution_update",
+        "toolCallId": "call_fixture_stream",
+        "toolName": "bash",
+        "partialResult": {
+          "content": [{ "type": "text", "text": "SENTINEL_SECRET token=fixture-canary" }]
+        },
+        "metadata": {
+          "shellKind": "bash",
+          "lifecycle": "running",
+          "terminalCheckpoint": "streaming",
+          "outputCompleteness": "unknown"
+        }
+      },
+      "expectedMarkers": ["[REDACTED_SECRET]"]
+    },
+    {
+      "name": "bash-execution-update",
+      "event": {
+        "type": "bash_execution_update",
+        "toolCallId": "call_fixture_bash_update",
+        "delta": "SENTINEL_PATH /Users/fixture/stream.txt",
+        "metadata": {
+          "shellKind": "bash",
+          "lifecycle": "running",
+          "terminalCheckpoint": "streaming",
+          "outputCompleteness": "unknown"
+        }
+      },
+      "expectedMarkers": ["[REDACTED_PATH]"]
+    },
+    {
+      "name": "bash-failure",
+      "event": {
+        "type": "tool_execution_end",
+        "toolCallId": "call_fixture_failure",
+        "toolName": "bash",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "SENTINEL_URL https://fixture-user:fixture-pass@example.test/private"
+            }
+          ]
+        },
+        "isError": true,
+        "metadata": {
+          "shellKind": "bash",
+          "lifecycle": "failed",
+          "terminalCheckpoint": "terminal",
+          "outputCompleteness": "upstream-truncated"
+        }
+      },
+      "expectedMarkers": ["[REDACTED_SECRET]"]
+    },
+    {
+      "name": "non-shell-tool",
+      "event": {
+        "type": "tool_execution_start",
+        "toolCallId": "call_fixture_read",
+        "toolName": "read",
+        "args": { "path": "SENTINEL_PATH /Users/fixture/private.txt" },
+        "metadata": {
+          "shellKind": "other",
+          "lifecycle": "running",
+          "terminalCheckpoint": "started"
+        }
+      },
+      "expectedMarkers": ["[REDACTED_PATH]"]
+    },
+    {
+      "name": "trusted-text-artifact",
+      "event": {
+        "type": "message_end",
+        "message": { "role": "assistant", "content": [] },
+        "metadata": {
+          "textArtifact": {
+            "id": "artifact_fixture_goal",
+            "label": "goal",
+            "source": "SENTINEL_PRIVATE_TEXT /Users/fixture/private.txt",
+            "trusted": true
+          }
+        }
+      },
+      "expectedMarkers": ["[REDACTED_PATH]"]
+    },
+    {
+      "name": "control-bytes-and-bidi",
+      "event": {
+        "type": "message_update",
+        "assistantMessageEvent": {
+          "type": "text_delta",
+          "contentIndex": 0,
+          "delta": "ANSI \u001b[31m and bidi \u202e SENTINEL_CONTROL"
+        }
+      },
+      "expectedMarkers": ["[REDACTED_CONTROL]"]
+    },
+    {
+      "name": "malformed-rich-payload",
+      "payload": {
+        "kind": "tool_result",
+        "id": "block_fixture_bad",
+        "revision": 0,
+        "seq": 1,
+        "occurredAt": "2026-01-01T00:00:00.000Z",
+        "toolName": "bash",
+        "output": "SENTINEL_MALFORMED",
+        "isError": false,
+        "callId": "bad/id",
+        "shellKind": "bash",
+        "lifecycle": "future",
+        "terminalCheckpoint": "terminal",
+        "outputCompleteness": "complete",
+        "redaction": { "policyVersion": 1, "fieldsRedacted": 0, "reasons": [] }
+      },
+      "expected": "guard-rejects"
+    },
+    {
+      "name": "legacy-cache-shape",
+      "payload": {
+        "kind": "tool_result",
+        "id": "block_fixture_legacy",
+        "revision": 1,
+        "seq": 1,
+        "occurredAt": "2026-01-01T00:00:00.000Z",
+        "toolName": "read",
+        "output": "legacy safe output",
+        "isError": false
+      },
+      "expected": "legacy-only"
+    }
+  ]
+}

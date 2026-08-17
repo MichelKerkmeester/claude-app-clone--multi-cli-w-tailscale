@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { Envelope, SyncMessage } from '@pi-remote/pi-rpc-protocol';
+import { isRichTranscriptBlock, type Envelope, type SyncMessage } from '@pi-remote/pi-rpc-protocol';
 
 import { SyncHub } from '../src/replay/sync.js';
 import { RelayStore } from '../src/store/relay-store.js';
@@ -79,6 +79,50 @@ describe('sync barrier', () => {
       if (messages[0]?.kind === 'sync.delta') {
         expect(messages[0].coversThrough).toBe(2);
         expect(messages[0].envelopes.map((item) => item.seq)).toEqual([2]);
+      }
+    } finally {
+      store.close();
+    }
+  });
+
+  it('broadcasts only the redacted rich projection after durable commit', () => {
+    const store = new RelayStore();
+    try {
+      const hub = new SyncHub(store);
+      const messages: SyncMessage[] = [];
+      hub.subscribe(IDENTITY, (message) => messages.push(message));
+      const candidate: Envelope = {
+        ...makeEnvelope(1),
+        eventId: 'event_sync_rich',
+        kind: 'transcript.block',
+        payload: {
+          id: 'block_sync_rich',
+          revision: 1,
+          seq: 1,
+          occurredAt: '2026-01-01T00:00:01.000Z',
+          kind: 'tool_result',
+          toolName: 'bash',
+          output: 'read /Users/sync/private.txt token=sync-canary',
+          isError: false,
+          callId: 'call_sync_rich',
+          shellKind: 'bash',
+          lifecycle: 'completed',
+          terminalCheckpoint: 'terminal',
+          outputCompleteness: 'complete',
+          redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+        },
+      };
+      hub.publish(candidate);
+
+      const serialized = JSON.stringify(messages);
+      expect(serialized).not.toContain('sync-canary');
+      expect(serialized).not.toContain('/Users/sync');
+      expect(serialized).toContain('[REDACTED_SECRET]');
+      expect(serialized).toContain('[REDACTED_PATH]');
+      const delta = messages.at(-1);
+      expect(delta?.kind).toBe('sync.delta');
+      if (delta?.kind === 'sync.delta') {
+        expect(isRichTranscriptBlock(delta.envelopes[0]?.payload)).toBe(true);
       }
     } finally {
       store.close();

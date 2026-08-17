@@ -4,6 +4,7 @@
 
 import {
   isOpaqueId,
+  isRichTranscriptBlock,
   isTranscriptBlock,
   type Envelope,
   type FilePreviewAvailability,
@@ -138,7 +139,18 @@ export interface UnknownTranscriptBlock {
   readonly originalKind: string;
 }
 
-export type DisplayTranscriptBlock = TranscriptBlock | UnknownTranscriptBlock;
+export type TranscriptProvenance = 'relay' | 'cache' | 'optimistic';
+
+export interface DisplayBlockMetadata {
+  readonly provenance?: TranscriptProvenance;
+  /** False is explicit: legacy blocks must not be upgraded by client inference. */
+  readonly richEligible?: boolean;
+}
+
+type WebTranscriptBlock = Exclude<TranscriptBlock, { readonly kind: 'text_artifact' }>;
+
+export type DisplayTranscriptBlock =
+  (WebTranscriptBlock & DisplayBlockMetadata) | (UnknownTranscriptBlock & DisplayBlockMetadata);
 
 export interface TranscriptState {
   readonly sessionId: string | null;
@@ -216,7 +228,7 @@ export function transcriptReducer(
         sessionId: action.sessionId,
         epoch: action.epoch,
         coversThrough: action.coversThrough,
-        blocks: normalizeBlocks(action.blocks),
+        blocks: normalizeBlocks(action.blocks, 'cache'),
         pendingPromptIds: [],
         source: 'cache',
         updatedAt: action.savedAt,
@@ -228,7 +240,7 @@ export function transcriptReducer(
       if (state.sessionId !== action.sessionId || state.epoch !== null) return state;
       return {
         ...state,
-        blocks: normalizeBlocks(action.blocks),
+        blocks: normalizeBlocks(action.blocks, 'relay'),
         source: 'relay',
         updatedAt: action.at,
         coversThrough: action.coversThrough,
@@ -274,7 +286,7 @@ export function transcriptReducer(
         ...state,
         epoch: action.message.epoch,
         coversThrough: Math.max(state.coversThrough, action.message.coversThrough),
-        blocks: normalizeBlocks([...state.blocks, ...incoming]),
+        blocks: normalizeBlocks([...state.blocks, ...incoming], 'relay'),
         source: 'relay',
         updatedAt: action.at,
         gapReason: null,
@@ -302,17 +314,17 @@ export function transcriptReducer(
       if (state.sessionId !== action.sessionId) return state;
       return {
         ...state,
-        blocks: normalizeBlocks([...state.blocks, action.block]),
+        blocks: normalizeBlocks([...state.blocks, action.block], 'optimistic'),
         pendingPromptIds: [...state.pendingPromptIds, action.block.id],
       };
     case 'promptAccepted':
       if (state.sessionId !== action.sessionId) return state;
       return {
         ...state,
-        blocks: normalizeBlocks([
-          ...state.blocks.filter((block) => block.id !== action.optimisticId),
-          action.block,
-        ]),
+        blocks: normalizeBlocks(
+          [...state.blocks.filter((block) => block.id !== action.optimisticId), action.block],
+          'relay',
+        ),
         pendingPromptIds: state.pendingPromptIds.filter((id) => id !== action.optimisticId),
         source: 'relay',
         updatedAt: action.at,
@@ -329,31 +341,36 @@ export function transcriptReducer(
   }
 }
 
-export function parseDisplayBlock(value: unknown): DisplayTranscriptBlock | null {
-  if (isTranscriptBlock(value)) return value;
+export function parseDisplayBlock(
+  value: unknown,
+  provenance: TranscriptProvenance = 'relay',
+): DisplayTranscriptBlock | null {
+  const protocolValue = stripDisplayMetadata(value);
+  if (isTranscriptBlock(protocolValue) && protocolValue.kind !== 'text_artifact') {
+    return annotateDisplayBlock(protocolValue, provenance);
+  }
+  if (isTranscriptBlock(protocolValue) && protocolValue.kind === 'text_artifact') {
+    return toUnknownDisplayBlock(protocolValue, provenance);
+  }
   if (
-    !isRecord(value) ||
-    !isOpaqueId(value.id) ||
-    typeof value.kind !== 'string' ||
-    typeof value.revision !== 'number' ||
-    !Number.isSafeInteger(value.revision) ||
-    value.revision <= 0 ||
-    typeof value.seq !== 'number' ||
-    !Number.isSafeInteger(value.seq) ||
-    value.seq <= 0 ||
-    typeof value.occurredAt !== 'string' ||
-    Number.isNaN(Date.parse(value.occurredAt))
+    !isRecord(protocolValue) ||
+    !isOpaqueId(protocolValue.id) ||
+    typeof protocolValue.kind !== 'string' ||
+    typeof protocolValue.revision !== 'number' ||
+    !Number.isSafeInteger(protocolValue.revision) ||
+    protocolValue.revision <= 0 ||
+    typeof protocolValue.seq !== 'number' ||
+    !Number.isSafeInteger(protocolValue.seq) ||
+    protocolValue.seq <= 0 ||
+    typeof protocolValue.occurredAt !== 'string' ||
+    Number.isNaN(Date.parse(protocolValue.occurredAt))
   ) {
     return null;
   }
-  return {
-    id: value.id,
-    revision: value.revision,
-    seq: value.seq,
-    occurredAt: value.occurredAt,
-    kind: 'unknown',
-    originalKind: value.kind,
-  };
+  return toUnknownDisplayBlock(
+    protocolValue as Pick<TranscriptBlock, 'id' | 'revision' | 'seq' | 'occurredAt' | 'kind'>,
+    provenance,
+  );
 }
 
 /** Resolve the explicit relay state, with a safe legacy inference for descriptors without it. */
@@ -380,30 +397,78 @@ function blocksFromEnvelopes(
       envelope.seq > coversThrough
     )
       continue;
-    const block = parseDisplayBlock(envelope.payload);
+    const block = parseDisplayBlock(envelope.payload, 'relay');
     if (block !== null && block.seq === envelope.seq) blocks.push(block);
   }
   return normalizeBlocks(blocks);
 }
 
 function normalizeBlocks(
-  blocks: readonly DisplayTranscriptBlock[],
+  blocks: readonly (DisplayTranscriptBlock | TranscriptBlock)[],
+  defaultProvenance: TranscriptProvenance = 'relay',
 ): readonly DisplayTranscriptBlock[] {
   const byId = new Map<string, DisplayTranscriptBlock>();
   for (const block of blocks) {
-    const current = byId.get(block.id);
-    if (current === undefined || isLaterBlock(block, current)) {
-      byId.set(block.id, block);
+    const existingProvenance =
+      'provenance' in block ? (block.provenance as TranscriptProvenance | undefined) : undefined;
+    const displayBlock = toDisplayBlock(block, existingProvenance ?? defaultProvenance);
+    const annotated = annotateDisplayBlock(
+      displayBlock,
+      displayBlock.provenance ?? defaultProvenance,
+    );
+    const current = byId.get(annotated.id);
+    if (current === undefined || isLaterBlock(annotated, current)) {
+      byId.set(annotated.id, annotated);
     }
   }
   return [...byId.values()].sort((left, right) => left.seq - right.seq);
 }
 
+function toDisplayBlock(
+  block: DisplayTranscriptBlock | TranscriptBlock,
+  provenance: TranscriptProvenance,
+): DisplayTranscriptBlock {
+  return block.kind === 'text_artifact' ? toUnknownDisplayBlock(block, provenance) : block;
+}
+
+function toUnknownDisplayBlock(
+  block: Pick<TranscriptBlock, 'id' | 'revision' | 'seq' | 'occurredAt' | 'kind'>,
+  provenance: TranscriptProvenance,
+): UnknownTranscriptBlock & DisplayBlockMetadata {
+  return {
+    id: block.id,
+    revision: typeof block.revision === 'number' ? block.revision : 1,
+    seq: block.seq,
+    occurredAt: block.occurredAt,
+    kind: 'unknown',
+    originalKind: block.kind,
+    provenance,
+    richEligible: false,
+  };
+}
+
+function annotateDisplayBlock(
+  block: DisplayTranscriptBlock,
+  provenance: TranscriptProvenance,
+): DisplayTranscriptBlock {
+  const protocolBlock = stripDisplayMetadata(block) as DisplayTranscriptBlock;
+  return {
+    ...protocolBlock,
+    provenance,
+    richEligible: protocolBlock.kind !== 'unknown' && isRichTranscriptBlock(protocolBlock),
+  };
+}
+
+function stripDisplayMetadata(value: unknown): unknown {
+  if (!isRecord(value)) return value;
+  const { provenance: _provenance, richEligible: _richEligible, ...protocolValue } = value;
+  return protocolValue;
+}
+
 function isLaterBlock(left: DisplayTranscriptBlock, right: DisplayTranscriptBlock): boolean {
   if (typeof left.revision === 'number' && typeof right.revision === 'number') {
     return (
-      left.revision > right.revision ||
-      (left.revision === right.revision && left.seq >= right.seq)
+      left.revision > right.revision || (left.revision === right.revision && left.seq >= right.seq)
     );
   }
   if (typeof left.revision === 'string' && typeof right.revision === 'string') {

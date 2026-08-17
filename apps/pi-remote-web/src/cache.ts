@@ -146,7 +146,7 @@ function parseCachedTranscript(value: unknown): CachedTranscript | null {
   )
     return null;
   const blocks = value.blocks
-    .map(parseDisplayBlock)
+    .map((block) => parseDisplayBlock(block, 'cache'))
     .filter(
       (block): block is DisplayTranscriptBlock => block !== null && block.kind !== 'file_preview',
     );

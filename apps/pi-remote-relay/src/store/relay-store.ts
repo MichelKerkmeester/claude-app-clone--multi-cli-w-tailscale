@@ -24,7 +24,7 @@ import {
   type StoredArtifact,
 } from './artifact-store.js';
 import { MigrationRunner } from './migrations.js';
-import { isControlPlaneProjection, redactEnvelope } from './redaction.js';
+import { isControlPlaneProjection, redactEnvelope, redactionMarkerText } from './redaction.js';
 
 const DEFAULT_RETENTION_EVENTS = 1_000;
 const MAX_RETENTION_EVENTS = 10_000;
@@ -96,6 +96,13 @@ export class RelayStore {
       throw new TypeError('Relay refused an invalid envelope before persistence.');
     }
     const envelope = redactEnvelope(candidate);
+    if (envelope.kind === 'transcript.block' && !isTranscriptBlock(envelope.payload)) {
+      throw new TypeError(
+        `Relay refused a malformed transcript projection after redaction. ${redactionMarkerText(
+          envelope.redaction,
+        )}`.trim(),
+      );
+    }
     if (envelope.kind === 'transcript.block' && isControlPlaneProjection(envelope.payload)) {
       // Control-plane residue is never persisted, replayed, synced or broadcast.
       return { inserted: false, envelope };

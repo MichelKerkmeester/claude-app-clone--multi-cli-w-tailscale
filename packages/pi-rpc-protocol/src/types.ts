@@ -116,11 +116,45 @@ export type PiRpcEvent = JsonObject & {
   readonly type: PiRpcEventType;
 };
 
-export interface RedactionMetadata {
+export interface RedactionMetadata extends JsonObject {
   readonly policyVersion: number;
   readonly fieldsRedacted: number;
   readonly reasons: readonly string[];
 }
+
+export const TRANSCRIPT_SHELL_KINDS = ['bash', 'shell', 'other'] as const;
+export type TranscriptShellKind = (typeof TRANSCRIPT_SHELL_KINDS)[number];
+
+export const TRANSCRIPT_LIFECYCLES = [
+  'queued',
+  'running',
+  'completed',
+  'failed',
+  'denied',
+  'cancelled',
+  'interrupted',
+  'unknown',
+] as const;
+export type TranscriptLifecycle = (typeof TRANSCRIPT_LIFECYCLES)[number];
+
+export const TRANSCRIPT_TERMINAL_CHECKPOINTS = [
+  'none',
+  'started',
+  'streaming',
+  'terminal',
+  'unknown',
+] as const;
+export type TranscriptTerminalCheckpoint = (typeof TRANSCRIPT_TERMINAL_CHECKPOINTS)[number];
+
+export const TRANSCRIPT_OUTPUT_COMPLETENESS = [
+  'complete',
+  'upstream-truncated',
+  'unknown',
+] as const;
+export type TranscriptOutputCompleteness = (typeof TRANSCRIPT_OUTPUT_COMPLETENESS)[number];
+
+export const TEXT_ARTIFACT_LABELS = ['prompt', 'goal', 'plan', 'document', 'text'] as const;
+export type TextArtifactLabel = (typeof TEXT_ARTIFACT_LABELS)[number];
 
 export interface ReplayMetadata {
   readonly eligible: boolean;
@@ -186,6 +220,7 @@ interface TranscriptBlockBase extends JsonObject {
   readonly revision: number;
   readonly seq: number;
   readonly occurredAt: string;
+  readonly redaction?: RedactionMetadata;
 }
 
 export interface TextBlock extends TranscriptBlockBase {
@@ -213,6 +248,14 @@ export interface ToolCallBlock extends TranscriptBlockBase {
   readonly kind: 'tool_call';
   readonly toolName: string;
   readonly inputSummary: string;
+  /**
+   * Rich-capable fields are optional for wire compatibility with older cached
+   * and replayed blocks. Rich eligibility requires the complete set.
+   */
+  readonly callId?: string;
+  readonly shellKind?: TranscriptShellKind;
+  readonly lifecycle?: TranscriptLifecycle;
+  readonly terminalCheckpoint?: TranscriptTerminalCheckpoint;
 }
 
 export interface ToolResultBlock extends TranscriptBlockBase {
@@ -220,6 +263,36 @@ export interface ToolResultBlock extends TranscriptBlockBase {
   readonly toolName: string;
   readonly output: string;
   readonly isError: boolean;
+  readonly callId?: string;
+  readonly shellKind?: TranscriptShellKind;
+  readonly lifecycle?: TranscriptLifecycle;
+  readonly terminalCheckpoint?: TranscriptTerminalCheckpoint;
+  readonly outputCompleteness?: TranscriptOutputCompleteness;
+}
+
+export interface RichToolCallBlock extends ToolCallBlock {
+  readonly callId: string;
+  readonly shellKind: TranscriptShellKind;
+  readonly lifecycle: TranscriptLifecycle;
+  readonly terminalCheckpoint: TranscriptTerminalCheckpoint;
+  readonly redaction: RedactionMetadata;
+}
+
+export interface RichToolResultBlock extends ToolResultBlock {
+  readonly callId: string;
+  readonly shellKind: TranscriptShellKind;
+  readonly lifecycle: TranscriptLifecycle;
+  readonly terminalCheckpoint: TranscriptTerminalCheckpoint;
+  readonly outputCompleteness: TranscriptOutputCompleteness;
+  readonly redaction: RedactionMetadata;
+}
+
+/** Relay-authored text metadata; it is never inferred from ordinary prose. */
+export interface TextArtifactBlock extends TranscriptBlockBase {
+  readonly kind: 'text_artifact';
+  readonly label: TextArtifactLabel;
+  readonly source: string;
+  readonly redaction: RedactionMetadata;
 }
 
 export interface FileDiffBlock extends TranscriptBlockBase {
@@ -268,9 +341,7 @@ export interface FilePreviewNoContent extends JsonObject {
 }
 
 export type FilePreviewContent =
-  | FilePreviewInlineText
-  | FilePreviewArtifactReference
-  | FilePreviewNoContent;
+  FilePreviewInlineText | FilePreviewArtifactReference | FilePreviewNoContent;
 
 /** Relay-authored metadata before transcript ordering fields are attached. */
 export interface FilePreviewDescriptor extends JsonObject {
@@ -317,6 +388,7 @@ export type TranscriptBlock =
   | PlanBlock
   | ToolCallBlock
   | ToolResultBlock
+  | TextArtifactBlock
   | FileDiffBlock
   | FilePreviewBlock
   | UsageBlock;

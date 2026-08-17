@@ -3383,6 +3383,346 @@ button[data-pressed]:not([data-disabled]) {
   color: oklch(0.82 0.08 25);
 }
 
+/* ── Read-only artifact card and viewer ──────────────────────────────── */
+.transcript-block.block-file_diff {
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.artifact-card {
+  display: grid;
+  min-inline-size: 0;
+  min-block-size: 10rem;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+  inline-size: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+
+.artifact-card[data-hovered] {
+  border-color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+
+.artifact-card[data-pressed] {
+  transform: none;
+}
+
+.artifact-card[data-focus-visible] {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.artifact-card-glyph {
+  display: grid;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.artifact-card-glyph svg,
+.artifact-viewer-close svg {
+  inline-size: 1.35rem;
+  block-size: 1.35rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.artifact-card-body {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--space-2);
+}
+
+.artifact-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.artifact-card-meta span + span::before {
+  margin-inline-end: var(--space-2);
+  content: '/';
+  color: var(--line-strong);
+}
+
+.artifact-card-summary {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.artifact-card-peek {
+  display: block;
+  min-inline-size: 0;
+  max-block-size: calc(1.45em * 6);
+  overflow: hidden;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-code);
+  color: var(--ink-inverse);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  text-align: start;
+  white-space: pre;
+}
+
+.artifact-card-peek-line {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artifact-card-open {
+  min-block-size: 2.75rem;
+  padding-block: 0.7rem;
+  color: var(--accent-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.artifact-viewer-overlay {
+  position: fixed;
+  z-index: 110;
+  inset: 0;
+  display: flex;
+  inline-size: 100%;
+  max-inline-size: 100vw;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ink) 58%, transparent);
+}
+
+.artifact-viewer-modal {
+  inline-size: min(100%, 48rem);
+  max-inline-size: 100%;
+  max-block-size: var(--visual-viewport-height, 100dvh);
+  overflow: hidden;
+  background: var(--surface-raised);
+  color: var(--ink);
+}
+
+.artifact-viewer-dialog {
+  display: grid;
+  min-inline-size: 0;
+  min-block-size: 100%;
+  max-block-size: inherit;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  overflow: hidden;
+  padding: max(var(--space-4), env(safe-area-inset-top))
+    max(var(--space-4), env(safe-area-inset-right)) max(var(--space-4), env(safe-area-inset-bottom))
+    max(var(--space-4), env(safe-area-inset-left));
+  outline: none;
+}
+
+.artifact-viewer-header {
+  display: flex;
+  min-inline-size: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block-end: var(--space-4);
+  border-block-end: 1px solid var(--line);
+}
+
+.artifact-viewer-heading-group {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--space-2);
+}
+
+.artifact-viewer-kicker {
+  color: var(--accent-ink);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.artifact-viewer-title {
+  max-inline-size: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 6vw, 2.15rem);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.artifact-viewer-title:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.artifact-viewer-close {
+  display: grid;
+  inline-size: 44px;
+  block-size: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.artifact-viewer-close[data-hovered] {
+  background: var(--accent-soft);
+}
+
+.artifact-viewer-close[data-focus-visible] {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.artifact-viewer-status {
+  min-block-size: 2.75rem;
+  padding-block: var(--space-3);
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.artifact-viewer-content {
+  display: grid;
+  min-inline-size: 0;
+  min-block-size: 0;
+  align-content: start;
+  gap: var(--space-4);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-block-end: var(--space-4);
+}
+
+.artifact-viewer-summary {
+  max-inline-size: 66ch;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink-secondary);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.artifact-preview-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--ink-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.artifact-preview-controls span {
+  min-block-size: 2rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.artifact-diff-preview {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin: 0;
+  overflow: auto;
+  padding-block: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-code);
+  color: var(--ink-inverse);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  white-space: pre;
+}
+
+.artifact-diff-line {
+  display: block;
+  min-block-size: 1.65em;
+  padding-inline: var(--space-4);
+}
+
+.artifact-diff-add {
+  background: color-mix(in oklch, var(--diff-add) 90%, transparent);
+}
+
+.artifact-diff-remove {
+  background: color-mix(in oklch, var(--diff-remove) 90%, transparent);
+}
+
+@supports not (height: 100dvh) {
+  .artifact-viewer-modal {
+    max-block-size: var(--visual-viewport-height, 100vh);
+  }
+}
+
+@media (max-width: 24rem) {
+  .artifact-card {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    padding: var(--space-3);
+  }
+
+  .artifact-card-glyph {
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+  }
+
+  .artifact-card-open {
+    display: none;
+  }
+
+  .artifact-viewer-dialog {
+    padding-inline: max(var(--space-3), env(safe-area-inset-left))
+      max(var(--space-3), env(safe-area-inset-right));
+  }
+
+  .artifact-viewer-title {
+    font-size: 1.45rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artifact-card,
+  .artifact-viewer-overlay,
+  .artifact-viewer-modal,
+  .artifact-viewer-close {
+    animation: none;
+    transition: none;
+  }
+}
+
 .usage-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

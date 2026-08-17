@@ -19,6 +19,22 @@ const SESSION_IDLE = 'demo-session-refactor';
 const SESSION_RUNNING = 'demo-session-triage';
 const EPOCH = 'demo-epoch-01';
 
+export const DEMO_DIFF_FIXTURE = Object.freeze({
+  sessionId: SESSION_IDLE,
+  blockId: 'blk-005',
+  summary: 'Harden ticket expiry in policy.ts',
+  patch: [
+    '@@ -40,7 +40,8 @@ export function verifyTicket(ticket, now) {',
+    '   if (ticket.principal !== expected) return false;',
+    '-  if (ticket.expiresAt < now) return true;',
+    '+  // Boundary is expired: fail closed rather than admit a stale ticket.',
+    '+  if (ticket.expiresAt <= now) return false;',
+    '   return true;',
+    ' }',
+  ].join('\n'),
+  query: '?demo=1&fixture=diff',
+});
+
 let cachedEnabled: boolean | null = null;
 
 /**
@@ -88,18 +104,10 @@ const REFACTOR_BLOCKS = [
     isError: false,
   },
   {
-    ...base('blk-005', 5, 7),
+    ...base(DEMO_DIFF_FIXTURE.blockId, 5, 7),
     kind: 'file_diff',
-    summary: 'Harden ticket expiry in policy.ts',
-    patch: [
-      '@@ -40,7 +40,8 @@ export function verifyTicket(ticket, now) {',
-      '   if (ticket.principal !== expected) return false;',
-      '-  if (ticket.expiresAt < now) return true;',
-      '+  // Boundary is expired: fail closed rather than admit a stale ticket.',
-      '+  if (ticket.expiresAt <= now) return false;',
-      '   return true;',
-      ' }',
-    ].join('\n'),
+    summary: DEMO_DIFF_FIXTURE.summary,
+    patch: DEMO_DIFF_FIXTURE.patch,
   },
   {
     ...base('blk-006', 6, 6),
@@ -346,11 +354,7 @@ function applyControl(
   if (operation.type === 'set_model') {
     const issued = ticket !== undefined ? runtimeTickets.get(ticket) : undefined;
     if (ticket !== undefined) runtimeTickets.delete(ticket);
-    if (
-      issued === undefined ||
-      issued.sessionId !== sessionId ||
-      issued.expiresAt <= Date.now()
-    ) {
+    if (issued === undefined || issued.sessionId !== sessionId || issued.expiresAt <= Date.now()) {
       return { outcome: { status: 'unavailable', reasonCode: 'host_rejected' } };
     }
     if (expectedRevision !== state.revision) {
@@ -383,7 +387,10 @@ function applyControl(
   }
   if (operation.type === 'set_thinking_level' && typeof operation.level === 'string') {
     if (THINKING_LEVELS.includes(operation.level)) state.thinkingLevel = operation.level;
-  } else if (operation.type === 'set_mode' && (operation.mode === 'build' || operation.mode === 'plan')) {
+  } else if (
+    operation.type === 'set_mode' &&
+    (operation.mode === 'build' || operation.mode === 'plan')
+  ) {
     state.mode = operation.mode;
   }
   state.revision += 1;
@@ -477,7 +484,7 @@ export function demoPostJson(path: string, body: unknown): unknown {
       return {
         accepted: true,
         block: {
-          id: `blk-echo-${Math.round((Date.now() % 1_000_000))}`,
+          id: `blk-echo-${Math.round(Date.now() % 1_000_000)}`,
           kind: 'text',
           role: 'user',
           text: String(request.message ?? ''),
@@ -500,10 +507,7 @@ interface FakeSocketListeners {
 /** A WebSocket-shaped stub. It emits one empty-envelope delta so the
  * connection reducer flips to "live" (enabling the composer) without
  * disturbing the transcript already loaded from the fixture page. */
-export function demoSocket(
-  sessionId: string,
-  onMessage: (message: unknown) => void,
-): WebSocket {
+export function demoSocket(sessionId: string, onMessage: (message: unknown) => void): WebSocket {
   const listeners: FakeSocketListeners = {};
   const session = SESSIONS.find((candidate) => candidate.id === sessionId);
   const coversThrough = session?.blocks.length ?? 0;

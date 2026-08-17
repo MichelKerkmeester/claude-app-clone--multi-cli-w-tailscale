@@ -31,6 +31,8 @@ import {
 } from 'react-aria-components';
 
 import { loadCache, saveCache, type ReadOnlyCache } from './cache.js';
+import { ArtifactCard } from './artifacts/ArtifactCard.js';
+import { ArtifactViewerProvider } from './artifacts/ArtifactViewerProvider.js';
 import {
   enrollDevice,
   establishSession,
@@ -1297,7 +1299,9 @@ export function Session({
           runtimeControls.openPlanReview?.();
         }}
       />
-      <TranscriptList blocks={transcript.blocks} running={status === 'running'} />
+      <ArtifactViewerProvider>
+        <TranscriptList blocks={transcript.blocks} running={status === 'running'} />
+      </ArtifactViewerProvider>
       <RuntimeStrip
         controls={runtimeControls}
         sheetOpen={sheetOpen}
@@ -1456,7 +1460,7 @@ export function TranscriptList({
   }
 
   return (
-    <section className="transcript-frame" aria-label="Typed transcript">
+    <section className="transcript-frame" aria-label="Typed transcript" tabIndex={-1}>
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
@@ -1764,12 +1768,7 @@ function Block({
       break;
     case 'file_diff':
       label = 'File diff';
-      content = (
-        <>
-          <p className="diff-summary">{block.summary}</p>
-          <DiffPatch patch={block.patch} />
-        </>
-      );
+      content = <ArtifactCard block={block} />;
       break;
     case 'usage':
       label = 'Usage';
@@ -1800,9 +1799,11 @@ function Block({
   const roleClass = block.kind === 'text' ? ` block-role-${block.role ?? 'assistant'}` : '';
   // Text turns imply role by placement + typography (Claude-style), and collapsible evidence
   // carries its own labelled trigger — so the label/timestamp header only shows for the
-  // promoted, standalone blocks (plan, file diff, unsupported). When `bare`, this block is
+  // promoted, standalone blocks (plan and unsupported). When `bare`, this block is
   // already inside an Activity disclosure: show its label and render content directly.
-  const showHeader = bare ? block.kind !== 'text' : block.kind !== 'text' && !collapsible;
+  const showHeader =
+    block.kind !== 'file_diff' &&
+    (bare ? block.kind !== 'text' : block.kind !== 'text' && !collapsible);
   const renderAsDisclosure = collapsible && !bare;
   return (
     <article
@@ -1823,28 +1824,6 @@ function Block({
         <AssistantActions text={block.text} />
       )}
     </article>
-  );
-}
-
-function DiffPatch({ patch }: { readonly patch: string }) {
-  return (
-    <pre className="diff-patch" aria-label="Redacted file diff">
-      {patch.split('\n').map((line, index) => (
-        <span
-          className={
-            line.startsWith('+')
-              ? 'diff-add'
-              : line.startsWith('-')
-                ? 'diff-remove'
-                : 'diff-context'
-          }
-          key={`${index}-${line.slice(0, 12)}`}
-        >
-          {line || ' '}
-          {'\n'}
-        </span>
-      ))}
-    </pre>
   );
 }
 

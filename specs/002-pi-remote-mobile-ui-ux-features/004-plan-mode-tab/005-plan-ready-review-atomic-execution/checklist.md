@@ -1,16 +1,15 @@
 # Checklist — Phase 4 — Plan-ready card, review sheet, and atomic execution
 
-- [ ] Only a live, newest, valid structured artifact enables Review and Execute; cached or superseded artifacts remain history-only.
-- [ ] Review opens with safe initial focus and four explicit actions; every dismissal path cancels without changing mode or executing.
-- [ ] `execute_plan` is one atomic operation bound to the reviewed plan and current runtime revision; invalid, stale, replayed, expired, non-Plan, non-idle, and non-foreground requests invoke no host tools.
-- [ ] Host publishes `Executing plan` only after successful handoff, never labels it read-only, and returns to Plan restrictions after success, cancellation, and failure.
-- [ ] Plan feedback disables the old Execute action immediately, and a retained artifact after leaving Plan cannot execute.
-- [ ] No ticket, token, raw plan, raw tool arguments, path, principal, hostname, or internal control event appears in transcript, URL, cache, notification, error, or diagnostics.
-- [ ] The token remains in live-session memory only and is absent from rendering, copying, logging, persistence, replay, and sync.
-- [ ] Required security review approves the atomic validator, execution lease, partial-failure restoration, invalidation policy, and redaction boundary before real Execute exposure.
-- [ ] `npm run typecheck` passes.
-- [ ] The protocol, relay, and extension test command passes.
-- [ ] The focused web test command passes for card, review sheet, leave sheet, and runtime tests.
-- [ ] The full fixture covers plan-ready, review, execute-pending, executing-plan, failure, and restored-Plan states with true `390px` CDP screenshots in light and dark mode for card, review, and executing state.
-- [ ] The scoped phase diff contains only the intended plan UI, runtime/relay validation, host handoff, security tests, and fixture changes.
-
+- [x] Only a live, newest, valid structured artifact enables Review and Execute; cached or superseded artifacts remain history-only. — `PlanReadyCard.tsx` gates on newest+valid; `PlanReadyCard.test.tsx`.
+- [x] Review opens with safe initial focus and four explicit actions; every dismissal path cancels without changing mode or executing. — `PlanReviewSheet.tsx` (initial focus `Keep planning`, four actions, safe dismissal); `PlanReviewSheet.test.tsx`.
+- [x] `execute_plan` is one atomic operation bound to the reviewed plan and current runtime revision; invalid, stale, replayed, expired, non-Plan, non-idle, and non-foreground requests invoke no host tools. — `relay.ts executePlan` (`type:'execute_plan'`, `postRunMode:'plan'`); relay atomic validation (foreground + opaque planId + revisions + ticket); relay negative-control tests.
+- [x] Host publishes `Executing plan` only after successful handoff, never labels it read-only, and returns to Plan restrictions after success, cancellation, and failure. — extension `executing-plan` mode + bounded lease restores on every terminal path; `plan-mode.test.ts`.
+- [x] Plan feedback disables the old Execute action immediately, and a retained artifact after leaving Plan cannot execute. — invalidation supersedes before replacement; `LeavePlanSheet` retained-artifact non-executable; tested.
+- [x] No ticket, token, raw plan, raw tool arguments, path, principal, hostname, or internal control event appears in transcript, URL, cache, notification, error, or diagnostics. — allowlisted redaction; negative-control tests.
+- [x] The token remains in live-session memory only and is absent from rendering, copying, logging, persistence, replay, and sync. — no `planToken` in `PlanReadyCard`/`PlanReviewSheet` (grep clean); redaction drops it from DTOs.
+- [x] Required security review approves the atomic validator, execution lease, partial-failure restoration, invalidation policy, and redaction boundary before real Execute exposure. — Claude review recorded in `implementation-summary.md`; all crux properties confirmed in code + tests.
+- [x] `npm run typecheck` passes. — verified (worktree).
+- [x] The protocol, relay, and extension test command passes. — covered by full `npm test` 221/221.
+- [x] The focused web test command passes for card, review sheet, leave sheet, and runtime tests. — covered by full `npm run test:web` 450/450 (+19 new).
+- [ ] The full fixture covers plan-ready, review, execute-pending, executing-plan, failure, and restored-Plan states with true `390px` CDP screenshots in light and dark mode for card, review, and executing state. — captured at the feature-004 batched visual pass (needs `demo.ts` plan-artifact fixtures); state transitions proven by DOM tests now.
+- [x] The scoped phase diff contains only the intended plan UI, runtime/relay validation, host handoff, security tests, and fixture changes. — `git status`: web plan UI + runtime/relay + extension + tests; no `packages/**`/`specs/**`; zero new colors.

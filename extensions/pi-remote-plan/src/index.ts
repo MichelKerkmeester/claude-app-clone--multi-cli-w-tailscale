@@ -116,6 +116,14 @@ const READ_ONLY_EXTENSION_TOOLS: ReadonlySet<string> = new Set();
 export interface PlanHost {
   acceptPlan(draft: PlanDraft, ctx: ExtensionContext): PlanArtifact;
   invalidatePlan(validity: 'superseded' | 'invalid', ctx: ExtensionContext): PlanArtifact | null;
+  executePlan(request: PlanExecutionRequest, ctx: ExtensionContext): boolean;
+}
+
+export interface PlanExecutionRequest {
+  readonly planId: string;
+  readonly planRevision: number;
+  readonly planToken: string;
+  readonly selectedApproachId?: string;
 }
 
 /**
@@ -191,6 +199,8 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
   const enterBuild = (ctx: ExtensionContext): void => {
     clearLease();
     if (!restoreTools(ctx)) return;
+    const invalidated = artifact.invalidate('superseded');
+    if (invalidated !== null) publishPlan(ctx, invalidated);
     capturedTools = undefined;
     mode = 'build';
     publishMode(ctx);
@@ -228,6 +238,7 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
    * bounded lease starts only after the handoff has been published.
    */
   const beginExecution = (ctx: ExtensionContext): boolean => {
+    if (mode !== 'plan') return false;
     if (!restoreTools(ctx)) {
       reportPlanSafetyError(ctx);
       return false;
@@ -251,8 +262,28 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
       reportPlanSafetyError(ctx);
       return;
     }
+    const invalidated = artifact.invalidate('superseded');
+    if (invalidated !== null) publishPlan(ctx, invalidated);
     mode = 'plan';
     publishMode(ctx);
+  };
+
+  const executePlan = (request: PlanExecutionRequest, ctx: ExtensionContext): boolean => {
+    const current = artifact.get();
+    if (
+      mode !== 'plan' ||
+      current === null ||
+      current.validity !== 'valid' ||
+      current.planId !== request.planId ||
+      current.planRevision !== request.planRevision ||
+      current.planToken !== request.planToken ||
+      (request.selectedApproachId !== undefined &&
+        !current.approachIds.includes(request.selectedApproachId))
+    ) {
+      publishError(ctx);
+      return false;
+    }
+    return beginExecution(ctx);
   };
 
   pi.registerCommand('plan', {
@@ -273,7 +304,22 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
           enterBuild(ctx);
           return;
         case 'execute':
-          beginExecution(ctx);
+          {
+            const current = artifact.get();
+            if (current === null) {
+              publishError(ctx);
+              reportPlanSafetyError(ctx);
+              return;
+            }
+            executePlan(
+              {
+                planId: current.planId,
+                planRevision: current.planRevision,
+                planToken: current.planToken,
+              },
+              ctx,
+            );
+          }
           return;
         case 'status':
           publishMode(ctx);
@@ -321,6 +367,7 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
       publishPlan(ctx, publication);
       return artifact.get();
     },
+    executePlan,
   };
 }
 

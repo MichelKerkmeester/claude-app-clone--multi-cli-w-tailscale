@@ -286,10 +286,9 @@ describe('plan authority lifecycle loop', () => {
     if (executed.outcome.status !== 'accepted') throw new Error('expected accepted execute');
     expect(executed.outcome.state.mode).toBe('executing-plan');
     expect(executed.outcome.state.revision).toBe(2);
-    expect(fake.settled.map((command) => command)).toEqual([
-      { type: 'prompt', message: '/plan on' },
-      { type: 'prompt', message: '/plan execute' },
-    ]);
+    expect(
+      fake.settled.map((command) => (command as unknown as { readonly type: string }).type),
+    ).toEqual(['prompt', 'execute_plan']);
   });
 
   it('maps unhealthy extension state to unknown and never to Build', async () => {
@@ -368,15 +367,16 @@ class PlanFakeSupervisor {
 
   public sendSettled(command: PiRpcCommand): Promise<PiRpcResponse> {
     this.settled.push(command);
+    const commandType = (command as unknown as { readonly type: string }).type;
+    if (commandType === 'execute_plan') {
+      queueMicrotask(() => this.emitPlanStatus('executing-plan'));
+      return Promise.resolve(ok({}));
+    }
     if (command.type !== 'prompt') {
       return Promise.reject(new Error(`unexpected mutation ${command.type}`));
     }
     const message = (command as unknown as { message: string }).message;
-    if (message === '/plan execute') {
-      queueMicrotask(() => this.emitPlanStatus('executing-plan'));
-    } else {
-      queueMicrotask(() => this.emitPlanStatus(message === '/plan on' ? 'plan' : 'build'));
-    }
+    queueMicrotask(() => this.emitPlanStatus(message === '/plan on' ? 'plan' : 'build'));
     return Promise.resolve(ok({}));
   }
 

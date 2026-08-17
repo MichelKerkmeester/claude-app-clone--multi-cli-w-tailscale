@@ -131,6 +131,18 @@ class FakeSupervisor {
         };
       }
     }
+    if ((command as unknown as { readonly type: string }).type === 'execute_plan') {
+      if (this.hostReject) {
+        return {
+          type: 'response',
+          command: 'execute_plan',
+          success: false,
+          error: 'policy denied /Users/private token=SECRET',
+        };
+      }
+      queueMicrotask(() => this.emitPlanStatus('executing-plan'));
+      return ok({});
+    }
     switch (command.type) {
       case 'get_state':
         return ok({ thinkingLevel: this.thinkingLevel, model: this.model, streaming: false });
@@ -167,10 +179,6 @@ class FakeSupervisor {
           };
         }
         const message = (command as unknown as { message: string }).message;
-        if (message === '/plan execute') {
-          queueMicrotask(() => this.emitPlanStatus('executing-plan'));
-          return ok({});
-        }
         const mode = message === '/plan on' ? 'plan' : 'build';
         queueMicrotask(() => this.emitPlanStatus(mode));
         return ok({});

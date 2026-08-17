@@ -40,6 +40,7 @@ class FakeSupervisor {
   public levels = ['off', 'high', 'max'];
   public models = [this.model];
   public rejectSettled = false;
+  public streaming = false;
   public settledCount = 0;
   public readonly settled: PiRpcCommand[] = [];
   private readonly lifecycleListeners = new Set<(event: SupervisorLifecycleEvent) => void>();
@@ -63,7 +64,7 @@ class FakeSupervisor {
     ) {
       if (command.type === 'get_state') {
         return Promise.resolve(
-          ok({ thinkingLevel: this.thinkingLevel, model: this.model, streaming: false }),
+          ok({ thinkingLevel: this.thinkingLevel, model: this.model, streaming: this.streaming }),
         );
       }
       if (command.type === 'get_available_thinking_levels') {
@@ -79,6 +80,11 @@ class FakeSupervisor {
     this.settled.push(command);
     if (this.rejectSettled) {
       return Promise.reject(new Error('transport failed after write'));
+    }
+    const commandType = (command as unknown as { readonly type: string }).type;
+    if (commandType === 'execute_plan') {
+      queueMicrotask(() => this.emitPlanStatus('executing-plan'));
+      return Promise.resolve(ok({}));
     }
     if (command.type !== 'prompt') {
       return Promise.reject(new Error(`unexpected mutation ${command.type}`));
@@ -410,6 +416,93 @@ describe('plan control boundary', () => {
     socket.close();
   });
 
+  it('exposes the token only through the live binding read and rejects a non-idle execute before host handoff', async () => {
+    const harness = await createHarness();
+    const client = await authorize(harness);
+    const socket = await connectWebSocket(
+      harness,
+      (await issueTicket(harness, client.cookie)).ticket,
+    );
+    harness.fake.emitPlanArtifact();
+
+    const entered = await post(harness.ingressUrl, '/api/plan/control', {
+      headers: authorizedHeaders(client.cookie),
+      body: setModeBody((await issueTicket(harness, client.cookie)).ticket, 'c_binding_enter'),
+    });
+    expect(entered.status).toBe(202);
+
+    const binding = await post(harness.ingressUrl, '/api/plan/binding', {
+      headers: authorizedHeaders(client.cookie),
+      body: {
+        sessionId: 'session_local',
+        planId: 'plan_007',
+        expectedPlanRevision: 1,
+        expectedRuntimeRevision: 1,
+      },
+    });
+    expect(binding.status).toBe(200);
+    expect(JSON.stringify(await binding.json())).toContain(PLAN_TOKEN);
+
+    harness.fake.streaming = true;
+    const before = harness.fake.settledCount;
+    const nonIdle = await post(harness.ingressUrl, '/api/plan/control', {
+      headers: authorizedHeaders(client.cookie),
+      body: executePlanBody((await issueTicket(harness, client.cookie)).ticket, 'c_non_idle'),
+    });
+    expect(nonIdle.status).toBe(409);
+    expect((await nonIdle.json()) as { outcome: { status: string } }).toMatchObject({
+      outcome: { status: 'stale' },
+    });
+    expect(harness.fake.settledCount).toBe(before);
+
+    socket.close();
+  });
+
+  it('rejects execution after the host leaves Plan without invoking a host execution operation', async () => {
+    const harness = await createHarness();
+    const client = await authorize(harness);
+    const socket = await connectWebSocket(
+      harness,
+      (await issueTicket(harness, client.cookie)).ticket,
+    );
+    harness.fake.emitPlanArtifact();
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/plan/control', {
+          headers: authorizedHeaders(client.cookie),
+          body: setModeBody((await issueTicket(harness, client.cookie)).ticket, 'c_non_plan_enter'),
+        })
+      ).status,
+    ).toBe(202);
+    expect(
+      (
+        await post(harness.ingressUrl, '/api/plan/control', {
+          headers: authorizedHeaders(client.cookie),
+          body: setModeBody(
+            (await issueTicket(harness, client.cookie)).ticket,
+            'c_non_plan_leave',
+            1,
+            'build',
+          ),
+        })
+      ).status,
+    ).toBe(202);
+
+    const before = harness.fake.settledCount;
+    const result = await post(harness.ingressUrl, '/api/plan/control', {
+      headers: authorizedHeaders(client.cookie),
+      body: executePlanBody((await issueTicket(harness, client.cookie)).ticket, 'c_non_plan_exec', {
+        expectedRuntimeRevision: 2,
+      }),
+    });
+    expect(result.status).toBe(409);
+    expect((await result.json()) as { outcome: { status: string } }).toMatchObject({
+      outcome: { status: 'stale' },
+    });
+    expect(harness.fake.settledCount).toBe(before);
+    socket.close();
+  });
+
   it('never persists, syncs, or broadcasts the raw plan token', async () => {
     const harness = await createHarness();
     const client = await authorize(harness);
@@ -578,10 +671,11 @@ function setModeBody(
   ticket: string,
   controlId: string,
   expectedRuntimeRevision = 0,
+  target: 'build' | 'plan' = 'plan',
 ): SetModeCommand {
   return {
     type: 'set_mode',
-    target: 'plan',
+    target,
     expectedRuntimeRevision,
     controlId,
     oneUseTicket: ticket,

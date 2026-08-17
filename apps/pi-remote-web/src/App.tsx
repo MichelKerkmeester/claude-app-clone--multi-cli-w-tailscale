@@ -71,6 +71,9 @@ import {
   type TranscriptState,
 } from './state.js';
 import { ModelEffortSheet, type EffortSheetSection } from './ModelEffortSheet.js';
+import { LeavePlanSheet } from './LeavePlanSheet.js';
+import { PlanReadyCard } from './PlanReadyCard.js';
+import { PlanReviewSheet } from './PlanReviewSheet.js';
 import { RuntimeModeAnnouncer } from './RuntimeModeAnnouncer.js';
 import { RuntimeStrip } from './RuntimeStrip.js';
 import { SessionComposer } from './SessionComposer.js';
@@ -81,7 +84,7 @@ import {
   type SelectedCommandBinding,
 } from './commands.js';
 import { bindingAfterDraftChange } from './insertSlashCommand.js';
-import { runtimeAnnouncement, useRuntime, type RuntimeUiState } from './runtime.js';
+import { modeAuthority, runtimeAnnouncement, useRuntime, type RuntimeUiState } from './runtime.js';
 import { submitSlashDraft, type SlashSubmitFailureCode } from './submitSlashDraft.js';
 import { groupBlocksIntoTurns } from './turns.js';
 
@@ -940,6 +943,8 @@ export function Session({
   // Bounded revalidation progress for one explicit slash Send; the flag is
   // local state only and never carries command content.
   const [slashSubmitting, setSlashSubmitting] = useState(false);
+  const planReviewTriggerRef = useRef<HTMLButtonElement>(null);
+  const [leavePlanReadyOpen, setLeavePlanReadyOpen] = useState(false);
 
   // One shared sheet per session view: the header opens the model section,
   // RuntimeStrip the effort section, and focus returns to whichever trigger
@@ -1099,6 +1104,9 @@ export function Session({
             cursorRef.current = { epoch: message.epoch, seq: message.coversThrough };
             dispatchConnection({ type: 'live', at });
             retryCount = 0;
+            const invalidation = planInvalidationFromSync(message);
+            if (invalidation !== null) runtimeControls.invalidatePlan?.(invalidation);
+            void runtimeControls.refresh('live');
           }
         },
         controller.signal,
@@ -1137,7 +1145,7 @@ export function Session({
       if (retryTimer !== null) window.clearTimeout(retryTimer);
       socket?.close();
     };
-  }, [cache, dispatchConnection, dispatchTranscript, sessionId]);
+  }, [cache, dispatchConnection, dispatchTranscript, runtimeControls.refresh, sessionId]);
 
   const isStale =
     connection !== 'live' || transcript.source === 'cache' || transcript.awaitingSnapshot;
@@ -1273,6 +1281,22 @@ export function Session({
           Reconciliation barrier active. Waiting for a fresh snapshot.
         </div>
       )}
+      <PlanReadyCard
+        artifact={runtimeControls.runtime.planArtifact}
+        isLive={
+          modeAuthority(runtimeControls.runtime).confirmedMode === 'plan' &&
+          runtimeControls.runtime.planLive === true
+        }
+        canReview={
+          runtimeControls.runtime.planToken !== null &&
+          runtimeControls.runtime.planToken !== undefined &&
+          runtimeControls.runtime.executePending !== true
+        }
+        reviewButtonRef={planReviewTriggerRef}
+        onReview={() => {
+          runtimeControls.openPlanReview?.();
+        }}
+      />
       <TranscriptList blocks={transcript.blocks} running={status === 'running'} />
       <RuntimeStrip
         controls={runtimeControls}
@@ -1302,6 +1326,43 @@ export function Session({
         runtimeRunning={runtimeRunning}
         onInsertCommand={insertCommand}
         externalOverlayOpen={sheetOpen}
+      />
+      <PlanReviewSheet
+        isOpen={runtimeControls.runtime.reviewOpen === true}
+        onOpenChange={(open) => {
+          if (!open) runtimeControls.dismissPlanReview?.();
+        }}
+        artifact={
+          runtimeControls.runtime.reviewedPlan?.artifact ?? runtimeControls.runtime.planArtifact
+        }
+        isExecuting={runtimeControls.runtime.executePending === true}
+        triggerRef={planReviewTriggerRef}
+        onKeepPlanning={() => runtimeControls.dismissPlanReview?.()}
+        onRevisePlan={() => {
+          runtimeControls.dismissPlanReview?.();
+          window.setTimeout(() => document.getElementById('session-prompt')?.focus(), 0);
+        }}
+        onLeaveWithoutRunning={() => {
+          runtimeControls.dismissPlanReview?.();
+          setLeavePlanReadyOpen(true);
+        }}
+        onExecuteReviewedPlan={() => {
+          void runtimeControls.executePlan?.();
+        }}
+      />
+      <LeavePlanSheet
+        isOpen={leavePlanReadyOpen}
+        onOpenChange={setLeavePlanReadyOpen}
+        variant="plan-ready"
+        onSwitchToBuild={() => {
+          setLeavePlanReadyOpen(false);
+          void runtimeControls.setMode('build');
+        }}
+        onLeaveWithoutRunning={() => {
+          setLeavePlanReadyOpen(false);
+          void runtimeControls.setMode('build');
+        }}
+        triggerRef={planReviewTriggerRef}
       />
       <ModelEffortSheet
         isOpen={sheetOpen}
@@ -1848,6 +1909,24 @@ function applySyncMessage(
       dispatch({ type: 'gap', message });
       break;
   }
+}
+
+function planInvalidationFromSync(message: SyncMessage): 'superseded' | 'invalid' | null {
+  if (message.kind === 'sync.gap') return null;
+  for (const envelope of message.envelopes) {
+    const payload = envelope.payload;
+    if (!isRecordValue(payload) || payload.type !== 'extension_ui_request') continue;
+    if (payload.method !== 'setPlan' || payload.statusKey !== 'pi-remote-plan-artifact') continue;
+    if (!isRecordValue(payload.plan)) continue;
+    if (payload.plan.validity === 'superseded' || payload.plan.validity === 'invalid') {
+      return payload.plan.validity;
+    }
+  }
+  return null;
+}
+
+function isRecordValue(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 async function loadApprovals(

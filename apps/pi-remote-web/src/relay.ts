@@ -7,6 +7,8 @@ import {
   isApprovalCardDto,
   isApprovalDecisionResponse,
   isCommandCatalogDto,
+  isOpaqueId,
+  isOpaqueToken,
   isPlanControlResponse,
   isPromptAbortResponse,
   isRuntimeControlResponse,
@@ -25,6 +27,7 @@ import {
   isWebSocketTicketResponse,
   type CommandBindingDto,
   type CommandCatalogDto,
+  type ExecutePlanCommand,
   type PlanControlOutcome,
   type PlanControlResponse,
   type PromptAbortResponse,
@@ -117,7 +120,11 @@ export class SlashSubmitError extends Error {
   readonly reasonCode: SlashSubmitIssueCode;
 
   constructor(reasonCode: SlashSubmitIssueCode) {
-    super(reasonCode === 'stale_catalog' ? 'Commands changed on the host.' : 'Command is not available.');
+    super(
+      reasonCode === 'stale_catalog'
+        ? 'Commands changed on the host.'
+        : 'Command is not available.',
+    );
     this.name = 'SlashSubmitError';
     this.reasonCode = reasonCode;
   }
@@ -136,6 +143,15 @@ export function parseBoundedRetryAfter(value: string | null): number | null {
 export interface TranscriptLoad {
   readonly items: readonly TranscriptBlock[];
   readonly coversThrough: number;
+}
+
+/** The opaque binding is accepted only into the live runtime object. */
+export interface PlanBindingResponse {
+  readonly sessionId: string;
+  readonly planId: string;
+  readonly planRevision: number;
+  readonly runtimeRevision: number;
+  readonly planToken: string;
 }
 
 export async function fetchSessions(signal: AbortSignal): Promise<readonly SessionCardDto[]> {
@@ -267,6 +283,26 @@ export async function fetchRuntimeSnapshot(signal?: AbortSignal): Promise<Runtim
   }
 }
 
+/** Read the current host binding without caching or placing it in a URL. */
+export async function fetchPlanBinding(
+  sessionId: string,
+  expectedRuntimeRevision: number,
+  planId: string,
+  expectedPlanRevision: number,
+  signal?: AbortSignal,
+): Promise<PlanBindingResponse> {
+  const payload = await postJson(
+    '/api/plan/binding',
+    { sessionId, expectedRuntimeRevision, planId, expectedPlanRevision },
+    signal,
+    [409, 422, 503],
+  );
+  if (!isPlanBindingResponse(payload)) {
+    throw new Error('Relay returned an invalid live plan binding.');
+  }
+  return payload;
+}
+
 export function normalizeRuntimeIssue(error: unknown): RuntimeIssueCode {
   if (error instanceof RuntimeRelayError) return error.issueCode;
   if (error instanceof RelayRequestError) {
@@ -304,7 +340,8 @@ export async function fetchCommands(signal?: AbortSignal): Promise<CommandCatalo
   } catch (error: unknown) {
     if (isAbortError(error)) throw error;
     if (error instanceof RelayRequestError) {
-      if (error.status === 401 || error.status === 403) throw new CatalogLifecycleError('forbidden');
+      if (error.status === 401 || error.status === 403)
+        throw new CatalogLifecycleError('forbidden');
       throw new CatalogLifecycleError('unavailable');
     }
     if (error instanceof SyntaxError) throw new CatalogLifecycleError('incompatible');
@@ -454,6 +491,62 @@ export async function setMode(
 }
 
 /**
+ * Submit one atomic reviewed-plan handoff. The ticket is minted immediately
+ * before the request and is never retained for a later attempt.
+ */
+export async function executePlan(
+  sessionId: string,
+  expectedRuntimeRevision: number,
+  planId: string,
+  expectedPlanRevision: number,
+  planToken: string,
+  selectedApproachId?: string,
+  signal?: AbortSignal,
+): Promise<RuntimeControlResponse> {
+  const controlId = `control_${crypto.randomUUID().replaceAll('-', '_')}`;
+  let controlStarted = false;
+  try {
+    const oneUseTicket = await requestTicket(signal);
+    const command: ExecutePlanCommand = {
+      type: 'execute_plan',
+      planId,
+      expectedPlanRevision,
+      planToken,
+      expectedRuntimeRevision,
+      postRunMode: 'plan',
+      controlId,
+      oneUseTicket,
+      ...(selectedApproachId === undefined ? {} : { selectedApproachId }),
+    };
+    controlStarted = true;
+    const payload = await postJson('/api/plan/control', command, signal, [202, 409, 422, 503]);
+    if (!isPlanControlResponse(payload)) {
+      return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
+    }
+    if (
+      payload.outcome.status === 'accepted' &&
+      (payload.outcome.state.sessionId !== sessionId ||
+        payload.outcome.state.mode !== 'executing-plan')
+    ) {
+      return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
+    }
+    return normalizePlanControlResponse(payload);
+  } catch (error: unknown) {
+    if (!controlStarted) {
+      const issueCode = runtimeIssueForTransportError(error);
+      return {
+        outcome: {
+          status: 'unavailable',
+          reasonCode: 'runtime_unavailable',
+          ...(issueCode === null ? {} : { issueCode }),
+        },
+      };
+    }
+    return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
+  }
+}
+
+/**
  * Fold the plan control outcome into the shared runtime response shape. Only
  * the status and the bounded issue code are load-bearing for the reducer; the
  * plan-specific reason codes are intentionally dropped so no raw reason text
@@ -491,6 +584,24 @@ function runtimeIssueForTransportError(error: unknown): RuntimeIssueCode | null 
   if (typeof navigator !== 'undefined' && !navigator.onLine) return 'offline';
   if (isRecord(error) && isRuntimeIssueCode(error.issueCode)) return error.issueCode;
   return null;
+}
+
+function isPlanBindingResponse(value: unknown): value is PlanBindingResponse {
+  return (
+    isRecord(value) &&
+    Object.keys(value).every((key) =>
+      ['sessionId', 'planId', 'planRevision', 'runtimeRevision', 'planToken'].includes(key),
+    ) &&
+    isOpaqueId(value.sessionId) &&
+    isOpaqueId(value.planId) &&
+    typeof value.planRevision === 'number' &&
+    Number.isSafeInteger(value.planRevision) &&
+    value.planRevision >= 0 &&
+    typeof value.runtimeRevision === 'number' &&
+    Number.isSafeInteger(value.runtimeRevision) &&
+    value.runtimeRevision >= 0 &&
+    isOpaqueToken(value.planToken)
+  );
 }
 
 /** Interrupt the running agent. A fresh one-use ticket is obtained immediately before. */

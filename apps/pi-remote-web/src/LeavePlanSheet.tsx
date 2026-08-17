@@ -16,6 +16,10 @@ export interface LeavePlanSheetProps {
   readonly onOpenChange: (open: boolean) => void;
   /** The only host mutation path; never invoked by dismissal or Stay. */
   readonly onSwitchToBuild: () => void;
+  /** Plan-ready uses the same authority-expanding confirmation with safer copy. */
+  readonly variant?: 'mode' | 'plan-ready';
+  readonly planReady?: boolean;
+  readonly onLeaveWithoutRunning?: () => void;
   /** The mode button that led here; focus returns to it on close. */
   readonly triggerRef: RefObject<HTMLButtonElement | null>;
 }
@@ -24,9 +28,13 @@ export function LeavePlanSheet({
   isOpen,
   onOpenChange,
   onSwitchToBuild,
+  variant = 'mode',
+  planReady = false,
+  onLeaveWithoutRunning,
   triggerRef,
 }: LeavePlanSheetProps) {
   const stayRef = useRef<HTMLButtonElement>(null);
+  const isPlanReady = variant === 'plan-ready' || planReady;
 
   const restoreTriggerFocus = () => {
     // The modal restores focus on its own; this timer covers paths where the
@@ -66,12 +74,7 @@ export function LeavePlanSheet({
             Pi may request write-capable tools again. The current plan will not run.
           </p>
           <div className="leave-plan-actions">
-            <Button
-              ref={stayRef}
-              type="button"
-              className="leave-plan-stay"
-              onPress={close}
-            >
+            <Button ref={stayRef} type="button" className="leave-plan-stay" onPress={close}>
               Stay in plan
             </Button>
             <Button
@@ -79,10 +82,11 @@ export function LeavePlanSheet({
               className="leave-plan-switch"
               onPress={() => {
                 onOpenChange(false);
-                onSwitchToBuild();
+                restoreTriggerFocus();
+                (onLeaveWithoutRunning ?? onSwitchToBuild)();
               }}
             >
-              Switch to Build
+              {isPlanReady ? 'Leave without running' : 'Switch to Build'}
             </Button>
           </div>
         </Dialog>

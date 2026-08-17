@@ -44,8 +44,10 @@ const relay = vi.hoisted(() => {
     fetchRuntimeSnapshot: vi.fn(),
     fetchRuntimeState: vi.fn(),
     fetchRuntimeModels: vi.fn(),
+    fetchPlanBinding: vi.fn(),
     controlRuntime: vi.fn(),
     setMode: vi.fn(),
+    executePlan: vi.fn(),
   };
 });
 
@@ -75,6 +77,25 @@ const MODELS: RuntimeModelCatalogDto = {
   models: [CURRENT_MODEL, TARGET_MODEL],
 };
 
+const PLAN_ARTIFACT = {
+  planId: 'plan_001',
+  planRevision: 2,
+  title: 'Review the bounded change',
+  summary: 'A redacted outline.',
+  stepCount: 5,
+  approachCount: 1,
+  validity: 'valid' as const,
+  occurredAt: '2026-01-01T00:00:00.000Z',
+};
+
+const PLAN_BINDING = {
+  sessionId: 'session_local',
+  planId: PLAN_ARTIFACT.planId,
+  planRevision: PLAN_ARTIFACT.planRevision,
+  runtimeRevision: HOST_STATE.revision,
+  planToken: 'token_plan_binding_abcdef0123456789',
+};
+
 function snapshot(
   state: RuntimeStateDto = HOST_STATE,
   models: RuntimeModelCatalogDto = MODELS,
@@ -90,7 +111,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.useRealTimers();
   relay.fetchRuntimeSnapshot.mockResolvedValue(snapshot());
+  relay.fetchPlanBinding.mockReset();
   relay.controlRuntime.mockResolvedValue(ACCEPTED);
+  relay.executePlan.mockReset();
 });
 
 afterEach(() => {
@@ -664,6 +687,103 @@ describe('plan-mode isolation', () => {
     );
     expect(result.current.runtime.state?.mode).toBe('plan');
     expect(result.current.runtime.state?.thinkingLevel).toBe('max');
+  });
+});
+
+describe('live plan review and atomic execute state', () => {
+  function planState(): RuntimeStateDto {
+    return {
+      ...HOST_STATE,
+      mode: 'plan',
+      plan: {
+        planId: PLAN_ARTIFACT.planId,
+        planRevision: PLAN_ARTIFACT.planRevision,
+        validity: 'valid',
+        artifact: PLAN_ARTIFACT,
+      },
+    };
+  }
+
+  it('keeps only a live newest artifact executable and clears its binding on feedback', () => {
+    const hydrated = runtimeReducer(INITIAL_RUNTIME_STATE, {
+      type: 'hydrated',
+      state: planState(),
+      models: MODELS,
+      planBinding: PLAN_BINDING,
+    });
+    expect(hydrated.planArtifact).toEqual(PLAN_ARTIFACT);
+    expect(hydrated.planLive).toBe(true);
+    expect(hydrated.planToken).toBe(PLAN_BINDING.planToken);
+
+    const reviewed = runtimeReducer(hydrated, { type: 'review-open' });
+    expect(reviewed.reviewOpen).toBe(true);
+    expect(reviewed.reviewedPlan?.artifact).toEqual(PLAN_ARTIFACT);
+
+    const superseded = runtimeReducer(reviewed, {
+      type: 'plan-invalidated',
+      validity: 'superseded',
+    });
+    expect(superseded.planLive).toBe(false);
+    expect(superseded.planToken).toBeNull();
+    expect(superseded.reviewOpen).toBe(false);
+    expect(superseded.reviewedPlan).toBeNull();
+    expect(superseded.planHistory?.at(-1)?.planRevision).toBe(PLAN_ARTIFACT.planRevision);
+
+    const replacement = runtimeReducer(superseded, {
+      type: 'plan-event',
+      artifact: { ...PLAN_ARTIFACT, planRevision: 3, title: 'Replacement plan' },
+      planToken: 'token_plan_binding_replacement_1234',
+      live: true,
+    });
+    expect(replacement.planArtifact?.planRevision).toBe(3);
+    expect(replacement.planToken).toBe('token_plan_binding_replacement_1234');
+  });
+
+  it('keeps execute pending until the atomic response and never uses a mode or prompt fallback', async () => {
+    relay.fetchRuntimeSnapshot.mockResolvedValue(snapshot(planState()));
+    relay.fetchPlanBinding.mockResolvedValue(PLAN_BINDING);
+    let resolveExecute!: (response: RuntimeControlResponse) => void;
+    relay.executePlan.mockImplementation(
+      () => new Promise<RuntimeControlResponse>((resolve) => (resolveExecute = resolve)),
+    );
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.planToken).toBe(PLAN_BINDING.planToken));
+
+    act(() => {
+      expect(result.current.openPlanReview?.()).toBe(true);
+    });
+    await waitFor(() => expect(result.current.runtime.reviewOpen).toBe(true));
+
+    let execution!: Promise<RuntimeControlResponse | null>;
+    act(() => {
+      execution = result.current.executePlan?.() ?? Promise.resolve(null);
+    });
+    await waitFor(() => expect(result.current.runtime.executePending).toBe(true));
+    expect(relay.executePlan).toHaveBeenCalledWith(
+      'session_local',
+      HOST_STATE.revision,
+      PLAN_ARTIFACT.planId,
+      PLAN_ARTIFACT.planRevision,
+      PLAN_BINDING.planToken,
+      undefined,
+      expect.any(AbortSignal),
+    );
+    expect(relay.setMode).not.toHaveBeenCalled();
+    expect(relay.controlRuntime).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveExecute({
+        outcome: {
+          status: 'accepted',
+          state: { ...planState(), revision: 5, mode: 'executing-plan' },
+        },
+      });
+      await execution;
+    });
+    expect(result.current.runtime.executePending).toBe(false);
+    expect(result.current.runtime.state?.mode).toBe('executing-plan');
+    expect(result.current.runtime.planToken).toBeNull();
+    expect(result.current.runtime.reviewOpen).toBe(false);
   });
 });
 

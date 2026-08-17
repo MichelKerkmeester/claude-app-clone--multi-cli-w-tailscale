@@ -131,6 +131,7 @@ export async function startReadOnlyServer(
   const runtimeTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
   const runtimeReconcileLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const planControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
+  const planBindingLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const activeSockets = new Set<ActiveSocket>();
   // A runtime mutation is only valid from a device that also holds a live, authenticated
   // sync socket — a background or stale device can never steer the host.
@@ -152,6 +153,7 @@ export async function startReadOnlyServer(
       runtimeControlLimiter,
       runtimeReconcileLimiter,
       planControlLimiter,
+      planBindingLimiter,
       isForegroundDevice,
     ).catch(() => sendJson(response, 400, { error: 'invalid_request' }));
   });
@@ -295,6 +297,7 @@ async function handleHttp(
   runtimeControlLimiter: FixedWindowRateLimiter,
   runtimeReconcileLimiter: FixedWindowRateLimiter,
   planControlLimiter: FixedWindowRateLimiter,
+  planBindingLimiter: FixedWindowRateLimiter,
   isForegroundDevice: (deviceId: string, token: string) => boolean,
 ): Promise<void> {
   if (
@@ -755,6 +758,41 @@ async function handleHttp(
     }
     return;
   }
+  if (ingress.path === '/api/plan/binding') {
+    const body = await readJsonBody(request);
+    if (
+      options.runtime === undefined ||
+      !isRecord(body) ||
+      !isOpaqueId(body.sessionId) ||
+      !isOpaqueId(body.planId) ||
+      !isSafeNonNegativeInteger(body.expectedRuntimeRevision) ||
+      !isSafeNonNegativeInteger(body.expectedPlanRevision)
+    ) {
+      sendJson(response, 400, { error: 'invalid_plan_binding_request' });
+      return;
+    }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (!planBindingLimiter.consume(session.deviceId)) {
+      auth.metrics.rateLimited += 1;
+      sendJson(response, 429, { error: 'rate_limited' });
+      return;
+    }
+    const binding = options.runtime.getPlanBinding({
+      sessionId: body.sessionId,
+      expectedRuntimeRevision: body.expectedRuntimeRevision,
+      planId: body.planId,
+      expectedPlanRevision: body.expectedPlanRevision,
+    });
+    if (binding === null) {
+      sendJson(response, 409, { error: 'stale_plan' });
+      return;
+    }
+    sendJson(response, 200, binding);
+    return;
+  }
   if (ingress.path === '/api/accept-edits') {
     const body = await readJsonBody(request);
     if (
@@ -955,6 +993,7 @@ function actionForRequest(path: string): string | null {
   if (path === '/api/runtime/ticket') return 'runtime-ticket:create';
   if (path === '/api/runtime/control') return 'runtime:control';
   if (path === '/api/plan/control') return 'plan:control';
+  if (path === '/api/plan/binding') return 'plan:control';
   if (path === '/api/commands/list') return 'commands:list';
   return null;
 }
@@ -1129,6 +1168,10 @@ function parseInteger(value: unknown, fallback: number, minimum: number): number
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= minimum
     ? value
     : fallback;
+}
+
+function isSafeNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
 function countDeviceSockets(sockets: ReadonlySet<ActiveSocket>, deviceId: string): number {

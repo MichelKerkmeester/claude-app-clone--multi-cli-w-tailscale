@@ -48,6 +48,14 @@ export interface RuntimeServiceOptions {
   readonly now?: () => number;
 }
 
+export interface LivePlanBinding {
+  readonly sessionId: string;
+  readonly planId: string;
+  readonly planRevision: number;
+  readonly runtimeRevision: number;
+  readonly planToken: string;
+}
+
 interface ModeWaiter {
   readonly target: RuntimeMode;
   readonly resolve: () => void;
@@ -127,7 +135,16 @@ export class RuntimeService {
       if (isPlanArtifactPublication(event)) {
         // The host is the only source of plan bindings; a malformed publication
         // drops the binding instead of guessing a plan to execute.
-        this.planArtifact = parsePlanArtifact(event);
+        const parsed = parsePlanArtifact(event);
+        if (
+          parsed !== null &&
+          this.planArtifact !== null &&
+          parsed.planId === this.planArtifact.planId &&
+          parsed.planRevision < this.planArtifact.planRevision
+        ) {
+          return;
+        }
+        this.planArtifact = parsed;
         if (this.planArtifact !== null) {
           this.planRevision = this.planArtifact.planRevision;
           this.planArtifactOccurredAt = new Date(this.now()).toISOString();
@@ -161,6 +178,40 @@ export class RuntimeService {
 
   public getRevision(): number {
     return this.revision;
+  }
+
+  /**
+   * Expose the opaque binding only to the authenticated live client immediately
+   * before it asks for execution. It is never part of a runtime DTO.
+   */
+  public getPlanBinding(input: {
+    readonly sessionId: string;
+    readonly expectedRuntimeRevision: number;
+    readonly planId: string;
+    readonly expectedPlanRevision: number;
+  }): LivePlanBinding | null {
+    if (
+      !this.live ||
+      this.currentState === null ||
+      this.currentState.sessionId !== input.sessionId ||
+      this.currentState.revision !== input.expectedRuntimeRevision ||
+      this.currentState.mode !== 'plan' ||
+      this.mode !== 'plan' ||
+      this.currentState.streaming ||
+      this.planArtifact === null ||
+      this.planArtifact.validity !== 'valid' ||
+      this.planArtifact.planId !== input.planId ||
+      this.planArtifact.planRevision !== input.expectedPlanRevision
+    ) {
+      return null;
+    }
+    return {
+      sessionId: input.sessionId,
+      planId: this.planArtifact.planId,
+      planRevision: this.planArtifact.planRevision,
+      runtimeRevision: this.revision,
+      planToken: this.planArtifact.planToken,
+    };
   }
 
   public validateModelTicketRequest(
@@ -492,6 +543,21 @@ export class RuntimeService {
     if (command.type === 'set_mode') {
       return this.applyModeSwitch(command);
     }
+    const executionPrecondition = await this.refreshExecutionPrecondition();
+    if (executionPrecondition === 'unavailable') {
+      return this.settlePlan(command.controlId, {
+        outcome: {
+          status: 'unavailable',
+          reasonCode: 'runtime_unavailable',
+          issueCode: 'host-unavailable',
+        },
+      });
+    }
+    if (executionPrecondition === 'stale') {
+      return this.settlePlan(command.controlId, {
+        outcome: { status: 'stale', state: this.currentState },
+      });
+    }
     if (!this.isExecutablePlanBinding(command)) {
       return this.settlePlan(command.controlId, {
         outcome: { status: 'stale', state: this.currentState },
@@ -500,11 +566,55 @@ export class RuntimeService {
     return this.applyPlanExecution(command);
   }
 
+  /** Re-read the turn immediately before the privileged host handoff. */
+  private async refreshExecutionPrecondition(): Promise<'ok' | 'stale' | 'unavailable'> {
+    if (this.currentState === null) return 'unavailable';
+    try {
+      const response = await this.supervisor.send({ type: 'get_state' });
+      if (response.success !== true) return 'unavailable';
+      const fresh = projectRuntimeState(dataOf(response), {
+        sessionId: this.options.sessionId,
+        revision: this.revision,
+        mode: this.mode,
+        availableThinkingLevels: this.availableThinkingLevels,
+        updatedAt: new Date(this.now()).toISOString(),
+        plan: this.planSnapshot(),
+      });
+      if (fresh === null) return 'unavailable';
+      if (!sameRuntimeState(this.currentState, fresh)) {
+        this.revision += 1;
+        const revised = projectRuntimeState(dataOf(response), {
+          sessionId: this.options.sessionId,
+          revision: this.revision,
+          mode: this.mode,
+          availableThinkingLevels: this.availableThinkingLevels,
+          updatedAt: new Date(this.now()).toISOString(),
+          plan: this.planSnapshot(),
+        });
+        if (revised === null) return 'unavailable';
+        this.currentState = revised;
+        if (this.modelCatalog !== null) {
+          this.modelCatalog = {
+            ...this.modelCatalog,
+            runtimeRevision: this.revision,
+            streaming: revised.streaming,
+          };
+        }
+        return 'stale';
+      }
+      return fresh.streaming ? 'stale' : 'ok';
+    } catch {
+      return 'unavailable';
+    }
+  }
+
   /** The exact plan binding, current Plan mode and post-run contract must all hold. */
   private isExecutablePlanBinding(command: ExecutePlanCommand): boolean {
     return (
       command.postRunMode === 'plan' &&
       this.mode === 'plan' &&
+      this.currentState?.mode === 'plan' &&
+      this.currentState.streaming === false &&
       this.planArtifact !== null &&
       this.planArtifact.validity === 'valid' &&
       command.planId === this.planArtifact.planId &&
@@ -531,9 +641,9 @@ export class RuntimeService {
 
   private async applyPlanExecution(command: ExecutePlanCommand): Promise<PlanControlResponse> {
     try {
-      ensureAccepted(
-        await this.supervisor.sendSettled({ type: 'prompt', message: '/plan execute' }),
-      );
+      // This is the dedicated host operation. It is intentionally not a prompt
+      // and cannot create transcript or model-visible content.
+      ensureAccepted(await this.supervisor.sendSettled(command as unknown as PiRpcCommand));
       await this.waitForMode('executing-plan');
       const state = this.commit(await this.supervisor.send({ type: 'get_state' }), null);
       return this.settlePlan(command.controlId, { outcome: { status: 'accepted', state } });

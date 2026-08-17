@@ -155,6 +155,7 @@ describe('Pi remote plan mode', () => {
     const fixture = createFixture();
 
     await runCommand(fixture, 'on');
+    prepareExecution(fixture);
     await runCommand(fixture, 'execute');
 
     expect(fixture.activeTools).toEqual(fixture.originalTools);
@@ -331,6 +332,38 @@ describe('Pi remote plan mode', () => {
     expect(artifact.approachIds).toHaveLength(1);
   });
 
+  it('requires the exact reviewed binding before publishing executing-plan', async () => {
+    const fixture = createFixture();
+    await runCommand(fixture, 'on');
+    const artifact = fixture.host.acceptPlan(draft('handoff'), fixture.ctx);
+
+    expect(
+      fixture.host.executePlan(
+        {
+          planId: artifact.planId,
+          planRevision: artifact.planRevision,
+          planToken: 'token_plan_binding_wrong_1234',
+        },
+        fixture.ctx,
+      ),
+    ).toBe(false);
+    expect(fixture.statusCalls.at(-1)).toEqual([STATUS_KEY, 'error']);
+    expect(fixture.activeTools).toEqual(['read', 'bash', 'grep']);
+
+    expect(
+      fixture.host.executePlan(
+        {
+          planId: artifact.planId,
+          planRevision: artifact.planRevision,
+          planToken: artifact.planToken,
+        },
+        fixture.ctx,
+      ),
+    ).toBe(true);
+    expect(fixture.activeTools).toEqual(fixture.originalTools);
+    expect(fixture.statusCalls.at(-1)).toEqual([STATUS_KEY, 'executing-plan']);
+  });
+
   it('rejects a draft that projects to an empty bounded field', () => {
     const fixture = createFixture();
 
@@ -344,6 +377,7 @@ describe('Pi remote plan mode', () => {
     const fixture = createFixture();
 
     await runCommand(fixture, 'on');
+    prepareExecution(fixture);
     await runCommand(fixture, 'execute');
     expect(fixture.activeTools).toEqual(fixture.originalTools);
 
@@ -371,6 +405,7 @@ describe('Pi remote plan mode', () => {
       const fixture = createFixture();
 
       await runCommand(fixture, 'on');
+      prepareExecution(fixture);
       await runCommand(fixture, 'execute');
       expect(fixture.statusCalls.at(-1)).toEqual([STATUS_KEY, 'executing-plan']);
 
@@ -391,6 +426,7 @@ describe('Pi remote plan mode', () => {
     const fixture = createFixture();
 
     await runCommand(fixture, 'on');
+    prepareExecution(fixture);
     await runCommand(fixture, 'execute');
     fixture.restoreWorks = false;
     runAgentEnd(fixture);
@@ -485,6 +521,10 @@ async function runCommand(fixture: ReturnType<typeof createFixture>, args: strin
   const command = fixture.registeredCommands.get('plan');
   if (!command) throw new Error('plan command was not registered');
   await command.handler(args, fixture.ctx);
+}
+
+function prepareExecution(fixture: ReturnType<typeof createFixture>): void {
+  fixture.host.acceptPlan(draft('execution'), fixture.ctx);
 }
 
 async function runTool(

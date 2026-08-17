@@ -19,6 +19,7 @@ import {
   type RuntimeOperation,
   type RuntimeSnapshotDto,
   type RuntimeStateDto,
+  type PlanArtifactDto,
 } from '@pi-remote/pi-rpc-protocol';
 
 import * as relay from './relay.js';
@@ -41,15 +42,23 @@ export type ModeTransition = 'entering-plan' | 'leaving-plan' | null;
 /** Whether the last mode mutation's delivery is known. */
 export type ModeDelivery = 'settled' | 'unknown';
 
-/**
- * The structured plan lifecycle phase. `drafting` is part of the authority
- * contract but cannot be derived here: this phase ships no plan artifact
- * surfaces, so the derivation only ever yields `none`, `ready`, or
- * `superseded` from the host snapshot.
- */
+/** The structured plan lifecycle phase derived from the host snapshot. */
 export type PlanPhase = 'none' | 'drafting' | 'ready' | 'superseded';
 
 export type TurnState = 'idle' | 'running';
+
+/** The opaque host binding is deliberately held only in this live runtime object. */
+export interface RuntimePlanBinding {
+  readonly planId: string;
+  readonly planRevision: number;
+  readonly runtimeRevision: number;
+  readonly planToken: string;
+}
+
+export interface ReviewedPlan {
+  readonly artifact: PlanArtifactDto;
+  readonly planToken: string;
+}
 
 export interface ModeAuthority {
   readonly confirmedMode: ConfirmedMode;
@@ -102,6 +111,15 @@ export interface RuntimeUiState {
   readonly error: string | null;
   readonly deliveryUnknown: boolean;
   readonly lastOutcome: RuntimeTerminalOutcome | null;
+  /** Current live artifact only; history is token-free and never executable. */
+  readonly planArtifact?: PlanArtifactDto | null;
+  readonly planLive?: boolean;
+  readonly planToken?: string | null;
+  readonly planHistory?: readonly PlanArtifactDto[];
+  readonly reviewOpen?: boolean;
+  readonly reviewedPlan?: ReviewedPlan | null;
+  readonly executePending?: boolean;
+  readonly executionError?: string | null;
 }
 
 export const INITIAL_RUNTIME_STATE: RuntimeUiState = {
@@ -117,6 +135,14 @@ export const INITIAL_RUNTIME_STATE: RuntimeUiState = {
   error: null,
   deliveryUnknown: false,
   lastOutcome: null,
+  planArtifact: null,
+  planLive: false,
+  planToken: null,
+  planHistory: [],
+  reviewOpen: false,
+  reviewedPlan: null,
+  executePending: false,
+  executionError: null,
 };
 
 export type RuntimeAction =
@@ -125,6 +151,7 @@ export type RuntimeAction =
       readonly type: 'hydrated';
       readonly state: RuntimeStateDto;
       readonly models: RuntimeModelCatalogDto;
+      readonly planBinding?: RuntimePlanBinding | null;
     }
   | {
       readonly type: 'hydrate-failed';
@@ -132,7 +159,17 @@ export type RuntimeAction =
       readonly retryAfterMs: number | null;
     }
   | { readonly type: 'control-start'; readonly operation: RuntimeOperation }
-  | { readonly type: 'control-settled'; readonly response: RuntimeControlResponse };
+  | { readonly type: 'control-settled'; readonly response: RuntimeControlResponse }
+  | {
+      readonly type: 'plan-event';
+      readonly artifact: PlanArtifactDto | null;
+      readonly planToken?: string | null;
+      readonly live: boolean;
+    }
+  | { readonly type: 'plan-invalidated'; readonly validity: 'superseded' | 'invalid' }
+  | { readonly type: 'review-open' }
+  | { readonly type: 'review-dismiss' }
+  | { readonly type: 'execute-start' };
 
 export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): RuntimeUiState {
   switch (action.type) {
@@ -148,7 +185,7 @@ export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): 
         error: null,
       };
     case 'hydrated':
-      return hydrate(current, action.state, action.models);
+      return hydrate(current, action.state, action.models, action.planBinding);
     case 'hydrate-failed':
       return {
         ...current,
@@ -169,9 +206,22 @@ export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): 
         error: null,
         deliveryUnknown: false,
         lastOutcome: null,
+        ...(action.operation.type === 'set_mode' && action.operation.mode === 'build'
+          ? clearExecutablePlan(current)
+          : {}),
       };
     case 'control-settled':
       return settle(current, action.response);
+    case 'plan-event':
+      return applyPlanEvent(current, action.artifact, action.planToken, action.live);
+    case 'plan-invalidated':
+      return invalidatePlan(current, action.validity);
+    case 'review-open':
+      return openPlanReview(current);
+    case 'review-dismiss':
+      return dismissPlanReview(current);
+    case 'execute-start':
+      return startPlanExecution(current);
     default:
       return current;
   }
@@ -181,9 +231,14 @@ function hydrate(
   current: RuntimeUiState,
   state: RuntimeStateDto,
   models: RuntimeModelCatalogDto,
+  planBinding?: RuntimePlanBinding | null,
 ): RuntimeUiState {
   // A mutation in flight keeps the machine pending; confirmed data still updates.
-  const phase = current.pending === null ? derivedReadyPhase(state, models) : 'pending';
+  const plan = hydratePlan(current, state, planBinding);
+  const phase =
+    current.pending === null && current.executePending !== true
+      ? derivedReadyPhase(state, models)
+      : 'pending';
   return {
     status: statusForPhase(phase),
     phase,
@@ -197,6 +252,7 @@ function hydrate(
     error: null,
     deliveryUnknown: false,
     lastOutcome: null,
+    ...plan,
   };
 }
 
@@ -205,6 +261,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
   switch (outcome.status) {
     case 'accepted':
       // The check moves only when the accepted response supplies the new host state.
+      const acceptedExecution = current.executePending === true;
       return {
         ...current,
         status: 'ready',
@@ -215,6 +272,9 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         error: null,
         deliveryUnknown: false,
         lastOutcome: null,
+        ...(acceptedExecution ? clearExecutablePlan(current) : {}),
+        executePending: false,
+        executionError: null,
       };
     case 'stale':
       // The host's current authoritative state replaces our stale view; retry is user-initiated.
@@ -228,6 +288,8 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         error: null,
         deliveryUnknown: false,
         lastOutcome: 'stale',
+        ...(current.executePending === true ? clearExecutablePlan(current) : {}),
+        executePending: false,
       };
     case 'unsupported':
       return {
@@ -239,6 +301,9 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         error: runtimeIssueMessage('unsupported'),
         deliveryUnknown: false,
         lastOutcome: 'unavailable',
+        ...(current.executePending === true ? clearExecutablePlan(current) : {}),
+        executePending: false,
+        executionError: runtimeIssueMessage('unsupported'),
       };
     case 'policy_blocked':
       return {
@@ -275,10 +340,206 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         error: runtimeIssueMessage('delivery-unknown'),
         deliveryUnknown: true,
         lastOutcome: 'delivery_unknown',
+        ...(current.executePending === true ? clearExecutablePlan(current) : {}),
+        executePending: false,
+        executionError: runtimeIssueMessage('delivery-unknown'),
       };
     default:
       return current;
   }
+}
+
+function hydratePlan(
+  current: RuntimeUiState,
+  state: RuntimeStateDto,
+  binding?: RuntimePlanBinding | null,
+): Pick<
+  RuntimeUiState,
+  'planArtifact' | 'planLive' | 'planToken' | 'planHistory' | 'reviewOpen' | 'reviewedPlan'
+> {
+  const snapshot = state.plan;
+  if (snapshot === undefined || snapshot.artifact === null) {
+    const validity =
+      snapshot?.validity === 'superseded' || snapshot?.validity === 'invalid'
+        ? snapshot.validity
+        : 'none';
+    return clearExecutablePlan(current, validity);
+  }
+  if (snapshot.validity !== 'valid') {
+    const cleared = clearExecutablePlan(current, snapshot.validity);
+    return {
+      ...cleared,
+      planHistory: appendPlanHistory(cleared.planHistory ?? [], snapshot.artifact),
+    };
+  }
+
+  const previous = current.planArtifact ?? null;
+  if (previous !== null && snapshot.artifact.planRevision < previous.planRevision) {
+    return {
+      ...clearExecutablePlan(current),
+      planHistory: current.planHistory ?? [],
+    };
+  }
+
+  const sameRevision =
+    previous !== null &&
+    previous.planId === snapshot.artifact.planId &&
+    previous.planRevision === snapshot.artifact.planRevision;
+  const token =
+    binding !== undefined &&
+    binding !== null &&
+    binding.planId === snapshot.artifact.planId &&
+    binding.planRevision === snapshot.artifact.planRevision &&
+    binding.runtimeRevision === state.revision
+      ? binding.planToken
+      : sameRevision
+        ? (current.planToken ?? null)
+        : null;
+  const live = state.mode === 'plan' && snapshot.validity === 'valid';
+  const history =
+    previous !== null && !sameRevision
+      ? appendPlanHistory(current.planHistory ?? [], previous)
+      : (current.planHistory ?? []);
+  const reviewedCurrent = current.reviewedPlan ?? null;
+  const reviewed =
+    sameRevision && reviewedCurrent !== null && token !== null ? reviewedCurrent : null;
+  return {
+    planArtifact: snapshot.validity === 'valid' ? snapshot.artifact : null,
+    planLive: live,
+    planToken: live ? token : null,
+    planHistory: history,
+    reviewOpen: reviewed === null ? false : current.reviewOpen === true,
+    reviewedPlan: reviewed,
+  };
+}
+
+function applyPlanEvent(
+  current: RuntimeUiState,
+  artifact: PlanArtifactDto | null,
+  planToken: string | null | undefined,
+  live: boolean,
+): RuntimeUiState {
+  if (artifact === null || artifact.validity !== 'valid') {
+    const validity =
+      artifact?.validity === 'superseded' || artifact?.validity === 'invalid'
+        ? artifact.validity
+        : 'none';
+    return { ...current, ...clearExecutablePlan(current, validity) };
+  }
+  const previous = current.planArtifact ?? null;
+  if (previous !== null && artifact.planRevision < previous.planRevision) {
+    return { ...current, ...clearExecutablePlan(current) };
+  }
+  const sameRevision =
+    previous !== null &&
+    previous.planId === artifact.planId &&
+    previous.planRevision === artifact.planRevision;
+  const history =
+    previous !== null && !sameRevision
+      ? appendPlanHistory(current.planHistory ?? [], previous)
+      : (current.planHistory ?? []);
+  const nextLive = live && artifact.validity === 'valid';
+  return {
+    ...current,
+    planArtifact: artifact,
+    planLive: nextLive,
+    planToken: nextLive ? (planToken ?? (sameRevision ? (current.planToken ?? null) : null)) : null,
+    planHistory: history,
+    reviewOpen: sameRevision ? current.reviewOpen === true : false,
+    reviewedPlan: sameRevision ? (current.reviewedPlan ?? null) : null,
+  };
+}
+
+function invalidatePlan(
+  current: RuntimeUiState,
+  validity: 'superseded' | 'invalid',
+): RuntimeUiState {
+  return {
+    ...current,
+    ...clearExecutablePlan(current, validity),
+    executePending: false,
+    executionError: null,
+  };
+}
+
+function openPlanReview(current: RuntimeUiState): RuntimeUiState {
+  if (
+    current.planLive !== true ||
+    current.planArtifact === null ||
+    current.planArtifact === undefined ||
+    current.planArtifact.validity !== 'valid' ||
+    current.planToken === null ||
+    current.planToken === undefined ||
+    current.executePending === true
+  ) {
+    return current;
+  }
+  return {
+    ...current,
+    reviewOpen: true,
+    reviewedPlan: { artifact: current.planArtifact, planToken: current.planToken },
+    executionError: null,
+  };
+}
+
+function dismissPlanReview(current: RuntimeUiState): RuntimeUiState {
+  return { ...current, reviewOpen: false, reviewedPlan: null };
+}
+
+function startPlanExecution(current: RuntimeUiState): RuntimeUiState {
+  if (
+    current.reviewOpen !== true ||
+    current.reviewedPlan === null ||
+    current.reviewedPlan === undefined ||
+    current.planLive !== true ||
+    current.executePending === true ||
+    current.state?.mode !== 'plan' ||
+    current.state.streaming
+  ) {
+    return current;
+  }
+  return {
+    ...current,
+    status: 'pending',
+    phase: 'pending',
+    executePending: true,
+    executionError: null,
+    error: null,
+  };
+}
+
+function clearExecutablePlan(
+  current: RuntimeUiState,
+  validity: 'none' | 'superseded' | 'invalid' = 'superseded',
+): Pick<
+  RuntimeUiState,
+  'planArtifact' | 'planLive' | 'planToken' | 'planHistory' | 'reviewOpen' | 'reviewedPlan'
+> {
+  const history =
+    current.planArtifact === null || current.planArtifact === undefined
+      ? (current.planHistory ?? [])
+      : appendPlanHistory(current.planHistory ?? [], {
+          ...current.planArtifact,
+          validity: validity === 'none' ? current.planArtifact.validity : validity,
+        });
+  return {
+    planArtifact: null,
+    planLive: false,
+    planToken: null,
+    planHistory: history,
+    reviewOpen: false,
+    reviewedPlan: null,
+  };
+}
+
+function appendPlanHistory(
+  history: readonly PlanArtifactDto[],
+  artifact: PlanArtifactDto,
+): readonly PlanArtifactDto[] {
+  const withoutDuplicate = history.filter(
+    (item) => !(item.planId === artifact.planId && item.planRevision === artifact.planRevision),
+  );
+  return [...withoutDuplicate, artifact].slice(-20);
 }
 
 /** The ready refinement derived from a host-confirmed snapshot. */
@@ -375,6 +636,10 @@ export interface RuntimeControls {
   readonly setModel: (provider: string, modelId: string) => Promise<RuntimeControlResponse | null>;
   readonly setThinkingLevel: (level: string) => Promise<RuntimeControlResponse | null>;
   readonly setMode: (mode: 'build' | 'plan') => Promise<RuntimeControlResponse | null>;
+  readonly openPlanReview?: () => boolean;
+  readonly dismissPlanReview?: () => void;
+  readonly invalidatePlan?: (validity: 'superseded' | 'invalid') => void;
+  readonly executePlan?: (selectedApproachId?: string) => Promise<RuntimeControlResponse | null>;
 }
 
 // The mutation lane fails closed outside settled ready authority. Streaming is
@@ -440,13 +705,18 @@ export function useRuntime(sessionId: string): RuntimeControls {
       });
       dispatch({ type: 'checking', phase: checkingPhase });
       try {
-        const snapshot = await hydrateSnapshot(controller.signal);
+        const hydration = await hydrateSnapshot(sessionId, controller.signal);
         if (controller.signal.aborted || generation !== authorityGenerationRef.current) return;
-        if (snapshot.sessionId !== sessionId) {
+        if (hydration.snapshot.sessionId !== sessionId) {
           dispatch({ type: 'hydrate-failed', issueCode: 'invalid-response', retryAfterMs: null });
           return;
         }
-        dispatch({ type: 'hydrated', state: snapshot.state, models: snapshot.models });
+        dispatch({
+          type: 'hydrated',
+          state: hydration.snapshot.state,
+          models: hydration.snapshot.models,
+          planBinding: hydration.planBinding,
+        });
       } catch (error: unknown) {
         if (generation !== authorityGenerationRef.current) return;
         // An unmount or superseding refresh cancels silently; a deadline abort is
@@ -577,6 +847,80 @@ export function useRuntime(sessionId: string): RuntimeControls {
     [apply],
   );
 
+  const openPlanReview = useCallback((): boolean => {
+    const current = runtimeRef.current;
+    const next = runtimeReducer(current, { type: 'review-open' });
+    if (next === current) return false;
+    runtimeRef.current = next;
+    dispatch({ type: 'review-open' });
+    return true;
+  }, []);
+
+  const dismissPlanReview = useCallback(() => {
+    runtimeRef.current = runtimeReducer(runtimeRef.current, { type: 'review-dismiss' });
+    dispatch({ type: 'review-dismiss' });
+  }, []);
+
+  const invalidatePlan = useCallback((validity: 'superseded' | 'invalid') => {
+    runtimeRef.current = runtimeReducer(runtimeRef.current, { type: 'plan-invalidated', validity });
+    dispatch({ type: 'plan-invalidated', validity });
+  }, []);
+
+  const executePlan = useCallback(
+    async (selectedApproachId?: string): Promise<RuntimeControlResponse | null> => {
+      const current = runtimeRef.current;
+      const reviewed = current.reviewedPlan ?? null;
+      if (
+        mutationInFlightRef.current ||
+        current.state === null ||
+        current.state.mode !== 'plan' ||
+        current.state.streaming ||
+        current.deliveryUnknown ||
+        current.planLive !== true ||
+        current.executePending === true ||
+        reviewed === null
+      ) {
+        return null;
+      }
+      const transport = planExecutionTransport();
+      if (transport === null) return null;
+      const generation = authorityGenerationRef.current + 1;
+      authorityGenerationRef.current = generation;
+      mutationInFlightRef.current = true;
+      const controller = new AbortController();
+      mutationControllerRef.current = controller;
+      const deadline = window.setTimeout(() => controller.abort(), MUTATION_DEADLINE_MS);
+      runtimeRef.current = runtimeReducer(current, { type: 'execute-start' });
+      dispatch({ type: 'execute-start' });
+      try {
+        const response = await transport(
+          sessionId,
+          current.state.revision,
+          reviewed.artifact.planId,
+          reviewed.artifact.planRevision,
+          reviewed.planToken,
+          selectedApproachId,
+          controller.signal,
+        );
+        if (generation !== authorityGenerationRef.current) return null;
+        dispatch({ type: 'control-settled', response });
+        return response;
+      } catch {
+        if (generation !== authorityGenerationRef.current) return null;
+        const response: RuntimeControlResponse = {
+          outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' },
+        };
+        dispatch({ type: 'control-settled', response });
+        return response;
+      } finally {
+        window.clearTimeout(deadline);
+        mutationInFlightRef.current = false;
+        if (mutationControllerRef.current === controller) mutationControllerRef.current = null;
+      }
+    },
+    [sessionId],
+  );
+
   useEffect(() => {
     void refresh('initial');
     return () => {
@@ -587,7 +931,17 @@ export function useRuntime(sessionId: string): RuntimeControls {
     };
   }, [refresh]);
 
-  return { runtime, refresh, setModel, setThinkingLevel, setMode };
+  return {
+    runtime,
+    refresh,
+    setModel,
+    setThinkingLevel,
+    setMode,
+    openPlanReview,
+    dismissPlanReview,
+    invalidatePlan,
+    executePlan,
+  };
 }
 
 /**
@@ -602,9 +956,15 @@ export function runtimeAnnouncement(runtime: RuntimeUiState): string {
     case 'streaming':
       return 'Available when the current turn ends.';
     case 'pending':
-      return runtime.pending === null ? 'Working…' : 'Applying change…';
+      return runtime.executePending === true
+        ? 'Preparing reviewed plan…'
+        : runtime.pending === null
+          ? 'Working…'
+          : 'Applying change…';
     case 'accepted':
-      return 'Runtime change accepted.';
+      return runtime.state?.mode === 'executing-plan'
+        ? 'Approved plan execution started.'
+        : 'Runtime change accepted.';
     case 'stale':
       return 'The host runtime changed. Refreshed.';
     case 'unsupported':
@@ -630,14 +990,109 @@ export function runtimeAnnouncement(runtime: RuntimeUiState): string {
  * Prefer the bounded reconcile snapshot; compose it from the two read-only
  * endpoints when the transport does not expose the reconcile function.
  */
-async function hydrateSnapshot(signal: AbortSignal): Promise<RuntimeSnapshotDto> {
+interface RuntimeHydration {
+  readonly snapshot: RuntimeSnapshotDto;
+  readonly planBinding: RuntimePlanBinding | null;
+}
+
+async function hydrateSnapshot(sessionId: string, signal: AbortSignal): Promise<RuntimeHydration> {
   const reconcileTransport = snapshotTransport();
-  if (reconcileTransport !== null) return reconcileTransport(signal);
-  const [state, models] = await Promise.all([
-    relay.fetchRuntimeState(signal),
-    relay.fetchRuntimeModels(signal),
-  ]);
-  return { sessionId: state.sessionId, state, models };
+  const snapshot =
+    reconcileTransport !== null
+      ? await reconcileTransport(signal)
+      : await (async () => {
+          const [state, models] = await Promise.all([
+            relay.fetchRuntimeState(signal),
+            relay.fetchRuntimeModels(signal),
+          ]);
+          return { sessionId: state.sessionId, state, models };
+        })();
+  const planBinding = await fetchLivePlanBinding(sessionId, snapshot, signal);
+  return { snapshot, planBinding };
+}
+
+async function fetchLivePlanBinding(
+  sessionId: string,
+  snapshot: RuntimeSnapshotDto,
+  signal: AbortSignal,
+): Promise<RuntimePlanBinding | null> {
+  const transport = planBindingTransport();
+  const plan = snapshot.state.plan;
+  if (
+    transport === null ||
+    plan === undefined ||
+    plan.artifact === null ||
+    plan.validity !== 'valid' ||
+    snapshot.state.mode !== 'plan' ||
+    snapshot.state.streaming
+  ) {
+    return null;
+  }
+  try {
+    return await transport(
+      sessionId,
+      snapshot.state.revision,
+      plan.artifact.planId,
+      plan.artifact.planRevision,
+      signal,
+    );
+  } catch {
+    return null;
+  }
+}
+
+function planBindingTransport():
+  | ((
+      sessionId: string,
+      expectedRuntimeRevision: number,
+      planId: string,
+      expectedPlanRevision: number,
+      signal: AbortSignal,
+    ) => Promise<RuntimePlanBinding>)
+  | null {
+  try {
+    const candidate = (relay as { fetchPlanBinding?: unknown }).fetchPlanBinding;
+    return typeof candidate === 'function'
+      ? (candidate as (
+          sessionId: string,
+          expectedRuntimeRevision: number,
+          planId: string,
+          expectedPlanRevision: number,
+          signal: AbortSignal,
+        ) => Promise<RuntimePlanBinding>)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function planExecutionTransport():
+  | ((
+      sessionId: string,
+      expectedRuntimeRevision: number,
+      planId: string,
+      expectedPlanRevision: number,
+      planToken: string,
+      selectedApproachId: string | undefined,
+      signal: AbortSignal,
+    ) => Promise<RuntimeControlResponse>)
+  | null {
+  try {
+    const candidate = (relay as { executePlan?: unknown }).executePlan;
+    return typeof candidate === 'function'
+      ? (candidate as (
+          sessionId: string,
+          expectedRuntimeRevision: number,
+          planId: string,
+          expectedPlanRevision: number,
+          planToken: string,
+          selectedApproachId: string | undefined,
+          signal: AbortSignal,
+        ) => Promise<RuntimeControlResponse>)
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 function snapshotTransport(): ((signal: AbortSignal) => Promise<RuntimeSnapshotDto>) | null {

@@ -192,6 +192,23 @@ async function waitForUnsupportedRow(client) {
   );
 }
 
+async function waitForInboundCard(client) {
+  await waitForPage(
+    client,
+    `(() => {
+      const target = document.querySelector('[data-inbound-image-card="true"]');
+      if (target !== null) return true;
+      const scroll = document.querySelector('.transcript-scroll');
+      if (scroll === null) return false;
+      scroll.scrollTop = Math.min(
+        scroll.scrollHeight,
+        scroll.scrollTop + Math.max(220, scroll.clientHeight * 0.75),
+      );
+      return false;
+    })()`,
+  );
+}
+
 async function waitForProcessExit(process) {
   if (process.exitCode !== null || process.signalCode !== null) return;
   await Promise.race([
@@ -200,7 +217,7 @@ async function waitForProcessExit(process) {
   ]);
 }
 
-async function exercise(client, theme, fixture, outputPath, viewportWidth) {
+async function exercise(client, theme, fixture, requestedState, outputPath, viewportWidth) {
   await client.send('Emulation.setDeviceMetricsOverride', {
     width: viewportWidth,
     height: 844,
@@ -208,7 +225,7 @@ async function exercise(client, theme, fixture, outputPath, viewportWidth) {
     mobile: true,
   });
   await client.send('Page.navigate', {
-    url: `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=${encodeURIComponent(fixture)}`,
+    url: `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=${encodeURIComponent(fixture)}${requestedState === null ? '' : `&state=${encodeURIComponent(requestedState)}`}`,
   });
   await waitForPage(client, 'document.readyState === "complete"');
   await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
@@ -217,7 +234,8 @@ async function exercise(client, theme, fixture, outputPath, viewportWidth) {
     `localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
   await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
-  await waitForUnsupportedRow(client);
+  if (fixture === 'inbound-media') await waitForUnsupportedRow(client);
+  else await waitForInboundCard(client);
 
   const state = await evaluate(
     client,
@@ -228,6 +246,8 @@ async function exercise(client, theme, fixture, outputPath, viewportWidth) {
         .map((node) => node.textContent ?? '')
         .filter((text) => /enable.*inbound|inbound.*enable|capture image|publish image|view inbound image|share inbound image/i.test(text));
       const unsupported = document.querySelector('[data-unsupported-kind="inbound_image"]');
+      const card = document.querySelector('[data-inbound-image-card="true"]');
+      const cardButton = card?.querySelectorAll('button, [role="button"]') ?? [];
       return {
         viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
         theme: root.dataset.theme,
@@ -238,6 +258,10 @@ async function exercise(client, theme, fixture, outputPath, viewportWidth) {
         disclosures: document.querySelectorAll('.evidence-trigger').length,
         unsupported: unsupported !== null,
         unsupportedText: unsupported?.textContent ?? '',
+        cardState: card?.getAttribute('data-image-state'),
+        cardText: card?.textContent ?? '',
+        cardButtonCount: cardButton.length,
+        cardHasVerifiedImage: card?.querySelector('[data-verified-image="true"]') !== null,
         imageElements: document.querySelectorAll('img, canvas, video, audio').length,
         enablingControls: controls,
       };
@@ -259,13 +283,35 @@ async function exercise(client, theme, fixture, outputPath, viewportWidth) {
     !state.transcript ||
     state.activity < 1 ||
     state.disclosures < 1 ||
-    !state.unsupported ||
-    !state.unsupportedText.includes('inbound_image') ||
-    !state.unsupportedText.includes('cannot be displayed') ||
-    state.imageElements !== 0 ||
     state.enablingControls.length !== 0
   ) {
-    throw new Error(`Disabled inbound-media fixture failed: ${JSON.stringify(state)}`);
+    throw new Error(`Transcript boundary fixture failed: ${JSON.stringify(state)}`);
+  }
+  if (fixture === 'inbound-media') {
+    if (
+      !state.unsupported ||
+      !state.unsupportedText.includes('inbound_image') ||
+      !state.unsupportedText.includes('cannot be displayed') ||
+      state.imageElements !== 0
+    ) {
+      throw new Error(`Disabled inbound-media fixture failed: ${JSON.stringify(state)}`);
+    }
+  } else {
+    const expectedCopy = {
+      processing: 'Preparing preview',
+      'inline-ready': '',
+      withheld: 'Preview withheld by relay policy.',
+      corrupt: 'This image couldn’t be verified.',
+    }[state.cardState ?? ''];
+    const cardButtonShapeValid =
+      requestedState === 'inline-ready' ? state.cardButtonCount === 1 : state.cardButtonCount <= 2;
+    if (
+      state.cardState !== requestedState ||
+      !cardButtonShapeValid ||
+      (expectedCopy !== undefined && !state.cardText.includes(expectedCopy))
+    ) {
+      throw new Error(`Inline image card fixture failed: ${JSON.stringify(state)}`);
+    }
   }
 
   const screenshot = await client.send('Page.captureScreenshot', {
@@ -274,16 +320,27 @@ async function exercise(client, theme, fixture, outputPath, viewportWidth) {
   });
   mkdirSync(dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, Buffer.from(screenshot.data, 'base64'));
-  return state;
+  return { ...state, expectedState: requestedState };
 }
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const fixture = options.fixture ?? 'inbound-media';
+  const state = options.state ?? null;
   const theme = requiredOption(options, 'theme');
   const output = requiredOption(options, 'screenshot');
   const viewportWidth = Number(options['viewport-width'] ?? '390');
-  if (fixture !== 'inbound-media') throw new Error(`Unsupported fixture: ${fixture}`);
+  if (fixture !== 'inbound-media' && fixture !== 'inline-card') {
+    throw new Error(`Unsupported fixture: ${fixture}`);
+  }
+  if (
+    fixture === 'inline-card' &&
+    !['processing', 'inline-ready', 'withheld', 'corrupt'].includes(state ?? '')
+  ) {
+    throw new Error(
+      `Inline card capture requires --state processing|inline-ready|withheld|corrupt`,
+    );
+  }
   if (theme !== 'light' && theme !== 'dark') throw new Error(`Unsupported theme: ${theme}`);
   if (!Number.isInteger(viewportWidth) || viewportWidth !== 390) {
     throw new Error(`This harness requires exactly 390 CSS pixels, got ${viewportWidth}`);
@@ -323,9 +380,9 @@ async function main() {
     await cdp.connect();
     await cdp.send('Page.enable');
     await cdp.send('Runtime.enable');
-    const state = await exercise(cdp, theme, fixture, outputPath, viewportWidth);
+    const capture = await exercise(cdp, theme, fixture, state, outputPath, viewportWidth);
     console.log(
-      `CDP passed: ${theme} inbound-media disabled fixture, ${state.viewportWidth} CSS-pixel width, transcript/disclosure boundaries preserved, no media elements or enable controls, screenshot ${outputPath}`,
+      `CDP passed: ${theme} ${fixture}${state === null ? '' : `/${state}`}, ${capture.viewportWidth} CSS-pixel width, transcript/card boundaries preserved, screenshot ${outputPath}`,
     );
   } finally {
     cdp?.close();

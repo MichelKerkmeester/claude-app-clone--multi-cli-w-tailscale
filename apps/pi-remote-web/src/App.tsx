@@ -37,6 +37,7 @@ import { installCacheRevalidation, loadCache, saveCache, type ReadOnlyCache } fr
 import { ArtifactCard } from './artifacts/ArtifactCard.js';
 import { ArtifactViewerProvider } from './artifacts/ArtifactViewerProvider.js';
 import { useOptionalArtifactViewer } from './artifacts/ArtifactViewerProvider.js';
+import { InboundImageBlockView } from './artifacts/InboundImageBlockView.js';
 import {
   enrollDevice,
   establishSession,
@@ -101,6 +102,7 @@ import { RichContentRouter } from './rich-content/RichContentRouter.js';
 import {
   normalizeTranscriptBlocks,
   type NormalizedActivityBlock,
+  type NormalizedFallbackBlock,
   type NormalizedTranscriptBlock,
 } from './rich-content/normalizeTranscriptBlocks.js';
 
@@ -1495,8 +1497,8 @@ export function TranscriptList({
     [artifactSessionId, blocks, running],
   );
   const renderItems = useMemo(
-    () => groupNormalizedTranscript(normalizedBlocks),
-    [normalizedBlocks],
+    () => groupNormalizedTranscript(normalizedBlocks, blocks),
+    [blocks, normalizedBlocks],
   );
   const turnStartIds = useMemo(() => {
     // Mark the first block of every turn after the first so a boundary rule can space
@@ -1513,15 +1515,21 @@ export function TranscriptList({
 
   useEffect(() => {
     if (blocks.length > previousCountRef.current) {
+      const addedBlocks = blocks.slice(previousCountRef.current);
+      const newImageCount = addedBlocks.filter((block) => block.kind === 'inbound_image').length;
       const completed = blocks.at(-1);
-      if (completed !== undefined) {
+      if (newImageCount > 0) {
+        setAnnouncement(
+          `${newImageCount} new image${newImageCount === 1 ? '' : 's'} from pi`,
+        );
+      } else if (completed !== undefined) {
         setAnnouncement(`${blockLabel(completed)} block completed.`);
       }
       const element = scrollRef.current;
       if (atLiveEdge && element !== null) {
         element.scrollTop = element.scrollHeight;
       } else {
-        setNewAway((count) => count + (blocks.length - previousCountRef.current));
+        setNewAway((count) => count + addedBlocks.length);
       }
     }
     previousCountRef.current = blocks.length;
@@ -1545,7 +1553,11 @@ export function TranscriptList({
             const item = renderItems[virtualItem.index];
             if (item === undefined) return null;
             const leadId =
-              item.kind === 'block' ? item.block.sourceBlockId : item.blocks[0]?.sourceBlockId;
+              item.kind === 'block' || item.kind === 'actions'
+                ? item.kind === 'block'
+                  ? item.block.sourceBlockId
+                  : item.sourceBlockId
+                : item.blocks[0]?.sourceBlockId;
             const isTurnStart = leadId !== undefined && turnStartIds.has(leadId);
             return (
               <div
@@ -1557,6 +1569,18 @@ export function TranscriptList({
               >
                 {item.kind === 'activity' ? (
                   <NormalizedActivityGroup blocks={item.blocks} />
+                ) : item.kind === 'inbound-stack' ? (
+                  <div className="inbound-image-stack">
+                    {item.blocks.map((block) => (
+                      <NormalizedTranscriptBlockView
+                        key={block.blockId}
+                        block={block}
+                        sessionId={artifactSessionId}
+                      />
+                    ))}
+                  </div>
+                ) : item.kind === 'actions' ? (
+                  <AssistantActions text={item.text} />
                 ) : (
                   <NormalizedTranscriptBlockView block={item.block} sessionId={artifactSessionId} />
                 )}
@@ -1636,27 +1660,99 @@ type RenderItem =
       readonly kind: 'activity';
       readonly id: string;
       readonly blocks: readonly NormalizedActivityBlock[];
+    }
+  | {
+      readonly kind: 'inbound-stack';
+      readonly id: string;
+      readonly blocks: readonly NormalizedFallbackBlock[];
+    }
+  | {
+      readonly kind: 'actions';
+      readonly id: string;
+      readonly sourceBlockId: string;
+      readonly text: string;
     };
 
-function groupNormalizedTranscript(blocks: readonly NormalizedTranscriptBlock[]): RenderItem[] {
+function groupNormalizedSequence(blocks: readonly NormalizedTranscriptBlock[]): RenderItem[] {
   const items: RenderItem[] = [];
   let run: NormalizedActivityBlock[] = [];
-  const flush = () => {
+  let imageRun: NormalizedFallbackBlock[] = [];
+  const flushActivity = () => {
     const first = run[0];
     if (first !== undefined) {
       items.push({ kind: 'activity', id: `activity-${first.blockId}`, blocks: run });
     }
     run = [];
   };
+  const flushImages = () => {
+    const first = imageRun[0];
+    if (first !== undefined) {
+      items.push({ kind: 'inbound-stack', id: `inbound-stack-${first.blockId}`, blocks: imageRun });
+    }
+    imageRun = [];
+  };
   for (const block of blocks) {
     if (block.kind === 'activity') {
+      flushImages();
       run.push(block);
+    } else if (isInboundImageFallback(block)) {
+      flushActivity();
+      imageRun.push(block);
     } else {
-      flush();
+      flushImages();
+      flushActivity();
       items.push({ kind: 'block', id: block.blockId, block });
     }
   }
-  flush();
+  flushImages();
+  flushActivity();
+  return items;
+}
+
+function isInboundImageFallback(
+  block: NormalizedTranscriptBlock,
+): block is NormalizedFallbackBlock & {
+  readonly sourceBlock: NormalizedFallbackBlock['sourceBlock'] & { readonly kind: 'inbound_image' };
+} {
+  return block.kind === 'fallback' && block.sourceBlock.kind === 'inbound_image';
+}
+
+function groupNormalizedTranscript(
+  blocks: readonly NormalizedTranscriptBlock[],
+  sourceBlocks: readonly DisplayTranscriptBlock[],
+): RenderItem[] {
+  const turns = groupBlocksIntoTurns(sourceBlocks);
+  if (turns.length === 0) return groupNormalizedSequence(blocks);
+  const turnIndexes = new Map<string, number>();
+  turns.forEach((turn, index) => {
+    turn.blocks.forEach((block) => turnIndexes.set(block.id, index));
+  });
+  const buckets = turns.map(() => [] as NormalizedTranscriptBlock[]);
+  const unassigned: NormalizedTranscriptBlock[] = [];
+  for (const block of blocks) {
+    const index = turnIndexes.get(block.sourceBlockId);
+    if (index === undefined) unassigned.push(block);
+    else buckets[index]?.push(block);
+  }
+  const items: RenderItem[] = [];
+  turns.forEach((turn, index) => {
+    items.push(...groupNormalizedSequence(buckets[index] ?? []));
+    const answer = turn.blocks
+      .filter((block) => block.kind === 'text' && block.role === 'assistant')
+      .map((block) => (block.kind === 'text' ? block.text : null))
+      .filter((text): text is string => text !== null)
+      .join('\n\n');
+    const lastBlock = turn.blocks.at(-1);
+    if (answer.length > 0 && lastBlock !== undefined) {
+      items.push({
+        kind: 'actions',
+        id: `actions-${turn.key}`,
+        sourceBlockId: lastBlock.id,
+        text: answer,
+      });
+    }
+  });
+  if (unassigned.length > 0) items.push(...groupNormalizedSequence(unassigned));
   return items;
 }
 
@@ -1893,6 +1989,10 @@ function Block({
         </div>
       );
       break;
+    case 'inbound_image':
+      label = block.displayName;
+      content = <InboundImageBlockView block={block} sessionId={sessionId} />;
+      break;
     case 'unknown':
       label = 'Unsupported block';
       content = (
@@ -1910,6 +2010,7 @@ function Block({
   const showHeader =
     block.kind !== 'file_diff' &&
     block.kind !== 'file_preview' &&
+    block.kind !== 'inbound_image' &&
     (bare ? block.kind !== 'text' : block.kind !== 'text' && !collapsible);
   const renderAsDisclosure = collapsible && !bare;
   return (
@@ -1926,9 +2027,6 @@ function Block({
         <CollapsedEvidence summary={label}>{content}</CollapsedEvidence>
       ) : (
         content
-      )}
-      {!bare && block.kind === 'text' && block.role !== 'user' && (
-        <AssistantActions text={block.text} />
       )}
     </article>
   );
@@ -2136,6 +2234,7 @@ function blockLabel(block: DisplayTranscriptBlock): string {
     file_diff: 'File diff',
     file_preview: 'File preview',
     attachment: 'Photo attachment',
+    inbound_image: 'Image from pi',
     usage: 'Usage',
     unknown: 'Unsupported',
   };

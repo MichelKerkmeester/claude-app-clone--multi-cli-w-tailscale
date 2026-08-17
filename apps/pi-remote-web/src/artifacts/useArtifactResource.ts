@@ -16,6 +16,7 @@ import {
   type ArtifactResource,
   type ArtifactResourceBlock,
 } from '../relay.js';
+import { demoInboundArtifactResource, isDemoMode } from '../demo.js';
 
 export const ARTIFACT_RESOURCE_STALL_MS = 15_000;
 export const MAX_ARTIFACT_RESOURCE_BYTES = 50 * 1024 * 1024;
@@ -278,14 +279,52 @@ function decodeBytes(bytes: Uint8Array): string {
   return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
 }
 
-async function requireImageDecode(signal: AbortSignal): Promise<void> {
+async function requireImageDecode(
+  bytes: Uint8Array,
+  contentType: string,
+  signal: AbortSignal,
+): Promise<void> {
   if (signal.aborted) throw new DOMException('The artifact request was aborted.', 'AbortError');
+  const imageBlob = new Blob([bytes.slice()], { type: contentType });
+  if (typeof globalThis.createImageBitmap === 'function') {
+    const bitmap = await globalThis.createImageBitmap(imageBlob);
+    bitmap.close();
+    if (signal.aborted) throw new DOMException('The artifact request was aborted.', 'AbortError');
+    return;
+  }
   const ImageConstructor = globalThis.Image;
   if (typeof ImageConstructor !== 'function') throw new Error('Image decoding is unavailable.');
   const image = new ImageConstructor();
-  if (typeof image.decode !== 'function') return;
+  if (typeof image.decode !== 'function') throw new Error('Image decoding is unavailable.');
+  if (typeof FileReader === 'function') {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      const abort = () => {
+        reader.abort();
+        reject(new DOMException('The artifact request was aborted.', 'AbortError'));
+      };
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error('Image bytes could not be read.'));
+      reader.onabort = abort;
+      signal.addEventListener('abort', abort, { once: true });
+      reader.readAsDataURL(imageBlob);
+    });
+    image.src = dataUrl;
+  }
   await image.decode();
   if (signal.aborted) throw new DOMException('The artifact request was aborted.', 'AbortError');
+}
+
+function readVerifiedArtifact(
+  sessionId: string,
+  block: ArtifactResourceBlock,
+  signal: AbortSignal,
+  variant?: ArtifactReadVariant,
+): Promise<ArtifactResource> {
+  if (isDemoMode() && isInboundImageReadyBlock(block)) {
+    return demoInboundArtifactResource(sessionId, block, signal, variant ?? 'full');
+  }
+  return readArtifact(sessionId, block, signal, variant);
 }
 
 function cleanupRequest(request: ActiveRequest): void {
@@ -520,7 +559,7 @@ export function useArtifactResource(
       currentBlock,
       variant,
       controller.signal,
-      options.read ?? readArtifact,
+      options.read ?? readVerifiedArtifact,
     )
       .then(async (resource) => {
         if (!isCurrent()) return;
@@ -541,7 +580,7 @@ export function useArtifactResource(
         const secureImage =
           image && (options.requireImageDecode ?? isInboundImageReadyBlock(currentBlock));
         if (secureImage) {
-          await requireImageDecode(controller.signal);
+          await requireImageDecode(resource.bytes, resource.contentType, controller.signal);
         }
         if (!isCurrent()) return;
         const binary = image || identity.renderer === 'pdf';

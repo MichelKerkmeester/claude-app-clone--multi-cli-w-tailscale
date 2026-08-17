@@ -164,7 +164,7 @@ export interface DisplayBlockMetadata {
 
 type WebTranscriptBlock = Exclude<
   TranscriptBlock,
-  { readonly kind: 'text_artifact' | 'attachment' | 'inbound_image' }
+  { readonly kind: 'text_artifact' | 'attachment' }
 >;
 
 export type DisplayTranscriptBlock =
@@ -368,9 +368,6 @@ export function parseDisplayBlock(
 ): DisplayTranscriptBlock | null {
   const protocolValue = stripDisplayMetadata(value);
   if (isTranscriptBlock(protocolValue)) {
-    if (protocolValue.kind === 'inbound_image') {
-      return toUnknownDisplayBlock(protocolValue, provenance);
-    }
     if (protocolValue.kind === 'attachment') {
       return isRedactedAttachmentBlock(protocolValue)
         ? annotateDisplayBlock(protocolValue, provenance)
@@ -456,9 +453,6 @@ function toDisplayBlock(
 ): DisplayTranscriptBlock {
   if (block.kind === 'attachment') {
     return annotateDisplayBlock(block as RedactedAttachmentBlock, provenance);
-  }
-  if (block.kind === 'inbound_image') {
-    return toUnknownDisplayBlock(block, provenance);
   }
   return annotateDisplayBlock(block as DisplayTranscriptBlock, provenance);
 }

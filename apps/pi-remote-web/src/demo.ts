@@ -13,6 +13,13 @@
 
 import type { DeviceIdentity } from './auth.js';
 import { sha256, type AvailableModelDto, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
+import type { InboundImageBlock, InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
+import type {
+  ArtifactReadVariant,
+  ArtifactResource,
+  ArtifactResourceBlock,
+} from './relay.js';
+import type { InboundImageLifecycleState } from './artifacts/ImageStatus.js';
 
 // Opaque ids must match the protocol guard pattern ^[A-Za-z0-9][A-Za-z0-9_-]{2,127}$.
 const SESSION_IDLE = 'demo-session-refactor';
@@ -60,6 +67,11 @@ export const DEMO_INBOUND_MEDIA_FIXTURE = Object.freeze({
   availability: 'withheld',
   reason: 'capture-permission',
   capability: 'unsupported',
+});
+
+export const DEMO_INBOUND_IMAGE_CARD_FIXTURE = Object.freeze({
+  query: '?demo=1&fixture=inline-card&state=inline-ready',
+  states: ['processing', 'inline-ready', 'withheld', 'corrupt'] as const,
 });
 
 let cachedEnabled: boolean | null = null;
@@ -116,7 +128,7 @@ const DEMO_INBOUND_MEDIA_PROCESSING_BLOCK = {
 } as const;
 
 const DEMO_INBOUND_MEDIA_BLOCK = {
-  ...base('blk-inbound-processing', 9, 5),
+  ...base('blk-inbound-card', 8, 5),
   kind: 'inbound_image',
   revision: 2,
   schemaVersion: 1,
@@ -513,6 +525,71 @@ function binaryFromBase64(value: string): Uint8Array {
 const DEMO_IMAGE_BYTES = binaryFromBase64(DEMO_IMAGE_BASE64);
 const DEMO_PDF_BYTES = binaryFromBase64(DEMO_PDF_BASE64);
 
+const DEMO_INBOUND_MEDIA_READY_BLOCK: InboundImageReadyBlock = {
+  ...base('blk-inbound-card', 8, 5),
+  kind: 'inbound_image',
+  revision: 2,
+  schemaVersion: 1,
+  mediaClass: 'screenshot',
+  displayName: 'Screenshot',
+  source: 'extension',
+  availability: 'ready',
+  artifact: {
+    id: 'artifact_inbound_image_demo_001',
+    revision: 'rev_inbound_image_demo_001',
+    expiresAt: '2099-01-01T00:00:00.000Z',
+    full: {
+      digest: DEMO_IMAGE_DIGEST,
+      mediaType: 'image/png',
+      width: 320,
+      height: 200,
+      byteLength: DEMO_IMAGE_BYTES.byteLength,
+    },
+    thumbnail: {
+      digest: DEMO_IMAGE_DIGEST,
+      mediaType: 'image/png',
+      width: 160,
+      height: 100,
+      byteLength: DEMO_IMAGE_BYTES.byteLength,
+    },
+  },
+  presentation: { safeAlt: 'Shared screenshot preview' },
+  redaction: { status: 'applied' },
+  shareAllowed: false,
+  content: { kind: 'artifact-ref' },
+};
+
+const DEMO_INBOUND_IMAGE_STATES: readonly InboundImageLifecycleState[] = [
+  'processing',
+  'deferred',
+  'thumbnail-fetching',
+  'thumbnail-verifying',
+  'decoding',
+  'inline-ready',
+  'opening',
+  'full-fetching',
+  'viewer-ready',
+  'details-open',
+  'full-degraded',
+  'stalled',
+  'offline-loaded',
+  'offline-unavailable',
+  'capture-permission',
+  'withheld',
+  'denied',
+  'expired',
+  'missing',
+  'revision-conflict',
+  'corrupt',
+  'rate-limited',
+  'stale',
+  'revoked',
+  'unsupported',
+  'privacy-covered',
+  'closing',
+  'aborted',
+];
+
 function binaryPreview(
   id: string,
   artifactId: string,
@@ -661,6 +738,57 @@ function isInboundMediaFixture(): boolean {
   return fixtureName() === 'inbound-media';
 }
 
+function isInboundImageCardFixture(): boolean {
+  return fixtureName() === 'inline-card';
+}
+
+export function demoInboundMediaCapabilityOff(): boolean {
+  return isDemoMode() && isInboundMediaFixture();
+}
+
+export function demoInboundImageState(): InboundImageLifecycleState | null {
+  if (!isDemoMode() || !isInboundImageCardFixture()) return null;
+  const requested = new URLSearchParams(window.location.search).get('state');
+  return requested !== null && DEMO_INBOUND_IMAGE_STATES.includes(requested as InboundImageLifecycleState)
+    ? (requested as InboundImageLifecycleState)
+    : 'inline-ready';
+}
+
+function terminalInboundImageBlock(
+  availability: 'withheld' | 'expired' | 'revoked',
+  reason: 'capture-permission' | 'policy' | 'retention',
+): InboundImageBlock {
+  return {
+    ...base('blk-inbound-card', 8, 5),
+    revision: 2,
+    kind: 'inbound_image',
+    schemaVersion: 1,
+    mediaClass: 'screenshot',
+    displayName: 'Screenshot',
+    source: 'extension',
+    availability,
+    reason,
+    shareAllowed: false,
+    content: { kind: 'none' },
+  };
+}
+
+function demoInboundBlockForState(state: InboundImageLifecycleState): InboundImageBlock {
+  if (state === 'processing') {
+    return {
+      ...DEMO_INBOUND_MEDIA_PROCESSING_BLOCK,
+      id: 'blk-inbound-card',
+      seq: 8,
+    };
+  }
+  if (state === 'capture-permission' || state === 'withheld') {
+    return DEMO_INBOUND_MEDIA_BLOCK;
+  }
+  if (state === 'expired') return terminalInboundImageBlock('expired', 'retention');
+  if (state === 'revoked') return terminalInboundImageBlock('revoked', 'policy');
+  return DEMO_INBOUND_MEDIA_READY_BLOCK;
+}
+
 function isTextCodeShareFixture(): boolean {
   return fixtureName() === 'text-code-share';
 }
@@ -701,6 +829,9 @@ function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   }
   if (isInboundMediaFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, DEMO_INBOUND_MEDIA_PROCESSING_BLOCK, DEMO_INBOUND_MEDIA_BLOCK];
+  }
+  if (isInboundImageCardFixture() && sessionId === SESSION_IDLE) {
+    return [...session.blocks, demoInboundBlockForState(demoInboundImageState() ?? 'inline-ready')];
   }
   if (isTextCodeShareFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_TEXT_CODE_SHARE_BLOCKS];
@@ -1071,6 +1202,28 @@ export function demoArtifactBytes(block: FilePreviewBlock): Uint8Array {
   if (block.artifactId === 'artifact_image_corrupt_001') return new Uint8Array(7);
   if (block.artifactId === 'artifact_image_revision_conflict_001') return DEMO_IMAGE_BYTES.slice();
   return new Uint8Array();
+}
+
+export async function demoInboundArtifactResource(
+  _sessionId: string,
+  block: ArtifactResourceBlock,
+  signal: AbortSignal,
+  variant: ArtifactReadVariant = 'full',
+): Promise<ArtifactResource> {
+  if (signal.aborted) throw new DOMException('The artifact request was aborted.', 'AbortError');
+  if (block.kind !== 'inbound_image' || block.availability !== 'ready') {
+    throw new Error('The demo artifact revision is unavailable.');
+  }
+  const selected = block.artifact[variant];
+  const bytes = DEMO_IMAGE_BYTES.slice();
+  return {
+    bytes,
+    contentType: selected.mediaType,
+    revision: block.artifact.revision,
+    etag: `"${selected.digest}"`,
+    digest: selected.digest,
+    contentDigest: selected.digest,
+  };
 }
 
 interface FakeSocketListeners {

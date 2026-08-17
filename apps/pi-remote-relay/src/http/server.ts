@@ -8,6 +8,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import {
   approvalActionDigest,
+  isAttachmentSetManifest,
   isApprovalAuthorityConsumeRequest,
   isApprovalAuthorityRequest,
   isApprovalDecisionCommand,
@@ -30,8 +31,23 @@ import {
 import { WebSocket, WebSocketServer } from 'ws';
 
 import { AuthService, type ApplicationSession } from '../auth/auth-service.js';
+import { isAttachmentAction } from '../auth/policy.js';
 import type { ApprovalService } from '../approval/approval-service.js';
 import { FixedWindowRateLimiter } from '../auth/rate-limit.js';
+import {
+  AttachmentService,
+  type AttachmentUploadInput,
+} from '../attachments/attachment-service.js';
+import { AttachmentReaper } from '../attachments/attachment-reaper.js';
+import { UPLOAD_BODY_DEADLINE_MS } from '../attachments/attachment-limits.js';
+import {
+  AttachmentServiceError,
+  isAttachmentTicketBinding,
+  type AttachmentOwner,
+  type AttachmentSetBinding,
+  type AttachmentStatusDto,
+  type AttachmentTicketBinding,
+} from '../attachments/attachment-types.js';
 import type { CommandService } from '../commands/command-service.js';
 import type { SyncHub } from '../replay/sync.js';
 import { RuntimeIssueError, type RuntimeService } from '../runtime/runtime-service.js';
@@ -52,6 +68,7 @@ const MAX_ARTIFACT_READ_BYTES = 50 * 1024 * 1024;
 const RUNTIME_RECONCILE_RETRY_AFTER_SECONDS = '1';
 const DEFAULT_PAGE_LIMIT = 50;
 const SESSION_COOKIE = '__Host-pi_remote_session';
+const ATTACHMENT_BINARY_CONTENT_TYPE = 'application/octet-stream';
 const TAILSCALE_IDENTITY_HEADERS = [
   'tailscale-user-login',
   'tailscale-user-name',
@@ -101,6 +118,9 @@ export interface ReadOnlyServerOptions {
   readonly push?: PushService;
   readonly now?: () => number;
   readonly mediaEnabled?: boolean;
+  readonly attachments?: AttachmentService;
+  readonly attachmentReaper?: AttachmentReaper;
+  readonly attachmentSessionId?: string;
 }
 
 export interface RunningReadOnlyServer {
@@ -116,6 +136,7 @@ export async function startReadOnlyServer(
   options: ReadOnlyServerOptions,
 ): Promise<RunningReadOnlyServer> {
   assertServerConfiguration(options);
+  await options.attachments?.initialize();
   const auth =
     options.auth ??
     new AuthService({
@@ -154,11 +175,11 @@ export async function startReadOnlyServer(
       response,
       options,
       auth,
-       requestLimiter,
-       enrollmentLimiter,
-       promptLimiter,
-       artifactReadLimiter,
-       runtimeTicketLimiter,
+      requestLimiter,
+      enrollmentLimiter,
+      promptLimiter,
+      artifactReadLimiter,
+      runtimeTicketLimiter,
       runtimeControlLimiter,
       runtimeReconcileLimiter,
       planControlLimiter,
@@ -262,6 +283,11 @@ export async function startReadOnlyServer(
         active.client.close(4003, 'Authorization revoked.');
       }
     }
+    void (sessionToken === undefined
+      ? (options.attachmentReaper?.onDeviceRevoked(deviceId) ??
+        options.attachments?.cancelForDevice(deviceId))
+      : (options.attachmentReaper?.onLogout(sessionToken) ??
+        options.attachments?.cancelForSession(sessionToken)));
   });
 
   await new Promise<void>((resolve, reject) => {
@@ -285,6 +311,11 @@ export async function startReadOnlyServer(
     },
     stop: async () => {
       stopRevocationListener();
+      if (options.attachmentReaper !== undefined) {
+        await options.attachmentReaper.shutdown();
+      } else {
+        await options.attachments?.cleanupAll();
+      }
       for (const client of webSocketServer.clients) client.terminate();
       await new Promise<void>((resolve) => webSocketServer.close(() => resolve()));
       await new Promise<void>((resolve, reject) => {
@@ -336,7 +367,14 @@ async function handleHttp(
     sendJson(response, 404, { error: 'not_found' });
     return;
   }
-  if (request.method !== 'POST' && parseArtifactRoute(ingress.path) === null) {
+  const attachmentRoute = parseAttachmentRoute(ingress.path);
+  if (
+    (attachmentRoute === null &&
+      request.method !== 'POST' &&
+      parseArtifactRoute(ingress.path) === null) ||
+    (attachmentRoute !== null &&
+      request.method !== (attachmentRoute.operation === 'upload' ? 'PUT' : 'POST'))
+  ) {
     discardRequest(request);
     sendJson(response, 405, { error: 'read_only' });
     return;
@@ -415,9 +453,26 @@ async function handleHttp(
     return;
   }
 
+  if (attachmentRoute !== null) {
+    await handleAttachmentRoute(
+      request,
+      response,
+      options,
+      auth,
+      ingress,
+      session,
+      attachmentRoute,
+      isForegroundDevice,
+    );
+    return;
+  }
+
   const artifactRoute = parseArtifactRoute(ingress.path);
   if (artifactRoute !== null) {
-    if (request.method !== 'GET' || new URL(request.url ?? '/', 'http://localhost').search.length > 0) {
+    if (
+      request.method !== 'GET' ||
+      new URL(request.url ?? '/', 'http://localhost').search.length > 0
+    ) {
       discardRequest(request);
       sendArtifactFailure(response, 405);
       return;
@@ -472,12 +527,37 @@ async function handleHttp(
     return;
   }
   if (ingress.path === '/api/auth/ticket') {
+    if (hasBody(request)) {
+      const body = await readJsonBody(request);
+      const requestData = parseAttachmentTicketRequest(body);
+      if (requestData === null || options.attachments === undefined) {
+        sendJson(response, 400, { error: 'invalid_ticket_request' });
+        return;
+      }
+      if (!attachmentBindingMatchesHostSession(requestData.binding, options)) {
+        sendJson(response, 404, { error: 'not_available' });
+        return;
+      }
+      if (!isForegroundDevice(session.deviceId, session.token)) {
+        sendJson(response, 403, { error: 'foreground_required' });
+        return;
+      }
+      const owner = attachmentOwner(session, requestData.binding);
+      if (!options.attachments.canIssueTicket(owner, requestData.binding)) {
+        sendJson(response, 404, { error: 'not_available' });
+        return;
+      }
+      sendJson(response, 201, auth.issueAttachmentTicket(session, requestData.binding));
+      return;
+    }
     await requireEmptyBody(request);
     sendJson(response, 201, auth.issueTicket(session));
     return;
   }
   if (ingress.path === '/api/auth/logout') {
     await requireEmptyBody(request);
+    await (options.attachmentReaper?.onLogout(session.token) ??
+      options.attachments?.cancelForSession(session.token));
     options.push?.unsubscribe(session.deviceId);
     auth.revokeSession(session.token);
     sendJson(response, 204, null, { 'set-cookie': expiredSessionCookie() });
@@ -485,6 +565,8 @@ async function handleHttp(
   }
   if (ingress.path === '/api/auth/revoke-device') {
     await requireEmptyBody(request);
+    await (options.attachmentReaper?.onDeviceRevoked(session.deviceId) ??
+      options.attachments?.cancelForDevice(session.deviceId));
     options.approvals?.revokePrincipal(session.principal);
     options.push?.unsubscribe(session.deviceId);
     auth.revokeDevice(session.deviceId);
@@ -919,6 +1001,352 @@ async function handleHttp(
   sendJson(response, 404, { error: 'not_found' });
 }
 
+type AttachmentRoute =
+  | { readonly operation: 'reserve' }
+  | { readonly operation: 'upload'; readonly setId: string; readonly partId: string }
+  | { readonly operation: 'status'; readonly setId: string }
+  | { readonly operation: 'cancel'; readonly setId: string };
+
+async function handleAttachmentRoute(
+  request: IncomingMessage,
+  response: ServerResponse,
+  options: ReadOnlyServerOptions,
+  auth: AuthService,
+  ingress: TrustedIngress,
+  session: ApplicationSession,
+  route: AttachmentRoute,
+  isForegroundDevice: (deviceId: string, token: string) => boolean,
+): Promise<void> {
+  const attachments = options.attachments;
+  if (attachments === undefined) {
+    discardRequest(request);
+    sendJson(response, 404, { error: 'not_found' });
+    return;
+  }
+  if (route.operation === 'reserve') {
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      rejectAttachmentRequest(request, response, 403, 'foreground_required');
+      return;
+    }
+    const ticketId = attachmentTicketFromRequest(request);
+    const consumed =
+      ticketId === null
+        ? null
+        : auth.consumeAttachmentTicket(
+            ticketId,
+            ingress.origin,
+            ingress.principal,
+            'attachment:reserve',
+          );
+    if (consumed === null) {
+      rejectAttachmentRequest(request, response, 401, 'unauthorized');
+      return;
+    }
+    const body = await readJsonBody(request);
+    if (!isAttachmentSetManifest(body)) {
+      sendJson(response, 400, { error: 'invalid_manifest' });
+      return;
+    }
+    if (
+      !attachmentBindingMatchesHostSession(consumed.binding, options) ||
+      consumed.binding.operation !== 'reserve' ||
+      consumed.binding.sessionId !== body.sessionId
+    ) {
+      sendJson(response, 401, { error: 'unauthorized' });
+      return;
+    }
+    const owner = attachmentOwner(session, consumed.binding);
+    let reservation;
+    try {
+      reservation = await attachments.reserve(owner, body, consumed.binding);
+    } catch (error: unknown) {
+      sendAttachmentError(response, error);
+      return;
+    }
+    const parts = attachments.getPartRecords(reservation.setId);
+    if (parts === null) {
+      sendJson(response, 503, { error: 'attachment_unavailable' });
+      return;
+    }
+    const common = reservation.binding;
+    const partTickets = parts.map((part) => {
+      const binding: AttachmentTicketBinding = {
+        operation: 'upload',
+        ...common,
+        setId: reservation.setId,
+        attachmentId: part.attachmentId,
+        partId: part.partId,
+        ordinal: part.item.ordinal,
+        byteLength: part.item.byteLength,
+        sha256: part.item.sha256,
+        declaredType: part.item.declaredType,
+      };
+      const ticket = auth.issueAttachmentTicket(session, binding);
+      return {
+        attachmentSetId: reservation.setId,
+        attachmentId: part.attachmentId,
+        partId: part.partId,
+        ordinal: part.item.ordinal,
+        ...ticket,
+      };
+    });
+    const statusBinding: AttachmentTicketBinding = {
+      operation: 'status',
+      ...common,
+      setId: reservation.setId,
+    };
+    const cancelBinding: AttachmentTicketBinding = {
+      operation: 'cancel',
+      ...common,
+      setId: reservation.setId,
+      reason: 'user',
+    };
+    sendJson(response, 201, {
+      attachmentSetId: reservation.setId,
+      revision: reservation.binding.expectedPromptRevision,
+      expiresAt: new Date(reservation.expiresAt).toISOString(),
+      parts: partTickets,
+      statusTicket: auth.issueAttachmentTicket(session, statusBinding),
+      cancelTicket: auth.issueAttachmentTicket(session, cancelBinding),
+    });
+    return;
+  }
+
+  if (route.operation === 'upload') {
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      rejectAttachmentRequest(request, response, 403, 'foreground_required');
+      return;
+    }
+    if (singleHeader(request.headers['content-length']) === null) {
+      rejectAttachmentRequest(request, response, 411, 'content_length_required');
+      return;
+    }
+    const contentLength = exactContentLength(request);
+    const contentType = singleHeader(request.headers['content-type']);
+    const digest = attachmentDigestFromRequest(request);
+    if (contentLength === null || contentType === null || digest === null) {
+      rejectAttachmentRequest(request, response, 400, 'invalid_upload_headers');
+      return;
+    }
+    const ticketId = attachmentTicketFromRequest(request);
+    const consumed =
+      ticketId === null
+        ? null
+        : auth.consumeAttachmentTicket(
+            ticketId,
+            ingress.origin,
+            ingress.principal,
+            'attachment:upload',
+          );
+    if (consumed === null) {
+      rejectAttachmentRequest(request, response, 401, 'unauthorized');
+      return;
+    }
+    const binding = consumed.binding;
+    const owner = attachmentOwner(session, binding);
+    if (
+      !attachmentBindingMatchesHostSession(binding, options) ||
+      binding.operation !== 'upload' ||
+      binding.setId !== route.setId ||
+      binding.partId !== route.partId ||
+      binding.byteLength !== contentLength ||
+      (contentType !== ATTACHMENT_BINARY_CONTENT_TYPE && contentType !== binding.declaredType) ||
+      binding.sha256 !== digest ||
+      !attachments.canIssueTicket(owner, binding)
+    ) {
+      rejectAttachmentRequest(request, response, 401, 'unauthorized');
+      return;
+    }
+    const deadline = setTimeout(
+      () => request.destroy(new Error('Upload body deadline.')),
+      UPLOAD_BODY_DEADLINE_MS,
+    );
+    deadline.unref?.();
+    try {
+      const upload: AttachmentUploadInput = {
+        setId: route.setId,
+        partId: route.partId,
+        contentLength,
+        declaredMime: binding.declaredType,
+        digest,
+        body: request,
+      };
+      const result = await attachments.uploadPart(upload);
+      sendJson(response, 201, {
+        attachmentSetId: result.setId,
+        partId: result.partId,
+        status: result.status,
+      });
+    } catch (error: unknown) {
+      sendAttachmentError(response, error);
+    } finally {
+      clearTimeout(deadline);
+    }
+    return;
+  }
+
+  const ticketId = attachmentTicketFromRequest(request);
+  const action = route.operation === 'status' ? 'attachment:status' : 'attachment:cancel';
+  const consumed =
+    ticketId === null
+      ? null
+      : auth.consumeAttachmentTicket(ticketId, ingress.origin, ingress.principal, action);
+  if (consumed === null) {
+    rejectAttachmentRequest(request, response, 401, 'unauthorized');
+    return;
+  }
+  const binding = consumed.binding;
+  if (!attachmentBindingMatchesHostSession(binding, options)) {
+    rejectAttachmentRequest(request, response, 401, 'unauthorized');
+    return;
+  }
+  const owner = attachmentOwner(session, binding);
+  if (binding.operation !== route.operation || binding.setId !== route.setId) {
+    rejectAttachmentRequest(request, response, 401, 'unauthorized');
+    return;
+  }
+  try {
+    await requireEmptyBody(request);
+    if (route.operation === 'status') {
+      const status = attachments.status(route.setId, owner);
+      sendJson(response, 200, status);
+    } else {
+      if (binding.operation !== 'cancel') {
+        sendJson(response, 401, { error: 'unauthorized' });
+        return;
+      }
+      await attachments.cancel(route.setId, owner, binding.reason);
+      sendJson(response, 204, null);
+    }
+  } catch (error: unknown) {
+    sendAttachmentError(response, error);
+  }
+}
+
+function attachmentOwner(
+  session: ApplicationSession,
+  binding: AttachmentTicketBinding,
+): AttachmentOwner {
+  return {
+    sessionToken: session.token,
+    sessionId: binding.sessionId,
+    sessionEpoch: binding.sessionEpoch,
+    deviceId: session.deviceId,
+    principal: session.principal,
+    origin: session.origin,
+  };
+}
+
+function attachmentBindingMatchesHostSession(
+  binding: AttachmentTicketBinding,
+  options: ReadOnlyServerOptions,
+): boolean {
+  return (
+    options.attachmentSessionId === undefined || binding.sessionId === options.attachmentSessionId
+  );
+}
+
+function parseAttachmentTicketRequest(
+  value: unknown,
+): { readonly binding: AttachmentTicketBinding } | null {
+  if (
+    !isRecord(value) ||
+    Object.keys(value).length !== 2 ||
+    typeof value.action !== 'string' ||
+    !value.action.startsWith('attachment:') ||
+    !isAttachmentTicketBinding(value.binding)
+  ) {
+    return null;
+  }
+  const action = value.action.slice('attachment:'.length);
+  return isAttachmentAction(value.action) && action === value.binding.operation
+    ? { binding: value.binding }
+    : null;
+}
+
+function attachmentTicketFromRequest(request: IncomingMessage): string | null {
+  const explicit =
+    singleHeader(request.headers['x-attachment-ticket']) ??
+    singleHeader(request.headers['x-pi-attachment-ticket']);
+  if (explicit !== null) return explicit;
+  const authorization = singleHeader(request.headers.authorization);
+  const prefix = 'UploadTicket ';
+  if (authorization === null || !authorization.startsWith(prefix)) return null;
+  const token = authorization.slice(prefix.length);
+  return isOpaqueId(token) ? token : null;
+}
+
+function attachmentDigestFromRequest(request: IncomingMessage): string | null {
+  const direct =
+    singleHeader(request.headers['x-attachment-sha256']) ??
+    singleHeader(request.headers['x-attachment-digest']) ??
+    singleHeader(request.headers['x-content-sha256']);
+  if (direct !== null) return direct;
+  const digestHeader = singleHeader(request.headers.digest);
+  if (digestHeader === null) return null;
+  const match = /^sha-256=([A-Za-z0-9_-]{43})$/u.exec(digestHeader);
+  return match?.[1] ?? null;
+}
+
+function exactContentLength(request: IncomingMessage): number | null {
+  const value = singleHeader(request.headers['content-length']);
+  if (value === null || !/^\d+$/u.test(value)) return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function rejectAttachmentRequest(
+  request: IncomingMessage,
+  response: ServerResponse,
+  status: number,
+  error: string,
+): void {
+  sendJson(response, status, { error });
+  request.destroy();
+}
+
+function sendAttachmentError(response: ServerResponse, error: unknown): void {
+  const code = error instanceof AttachmentServiceError ? error.code : 'internal';
+  const status = statusForAttachmentError(code);
+  sendJson(response, status, { error: code });
+}
+
+function statusForAttachmentError(code: string): number {
+  switch (code) {
+    case 'ownership':
+    case 'invalid_binding':
+      return 401;
+    case 'rate_limited':
+    case 'quarantine_full':
+    case 'concurrency_limited':
+      return 429;
+    case 'body_too_large':
+      return 413;
+    case 'not_found':
+      return 404;
+    case 'expired':
+    case 'cancelled':
+      return 410;
+    case 'unsupported':
+    case 'mime_mismatch':
+    case 'dimensions_exceeded':
+    case 'channels_exceeded':
+    case 'frames_exceeded':
+    case 'animated':
+      return 415;
+    case 'decode_timeout':
+      return 408;
+    case 'invalid_content_length':
+    case 'digest_mismatch':
+    case 'invalid_manifest':
+    case 'invalid_image':
+    case 'output_too_large':
+      return 400;
+    default:
+      return 503;
+  }
+}
+
 async function handleExtensionAuthority(
   request: IncomingMessage,
   response: ServerResponse,
@@ -1086,6 +1514,23 @@ function isAttachmentRoute(path: string): boolean {
   );
 }
 
+function parseAttachmentRoute(path: string): AttachmentRoute | null {
+  if (path === '/api/attachment-sets') return { operation: 'reserve' };
+  const upload = /^\/api\/attachment-sets\/([^/]+)\/parts\/([^/]+)$/u.exec(path);
+  if (upload !== null && isOpaqueId(upload[1]) && isOpaqueId(upload[2])) {
+    return { operation: 'upload', setId: upload[1], partId: upload[2] };
+  }
+  const status = /^\/api\/attachment-sets\/([^/]+)\/status$/u.exec(path);
+  if (status !== null && isOpaqueId(status[1])) {
+    return { operation: 'status', setId: status[1] };
+  }
+  const cancel = /^\/api\/attachment-sets\/([^/]+)\/cancel$/u.exec(path);
+  if (cancel !== null && isOpaqueId(cancel[1])) {
+    return { operation: 'cancel', setId: cancel[1] };
+  }
+  return null;
+}
+
 function statusForControlOutcome(result: RuntimeControlResponse | PlanControlResponse): number {
   switch (result.outcome.status) {
     case 'accepted':
@@ -1184,18 +1629,15 @@ function parseArtifactRoute(path: string): ArtifactRoute | null {
   }
 }
 
-function parseArtifactRange(value: string): { readonly start: number; readonly end: number } | null {
+function parseArtifactRange(
+  value: string,
+): { readonly start: number; readonly end: number } | null {
   const match = /^bytes=(\d+)-(\d*)$/u.exec(value.trim());
   if (match === null) return null;
   const start = Number(match[1]);
   const endText = match[2] ?? '';
   const end = endText.length === 0 ? Number.MAX_SAFE_INTEGER : Number(endText);
-  if (
-    !Number.isSafeInteger(start) ||
-    !Number.isSafeInteger(end) ||
-    start < 0 ||
-    end < start
-  ) {
+  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || end < start) {
     return null;
   }
   return { start, end };
@@ -1289,6 +1731,12 @@ function readCookie(request: IncomingMessage, name: string): string | null {
     }
   }
   return null;
+}
+
+function hasBody(request: IncomingMessage): boolean {
+  const contentLength = singleHeader(request.headers['content-length']);
+  if (contentLength !== null) return contentLength !== '0';
+  return request.headers['transfer-encoding'] !== undefined;
 }
 
 function sessionCookie(token: string, expiresAt: string, now: number): string {

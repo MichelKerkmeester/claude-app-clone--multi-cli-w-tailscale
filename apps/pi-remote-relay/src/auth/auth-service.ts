@@ -16,7 +16,18 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { EnrollmentRegistry, verifyDeviceSignature } from './enrollment.js';
-import { authorizeAction, type AuthorizedAction } from './policy.js';
+import {
+  authorizeAction,
+  isAttachmentAction,
+  type AttachmentAction,
+  type AuthorizedAction,
+} from './policy.js';
+import {
+  attachmentTicketBindingsEqual,
+  isAttachmentTicketBinding,
+  type AttachmentTicketBinding,
+  type AttachmentTicketDto,
+} from '../attachments/attachment-types.js';
 
 const DEFAULT_SESSION_TTL_MS = 15 * 60_000;
 const DEFAULT_TICKET_TTL_MS = 20_000;
@@ -57,6 +68,21 @@ interface RuntimeModelTicket extends RuntimeModelTicketResponse {
   consumed: boolean;
 }
 
+interface AttachmentTicket extends AttachmentTicketDto {
+  readonly sessionToken: string;
+  readonly deviceId: string;
+  readonly principal: string;
+  readonly origin: string;
+  readonly action: AttachmentAction;
+  readonly binding: AttachmentTicketBinding;
+  consumed: boolean;
+}
+
+export interface ConsumedAttachmentTicket {
+  readonly session: ApplicationSession;
+  readonly binding: AttachmentTicketBinding;
+}
+
 export interface AuthMetrics {
   bootstrap: number;
   sessionsCreated: number;
@@ -77,6 +103,7 @@ export interface AuthServiceOptions {
   readonly sessionTtlMs?: number;
   readonly ticketTtlMs?: number;
   readonly runtimeTicketTtlMs?: number;
+  readonly attachmentTicketTtlMs?: number;
 }
 
 /** Coordinate device proof, short sessions, one-use tickets and revocation. */
@@ -86,10 +113,12 @@ export class AuthService {
   private readonly sessionTtlMs: number;
   private readonly ticketTtlMs: number;
   private readonly runtimeTicketTtlMs: number;
+  private readonly attachmentTicketTtlMs: number;
   private readonly sessionChallenges = new Map<string, PendingSessionChallenge>();
   private readonly sessions = new Map<string, ApplicationSession>();
   private readonly tickets = new Map<string, WebSocketTicket>();
   private readonly runtimeTickets = new Map<string, RuntimeModelTicket>();
+  private readonly attachmentTickets = new Map<string, AttachmentTicket>();
   private readonly revocationListeners = new Set<
     (deviceId: string, sessionToken?: string) => void
   >();
@@ -111,6 +140,7 @@ export class AuthService {
     this.sessionTtlMs = options.sessionTtlMs ?? DEFAULT_SESSION_TTL_MS;
     this.ticketTtlMs = options.ticketTtlMs ?? DEFAULT_TICKET_TTL_MS;
     this.runtimeTicketTtlMs = options.runtimeTicketTtlMs ?? DEFAULT_RUNTIME_TICKET_TTL_MS;
+    this.attachmentTicketTtlMs = options.attachmentTicketTtlMs ?? 90_000;
     this.enrollment = new EnrollmentRegistry({
       origin: options.origin,
       hostId: options.hostId,
@@ -243,6 +273,7 @@ export class AuthService {
     action: AuthorizedAction = 'sync:read',
   ): ApplicationSession | null {
     this.prune();
+    if (isAttachmentAction(action)) return null;
     const ticket = this.tickets.get(ticketId);
     if (
       ticket === undefined ||
@@ -259,6 +290,66 @@ export class AuthService {
     this.tickets.delete(ticketId);
     this.metrics.ticketsConsumed += 1;
     return session;
+  }
+
+  /** Issue a ticket whose operation and all client-visible bindings are immutable. */
+  public issueAttachmentTicket(
+    session: ApplicationSession,
+    binding: AttachmentTicketBinding,
+  ): AttachmentTicketDto {
+    this.prune();
+    if (!isAttachmentTicketBinding(binding)) {
+      throw new Error('Invalid attachment ticket binding.');
+    }
+    const ticket: AttachmentTicket = {
+      ticket: opaqueId('attachment_ticket'),
+      expiresAt: new Date(this.now() + this.attachmentTicketTtlMs).toISOString(),
+      sessionToken: session.token,
+      deviceId: session.deviceId,
+      principal: session.principal,
+      origin: session.origin,
+      action: attachmentAction(binding.operation),
+      binding,
+      consumed: false,
+    };
+    this.attachmentTickets.set(ticket.ticket, ticket);
+    this.metrics.ticketsIssued += 1;
+    return { ticket: ticket.ticket, expiresAt: ticket.expiresAt };
+  }
+
+  /** Consume attachment authority before the caller reads any request body. */
+  public consumeAttachmentTicket(
+    ticketId: string,
+    origin: string,
+    principal: string,
+    action: AttachmentAction,
+    expectedBinding?: AttachmentTicketBinding,
+  ): ConsumedAttachmentTicket | null {
+    this.prune();
+    const ticket = this.attachmentTickets.get(ticketId);
+    if (
+      ticket === undefined ||
+      ticket.consumed ||
+      Date.parse(ticket.expiresAt) <= this.now() ||
+      ticket.origin !== origin ||
+      ticket.principal !== principal
+    ) {
+      return null;
+    }
+    const session = this.authenticate(ticket.sessionToken, origin, principal, action);
+    if (session === null || session.deviceId !== ticket.deviceId || ticket.action !== action) {
+      return null;
+    }
+    ticket.consumed = true;
+    this.attachmentTickets.delete(ticketId);
+    this.metrics.ticketsConsumed += 1;
+    if (
+      expectedBinding !== undefined &&
+      !attachmentTicketBindingsEqual(ticket.binding, expectedBinding)
+    ) {
+      return null;
+    }
+    return { session, binding: ticket.binding };
   }
 
   public issueRuntimeModelTicket(
@@ -373,6 +464,14 @@ export class AuthService {
         this.runtimeTickets.delete(id);
       }
     }
+    for (const [id, ticket] of this.attachmentTickets) {
+      if (
+        ticket.deviceId === deviceId &&
+        (sessionToken === undefined || ticket.sessionToken === sessionToken)
+      ) {
+        this.attachmentTickets.delete(id);
+      }
+    }
   }
 
   private emitRevocation(deviceId: string, sessionToken?: string): void {
@@ -392,10 +491,19 @@ export class AuthService {
     for (const [id, ticket] of this.runtimeTickets) {
       if (ticket.consumed || Date.parse(ticket.expiresAt) <= now) this.runtimeTickets.delete(id);
     }
+    for (const [id, ticket] of this.attachmentTickets) {
+      if (ticket.consumed || Date.parse(ticket.expiresAt) <= now) {
+        this.attachmentTickets.delete(id);
+      }
+    }
     for (const [id, session] of this.sessions) {
       if (session.revoked || Date.parse(session.expiresAt) <= now) this.sessions.delete(id);
     }
   }
+}
+
+function attachmentAction(operation: AttachmentTicketBinding['operation']): AttachmentAction {
+  return `attachment:${operation}` as AttachmentAction;
 }
 
 function publicChallenge(challenge: PendingSessionChallenge): SessionChallengeResponse {

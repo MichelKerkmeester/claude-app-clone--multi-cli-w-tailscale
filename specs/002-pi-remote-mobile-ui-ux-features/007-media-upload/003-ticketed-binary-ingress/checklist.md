@@ -1,21 +1,20 @@
 # Checklist — Ticketed Binary Ingress, Quarantine, and Cleanup
 
-- [ ] Reserve, upload, and cancel mutations require the host flag, exact origin, an enrolled authenticated device, current session, live foreground socket, and the correct one-use operation ticket.
-- [ ] Tickets are consumed before the binary body is read and cannot be replayed or used for another operation, session, device, set, part, revision, or digest.
-- [ ] The binary route requires exact `Content-Length`, counts streamed bytes, compares declared and streamed length, verifies the digest, and bypasses the global JSON reader.
-- [ ] Source and normalized bytes never enter SQLite, transcript events, sync frames, service-worker cache, public/webroot paths, or unapproved logs.
-- [ ] Length, digest, MIME, decode, dimension, animation, quota, rate, timeout, and concurrency failures leave no usable bytes.
-- [ ] Normalization enforces the source/output limits, full decode, frame/channel/pixel ceilings, orientation, 8-bit sRGB, metadata stripping, and deterministic JPEG/PNG output.
-- [ ] Source bytes are deleted after normalized derivative commit.
-- [ ] Abandoned source and derivative objects are reaped for TTL expiry, cancellation, logout, device revocation, epoch changes, shutdown, startup crash recovery, and delivery ambiguity.
-- [ ] Per-device limits are 12 attachments per five minutes and 120 MiB per hour, with approved coarse logging only.
-- [ ] Existing JSON/WebSocket limits and read-only routes are unchanged.
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npm run test` exits 0.
-- [ ] `npm run test:web` exits 0.
-- [ ] Focused relay attachment, normalization, and security suites exit 0.
-- [ ] A real CDP run uses exactly 390 CSS px in light and dark themes with the host flag off.
-- [ ] The CDP evidence shows the existing composer unchanged.
-- [ ] Every invalid authority combination is exercised against the endpoints with an authenticated foreground socket.
-- [ ] Required security review signs off the upload mutation and cleanup boundary before enablement.
-
+- [x] Reserve, upload, and cancel mutations require the host flag, exact origin, an enrolled authenticated device, current session, live foreground socket, and the correct one-use operation ticket. — `http/server.ts` handlers gate on `mediaEnabled`, authenticate, foreground, and consume the operation-specific ticket with full binding checks.
+- [x] Tickets are consumed before the binary body is read and cannot be replayed or used for another operation, session, device, set, part, revision, or digest. — `server.ts:1131` consumes `attachment:upload` before `uploadPart` reads the stream; binding verified against operation/setId/partId/byteLength/type/digest/session; one-use consume in `auth-service.ts`; negative controls pass.
+- [x] The binary route requires exact `Content-Length`, counts streamed bytes, compares declared and streamed length, verifies the digest, and bypasses the global JSON reader. — `server.ts:1120-1174` requires exact Content-Length; `uploadPart` streams with a running byte count + digest compare; a test asserts `readJsonBody` is absent from the upload path.
+- [x] Source and normalized bytes never enter SQLite, transcript events, sync frames, service-worker cache, public/webroot paths, or unapproved logs. — scan shows no `better-sqlite`/`RelayStore`/`transcript`/`syncHub`/`console.*` in service/types/decoder; quarantine asserted outside the workspace; negative-control test enforces this.
+- [x] Length, digest, MIME, decode, dimension, animation, quota, rate, timeout, and concurrency failures leave no usable bytes. — service raises typed errors and cleans source+derivative on every failure; normalizer zeroes all transient buffers in `finally`; tests cover each failure.
+- [x] Normalization enforces the source/output limits, full decode, frame/channel/pixel ceilings, orientation, 8-bit sRGB, metadata stripping, and deterministic JPEG/PNG output. — `attachment-normalizer.ts` + `attachment-decoder.ts`: header ceilings pre-decode, EXIF orientation applied, ≤2000px downscale, alpha-aware JPEG/PNG re-encode (metadata stripped by re-encode); tests pass.
+- [x] Source bytes are deleted after normalized derivative commit. — `attachment-service.ts:342-355`.
+- [x] Abandoned source and derivative objects are reaped for TTL expiry, cancellation, logout, device revocation, epoch changes, shutdown, startup crash recovery, and delivery ambiguity. — `attachment-reaper.ts:25-55` + startup purge `attachment-service.ts:149-155`.
+- [x] Per-device limits are 12 attachments per five minutes and 120 MiB per hour, with approved coarse logging only. — `auth/rate-limit.ts` + `attachment-limits.ts` coarse buckets.
+- [x] Existing JSON/WebSocket limits and read-only routes are unchanged. — full backend suite green (287/287) incl. all pre-existing auth/runtime/plan/approval/sync/artifact tests.
+- [x] `npm run typecheck` exits 0. — verified on `main`, outside sandbox.
+- [x] `npm run test` exits 0. — 287 passed / 35 files (+21 vs 266 baseline); known `auth.test.ts` flake passed; codex in-sandbox EPERM not reproduced outside sandbox.
+- [x] `npm run test:web` exits 0. — 545 passed / 44 files (delta 0).
+- [x] Focused relay attachment, normalization, and security suites exit 0. — `attachments.test.ts`, `attachment-normalization.test.ts`, `security/attachment-negative-controls.test.ts` all green.
+- [x] A real CDP run uses exactly 390 CSS px in light and dark themes with the host flag off. — headless Chrome CDP, both themes `width=390`, media disabled.
+- [x] The CDP evidence shows the existing composer unchanged. — `mediaAffordances=0`, no overflow, composer+transcript present; 390×844 PNGs inspected light+dark.
+- [x] Every invalid authority combination is exercised against the endpoints with an authenticated foreground socket. — `security/attachment-negative-controls.test.ts` exercises flag-off, wrong-op, replay, cross-session/device, bad digest/length, path-traversal, and unsupported-MIME rejection.
+- [x] Required security review signs off the upload mutation and cleanup boundary before enablement. — `adversarial-security-review.md` (this phase) + Claude's post-build security sign-off; both MUST-FIX items confirmed; flag stays OFF until Phase 5.

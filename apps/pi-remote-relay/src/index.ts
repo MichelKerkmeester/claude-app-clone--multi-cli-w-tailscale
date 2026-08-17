@@ -10,6 +10,8 @@ import type { Envelope, JsonValue, PiRpcEvent } from '@pi-remote/pi-rpc-protocol
 
 import { startReadOnlyServer } from './http/server.js';
 import { ApprovalService } from './approval/approval-service.js';
+import { AttachmentReaper } from './attachments/attachment-reaper.js';
+import { AttachmentService } from './attachments/attachment-service.js';
 import { CommandService } from './commands/command-service.js';
 import { isMediaFeatureEnabled } from './auth/policy.js';
 import { MutationPolicy } from './policy/mutation-policy.js';
@@ -20,9 +22,7 @@ import { RpcSupervisor } from './rpc/supervisor.js';
 import { RuntimeService } from './runtime/runtime-service.js';
 import { SessionCatalog } from './sessions/catalog.js';
 import { RelayStore } from './store/relay-store.js';
-import {
-  getAllowlistedArtifactSnapshot,
-} from './store/artifact-sanitizer.js';
+import { getAllowlistedArtifactSnapshot } from './store/artifact-sanitizer.js';
 import { TranscriptProjector } from './store/transcript-projector.js';
 
 const HOST_ID = 'host_local';
@@ -59,6 +59,15 @@ export async function runRelay(): Promise<() => Promise<void>> {
     identity: { hostId: HOST_ID, workspaceRef: WORKSPACE_REF },
   });
   const epoch = `epoch_${randomUUID()}`;
+  const attachmentService = new AttachmentService({
+    currentEpoch: epoch,
+    now: Date.now,
+    ...(process.env.PI_REMOTE_ATTACHMENT_QUARANTINE === undefined
+      ? {}
+      : { quarantineRoot: process.env.PI_REMOTE_ATTACHMENT_QUARANTINE }),
+  });
+  const attachmentReaper = new AttachmentReaper({ service: attachmentService });
+  await attachmentReaper.start();
   // Full access takes precedence over the mutation family path, so mutation stays off
   // whenever PI_REMOTE_FULL_ACCESS is set. Nothing downstream may require the operator
   // principal, mint an approval secret, or pass an extension authority in that mode.
@@ -117,6 +126,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
   supervisor.onLifecycle((event) => {
     if (event.reason === 'exit' || event.reason === 'restart' || event.reason === 'failed') {
       commands.invalidate();
+      void attachmentReaper.onEpochChange(epoch);
     }
   });
   supervisor.onEvent((event) => {
@@ -155,6 +165,9 @@ export async function runRelay(): Promise<() => Promise<void>> {
     commands,
     ...(push === undefined ? {} : { push }),
     mediaEnabled,
+    attachments: attachmentService,
+    attachmentReaper,
+    attachmentSessionId: SESSION_ID,
     port: relayPort,
   });
   if (mutationChildEnvironment !== null) {
@@ -282,7 +295,10 @@ function stripArtifactSnapshotSources(value: JsonValue): JsonValue {
   let changed = false;
   const output: Record<string, JsonValue> = {};
   for (const [key, child] of Object.entries(source)) {
-    if ((key === 'artifactSnapshot' || key === 'snapshot') && getAllowlistedArtifactSnapshot(child) !== null) {
+    if (
+      (key === 'artifactSnapshot' || key === 'snapshot') &&
+      getAllowlistedArtifactSnapshot(child) !== null
+    ) {
       changed = true;
       continue;
     }

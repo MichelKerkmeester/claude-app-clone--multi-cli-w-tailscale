@@ -37,7 +37,11 @@ import {
 } from '../auth/auth-service.js';
 import { isAttachmentAction } from '../auth/policy.js';
 import type { ApprovalService } from '../approval/approval-service.js';
-import { FixedWindowRateLimiter } from '../auth/rate-limit.js';
+import {
+  ArtifactReadRateLimiter,
+  FixedWindowRateLimiter,
+  type ArtifactReadVariant,
+} from '../auth/rate-limit.js';
 import {
   AttachmentService,
   type AttachmentUploadInput,
@@ -170,6 +174,7 @@ export async function startReadOnlyServer(
     60_000,
     options.now ?? Date.now,
   );
+  const inboundArtifactReadLimiter = new ArtifactReadRateLimiter(options.now ?? Date.now);
   const runtimeControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const runtimeTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
   const runtimeReconcileLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
@@ -193,6 +198,7 @@ export async function startReadOnlyServer(
       enrollmentLimiter,
       promptLimiter,
       artifactReadLimiter,
+      inboundArtifactReadLimiter,
       runtimeTicketLimiter,
       runtimeControlLimiter,
       runtimeReconcileLimiter,
@@ -348,6 +354,7 @@ async function handleHttp(
   enrollmentLimiter: FixedWindowRateLimiter,
   promptLimiter: FixedWindowRateLimiter,
   artifactReadLimiter: FixedWindowRateLimiter,
+  inboundArtifactReadLimiter: ArtifactReadRateLimiter,
   runtimeTicketLimiter: FixedWindowRateLimiter,
   runtimeControlLimiter: FixedWindowRateLimiter,
   runtimeReconcileLimiter: FixedWindowRateLimiter,
@@ -386,7 +393,8 @@ async function handleHttp(
   if (
     (attachmentRoute === null &&
       request.method !== 'POST' &&
-      parseArtifactRoute(ingress.path) === null) ||
+      parseArtifactRoute(ingress.path) === null &&
+      ingress.path !== '/api/artifacts/read') ||
     (attachmentRoute !== null &&
       request.method !== (attachmentRoute.operation === 'upload' ? 'PUT' : 'POST'))
   ) {
@@ -477,6 +485,18 @@ async function handleHttp(
       ingress,
       session,
       attachmentRoute,
+      isForegroundDevice,
+    );
+    return;
+  }
+
+  if (ingress.path === '/api/artifacts/read') {
+    await handleInboundArtifactReadRoute(
+      request,
+      response,
+      options,
+      session,
+      inboundArtifactReadLimiter,
       isForegroundDevice,
     );
     return;
@@ -1050,6 +1070,149 @@ async function handleHttp(
   }
   discardRequest(request);
   sendJson(response, 404, { error: 'not_found' });
+}
+
+interface InboundArtifactReadRequest {
+  readonly sessionId: string;
+  readonly artifactId: string;
+  readonly revision: string;
+  readonly variant: ArtifactReadVariant;
+}
+
+async function handleInboundArtifactReadRoute(
+  request: IncomingMessage,
+  response: ServerResponse,
+  options: ReadOnlyServerOptions,
+  session: ApplicationSession,
+  rateLimiter: ArtifactReadRateLimiter,
+  isForegroundDevice: (deviceId: string, token: string) => boolean,
+): Promise<void> {
+  const requestUrl = new URL(request.url ?? '/', 'http://localhost');
+  if (request.method !== 'POST') {
+    discardRequest(request);
+    sendInboundArtifactReadFailure(response, 405);
+    return;
+  }
+  if (requestUrl.search.length > 0) {
+    discardRequest(request);
+    sendInboundArtifactReadFailure(response, 400);
+    return;
+  }
+  if (!isForegroundDevice(session.deviceId, session.token)) {
+    discardRequest(request);
+    sendJson(response, 403, { error: 'foreground_required' });
+    return;
+  }
+  if (!isJsonContentType(singleHeader(request.headers['content-type']))) {
+    discardRequest(request);
+    sendInboundArtifactReadFailure(response, 400);
+    return;
+  }
+
+  let body: unknown;
+  try {
+    body = await readJsonBody(request);
+  } catch {
+    discardRequest(request);
+    sendInboundArtifactReadFailure(response, 400);
+    return;
+  }
+  const readRequest = parseInboundArtifactReadRequest(body);
+  if (readRequest === null) {
+    sendInboundArtifactReadFailure(response, 400);
+    return;
+  }
+  if (!isSessionMember(options.catalog, readRequest.sessionId)) {
+    sendInboundArtifactReadFailure(response, 404);
+    return;
+  }
+
+  const now = options.now?.() ?? Date.now();
+  const identity = {
+    sessionId: readRequest.sessionId,
+    artifactId: readRequest.artifactId,
+    revision: readRequest.revision,
+  } as const;
+  const ownsArtifactRevision = options.store.artifactStore.isInboundArtifactOwner(
+    identity,
+    session.principal,
+  );
+  const lookup = options.store.artifactStore.lookupInboundArtifact(identity, now);
+  if (lookup.status !== 'ready') {
+    const statusCode =
+      (lookup.status === 'expired' || lookup.status === 'revoked') && ownsArtifactRevision
+        ? 410
+        : lookup.status === 'missing' &&
+            options.store.artifactStore.hasInboundArtifactRevisionConflict(
+              identity,
+              session.principal,
+            )
+          ? 409
+          : 404;
+    sendInboundArtifactReadFailure(response, statusCode);
+    return;
+  }
+  if (!ownsArtifactRevision || lookup.artifact.ownerPrincipal !== session.principal) {
+    sendInboundArtifactReadFailure(response, 404);
+    return;
+  }
+
+  const admission = rateLimiter.tryAcquire(
+    session.deviceId,
+    readRequest.sessionId,
+    readRequest.variant,
+  );
+  if (!admission.allowed) {
+    sendInboundArtifactReadFailure(response, 429, admission.retryAfterSeconds);
+    return;
+  }
+
+  let released = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    rateLimiter.release(session.deviceId, readRequest.sessionId, readRequest.variant);
+  };
+  try {
+    const result = options.store.artifactStore.readInboundVariant(
+      { ...identity, variant: readRequest.variant },
+      now,
+    );
+    if (result.status !== 'ready') {
+      sendInboundArtifactReadFailure(
+        response,
+        result.status === 'expired' || result.status === 'revoked' ? 410 : 404,
+      );
+      return;
+    }
+    if (result.bytes.byteLength !== result.byteLength) {
+      sendInboundArtifactReadFailure(response, 404);
+      return;
+    }
+    response.writeHead(200, {
+      'content-type': result.mediaType,
+      'content-length': String(result.byteLength),
+      'content-digest': contentDigestHeader(result.digest),
+      etag: result.etag,
+      'content-disposition': `attachment; filename="${previewFilename(result.mediaType)}"`,
+      'cache-control': 'private, no-store, max-age=0',
+      'x-content-type-options': 'nosniff',
+      'cross-origin-resource-policy': 'same-origin',
+      'referrer-policy': 'no-referrer',
+    });
+    await new Promise<void>((resolve) => {
+      const complete = () => {
+        response.off('finish', complete);
+        response.off('close', complete);
+        resolve();
+      };
+      response.once('finish', complete);
+      response.once('close', complete);
+      response.end(result.bytes);
+    });
+  } finally {
+    release();
+  }
 }
 
 type AttachmentRoute =
@@ -1780,6 +1943,7 @@ function actionForRequest(path: string, mediaEnabled = false): string | null {
   if (path === '/api/attention' || path === '/api/attention/open') return 'attention:read';
   if (path.startsWith('/api/push/')) return 'push:manage';
   if (/^\/api\/sessions\/[^/]+\/transcript$/.test(path)) return 'transcript:read';
+  if (path === '/api/artifacts/read') return 'artifact:read';
   if (/^\/api\/sessions\/[^/]+\/artifacts\/[^/]+\/revisions\/[^/]+$/.test(path)) {
     return 'artifact:read';
   }
@@ -1937,6 +2101,51 @@ function parseArtifactRoute(path: string): ArtifactRoute | null {
   }
 }
 
+function parseInboundArtifactReadRequest(value: unknown): InboundArtifactReadRequest | null {
+  if (!isRecord(value)) return null;
+  const fields = ['sessionId', 'artifactId', 'revision', 'variant'];
+  if (
+    Object.keys(value).length !== fields.length ||
+    Object.keys(value).some((key) => !fields.includes(key))
+  ) {
+    return null;
+  }
+  if (
+    !isInboundReadToken(value.sessionId) ||
+    !isInboundReadToken(value.artifactId) ||
+    !isInboundReadToken(value.revision) ||
+    (value.variant !== 'thumbnail' && value.variant !== 'full')
+  ) {
+    return null;
+  }
+  return {
+    sessionId: value.sessionId,
+    artifactId: value.artifactId,
+    revision: value.revision,
+    variant: value.variant,
+  };
+}
+
+function isInboundReadToken(value: unknown): value is string {
+  return isOpaqueId(value) && value !== 'latest' && !/[/:\\]/u.test(value);
+}
+
+function isSessionMember(catalog: SessionCatalog, sessionId: string): boolean {
+  return catalog.list().some((session) => session.id === sessionId);
+}
+
+function isJsonContentType(value: string | null): boolean {
+  return value?.split(';', 1)[0]?.trim().toLowerCase() === 'application/json';
+}
+
+function contentDigestHeader(digest: string): string {
+  return `sha-256=:${Buffer.from(digest, 'hex').toString('base64')}:`;
+}
+
+function previewFilename(mediaType: 'image/png' | 'image/jpeg'): string {
+  return mediaType === 'image/jpeg' ? 'pi-preview.jpg' : 'pi-preview.png';
+}
+
 function parseArtifactRange(
   value: string,
 ): { readonly start: number; readonly end: number } | null {
@@ -2009,6 +2218,21 @@ function sendArtifactFailure(response: ServerResponse, statusCode: number): void
     statusCode,
     { error: 'artifact_unavailable' },
     { 'cross-origin-resource-policy': 'same-origin' },
+  );
+}
+
+function sendInboundArtifactReadFailure(
+  response: ServerResponse,
+  statusCode: number,
+  retryAfterSeconds?: number,
+): void {
+  sendJson(
+    response,
+    statusCode,
+    { error: statusCode === 429 ? 'rate_limited' : 'artifact_unavailable' },
+    retryAfterSeconds === undefined
+      ? {}
+      : { 'retry-after': String(Math.max(1, retryAfterSeconds)) },
   );
 }
 

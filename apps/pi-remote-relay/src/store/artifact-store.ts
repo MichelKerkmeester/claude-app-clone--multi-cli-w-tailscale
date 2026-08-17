@@ -145,6 +145,23 @@ export type InboundArtifactLookup =
   | { readonly status: 'ready'; readonly artifact: InboundStoredArtifact }
   | { readonly status: 'withheld' | 'missing' | 'expired' | 'revoked' };
 
+export interface InboundVariantReadInput extends ArtifactIdentity {
+  readonly variant: 'full' | 'thumbnail';
+}
+
+export interface InboundVariantReadValue {
+  readonly bytes: Buffer;
+  readonly metadata: InboundArtifactVariant;
+  readonly mediaType: InboundImageArtifactMediaType;
+  readonly byteLength: number;
+  readonly digest: string;
+  readonly etag: string;
+}
+
+export type InboundVariantReadResult =
+  | ({ readonly status: 'ready' } & InboundVariantReadValue)
+  | { readonly status: 'not-found' | 'expired' | 'revoked' };
+
 interface ManagedInboundArtifact extends InboundStoredArtifact {
   readonly fullPath: string;
   readonly thumbnailPath: string;
@@ -514,26 +531,103 @@ export class ArtifactStore {
     return lookup.status === 'ready' ? lookup.artifact : null;
   }
 
+  public hasInboundArtifactRevisionConflict(
+    identity: ArtifactIdentity,
+    principal?: string,
+  ): boolean {
+    if (identity.revision === 'latest') return false;
+    const row =
+      principal === undefined
+        ? this.database
+            .prepare(
+              `SELECT 1 FROM inbound_artifacts
+               WHERE session_id = ? AND artifact_id = ? AND revision <> ?
+               LIMIT 1`,
+            )
+            .get(identity.sessionId, identity.artifactId, identity.revision)
+        : this.database
+            .prepare(
+              `SELECT 1 FROM inbound_artifacts
+               WHERE session_id = ? AND artifact_id = ? AND revision <> ? AND owner_principal = ?
+               LIMIT 1`,
+            )
+            .get(identity.sessionId, identity.artifactId, identity.revision, principal);
+    return row !== undefined;
+  }
+
+  public isInboundArtifactOwner(identity: ArtifactIdentity, principal: string): boolean {
+    return (
+      this.database
+        .prepare(
+          `SELECT 1 FROM inbound_artifacts
+           WHERE session_id = ? AND artifact_id = ? AND revision = ? AND owner_principal = ?
+           LIMIT 1`,
+        )
+        .get(identity.sessionId, identity.artifactId, identity.revision, principal) !== undefined
+    );
+  }
+
   /** Read a final variant by exact identity; no latest or digest lookup is supported. */
+  public readInboundVariant(input: InboundVariantReadInput, now?: number): InboundVariantReadResult;
   public readInboundVariant(
     identity: ArtifactIdentity,
     variant: 'full' | 'thumbnail',
-    now = this.now(),
-  ): { readonly bytes: Buffer; readonly metadata: InboundArtifactVariant } | null {
+    now?: number,
+  ): { readonly bytes: Buffer; readonly metadata: InboundArtifactVariant } | null;
+  public readInboundVariant(
+    inputOrIdentity: InboundVariantReadInput | ArtifactIdentity,
+    variantOrNow?: 'full' | 'thumbnail' | number,
+    explicitNow?: number,
+  ):
+    | InboundVariantReadResult
+    | { readonly bytes: Buffer; readonly metadata: InboundArtifactVariant }
+    | null {
+    const isStructuredRequest = 'variant' in inputOrIdentity;
+    const identity: ArtifactIdentity = inputOrIdentity;
+    const variant = isStructuredRequest
+      ? inputOrIdentity.variant
+      : variantOrNow === 'full' || variantOrNow === 'thumbnail'
+        ? variantOrNow
+        : null;
+    const now = isStructuredRequest
+      ? typeof variantOrNow === 'number'
+        ? variantOrNow
+        : this.now()
+      : (explicitNow ?? this.now());
+    if (variant === null || identity.revision === 'latest') {
+      return isStructuredRequest ? { status: 'not-found' } : null;
+    }
     const lookup = this.lookupInboundArtifact(identity, now);
-    if (lookup.status !== 'ready') return null;
-    const artifact = this.inboundArtifacts.get(inboundKey(identity.sessionId, identity.artifactId, identity.revision));
-    if (artifact === undefined) return null;
+    if (lookup.status !== 'ready') {
+      if (!isStructuredRequest) return null;
+      if (lookup.status === 'expired' || lookup.status === 'revoked') {
+        return { status: lookup.status };
+      }
+      return { status: 'not-found' };
+    }
+    const artifact = this.inboundArtifacts.get(
+      inboundKey(identity.sessionId, identity.artifactId, identity.revision),
+    );
+    if (artifact === undefined) return isStructuredRequest ? { status: 'not-found' } : null;
     const metadata = artifact[variant];
     try {
       const bytes = readFileSync(variant === 'full' ? artifact.fullPath : artifact.thumbnailPath);
       if (bytes.byteLength !== metadata.byteLength || digestBytes(bytes) !== metadata.digest) {
         bytes.fill(0);
-        return null;
+        return isStructuredRequest ? { status: 'not-found' } : null;
       }
-      return { bytes, metadata };
+      if (!isStructuredRequest) return { bytes, metadata };
+      return {
+        status: 'ready',
+        bytes,
+        metadata,
+        mediaType: metadata.mediaType,
+        byteLength: metadata.byteLength,
+        digest: metadata.digest,
+        etag: `"${metadata.digest}"`,
+      };
     } catch {
-      return null;
+      return isStructuredRequest ? { status: 'not-found' } : null;
     }
   }
 
@@ -830,7 +924,8 @@ function inboundKey(sessionId: string, artifactId: string, revision: string): st
 }
 
 function isSafeInboundOwner(value: unknown): value is string {
-  return typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(value);
+  // Owners are the authenticated principal (email-like) and enrolled device id, so '@' is valid.
+  return typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:@-]{0,127}$/u.test(value);
 }
 
 function isInboundMediaClass(value: unknown): value is InboundImageMediaClass {

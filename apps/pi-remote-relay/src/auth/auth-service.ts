@@ -327,7 +327,8 @@ export class AuthService {
     action: AuthorizedAction = 'sync:read',
   ): ApplicationSession | null {
     this.prune();
-    if (isAttachmentAction(action)) return null;
+    // Repeatable artifact reads use the authenticated application session, never ticket authority.
+    if (action === 'artifact:read' || isAttachmentAction(action)) return null;
     const ticket = this.tickets.get(ticketId);
     if (
       ticket === undefined ||

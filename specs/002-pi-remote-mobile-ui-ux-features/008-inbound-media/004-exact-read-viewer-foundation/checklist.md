@@ -81,21 +81,21 @@ Only the four requested Markdown files belong in this phase folder; generated JS
 The phase remains open until every required checkbox below has evidence.
 <!-- /ANCHOR:summary -->
 
-- [ ] CHK-001 [P0] An authorized exact session/artifact/revision/variant tuple returns the requested sanitized variant with matching digest and ETag.
-- [ ] CHK-002 [P0] `latest`, paths, URLs, cross-session tuples, unknown fields, expired/revoked tuples, and unauthorized principals are rejected with the specified status mapping.
-- [ ] CHK-003 [P0] Reads cannot invoke pi, mint a mutation ticket, or change workspace state.
-- [ ] CHK-004 [P0] Response headers include no-store and the required content type, length, digest, ETag, disposition, nosniff, origin, and referrer controls.
-- [ ] CHK-005 [P1] Read rate limits and thumbnail/full concurrency limits are enforced.
-- [ ] CHK-006 [P0] The client creates no object URL until streamed length, SHA-256, ETag/Content-Digest, and image decode pass.
-- [ ] CHK-007 [P0] Strict Mode, close, abort, revision replacement, logout, revocation, and backgrounding leave no resource leak.
-- [ ] CHK-008 [P0] The shared provider mounts outside the virtualized transcript with deterministic history, focus, and scroll ownership.
-- [ ] CHK-009 [P0] Cache Storage, IndexedDB, localStorage, history, persisted transcript state, and service-worker caches contain no artifact resource.
-- [ ] CHK-010 [P0] The web test flips a served byte and proves corruption renders zero pixels.
-- [ ] CHK-011 [P1] The shared viewer foundation uses safe metadata only and does not introduce send/export/share/save/copy/download actions.
-- [ ] CHK-012 [P0] Security review confirms the read surface remains read-only and no-store before Phase 4 card promotion.
-- [ ] CHK-013 [P0] `npm run typecheck` passes.
-- [ ] CHK-014 [P0] `npm test` passes.
-- [ ] CHK-015 [P0] `npm run test:web` passes.
-- [ ] CHK-016 [P1] The light `viewer-shell` screenshot is written to `/private/tmp/f8-phase-3-light.png` at true 390 CSS pixels.
-- [ ] CHK-017 [P1] The dark `viewer-shell` screenshot is written to `/private/tmp/f8-phase-3-dark.png` at true 390 CSS pixels.
-- [ ] CHK-018 [P0] `npm run build` passes.
+- [x] CHK-001 [P0] An authorized exact session/artifact/revision/variant tuple returns the requested sanitized variant with matching digest and ETag. — `artifact-read.test.ts` (exact-tuple → 200 + Content-Digest + ETag).
+- [x] CHK-002 [P0] `latest`, paths, URLs, cross-session tuples, unknown fields, expired/revoked tuples, and unauthorized principals are rejected with the specified status mapping. — `artifact-read.test.ts` + `artifact-auth.test.ts` (404/410/429; rejection set).
+- [x] CHK-003 [P0] Reads cannot invoke pi, mint a mutation ticket, or change workspace state. — `artifact-auth.test.ts` asserts no ticket minted/consumed, no publish, no mutation; handler has no issueTicket/consumeTicket/pi call.
+- [x] CHK-004 [P0] Response headers include no-store and the required content type, length, digest, ETag, disposition, nosniff, origin, and referrer controls. — `artifact-headers.test.ts`; handler writes the exact header set (`server.ts:1192-1201`).
+- [x] CHK-005 [P1] Read rate limits and thumbnail/full concurrency limits are enforced. — `ArtifactReadRateLimiter` (60 thumb/30 full per 5 min; 2/1 concurrent); tested.
+- [ ] CHK-006 [P0] The client creates no object URL until streamed length, SHA-256, ETag/Content-Digest, and image decode pass. — **HELD for slice 3b** (web `useArtifactResource`; touches the white-screen suspect area).
+- [ ] CHK-007 [P0] Strict Mode, close, abort, revision replacement, logout, revocation, and backgrounding leave no resource leak. — **HELD for slice 3b** (web viewer lifecycle).
+- [ ] CHK-008 [P0] The shared provider mounts outside the virtualized transcript with deterministic history, focus, and scroll ownership. — **HELD for slice 3b** (web viewer provider).
+- [ ] CHK-009 [P0] Cache Storage, IndexedDB, localStorage, history, persisted transcript state, and service-worker caches contain no artifact resource. — **HELD for slice 3b** (`cache.ts` + `service-worker.js`).
+- [ ] CHK-010 [P0] The web test flips a served byte and proves corruption renders zero pixels. — **HELD for slice 3b** (web resource test); the relay-side flipped-byte digest failure IS covered by `artifact-headers.test.ts`.
+- [ ] CHK-011 [P1] The shared viewer foundation uses safe metadata only and does not introduce send/export/share/save/copy/download actions. — **HELD for slice 3b** (web viewer foundation).
+- [x] CHK-012 [P0] Security review confirms the read surface remains read-only and no-store before Phase 4 card promotion. — Claude read the read-route diffs: read-only exact-tuple, no ticket/pi/mutation, full no-store header set.
+- [x] CHK-013 [P0] `npm run typecheck` passes. — exit 0.
+- [x] CHK-014 [P0] `npm test` passes. — 336/336 outside sandbox (+9; the two socket-test bugs codex couldn't verify were fixed).
+- [x] CHK-015 [P0] `npm run test:web` passes. — 583/583 (relay slice touched no web file).
+- [ ] CHK-016 [P1] The light `viewer-shell` screenshot is written to `/private/tmp/...` at true 390 CSS pixels. — **HELD for slice 3b** (no viewer shell yet). The relay slice's flag-off 390px light shot is `008p3a-composer-light.png`.
+- [ ] CHK-017 [P1] The dark `viewer-shell` screenshot is written to `/private/tmp/...` at true 390 CSS pixels. — **HELD for slice 3b**. The relay slice's flag-off 390px dark shot is `008p3a-composer-dark.png`.
+- [x] CHK-018 [P0] `npm run build` passes. — exit 0.

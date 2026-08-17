@@ -13,6 +13,7 @@ import {
   type SyncDelta,
   type SyncGap,
   type SyncSnapshot,
+  type TextArtifactBlock,
   type TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 
@@ -150,7 +151,9 @@ export interface DisplayBlockMetadata {
 type WebTranscriptBlock = Exclude<TranscriptBlock, { readonly kind: 'text_artifact' }>;
 
 export type DisplayTranscriptBlock =
-  (WebTranscriptBlock & DisplayBlockMetadata) | (UnknownTranscriptBlock & DisplayBlockMetadata);
+  | (WebTranscriptBlock & DisplayBlockMetadata)
+  | (TextArtifactBlock & DisplayBlockMetadata)
+  | (UnknownTranscriptBlock & DisplayBlockMetadata);
 
 export interface TranscriptState {
   readonly sessionId: string | null;
@@ -350,7 +353,7 @@ export function parseDisplayBlock(
     return annotateDisplayBlock(protocolValue, provenance);
   }
   if (isTranscriptBlock(protocolValue) && protocolValue.kind === 'text_artifact') {
-    return toUnknownDisplayBlock(protocolValue, provenance);
+    return annotateDisplayBlock(protocolValue, provenance);
   }
   if (
     !isRecord(protocolValue) ||
@@ -428,7 +431,7 @@ function toDisplayBlock(
   block: DisplayTranscriptBlock | TranscriptBlock,
   provenance: TranscriptProvenance,
 ): DisplayTranscriptBlock {
-  return block.kind === 'text_artifact' ? toUnknownDisplayBlock(block, provenance) : block;
+  return annotateDisplayBlock(block as DisplayTranscriptBlock, provenance);
 }
 
 function toUnknownDisplayBlock(

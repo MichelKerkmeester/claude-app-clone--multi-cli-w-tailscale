@@ -115,6 +115,50 @@ describe('PWA shell and history-only cache boundary', () => {
     expect(cacheOpen).not.toHaveBeenCalled();
   });
 
+  it('fetches transcript routes without caching rich response bodies', async () => {
+    const listeners = new Map<string, (event: unknown) => void>();
+    const cacheOpen = vi.fn();
+    const fetchSpy = vi.fn(async (request: Request) => {
+      expect(request.cache).toBe('no-store');
+      return new Response('bounded transcript projection', { status: 200 });
+    });
+    const context = {
+      Request,
+      URL,
+      Promise,
+      Response,
+      fetch: fetchSpy,
+      caches: { open: cacheOpen, keys: vi.fn(), match: vi.fn(), delete: vi.fn() },
+      self: {
+        location: { origin: 'https://pi-remote.example.test' },
+        addEventListener: (type: string, listener: (event: unknown) => void) => {
+          listeners.set(type, listener);
+        },
+        skipWaiting: vi.fn(),
+        clients: { claim: vi.fn(), matchAll: vi.fn(), openWindow: vi.fn() },
+        registration: { showNotification: vi.fn() },
+      },
+    };
+    runInNewContext(SERVICE_WORKER, context);
+    const event: {
+      readonly request: Request;
+      response?: Promise<Response>;
+      respondWith: (value: Promise<Response>) => void;
+    } = {
+      request: new Request(
+        'https://pi-remote.example.test/api/sessions/session_local/transcript',
+        { method: 'GET' },
+      ),
+      respondWith(value) {
+        this.response = value;
+      },
+    };
+    listeners.get('fetch')?.(event);
+    expect(await event.response).toBeInstanceOf(Response);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(cacheOpen).not.toHaveBeenCalled();
+  });
+
   it('does not expose a stale token or authority field from persisted history', () => {
     const staleToken = 'token_should_not_escape_history';
     localStorage.setItem(
@@ -160,6 +204,63 @@ describe('PWA shell and history-only cache boundary', () => {
     const serialized = localStorage.getItem('pi-remote.read-only.v1') ?? '';
     expect(serialized).not.toContain('CACHE_ARTIFACT_SECRET');
     expect(serialized).not.toContain(FILE_PREVIEW.artifactId);
+    expect(loadCache()?.transcripts[0]?.blocks).toEqual([]);
+  });
+
+  it('does not persist rich command, output, or text-artifact bodies', () => {
+    saveCache([SESSION], {
+      ...EMPTY_TRANSCRIPT,
+      sessionId: SESSION.id,
+      source: 'relay',
+      epoch: 'epoch_cache_001',
+      coversThrough: 3,
+      blocks: [
+        {
+          id: 'rich-cache-call',
+          revision: 1,
+          seq: 1,
+          occurredAt: '2026-01-01T00:00:00.000Z',
+          kind: 'tool_call',
+          toolName: 'bash',
+          inputSummary: 'RICH_COMMAND_BODY',
+          callId: 'rich-cache-call-id',
+          shellKind: 'bash',
+          lifecycle: 'completed',
+          terminalCheckpoint: 'terminal',
+          redaction: { policyVersion: 1, fieldsRedacted: 1, reasons: ['command'] },
+        },
+        {
+          id: 'rich-cache-result',
+          revision: 1,
+          seq: 2,
+          occurredAt: '2026-01-01T00:00:00.000Z',
+          kind: 'tool_result',
+          toolName: 'bash',
+          output: 'RICH_OUTPUT_BODY',
+          isError: false,
+          callId: 'rich-cache-call-id',
+          shellKind: 'bash',
+          lifecycle: 'completed',
+          terminalCheckpoint: 'terminal',
+          outputCompleteness: 'complete',
+          redaction: { policyVersion: 1, fieldsRedacted: 1, reasons: ['output'] },
+        },
+        {
+          id: 'rich-cache-text',
+          revision: 1,
+          seq: 3,
+          occurredAt: '2026-01-01T00:00:00.000Z',
+          kind: 'text_artifact',
+          label: 'document',
+          source: 'RICH_TEXT_ARTIFACT_BODY',
+          redaction: { policyVersion: 1, fieldsRedacted: 1, reasons: ['document'] },
+        },
+      ],
+    });
+    const serialized = localStorage.getItem('pi-remote.read-only.v1') ?? '';
+    expect(serialized).not.toContain('RICH_COMMAND_BODY');
+    expect(serialized).not.toContain('RICH_OUTPUT_BODY');
+    expect(serialized).not.toContain('RICH_TEXT_ARTIFACT_BODY');
     expect(loadCache()?.transcripts[0]?.blocks).toEqual([]);
   });
 

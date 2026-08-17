@@ -1871,6 +1871,306 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+.rich-block-frame {
+  min-inline-size: 0;
+  inline-size: 100%;
+  margin-block: var(--space-3);
+  padding: var(--space-4);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-raised);
+}
+
+.rich-block-header {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  justify-content: space-between;
+  min-inline-size: 0;
+  margin-block-end: var(--space-3);
+}
+
+.rich-block-heading {
+  min-inline-size: 0;
+}
+
+.rich-block-heading h3,
+.rich-command-region h4 {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.rich-block-heading h3 {
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+}
+
+.rich-block-eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rich-block-metadata,
+.rich-block-status,
+.rich-command-region-heading,
+.rich-block-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.rich-block-metadata {
+  margin-block-start: var(--space-2);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.rich-block-metadata span + span::before {
+  margin-inline-end: var(--space-2);
+  content: '·';
+}
+
+.rich-block-status {
+  flex: 0 1 auto;
+  justify-content: flex-end;
+  color: var(--ink-muted);
+  font-size: 0.8125rem;
+  text-align: end;
+}
+
+.rich-redaction-badge {
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--ink-muted);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+.rich-block-content {
+  min-inline-size: 0;
+}
+
+.rich-block-actions {
+  margin-block-start: var(--space-4);
+}
+
+.rich-block-action {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.rich-block-action[data-hovered] {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.rich-command-region + .rich-command-region {
+  margin-block-start: var(--space-4);
+}
+
+.rich-command-region-heading {
+  justify-content: space-between;
+  margin-block-end: var(--space-2);
+}
+
+.rich-command-region h4 {
+  font-size: 0.8125rem;
+}
+
+.rich-shell-well {
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--space-3);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-code);
+  color: var(--ink-inverse);
+  font: 0.8125rem/1.45 var(--font-mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.rich-output-preview {
+  block-size: 8.5rem;
+  contain: content;
+}
+
+.rich-clipped-count,
+.rich-output-meta,
+.rich-continuation {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.rich-output-meta,
+.rich-continuation {
+  margin: var(--space-2) 0 0;
+}
+
+.rich-code-preview {
+  max-block-size: 228px;
+  min-inline-size: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.rich-code-preview pre {
+  inline-size: max-content;
+  min-inline-size: 100%;
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-code);
+  color: var(--ink-inverse);
+  font: 0.8125rem/1.45 var(--font-mono);
+  white-space: pre;
+}
+
+.rich-text-artifact-preview {
+  max-block-size: 9.5rem;
+  overflow: hidden;
+  border-block: 1px solid var(--line);
+}
+
+.rich-text-artifact-preview pre {
+  margin: 0;
+  padding-block: var(--space-3);
+  color: var(--ink);
+  font: 1rem/1.55 var(--font-display);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.rich-prose-block {
+  min-inline-size: 0;
+  max-inline-size: var(--reading-width);
+  margin-block: var(--space-3);
+}
+
+.safe-markdown,
+.safe-markdown-fallback {
+  min-inline-size: 0;
+  color: var(--ink);
+  font: 1rem/1.55 var(--font-display);
+  overflow-wrap: anywhere;
+}
+
+.safe-markdown p,
+.safe-markdown h1,
+.safe-markdown h2,
+.safe-markdown h3,
+.safe-markdown h4,
+.safe-markdown h5,
+.safe-markdown h6,
+.safe-markdown blockquote {
+  margin-block: 0 var(--space-3);
+}
+
+.safe-markdown blockquote {
+  padding-inline-start: var(--space-3);
+  border-inline-start: 3px solid var(--line-strong);
+  color: var(--ink-muted);
+}
+
+.safe-markdown ul,
+.safe-markdown ol {
+  margin-block: 0 var(--space-3);
+  padding-inline-start: 1.4rem;
+}
+
+.safe-markdown code {
+  padding: 0.1rem 0.25rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+.safe-markdown-code {
+  max-inline-size: 100%;
+  margin-block: 0 var(--space-3);
+  padding: var(--space-3);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-code);
+  color: var(--ink-inverse);
+  font: 0.8125rem/1.45 var(--font-mono);
+  white-space: pre;
+}
+
+.safe-markdown-code code {
+  padding: 0;
+  background: transparent;
+}
+
+.safe-markdown table {
+  inline-size: 100%;
+  margin-block: 0 var(--space-3);
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.safe-markdown th,
+.safe-markdown td {
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  text-align: start;
+  vertical-align: top;
+}
+
+.rich-copy-status {
+  min-block-size: 1.25rem;
+  margin: var(--space-2) 0 0;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+.rich-fallback-card,
+.rich-activity-card {
+  box-shadow: none;
+}
+
+@media (max-width: 27rem) {
+  .rich-block-frame {
+    padding: var(--space-3);
+  }
+
+  .rich-block-header {
+    display: block;
+  }
+
+  .rich-block-status {
+    justify-content: flex-start;
+    margin-block-start: var(--space-2);
+    text-align: start;
+  }
+
+  .rich-block-action {
+    flex: 1 1 10rem;
+  }
+}
+
 /* Artifact reader contract: the viewer is a bounded reading surface, while code owns its pan. */
 .artifact-viewer-modal {
   background: #ffffff;

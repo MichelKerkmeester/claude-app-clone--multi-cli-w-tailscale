@@ -94,6 +94,12 @@ import { bindingAfterDraftChange } from './insertSlashCommand.js';
 import { modeAuthority, runtimeAnnouncement, useRuntime, type RuntimeUiState } from './runtime.js';
 import { submitSlashDraft, type SlashSubmitFailureCode } from './submitSlashDraft.js';
 import { groupBlocksIntoTurns } from './turns.js';
+import { RichContentRouter } from './rich-content/RichContentRouter.js';
+import {
+  normalizeTranscriptBlocks,
+  type NormalizedActivityBlock,
+  type NormalizedTranscriptBlock,
+} from './rich-content/normalizeTranscriptBlocks.js';
 
 const initialCache = loadCache();
 type ThemePreference = 'system' | 'light' | 'dark';
@@ -1450,9 +1456,16 @@ export function TranscriptList({
     setAtLiveEdge(nearBottom);
     if (nearBottom) setNewAway(0);
   };
-  // Render items group consecutive routine evidence into one Activity disclosure; the flat
-  // block stream is untouched (no block is dropped or reordered — only how it renders).
-  const renderItems = useMemo(() => groupTranscript(blocks), [blocks]);
+  const normalizedBlocks = useMemo(
+    () =>
+      normalizeTranscriptBlocks({
+        sessionId: artifactSessionId || 'unknown-session',
+        blocks,
+        settled: !running,
+      }),
+    [artifactSessionId, blocks, running],
+  );
+  const renderItems = useMemo(() => groupNormalizedTranscript(normalizedBlocks), [normalizedBlocks]);
   const turnStartIds = useMemo(() => {
     // Mark the first block of every turn after the first so a boundary rule can space
     // consecutive turns; the derivation never mutates or drops a block.
@@ -1491,7 +1504,11 @@ export function TranscriptList({
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
-      <div className="transcript-scroll" ref={scrollRef} onScroll={onScroll}>
+      <div
+        className="transcript-scroll"
+        ref={scrollRef}
+        onScroll={onScroll}
+      >
         <div
           className="transcript-virtual"
           style={{ height: virtualizer.getTotalSize() + (running ? 72 : 0) }}
@@ -1499,7 +1516,10 @@ export function TranscriptList({
           {virtualizer.getVirtualItems().map((virtualItem) => {
             const item = renderItems[virtualItem.index];
             if (item === undefined) return null;
-            const leadId = item.kind === 'block' ? item.block.id : item.blocks[0]?.id;
+            const leadId =
+              item.kind === 'block'
+                ? item.block.sourceBlockId
+                : item.blocks[0]?.sourceBlockId;
             const isTurnStart = leadId !== undefined && turnStartIds.has(leadId);
             return (
               <div
@@ -1510,9 +1530,12 @@ export function TranscriptList({
                 style={{ transform: `translateY(${virtualItem.start}px)` }}
               >
                 {item.kind === 'activity' ? (
-                  <ActivityGroup blocks={item.blocks} sessionId={artifactSessionId} />
+                  <NormalizedActivityGroup blocks={item.blocks} />
                 ) : (
-                  <Block block={item.block} sessionId={artifactSessionId} />
+                  <NormalizedTranscriptBlockView
+                    block={item.block}
+                    sessionId={artifactSessionId}
+                  />
                 )}
               </div>
             );
@@ -1584,66 +1607,50 @@ function CollapsedEvidence({
   );
 }
 
-// Consecutive routine evidence (thinking, tool calls/results, usage) collapses into ONE
-// "Activity" disclosure so telemetry never interrupts the assistant's answer. Tool ERRORS,
-// plans, diffs, and text stay prominent and standalone (never folded away).
-function isEvidenceBlock(block: DisplayTranscriptBlock): boolean {
-  switch (block.kind) {
-    case 'thinking':
-    case 'tool_call':
-    case 'usage':
-      return true;
-    case 'tool_result':
-      return !block.isError;
-    default:
-      return false;
-  }
-}
-
 type RenderItem =
-  | { readonly kind: 'block'; readonly id: string; readonly block: DisplayTranscriptBlock }
+  | { readonly kind: 'block'; readonly id: string; readonly block: NormalizedTranscriptBlock }
   | {
       readonly kind: 'activity';
       readonly id: string;
-      readonly blocks: readonly DisplayTranscriptBlock[];
+      readonly blocks: readonly NormalizedActivityBlock[];
     };
 
-function groupTranscript(blocks: readonly DisplayTranscriptBlock[]): RenderItem[] {
+function groupNormalizedTranscript(
+  blocks: readonly NormalizedTranscriptBlock[],
+): RenderItem[] {
   const items: RenderItem[] = [];
-  let run: DisplayTranscriptBlock[] = [];
+  let run: NormalizedActivityBlock[] = [];
   const flush = () => {
     const first = run[0];
     if (first !== undefined) {
-      items.push({ kind: 'activity', id: `activity-${first.id}`, blocks: run });
+      items.push({ kind: 'activity', id: `activity-${first.blockId}`, blocks: run });
     }
     run = [];
   };
   for (const block of blocks) {
-    if (isEvidenceBlock(block)) {
+    if (block.kind === 'activity') {
       run.push(block);
     } else {
       flush();
-      items.push({ kind: 'block', id: block.id, block });
+      items.push({ kind: 'block', id: block.blockId, block });
     }
   }
   flush();
   return items;
 }
 
-function activitySummary(blocks: readonly DisplayTranscriptBlock[]): string {
-  const tools = blocks.filter((block) => block.kind === 'tool_call').length;
+function normalizedActivitySummary(blocks: readonly NormalizedActivityBlock[]): string {
+  const tools = blocks.filter((block) => block.sourceBlock.kind === 'tool_call').length;
   if (tools > 0) return `Worked · ${tools} tool${tools === 1 ? '' : 's'}`;
-  if (blocks.some((block) => block.kind === 'thinking')) return 'Thinking';
-  if (blocks.some((block) => block.kind === 'usage')) return 'Usage';
+  if (blocks.some((block) => block.sourceBlock.kind === 'thinking')) return 'Thinking';
+  if (blocks.some((block) => block.sourceBlock.kind === 'usage')) return 'Usage';
   return 'Activity';
 }
 
-function ActivityGroup({
+function NormalizedActivityGroup({
   blocks,
-  sessionId,
 }: {
-  readonly blocks: readonly DisplayTranscriptBlock[];
-  readonly sessionId: string;
+  readonly blocks: readonly NormalizedActivityBlock[];
 }) {
   return (
     <div className="activity-group">
@@ -1653,19 +1660,41 @@ function ActivityGroup({
             <span className="evidence-chevron" aria-hidden="true">
               ›
             </span>
-            <span className="evidence-summary">{activitySummary(blocks)}</span>
+            <span className="evidence-summary">{normalizedActivitySummary(blocks)}</span>
           </Button>
         </Heading>
         <DisclosurePanel>
           <div className="activity-stack">
             {blocks.map((block) => (
-              <Block key={block.id} block={block} bare sessionId={sessionId} />
+              <RichContentRouter key={block.blockId} block={block} />
             ))}
           </div>
         </DisclosurePanel>
       </Disclosure>
     </div>
   );
+}
+
+function NormalizedTranscriptBlockView({
+  block,
+  sessionId,
+}: {
+  readonly block: NormalizedTranscriptBlock;
+  readonly sessionId: string;
+}) {
+  if (
+    block.kind === 'fallback' &&
+    block.sourceBlock !== null
+  ) {
+    return <Block block={block.sourceBlock} sessionId={sessionId} />;
+  }
+  if (
+    block.kind === 'diff' &&
+    block.sourceBlock.kind === 'file_diff'
+  ) {
+    return <Block block={block.sourceBlock} sessionId={sessionId} />;
+  }
+  return <RichContentRouter block={block} />;
 }
 
 /** Under-answer actions. Capability-gated and honest: Copy renders only where the Clipboard
@@ -1772,6 +1801,10 @@ function Block({
     case 'text':
       label = block.role === 'user' ? 'You' : 'Assistant';
       content = <p className="block-copy">{block.text}</p>;
+      break;
+    case 'text_artifact':
+      label = `Text artifact · ${block.label}`;
+      content = <pre className="block-copy">{block.source}</pre>;
       break;
     case 'thinking':
       label = 'Thinking summary';
@@ -2061,6 +2094,7 @@ function SessionStateIcon({ status }: { readonly status: SessionCardDto['status'
 function blockLabel(block: DisplayTranscriptBlock): string {
   const labels: Record<DisplayTranscriptBlock['kind'], string> = {
     text: 'Assistant response',
+    text_artifact: 'Text artifact',
     thinking: 'Thinking summary',
     plan: 'Plan',
     tool_call: 'Tool call',

@@ -9,8 +9,21 @@ export type ArtifactViewerPhase = 'closed' | 'opening' | 'ready-diff' | 'exiting
 export type ArtifactDismissalReason =
   'close' | 'escape' | 'history' | 'edge-back' | 'voiceover-scrub';
 
+export interface InMemoryArtifactDocument {
+  readonly kind: 'in-memory';
+  readonly id: string;
+  readonly displayName: string;
+  readonly renderer: 'text' | 'code' | 'diff';
+  readonly text: string;
+  readonly summary: string;
+  readonly language?: string;
+  readonly redaction: 'applied';
+}
+
+export type ArtifactViewerSource = FileDiffBlock | FilePreviewBlock | InMemoryArtifactDocument;
+
 export interface ArtifactPreview {
-  readonly source: Readonly<FileDiffBlock | FilePreviewBlock>;
+  readonly source: Readonly<ArtifactViewerSource>;
   readonly trigger: HTMLButtonElement | null;
   readonly scrollContainer: HTMLElement | null;
   readonly scrollTop: number;
@@ -26,13 +39,17 @@ export interface ArtifactViewerContextValue {
     block: FileDiffBlock | FilePreviewBlock,
     trigger: HTMLButtonElement | null,
   ) => void;
+  readonly openInMemory: (
+    document: InMemoryArtifactDocument,
+    trigger: HTMLButtonElement | null,
+  ) => void;
   readonly close: (reason?: ArtifactDismissalReason) => void;
 }
 
 const ArtifactViewerContext = createContext<ArtifactViewerContextValue | null>(null);
 
 function capturePreview(
-  block: FileDiffBlock | FilePreviewBlock,
+  block: ArtifactViewerSource,
   trigger: HTMLButtonElement | null,
   generation: number,
 ): ArtifactPreview {
@@ -110,6 +127,38 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     }, 0);
   };
 
+  const openInMemory = (
+    document: InMemoryArtifactDocument,
+    trigger: HTMLButtonElement | null,
+  ) => {
+    clearTimers();
+    const generation = generationRef.current + 1;
+    generationRef.current = generation;
+    const nextPreview = capturePreview(document, trigger, generation);
+    restoredGenerationRef.current = null;
+    if (previewRef.current === null) {
+      history.open();
+      const state = window.history.state;
+      if (state !== null && typeof state === 'object') {
+        window.history.replaceState(
+          { ...(state as Record<string, unknown>), __piRemoteArtifactBlockId: document.id },
+          '',
+          window.location.href,
+        );
+      }
+    }
+    previewRef.current = nextPreview;
+    setPreview(nextPreview);
+    setPhase('opening');
+    openingTimerRef.current = window.setTimeout(() => {
+      openingTimerRef.current = null;
+      if (generationRef.current !== generation || previewRef.current?.generation !== generation) {
+        return;
+      }
+      setPhase('ready-diff');
+    }, 0);
+  };
+
   const close = (reason: ArtifactDismissalReason = 'close') => {
     const current = previewRef.current;
     if (current === null) return;
@@ -156,7 +205,7 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     };
   }, []);
 
-  const value: ArtifactViewerContextValue = { phase, preview, openDiff, close };
+  const value: ArtifactViewerContextValue = { phase, preview, openDiff, openInMemory, close };
   return (
     <ArtifactViewerContext.Provider value={value}>
       {children}

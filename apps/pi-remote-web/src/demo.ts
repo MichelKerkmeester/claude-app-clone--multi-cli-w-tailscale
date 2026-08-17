@@ -167,6 +167,112 @@ const TRIAGE_BLOCKS = [
   },
 ];
 
+const RICH_REDACTION = {
+  policyVersion: 1,
+  fieldsRedacted: 1,
+  reasons: ['command'],
+} as const;
+
+function richCall(
+  id: string,
+  callId: string,
+  seq: number,
+  lifecycle: 'queued' | 'running' | 'completed' | 'failed' | 'denied' | 'cancelled' | 'interrupted',
+) {
+  return {
+    ...base(id, seq, 1),
+    kind: 'tool_call',
+    toolName: 'bash',
+    inputSummary: 'printf "[redacted command]\\n"',
+    callId,
+    shellKind: 'bash',
+    lifecycle,
+    terminalCheckpoint: lifecycle === 'queued' ? 'none' : lifecycle === 'running' ? 'streaming' : 'terminal',
+    redaction: RICH_REDACTION,
+  };
+}
+
+function richResult(
+  id: string,
+  callId: string,
+  seq: number,
+  lifecycle: 'queued' | 'running' | 'completed' | 'failed' | 'denied' | 'cancelled' | 'interrupted',
+  output: string,
+) {
+  return {
+    ...base(id, seq, 1),
+    kind: 'tool_result',
+    toolName: 'bash',
+    output,
+    isError: lifecycle === 'failed',
+    callId,
+    shellKind: 'bash',
+    lifecycle,
+    terminalCheckpoint: lifecycle === 'running' ? 'streaming' : 'terminal',
+    outputCompleteness: lifecycle === 'completed' ? 'complete' : 'unknown',
+    redaction: RICH_REDACTION,
+  };
+}
+
+export const DEMO_RICH_CONTENT_BLOCKS: readonly Record<string, unknown>[] = [
+  richCall('rich-call-running', 'rich-call-001', 1, 'running'),
+  richResult(
+    'rich-result-running',
+    'rich-call-001',
+    2,
+    'running',
+    'first line\nsecond line\nthird line\nfourth line\nfifth line\nsixth line\nseventh line\ncurrent tail',
+  ),
+  richResult('rich-result-before-call', 'rich-call-002', 3, 'completed', 'result arrived first\n'),
+  richCall('rich-call-before-result', 'rich-call-002', 4, 'completed'),
+  richCall('rich-call-completed', 'rich-call-003', 5, 'completed'),
+  richResult('rich-result-completed', 'rich-call-003', 6, 'completed', 'done\n'),
+  richCall('rich-call-failed', 'rich-call-004', 7, 'failed'),
+  richResult('rich-result-failed', 'rich-call-004', 8, 'failed', 'command failed\n'),
+  richCall('rich-call-denied', 'rich-call-005', 9, 'denied'),
+  richCall('rich-call-cancelled', 'rich-call-006', 10, 'cancelled'),
+  richCall('rich-call-interrupted', 'rich-call-007', 11, 'interrupted'),
+  {
+    ...base('rich-code-source', 12, 1),
+    kind: 'text',
+    role: 'assistant',
+    text: 'Here is the bounded code:\n\n```bash\nprintf "hello\\n"\n# no line numbers\n```\n',
+    settled: true,
+  },
+  {
+    ...base('rich-long-text', 13, 1),
+    kind: 'text',
+    role: 'assistant',
+    text: Array.from({ length: 18 }, (_, index) => `Long text line ${index + 1}`).join('\n'),
+    settled: true,
+  },
+  {
+    ...base('rich-text-artifact', 14, 1),
+    kind: 'text_artifact',
+    label: 'document',
+    source: 'A committed text artifact with an exact trailing newline.\n',
+    redaction: RICH_REDACTION,
+  },
+  {
+    ...base('rich-unknown', 15, 1),
+    kind: 'unknown_payload',
+    payload: '<not rendered>',
+  },
+  {
+    ...base('rich-legacy-incomplete', 16, 1),
+    kind: 'tool_call',
+    toolName: 'legacy-tool',
+    inputSummary: 'legacy content remains read-only',
+  },
+  {
+    ...base('rich-optimistic', 17, 1),
+    kind: 'text',
+    role: 'user',
+    text: 'This optimistic prompt must remain outside rich cards.',
+    provenance: 'optimistic',
+  },
+];
+
 export const DEMO_ARTIFACT_BLOCKS: readonly FilePreviewBlock[] = [
   {
     ...artifactBase('blk-artifact-ready', 'rev_ready_001', 8, 5),
@@ -477,9 +583,21 @@ function isImagePdfReleaseFixture(): boolean {
   return fixtureName() === 'image-pdf-release';
 }
 
+function isRichCoreFixture(): boolean {
+  return fixtureName() === 'rich-core';
+}
+
 function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   const session = SESSIONS.find((candidate) => candidate.id === sessionId);
   if (session === undefined) return [];
+  if (isRichCoreFixture() && sessionId === SESSION_IDLE) {
+    return [
+      ...session.blocks,
+      ...DEMO_RICH_CONTENT_BLOCKS.filter(
+        (block) => block.kind !== 'unknown_payload' && block.provenance !== 'optimistic',
+      ),
+    ];
+  }
   if (isArtifactStatesFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_ARTIFACT_BLOCKS];
   }

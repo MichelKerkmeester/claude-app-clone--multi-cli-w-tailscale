@@ -25,6 +25,7 @@ import { ArtifactHeader, type ArtifactHeaderProps } from './ArtifactHeader.js';
 import { ArtifactStatus } from './ArtifactStatus.js';
 import type {
   ArtifactDismissalReason,
+  InMemoryArtifactDocument,
   ArtifactPreview,
   ArtifactViewerPhase,
 } from './ArtifactViewerProvider.js';
@@ -61,6 +62,20 @@ function isLegacyDiffSource(value: unknown): value is FileDiffBlock {
     (value as { readonly kind?: unknown }).kind === 'file_diff' &&
     typeof (value as { readonly summary?: unknown }).summary === 'string' &&
     typeof (value as { readonly patch?: unknown }).patch === 'string'
+  );
+}
+
+function isInMemoryArtifactSource(value: unknown): value is InMemoryArtifactDocument {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value as { readonly kind?: unknown }).kind === 'in-memory' &&
+    typeof (value as { readonly id?: unknown }).id === 'string' &&
+    typeof (value as { readonly displayName?: unknown }).displayName === 'string' &&
+    (value as { readonly renderer?: unknown }).renderer !== undefined &&
+    typeof (value as { readonly text?: unknown }).text === 'string' &&
+    typeof (value as { readonly summary?: unknown }).summary === 'string' &&
+    (value as { readonly redaction?: unknown }).redaction === 'applied'
   );
 }
 
@@ -250,6 +265,35 @@ function renderDescriptor(
   }
 }
 
+function renderInMemoryDocument(
+  document: InMemoryArtifactDocument,
+  wrap: boolean,
+  findTerm: string,
+): React.ReactNode {
+  switch (document.renderer) {
+    case 'text':
+      return (
+        <TextPreview
+          text={document.text}
+          wrap={wrap}
+          findTerm={findTerm}
+          ariaLabel={`${document.displayName} preview`}
+        />
+      );
+    case 'code':
+      return (
+        <TextPreview
+          text={document.text}
+          wrap={wrap}
+          findTerm={findTerm}
+          ariaLabel={`${document.displayName} code preview`}
+        />
+      );
+    case 'diff':
+      return <DiffPreview patch={document.text} wrap={wrap} findTerm={findTerm} />;
+  }
+}
+
 export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHostProps) {
   useVisualViewportAnchor();
   const dialogRef = useRef<HTMLElement>(null);
@@ -264,6 +308,8 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const sourceValue: unknown = preview?.source;
   const legacyDiff: FileDiffBlock | null =
     sourceValue !== undefined && isLegacyDiffSource(sourceValue) ? sourceValue : null;
+  const inMemory: InMemoryArtifactDocument | null =
+    sourceValue !== undefined && isInMemoryArtifactSource(sourceValue) ? sourceValue : null;
   const descriptor: FilePreviewBlock | null =
     sourceValue !== undefined && isFilePreviewBlock(sourceValue) ? sourceValue : null;
   const sessionId = preview?.trigger?.dataset.artifactSessionId ?? null;
@@ -381,9 +427,11 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     if (touch !== undefined) finishEdgeBack(touch.clientX, touch.clientY);
   };
 
-  const kind = descriptor === null ? 'diff' : descriptorKind(descriptor);
-  const subject = descriptor === null ? 'Redacted file diff' : descriptorSubject(descriptor);
-  const title = descriptor === null ? 'File diff' : descriptorSubject(descriptor);
+  const kind = inMemory?.renderer ?? (descriptor === null ? 'diff' : descriptorKind(descriptor));
+  const subject =
+    inMemory?.displayName ??
+    (descriptor === null ? 'Redacted file diff' : descriptorSubject(descriptor));
+  const title = inMemory?.displayName ?? (descriptor === null ? 'File diff' : descriptorSubject(descriptor));
   const resourceStatus = descriptor === null ? null : resource.status;
   const currentStatus =
     descriptor === null
@@ -397,7 +445,9 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     resource.status === 'ready' &&
     rendererStatus === 'ready';
   const body =
-    descriptor === null ? (
+    inMemory !== null ? (
+      renderInMemoryDocument(inMemory, wrap, findTerm)
+    ) : descriptor === null ? (
       legacyDiff === null ? (
         <UnsupportedPreview message="The preview source could not be verified." />
       ) : (
@@ -417,13 +467,18 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
         setFindTerm,
       )
     );
-  const displayedBuffer = descriptor === null ? (legacyDiff?.patch ?? null) : resource.buffer;
+  const displayedBuffer =
+    inMemory !== null
+      ? inMemory.text
+      : descriptor === null
+        ? (legacyDiff?.patch ?? null)
+        : resource.buffer;
   const shareInput: DisplayedArtifactShareInput = {
     displayName: title,
-    renderer: descriptor?.renderer ?? 'diff',
+    renderer: inMemory?.renderer ?? descriptor?.renderer ?? 'diff',
     displayedBuffer: displayedBuffer ?? '',
-    shareAllowed: descriptor?.shareAllowed ?? false,
-    redaction: descriptor?.redaction ?? 'not-needed',
+    shareAllowed: inMemory === null ? (descriptor?.shareAllowed ?? false) : false,
+    redaction: inMemory !== null ? 'applied' : (descriptor?.redaction ?? 'not-needed'),
     completeness: descriptor?.completeness ?? 'complete',
     ...(binaryPreviewReady && resource.bytes !== null
       ? { displayedBytes: resource.bytes, mimeType: descriptor.mimeType }
@@ -435,7 +490,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const canShare =
     (displayedBuffer !== null || displayedBytes !== null) && canShareDisplayedArtifact(shareInput);
   const terminal =
-    legacyDiff === null && descriptor === null
+    inMemory === null && legacyDiff === null && descriptor === null
       ? 'The preview source could not be verified.'
       : descriptor !== null && !isReadyDescriptor(descriptor)
         ? unavailableMessage(descriptor)
@@ -446,13 +501,18 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
             : null;
   const statusAnnouncement =
     announcement ??
-    (descriptor === null && legacyDiff === null
+    (inMemory === null && descriptor === null && legacyDiff === null
       ? 'The preview source could not be verified.'
       : descriptor !== null &&
           (!isReadyDescriptor(descriptor) || descriptorKind(descriptor) === null)
         ? unavailableMessage(descriptor)
         : null);
-  const kindLabel = descriptor === null ? 'Redacted artifact' : `Redacted ${kind ?? 'artifact'}`;
+  const kindLabel =
+    inMemory !== null
+      ? `Redacted ${kind ?? 'artifact'}`
+      : descriptor === null
+        ? 'Redacted artifact'
+        : `Redacted ${kind ?? 'artifact'}`;
   const headerProps: ArtifactHeaderProps = {
     headingRef,
     onClose: () => onClose('close'),
@@ -510,7 +570,9 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
           />
           <div className="artifact-viewer-content">
             <p className="artifact-viewer-summary" dir="auto">
-              {descriptor === null
+              {inMemory !== null
+                ? inMemory.summary
+                : descriptor === null
                 ? (legacyDiff?.summary ?? 'Unverified preview source')
                 : `${descriptor.mimeType} · ${descriptor.completeness === 'excerpt' ? 'Excerpt' : 'Complete'} · ${descriptor.redaction === 'applied' ? 'Redacted' : 'Relay-sanitized'}`}
             </p>

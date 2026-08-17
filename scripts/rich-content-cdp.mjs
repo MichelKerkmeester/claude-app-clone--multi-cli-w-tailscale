@@ -173,10 +173,52 @@ async function navigate(client, url) {
 async function waitForPage(client, expression) {
   const deadline = Date.now() + 20_000;
   while (Date.now() < deadline) {
-    if (await evaluate(client, expression)) return;
+    if (await evaluate(client, expression)) return true;
     await sleep(100);
   }
-  throw new Error(`Timed out waiting for page condition: ${expression}`);
+  let bodyText = '';
+  try {
+    bodyText = String((await evaluate(client, 'document.body?.innerText ?? ""')).slice(0, 500));
+  } catch {
+    bodyText = '<page evaluation unavailable>';
+  }
+  throw new Error(`Timed out waiting for page condition: ${expression}; body=${JSON.stringify(bodyText)}`);
+}
+
+async function scrollUntilSelector(client, selector, text = null, requireNoActions = false) {
+  return waitForPage(
+    client,
+    `(() => {
+      const scroll = document.querySelector('.transcript-scroll');
+      const target = [...document.querySelectorAll(${JSON.stringify(selector)})]
+        .find((node) => ${JSON.stringify(text)} === null || node.textContent?.includes(${JSON.stringify(text)}));
+      if (
+        target !== undefined &&
+        (!${JSON.stringify(requireNoActions)} || target.querySelectorAll('.rich-block-action').length === 0)
+      ) return true;
+      if (scroll === null) return false;
+      scroll.scrollTop = Math.min(
+        scroll.scrollHeight,
+        scroll.scrollTop + Math.max(220, scroll.clientHeight * 0.75),
+      );
+      return false;
+    })()`,
+  );
+}
+
+async function scrollUntilCommandStatus(client, status, direction) {
+  await waitForPage(
+    client,
+    `(() => {
+      const scroll = document.querySelector('.transcript-scroll');
+      const hasStatus = [...document.querySelectorAll('.rich-command-card .rich-block-status')]
+        .some((node) => node.textContent?.includes(${JSON.stringify(status)}));
+      if (hasStatus) return true;
+      if (scroll === null) return false;
+      scroll.scrollTop = ${direction === 'up' ? 'Math.max(0, scroll.scrollTop - Math.max(220, scroll.clientHeight * 0.75))' : `Math.min(scroll.scrollHeight, scroll.scrollTop + Math.max(220, scroll.clientHeight * 0.75))`};
+      return false;
+    })()`,
+  );
 }
 
 async function waitForProcessExit(process) {
@@ -192,7 +234,7 @@ async function exerciseLegacyActivity(client, theme, outputPath, viewportWidth) 
   await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
   await evaluate(
     client,
-    `localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
+    `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
   await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
   await waitForPage(
@@ -252,13 +294,166 @@ async function exerciseLegacyActivity(client, theme, outputPath, viewportWidth) 
   return state;
 }
 
+async function exerciseRichCore(client, theme, outputPath, viewportWidth) {
+  await navigate(client, `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=rich-core`);
+  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await evaluate(
+    client,
+    `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
+  );
+  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await scrollUntilCommandStatus(client, 'Running', 'up');
+
+  const initial = await evaluate(
+    client,
+    `(() => {
+      const scroll = document.querySelector('.transcript-scroll');
+      const actions = [...document.querySelectorAll('.rich-block-action')];
+      const bounds = actions.map((action) => {
+        const rect = action.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      });
+      return {
+        viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
+        theme: document.documentElement.dataset.theme,
+        clientWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+        running: document.body.textContent?.includes('Running') ?? false,
+        completed: document.body.textContent?.includes('Completed') ?? false,
+        malformedFallback: document.querySelector('.block-tool_call') !== null,
+        actionCount: actions.length,
+        bounds,
+      };
+    })()`,
+  );
+  if (initial.viewportWidth !== viewportWidth || initial.clientWidth !== viewportWidth) {
+    throw new Error(
+      `Expected ${viewportWidth} CSS-pixel width, got viewport=${initial.viewportWidth}, client=${initial.clientWidth}`,
+    );
+  }
+  if (initial.theme !== theme) throw new Error(`Expected ${theme} theme, got ${initial.theme ?? 'unset'}`);
+  if (initial.scrollWidth > initial.clientWidth) {
+    throw new Error(
+      `Horizontal overflow at ${viewportWidth}px: client=${initial.clientWidth}, scroll=${initial.scrollWidth}`,
+    );
+  }
+  if (!initial.running) {
+    throw new Error('Rich core fixture did not expose the running command state.');
+  }
+  if (initial.bounds.some((bound) => bound.width < 44 || bound.height < 44)) {
+    throw new Error('Rich core action is smaller than 44 CSS pixels.');
+  }
+
+  const copied = await evaluate(
+    client,
+    `(() => {
+      const button = [...document.querySelectorAll('.rich-command-card button')].find(
+        (candidate) => candidate.textContent?.includes('Copy command'),
+      );
+      if (!(button instanceof HTMLElement)) return false;
+      button.click();
+      return true;
+    })()`,
+  );
+  if (!copied) throw new Error('Rich core Copy command action was not found.');
+  await waitForPage(client, 'typeof window.__richCopied === "string"');
+
+  await scrollUntilCommandStatus(client, 'Completed', 'down');
+  await scrollUntilSelector(client, '.rich-code-card');
+  const opened = await evaluate(
+    client,
+    `(() => {
+      const button = [...document.querySelectorAll('.rich-code-card button')].find(
+        (candidate) => candidate.textContent?.includes('Open full screen'),
+      );
+      if (!(button instanceof HTMLElement)) return false;
+      button.click();
+      return true;
+    })()`,
+  );
+  if (!opened) throw new Error('Rich core Open full screen action was not found.');
+  await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") !== null');
+  const openedState = await evaluate(
+    client,
+    `window.history.state?.__piRemoteArtifactBlockId ?? null`,
+  );
+  if (typeof openedState !== 'string' || openedState.length === 0) {
+    throw new Error('F6 history did not contain the opaque rich block id.');
+  }
+  await evaluate(
+    client,
+    `document.querySelector('.artifact-viewer-close')?.click()`,
+  );
+  await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") === null');
+
+  await evaluate(
+    client,
+    `document.querySelectorAll('.evidence-trigger').forEach((trigger) => {
+      if (trigger.getAttribute('aria-expanded') !== 'true') trigger.click();
+    })`,
+  );
+  const malformedLegacyFound = await scrollUntilSelector(
+    client,
+    '.rich-activity-card',
+    'legacy content remains read-only',
+    true,
+  );
+  const finalLayout = await evaluate(
+    client,
+    `(() => {
+      const root = document.documentElement;
+      const actions = [...document.querySelectorAll('.rich-block-action')];
+      return {
+        viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
+        clientWidth: root.clientWidth,
+        scrollWidth: root.scrollWidth,
+        malformedFallback: ${JSON.stringify(malformedLegacyFound === true)},
+        malformedActions: 0,
+        bounds: actions.map((action) => {
+          const rect = action.getBoundingClientRect();
+          return { width: rect.width, height: rect.height };
+        }),
+      };
+    })()`,
+  );
+  if (!finalLayout.malformedFallback || finalLayout.malformedActions !== 0) {
+    throw new Error('Rich core fixture did not expose the malformed legacy fallback.');
+  }
+  if (
+    finalLayout.viewportWidth !== viewportWidth ||
+    finalLayout.clientWidth !== viewportWidth ||
+    finalLayout.scrollWidth > finalLayout.clientWidth
+  ) {
+    throw new Error(
+      `Horizontal overflow at ${viewportWidth}px: client=${finalLayout.clientWidth}, scroll=${finalLayout.scrollWidth}`,
+    );
+  }
+  if (finalLayout.bounds.some((bound) => bound.width < 44 || bound.height < 44)) {
+    throw new Error('Rich core action is smaller than 44 CSS pixels.');
+  }
+
+  const screenshot = await client.send('Page.captureScreenshot', {
+    format: 'png',
+    fromSurface: true,
+  });
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, Buffer.from(screenshot.data, 'base64'));
+  return {
+    ...initial,
+    ...finalLayout,
+    copied,
+    opened,
+    historyBlockId: openedState,
+  };
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const fixture = requiredOption(options, 'fixture');
   const theme = requiredOption(options, 'theme');
   const output = requiredOption(options, 'output');
   const viewportWidth = Number(requiredOption(options, 'viewport-width'));
-  if (fixture !== 'legacy-activity') {
+  if (fixture !== 'legacy-activity' && fixture !== 'rich-core') {
     throw new Error(`Unsupported fixture: ${fixture}`);
   }
   if (theme !== 'light' && theme !== 'dark') {
@@ -303,15 +498,24 @@ async function main() {
     await cdp.connect();
     await cdp.send('Page.enable');
     await cdp.send('Runtime.enable');
+    await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
+      source:
+        "Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (value) => { window.__richCopied = value; } } });",
+    });
     await cdp.send('Emulation.setDeviceMetricsOverride', {
       width: viewportWidth,
       height: 844,
       deviceScaleFactor: 1,
       mobile: true,
     });
-    const state = await exerciseLegacyActivity(cdp, theme, outputPath, viewportWidth);
+    const state =
+      fixture === 'rich-core'
+        ? await exerciseRichCore(cdp, theme, outputPath, viewportWidth)
+        : await exerciseLegacyActivity(cdp, theme, outputPath, viewportWidth);
     console.log(
-      `CDP passed: ${theme} legacy-activity, ${state.viewportWidth} CSS-pixel width, no horizontal overflow, Activity/prose/composer unchanged, screenshot ${outputPath}`,
+      fixture === 'rich-core'
+        ? `CDP passed: ${theme} rich-core, ${state.viewportWidth} CSS-pixel width, no horizontal overflow, 44px actions, Copy/Open/Close and malformed fallback exercised, screenshot ${outputPath}`
+        : `CDP passed: ${theme} legacy-activity, ${state.viewportWidth} CSS-pixel width, no horizontal overflow, Activity/prose/composer unchanged, screenshot ${outputPath}`,
     );
   } finally {
     cdp?.close();

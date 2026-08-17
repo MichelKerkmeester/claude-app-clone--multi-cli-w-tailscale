@@ -16,6 +16,7 @@ import {
   isRuntimeIssueCode,
   isRuntimeIssueDto,
   isRuntimeIssueResponse,
+  isRuntimeMediaCapabilityDto,
   isRuntimeModelCatalogDto,
   isRuntimeModelTicketResponse,
   isRuntimeSnapshotDto,
@@ -37,6 +38,7 @@ import {
   type RuntimeControlCommand,
   type RuntimeControlResponse,
   type RuntimeIssueCode,
+  type RuntimeMediaCapabilityDto,
   type RuntimeModelCatalogDto,
   type RuntimeModelTicketRequest,
   type RuntimeOperation,
@@ -344,6 +346,15 @@ export async function fetchRuntimeModels(signal?: AbortSignal): Promise<RuntimeM
   return payload;
 }
 
+export function parseRuntimeMediaCapability(value: unknown): RuntimeMediaCapabilityDto | null {
+  return isRuntimeMediaCapabilityDto(value) ? value : null;
+}
+
+export function parseRuntimeSnapshot(value: unknown): RuntimeSnapshotDto | null {
+  if (!isRuntimeSnapshotDto(value)) return null;
+  return value.media === undefined || parseRuntimeMediaCapability(value.media) !== null ? value : null;
+}
+
 export async function fetchRuntimeSnapshot(signal?: AbortSignal): Promise<RuntimeSnapshotDto> {
   if (isDemoMode()) {
     const [state, models] = await Promise.all([
@@ -351,7 +362,8 @@ export async function fetchRuntimeSnapshot(signal?: AbortSignal): Promise<Runtim
       fetchRuntimeModels(signal),
     ]);
     const snapshot = { sessionId: state.sessionId, state, models };
-    if (isRuntimeSnapshotDto(snapshot)) return snapshot;
+    const parsed = parseRuntimeSnapshot(snapshot);
+    if (parsed !== null) return parsed;
     throw new RuntimeRelayError('invalid-response');
   }
   try {
@@ -361,7 +373,8 @@ export async function fetchRuntimeSnapshot(signal?: AbortSignal): Promise<Runtim
       signal,
       [422, 429, 502, 503],
     );
-    if (isRuntimeSnapshotDto(payload)) return payload;
+    const snapshot = parseRuntimeSnapshot(payload);
+    if (snapshot !== null) return snapshot;
     if (isRuntimeIssueResponse(payload)) throw new RuntimeRelayError(payload.error);
     if (isRuntimeIssueDto(payload)) throw new RuntimeRelayError(payload.issueCode);
     throw new RuntimeRelayError('invalid-response');

@@ -8,6 +8,12 @@ import type {
   AttentionClass,
   AttentionItemDto,
   AttentionResolutionDto,
+  AttachmentManifestItem,
+  AttachmentCancellation,
+  AttachmentPartStatusDto,
+  AttachmentPartTicket,
+  AttachmentSetManifest,
+  AttachmentSubmissionResult,
   ApprovalCardDto,
   ApprovalAuthorityConsumeRequest,
   ApprovalAuthorityConsumeResponse,
@@ -35,11 +41,14 @@ import type {
   FilePreviewRedaction,
   FilePreviewRenderer,
   JsonValue,
+  MediaPolicyDto,
+  NormalizedPiImage,
   PiRpcCommand,
   PiRpcEvent,
   PiRpcEventType,
   PiRpcResponse,
   RedactionMetadata,
+  RedactedAttachmentBlock,
   RichToolCallBlock,
   RichToolResultBlock,
   PlanArtifactDto,
@@ -49,6 +58,7 @@ import type {
   PlanSnapshotDto,
   PlanValidityValue,
   PromptAbortResponse,
+  PromptAttachmentReference,
   PromptSubmitCommand,
   PromptSubmitResponse,
   RuntimeControlCommand,
@@ -57,6 +67,7 @@ import type {
   RuntimeIssueCode,
   RuntimeIssueDto,
   RuntimeIssueResponse,
+  RuntimeMediaCapabilityDto,
   RuntimeModelTicketRequest,
   RuntimeModelTicketResponse,
   RuntimeModelCatalogDto,
@@ -82,6 +93,7 @@ import type {
   TranscriptPageDto,
   TranscriptShellKind,
   TranscriptTerminalCheckpoint,
+  RedactedAttachmentStatus,
   WebSocketTicketResponse,
 } from './types.js';
 
@@ -89,6 +101,9 @@ import {
   MODEL_AVAILABILITIES,
   MODEL_AVAILABILITY_REASON_CODES,
   MODEL_INPUT_KINDS,
+  ATTACHMENT_CANCELLATION_REASONS,
+  ATTACHMENT_PART_STATUSES,
+  ATTACHMENT_SUBMISSION_STATUSES,
   FILE_PREVIEW_AVAILABILITIES,
   FILE_PREVIEW_COMPLETENESS_STATES,
   FILE_PREVIEW_REDACTION_STATES,
@@ -104,6 +119,9 @@ import {
   TRANSCRIPT_OUTPUT_COMPLETENESS,
   TRANSCRIPT_SHELL_KINDS,
   TRANSCRIPT_TERMINAL_CHECKPOINTS,
+  MEDIA_OUTPUT_MIME_TYPES,
+  MEDIA_SOURCE_MIME_TYPES,
+  REDACTED_ATTACHMENT_STATUSES,
 } from './types.js';
 
 const APPROVAL_RESULT_STATUSES = new Set([
@@ -178,6 +196,34 @@ const TRANSCRIPT_COMPLETENESS_SET = new Set<TranscriptOutputCompleteness>(
   TRANSCRIPT_OUTPUT_COMPLETENESS,
 );
 const TEXT_ARTIFACT_LABEL_SET = new Set<TextArtifactLabel>(TEXT_ARTIFACT_LABELS);
+const MEDIA_SOURCE_MIME_TYPE_SET = new Set<string>(MEDIA_SOURCE_MIME_TYPES);
+const MEDIA_OUTPUT_MIME_TYPE_SET = new Set<string>(MEDIA_OUTPUT_MIME_TYPES);
+const ATTACHMENT_PART_STATUS_SET = new Set<string>(ATTACHMENT_PART_STATUSES);
+const ATTACHMENT_CANCELLATION_REASON_SET = new Set<string>(ATTACHMENT_CANCELLATION_REASONS);
+const ATTACHMENT_SUBMISSION_STATUS_SET = new Set<string>(ATTACHMENT_SUBMISSION_STATUSES);
+const REDACTED_ATTACHMENT_STATUS_SET = new Set<RedactedAttachmentStatus>(
+  REDACTED_ATTACHMENT_STATUSES,
+);
+const MEDIA_MAX_IMAGES = 4;
+const MEDIA_MAX_SOURCE_BYTES_PER_IMAGE = 15 * 1024 * 1024;
+const MEDIA_MAX_SOURCE_BYTES_PER_BATCH = 30 * 1024 * 1024;
+const MEDIA_MAX_DECODED_MEGAPIXELS = 60;
+const MEDIA_MAX_SOURCE_EDGE_PIXELS = 12_000;
+const MEDIA_MAX_NORMALIZED_EDGE_PIXELS = 2_000;
+const MEDIA_MAX_NORMALIZED_BYTES_PER_IMAGE = 2 * 1024 * 1024;
+const MEDIA_MAX_NORMALIZED_BYTES_PER_TURN = 8 * 1024 * 1024;
+const MEDIA_MAX_PARALLEL_UPLOADS = 2;
+const MEDIA_MAX_UNCOMMITTED_TTL_SECONDS = 10 * 60;
+const MEDIA_MAX_UPLOAD_TICKET_TTL_SECONDS = 90;
+const MEDIA_MAX_UPLOAD_BODY_DEADLINE_SECONDS = 120;
+const MEDIA_MAX_ATTACHMENTS_PER_WINDOW = 12;
+const MEDIA_MAX_ATTACHMENT_RATE_WINDOW_SECONDS = 5 * 60;
+const MEDIA_MAX_BYTES_PER_WINDOW = 120 * 1024 * 1024;
+const MEDIA_MAX_BYTE_RATE_WINDOW_SECONDS = 60 * 60;
+const MEDIA_MAX_QUARANTINE_BYTES_PER_DEVICE = 30 * 1024 * 1024;
+const MEDIA_MAX_QUARANTINE_BYTES_RELAY_WIDE = 256 * 1024 * 1024;
+const MEDIA_MAX_SESSION_EPOCH_LENGTH = 256;
+const MEDIA_MAX_NORMALIZED_BASE64 = Math.ceil(MEDIA_MAX_NORMALIZED_BYTES_PER_IMAGE / 3) * 4;
 
 /** Return whether a value can be serialized as JSON without coercion. */
 export function isJsonValue(value: unknown): value is JsonValue {
@@ -297,7 +343,22 @@ export function isPiRpcCommand(value: unknown): value is PiRpcCommand {
     return false;
   }
   if (value.type === 'prompt' || value.type === 'steer' || value.type === 'follow_up') {
-    return typeof value.message === 'string' && isJsonValue(value);
+    const optional =
+      value.type === 'prompt'
+        ? ['id', 'images', 'streamingBehavior']
+        : ['id', 'images'];
+    return (
+      hasRequiredAndOptionalKeys(value, ['type', 'message'], optional) &&
+      typeof value.message === 'string' &&
+      (value.images === undefined ||
+        (Array.isArray(value.images) &&
+          value.images.length <= MEDIA_MAX_IMAGES &&
+          value.images.every(isNormalizedPiImage))) &&
+      (value.type !== 'prompt' ||
+        value.streamingBehavior === undefined ||
+        value.streamingBehavior === 'steer' ||
+        value.streamingBehavior === 'followUp')
+    );
   }
   if (value.type === 'get_entries') {
     return (value.since === undefined || typeof value.since === 'string') && isJsonValue(value);
@@ -341,26 +402,367 @@ const PROMPT_SUBMIT_KEYS = new Set([
   'sessionId',
   'message',
   'ticket',
+  'expectedPromptRevision',
+  'attachmentSetId',
+  'attachmentIds',
   'streamingBehavior',
   'command',
 ]);
 
 export function isPromptSubmitCommand(value: unknown): value is PromptSubmitCommand {
+  if (
+    !isRecord(value) ||
+    !Object.keys(value).every((key) => PROMPT_SUBMIT_KEYS.has(key)) ||
+    value.type !== 'prompt.submit' ||
+    !isOpaqueId(value.submissionId) ||
+    !isOpaqueId(value.sessionId) ||
+    typeof value.message !== 'string' ||
+    !isOpaqueId(value.ticket) ||
+    (value.command !== undefined && !isCommandBindingDto(value.command)) ||
+    (value.streamingBehavior !== undefined &&
+      (value.command !== undefined ||
+        (value.streamingBehavior !== 'steer' && value.streamingBehavior !== 'followUp')))
+  ) {
+    return false;
+  }
+  const hasAttachmentReferences =
+    value.attachmentSetId !== undefined || value.attachmentIds !== undefined;
+  if (hasAttachmentReferences) {
+    return (
+      isBoundedNonNegativeInteger(value.expectedPromptRevision, 1_000_000_000) &&
+      isPromptAttachmentReference({
+        attachmentSetId: value.attachmentSetId,
+        attachmentIds: value.attachmentIds,
+      }) &&
+      value.message.length <= 256 * 1024
+    );
+  }
+  return (
+    value.message.trim().length > 0 &&
+    (value.expectedPromptRevision === undefined ||
+      isBoundedNonNegativeInteger(value.expectedPromptRevision, 1_000_000_000))
+  );
+}
+
+/** Narrow the host-published still-image policy to its fixed bounded contract. */
+export function isMediaPolicyDto(value: unknown): value is MediaPolicyDto {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      'mediaKind',
+      'sourceMimeTypes',
+      'outputMimeTypes',
+      'maxImagesPerTurn',
+      'maxSourceBytesPerImage',
+      'maxSourceBytesPerBatch',
+      'maxDecodedMegapixels',
+      'maxSourceEdgePixels',
+      'maxNormalizedEdgePixels',
+      'maxNormalizedBytesPerImage',
+      'maxNormalizedBytesPerTurn',
+      'maxParallelUploads',
+      'uncommittedTtlSeconds',
+      'uploadTicketTtlSeconds',
+      'uploadBodyDeadlineSeconds',
+      'maxAttachmentsPerWindow',
+      'attachmentRateWindowSeconds',
+      'maxBytesPerWindow',
+      'byteRateWindowSeconds',
+      'maxQuarantineBytesPerDevice',
+      'maxQuarantineBytesRelayWide',
+    ]) ||
+    value.mediaKind !== 'image' ||
+    !Array.isArray(value.sourceMimeTypes) ||
+    value.sourceMimeTypes.length === 0 ||
+    value.sourceMimeTypes.length > MEDIA_SOURCE_MIME_TYPES.length ||
+    !value.sourceMimeTypes.every(
+      (mimeType) =>
+        typeof mimeType === 'string' && MEDIA_SOURCE_MIME_TYPE_SET.has(mimeType),
+    ) ||
+    new Set(value.sourceMimeTypes).size !== value.sourceMimeTypes.length ||
+    !Array.isArray(value.outputMimeTypes) ||
+    value.outputMimeTypes.length === 0 ||
+    value.outputMimeTypes.length > MEDIA_OUTPUT_MIME_TYPES.length ||
+    !value.outputMimeTypes.every(
+      (mimeType) => typeof mimeType === 'string' && MEDIA_OUTPUT_MIME_TYPE_SET.has(mimeType),
+    ) ||
+    new Set(value.outputMimeTypes).size !== value.outputMimeTypes.length
+  ) {
+    return false;
+  }
+  return (
+    isBoundedPositiveInteger(value.maxImagesPerTurn) &&
+    value.maxImagesPerTurn <= MEDIA_MAX_IMAGES &&
+    isBoundedPositiveInteger(value.maxSourceBytesPerImage) &&
+    value.maxSourceBytesPerImage <= MEDIA_MAX_SOURCE_BYTES_PER_IMAGE &&
+    isBoundedPositiveInteger(value.maxSourceBytesPerBatch) &&
+    value.maxSourceBytesPerBatch <= MEDIA_MAX_SOURCE_BYTES_PER_BATCH &&
+    value.maxSourceBytesPerBatch >= value.maxSourceBytesPerImage &&
+    isBoundedPositiveInteger(value.maxDecodedMegapixels) &&
+    value.maxDecodedMegapixels <= MEDIA_MAX_DECODED_MEGAPIXELS &&
+    isBoundedPositiveInteger(value.maxSourceEdgePixels) &&
+    value.maxSourceEdgePixels <= MEDIA_MAX_SOURCE_EDGE_PIXELS &&
+    isBoundedPositiveInteger(value.maxNormalizedEdgePixels) &&
+    value.maxNormalizedEdgePixels <= MEDIA_MAX_NORMALIZED_EDGE_PIXELS &&
+    isBoundedPositiveInteger(value.maxNormalizedBytesPerImage) &&
+    value.maxNormalizedBytesPerImage <= MEDIA_MAX_NORMALIZED_BYTES_PER_IMAGE &&
+    isBoundedPositiveInteger(value.maxNormalizedBytesPerTurn) &&
+    value.maxNormalizedBytesPerTurn <= MEDIA_MAX_NORMALIZED_BYTES_PER_TURN &&
+    value.maxNormalizedBytesPerTurn >= value.maxNormalizedBytesPerImage &&
+    isBoundedPositiveInteger(value.maxParallelUploads) &&
+    value.maxParallelUploads <= MEDIA_MAX_PARALLEL_UPLOADS &&
+    isBoundedPositiveInteger(value.uncommittedTtlSeconds) &&
+    value.uncommittedTtlSeconds <= MEDIA_MAX_UNCOMMITTED_TTL_SECONDS &&
+    isBoundedPositiveInteger(value.uploadTicketTtlSeconds) &&
+    value.uploadTicketTtlSeconds <= MEDIA_MAX_UPLOAD_TICKET_TTL_SECONDS &&
+    isBoundedPositiveInteger(value.uploadBodyDeadlineSeconds) &&
+    value.uploadBodyDeadlineSeconds <= MEDIA_MAX_UPLOAD_BODY_DEADLINE_SECONDS &&
+    isBoundedPositiveInteger(value.maxAttachmentsPerWindow) &&
+    value.maxAttachmentsPerWindow <= MEDIA_MAX_ATTACHMENTS_PER_WINDOW &&
+    isBoundedPositiveInteger(value.attachmentRateWindowSeconds) &&
+    value.attachmentRateWindowSeconds <= MEDIA_MAX_ATTACHMENT_RATE_WINDOW_SECONDS &&
+    isBoundedPositiveInteger(value.maxBytesPerWindow) &&
+    value.maxBytesPerWindow <= MEDIA_MAX_BYTES_PER_WINDOW &&
+    isBoundedPositiveInteger(value.byteRateWindowSeconds) &&
+    value.byteRateWindowSeconds <= MEDIA_MAX_BYTE_RATE_WINDOW_SECONDS &&
+    isBoundedPositiveInteger(value.maxQuarantineBytesPerDevice) &&
+    value.maxQuarantineBytesPerDevice <= MEDIA_MAX_QUARANTINE_BYTES_PER_DEVICE &&
+    isBoundedPositiveInteger(value.maxQuarantineBytesRelayWide) &&
+    value.maxQuarantineBytesRelayWide <= MEDIA_MAX_QUARANTINE_BYTES_RELAY_WIDE &&
+    value.maxQuarantineBytesRelayWide >= value.maxQuarantineBytesPerDevice
+  );
+}
+
+/** Narrow the host capability and its policy without accepting client claims. */
+export function isRuntimeMediaCapabilityDto(
+  value: unknown,
+): value is RuntimeMediaCapabilityDto {
   return (
     isRecord(value) &&
-    Object.keys(value).every((key) => PROMPT_SUBMIT_KEYS.has(key)) &&
-    value.type === 'prompt.submit' &&
-    isOpaqueId(value.submissionId) &&
-    isOpaqueId(value.sessionId) &&
-    typeof value.message === 'string' &&
-    value.message.trim().length > 0 &&
-    isOpaqueId(value.ticket) &&
-    (value.command === undefined || isCommandBindingDto(value.command)) &&
-    // A bound slash submission is explicit and is never steered or queued implicitly.
-    (value.streamingBehavior === undefined ||
-      (value.command === undefined &&
-        (value.streamingBehavior === 'steer' || value.streamingBehavior === 'followUp')))
+    hasOnlyKeys(value, ['enabled', 'imageIn', 'policy']) &&
+    typeof value.enabled === 'boolean' &&
+    typeof value.imageIn === 'boolean' &&
+    isMediaPolicyDto(value.policy)
   );
+}
+
+/** Narrow one manifest item before any byte-bearing route exists. */
+export function isAttachmentManifestItem(value: unknown): value is AttachmentManifestItem {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['clientId', 'ordinal', 'declaredType', 'byteLength', 'sha256']) &&
+    isOpaqueId(value.clientId) &&
+    isBoundedPositiveInteger(value.ordinal) &&
+    value.ordinal <= MEDIA_MAX_IMAGES &&
+    typeof value.declaredType === 'string' &&
+    MEDIA_SOURCE_MIME_TYPE_SET.has(value.declaredType) &&
+    isBoundedPositiveInteger(value.byteLength) &&
+    value.byteLength <= MEDIA_MAX_SOURCE_BYTES_PER_IMAGE &&
+    isSha256Digest(value.sha256)
+  );
+}
+
+/** Narrow an ordered, bounded attachment-set manifest. */
+export function isAttachmentSetManifest(value: unknown): value is AttachmentSetManifest {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      'submissionId',
+      'sessionId',
+      'sessionEpoch',
+      'expectedPromptRevision',
+      'items',
+    ]) ||
+    !isOpaqueId(value.submissionId) ||
+    !isOpaqueId(value.sessionId) ||
+    !isOpaqueId(value.sessionEpoch) ||
+    typeof value.sessionEpoch !== 'string' ||
+    value.sessionEpoch.length > MEDIA_MAX_SESSION_EPOCH_LENGTH ||
+    !isBoundedNonNegativeInteger(value.expectedPromptRevision, 1_000_000_000) ||
+    !Array.isArray(value.items) ||
+    value.items.length === 0 ||
+    value.items.length > MEDIA_MAX_IMAGES ||
+    !value.items.every(isAttachmentManifestItem)
+  ) {
+    return false;
+  }
+  const items = value.items as readonly AttachmentManifestItem[];
+  const clientIds = new Set(items.map((item) => item.clientId));
+  const totalBytes = items.reduce((total, item) => total + item.byteLength, 0);
+  return (
+    clientIds.size === items.length &&
+    totalBytes <= MEDIA_MAX_SOURCE_BYTES_PER_BATCH &&
+    items.every((item, index) => item.ordinal === index + 1)
+  );
+}
+
+/** Narrow one opaque, revision-free upload-part ticket projection. */
+export function isAttachmentPartTicket(value: unknown): value is AttachmentPartTicket {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'attachmentSetId',
+      'attachmentId',
+      'partId',
+      'ordinal',
+      'ticket',
+      'expiresAt',
+    ]) &&
+    isOpaqueId(value.attachmentSetId) &&
+    isOpaqueId(value.attachmentId) &&
+    isOpaqueId(value.partId) &&
+    isBoundedPositiveInteger(value.ordinal) &&
+    value.ordinal <= MEDIA_MAX_IMAGES &&
+    isOpaqueToken(value.ticket) &&
+    isTimestamp(value.expiresAt)
+  );
+}
+
+/** Narrow a part status projection; it has no source bytes or derived metadata. */
+export function isAttachmentPartStatusDto(value: unknown): value is AttachmentPartStatusDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['attachmentSetId', 'attachmentId', 'partId', 'ordinal', 'status']) &&
+    isOpaqueId(value.attachmentSetId) &&
+    isOpaqueId(value.attachmentId) &&
+    isOpaqueId(value.partId) &&
+    isBoundedPositiveInteger(value.ordinal) &&
+    value.ordinal <= MEDIA_MAX_IMAGES &&
+    typeof value.status === 'string' &&
+    ATTACHMENT_PART_STATUS_SET.has(value.status)
+  );
+}
+
+/** Narrow a one-use cancellation reference. */
+export function isAttachmentCancellation(value: unknown): value is AttachmentCancellation {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['attachmentSetId', 'ticket', 'reason']) &&
+    isOpaqueId(value.attachmentSetId) &&
+    isOpaqueToken(value.ticket) &&
+    typeof value.reason === 'string' &&
+    ATTACHMENT_CANCELLATION_REASON_SET.has(value.reason)
+  );
+}
+
+/** Narrow the non-pixel submission result used by later attachment phases. */
+export function isAttachmentSubmissionResult(
+  value: unknown,
+): value is AttachmentSubmissionResult {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['submissionId', 'status', 'revision', 'attachmentIds']) &&
+    isOpaqueId(value.submissionId) &&
+    typeof value.status === 'string' &&
+    ATTACHMENT_SUBMISSION_STATUS_SET.has(value.status) &&
+    isBoundedNonNegativeInteger(value.revision, 1_000_000_000) &&
+    Array.isArray(value.attachmentIds) &&
+    value.attachmentIds.length <= MEDIA_MAX_IMAGES &&
+    value.attachmentIds.every(isOpaqueId) &&
+    new Set(value.attachmentIds).size === value.attachmentIds.length
+  );
+}
+
+/** Narrow the reference-only extension accepted by prompt submission. */
+export function isPromptAttachmentReference(value: unknown): value is PromptAttachmentReference {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['attachmentSetId', 'attachmentIds']) &&
+    isOpaqueId(value.attachmentSetId) &&
+    Array.isArray(value.attachmentIds) &&
+    value.attachmentIds.length > 0 &&
+    value.attachmentIds.length <= MEDIA_MAX_IMAGES &&
+    value.attachmentIds.every(isOpaqueId) &&
+    new Set(value.attachmentIds).size === value.attachmentIds.length
+  );
+}
+
+/** Narrow the host-to-Pi normalized image block without decoding it here. */
+export function isNormalizedPiImage(value: unknown): value is NormalizedPiImage {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['type', 'data', 'mimeType']) &&
+    value.type === 'image' &&
+    typeof value.mimeType === 'string' &&
+    MEDIA_OUTPUT_MIME_TYPE_SET.has(value.mimeType) &&
+    isBase64(value.data, 4, MEDIA_MAX_NORMALIZED_BASE64, MEDIA_MAX_NORMALIZED_BYTES_PER_IMAGE)
+  );
+}
+
+/** Narrow the structural, metadata-only durable attachment block. */
+export function isRedactedAttachmentBlock(value: unknown): value is RedactedAttachmentBlock {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'kind',
+      'id',
+      'revision',
+      'seq',
+      'occurredAt',
+      'role',
+      'mediaKind',
+      'ordinal',
+      'status',
+      'previewRetained',
+    ]) &&
+    isTranscriptBase(value) &&
+    value.kind === 'attachment' &&
+    value.role === 'user' &&
+    value.mediaKind === 'image' &&
+    isBoundedPositiveInteger(value.ordinal) &&
+    value.ordinal <= MEDIA_MAX_IMAGES &&
+    typeof value.status === 'string' &&
+    REDACTED_ATTACHMENT_STATUS_SET.has(value.status as RedactedAttachmentStatus) &&
+    value.previewRetained === false
+  );
+}
+
+export function isMediaPolicy(value: unknown): value is MediaPolicyDto {
+  return isMediaPolicyDto(value);
+}
+
+export function isRuntimeMediaCapability(value: unknown): value is RuntimeMediaCapabilityDto {
+  return isRuntimeMediaCapabilityDto(value);
+}
+
+export function isAttachmentManifestItemDto(value: unknown): value is AttachmentManifestItem {
+  return isAttachmentManifestItem(value);
+}
+
+export function isAttachmentSetManifestDto(value: unknown): value is AttachmentSetManifest {
+  return isAttachmentSetManifest(value);
+}
+
+export function isAttachmentPartTicketDto(value: unknown): value is AttachmentPartTicket {
+  return isAttachmentPartTicket(value);
+}
+
+export function isAttachmentPartStatus(value: unknown): value is AttachmentPartStatusDto {
+  return isAttachmentPartStatusDto(value);
+}
+
+export function isAttachmentCancellationDto(value: unknown): value is AttachmentCancellation {
+  return isAttachmentCancellation(value);
+}
+
+export function isAttachmentSubmissionResultDto(
+  value: unknown,
+): value is AttachmentSubmissionResult {
+  return isAttachmentSubmissionResult(value);
+}
+
+export function isPromptAttachmentReferenceDto(
+  value: unknown,
+): value is PromptAttachmentReference {
+  return isPromptAttachmentReference(value);
+}
+
+export function isNormalizedImage(value: unknown): value is NormalizedPiImage {
+  return isNormalizedPiImage(value);
+}
+
+export function isNormalizedImageBlock(value: unknown): value is NormalizedPiImage {
+  return isNormalizedPiImage(value);
 }
 
 /** Narrow an unknown value to a correlated Pi RPC response. */
@@ -499,6 +901,8 @@ export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
       return typeof value.summary === 'string' && typeof value.patch === 'string';
     case 'file_preview':
       return false;
+    case 'attachment':
+      return isRedactedAttachmentBlock(value);
     case 'usage':
       return (
         isNonNegativeNumber(value.inputTokens) &&
@@ -1093,6 +1497,29 @@ function isBase64Url(value: unknown, minimum: number, maximum: number): value is
   );
 }
 
+function isBase64(
+  value: unknown,
+  minimum: number,
+  maximum: number,
+  decodedMaximum = Number.POSITIVE_INFINITY,
+): value is string {
+  if (
+    typeof value === 'string' &&
+    value.length >= minimum &&
+    value.length <= maximum &&
+    value.length % 4 === 0 &&
+    /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value)
+  ) {
+    const padding = value.endsWith('==') ? 2 : value.endsWith('=') ? 1 : 0;
+    return value.length / 4 * 3 - padding <= decodedMaximum;
+  }
+  return false;
+}
+
+function isSha256Digest(value: unknown): value is string {
+  return typeof value === 'string' && /^[A-Za-z0-9_-]{43}$/.test(value);
+}
+
 function isTimestamp(value: unknown): value is string {
   return typeof value === 'string' && !Number.isNaN(Date.parse(value));
 }
@@ -1311,10 +1738,11 @@ export function isRuntimeModelCatalogDto(value: unknown): value is RuntimeModelC
 export function isRuntimeSnapshotDto(value: unknown): value is RuntimeSnapshotDto {
   return (
     isRecord(value) &&
-    hasOnlyKeys(value, ['sessionId', 'state', 'models']) &&
+    hasRequiredAndOptionalKeys(value, ['sessionId', 'state', 'models'], ['media']) &&
     isOpaqueId(value.sessionId) &&
     isRuntimeStateDto(value.state) &&
     isRuntimeModelCatalogDto(value.models) &&
+    (value.media === undefined || isRuntimeMediaCapabilityDto(value.media)) &&
     value.state.sessionId === value.sessionId &&
     value.models.sessionId === value.sessionId &&
     value.state.revision === value.models.runtimeRevision

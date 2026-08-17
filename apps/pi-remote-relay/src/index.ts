@@ -11,6 +11,7 @@ import type { Envelope, JsonValue, PiRpcEvent } from '@pi-remote/pi-rpc-protocol
 import { startReadOnlyServer } from './http/server.js';
 import { ApprovalService } from './approval/approval-service.js';
 import { CommandService } from './commands/command-service.js';
+import { isMediaFeatureEnabled } from './auth/policy.js';
 import { MutationPolicy } from './policy/mutation-policy.js';
 import { PushService, createAttentionPayload } from './push/push-service.js';
 import { PromptService } from './prompt/prompt-service.js';
@@ -36,6 +37,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
   const syncHub = new SyncHub(store);
   const push = createPushService(store);
   const fullAccess = process.env.PI_REMOTE_FULL_ACCESS === '1';
+  const mediaEnabled = isMediaFeatureEnabled();
   const mutationPolicy = new MutationPolicy();
   const configuredFamily = process.env.PI_REMOTE_MUTATION_FAMILY;
   const mutationFamily =
@@ -106,7 +108,10 @@ export async function runRelay(): Promise<() => Promise<void>> {
     epoch,
     commands,
   });
-  const runtime = new RuntimeService(supervisor, { sessionId: SESSION_ID });
+  const runtime = new RuntimeService(supervisor, {
+    sessionId: SESSION_ID,
+    mediaEnabled,
+  });
   // A restarted host gets a new epoch: every prior catalog snapshot and binding
   // dies with it, so nothing from the old generation can authorize a submission.
   supervisor.onLifecycle((event) => {
@@ -149,6 +154,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
     runtime,
     commands,
     ...(push === undefined ? {} : { push }),
+    mediaEnabled,
     port: relayPort,
   });
   if (mutationChildEnvironment !== null) {

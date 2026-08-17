@@ -3,6 +3,7 @@
 // ───────────────────────────────────────────────────────────────────
 
 import type {
+  MediaPolicyDto,
   PiRpcCommand,
   PiRpcResponse,
   PlanControlCommand,
@@ -12,6 +13,7 @@ import type {
   RuntimeControlResponse,
   RuntimeControlReasonCode,
   RuntimeIssueCode,
+  RuntimeMediaCapabilityDto,
   RuntimeModelTicketRequest,
   RuntimeMode,
   RuntimeModelCatalogDto,
@@ -21,7 +23,11 @@ import type {
   SetModeCommand,
   ExecutePlanCommand,
 } from '@pi-remote/pi-rpc-protocol';
-import { isRuntimeSnapshotDto, isRuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
+import {
+  DEFAULT_MEDIA_POLICY,
+  isRuntimeSnapshotDto,
+  isRuntimeStateDto,
+} from '@pi-remote/pi-rpc-protocol';
 
 import type { RpcSupervisor } from '../rpc/supervisor.js';
 import {
@@ -46,6 +52,8 @@ const MODE_CONFIRM_TIMEOUT_MS = 4_000;
 export interface RuntimeServiceOptions {
   readonly sessionId: string;
   readonly now?: () => number;
+  readonly mediaEnabled?: boolean;
+  readonly mediaPolicy?: MediaPolicyDto;
 }
 
 export interface LivePlanBinding {
@@ -107,12 +115,16 @@ export class RuntimeService {
   private readonly planIdempotency = new Map<string, PlanControlResponse>();
   private modeWaiters: ModeWaiter[] = [];
   private readonly now: () => number;
+  private readonly mediaEnabled: boolean;
+  private readonly mediaPolicy: MediaPolicyDto;
 
   public constructor(
     private readonly supervisor: RpcSupervisor,
     private readonly options: RuntimeServiceOptions,
   ) {
     this.now = options.now ?? ((): number => Date.now());
+    this.mediaEnabled = options.mediaEnabled === true;
+    this.mediaPolicy = options.mediaPolicy ?? DEFAULT_MEDIA_POLICY;
     supervisor.onLifecycle((event) => {
       if (event.reason === 'exit' || event.reason === 'restart' || event.reason === 'failed') {
         this.lifecycleGeneration += 1;
@@ -168,11 +180,15 @@ export class RuntimeService {
 
   public getSnapshot(): RuntimeSnapshotDto | null {
     if (this.currentState === null || this.modelCatalog === null) return null;
-    const snapshot = {
-      sessionId: this.options.sessionId,
-      state: this.currentState,
-      models: this.modelCatalog,
-    };
+    const snapshot = withMediaCapability(
+      {
+        sessionId: this.options.sessionId,
+        state: this.currentState,
+        models: this.modelCatalog,
+      },
+      this.mediaEnabled,
+      this.mediaPolicy,
+    );
     return isRuntimeSnapshotDto(snapshot) ? snapshot : null;
   }
 
@@ -348,15 +364,25 @@ export class RuntimeService {
         : catalogChanged
           ? this.catalogRevision + 1
           : this.catalogRevision;
-    const snapshot = projectRuntimeSnapshot(dataOf(stateResponse), levels, dataOf(modelsResponse), {
-      sessionId: this.options.sessionId,
-      revision: nextRevision,
-      catalogRevision: nextCatalogRevision,
-      mode: this.mode,
-      updatedAt: new Date(this.now()).toISOString(),
-      plan,
-    });
-    if (snapshot === null) throw new RuntimeIssueError('invalid-response');
+    const snapshotProjection = projectRuntimeSnapshot(
+      dataOf(stateResponse),
+      levels,
+      dataOf(modelsResponse),
+      {
+        sessionId: this.options.sessionId,
+        revision: nextRevision,
+        catalogRevision: nextCatalogRevision,
+        mode: this.mode,
+        updatedAt: new Date(this.now()).toISOString(),
+        plan,
+      },
+    );
+    if (snapshotProjection === null) throw new RuntimeIssueError('invalid-response');
+    const snapshot = withMediaCapability(
+      snapshotProjection,
+      this.mediaEnabled,
+      this.mediaPolicy,
+    );
     if (generation !== this.lifecycleGeneration) {
       throw new RuntimeIssueError('host-unavailable');
     }
@@ -855,6 +881,19 @@ export class RuntimeService {
   private settlePlan(controlId: string, response: PlanControlResponse): PlanControlResponse {
     return storeSettled(this.planIdempotency, controlId, response);
   }
+}
+
+function withMediaCapability(
+  snapshot: RuntimeSnapshotDto,
+  enabled: boolean,
+  policy: MediaPolicyDto,
+): RuntimeSnapshotDto {
+  const media: RuntimeMediaCapabilityDto = {
+    enabled,
+    imageIn: snapshot.state.model?.input?.includes('image') === true,
+    policy,
+  };
+  return { ...snapshot, media };
 }
 
 function storeSettled<K, V>(map: Map<K, V>, key: K, value: V): V {

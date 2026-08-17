@@ -5,6 +5,7 @@
 import {
   isOpaqueId,
   isRichTranscriptBlock,
+  isRuntimeMediaCapabilityDto,
   isTranscriptBlock,
   type Envelope,
   type FilePreviewAvailability,
@@ -13,9 +14,14 @@ import {
   type SyncDelta,
   type SyncGap,
   type SyncSnapshot,
+  type RuntimeMediaCapabilityDto,
   type TextArtifactBlock,
   type TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
+
+export function parseRuntimeMediaCapability(value: unknown): RuntimeMediaCapabilityDto | null {
+  return isRuntimeMediaCapabilityDto(value) ? value : null;
+}
 
 // ── Composer keyboard preference ──────────────────────────────────────────────
 // A preference, not a mode state: it only gates whether the composer
@@ -148,7 +154,10 @@ export interface DisplayBlockMetadata {
   readonly richEligible?: boolean;
 }
 
-type WebTranscriptBlock = Exclude<TranscriptBlock, { readonly kind: 'text_artifact' }>;
+type WebTranscriptBlock = Exclude<
+  TranscriptBlock,
+  { readonly kind: 'text_artifact' | 'attachment' }
+>;
 
 export type DisplayTranscriptBlock =
   | (WebTranscriptBlock & DisplayBlockMetadata)
@@ -349,11 +358,11 @@ export function parseDisplayBlock(
   provenance: TranscriptProvenance = 'relay',
 ): DisplayTranscriptBlock | null {
   const protocolValue = stripDisplayMetadata(value);
-  if (isTranscriptBlock(protocolValue) && protocolValue.kind !== 'text_artifact') {
-    return annotateDisplayBlock(protocolValue, provenance);
-  }
-  if (isTranscriptBlock(protocolValue) && protocolValue.kind === 'text_artifact') {
-    return annotateDisplayBlock(protocolValue, provenance);
+  if (isTranscriptBlock(protocolValue)) {
+    if (protocolValue.kind === 'attachment') {
+      return toUnknownDisplayBlock(protocolValue, provenance);
+    }
+    return annotateDisplayBlock(protocolValue as DisplayTranscriptBlock, provenance);
   }
   if (
     !isRecord(protocolValue) ||
@@ -431,6 +440,7 @@ function toDisplayBlock(
   block: DisplayTranscriptBlock | TranscriptBlock,
   provenance: TranscriptProvenance,
 ): DisplayTranscriptBlock {
+  if (block.kind === 'attachment') return toUnknownDisplayBlock(block, provenance);
   return annotateDisplayBlock(block as DisplayTranscriptBlock, provenance);
 }
 

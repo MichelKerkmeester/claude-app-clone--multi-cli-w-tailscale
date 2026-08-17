@@ -15,6 +15,170 @@ export interface ImageContent extends JsonObject {
   readonly mimeType: string;
 }
 
+export const MEDIA_SOURCE_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+] as const;
+export type MediaSourceMimeType = (typeof MEDIA_SOURCE_MIME_TYPES)[number];
+
+export const MEDIA_OUTPUT_MIME_TYPES = ['image/jpeg', 'image/png'] as const;
+export type MediaOutputMimeType = (typeof MEDIA_OUTPUT_MIME_TYPES)[number];
+
+export const ATTACHMENT_PART_STATUSES = [
+  'reserved',
+  'uploading',
+  'checking',
+  'ready',
+  'rejected',
+  'cancelled',
+  'expired',
+] as const;
+export type AttachmentPartStatus = (typeof ATTACHMENT_PART_STATUSES)[number];
+
+export const ATTACHMENT_CANCELLATION_REASONS = [
+  'user',
+  'stale',
+  'expired',
+  'revoked',
+  'shutdown',
+] as const;
+export type AttachmentCancellationReason = (typeof ATTACHMENT_CANCELLATION_REASONS)[number];
+
+export const ATTACHMENT_SUBMISSION_STATUSES = [
+  'accepted',
+  'rejected',
+  'stale',
+  'expired',
+  'cancelled',
+  'delivery-unknown',
+] as const;
+export type AttachmentSubmissionStatus = (typeof ATTACHMENT_SUBMISSION_STATUSES)[number];
+
+/** Host-published bounds for the still-image attachment lane. */
+export interface MediaPolicyDto extends JsonObject {
+  readonly mediaKind: 'image';
+  readonly sourceMimeTypes: readonly MediaSourceMimeType[];
+  readonly outputMimeTypes: readonly MediaOutputMimeType[];
+  readonly maxImagesPerTurn: number;
+  readonly maxSourceBytesPerImage: number;
+  readonly maxSourceBytesPerBatch: number;
+  readonly maxDecodedMegapixels: number;
+  readonly maxSourceEdgePixels: number;
+  readonly maxNormalizedEdgePixels: number;
+  readonly maxNormalizedBytesPerImage: number;
+  readonly maxNormalizedBytesPerTurn: number;
+  readonly maxParallelUploads: number;
+  readonly uncommittedTtlSeconds: number;
+  readonly uploadTicketTtlSeconds: number;
+  readonly uploadBodyDeadlineSeconds: number;
+  readonly maxAttachmentsPerWindow: number;
+  readonly attachmentRateWindowSeconds: number;
+  readonly maxBytesPerWindow: number;
+  readonly byteRateWindowSeconds: number;
+  readonly maxQuarantineBytesPerDevice: number;
+  readonly maxQuarantineBytesRelayWide: number;
+}
+
+export const DEFAULT_MEDIA_POLICY = {
+  mediaKind: 'image',
+  sourceMimeTypes: MEDIA_SOURCE_MIME_TYPES,
+  outputMimeTypes: MEDIA_OUTPUT_MIME_TYPES,
+  maxImagesPerTurn: 4,
+  maxSourceBytesPerImage: 15 * 1024 * 1024,
+  maxSourceBytesPerBatch: 30 * 1024 * 1024,
+  maxDecodedMegapixels: 60,
+  maxSourceEdgePixels: 12_000,
+  maxNormalizedEdgePixels: 2_000,
+  maxNormalizedBytesPerImage: 2 * 1024 * 1024,
+  maxNormalizedBytesPerTurn: 8 * 1024 * 1024,
+  maxParallelUploads: 2,
+  uncommittedTtlSeconds: 10 * 60,
+  uploadTicketTtlSeconds: 90,
+  uploadBodyDeadlineSeconds: 120,
+  maxAttachmentsPerWindow: 12,
+  attachmentRateWindowSeconds: 5 * 60,
+  maxBytesPerWindow: 120 * 1024 * 1024,
+  byteRateWindowSeconds: 60 * 60,
+  maxQuarantineBytesPerDevice: 30 * 1024 * 1024,
+  maxQuarantineBytesRelayWide: 256 * 1024 * 1024,
+} as const satisfies MediaPolicyDto;
+
+export interface RuntimeMediaCapabilityDto extends JsonObject {
+  readonly enabled: boolean;
+  readonly imageIn: boolean;
+  readonly policy: MediaPolicyDto;
+}
+
+export interface AttachmentManifestItem extends JsonObject {
+  readonly clientId: string;
+  readonly ordinal: number;
+  readonly declaredType: MediaSourceMimeType;
+  readonly byteLength: number;
+  readonly sha256: string;
+}
+
+export interface AttachmentSetManifest extends JsonObject {
+  readonly submissionId: string;
+  readonly sessionId: string;
+  readonly sessionEpoch: string;
+  readonly expectedPromptRevision: number;
+  readonly items: readonly AttachmentManifestItem[];
+}
+
+export interface AttachmentPartTicket extends JsonObject {
+  readonly attachmentSetId: string;
+  readonly attachmentId: string;
+  readonly partId: string;
+  readonly ordinal: number;
+  readonly ticket: string;
+  readonly expiresAt: string;
+}
+
+export interface AttachmentPartStatusDto extends JsonObject {
+  readonly attachmentSetId: string;
+  readonly attachmentId: string;
+  readonly partId: string;
+  readonly ordinal: number;
+  readonly status: AttachmentPartStatus;
+}
+
+export interface AttachmentCancellation extends JsonObject {
+  readonly attachmentSetId: string;
+  readonly ticket: string;
+  readonly reason: AttachmentCancellationReason;
+}
+
+export interface AttachmentSubmissionResult extends JsonObject {
+  readonly submissionId: string;
+  readonly status: AttachmentSubmissionStatus;
+  readonly revision: number;
+  readonly attachmentIds: readonly string[];
+}
+
+export interface PromptAttachmentReference extends JsonObject {
+  readonly attachmentSetId: string;
+  readonly attachmentIds: readonly string[];
+}
+
+/** Host-only image content; browser submission DTOs never carry this shape. */
+export interface NormalizedPiImage extends ImageContent {
+  readonly mimeType: MediaOutputMimeType;
+}
+
+export type MediaPolicy = MediaPolicyDto;
+export type RuntimeMediaCapability = RuntimeMediaCapabilityDto;
+export type AttachmentManifestItemDto = AttachmentManifestItem;
+export type AttachmentSetManifestDto = AttachmentSetManifest;
+export type AttachmentPartTicketDto = AttachmentPartTicket;
+export type AttachmentCancellationDto = AttachmentCancellation;
+export type AttachmentSubmissionResultDto = AttachmentSubmissionResult;
+export type PromptAttachmentReferenceDto = PromptAttachmentReference;
+export type NormalizedImage = NormalizedPiImage;
+export type NormalizedImageBlock = NormalizedPiImage;
+
 interface PiRpcCommandBase extends JsonObject {
   readonly id?: string;
 }
@@ -32,6 +196,9 @@ export interface PromptSubmitCommand {
   readonly sessionId: string;
   readonly message: string;
   readonly ticket: string;
+  readonly expectedPromptRevision?: number;
+  readonly attachmentSetId?: string;
+  readonly attachmentIds?: readonly string[];
   /** Absent for an idle send; 'steer' interrupts, 'followUp' queues behind the turn. */
   readonly streamingBehavior?: 'steer' | 'followUp';
   /**
@@ -382,6 +549,19 @@ export interface UsageBlock extends TranscriptBlockBase {
   readonly cost: number;
 }
 
+export const REDACTED_ATTACHMENT_STATUSES = ['delivered', 'delivery-unknown'] as const;
+export type RedactedAttachmentStatus = (typeof REDACTED_ATTACHMENT_STATUSES)[number];
+
+/** Metadata-only durable proof that an image was part of a user turn. */
+export interface RedactedAttachmentBlock extends TranscriptBlockBase {
+  readonly kind: 'attachment';
+  readonly role: 'user';
+  readonly mediaKind: 'image';
+  readonly ordinal: number;
+  readonly status: RedactedAttachmentStatus;
+  readonly previewRetained: false;
+}
+
 export type TranscriptBlock =
   | TextBlock
   | ThinkingBlock
@@ -391,7 +571,8 @@ export type TranscriptBlock =
   | TextArtifactBlock
   | FileDiffBlock
   | FilePreviewBlock
-  | UsageBlock;
+  | UsageBlock
+  | RedactedAttachmentBlock;
 
 export interface TranscriptPageDto {
   readonly sessionId: string;
@@ -704,6 +885,8 @@ export interface RuntimeSnapshotDto {
   readonly sessionId: string;
   readonly state: RuntimeStateDto;
   readonly models: RuntimeModelCatalogDto;
+  /** Optional for legacy snapshots; present on host-published snapshots. */
+  readonly media?: RuntimeMediaCapabilityDto;
 }
 
 export const RUNTIME_ISSUE_CODES = [

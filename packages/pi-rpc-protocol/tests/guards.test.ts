@@ -7,7 +7,13 @@ import { describe, expect, it } from 'vitest';
 import {
   approvalActionDigest,
   canonicalizeApprovalAction,
+  DEFAULT_MEDIA_POLICY,
   enrollmentProof,
+  isAttachmentCancellation,
+  isAttachmentPartStatusDto,
+  isAttachmentPartTicket,
+  isAttachmentSetManifest,
+  isAttachmentSubmissionResult,
   isAvailableModelDto,
   isCommandBindingDto,
   isCommandCatalogDto,
@@ -28,7 +34,10 @@ import {
   isPlanControlResponse,
   isPlanSnapshotDto,
   isPlanValidityValue,
+  isMediaPolicyDto,
+  isNormalizedPiImage,
   isPromptAbortResponse,
+  isPromptAttachmentReference,
   isPromptSubmitCommand,
   isPromptSubmitResponse,
   isRedactionMetadata,
@@ -40,6 +49,7 @@ import {
   isRuntimeIssueCode,
   isRuntimeIssueDto,
   isRuntimeIssueResponse,
+  isRuntimeMediaCapabilityDto,
   isRuntimeModelCatalogDto,
   isRuntimeModelTicketRequest,
   isRuntimeModelTicketResponse,
@@ -52,6 +62,7 @@ import {
   isSyncMessage,
   isTranscriptBlock,
   isTextArtifactBlock,
+  isRedactedAttachmentBlock,
   PLAN_CONTROL_REASON_CODES,
   PLAN_VALIDITY_VALUES,
   RUNTIME_ISSUE_CODES,
@@ -1110,5 +1121,178 @@ describe('plan control guards', () => {
     ]);
     expect(PLAN_CONTROL_REASON_CODES.every(isPlanControlReasonCode)).toBe(true);
     expect(isPlanControlReasonCode('stale_catalog')).toBe(false);
+  });
+
+  it('bounds the media policy and keeps capability host-authored', () => {
+    expect(isMediaPolicyDto(DEFAULT_MEDIA_POLICY)).toBe(true);
+    expect(isMediaPolicyDto({ ...DEFAULT_MEDIA_POLICY, maxImagesPerTurn: 5 })).toBe(false);
+    expect(isMediaPolicyDto({ ...DEFAULT_MEDIA_POLICY, unexpected: true })).toBe(false);
+    expect(
+      isRuntimeMediaCapabilityDto({
+        enabled: false,
+        imageIn: false,
+        policy: DEFAULT_MEDIA_POLICY,
+      }),
+    ).toBe(true);
+    expect(
+      isRuntimeMediaCapabilityDto({
+        enabled: false,
+        imageIn: false,
+        policy: DEFAULT_MEDIA_POLICY,
+        modelLabel: 'vision',
+      }),
+    ).toBe(false);
+  });
+
+  it('accepts bounded manifests, tickets, status, cancellation and results only', () => {
+    const digest = 'A'.repeat(43);
+    const manifest = {
+      submissionId: 'submission_001',
+      sessionId: 'session_local',
+      sessionEpoch: 'epoch_001',
+      expectedPromptRevision: 4,
+      items: [
+        {
+          clientId: 'client_001',
+          ordinal: 1,
+          declaredType: 'image/heic',
+          byteLength: 4_000,
+          sha256: digest,
+        },
+        {
+          clientId: 'client_002',
+          ordinal: 2,
+          declaredType: 'image/png',
+          byteLength: 8_000,
+          sha256: digest,
+        },
+      ],
+    } as const;
+    expect(isAttachmentSetManifest(manifest)).toBe(true);
+    expect(isAttachmentSetManifest({ ...manifest, items: [{ ...manifest.items[0], ordinal: 0 }] })).toBe(
+      false,
+    );
+    expect(isAttachmentSetManifest({ ...manifest, items: [{ ...manifest.items[0], sha256: 'bad' }] })).toBe(
+      false,
+    );
+    expect(isAttachmentSetManifest({ ...manifest, extra: true })).toBe(false);
+    expect(
+      isAttachmentPartTicket({
+        attachmentSetId: 'set_001',
+        attachmentId: 'attachment_001',
+        partId: 'part_001',
+        ordinal: 1,
+        ticket: 'ticket_attachment_001',
+        expiresAt: '2026-01-01T00:00:00.000Z',
+      }),
+    ).toBe(true);
+    expect(
+      isAttachmentPartStatusDto({
+        attachmentSetId: 'set_001',
+        attachmentId: 'attachment_001',
+        partId: 'part_001',
+        ordinal: 1,
+        status: 'ready',
+      }),
+    ).toBe(true);
+    expect(
+      isAttachmentCancellation({
+        attachmentSetId: 'set_001',
+        ticket: 'ticket_attachment_001',
+        reason: 'user',
+      }),
+    ).toBe(true);
+    expect(
+      isAttachmentSubmissionResult({
+        submissionId: 'submission_001',
+        status: 'accepted',
+        revision: 5,
+        attachmentIds: ['attachment_001', 'attachment_002'],
+      }),
+    ).toBe(true);
+  });
+
+  it('accepts attachment references but rejects pixel-bearing prompt fields', () => {
+    const reference = {
+      attachmentSetId: 'set_001',
+      attachmentIds: ['attachment_001', 'attachment_002'],
+    } as const;
+    expect(isPromptAttachmentReference(reference)).toBe(true);
+    expect(isPromptAttachmentReference({ ...reference, path: '/tmp/photo.jpg' })).toBe(false);
+    expect(
+      isPromptSubmitCommand({
+        type: 'prompt.submit',
+        submissionId: 'submission_001',
+        sessionId: 'session_local',
+        message: '',
+        ticket: 'ticket_prompt_001',
+        expectedPromptRevision: 4,
+        ...reference,
+      }),
+    ).toBe(true);
+    expect(
+      isPromptSubmitCommand({
+        type: 'prompt.submit',
+        submissionId: 'submission_001',
+        sessionId: 'session_local',
+        message: '',
+        ticket: 'ticket_prompt_001',
+        expectedPromptRevision: 4,
+        ...reference,
+        base64: 'AAAA',
+      }),
+    ).toBe(false);
+    expect(
+      isPromptSubmitCommand({
+        type: 'prompt.submit',
+        submissionId: 'submission_001',
+        sessionId: 'session_local',
+        message: 'caption',
+        ticket: 'ticket_prompt_001',
+        expectedPromptRevision: 4,
+        attachmentSetId: 'set_001',
+        attachmentIds: ['attachment_001', 'attachment_001'],
+      }),
+    ).toBe(false);
+    expect(
+      isPromptSubmitCommand({
+        type: 'prompt.submit',
+        submissionId: 'submission_001',
+        sessionId: 'session_local',
+        message: 'caption',
+        ticket: 'ticket_prompt_001',
+        expectedPromptRevision: 1_000_000_001,
+      }),
+    ).toBe(false);
+  });
+
+  it('guards normalized Pi images without decoding or accepting data URLs', () => {
+    const image = { type: 'image', mimeType: 'image/jpeg', data: 'AAAA' } as const;
+    expect(isNormalizedPiImage(image)).toBe(true);
+    expect(isPiRpcCommand({ type: 'prompt', message: 'caption', images: [image] })).toBe(true);
+    expect(isNormalizedPiImage({ ...image, mimeType: 'image/gif' })).toBe(false);
+    expect(isNormalizedPiImage({ ...image, data: 'data:image/jpeg;base64,AAAA' })).toBe(false);
+    expect(isNormalizedPiImage({ ...image, extra: true })).toBe(false);
+  });
+
+  it('allowlists redacted attachment blocks and safely ignores unknown kinds', () => {
+    const block = {
+      id: 'attachment_block_001',
+      revision: 1,
+      seq: 1,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'attachment',
+      role: 'user',
+      mediaKind: 'image',
+      ordinal: 1,
+      status: 'delivered',
+      previewRetained: false,
+    } as const;
+    expect(isRedactedAttachmentBlock(block)).toBe(true);
+    expect(isTranscriptBlock(block)).toBe(true);
+    expect(isRedactedAttachmentBlock({ ...block, digest: 'A'.repeat(43) })).toBe(false);
+    expect(isRedactedAttachmentBlock({ ...block, previewRetained: true })).toBe(false);
+    expect(isRedactedAttachmentBlock({ ...block, ordinal: 5 })).toBe(false);
+    expect(isTranscriptBlock({ ...block, kind: 'future_attachment' })).toBe(false);
   });
 });

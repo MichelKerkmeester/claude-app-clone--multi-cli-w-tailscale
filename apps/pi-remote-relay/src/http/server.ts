@@ -100,6 +100,7 @@ export interface ReadOnlyServerOptions {
   readonly commands?: CommandService;
   readonly push?: PushService;
   readonly now?: () => number;
+  readonly mediaEnabled?: boolean;
 }
 
 export interface RunningReadOnlyServer {
@@ -330,6 +331,11 @@ async function handleHttp(
     sendJson(response, 429, { error: 'rate_limited' });
     return;
   }
+  if (isAttachmentRoute(ingress.path) && options.mediaEnabled !== true) {
+    discardRequest(request);
+    sendJson(response, 404, { error: 'not_found' });
+    return;
+  }
   if (request.method !== 'POST' && parseArtifactRoute(ingress.path) === null) {
     discardRequest(request);
     sendJson(response, 405, { error: 'read_only' });
@@ -396,7 +402,7 @@ async function handleHttp(
   }
 
   const sessionToken = readCookie(request, SESSION_COOKIE);
-  const action = actionForRequest(ingress.path);
+  const action = actionForRequest(ingress.path, options.mediaEnabled === true);
   const session = auth.authenticate(
     sessionToken,
     ingress.origin,
@@ -1025,7 +1031,21 @@ function safePathPrefix(path: string, prefix: string): boolean {
   return candidate.length === expected.length && timingSafeEqual(candidate, expected);
 }
 
-function actionForRequest(path: string): string | null {
+function actionForRequest(path: string, mediaEnabled = false): string | null {
+  if (isAttachmentRoute(path)) {
+    if (!mediaEnabled) return null;
+    if (path === '/api/attachment-sets') return 'attachment:reserve';
+    if (/^\/api\/attachment-sets\/[^/]+\/parts\/[^/]+$/.test(path)) {
+      return 'attachment:upload';
+    }
+    if (/^\/api\/attachment-sets\/[^/]+\/status$/.test(path)) {
+      return 'attachment:status';
+    }
+    if (/^\/api\/attachment-sets\/[^/]+\/cancel$/.test(path)) {
+      return 'attachment:cancel';
+    }
+    return null;
+  }
   if (path === '/health') return 'health:read';
   if (path === '/api/sessions') return 'sessions:list';
   if (path === '/api/attention' || path === '/api/attention/open') return 'attention:read';
@@ -1055,6 +1075,15 @@ function actionForRequest(path: string): string | null {
   if (path === '/api/plan/binding') return 'plan:control';
   if (path === '/api/commands/list') return 'commands:list';
   return null;
+}
+
+function isAttachmentRoute(path: string): boolean {
+  return (
+    path === '/api/attachment-sets' ||
+    /^\/api\/attachment-sets\/[^/]+\/parts\/[^/]+$/.test(path) ||
+    /^\/api\/attachment-sets\/[^/]+\/status$/.test(path) ||
+    /^\/api\/attachment-sets\/[^/]+\/cancel$/.test(path)
+  );
 }
 
 function statusForControlOutcome(result: RuntimeControlResponse | PlanControlResponse): number {

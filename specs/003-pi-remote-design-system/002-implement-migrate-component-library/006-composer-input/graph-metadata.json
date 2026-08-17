@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/006-composer-input",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/006-composer-input",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "grandchild",
+      "composer",
+      "input",
+      "plan",
+      "tasks",
+      "checklist"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "checklist.md",
+      "spec.md",
+      "plan.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary This",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Goal The",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Redaction Styling",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "per-state",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "composer",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach Migrate",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "text",
+        "kind": "technology",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Steps",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Files to change",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Grandchild 6 — Composer input",
+    "created_at": "2026-08-17T05:00:07.059Z",
+    "last_save_at": "2026-08-17T05:11:28.553Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:ecc5e5447068ac76808b600c05c46ce5404778fe1da4b0d35501607f3f9bd061",
+    "source_doc_hashes": {
+      "spec.md": "9e3cb01098bf0266312e23dcfb4d0a03e87d3bcb85878f83d3f0b7b5fcb98bf6",
+      "plan.md": "c11a3fc6476d0e01ccf3940bc34cef1affb094cdbef5dee70af352496324284a",
+      "tasks.md": "378532fcc46794494b478a8b9e522a6e0a9303038247a50095bd26c89d370749",
+      "checklist.md": "3f96d128ad7431b6d32e1f5c9edf8cf152794344eb9e22f09857fd7764270314"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

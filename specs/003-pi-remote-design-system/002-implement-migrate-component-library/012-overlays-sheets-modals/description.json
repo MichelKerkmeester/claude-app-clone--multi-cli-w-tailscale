@@ -1,0 +1,22 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/012-overlays-sheets-modals",
+  "description": "Grandchild 12 — Overlay, sheet & modal primitives",
+  "keywords": [
+    "grandchild",
+    "overlay",
+    "sheet",
+    "modal",
+    "primitives"
+  ],
+  "lastUpdated": "2026-08-17T04:55:42.603Z",
+  "specId": "012",
+  "folderSlug": "overlays-sheets-modals",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-pi-remote-design-system",
+    "002-implement-migrate-component-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

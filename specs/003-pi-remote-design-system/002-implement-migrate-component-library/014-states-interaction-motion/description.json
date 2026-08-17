@@ -1,0 +1,22 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/014-states-interaction-motion",
+  "description": "Grandchild 14 — State vocabulary, interaction & motion",
+  "keywords": [
+    "grandchild",
+    "state",
+    "vocabulary",
+    "interaction",
+    "motion"
+  ],
+  "lastUpdated": "2026-08-17T04:57:28.406Z",
+  "specId": "014",
+  "folderSlug": "states-interaction-motion",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-pi-remote-design-system",
+    "002-implement-migrate-component-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

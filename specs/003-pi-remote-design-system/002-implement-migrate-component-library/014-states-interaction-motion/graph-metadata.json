@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/014-states-interaction-motion",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/014-states-interaction-motion",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "grandchild",
+      "state",
+      "vocabulary",
+      "interaction",
+      "motion",
+      "plan",
+      "tasks",
+      "checklist"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "checklist.md",
+      "spec.md",
+      "plan.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary This",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Goal The",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Redaction Styling",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem & Goal",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach Consolidate",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "text",
+        "kind": "technology",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "their",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Steps",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Grandchild 14 — State vocabulary, interaction & motion",
+    "created_at": "2026-08-17T05:00:09.779Z",
+    "last_save_at": "2026-08-17T05:11:31.675Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:25cf5d4b42bfbfb29a25d08135f7c972eeea27477b235191f893e9086b843ff6",
+    "source_doc_hashes": {
+      "spec.md": "81e46d8a5c5b4149dede8b4711c512ab5fc8b0aa7dad1810c864e1a140e20cd3",
+      "plan.md": "249b8752f3b72bd84f4a72c387ea12865e649b78493e1f93c9e7aaac6f7dd209",
+      "tasks.md": "abf8c3963f1ae9db143c986c118229d3bf221114ae7641e6cad5dbdcb8d3caac",
+      "checklist.md": "8adccc068dcfc08d6a67fb07a0b5dc247e05c1423df0aece60220820903cd53e"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

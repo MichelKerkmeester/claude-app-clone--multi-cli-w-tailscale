@@ -1,0 +1,20 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/009-plan-mode-controls",
+  "description": "Grandchild 9 — Plan-mode controls",
+  "keywords": [
+    "grandchild",
+    "plan-mode",
+    "controls"
+  ],
+  "lastUpdated": "2026-08-17T04:57:05.351Z",
+  "specId": "009",
+  "folderSlug": "plan-mode-controls",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-pi-remote-design-system",
+    "002-implement-migrate-component-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

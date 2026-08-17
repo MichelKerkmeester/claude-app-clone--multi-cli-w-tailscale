@@ -1,0 +1,32 @@
+{
+  "topic": "Architecture, conventions & token library for a designer-editable coded design system for apps/pi-remote-web.\n\nGoal: Decide, with cited evidence, (1) the component architecture and file/setup conventions, (2) the designer-editability model — token-first CSS, an inline-comment grammar labelling each editable region and per-state block, variant/slot conventions, 'edit here' seams, and guardrails keeping logic and the security boundary out of a designer's edit path, and (3) the token-library architecture — primitive -> semantic -> component layering with the frozen ink-on-parchment palette as the primitive source, the light/dark theming mechanism, and WCAG AA contrast guaranteed at the token layer.\n\nReference direction (investigate, do not assume): the Untitled UI React library, shadcn/ui, Radix Themes, Material 3 tokens, Polaris token tiers.",
+  "status": "pending",
+  "provenance": "TBD",
+  "runtimeNote": "Models are TBD (operator-defined). The 20 iterations are NOT run in this packet; this manifest and the iterations/ scaffold are created for a later operator-run pass. Runtime state artifacts are intentionally absent until the run (see PROVENANCE.md).",
+  "antiConvergence": {
+    "policy": "no-early-convergence",
+    "minIterations": 20
+  },
+  "iterationsPlanned": 20,
+  "iterationsComplete": 0,
+  "modelsTBD": true,
+  "executors": [],
+  "createdAt": "2026-08-17T00:00:00.000Z",
+  "completedAt": null,
+  "outputs": {
+    "research": "research.md",
+    "iterations": "iterations/iteration-NNN.md",
+    "brief": "BRIEF.md",
+    "topic": ".research-topic.txt"
+  },
+  "absentRuntimeArtifacts": [
+    "deep-research-state.jsonl",
+    "findings-registry.json",
+    "deep-research-dashboard.md",
+    "observability-events.jsonl",
+    "orchestration-summary.json",
+    "deltas/",
+    "dispatch-receipts/",
+    "lineages/"
+  ]
+}

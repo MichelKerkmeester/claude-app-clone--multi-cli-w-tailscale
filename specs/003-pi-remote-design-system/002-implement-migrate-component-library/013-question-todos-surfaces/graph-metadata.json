@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/013-question-todos-surfaces",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/013-question-todos-surfaces",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "grandchild",
+      "plan",
+      "todo",
+      "ask-question",
+      "surfaces",
+      "tasks",
+      "checklist"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "checklist.md",
+      "spec.md",
+      "plan.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary This",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Goal In",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Redaction Styling",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Summary",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem & Goal",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Scope",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Approach Migrate",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "text",
+        "kind": "technology",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "done",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "option",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "status",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Grandchild 13 — Plan/todo & ask-question surfaces",
+    "created_at": "2026-08-17T05:00:09.452Z",
+    "last_save_at": "2026-08-17T05:11:31.337Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:814ce6c3e8896835ba3d3559f75bd7beff0fca1058746f299b4541699761622f",
+    "source_doc_hashes": {
+      "spec.md": "e34b8f95d2ffa2e479e3f0026ce49b14611405d6dd6e4e4ab254119ae0c4b384",
+      "plan.md": "28818d5b2c54b256113d52c8ff0a6540a8f2e8b91cf1024c95c440c9941bb2d8",
+      "tasks.md": "8bfa39f70a922eeaa507e5db53a11c88b44891798dc327ae6e551134a0a30ec4",
+      "checklist.md": "574b3acb48458e386fc4e651bd5b2a6c588793fbf82d36465fb551cc4c4defd5"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

@@ -1,0 +1,10 @@
+Architecture, conventions & token library for a designer-editable coded design system for apps/pi-remote-web.
+
+Decide, with cited evidence:
+1. Component architecture and file/setup conventions (keeping the single style.css + Tailwind-4 @theme authorship model; react-aria owns behaviour/state).
+2. Designer-editability model: token-first CSS; the inline-comment grammar (working proposal @ds surface: / @ds edit: / @ds slot: / @ds state: / @ds guardrail:); variant/slot conventions; "edit here" seams; guardrails keeping logic and the security boundary out of a designer's edit path.
+3. Token-library architecture: primitive -> semantic -> component layering; the frozen ink-on-parchment palette as the primitive source; the light/dark theming mechanism; WCAG AA contrast guaranteed by the semantic->primitive map.
+
+Reference direction (investigate, do not assume): Untitled UI React library, shadcn/ui, Radix Themes, Material 3 tokens, Polaris token tiers.
+
+Models: TBD (operator-defined). 20 iterations, no early convergence. NOT run in this packet.

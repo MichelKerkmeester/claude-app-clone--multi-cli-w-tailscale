@@ -1,0 +1,21 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/008-slash-command-autocomplete",
+  "description": "Grandchild 8 — Slash command autocomplete",
+  "keywords": [
+    "grandchild",
+    "slash",
+    "command",
+    "autocomplete"
+  ],
+  "lastUpdated": "2026-08-17T04:56:13.616Z",
+  "specId": "008",
+  "folderSlug": "slash-command-autocomplete",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-pi-remote-design-system",
+    "002-implement-migrate-component-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

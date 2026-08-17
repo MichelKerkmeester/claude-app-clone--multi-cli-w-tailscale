@@ -1,0 +1,21 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/011-artifacts-viewer-previews",
+  "description": "Grandchild 11 — Artifacts viewer & previews",
+  "keywords": [
+    "grandchild",
+    "artifacts",
+    "viewer",
+    "previews"
+  ],
+  "lastUpdated": "2026-08-17T04:58:47.903Z",
+  "specId": "011",
+  "folderSlug": "artifacts-viewer-previews",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-pi-remote-design-system",
+    "002-implement-migrate-component-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

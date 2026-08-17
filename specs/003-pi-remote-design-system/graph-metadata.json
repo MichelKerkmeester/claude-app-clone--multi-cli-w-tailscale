@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system",
+  "parent_id": null,
+  "children_ids": [
+    "app-mobile-cli/003-pi-remote-design-system/001-architecture-conventions-tokens",
+    "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library",
+    "app-mobile-cli/003-pi-remote-design-system/003-refine-audit-designer-editability",
+    "app-mobile-cli/003-pi-remote-design-system/004-sk-code-mobile-cli-mode",
+    "app-mobile-cli/003-pi-remote-design-system/001-architecture-conventions-tokens",
+    "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library",
+    "app-mobile-cli/003-pi-remote-design-system/003-refine-audit-designer-editability",
+    "app-mobile-cli/003-pi-remote-design-system/004-sk-code-mobile-cli-mode"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "feature specification: pi remote — designer-editable coded design system"
+    ],
+    "key_topics": [
+      "feature",
+      "specification",
+      "remote",
+      "designer-editable",
+      "coded",
+      "design",
+      "system",
+      "web",
+      "app",
+      "already",
+      "reaches",
+      "claude"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md",
+      "001-architecture-conventions-tokens/research/research.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Feature Specification",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Editable Coded Design System",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Prepare Phase",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement The Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Bring",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "The Pi Remote web app already reaches Claude/Kimi-app visual quality, but its UI is authored as one 5,000-line global stylesheet plus ~55 hand-styled React components with no shared component API, no formal token layering, and no catalog",
+    "created_at": "2026-08-17T05:00:03.045Z",
+    "last_save_at": "2026-08-17T05:11:25.523Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:a94be133aff1363c281f6c7983042212426505d12faa4bb8d6625c981188d1da",
+    "source_doc_hashes": {
+      "spec.md": "804f28cacb338af4e054d8005bee5d598c43f056fd705d0fe6f34f8e8c8a453a"
+    },
+    "last_active_child_id": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library",
+    "last_active_at": null
+  }
+}

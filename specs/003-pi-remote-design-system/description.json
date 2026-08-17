@@ -1,0 +1,31 @@
+{
+  "level": "phase",
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system",
+  "description": "The Pi Remote web app already reaches Claude/Kimi-app visual quality, but its UI is authored as one 5,000-line global stylesheet plus ~55 hand-styled",
+  "keywords": [
+    "remote",
+    "web",
+    "app",
+    "already",
+    "reaches",
+    "claude",
+    "kimi-app",
+    "visual",
+    "quality",
+    "authored",
+    "one",
+    "000-line",
+    "global",
+    "stylesheet",
+    "plus",
+    "hand-styled"
+  ],
+  "lastUpdated": "2026-08-17T04:43:41.873Z",
+  "specId": "003",
+  "folderSlug": "pi-remote-design-system",
+  "parentChain": [
+    "app-mobile-cli"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

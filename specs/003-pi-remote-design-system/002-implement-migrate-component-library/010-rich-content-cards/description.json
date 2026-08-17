@@ -1,0 +1,21 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/010-rich-content-cards",
+  "description": "Grandchild 10 — Rich content cards",
+  "keywords": [
+    "grandchild",
+    "rich",
+    "content",
+    "cards"
+  ],
+  "lastUpdated": "2026-08-17T04:57:54.249Z",
+  "specId": "010",
+  "folderSlug": "rich-content-cards",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-pi-remote-design-system",
+    "002-implement-migrate-component-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

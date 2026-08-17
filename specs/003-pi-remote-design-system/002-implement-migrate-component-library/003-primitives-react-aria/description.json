@@ -1,0 +1,20 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library/003-primitives-react-aria",
+  "description": "Grandchild 3 — Control primitives",
+  "keywords": [
+    "grandchild",
+    "control",
+    "primitives"
+  ],
+  "lastUpdated": "2026-08-17T04:55:22.336Z",
+  "specId": "003",
+  "folderSlug": "primitives-react-aria",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-pi-remote-design-system",
+    "002-implement-migrate-component-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

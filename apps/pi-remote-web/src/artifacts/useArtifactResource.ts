@@ -58,6 +58,8 @@ export interface ArtifactResourceSnapshot {
   readonly bytes: Uint8Array | null;
   /** Created only after length, digest, local hash, and image decode pass. */
   readonly objectUrl: string | null;
+  /** True when the verified bounded foreground retention supplied this value. */
+  readonly offlineLoaded?: boolean;
   readonly errorCode: ArtifactReadErrorCode | null;
   readonly reload: () => void;
   readonly close: () => void;
@@ -78,12 +80,14 @@ export interface UseArtifactResourceOptions {
 
 interface ActiveRequest {
   readonly generation: number;
+  readonly variant: ArtifactReadVariant;
   readonly controller: AbortController;
   timer: number | null;
   bytes: Uint8Array | null;
   storeKey: string | null;
   storeVariant: ArtifactReadVariant | null;
   worker: Worker | null;
+  onPurge: (() => void) | null;
 }
 
 interface StoredArtifactResource {
@@ -95,9 +99,12 @@ interface StoredArtifactResource {
   lastUsed: number;
 }
 
+type LoadedArtifactResource = ArtifactResource & { readonly retained?: boolean };
+
 const EMPTY_IDENTITY = 'none';
 const thumbnailStore = new Map<string, StoredArtifactResource>();
 const fullStore = new Map<string, StoredArtifactResource>();
+const activeRequests = new Set<ActiveRequest>();
 let resourceUseClock = 0;
 
 const ARTIFACT_LIFECYCLE_EVENTS = [
@@ -105,10 +112,12 @@ const ARTIFACT_LIFECYCLE_EVENTS = [
   'pi-remote:logout',
   'pi-remote:session-switch',
   'pi-remote:artifact-revoked',
+  'pi-remote:transcript-superseded',
   'privacy-cover',
   'logout',
   'session-switch',
   'artifact-revoked',
+  'transcript-superseded',
 ] as const;
 
 function storeFor(variant: ArtifactReadVariant): Map<string, StoredArtifactResource> {
@@ -177,12 +186,10 @@ function releaseObjectUrl(key: string, variant: ArtifactReadVariant): void {
   }
 }
 
-/** Clears every memory-only artifact blob and URL owned by the viewer layer. */
-export function clearArtifactResourceStore(): void {
-  for (const store of [thumbnailStore, fullStore]) {
-    for (const entry of store.values()) revokeStoredUrl(entry);
-    store.clear();
-  }
+function clearStore(variant: ArtifactReadVariant): void {
+  const store = storeFor(variant);
+  for (const entry of store.values()) revokeStoredUrl(entry);
+  store.clear();
 }
 
 function blockIdentity(
@@ -234,6 +241,7 @@ function snapshotFor(
   errorCode: ArtifactReadErrorCode | null = null,
   bytes: Uint8Array | null = null,
   objectUrl: string | null = null,
+  offlineLoaded = false,
 ): ArtifactResourceSnapshot {
   const identity = blockIdentity(block, variant);
   return {
@@ -247,6 +255,7 @@ function snapshotFor(
     buffer: text,
     bytes,
     objectUrl,
+    offlineLoaded,
     errorCode,
     reload: () => undefined,
     close: () => undefined,
@@ -328,6 +337,7 @@ function readVerifiedArtifact(
 }
 
 function cleanupRequest(request: ActiveRequest): void {
+  activeRequests.delete(request);
   if (request.timer !== null) window.clearTimeout(request.timer);
   request.timer = null;
   request.controller.abort();
@@ -342,12 +352,41 @@ function cleanupRequest(request: ActiveRequest): void {
   request.bytes = null;
 }
 
+function purgeActiveRequests(variant: ArtifactReadVariant | null): void {
+  for (const request of [...activeRequests]) {
+    if (variant !== null && request.variant !== variant) continue;
+    request.onPurge?.();
+    cleanupRequest(request);
+  }
+}
+
+/** Purges every in-memory artifact pixel and cancels each active request. */
+export function purgeArtifactResourceStore(): void {
+  purgeActiveRequests(null);
+  clearStore('thumbnail');
+  clearStore('full');
+}
+
+/** Drops a previous full resource while preserving verified thumbnails. */
+export function clearArtifactFullResourceStore(): void {
+  purgeActiveRequests('full');
+  clearStore('full');
+}
+
+/** Clears every memory-only artifact blob and URL owned by the viewer layer. */
+export function clearArtifactResourceStore(): void {
+  purgeArtifactResourceStore();
+}
+
 function mapReadError(error: unknown): {
   readonly status: ArtifactResourceStatus;
   readonly code: ArtifactReadErrorCode | null;
 } {
   if (isAbortError(error)) return { status: 'aborted', code: null };
   const code = artifactReadDisplayCode(error);
+  if (code === 'unavailable' && typeof navigator !== 'undefined' && !navigator.onLine) {
+    return { status: 'offline', code };
+  }
   if (code !== null) {
     return {
       status:
@@ -377,9 +416,27 @@ async function loadVerifiedResource(
   variant: ArtifactReadVariant,
   signal: AbortSignal,
   read: NonNullable<UseArtifactResourceOptions['read']>,
-): Promise<ArtifactResource> {
+): Promise<LoadedArtifactResource> {
   const identity = blockIdentity(block, variant);
   if (identity === null) throw new Error('Artifact identity is unavailable.');
+  const retained = storeFor(variant).get(identityKey(block, variant));
+  if (retained !== undefined) {
+    const retainedBytes = new Uint8Array(await retained.blob.arrayBuffer());
+    return {
+      bytes: retainedBytes,
+      contentType: identity.contentType,
+      revision: identity.revision,
+      etag: `"${identity.digest}"`,
+      digest: identity.digest,
+      contentDigest: identity.digest,
+      retained: true,
+    };
+  }
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    const unavailable = new Error('The retained artifact is unavailable while offline.');
+    Object.assign(unavailable, { code: 'unavailable' as const });
+    throw unavailable;
+  }
   const resource =
     isFilePreviewBlock(block) && block.content.kind === 'inline-text'
       ? {
@@ -394,14 +451,6 @@ async function loadVerifiedResource(
         : await read(sessionId, block, signal, variant);
 
   if (signal.aborted) throw new DOMException('The artifact request was aborted.', 'AbortError');
-  if (
-    resource.revision !== identity.revision ||
-    stripEtagQuotes(resource.etag).toLowerCase() !== identity.digest.toLowerCase()
-  ) {
-    const conflict = new Error('Artifact revision conflict.');
-    Object.assign(conflict, { code: 'revision-conflict' as const });
-    throw conflict;
-  }
   if (resource.bytes.byteLength > MAX_ARTIFACT_RESOURCE_BYTES) {
     const tooLarge = new Error('Artifact is too large.');
     Object.assign(tooLarge, { code: 'too-large' as const });
@@ -413,8 +462,18 @@ async function loadVerifiedResource(
     throw conflict;
   }
   if (
-    resource.contentDigest !== undefined &&
-    resource.contentDigest.toLowerCase() !== identity.digest.toLowerCase()
+    resource.revision !== identity.revision ||
+    resource.contentType !== identity.contentType ||
+    stripEtagQuotes(resource.etag).toLowerCase() !== identity.digest.toLowerCase()
+  ) {
+    const conflict = new Error('Artifact revision conflict.');
+    Object.assign(conflict, { code: 'revision-conflict' as const });
+    throw conflict;
+  }
+  if (
+    isInboundImageReadyBlock(block) &&
+    (resource.contentDigest === undefined ||
+      resource.contentDigest.toLowerCase() !== identity.digest.toLowerCase())
   ) {
     const mismatch = new Error('Artifact content digest mismatch.');
     Object.assign(mismatch, { code: 'digest-mismatch' as const });
@@ -458,8 +517,16 @@ export function useArtifactResource(
   const generationRef = useRef(0);
   const activeRef = useRef<ActiveRequest | null>(null);
   const closedRef = useRef(false);
+  const retryKeyRef = useRef(key);
+  const retryCountRef = useRef(0);
+  if (retryKeyRef.current !== key) {
+    retryKeyRef.current = key;
+    retryCountRef.current = 0;
+  }
 
   const reload = () => {
+    if (retryKeyRef.current !== key || retryCountRef.current >= 1) return;
+    retryCountRef.current += 1;
     closedRef.current = false;
     setRequestNumber((current) => current + 1);
   };
@@ -521,16 +588,26 @@ export function useArtifactResource(
     const controller = new AbortController();
     const request: ActiveRequest = {
       generation,
+      variant,
       controller,
       timer: null,
       bytes: null,
       storeKey: null,
       storeVariant: null,
       worker: null,
+      onPurge: null,
     };
     const previous = activeRef.current;
     if (previous !== null) cleanupRequest(previous);
     activeRef.current = request;
+    request.onPurge = () => {
+      if (activeRef.current?.generation !== generation) return;
+      closedRef.current = true;
+      generationRef.current += 1;
+      activeRef.current = null;
+      setState(snapshotFor(key, currentBlock, variant, 'closed'));
+    };
+    activeRequests.add(request);
     setState(snapshotFor(key, currentBlock, variant, 'loading'));
     const stallMs = options.stallMs ?? ARTIFACT_RESOURCE_STALL_MS;
     request.timer = window.setTimeout(() => {
@@ -616,6 +693,7 @@ export function useArtifactResource(
             null,
             binary ? resource.bytes : null,
             objectUrl,
+            resource.retained === true,
           ),
         );
       })

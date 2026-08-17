@@ -218,6 +218,7 @@ async function waitForProcessExit(process) {
 }
 
 async function exercise(client, theme, fixture, requestedState, outputPath, viewportWidth) {
+  const demoFixture = fixture === 'viewer-ready' ? 'inline-card' : fixture;
   await client.send('Emulation.setDeviceMetricsOverride', {
     width: viewportWidth,
     height: 844,
@@ -225,7 +226,7 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
     mobile: true,
   });
   await client.send('Page.navigate', {
-    url: `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=${encodeURIComponent(fixture)}${requestedState === null ? '' : `&state=${encodeURIComponent(requestedState)}`}`,
+    url: `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=${encodeURIComponent(demoFixture)}${requestedState === null ? '' : `&state=${encodeURIComponent(requestedState)}`}`,
   });
   await waitForPage(client, 'document.readyState === "complete"');
   await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
@@ -236,6 +237,13 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
   await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
   if (fixture === 'inbound-media') await waitForUnsupportedRow(client);
   else await waitForInboundCard(client);
+  if (fixture === 'viewer-ready') {
+    await evaluate(
+      client,
+      `document.querySelector('[data-inbound-image-card="true"] button, [data-inbound-image-card="true"] [role="button"]')?.click()`,
+    );
+    await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") !== null');
+  }
 
   const state = await evaluate(
     client,
@@ -262,6 +270,13 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
         cardText: card?.textContent ?? '',
         cardButtonCount: cardButton.length,
         cardHasVerifiedImage: card?.querySelector('[data-verified-image="true"]') !== null,
+        viewerOpen: document.querySelector('.artifact-viewer-dialog') !== null,
+        viewerState: document.querySelector('.artifact-viewer-overlay')?.getAttribute('data-artifact-state'),
+        viewerHasClose: [...document.querySelectorAll('.artifact-viewer-dialog button, .artifact-viewer-dialog [role="button"]')]
+          .some((node) => /close/i.test(node.getAttribute('aria-label') ?? node.textContent ?? '')),
+        viewerForbiddenControls: [...document.querySelectorAll('.artifact-viewer-dialog button, .artifact-viewer-dialog a')]
+          .map((node) => node.getAttribute('aria-label') ?? node.textContent ?? '')
+          .filter((text) => /export|capture|re-send|share|save|copy|download|public url/i.test(text)),
         imageElements: document.querySelectorAll('img, canvas, video, audio').length,
         enablingControls: controls,
       };
@@ -296,6 +311,15 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
     ) {
       throw new Error(`Disabled inbound-media fixture failed: ${JSON.stringify(state)}`);
     }
+  } else if (fixture === 'viewer-ready') {
+    if (
+      !state.viewerOpen ||
+      !state.viewerHasClose ||
+      state.viewerForbiddenControls.length !== 0 ||
+      state.viewerState === 'privacy-covered'
+    ) {
+      throw new Error(`Viewer-ready fixture failed: ${JSON.stringify(state)}`);
+    }
   } else {
     const expectedCopy = {
       processing: 'Preparing preview',
@@ -328,9 +352,10 @@ async function main() {
   const fixture = options.fixture ?? 'inbound-media';
   const state = options.state ?? null;
   const theme = requiredOption(options, 'theme');
-  const output = requiredOption(options, 'screenshot');
+  const output =
+    options.screenshot ?? join(tmpdir(), `pi-remote-inbound-${fixture}-${theme}.png`);
   const viewportWidth = Number(options['viewport-width'] ?? '390');
-  if (fixture !== 'inbound-media' && fixture !== 'inline-card') {
+  if (fixture !== 'inbound-media' && fixture !== 'inline-card' && fixture !== 'viewer-ready') {
     throw new Error(`Unsupported fixture: ${fixture}`);
   }
   if (

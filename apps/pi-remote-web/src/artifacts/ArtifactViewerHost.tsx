@@ -213,7 +213,10 @@ interface SecureImagePreviewProps {
   readonly alt: string;
   readonly zoom: number;
   readonly pan: ImagePan;
+  readonly imageState: 'loading' | 'ready' | 'full-degraded';
+  readonly isFull: boolean;
   readonly onPanChange: (pan: ImagePan) => void;
+  readonly onZoomChange: (zoom: number) => void;
   readonly onStateChange: (status: ArtifactResourceStatus) => void;
 }
 
@@ -222,7 +225,10 @@ function SecureImagePreview({
   alt,
   zoom,
   pan,
+  imageState,
+  isFull,
   onPanChange,
+  onZoomChange,
   onStateChange,
 }: SecureImagePreviewProps) {
   const panStartRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
@@ -254,19 +260,57 @@ function SecureImagePreview({
     <section
       className="image-preview"
       aria-label="Sanitized image preview"
-      data-image-state="ready"
+      data-image-state={imageState}
     >
       <div
         className="image-preview-stage"
+        role="group"
+        tabIndex={0}
+        aria-label="Image zoom and pan surface"
+        onKeyDown={(event) => {
+          if (event.key === '+' || event.key === '=') {
+            event.preventDefault();
+            onZoomChange(zoom + 1);
+          } else if (event.key === '-' || event.key === '_') {
+            event.preventDefault();
+            onZoomChange(zoom - 1);
+          } else if (event.key === '0') {
+            event.preventDefault();
+            onZoomChange(IMAGE_MIN_ZOOM);
+          } else if (
+            event.key === 'ArrowUp' ||
+            event.key === 'ArrowDown' ||
+            event.key === 'ArrowLeft' ||
+            event.key === 'ArrowRight'
+          ) {
+            event.preventDefault();
+            const delta = 48;
+            onPanChange({
+              x:
+                pan.x +
+                (event.key === 'ArrowLeft' ? -delta : event.key === 'ArrowRight' ? delta : 0),
+              y:
+                pan.y +
+                (event.key === 'ArrowUp' ? -delta : event.key === 'ArrowDown' ? delta : 0),
+            });
+          }
+        }}
         onPointerDown={(event) => {
           if (event.pointerType !== 'mouse' && zoom > IMAGE_MIN_ZOOM) {
+            event.stopPropagation();
             event.currentTarget.setPointerCapture(event.pointerId);
             panStartRef.current = { x: event.clientX, y: event.clientY, panX: pan.x, panY: pan.y };
           }
         }}
         onPointerMove={updatePan}
-        onPointerUp={stopPan}
-        onPointerCancel={stopPan}
+        onPointerUp={(event) => {
+          if (zoom > IMAGE_MIN_ZOOM) event.stopPropagation();
+          stopPan();
+        }}
+        onPointerCancel={(event) => {
+          if (zoom > IMAGE_MIN_ZOOM) event.stopPropagation();
+          stopPan();
+        }}
         onPointerLeave={stopPan}
       >
         <img
@@ -274,8 +318,13 @@ function SecureImagePreview({
           src={objectUrl}
           alt={alt}
           draggable={false}
-          onLoad={() => onStateChange('ready')}
-          onError={() => onStateChange('corrupt')}
+          data-pixel-variant={isFull ? 'full' : 'thumbnail'}
+          onLoad={() => {
+            if (isFull) onStateChange('ready');
+          }}
+          onError={() => {
+            if (isFull) onStateChange('corrupt');
+          }}
           style={{ transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})` }}
         />
       </div>
@@ -293,6 +342,7 @@ function renderDescriptor(
   imageZoom: number,
   imagePan: ImagePan,
   onImagePanChange: (pan: ImagePan) => void,
+  onImageZoomChange: (zoom: number) => void,
   wrap: boolean,
   findTerm: string,
   resourceReady: boolean,
@@ -337,7 +387,10 @@ function renderDescriptor(
         alt={imageAlt}
         zoom={imageZoom}
         pan={imagePan}
+        imageState="ready"
+        isFull
         onPanChange={onImagePanChange}
+        onZoomChange={onImageZoomChange}
         onStateChange={onRendererStatus}
       />
     );
@@ -439,12 +492,21 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
       isReadyDescriptor(descriptor) &&
       descriptorKind(descriptor) !== null) ||
       inbound !== null) &&
-    phase !== 'exiting';
+    phase !== 'exiting' &&
+    phase !== 'privacy-covered' &&
+    phase !== 'closing';
+  const thumbnailResource = useArtifactResource(sessionId, inbound, {
+    enabled: resourceEnabled && inbound !== null,
+    variant: 'thumbnail',
+    requireImageDecode: true,
+  });
   const resource = useArtifactResource(sessionId, resourceBlock, {
     enabled: resourceEnabled,
     variant: 'full',
     requireImageDecode: inbound !== null || descriptor?.renderer === 'image',
   });
+  const thumbnailCloseRef = useRef(thumbnailResource.close);
+  thumbnailCloseRef.current = thumbnailResource.close;
   const resourceCloseRef = useRef(resource.close);
   resourceCloseRef.current = resource.close;
   const resourceReloadRef = useRef(resource.reload);
@@ -459,12 +521,16 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   );
 
   useEffect(() => {
-    if (phase === 'exiting') resourceCloseRef.current();
+    if (phase === 'exiting' || phase === 'privacy-covered' || phase === 'closing') {
+      thumbnailCloseRef.current();
+      resourceCloseRef.current();
+    }
   }, [phase]);
 
   useEffect(() => {
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
+        thumbnailCloseRef.current();
         resourceCloseRef.current();
       } else if (phase === 'ready-diff' && descriptor !== null) {
         resourceReloadRef.current();
@@ -593,22 +659,35 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     (descriptor.renderer === 'image' || descriptor.renderer === 'pdf') &&
     resource.status === 'ready' &&
     rendererStatus === 'ready';
+  const imageObjectUrl = resource.objectUrl ?? thumbnailResource.objectUrl;
+  const imageIsFull = resource.objectUrl !== null;
+  const imageState: 'loading' | 'ready' | 'full-degraded' =
+    imageIsFull
+      ? 'ready'
+      : thumbnailResource.objectUrl !== null &&
+          (resource.status === 'stalled' || isResourceError(resource.status))
+        ? 'full-degraded'
+        : 'loading';
   const body =
     inMemory !== null ? (
       renderInMemoryDocument(inMemory, wrap, findTerm)
     ) : inbound !== null ? (
-      !isResourceError(resource.status) &&
-      resource.status !== 'loading' &&
-      resource.status !== 'stalled' ? (
+      imageObjectUrl !== null ? (
         <SecureImagePreview
-          objectUrl={resource.objectUrl}
+          objectUrl={imageObjectUrl}
           alt={inbound.presentation.safeAlt}
           zoom={imageZoom}
           pan={imagePan}
+          imageState={imageState}
+          isFull={imageIsFull}
           onPanChange={setImagePan}
+          onZoomChange={setBoundedImageZoom}
           onStateChange={onRendererStatus}
         />
-      ) : resource.status === 'loading' || resource.status === 'stalled' ? (
+      ) : resource.status === 'loading' ||
+        resource.status === 'stalled' ||
+        thumbnailResource.status === 'loading' ||
+        thumbnailResource.status === 'stalled' ? (
         <div className="artifact-loading-preview" aria-hidden="true">
           <span />
           <span />
@@ -636,6 +715,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
         imageZoom,
         imagePan,
         setImagePan,
+        setBoundedImageZoom,
         wrap,
         findTerm,
         resource.status === 'ready' &&
@@ -696,6 +776,28 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
           : null);
   const statusPhase = phase === 'opening' && inbound === null ? 'ready-diff' : phase;
   const status = phase === 'opening' && inbound === null ? null : currentStatus;
+  const viewerState: ArtifactViewerPhase =
+    phase === 'privacy-covered' || phase === 'closing'
+      ? 'privacy-covered'
+      : inbound === null
+        ? phase
+        : resource.status === 'stalled'
+          ? 'stalled'
+          : resource.offlineLoaded === true
+            ? 'offline-loaded'
+            : resource.status === 'offline'
+              ? 'offline-unavailable'
+              : resource.status === 'stale'
+                ? 'stale'
+                : resource.status === 'revoked'
+                  ? 'revoked'
+                  : resource.status === 'aborted'
+                    ? 'aborted'
+                    : resource.objectUrl !== null
+                      ? 'viewer-ready'
+                      : thumbnailResource.objectUrl !== null && isResourceError(resource.status)
+                        ? 'full-degraded'
+                        : 'full-fetching';
   const kindLabel =
     inMemory !== null
       ? `Redacted ${kind ?? 'artifact'}`
@@ -753,7 +855,8 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
       isOpen
       isDismissable={inbound === null}
       className="artifact-viewer-overlay"
-      data-artifact-state={phase}
+      data-artifact-state={viewerState}
+      data-privacy-covered={viewerState === 'privacy-covered' ? 'true' : undefined}
       onOpenChange={(open) => {
         if (!open) onClose('escape');
       }}
@@ -766,6 +869,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
               ? 'Image preview viewer'
               : `${title === 'File diff' ? 'File diff' : 'File preview'} viewer`
           }
+          aria-describedby="artifact-viewer-summary"
           className="artifact-viewer-dialog"
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
@@ -781,7 +885,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
             terminalMessage={terminal}
           />
           <div className="artifact-viewer-content">
-            <p className="artifact-viewer-summary" dir="auto">
+            <p id="artifact-viewer-summary" className="artifact-viewer-summary" dir="auto">
               {inMemory !== null
                 ? inMemory.summary
                 : inbound !== null

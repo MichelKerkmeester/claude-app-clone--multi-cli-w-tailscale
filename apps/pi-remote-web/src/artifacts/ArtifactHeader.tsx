@@ -22,6 +22,7 @@ export function ArtifactHeader({
         <span className="artifact-viewer-kicker">{kindLabel}</span>
         <Heading
           ref={headingRef}
+          id="artifact-viewer-title"
           slot="title"
           tabIndex={-1}
           className="artifact-viewer-title"

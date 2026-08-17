@@ -109,6 +109,10 @@ import {
 const initialCache = loadCache();
 type ThemePreference = 'system' | 'light' | 'dark';
 
+function dispatchArtifactLifecycleEvent(name: string): void {
+  window.dispatchEvent(new Event(name));
+}
+
 export interface AppProps {
   /** Typed fixture injection keeps production media disabled until host enablement. */
   readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
@@ -185,10 +189,16 @@ export function App({ mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF }: AppProps
   }, [authAttempt]);
 
   useEffect(() => {
-    const onPopState = () => setSelectedSessionId(readSessionIdFromLocation());
+    const onPopState = () => {
+      const nextSessionId = readSessionIdFromLocation();
+      if (nextSessionId !== selectedSessionId) {
+        dispatchArtifactLifecycleEvent('pi-remote:session-switch');
+      }
+      setSelectedSessionId(nextSessionId);
+    };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
-  }, []);
+  }, [selectedSessionId]);
 
   useEffect(() => {
     if (!authReady) return;
@@ -209,13 +219,16 @@ export function App({ mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF }: AppProps
           setReviewOpen(true);
           setInboxOpen(false);
         } else {
+          if (resolution.sessionId !== selectedSessionId) {
+            dispatchArtifactLifecycleEvent('pi-remote:session-switch');
+          }
           setSelectedSessionId(resolution.sessionId);
           setInboxOpen(false);
         }
       })
       .catch(() => setInboxOpen(true));
     return () => controller.abort();
-  }, [authReady]);
+  }, [authReady, selectedSessionId]);
 
   useEffect(() => {
     if (!authReady) return;
@@ -268,6 +281,9 @@ export function App({ mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF }: AppProps
 
   function navigate(sessionId: string | null) {
     const nextPath = sessionId === null ? '/' : `/session/${encodeURIComponent(sessionId)}`;
+    if (sessionId !== selectedSessionId) {
+      dispatchArtifactLifecycleEvent('pi-remote:session-switch');
+    }
     window.history.pushState({}, '', nextPath);
     setSelectedSessionId(sessionId);
   }
@@ -333,7 +349,8 @@ export function App({ mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF }: AppProps
           onSelect={(sessionId) => navigate(sessionId)}
           device={device}
           onRevoke={() => {
-            window.dispatchEvent(new Event('pi-remote:app-lock'));
+            dispatchArtifactLifecycleEvent('pi-remote:app-lock');
+            dispatchArtifactLifecycleEvent('pi-remote:artifact-revoked');
             void revokeDevice().finally(() => {
               setAuthReady(false);
               setDevice(null);
@@ -341,7 +358,7 @@ export function App({ mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF }: AppProps
             });
           }}
           onLogout={() => {
-            window.dispatchEvent(new Event('pi-remote:logout'));
+            dispatchArtifactLifecycleEvent('pi-remote:logout');
             void unsubscribeFromPush()
               .catch(() => undefined)
               .then(logoutDevice)
@@ -1121,10 +1138,18 @@ export function Session({
             cursorRef.current !== null &&
             cursorRef.current.epoch !== message.epoch
           ) {
+            dispatchArtifactLifecycleEvent('pi-remote:transcript-superseded');
             cursorRef.current = null;
             dispatchTranscript({ type: 'delta', message, at });
             socket?.close();
             return;
+          }
+          if (
+            message.kind === 'sync.snapshot' &&
+            cursorRef.current !== null &&
+            cursorRef.current.epoch !== message.epoch
+          ) {
+            dispatchArtifactLifecycleEvent('pi-remote:transcript-superseded');
           }
           pendingMessagesRef.current.push({ message, at });
           if (frameRef.current === null) {

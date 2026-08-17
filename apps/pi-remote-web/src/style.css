@@ -6120,3 +6120,150 @@ select:focus-visible,
     transform: none !important;
   }
 }
+
+/* The artifact viewer owns a privacy boundary, so its cover and image stage
+   stay fully opaque even when the underlying transcript is still mounted. */
+.artifact-viewer-overlay {
+  inline-size: 100%;
+  block-size: 100svh;
+  block-size: 100dvh;
+  min-block-size: 100svh;
+  min-block-size: 100dvh;
+  overflow: clip;
+  overscroll-behavior: contain;
+  background: #24221f;
+}
+
+.artifact-viewer-modal {
+  inline-size: min(100%, 48rem);
+  max-inline-size: 100%;
+  block-size: 100%;
+  max-block-size: 100svh;
+  max-block-size: 100dvh;
+  overflow: hidden;
+}
+
+.artifact-viewer-dialog {
+  min-inline-size: 0;
+  min-block-size: 100%;
+  max-block-size: 100%;
+  padding-block-start: max(var(--space-4), env(safe-area-inset-top, 0px));
+  padding-block-end: max(var(--space-4), env(safe-area-inset-bottom, 0px));
+  padding-inline-start: max(var(--space-4), env(safe-area-inset-left, 0px));
+  padding-inline-end: max(var(--space-4), env(safe-area-inset-right, 0px));
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.artifact-viewer-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  min-inline-size: 0;
+  gap: var(--space-3);
+}
+
+.artifact-viewer-heading-group,
+.artifact-viewer-title,
+.artifact-viewer-revision {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.artifact-viewer-revision {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.artifact-viewer-content {
+  min-inline-size: 0;
+  min-block-size: 0;
+  overscroll-behavior: contain;
+  overflow: auto;
+}
+
+.image-preview-stage {
+  min-block-size: min(60svh, 32rem);
+  min-block-size: min(60dvh, 32rem);
+  max-block-size: 100%;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: none;
+  background: #24221f;
+}
+
+.image-preview-image {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.artifact-control-button,
+.artifact-viewer-close,
+.artifact-stale-action,
+.artifact-image-pan-controls button {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+}
+
+.artifact-viewer-privacy-curtain {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  inline-size: 100vw;
+  block-size: 100svh;
+  block-size: 100dvh;
+  background: #24221f;
+  opacity: 1;
+  pointer-events: all;
+}
+
+html[data-artifact-viewer-open='true'] .composer-region {
+  filter: blur(0.5rem);
+  pointer-events: none;
+  user-select: none;
+}
+
+.artifact-viewer-overlay[data-privacy-covered='true'] .artifact-viewer-dialog {
+  visibility: hidden;
+}
+
+@media (max-width: 30rem) {
+  .artifact-viewer-header {
+    grid-template-columns: minmax(0, 1fr) 44px;
+  }
+
+  .artifact-viewer-close {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .artifact-viewer-dialog {
+    padding-inline-start: max(var(--space-3), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--space-3), env(safe-area-inset-right, 0px));
+  }
+}
+
+@media (prefers-contrast: more) {
+  .artifact-viewer-dialog,
+  .artifact-viewer-dialog button,
+  .artifact-viewer-dialog input,
+  .artifact-viewer-dialog [role='group'] {
+    border-color: CanvasText;
+  }
+
+  .artifact-viewer-dialog :is(button, input, [tabindex='0']):focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artifact-viewer-overlay,
+  .artifact-viewer-modal,
+  .artifact-viewer-dialog,
+  .artifact-viewer-close,
+  .image-preview-image {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -13,6 +13,7 @@ export interface ArtifactDetailsModel {
 export interface ArtifactDetailsProps {
   readonly model: ArtifactDetailsModel;
   readonly open: boolean;
+  readonly id?: string;
 }
 
 function formatBytes(value: number): string {
@@ -21,10 +22,10 @@ function formatBytes(value: number): string {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function ArtifactDetails({ model, open }: ArtifactDetailsProps) {
+export function ArtifactDetails({ model, open, id = 'artifact-details' }: ArtifactDetailsProps) {
   if (!open) return null;
   return (
-    <section className="artifact-details" aria-label="Image details">
+    <section id={id} className="artifact-details" aria-label="Image details">
       <dl>
         <div>
           <dt>Display name</dt>

@@ -110,6 +110,7 @@ export function PreviewControls({
               type="button"
               className="artifact-control-button"
               aria-expanded={detailsOpen}
+              aria-controls="artifact-details"
               onClick={onDetails}
             >
               Details

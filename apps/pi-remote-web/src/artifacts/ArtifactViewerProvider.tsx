@@ -7,13 +7,42 @@ import {
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { ArtifactViewerHost } from './ArtifactViewerHost.js';
-import { clearArtifactResourceStore } from './useArtifactResource.js';
+import {
+  clearArtifactFullResourceStore,
+  clearArtifactResourceStore,
+} from './useArtifactResource.js';
 import { useArtifactHistory } from './useArtifactHistory.js';
 
-export type ArtifactViewerPhase = 'closed' | 'opening' | 'ready-diff' | 'ready-image' | 'exiting';
+export type ArtifactViewerPhase =
+  | 'closed'
+  | 'opening'
+  | 'full-fetching'
+  | 'viewer-ready'
+  | 'full-degraded'
+  | 'stalled'
+  | 'offline-loaded'
+  | 'offline-unavailable'
+  | 'stale'
+  | 'revoked'
+  | 'privacy-covered'
+  | 'closing'
+  | 'aborted'
+  | 'ready-diff'
+  | 'ready-image'
+  | 'exiting';
 
 export type ArtifactDismissalReason =
-  'close' | 'escape' | 'history' | 'edge-back' | 'voiceover-scrub';
+  | 'close'
+  | 'escape'
+  | 'history'
+  | 'edge-back'
+  | 'voiceover-scrub'
+  | 'privacy-purge'
+  | 'pagehide'
+  | 'logout'
+  | 'session-switch'
+  | 'revoked'
+  | 'transcript-superseded';
 
 export interface InMemoryArtifactDocument {
   readonly kind: 'in-memory';
@@ -78,7 +107,21 @@ function capturePreview(
   const transcriptRegion =
     trigger?.closest<HTMLElement>('[aria-label="Typed transcript"]') ??
     document.querySelector<HTMLElement>('[aria-label="Typed transcript"]');
-  const source = Object.freeze({ ...block });
+  const source = Object.freeze(
+    isInboundImageReadyBlock(block)
+      ? {
+          ...block,
+          artifact: Object.freeze({
+            ...block.artifact,
+            full: Object.freeze({ ...block.artifact.full }),
+            thumbnail: Object.freeze({ ...block.artifact.thumbnail }),
+          }),
+          presentation: Object.freeze({ ...block.presentation }),
+          redaction: Object.freeze({ ...block.redaction }),
+          content: Object.freeze({ ...block.content }),
+        }
+      : { ...block },
+  ) as Readonly<ArtifactViewerSource>;
   return {
     source,
     trigger,
@@ -125,6 +168,45 @@ function tagInMemoryHistory(documentId: string): void {
   }
 }
 
+const PRIVACY_CURTAIN_ID = 'artifact-viewer-privacy-curtain';
+
+function showPrivacyCurtain(): void {
+  if (typeof document === 'undefined') return;
+  document.documentElement.dataset.artifactViewerPrivacy = 'covered';
+  if (document.getElementById(PRIVACY_CURTAIN_ID) !== null) return;
+  const curtain = document.createElement('div');
+  curtain.id = PRIVACY_CURTAIN_ID;
+  curtain.className = 'artifact-viewer-privacy-curtain';
+  curtain.setAttribute('aria-hidden', 'true');
+  document.body?.append(curtain);
+}
+
+function hidePrivacyCurtain(): void {
+  if (typeof document === 'undefined') return;
+  document.getElementById(PRIVACY_CURTAIN_ID)?.remove();
+  delete document.documentElement.dataset.artifactViewerPrivacy;
+}
+
+function markViewerOpen(open: boolean): void {
+  if (typeof document === 'undefined') return;
+  if (open) {
+    document.documentElement.dataset.artifactViewerOpen = 'true';
+    document.querySelector<HTMLElement>('.composer-region textarea, .composer-input')?.blur();
+  } else {
+    delete document.documentElement.dataset.artifactViewerOpen;
+  }
+}
+
+function purgeViewerPixelNodes(): void {
+  if (typeof document === 'undefined') return;
+  for (const image of document.querySelectorAll<HTMLImageElement>(
+    '.artifact-viewer-dialog img, [data-verified-image="true"]',
+  )) {
+    image.removeAttribute('src');
+    image.removeAttribute('srcset');
+  }
+}
+
 export function ArtifactViewerProvider({ children }: { readonly children: ReactNode }) {
   const [phase, setPhase] = useState<ArtifactViewerPhase>('closed');
   const [preview, setPreview] = useState<ArtifactPreview | null>(null);
@@ -153,7 +235,9 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     readyPhase: 'ready-diff' | 'ready-image',
   ) => {
     clearTimers();
-    clearArtifactResourceStore();
+    clearArtifactFullResourceStore();
+    hidePrivacyCurtain();
+    markViewerOpen(true);
     const generation = generationRef.current + 1;
     generationRef.current = generation;
     const nextPreview = capturePreview(block, trigger, generation, sessionId);
@@ -197,7 +281,9 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
 
   const openInMemory = (document: InMemoryArtifactDocument, trigger: HTMLButtonElement | null) => {
     clearTimers();
-    clearArtifactResourceStore();
+    clearArtifactFullResourceStore();
+    hidePrivacyCurtain();
+    markViewerOpen(true);
     const existing = previewRef.current;
     if (existing?.source.kind === 'in-memory' && existing.source.id === document.id) {
       updateInMemory(document);
@@ -263,19 +349,36 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
   };
 
   const close = (reason: ArtifactDismissalReason = 'close') => {
-    clearArtifactResourceStore();
     const current = previewRef.current;
-    if (current === null) return;
+    if (current === null) {
+      purgeViewerPixelNodes();
+      clearArtifactResourceStore();
+      return;
+    }
     clearTimers();
+    showPrivacyCurtain();
+    purgeViewerPixelNodes();
+    clearArtifactResourceStore();
     generationRef.current += 1;
     if (reason !== 'history') history.close();
-    setPhase('exiting');
+    setPhase(
+      reason === 'privacy-purge' ||
+        reason === 'pagehide' ||
+        reason === 'logout' ||
+        reason === 'session-switch' ||
+        reason === 'revoked' ||
+        reason === 'transcript-superseded'
+        ? 'privacy-covered'
+        : 'exiting',
+    );
     exitingTimerRef.current = window.setTimeout(() => {
       exitingTimerRef.current = null;
       if (previewRef.current?.generation !== current.generation) return;
       previewRef.current = null;
       setPreview(null);
       setPhase('closed');
+      markViewerOpen(false);
+      hidePrivacyCurtain();
       if (restoredGenerationRef.current !== current.generation) {
         restoredGenerationRef.current = current.generation;
         restorePreview(current, restoreTimerRef);
@@ -287,7 +390,10 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
   useEffect(
     () => () => {
       clearTimers();
+      purgeViewerPixelNodes();
       clearArtifactResourceStore();
+      markViewerOpen(false);
+      hidePrivacyCurtain();
       history.dispose();
       const current = previewRef.current;
       if (current !== null && restoredGenerationRef.current !== current.generation) {
@@ -300,36 +406,69 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
   useEffect(() => {
     const closeHiddenViewer = () => {
       if (document.visibilityState === 'hidden') {
-        clearArtifactResourceStore();
-        closeRef.current('close');
+        closeRef.current('privacy-purge');
+      } else if (previewRef.current === null) {
+        hidePrivacyCurtain();
       }
     };
     const closeBfcacheViewer = () => {
-      clearArtifactResourceStore();
-      closeRef.current('close');
+      closeRef.current('pagehide');
     };
-    const invalidateViewer = () => {
-      clearArtifactResourceStore();
-      closeRef.current('close');
+    const reconcileBfcacheReturn = (event: PageTransitionEvent) => {
+      if (!event.persisted) return;
+      if (previewRef.current !== null) closeRef.current('pagehide');
+      else hidePrivacyCurtain();
+    };
+    const invalidateViewer = (event: Event) => {
+      const reasonByEvent: Record<string, ArtifactDismissalReason> = {
+        'pi-remote:privacy-cover': 'privacy-purge',
+        'privacy-cover': 'privacy-purge',
+        'pi-remote:logout': 'logout',
+        logout: 'logout',
+        'pi-remote:session-switch': 'session-switch',
+        'session-switch': 'session-switch',
+        'pi-remote:artifact-revoked': 'revoked',
+        'artifact-revoked': 'revoked',
+        'pi-remote:app-lock': 'revoked',
+        'pi-remote:transcript-superseded': 'transcript-superseded',
+        'transcript-superseded': 'transcript-superseded',
+      };
+      closeRef.current(reasonByEvent[event.type] ?? 'privacy-purge');
     };
     document.addEventListener('visibilitychange', closeHiddenViewer);
     window.addEventListener('pagehide', closeBfcacheViewer);
+    window.addEventListener('pageshow', reconcileBfcacheReturn);
     for (const eventName of [
       'pi-remote:privacy-cover',
       'pi-remote:logout',
       'pi-remote:session-switch',
       'pi-remote:artifact-revoked',
+      'pi-remote:app-lock',
+      'pi-remote:transcript-superseded',
+      'privacy-cover',
+      'logout',
+      'session-switch',
+      'artifact-revoked',
+      'transcript-superseded',
     ]) {
       window.addEventListener(eventName, invalidateViewer);
     }
     return () => {
       document.removeEventListener('visibilitychange', closeHiddenViewer);
       window.removeEventListener('pagehide', closeBfcacheViewer);
+      window.removeEventListener('pageshow', reconcileBfcacheReturn);
       for (const eventName of [
         'pi-remote:privacy-cover',
         'pi-remote:logout',
         'pi-remote:session-switch',
         'pi-remote:artifact-revoked',
+        'pi-remote:app-lock',
+        'pi-remote:transcript-superseded',
+        'privacy-cover',
+        'logout',
+        'session-switch',
+        'artifact-revoked',
+        'transcript-superseded',
       ]) {
         window.removeEventListener(eventName, invalidateViewer);
       }

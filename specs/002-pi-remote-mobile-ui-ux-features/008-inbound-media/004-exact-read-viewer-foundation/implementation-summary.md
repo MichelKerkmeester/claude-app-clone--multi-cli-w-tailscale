@@ -1,12 +1,13 @@
 # Implementation Summary — 008 Phase 3 (slice 3a: relay read lane)
 
-## Final state — PARTIAL (relay read lane complete; web viewer slice HELD)
+## Final state — COMPLETE (relay read lane 3a + web viewer 3b)
 
-The Phase-3 **relay read lane** is complete and verified (automated gates + Claude security sign-off + 390px
-CDP). The **web viewer / resource-fetch / service-worker / CSP slice (3b) is intentionally HELD** — its
-files (`apps/pi-remote-web/*`, `service-worker.js`, `index.html` CSP, `main.tsx`) are the exact area
-implicated in an open production white-screen regression on the installed iPhone PWA, so I did not stack the
-web viewer onto that area until the regression is understood. The inbound-media capability stays OFF.
+The Phase-3 relay read lane AND the web viewer/resource-fetch/CSP/service-worker slice are both complete and
+verified (automated gates + Claude security sign-off + 390px CDP + a real-path non-demo mount check). Slice
+3b was built after a real-path mount baseline confirmed the committed code renders on the non-demo path — so
+the CSP/service-worker/`CACHE_NAME` changes were verified NOT to white-screen the shell (the real-path mount
+check passed post-build). `main.tsx`'s `RootErrorBoundary` was preserved untouched; `CACHE_NAME` bumped
+v4→v5. The inbound-media capability stays OFF.
 Implemented by GPT-5.6 Luna Max (via the Codex CLI); orchestrated, security-reviewed, and verified by Claude
 on `main`.
 
@@ -52,13 +53,22 @@ on `main`.
   full required header set (no-store/nosniff/CORP/no-referrer/Content-Digest/immutable ETag); byte-integrity
   check; rate limits; Plan-mode read allowed.
 
-## Held for slice 3b (pending the white-screen resolution)
+## Slice 3b — web viewer/resource foundation (complete)
 
-The web `useArtifactResource` (verified fetch → decode → object URL), the shared viewer/resource foundation
-(`ArtifactViewerProvider/Host/Header/Details/PreviewControls/useArtifactHistory`), the exact-read `relay.ts`
-consumer, `cache.ts` artifact-stripping, the `service-worker.js` network-only artifact rule, the `index.html`
-CSP (`img-src self blob:`), and `main.tsx` — checklist items CHK-006..011 and CHK-016..017. These touch the
-white-screen suspect files and will be built once the regression is confirmed resolved on-device.
+- `useArtifactResource.ts` — the verified resource hook: POST `/api/artifacts/read` (same-origin, no-store,
+  redirect-rejected, AbortSignal); Content-Length pre-alloc check + streamed-byte count + ETag/Content-Digest
+  compare + local WebCrypto SHA-256 + `HTMLImageElement.decode()` ALL precede `createObjectURL`; any
+  mismatch/decode-fail creates NO object URL and paints zero pixels. Memory-only store (≤20 thumbs + 1 full);
+  ref-counted object URLs revoked on every lifecycle event.
+- Shared viewer extended (`ArtifactViewerProvider/Host/PreviewControls` + new `ArtifactDetails.tsx`) — safe-
+  metadata Details only, no export/share/save/copy/download. A follow-up fix kept inline artifacts (diff/code/
+  text) settling to "… ready." while only the async image resource shows "Opening …" (an existing 005 viewer
+  test regressed and was root-cause fixed, not silenced).
+- `relay.ts` exact read helper; `cache.ts` strips artifact bytes/URLs; `service-worker.js` keeps
+  `/api/artifacts/` network-only + `CACHE_NAME` v4→v5; `index.html` CSP additively gains `img-src 'self'
+  blob:` / `connect-src 'self'` / `object-src 'none'` with `script-src 'self'` preserved.
+- Verified: build/typecheck 0; backend 336/336; web 593/593; flag-off 390px CDP; and a **real-path (non-demo)
+  mount check PASSED** post-build — confirming the CSP/service-worker changes did not white-screen the shell.
 
 ## Frozen contracts
 

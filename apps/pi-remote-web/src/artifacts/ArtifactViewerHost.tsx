@@ -7,9 +7,11 @@ import {
   type TouchEvent,
 } from 'react';
 import {
+  isInboundImageReadyBlock,
   isFilePreviewBlock,
   type FileDiffBlock,
   type FilePreviewBlock,
+  type InboundImageReadyBlock,
 } from '@pi-remote/pi-rpc-protocol';
 import { Dialog, Modal, ModalOverlay } from 'react-aria-components';
 
@@ -22,6 +24,7 @@ import {
   type DisplayedArtifactShareInput,
 } from './artifact-share.js';
 import { ArtifactHeader, type ArtifactHeaderProps } from './ArtifactHeader.js';
+import { ArtifactDetails, type ArtifactDetailsModel } from './ArtifactDetails.js';
 import { ArtifactStatus } from './ArtifactStatus.js';
 import type {
   ArtifactDismissalReason,
@@ -31,7 +34,6 @@ import type {
 } from './ArtifactViewerProvider.js';
 import { CodePreview } from './CodePreview.js';
 import { DiffPreview } from './DiffPreview.js';
-import { ImagePreview, type ImagePreviewState } from './ImagePreview.js';
 import { MarkdownPreview } from './MarkdownPreview.js';
 import { PdfPreview, type PdfPreviewState } from './PdfPreview.js';
 import { PreviewControls } from './PreviewControls.js';
@@ -48,6 +50,8 @@ export interface ArtifactViewerHostProps {
 const EDGE_BACK_START = 28;
 const EDGE_BACK_DISTANCE = 64;
 const EDGE_BACK_CROSS_AXIS = 96;
+const IMAGE_MIN_ZOOM = 1;
+const IMAGE_MAX_ZOOM = 4;
 
 function isReadyDescriptor(block: FilePreviewBlock): boolean {
   if (block.renderer === 'pdf' && block.textLayerSafe !== true) return false;
@@ -77,6 +81,10 @@ function isInMemoryArtifactSource(value: unknown): value is InMemoryArtifactDocu
     typeof (value as { readonly summary?: unknown }).summary === 'string' &&
     (value as { readonly redaction?: unknown }).redaction === 'applied'
   );
+}
+
+function isInboundImageSource(value: unknown): value is InboundImageReadyBlock {
+  return isInboundImageReadyBlock(value);
 }
 
 function descriptorSubject(block: FilePreviewBlock): string {
@@ -195,11 +203,96 @@ function isResourceError(status: ArtifactResourceStatus): boolean {
   ].includes(status);
 }
 
+interface ImagePan {
+  readonly x: number;
+  readonly y: number;
+}
+
+interface SecureImagePreviewProps {
+  readonly objectUrl: string | null;
+  readonly alt: string;
+  readonly zoom: number;
+  readonly pan: ImagePan;
+  readonly onPanChange: (pan: ImagePan) => void;
+  readonly onStateChange: (status: ArtifactResourceStatus) => void;
+}
+
+function SecureImagePreview({
+  objectUrl,
+  alt,
+  zoom,
+  pan,
+  onPanChange,
+  onStateChange,
+}: SecureImagePreviewProps) {
+  const panStartRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+  const updatePan = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const start = panStartRef.current;
+    if (start === null || zoom <= IMAGE_MIN_ZOOM) return;
+    onPanChange({
+      x: start.panX + event.clientX - start.x,
+      y: start.panY + event.clientY - start.y,
+    });
+  };
+  const stopPan = () => {
+    panStartRef.current = null;
+  };
+  if (objectUrl === null) {
+    return (
+      <section
+        className="image-preview"
+        aria-label="Sanitized image preview"
+        data-image-state="loading"
+      >
+        <p className="artifact-preview-message" role="status">
+          Loading sanitized image.
+        </p>
+      </section>
+    );
+  }
+  return (
+    <section
+      className="image-preview"
+      aria-label="Sanitized image preview"
+      data-image-state="ready"
+    >
+      <div
+        className="image-preview-stage"
+        onPointerDown={(event) => {
+          if (event.pointerType !== 'mouse' && zoom > IMAGE_MIN_ZOOM) {
+            event.currentTarget.setPointerCapture(event.pointerId);
+            panStartRef.current = { x: event.clientX, y: event.clientY, panX: pan.x, panY: pan.y };
+          }
+        }}
+        onPointerMove={updatePan}
+        onPointerUp={stopPan}
+        onPointerCancel={stopPan}
+        onPointerLeave={stopPan}
+      >
+        <img
+          className="image-preview-image"
+          src={objectUrl}
+          alt={alt}
+          draggable={false}
+          onLoad={() => onStateChange('ready')}
+          onError={() => onStateChange('corrupt')}
+          style={{ transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})` }}
+        />
+      </div>
+    </section>
+  );
+}
+
 function renderDescriptor(
   block: FilePreviewBlock,
   status: ArtifactResourceStatus,
   text: string | null,
   bytes: Uint8Array | null,
+  objectUrl: string | null,
+  imageAlt: string,
+  imageZoom: number,
+  imagePan: ImagePan,
+  onImagePanChange: (pan: ImagePan) => void,
   wrap: boolean,
   findTerm: string,
   resourceReady: boolean,
@@ -239,10 +332,13 @@ function renderDescriptor(
   }
   if (block.renderer === 'image') {
     return (
-      <ImagePreview
-        block={block}
-        bytes={bytes}
-        onStateChange={(nextState: ImagePreviewState) => onRendererStatus(nextState)}
+      <SecureImagePreview
+        objectUrl={objectUrl}
+        alt={imageAlt}
+        zoom={imageZoom}
+        pan={imagePan}
+        onPanChange={onImagePanChange}
+        onStateChange={onRendererStatus}
       />
     );
   }
@@ -323,6 +419,9 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const [copyLabel, setCopyLabel] = useState('Copy');
   const [announcement, setAnnouncement] = useState<string | null>(null);
   const [rendererStatus, setRendererStatus] = useState<ArtifactResourceStatus | null>(null);
+  const [imageZoom, setImageZoom] = useState(IMAGE_MIN_ZOOM);
+  const [imagePan, setImagePan] = useState<ImagePan>({ x: 0, y: 0 });
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const sourceValue: unknown = preview?.source;
   const legacyDiff: FileDiffBlock | null =
@@ -331,13 +430,21 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     sourceValue !== undefined && isInMemoryArtifactSource(sourceValue) ? sourceValue : null;
   const descriptor: FilePreviewBlock | null =
     sourceValue !== undefined && isFilePreviewBlock(sourceValue) ? sourceValue : null;
-  const sessionId = preview?.trigger?.dataset.artifactSessionId ?? null;
+  const inbound: InboundImageReadyBlock | null =
+    sourceValue !== undefined && isInboundImageSource(sourceValue) ? sourceValue : null;
+  const resourceBlock = descriptor ?? inbound;
+  const sessionId = preview?.sessionId ?? preview?.trigger?.dataset.artifactSessionId ?? null;
   const resourceEnabled =
-    descriptor !== null &&
-    isReadyDescriptor(descriptor) &&
-    descriptorKind(descriptor) !== null &&
+    ((descriptor !== null &&
+      isReadyDescriptor(descriptor) &&
+      descriptorKind(descriptor) !== null) ||
+      inbound !== null) &&
     phase !== 'exiting';
-  const resource = useArtifactResource(sessionId, descriptor, { enabled: resourceEnabled });
+  const resource = useArtifactResource(sessionId, resourceBlock, {
+    enabled: resourceEnabled,
+    variant: 'full',
+    requireImageDecode: inbound !== null || descriptor?.renderer === 'image',
+  });
   const resourceCloseRef = useRef(resource.close);
   resourceCloseRef.current = resource.close;
   const resourceReloadRef = useRef(resource.reload);
@@ -359,12 +466,12 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         resourceCloseRef.current();
-      } else if (phase === 'ready-diff') {
+      } else if (phase === 'ready-diff' && descriptor !== null) {
         resourceReloadRef.current();
       }
     };
     const onPageShow = (event: PageTransitionEvent) => {
-      if (event.persisted && phase === 'ready-diff') {
+      if (event.persisted && phase === 'ready-diff' && descriptor !== null) {
         resourceCloseRef.current();
         resourceReloadRef.current();
       }
@@ -383,6 +490,9 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     setCopyLabel('Copy');
     setAnnouncement(null);
     setRendererStatus(null);
+    setImageZoom(IMAGE_MIN_ZOOM);
+    setImagePan({ x: 0, y: 0 });
+    setDetailsOpen(false);
   }, [preview?.generation]);
 
   useEffect(() => {
@@ -395,7 +505,8 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   }, [announcement, resource.status]);
 
   useEffect(() => {
-    if (!hasPreview || (phase !== 'opening' && phase !== 'ready-diff')) return undefined;
+    if (!hasPreview || (phase !== 'opening' && phase !== 'ready-diff' && phase !== 'ready-image'))
+      return undefined;
     const timer = window.setTimeout(() => {
       headingRef.current?.focus({ preventScroll: true });
     }, 0);
@@ -403,7 +514,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   }, [hasPreview, phase, preview?.generation]);
 
   useEffect(() => {
-    if (phase !== 'ready-diff') return undefined;
+    if (phase !== 'ready-diff' && phase !== 'ready-image') return undefined;
     const onFocusIn = (event: FocusEvent) => {
       const target = event.target;
       if (target instanceof Node && !dialogRef.current?.contains(target)) {
@@ -445,17 +556,36 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     if (touch !== undefined) finishEdgeBack(touch.clientX, touch.clientY);
   };
 
-  const kind = inMemory?.renderer ?? (descriptor === null ? 'diff' : descriptorKind(descriptor));
+  const setBoundedImageZoom = (next: number) => {
+    const bounded = Math.min(IMAGE_MAX_ZOOM, Math.max(IMAGE_MIN_ZOOM, next));
+    setImageZoom(bounded);
+    if (bounded === IMAGE_MIN_ZOOM) setImagePan({ x: 0, y: 0 });
+  };
+  const panImage = (direction: 'up' | 'down' | 'left' | 'right') => {
+    if (imageZoom <= IMAGE_MIN_ZOOM) return;
+    const delta = 48;
+    setImagePan((current) => ({
+      x: current.x + (direction === 'left' ? -delta : direction === 'right' ? delta : 0),
+      y: current.y + (direction === 'up' ? -delta : direction === 'down' ? delta : 0),
+    }));
+  };
+  const kind =
+    inbound !== null
+      ? 'image'
+      : (inMemory?.renderer ?? (descriptor === null ? 'diff' : descriptorKind(descriptor)));
   const subject =
     inMemory?.displayName ??
+    inbound?.displayName ??
     (descriptor === null ? 'Redacted file diff' : descriptorSubject(descriptor));
   const title =
-    inMemory?.displayName ?? (descriptor === null ? 'File diff' : descriptorSubject(descriptor));
-  const resourceStatus = descriptor === null ? null : resource.status;
+    inMemory?.displayName ??
+    inbound?.displayName ??
+    (descriptor === null ? 'File diff' : descriptorSubject(descriptor));
+  const resourceStatus = resourceBlock === null ? null : resource.status;
   const currentStatus =
-    descriptor === null
+    resourceBlock === null
       ? null
-      : isReadyDescriptor(descriptor)
+      : inbound !== null || isReadyDescriptor(descriptor as FilePreviewBlock)
         ? (rendererStatus ?? resource.status)
         : null;
   const binaryPreviewReady =
@@ -466,6 +596,29 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const body =
     inMemory !== null ? (
       renderInMemoryDocument(inMemory, wrap, findTerm)
+    ) : inbound !== null ? (
+      !isResourceError(resource.status) &&
+      resource.status !== 'loading' &&
+      resource.status !== 'stalled' ? (
+        <SecureImagePreview
+          objectUrl={resource.objectUrl}
+          alt={inbound.presentation.safeAlt}
+          zoom={imageZoom}
+          pan={imagePan}
+          onPanChange={setImagePan}
+          onStateChange={onRendererStatus}
+        />
+      ) : resource.status === 'loading' || resource.status === 'stalled' ? (
+        <div className="artifact-loading-preview" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+      ) : (
+        <div role="alert">
+          <UnsupportedPreview renderer="image" message={errorPreviewMessage(resource.status)} />
+        </div>
+      )
     ) : descriptor === null ? (
       legacyDiff === null ? (
         <UnsupportedPreview message="The preview source could not be verified." />
@@ -478,9 +631,15 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
         currentStatus ?? resource.status,
         resource.text,
         resource.bytes,
+        resource.objectUrl,
+        descriptor.altText ?? 'Sanitized image preview',
+        imageZoom,
+        imagePan,
+        setImagePan,
         wrap,
         findTerm,
-        resource.status === 'ready',
+        resource.status === 'ready' &&
+          (descriptor.renderer !== 'image' || resource.objectUrl !== null),
         onRendererStatus,
         onPdfRendererStatus,
         setFindTerm,
@@ -489,7 +648,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const displayedBuffer =
     inMemory !== null
       ? inMemory.text
-      : descriptor === null
+      : inbound !== null || descriptor === null
         ? (legacyDiff?.patch ?? null)
         : resource.buffer;
   const shareInput: DisplayedArtifactShareInput = {
@@ -504,43 +663,71 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
       : {}),
   };
   const displayedBytes = binaryPreviewReady ? resource.bytes : null;
-  const canCopy = displayedBuffer !== null && canCopyDisplayedArtifact();
+  const canCopy = inbound === null && displayedBuffer !== null && canCopyDisplayedArtifact();
   const canShare =
-    (displayedBuffer !== null || displayedBytes !== null) && canShareDisplayedArtifact(shareInput);
+    inbound === null &&
+    (displayedBuffer !== null || displayedBytes !== null) &&
+    canShareDisplayedArtifact(shareInput);
   const terminal =
     inMemory !== null
       ? inMemoryStatusMessage(inMemory)
-      : inMemory === null && legacyDiff === null && descriptor === null
-        ? 'The preview source could not be verified.'
-        : descriptor !== null && !isReadyDescriptor(descriptor)
-          ? unavailableMessage(descriptor)
-          : descriptor !== null && descriptorKind(descriptor) === null
+      : inbound !== null
+        ? resourceStatus === null
+          ? null
+          : terminalMessage(currentStatus ?? resourceStatus)
+        : inMemory === null && legacyDiff === null && descriptor === null
+          ? 'The preview source could not be verified.'
+          : descriptor !== null && !isReadyDescriptor(descriptor)
             ? unavailableMessage(descriptor)
-            : resourceStatus !== null
-              ? terminalMessage(currentStatus ?? resourceStatus)
-              : null;
+            : descriptor !== null && descriptorKind(descriptor) === null
+              ? unavailableMessage(descriptor)
+              : resourceStatus !== null
+                ? terminalMessage(currentStatus ?? resourceStatus)
+                : null;
   const statusAnnouncement =
     announcement ??
-    (inMemory === null && descriptor === null && legacyDiff === null
-      ? 'The preview source could not be verified.'
-      : descriptor !== null &&
-          (!isReadyDescriptor(descriptor) || descriptorKind(descriptor) === null)
-        ? unavailableMessage(descriptor)
-        : null);
+    (inbound !== null
+      ? null
+      : inMemory === null && descriptor === null && legacyDiff === null
+        ? 'The preview source could not be verified.'
+        : descriptor !== null &&
+            (!isReadyDescriptor(descriptor) || descriptorKind(descriptor) === null)
+          ? unavailableMessage(descriptor)
+          : null);
+  const statusPhase = phase === 'opening' && inbound === null ? 'ready-diff' : phase;
+  const status = phase === 'opening' && inbound === null ? null : currentStatus;
   const kindLabel =
     inMemory !== null
       ? `Redacted ${kind ?? 'artifact'}`
-      : descriptor === null
-        ? 'Redacted artifact'
-        : `Redacted ${kind ?? 'artifact'}`;
+      : inbound !== null
+        ? 'Redacted image'
+        : descriptor === null
+          ? 'Redacted artifact'
+          : `Redacted ${kind ?? 'artifact'}`;
   const headerProps: ArtifactHeaderProps = {
     headingRef,
     onClose: () => onClose('close'),
     title,
     kindLabel,
     revision:
-      descriptor?.revision ?? (inMemory?.revision === undefined ? null : String(inMemory.revision)),
+      inbound?.artifact.revision ??
+      descriptor?.revision ??
+      (inMemory?.revision === undefined ? null : String(inMemory.revision)),
   };
+  const imageDetails: ArtifactDetailsModel | null =
+    inbound === null
+      ? null
+      : {
+          displayName: inbound.displayName,
+          mediaType: inbound.artifact.full.mediaType,
+          width: inbound.artifact.full.width,
+          height: inbound.artifact.full.height,
+          thumbnailBytes: inbound.artifact.thumbnail.byteLength,
+          fullBytes: inbound.artifact.full.byteLength,
+          revision: inbound.artifact.revision,
+          processing: 'complete',
+          redaction: inbound.redaction.status,
+        };
   const onCopy = () => {
     if (displayedBuffer === null) return;
     void copyDisplayedArtifact(displayedBuffer).then((copied) => {
@@ -564,7 +751,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   return (
     <ModalOverlay
       isOpen
-      isDismissable
+      isDismissable={inbound === null}
       className="artifact-viewer-overlay"
       data-artifact-state={phase}
       onOpenChange={(open) => {
@@ -574,7 +761,11 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
       <Modal className="artifact-viewer-modal">
         <Dialog
           ref={dialogRef}
-          aria-label={`${title === 'File diff' ? 'File diff' : 'File preview'} viewer`}
+          aria-label={
+            inbound !== null
+              ? 'Image preview viewer'
+              : `${title === 'File diff' ? 'File diff' : 'File preview'} viewer`
+          }
           className="artifact-viewer-dialog"
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
@@ -583,8 +774,8 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
         >
           <ArtifactHeader {...headerProps} />
           <ArtifactStatus
-            phase={phase}
-            status={currentStatus}
+            phase={statusPhase}
+            status={status}
             subject={subject}
             announcement={statusAnnouncement}
             terminalMessage={terminal}
@@ -593,12 +784,14 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
             <p className="artifact-viewer-summary" dir="auto">
               {inMemory !== null
                 ? inMemory.summary
-                : descriptor === null
-                  ? (legacyDiff?.summary ?? 'Unverified preview source')
-                  : `${descriptor.mimeType} · ${descriptor.completeness === 'excerpt' ? 'Excerpt' : 'Complete'} · ${descriptor.redaction === 'applied' ? 'Redacted' : 'Relay-sanitized'}`}
+                : inbound !== null
+                  ? `${inbound.artifact.full.mediaType} · ${inbound.artifact.full.width} × ${inbound.artifact.full.height} · Redacted`
+                  : descriptor === null
+                    ? (legacyDiff?.summary ?? 'Unverified preview source')
+                    : `${descriptor.mimeType} · ${descriptor.completeness === 'excerpt' ? 'Excerpt' : 'Complete'} · ${descriptor.redaction === 'applied' ? 'Redacted' : 'Relay-sanitized'}`}
             </p>
             <PreviewControls
-              kind={kind === 'image' || kind === 'pdf' ? 'text' : (kind ?? 'text')}
+              kind={kind === 'pdf' ? 'text' : (kind ?? 'text')}
               wrap={wrap}
               findTerm={findTerm}
               {...(kind === 'text' || kind === 'code' || kind === 'diff'
@@ -612,7 +805,23 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
               onCopy={onCopy}
               onShare={onShare}
               copyLabel={copyLabel}
+              {...(kind === 'image'
+                ? {
+                    zoom: imageZoom,
+                    onZoomOut: () => setBoundedImageZoom(imageZoom - 1),
+                    onFit: () => setBoundedImageZoom(IMAGE_MIN_ZOOM),
+                    onZoomIn: () => setBoundedImageZoom(imageZoom + 1),
+                    onPan: panImage,
+                    ...(imageDetails === null
+                      ? {}
+                      : {
+                          onDetails: () => setDetailsOpen((current) => !current),
+                          detailsOpen,
+                        }),
+                  }
+                : {})}
             />
+            {imageDetails !== null && <ArtifactDetails model={imageDetails} open={detailsOpen} />}
             {descriptor !== null && resource.status === 'stale' && (
               <button
                 type="button"

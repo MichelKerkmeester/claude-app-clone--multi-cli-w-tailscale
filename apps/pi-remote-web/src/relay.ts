@@ -25,6 +25,7 @@ import {
   isRuntimeSnapshotDto,
   isRuntimeStateDto,
   isRichTranscriptBlock,
+  isInboundImageReadyBlock,
   isSessionCardDto,
   isPromptSubmitResponse,
   isSlashSubmitIssueResponse,
@@ -36,6 +37,7 @@ import {
   type CommandCatalogDto,
   type ExecutePlanCommand,
   type FilePreviewBlock,
+  type InboundImageReadyBlock,
   type PlanControlOutcome,
   type PlanControlResponse,
   type PromptAbortResponse,
@@ -241,7 +243,12 @@ export interface ArtifactResource {
   readonly revision: string;
   readonly etag: string;
   readonly digest: string;
+  readonly contentDigest?: string;
 }
+
+export type ArtifactReadVariant = 'thumbnail' | 'full';
+
+export type ArtifactResourceBlock = FilePreviewBlock | InboundImageReadyBlock;
 
 /** The opaque binding is accepted only into the live runtime object. */
 export interface PlanBindingResponse {
@@ -1072,9 +1079,21 @@ function annotateRelayBlock(block: TranscriptBlock): RelayTranscriptBlock {
 /** Read one relay-authored artifact revision without routing bytes through JSON transport. */
 export async function readArtifact(
   sessionId: string,
-  block: FilePreviewBlock,
+  block: ArtifactResourceBlock,
   signal?: AbortSignal,
+  variant?: ArtifactReadVariant,
 ): Promise<ArtifactResource> {
+  if (isInboundImageReadyBlock(block)) {
+    return readInboundArtifact(sessionId, block, variant ?? 'full', signal);
+  }
+  if (isFilePreviewBlock(block) && block.renderer === 'image') {
+    return readInboundArtifact(
+      sessionId,
+      block as FilePreviewBlock & { readonly renderer: 'image' },
+      variant ?? 'full',
+      signal,
+    );
+  }
   if (
     !isOpaqueId(sessionId) ||
     !isFilePreviewBlock(block) ||
@@ -1099,6 +1118,7 @@ export async function readArtifact(
       method: 'GET',
       cache: 'no-store',
       credentials: 'same-origin',
+      redirect: 'error',
       headers: { accept: block.mimeType },
       ...(signal === undefined ? {} : { signal }),
     });
@@ -1151,6 +1171,130 @@ export async function readArtifact(
   return validateArtifactBytes(bytes, block, contentType, revision, etag);
 }
 
+async function readInboundArtifact(
+  sessionId: string,
+  block: InboundImageReadyBlock | (FilePreviewBlock & { readonly renderer: 'image' }),
+  variant: ArtifactReadVariant,
+  signal?: AbortSignal,
+): Promise<ArtifactResource> {
+  if (!isOpaqueId(sessionId) || block.content.kind !== 'artifact-ref') {
+    throw new ArtifactReadError('unavailable');
+  }
+  const expected = isInboundImageReadyBlock(block)
+    ? {
+        artifactId: block.artifact.id,
+        revision: block.artifact.revision,
+        digest: block.artifact[variant].digest,
+        byteLength: block.artifact[variant].byteLength,
+        contentType: block.artifact[variant].mediaType,
+      }
+    : {
+        artifactId: block.artifactId,
+        revision: block.revision,
+        digest: block.digest,
+        byteLength: block.byteLength,
+        contentType: block.mimeType,
+      };
+
+  if (isDemoMode()) {
+    if (!isFilePreviewBlock(block)) throw new ArtifactReadError('unavailable');
+    const bytes = demoArtifactBytes(block);
+    noteRelayHeartbeat();
+    return validateArtifactBytes(bytes, block);
+  }
+
+  let response: Response;
+  try {
+    response = await fetch('/api/artifacts/read', {
+      method: 'POST',
+      cache: 'no-store',
+      credentials: 'same-origin',
+      redirect: 'error',
+      headers: {
+        accept: expected.contentType,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        sessionId,
+        artifactId: expected.artifactId,
+        revision: expected.revision,
+        variant,
+      }),
+      ...(signal === undefined ? {} : { signal }),
+    });
+  } catch (error: unknown) {
+    if (isAbortError(error)) throw error;
+    throw new ArtifactReadError('unavailable');
+  }
+  noteRelayHeartbeat();
+  if (response.status !== 200 || !response.ok) {
+    throw new ArtifactReadError(artifactReadCodeForStatus(response.status), response.status);
+  }
+
+  const contentType = response.headers.get('content-type')?.split(';', 1)[0]?.trim() ?? '';
+  const contentLength = parseContentLength(response.headers.get('content-length'));
+  const contentDigest = parseContentDigest(response.headers.get('content-digest'));
+  const etag = response.headers.get('etag');
+  const cacheControl = response.headers.get('cache-control') ?? '';
+  const contentDisposition = response.headers.get('content-disposition') ?? '';
+  const nosniff = response.headers.get('x-content-type-options');
+  const resourcePolicy = response.headers.get('cross-origin-resource-policy');
+  const referrerPolicy = response.headers.get('referrer-policy');
+  if (
+    contentLength === null ||
+    contentLength > MAX_ARTIFACT_BYTES ||
+    (expected.byteLength !== null && contentLength !== expected.byteLength) ||
+    contentType !== expected.contentType ||
+    etag === null ||
+    etag.startsWith('W/') ||
+    contentDigest === null ||
+    !cacheControl.toLowerCase().includes('no-store') ||
+    !contentDisposition.toLowerCase().startsWith('attachment;') ||
+    nosniff?.toLowerCase() !== 'nosniff' ||
+    resourcePolicy?.toLowerCase() !== 'same-origin' ||
+    referrerPolicy?.toLowerCase() !== 'no-referrer'
+  ) {
+    throw new ArtifactReadError('revision-conflict', response.status);
+  }
+
+  const bytes = await readBoundedBody(response, MAX_ARTIFACT_BYTES, contentLength);
+  if (
+    bytes.byteLength !== contentLength ||
+    stripEtagQuotes(etag).toLowerCase() !== expected.digest.toLowerCase() ||
+    contentDigest.toLowerCase() !== expected.digest.toLowerCase()
+  ) {
+    throw new ArtifactReadError('digest-mismatch', response.status);
+  }
+  const digest = await digestBytes(bytes);
+  if (digest !== expected.digest.toLowerCase()) {
+    throw new ArtifactReadError('digest-mismatch', response.status);
+  }
+  return {
+    bytes,
+    contentType,
+    revision: expected.revision,
+    etag,
+    digest,
+    contentDigest,
+  };
+}
+
+function artifactReadCodeForStatus(status: number): ArtifactReadErrorCode {
+  return status === 401 || status === 403
+    ? 'denied'
+    : status === 404
+      ? 'missing'
+      : status === 410
+        ? 'expired'
+        : status === 409
+          ? 'revision-conflict'
+          : status === 429
+            ? 'rate-limited'
+            : status >= 500
+              ? 'unavailable'
+              : 'invalid-response';
+}
+
 export const fetchArtifactRevision = readArtifact;
 export const readArtifactRevision = readArtifact;
 
@@ -1161,10 +1305,22 @@ async function digestBytes(bytes: Uint8Array): Promise<string> {
   return [...new Uint8Array(hash)].map((part) => part.toString(16).padStart(2, '0')).join('');
 }
 
-async function readBoundedBody(response: Response, maximumBytes: number): Promise<Uint8Array> {
+async function readBoundedBody(
+  response: Response,
+  maximumBytes: number,
+  expectedLength: number | null = null,
+): Promise<Uint8Array> {
   if (response.body === null || typeof response.body.getReader !== 'function') {
     const bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.byteLength > maximumBytes) throw new ArtifactReadError('too-large', response.status);
+    if (
+      bytes.byteLength > maximumBytes ||
+      (expectedLength !== null && bytes.byteLength !== expectedLength)
+    ) {
+      throw new ArtifactReadError(
+        bytes.byteLength > maximumBytes ? 'too-large' : 'invalid-response',
+        response.status,
+      );
+    }
     return bytes;
   }
   const reader = response.body.getReader();
@@ -1190,6 +1346,9 @@ async function readBoundedBody(response: Response, maximumBytes: number): Promis
   for (const chunk of chunks) {
     bytes.set(chunk, offset);
     offset += chunk.byteLength;
+  }
+  if (expectedLength !== null && total !== expectedLength) {
+    throw new ArtifactReadError('invalid-response', response.status);
   }
   return bytes;
 }
@@ -1223,6 +1382,19 @@ function parseContentLength(value: string | null): number | null {
   if (value === null || !/^\d+$/.test(value)) return null;
   const parsed = Number(value);
   return Number.isSafeInteger(parsed) ? parsed : null;
+}
+
+function parseContentDigest(value: string | null): string | null {
+  if (value === null) return null;
+  const match = /^sha-256=:([A-Za-z0-9+/]+={0,2}):$/i.exec(value.trim());
+  if (match === null || match[1] === undefined) return null;
+  try {
+    const decoded = atob(match[1]);
+    if (decoded.length !== 32) return null;
+    return [...decoded].map((part) => part.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+  } catch {
+    return null;
+  }
 }
 
 export async function openSyncSocket(

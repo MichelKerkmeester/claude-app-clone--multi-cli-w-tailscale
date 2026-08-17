@@ -53,6 +53,35 @@ export interface ReadOnlyCache {
   readonly transcripts: readonly CachedTranscript[];
 }
 
+const NON_DURABLE_ARTIFACT_KEYS = new Set([
+  'bytes',
+  'buffer',
+  'blob',
+  'objectUrl',
+  'objectURL',
+  'resource',
+  'resourceState',
+  'decoded',
+  'bitmap',
+  'imageBitmap',
+  'arrayBuffer',
+  'file',
+  'fileHandle',
+  'url',
+]);
+
+/** Keep cache records metadata-only if a future caller passes a richer live object. */
+export function stripArtifactResourceState(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stripArtifactResourceState);
+  if (!isRecord(value)) return value;
+  const result: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) {
+    if (NON_DURABLE_ARTIFACT_KEYS.has(key)) continue;
+    result[key] = stripArtifactResourceState(child);
+  }
+  return result;
+}
+
 export function installCacheRevalidation(onRestore: () => void): () => void {
   const onPageShow = (event: PageTransitionEvent) => {
     if (event.persisted) onRestore();
@@ -128,7 +157,7 @@ export function saveCache(sessions: readonly SessionCardDto[], current: Transcri
         ].slice(0, MAX_SESSIONS);
   const value: ReadOnlyCache = { sessions, savedAt, transcripts };
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(value));
+    localStorage.setItem(CACHE_KEY, JSON.stringify(stripArtifactResourceState(value)));
   } catch {
     // Storage pressure must not affect the live read-only view.
   }

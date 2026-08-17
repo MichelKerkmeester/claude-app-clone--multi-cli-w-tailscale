@@ -1,5 +1,5 @@
 export interface PreviewControlsProps {
-  readonly kind: 'diff' | 'text' | 'markdown' | 'code';
+  readonly kind: 'diff' | 'text' | 'markdown' | 'code' | 'image';
   readonly readOnly?: boolean;
   readonly wrap?: boolean;
   readonly onWrapChange?: (wrap: boolean) => void;
@@ -10,6 +10,13 @@ export interface PreviewControlsProps {
   readonly onCopy?: () => void;
   readonly onShare?: () => void;
   readonly copyLabel?: string;
+  readonly zoom?: number;
+  readonly onZoomOut?: () => void;
+  readonly onFit?: () => void;
+  readonly onZoomIn?: () => void;
+  readonly onPan?: (direction: 'up' | 'down' | 'left' | 'right') => void;
+  readonly onDetails?: () => void;
+  readonly detailsOpen?: boolean;
 }
 
 const KIND_LABELS: Record<PreviewControlsProps['kind'], string> = {
@@ -17,6 +24,7 @@ const KIND_LABELS: Record<PreviewControlsProps['kind'], string> = {
   text: 'Text',
   markdown: 'Markdown',
   code: 'Code',
+  image: 'Image',
 };
 
 export function PreviewControls({
@@ -31,11 +39,84 @@ export function PreviewControls({
   onCopy,
   onShare,
   copyLabel = 'Copy',
+  zoom = 1,
+  onZoomOut,
+  onFit,
+  onZoomIn,
+  onPan,
+  onDetails,
+  detailsOpen = false,
 }: PreviewControlsProps) {
   return (
     <div className="artifact-preview-controls" role="group" aria-label="Preview controls">
       <span>{KIND_LABELS[kind]}</span>
       <span>{readOnly ? 'Read-only' : 'Preview'}</span>
+      {kind === 'image' && (
+        <>
+          <span aria-live="polite">{Math.round(zoom * 100)}%</span>
+          {onZoomOut !== undefined && (
+            <button
+              type="button"
+              className="artifact-control-button"
+              aria-label="Zoom out"
+              onClick={onZoomOut}
+            >
+              −
+            </button>
+          )}
+          {onFit !== undefined && (
+            <button
+              type="button"
+              className="artifact-control-button"
+              aria-pressed={zoom === 1}
+              onClick={onFit}
+            >
+              Fit
+            </button>
+          )}
+          {onZoomIn !== undefined && (
+            <button
+              type="button"
+              className="artifact-control-button"
+              aria-label="Zoom in"
+              onClick={onZoomIn}
+            >
+              +
+            </button>
+          )}
+          {onPan !== undefined && (
+            <span className="artifact-image-pan-controls" role="group" aria-label="Pan image">
+              {(['up', 'left', 'right', 'down'] as const).map((direction) => (
+                <button
+                  key={direction}
+                  type="button"
+                  className="artifact-control-button"
+                  aria-label={`Pan ${direction}`}
+                  onClick={() => onPan(direction)}
+                >
+                  {direction === 'up'
+                    ? '↑'
+                    : direction === 'down'
+                      ? '↓'
+                      : direction === 'left'
+                        ? '←'
+                        : '→'}
+                </button>
+              ))}
+            </span>
+          )}
+          {onDetails !== undefined && (
+            <button
+              type="button"
+              className="artifact-control-button"
+              aria-expanded={detailsOpen}
+              onClick={onDetails}
+            >
+              Details
+            </button>
+          )}
+        </>
+      )}
       {onWrapChange !== undefined && (
         <button
           type="button"
@@ -58,12 +139,12 @@ export function PreviewControls({
           />
         </label>
       )}
-      {canCopy && onCopy !== undefined && (
+      {kind !== 'image' && canCopy && onCopy !== undefined && (
         <button type="button" className="artifact-control-button" onClick={onCopy}>
           {copyLabel}
         </button>
       )}
-      {canShare && onShare !== undefined && (
+      {kind !== 'image' && canShare && onShare !== undefined && (
         <button type="button" className="artifact-control-button" onClick={onShare}>
           Share
         </button>

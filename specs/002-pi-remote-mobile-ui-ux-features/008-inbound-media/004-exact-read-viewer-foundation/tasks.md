@@ -61,14 +61,14 @@ All concrete tasks below must be addressed before this phase is shippable.
 See `spec.md`, `plan.md`, and `checklist.md` in this folder.
 <!-- /ANCHOR:cross-refs -->
 
-- [ ] Change `apps/pi-remote-relay/src/auth/policy.ts` to add `artifact:read` separately from `artifact:publish` and leave unknown actions denied.
-- [ ] Change `apps/pi-remote-relay/src/http/server.ts` to add `POST /api/artifacts/read` with exact body fields, session membership, Origin/principal/device checks, 404/409/410/429 mapping, concurrency limits, and no-store integrity headers.
-- [ ] Change `apps/pi-remote-relay/src/auth/rate-limit.ts` for 60 thumbnail reads, 30 full reads, two thumbnail requests, and one full request per device/session window.
-- [ ] Extend `apps/pi-remote-relay/src/store/artifact-store.ts` with immutable exact-tuple lookup, variant streaming, ETag/Content-Digest, expiry, and revocation behavior; reject `latest` and never substitute a newer revision.
-- [ ] Add or extend `apps/pi-remote-web/src/artifacts/useArtifactResource.ts` with AbortSignal ownership, streamed length checking, WebCrypto SHA-256, ETag/Content-Digest comparison, `HTMLImageElement.decode`, typed Blob creation, reference-counted object URLs, bounded LRU retention, and generation invalidation.
-- [ ] Add or extend `apps/pi-remote-web/src/artifacts/ArtifactViewerProvider.tsx` and `ArtifactViewerHost.tsx` as shared React Aria infrastructure outside the virtualized transcript, including frozen identity/digest, history, scroll, focus, and privacy-cover responsibilities.
-- [ ] Add or extend `apps/pi-remote-web/src/artifacts/ArtifactHeader.tsx`, `ArtifactDetails.tsx`, `PreviewControls.tsx`, and `useArtifactHistory.ts` for safe metadata, close/history, zoom/pan controls, and focus restoration.
-- [ ] Change `apps/pi-remote-web/src/relay.ts` for exact read status mapping, same-origin credentials, no-store, redirect rejection, and no mutation-ticket use.
-- [ ] Change `apps/pi-remote-web/src/cache.ts` and `apps/pi-remote-web/public/service-worker.js` so artifact resources are never persisted or cached; remove legacy artifact caches during activation.
-- [ ] Change `apps/pi-remote-web/index.html` and `apps/pi-remote-web/src/main.tsx` to merge the required CSP and mount the provider without artifact URLs in markup or history.
-- [ ] Add relay artifact-read/header/auth tests, web resource/cache/provider/history tests, and the deterministic in-memory read fixture in `scripts/inbound-media-cdp.mjs`.
+- [x] Change `apps/pi-remote-relay/src/auth/policy.ts` to add `artifact:read` separately from `artifact:publish` and leave unknown actions denied.
+- [x] Change `apps/pi-remote-relay/src/http/server.ts` to add `POST /api/artifacts/read` with exact body fields, session membership, Origin/principal/device checks, 404/409/410/429 mapping, concurrency limits, and no-store integrity headers.
+- [x] Change `apps/pi-remote-relay/src/auth/rate-limit.ts` for 60 thumbnail reads, 30 full reads, two thumbnail requests, and one full request per device/session window.
+- [x] Extend `apps/pi-remote-relay/src/store/artifact-store.ts` with immutable exact-tuple lookup, variant streaming, ETag/Content-Digest, expiry, and revocation behavior; reject `latest` and never substitute a newer revision.
+- [x] Add or extend `apps/pi-remote-web/src/artifacts/useArtifactResource.ts` with AbortSignal ownership, streamed length checking, WebCrypto SHA-256, ETag/Content-Digest comparison, `HTMLImageElement.decode`, typed Blob creation, reference-counted object URLs, bounded LRU retention, and generation invalidation.
+- [x] Add or extend `apps/pi-remote-web/src/artifacts/ArtifactViewerProvider.tsx` and `ArtifactViewerHost.tsx` as shared React Aria infrastructure outside the virtualized transcript, including frozen identity/digest, history, scroll, focus, and privacy-cover responsibilities.
+- [x] Add or extend `apps/pi-remote-web/src/artifacts/ArtifactHeader.tsx`, `ArtifactDetails.tsx`, `PreviewControls.tsx`, and `useArtifactHistory.ts` for safe metadata, close/history, zoom/pan controls, and focus restoration.
+- [x] Change `apps/pi-remote-web/src/relay.ts` for exact read status mapping, same-origin credentials, no-store, redirect rejection, and no mutation-ticket use.
+- [x] Change `apps/pi-remote-web/src/cache.ts` and `apps/pi-remote-web/public/service-worker.js` so artifact resources are never persisted or cached; remove legacy artifact caches during activation.
+- [x] Change `apps/pi-remote-web/index.html` and `apps/pi-remote-web/src/main.tsx` to merge the required CSP and mount the provider without artifact URLs in markup or history.
+- [x] Add relay artifact-read/header/auth tests, web resource/cache/provider/history tests, and the deterministic in-memory read fixture in `scripts/inbound-media-cdp.mjs`.

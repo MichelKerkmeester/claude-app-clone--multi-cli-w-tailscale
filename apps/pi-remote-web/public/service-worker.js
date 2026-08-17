@@ -2,7 +2,8 @@
 // MODULE: Pi Remote PWA Service Worker
 // ───────────────────────────────────────────────────────────────────
 
-const CACHE_NAME = 'pi-remote-shell-v4';
+// Legacy installed workers used: const CACHE_NAME = 'pi-remote-shell-v4';
+const CACHE_NAME = 'pi-remote-shell-v5';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
 const SHELL_PATHS = new Set(SHELL);
 
@@ -16,6 +17,7 @@ self.addEventListener('activate', (event) => {
     caches
       .keys()
       .then((keys) =>
+        // The active shell is the only durable cache; this also strips legacy artifact caches.
         Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
       )
       .then(() => self.clients.claim()),
@@ -24,19 +26,20 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const request = event.request;
-  if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (isAttachmentRequest(url)) {
-    // Attachment-bearing resources are transient and must never enter the shell cache.
+  if (isArtifactRequest(url)) {
+    // Artifact bytes are authenticated, revision-specific data. They must never
+    // become durable shell or runtime cache entries, including the exact POST read.
     event.respondWith(fetchWithoutBrowserCache(request));
     return;
   }
 
-  if (isArtifactRequest(url)) {
-    // Artifact bytes are authenticated, revision-specific data. They must never
-    // become durable shell or runtime cache entries.
+  if (request.method !== 'GET') return;
+
+  if (isAttachmentRequest(url)) {
+    // Attachment-bearing resources are transient and must never enter the shell cache.
     event.respondWith(fetchWithoutBrowserCache(request));
     return;
   }
@@ -85,7 +88,10 @@ function isShellRequest(url) {
 }
 
 function isArtifactRequest(url) {
-  return /^\/api\/sessions\/[^/]+\/artifacts\/[^/]+\/revisions\/[^/]+$/.test(url.pathname);
+  return (
+    url.pathname.startsWith('/api/artifacts/') ||
+    /^\/api\/sessions\/[^/]+\/artifacts\/[^/]+\/revisions\/[^/]+$/.test(url.pathname)
+  );
 }
 
 function isAttachmentRequest(url) {

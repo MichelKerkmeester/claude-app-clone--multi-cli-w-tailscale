@@ -1,10 +1,16 @@
-import type { FileDiffBlock, FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
+import {
+  isInboundImageReadyBlock,
+  type FileDiffBlock,
+  type FilePreviewBlock,
+  type InboundImageReadyBlock,
+} from '@pi-remote/pi-rpc-protocol';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { ArtifactViewerHost } from './ArtifactViewerHost.js';
+import { clearArtifactResourceStore } from './useArtifactResource.js';
 import { useArtifactHistory } from './useArtifactHistory.js';
 
-export type ArtifactViewerPhase = 'closed' | 'opening' | 'ready-diff' | 'exiting';
+export type ArtifactViewerPhase = 'closed' | 'opening' | 'ready-diff' | 'ready-image' | 'exiting';
 
 export type ArtifactDismissalReason =
   'close' | 'escape' | 'history' | 'edge-back' | 'voiceover-scrub';
@@ -24,11 +30,13 @@ export interface InMemoryArtifactDocument {
     'current' | 'stale-cache' | 'connection-lost' | 'terminal-without-result' | 'source-removed';
 }
 
-export type ArtifactViewerSource = FileDiffBlock | FilePreviewBlock | InMemoryArtifactDocument;
+export type ArtifactViewerSource =
+  FileDiffBlock | FilePreviewBlock | InboundImageReadyBlock | InMemoryArtifactDocument;
 
 export interface ArtifactPreview {
   readonly source: Readonly<ArtifactViewerSource>;
   readonly trigger: HTMLButtonElement | null;
+  readonly sessionId: string | null;
   readonly scrollContainer: HTMLElement | null;
   readonly scrollTop: number;
   readonly scrollLeft: number;
@@ -40,8 +48,13 @@ export interface ArtifactViewerContextValue {
   readonly phase: ArtifactViewerPhase;
   readonly preview: ArtifactPreview | null;
   readonly openDiff: (
-    block: FileDiffBlock | FilePreviewBlock,
+    block: FileDiffBlock | FilePreviewBlock | InboundImageReadyBlock,
     trigger: HTMLButtonElement | null,
+  ) => void;
+  readonly openInboundImage: (
+    block: InboundImageReadyBlock,
+    trigger: HTMLButtonElement | null,
+    sessionId: string | null,
   ) => void;
   readonly openInMemory: (
     document: InMemoryArtifactDocument,
@@ -57,6 +70,7 @@ function capturePreview(
   block: ArtifactViewerSource,
   trigger: HTMLButtonElement | null,
   generation: number,
+  sessionId: string | null,
 ): ArtifactPreview {
   const scrollContainer =
     trigger?.closest<HTMLElement>('.transcript-scroll') ??
@@ -68,6 +82,7 @@ function capturePreview(
   return {
     source,
     trigger,
+    sessionId,
     scrollContainer,
     scrollTop: scrollContainer?.scrollTop ?? 0,
     scrollLeft: scrollContainer?.scrollLeft ?? 0,
@@ -76,12 +91,19 @@ function capturePreview(
   };
 }
 
-function restorePreview(preview: ArtifactPreview): void {
+function restorePreview(
+  preview: ArtifactPreview,
+  timerRef: { current: number | null },
+  restoreFocus = true,
+): void {
   if (preview.scrollContainer !== null) {
     preview.scrollContainer.scrollTop = preview.scrollTop;
     preview.scrollContainer.scrollLeft = preview.scrollLeft;
   }
-  window.setTimeout(() => {
+  if (!restoreFocus) return;
+  if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+  timerRef.current = window.setTimeout(() => {
+    timerRef.current = null;
     if (preview.trigger?.isConnected === true) {
       preview.trigger.focus({ preventScroll: true });
       return;
@@ -92,6 +114,17 @@ function restorePreview(preview: ArtifactPreview): void {
   }, 0);
 }
 
+function tagInMemoryHistory(documentId: string): void {
+  const state = window.history.state;
+  if (state !== null && typeof state === 'object') {
+    window.history.replaceState(
+      { ...(state as Record<string, unknown>), __piRemoteArtifactBlockId: documentId },
+      '',
+      window.location.href,
+    );
+  }
+}
+
 export function ArtifactViewerProvider({ children }: { readonly children: ReactNode }) {
   const [phase, setPhase] = useState<ArtifactViewerPhase>('closed');
   const [preview, setPreview] = useState<ArtifactPreview | null>(null);
@@ -99,6 +132,7 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
   const previewRef = useRef<ArtifactPreview | null>(null);
   const openingTimerRef = useRef<number | null>(null);
   const exitingTimerRef = useRef<number | null>(null);
+  const restoreTimerRef = useRef<number | null>(null);
   const restoredGenerationRef = useRef<number | null>(null);
   const closeRef = useRef<(reason?: ArtifactDismissalReason) => void>(() => undefined);
   const history = useArtifactHistory(() => closeRef.current('history'));
@@ -106,15 +140,23 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
   const clearTimers = () => {
     if (openingTimerRef.current !== null) window.clearTimeout(openingTimerRef.current);
     if (exitingTimerRef.current !== null) window.clearTimeout(exitingTimerRef.current);
+    if (restoreTimerRef.current !== null) window.clearTimeout(restoreTimerRef.current);
     openingTimerRef.current = null;
     exitingTimerRef.current = null;
+    restoreTimerRef.current = null;
   };
 
-  const openDiff = (block: FileDiffBlock | FilePreviewBlock, trigger: HTMLButtonElement | null) => {
+  const openViewer = (
+    block: ArtifactViewerSource,
+    trigger: HTMLButtonElement | null,
+    sessionId: string | null,
+    readyPhase: 'ready-diff' | 'ready-image',
+  ) => {
     clearTimers();
+    clearArtifactResourceStore();
     const generation = generationRef.current + 1;
     generationRef.current = generation;
-    const nextPreview = capturePreview(block, trigger, generation);
+    const nextPreview = capturePreview(block, trigger, generation, sessionId);
     restoredGenerationRef.current = null;
     if (previewRef.current === null) history.open();
     previewRef.current = nextPreview;
@@ -125,12 +167,37 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
       if (generationRef.current !== generation || previewRef.current?.generation !== generation) {
         return;
       }
-      setPhase('ready-diff');
+      setPhase(readyPhase);
     }, 0);
+  };
+
+  const openDiff = (
+    block: FileDiffBlock | FilePreviewBlock | InboundImageReadyBlock,
+    trigger: HTMLButtonElement | null,
+  ) => {
+    if (isInboundImageReadyBlock(block)) {
+      openInboundImage(block, trigger, trigger?.dataset.artifactSessionId ?? null);
+      return;
+    }
+    openViewer(block, trigger, trigger?.dataset.artifactSessionId ?? null, 'ready-diff');
+  };
+
+  const openInboundImage = (
+    block: InboundImageReadyBlock,
+    trigger: HTMLButtonElement | null,
+    sessionId: string | null,
+  ) => {
+    openViewer(
+      block,
+      trigger,
+      sessionId ?? trigger?.dataset.artifactSessionId ?? null,
+      'ready-image',
+    );
   };
 
   const openInMemory = (document: InMemoryArtifactDocument, trigger: HTMLButtonElement | null) => {
     clearTimers();
+    clearArtifactResourceStore();
     const existing = previewRef.current;
     if (existing?.source.kind === 'in-memory' && existing.source.id === document.id) {
       updateInMemory(document);
@@ -138,28 +205,15 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     }
     const generation = generationRef.current + 1;
     generationRef.current = generation;
-    const nextPreview = capturePreview(document, trigger, generation);
+    const nextPreview = capturePreview(
+      document,
+      trigger,
+      generation,
+      trigger?.dataset.artifactSessionId ?? null,
+    );
     restoredGenerationRef.current = null;
-    if (previewRef.current === null) {
-      history.open();
-      const state = window.history.state;
-      if (state !== null && typeof state === 'object') {
-        window.history.replaceState(
-          { ...(state as Record<string, unknown>), __piRemoteArtifactBlockId: document.id },
-          '',
-          window.location.href,
-        );
-      }
-    } else {
-      const state = window.history.state;
-      if (state !== null && typeof state === 'object') {
-        window.history.replaceState(
-          { ...(state as Record<string, unknown>), __piRemoteArtifactBlockId: document.id },
-          '',
-          window.location.href,
-        );
-      }
-    }
+    if (previewRef.current === null) history.open();
+    tagInMemoryHistory(document.id);
     previewRef.current = nextPreview;
     setPreview(nextPreview);
     setPhase('opening');
@@ -209,6 +263,7 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
   };
 
   const close = (reason: ArtifactDismissalReason = 'close') => {
+    clearArtifactResourceStore();
     const current = previewRef.current;
     if (current === null) return;
     clearTimers();
@@ -223,7 +278,7 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
       setPhase('closed');
       if (restoredGenerationRef.current !== current.generation) {
         restoredGenerationRef.current = current.generation;
-        restorePreview(current);
+        restorePreview(current, restoreTimerRef);
       }
     }, 0);
   };
@@ -232,10 +287,11 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
   useEffect(
     () => () => {
       clearTimers();
+      clearArtifactResourceStore();
       history.dispose();
       const current = previewRef.current;
       if (current !== null && restoredGenerationRef.current !== current.generation) {
-        restorePreview(current);
+        restorePreview(current, restoreTimerRef, false);
       }
     },
     [history],
@@ -243,14 +299,40 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
 
   useEffect(() => {
     const closeHiddenViewer = () => {
-      if (document.visibilityState === 'hidden') closeRef.current('close');
+      if (document.visibilityState === 'hidden') {
+        clearArtifactResourceStore();
+        closeRef.current('close');
+      }
     };
-    const closeBfcacheViewer = () => closeRef.current('close');
+    const closeBfcacheViewer = () => {
+      clearArtifactResourceStore();
+      closeRef.current('close');
+    };
+    const invalidateViewer = () => {
+      clearArtifactResourceStore();
+      closeRef.current('close');
+    };
     document.addEventListener('visibilitychange', closeHiddenViewer);
     window.addEventListener('pagehide', closeBfcacheViewer);
+    for (const eventName of [
+      'pi-remote:privacy-cover',
+      'pi-remote:logout',
+      'pi-remote:session-switch',
+      'pi-remote:artifact-revoked',
+    ]) {
+      window.addEventListener(eventName, invalidateViewer);
+    }
     return () => {
       document.removeEventListener('visibilitychange', closeHiddenViewer);
       window.removeEventListener('pagehide', closeBfcacheViewer);
+      for (const eventName of [
+        'pi-remote:privacy-cover',
+        'pi-remote:logout',
+        'pi-remote:session-switch',
+        'pi-remote:artifact-revoked',
+      ]) {
+        window.removeEventListener(eventName, invalidateViewer);
+      }
     };
   }, []);
 
@@ -258,6 +340,7 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     phase,
     preview,
     openDiff,
+    openInboundImage,
     openInMemory,
     updateInMemory,
     close,

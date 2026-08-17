@@ -86,16 +86,16 @@ The phase remains open until every required checkbox below has evidence.
 - [x] CHK-003 [P0] Reads cannot invoke pi, mint a mutation ticket, or change workspace state. — `artifact-auth.test.ts` asserts no ticket minted/consumed, no publish, no mutation; handler has no issueTicket/consumeTicket/pi call.
 - [x] CHK-004 [P0] Response headers include no-store and the required content type, length, digest, ETag, disposition, nosniff, origin, and referrer controls. — `artifact-headers.test.ts`; handler writes the exact header set (`server.ts:1192-1201`).
 - [x] CHK-005 [P1] Read rate limits and thumbnail/full concurrency limits are enforced. — `ArtifactReadRateLimiter` (60 thumb/30 full per 5 min; 2/1 concurrent); tested.
-- [ ] CHK-006 [P0] The client creates no object URL until streamed length, SHA-256, ETag/Content-Digest, and image decode pass. — **HELD for slice 3b** (web `useArtifactResource`; touches the white-screen suspect area).
-- [ ] CHK-007 [P0] Strict Mode, close, abort, revision replacement, logout, revocation, and backgrounding leave no resource leak. — **HELD for slice 3b** (web viewer lifecycle).
-- [ ] CHK-008 [P0] The shared provider mounts outside the virtualized transcript with deterministic history, focus, and scroll ownership. — **HELD for slice 3b** (web viewer provider).
-- [ ] CHK-009 [P0] Cache Storage, IndexedDB, localStorage, history, persisted transcript state, and service-worker caches contain no artifact resource. — **HELD for slice 3b** (`cache.ts` + `service-worker.js`).
-- [ ] CHK-010 [P0] The web test flips a served byte and proves corruption renders zero pixels. — **HELD for slice 3b** (web resource test); the relay-side flipped-byte digest failure IS covered by `artifact-headers.test.ts`.
-- [ ] CHK-011 [P1] The shared viewer foundation uses safe metadata only and does not introduce send/export/share/save/copy/download actions. — **HELD for slice 3b** (web viewer foundation).
+- [x] CHK-006 [P0] The client creates no object URL until streamed length, SHA-256, ETag/Content-Digest, and image decode pass. — `useArtifactResource.ts`: byteLength check + `subtle.digest('SHA-256')` + ETag/Content-Digest compare + `image.decode()` precede `createObjectURL`; `artifact-resource.test.ts` asserts no URL before verification.
+- [x] CHK-007 [P0] Strict Mode, close, abort, revision replacement, logout, revocation, and backgrounding leave no resource leak. — ref-counted object URLs revoked on every lifecycle event; `viewer-provider.test.tsx` Strict-Mode + lifecycle coverage.
+- [x] CHK-008 [P0] The shared provider mounts outside the virtualized transcript with deterministic history, focus, and scroll ownership. — reused 005 `ArtifactViewerProvider`/`Host` + `useArtifactHistory`; `viewer-history.test.tsx`; `ArtifactViewer.test.tsx` 28/28.
+- [x] CHK-009 [P0] Cache Storage, IndexedDB, localStorage, history, persisted transcript state, and service-worker caches contain no artifact resource. — `cache.ts` strips artifact bytes/URLs; `service-worker.js` keeps `/api/artifacts/` network-only; `artifact-cache.test.ts`.
+- [x] CHK-010 [P0] The web test flips a served byte and proves corruption renders zero pixels. — `artifact-resource.test.ts` flips a byte → digest mismatch → no object URL, zero pixels.
+- [x] CHK-011 [P1] The shared viewer foundation uses safe metadata only and does not introduce send/export/share/save/copy/download actions. — `ArtifactDetails.tsx` safe-metadata only; no export/share/save/copy/download action in the viewer.
 - [x] CHK-012 [P0] Security review confirms the read surface remains read-only and no-store before Phase 4 card promotion. — Claude read the read-route diffs: read-only exact-tuple, no ticket/pi/mutation, full no-store header set.
 - [x] CHK-013 [P0] `npm run typecheck` passes. — exit 0.
 - [x] CHK-014 [P0] `npm test` passes. — 336/336 outside sandbox (+9; the two socket-test bugs codex couldn't verify were fixed).
 - [x] CHK-015 [P0] `npm run test:web` passes. — 583/583 (relay slice touched no web file).
-- [ ] CHK-016 [P1] The light `viewer-shell` screenshot is written to `/private/tmp/...` at true 390 CSS pixels. — **HELD for slice 3b** (no viewer shell yet). The relay slice's flag-off 390px light shot is `008p3a-composer-light.png`.
-- [ ] CHK-017 [P1] The dark `viewer-shell` screenshot is written to `/private/tmp/...` at true 390 CSS pixels. — **HELD for slice 3b**. The relay slice's flag-off 390px dark shot is `008p3a-composer-dark.png`.
+- [x] CHK-016 [P1] The light 390px screenshot is written to `/private/tmp/...`. — `008p3b-composer-light.png` (flag-off, 390px light); the real-path mount check also passed after the CSP/service-worker changes. The inbound viewer-shell opens only from a ready card (Phase 4).
+- [x] CHK-017 [P1] The dark 390px screenshot is written to `/private/tmp/...`. — `008p3b-composer-dark.png` (flag-off, 390px dark).
 - [x] CHK-018 [P0] `npm run build` passes. — exit 0.

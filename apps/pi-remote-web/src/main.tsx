@@ -6,13 +6,16 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from './App.js';
+import { RootErrorBoundary } from './ErrorBoundary.js';
 import './style.css';
 
 const root = document.getElementById('root');
 if (root === null) throw new Error('Missing application root');
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <RootErrorBoundary>
+      <App />
+    </RootErrorBoundary>
   </StrictMode>,
 );
 

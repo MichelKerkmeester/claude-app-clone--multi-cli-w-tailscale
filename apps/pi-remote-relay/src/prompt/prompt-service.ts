@@ -34,7 +34,10 @@ interface PromptServiceOptions {
   readonly commands?: CommandService;
   readonly now?: () => Date;
   readonly imageBridge?: PiImageBridge;
-  readonly getAttachmentOwner?: (deviceId: string) => AttachmentOwner | null;
+  readonly getAttachmentOwner?: (
+    deviceId: string,
+    attachmentSetId?: string,
+  ) => AttachmentOwner | null;
   readonly revisionCoordinator?: PromptRevisionCoordinator;
 }
 
@@ -43,6 +46,14 @@ export class SlashSubmissionError extends Error {
   public constructor(readonly reason: SlashSubmitIssueCode) {
     super(reason);
     this.name = 'SlashSubmissionError';
+  }
+}
+
+/** A revision-bound prompt was rejected before any host mutation was attempted. */
+export class PromptRevisionStaleError extends Error {
+  public constructor() {
+    super('Prompt revision is stale.');
+    this.name = 'PromptRevisionStaleError';
   }
 }
 
@@ -112,6 +123,14 @@ export class PromptService {
     }
   }
 
+  public getSubmissionState(
+    submissionId: string,
+    deviceId: string,
+  ): SubmissionRecord['state'] | null {
+    const record = this.submissions.get(submissionId);
+    return record === undefined || record.deviceId !== deviceId ? null : record.state;
+  }
+
   /**
    * Interrupt the running agent. Sent immediately (not through the settled mutation
    * lane) so it can preempt an in-flight turn; an uncertain outcome is delivery-unknown
@@ -151,14 +170,18 @@ export class PromptService {
       !this.revisionCoordinator.matches(command.expectedPromptRevision)
     ) {
       this.submissions.delete(command.submissionId);
-      throw new Error('Prompt revision is stale.');
+      throw new PromptRevisionStaleError();
     }
 
-    let imageDelivery: { readonly status: 'delivered' | 'delivery-unknown'; readonly attachmentCount: number } | null = null;
+    let imageDelivery: {
+      readonly status: 'delivered' | 'delivery-unknown';
+      readonly attachmentCount: number;
+    } | null = null;
     try {
       if (hasAttachmentReferences(command)) {
         const bridge = this.options.imageBridge;
-        const owner = this.options.getAttachmentOwner?.(record.deviceId) ?? null;
+        const owner =
+          this.options.getAttachmentOwner?.(record.deviceId, command.attachmentSetId) ?? null;
         if (bridge === undefined || owner === null) {
           throw new Error('Image delivery is unavailable.');
         }
@@ -252,7 +275,11 @@ export class PromptService {
 
   private publishBlock(
     block: ReturnType<TranscriptProjector['projectSubmittedPrompt']>,
-    identity: { readonly hostId: string; readonly workspaceRef: string; readonly sessionId: string },
+    identity: {
+      readonly hostId: string;
+      readonly workspaceRef: string;
+      readonly sessionId: string;
+    },
     occurredAt: string,
     submissionId: string,
   ): ReturnType<TranscriptProjector['projectSubmittedPrompt']> {

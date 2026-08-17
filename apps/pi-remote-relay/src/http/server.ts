@@ -48,13 +48,18 @@ import {
   type AttachmentStatusDto,
   type AttachmentTicketBinding,
 } from '../attachments/attachment-types.js';
+import { PiImageBridgeError } from '../attachments/pi-image-bridge.js';
 import type { CommandService } from '../commands/command-service.js';
 import type { SyncHub } from '../replay/sync.js';
 import { RuntimeIssueError, type RuntimeService } from '../runtime/runtime-service.js';
 import type { SessionCatalog } from '../sessions/catalog.js';
 import type { RelayStore } from '../store/relay-store.js';
 import type { PushService } from '../push/push-service.js';
-import { SlashSubmissionError, type PromptService } from '../prompt/prompt-service.js';
+import {
+  PromptRevisionStaleError,
+  SlashSubmissionError,
+  type PromptService,
+} from '../prompt/prompt-service.js';
 
 const LOOPBACK_HOST = '127.0.0.1';
 const DEFAULT_PORT = 4_310;
@@ -530,7 +535,11 @@ async function handleHttp(
     if (hasBody(request)) {
       const body = await readJsonBody(request);
       const requestData = parseAttachmentTicketRequest(body);
-      if (requestData === null || options.attachments === undefined) {
+      if (options.mediaEnabled !== true || options.attachments === undefined) {
+        sendJson(response, 404, { error: 'not_available' });
+        return;
+      }
+      if (requestData === null) {
         sendJson(response, 400, { error: 'invalid_ticket_request' });
         return;
       }
@@ -693,6 +702,21 @@ async function handleHttp(
       sendJson(response, 401, { error: 'unauthorized' });
       return;
     }
+    const hasAttachments = body.attachmentSetId !== undefined || body.attachmentIds !== undefined;
+    if (hasAttachments && options.mediaEnabled !== true) {
+      sendJson(response, 404, { error: 'not_available' });
+      return;
+    }
+    if (hasAttachments && !isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (
+      options.prompts.getSubmissionState(body.submissionId, session.deviceId) === 'delivery-unknown'
+    ) {
+      sendJson(response, 503, { error: 'delivery_unknown' });
+      return;
+    }
     if (!promptLimiter.consume(session.deviceId)) {
       auth.metrics.rateLimited += 1;
       sendJson(response, 429, { error: 'rate_limited' });
@@ -700,6 +724,13 @@ async function handleHttp(
     }
     try {
       const block = await options.prompts.submit(body, session.deviceId);
+      if (
+        options.prompts.getSubmissionState(body.submissionId, session.deviceId) ===
+        'delivery-unknown'
+      ) {
+        sendJson(response, 503, { error: 'delivery_unknown' });
+        return;
+      }
       sendJson(response, 202, { accepted: true, block });
     } catch (error: unknown) {
       if (error instanceof SlashSubmissionError) {
@@ -707,6 +738,16 @@ async function handleHttp(
         sendJson(response, error.reason === 'stale_catalog' ? 409 : 403, {
           error: error.reason,
         });
+        return;
+      }
+      if (error instanceof PiImageBridgeError) {
+        sendJson(response, statusForImageBridgeError(error.code), {
+          error: imageBridgeErrorCode(error.code),
+        });
+        return;
+      }
+      if (error instanceof PromptRevisionStaleError) {
+        sendJson(response, 409, { error: 'stale_revision' });
         return;
       }
       sendJson(response, 503, { error: 'pi_unavailable' });
@@ -1023,6 +1064,11 @@ async function handleAttachmentRoute(
     sendJson(response, 404, { error: 'not_found' });
     return;
   }
+  if (options.mediaEnabled !== true) {
+    discardRequest(request);
+    sendJson(response, 404, { error: 'not_found' });
+    return;
+  }
   if (route.operation === 'reserve') {
     if (!isForegroundDevice(session.deviceId, session.token)) {
       rejectAttachmentRequest(request, response, 403, 'foreground_required');
@@ -1309,6 +1355,23 @@ function sendAttachmentError(response: ServerResponse, error: unknown): void {
   const code = error instanceof AttachmentServiceError ? error.code : 'internal';
   const status = statusForAttachmentError(code);
   sendJson(response, status, { error: code });
+}
+
+function statusForImageBridgeError(
+  code: ConstructorParameters<typeof PiImageBridgeError>[0],
+): number {
+  if (code === 'expired') return 410;
+  if (code === 'ownership') return 401;
+  if (code === 'revision-mismatch' || code === 'replayed') return 409;
+  if (code === 'image-input-unavailable' || code === 'plan-invalid' || code === 'not-ready') {
+    return 409;
+  }
+  if (code === 'invalid-reference') return 400;
+  return 503;
+}
+
+function imageBridgeErrorCode(code: ConstructorParameters<typeof PiImageBridgeError>[0]): string {
+  return code === 'rejected' ? 'pi_rejected' : code;
 }
 
 function statusForAttachmentError(code: string): number {

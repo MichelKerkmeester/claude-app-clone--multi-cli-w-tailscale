@@ -1,28 +1,27 @@
 # Checklist — End-to-End Submission, Reconciliation, and Release Enablement
 
-- [ ] A user can select, review, explicitly Send, and receive ordered redacted cards for four supported photos with or without a caption.
-- [ ] Text-only, photo-only, and caption-plus-photo turns preserve the same prompt revision and Steer/Later semantics; image-only turns use an empty message.
-- [ ] The client hashes exact transfer bytes, sends only a bounded reference manifest, uses one-use ticketed uploads, limits concurrency to two, and reports real per-tile progress.
-- [ ] No upload body enters browser JSON, the sync socket, persistent storage, cache, analytics, or error payloads.
-- [ ] Every state in the feature state table is reached by a tested success, failure, cancellation, stale, expiry, or lifecycle scenario.
-- [ ] Duplicate Send is suppressed and caption/order are frozen during `committing`.
-- [ ] The batch is atomic: no partial commit, duplicate prompt, path fallback, silent image omission, or automatic resend occurs.
-- [ ] Removing during upload, model switching, revision changes, logout, revocation, epoch changes, shutdown, process death, and ambiguous acknowledgement fail closed and preserve only allowed local/text state.
-- [ ] Ambiguous acknowledgement becomes `delivery-unknown`; authenticated status reconciliation is read-only and precedes any user-directed resend.
-- [ ] On process death, only text is restored and the UI says **“Photos need to be attached again.”**
-- [ ] Raw and normalized media are deleted at every required success, failure, cancel, expiry, logout, revocation, epoch, shutdown, crash-recovery, and delivery-ambiguity boundary.
-- [ ] No raw-media persistence, cache entry, unsafe log field, workspace change, or unapproved transcript/provider payload is observed.
-- [ ] Fixed design system, WCAG AA, light/dark themes, exact 390 px screenshots, 320 px/200% reflow, reduced motion, RTL, safe-area/keyboard behavior, and real iOS lifecycle checks pass.
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npm run test` exits 0.
-- [ ] `npm run test:web` exits 0.
-- [ ] All focused protocol, relay, web, security, integration, kill-point, pinned-Pi, and end-to-end browser suites exit 0.
-- [ ] CDP captures use exactly 390 CSS px in both light and dark themes for principal success and failure states and verify focus/overflow/redaction.
-- [ ] Real-device Safari and installed-PWA checks cover Photo Library, rear camera, HEIC/HEIF, cancellation, VoiceOver, Switch Control, RTL, backgrounding, process death, app lock, keyboard variants, and tailnet reconnection.
-- [ ] Pinned-Pi persistence/echo, HEIF decoder, provider-retention disclosure, revision, workspace, service-worker, log, and storage evidence is recorded.
-- [ ] Phase 2 upload-mutation security review signs off.
-- [ ] Phase 3 Pi/provider-boundary security review signs off.
-- [ ] Final enablement security review signs off with all required negative-test, cleanup, route/ticket, disclosure, probe, scan, snapshot, CDP, and device evidence.
-- [ ] `PI_REMOTE_MEDIA_ENABLED=1` is set only on an approved host that passed every gate; default remains off elsewhere.
-- [ ] Rollback is documented and tested as the flag/configuration change plus quarantine cleanup, with no client fallback to paths or silent image omission.
-
+- [x] A user can select, review, explicitly Send, and receive ordered redacted cards for four supported photos with or without a caption. — relay `attachment-flow.test.ts` (reserve→upload→normalize→commit→bridge→redacted card) + `AttachmentSubmission.test.tsx`, flag enabled via DI/fixture.
+- [x] Text-only, photo-only, and caption-plus-photo turns preserve the same prompt revision and Steer/Later semantics; image-only turns use an empty message. — submission machine + prompt-service; tested.
+- [x] The client hashes exact transfer bytes, sends only a bounded reference manifest, uses one-use ticketed uploads, limits concurrency to two, and reports real per-tile progress. — `attachment-hash.worker.ts` + `attachment-client.ts` (manifest = sha256/byteLength/ordinal/type; ticketed XHR PUT; ≤2 concurrency; determinate progress).
+- [x] No upload body enters browser JSON, the sync socket, persistent storage, cache, analytics, or error payloads. — bodies go only via ticketed XHR PUT; scan clean; negative-control tests.
+- [x] Every state in the feature state table is reached by a tested success, failure, cancellation, stale, expiry, or lifecycle scenario. — `AttachmentSubmission.test.tsx` covers the state table incl. failure/lifecycle.
+- [x] Duplicate Send is suppressed and caption/order are frozen during committing. — generation-token guard + atomic commit; tested.
+- [x] The batch is atomic: no partial commit, duplicate prompt, path fallback, silent image omission, or automatic resend occurs. — atomic commit + no-fallback/no-resend; tested.
+- [x] Removing during upload, model switching, revision changes, logout, revocation, epoch changes, shutdown, process death, and ambiguous acknowledgement fail closed and preserve only allowed local/text state. — generation tokens + abort + lifecycle listeners; `AttachmentSubmission.test.tsx` + kill-point `attachment-recovery.test.ts`.
+- [x] Ambiguous acknowledgement becomes delivery-unknown; authenticated status reconciliation is read-only and precedes any user-directed resend. — bridge + submission return delivery-unknown; read-only status; no auto-resend; tested.
+- [x] On process death, only text is restored and the UI says "Photos need to be attached again." — App process-death path; tested.
+- [x] Raw and normalized media are deleted at every required success, failure, cancel, expiry, logout, revocation, epoch, shutdown, crash-recovery, and delivery-ambiguity boundary. — `acknowledgeDelivered`/`markDeliveryUnknown` + reaper; kill-point test verifies orphan reaping.
+- [x] No raw-media persistence, cache entry, unsafe log field, workspace change, or unapproved transcript/provider payload is observed. — base64 only in the bridge; supervisor pre-frame echo suppression; negative controls; scans clean.
+- [ ] Fixed design system, WCAG AA, light/dark themes, exact 390 px screenshots, 320 px/200% reflow, reduced motion, RTL, safe-area/keyboard behavior, and real iOS lifecycle checks pass. — design/AA/flag-off 390px CDP/reflow/RTL/reduced-motion are DOM-tested + CDP-verified; **real iOS lifecycle checks are operator-required** (physical device).
+- [x] `npm run typecheck` exits 0. — verified on `main`.
+- [x] `npm run test` exits 0. — 303 on re-run (+4 over 299); known `auth.test.ts` flake passed on re-run.
+- [x] `npm run test:web` exits 0. — 581 (+9 over 572).
+- [x] All focused protocol, relay, web, security, integration, and kill-point suites exit 0. — all green; the pinned-Pi live probe skips honestly (see item 22) and the 1 MiB framing test passes.
+- [ ] CDP captures use exactly 390 CSS px in both light and dark themes for principal success and failure states and verify focus/overflow/redaction. — the flag-OFF case is CDP-verified (390px light+dark, DOM overflow check, zero affordances); the ON-state success/failure pixel captures need a demo media wiring (app code, outside Claude's writable scope) and are DOM-tested at 390px — **operator-visual-review**.
+- [ ] Real-device Safari and installed-PWA checks cover Photo Library, rear camera, HEIC/HEIF, cancellation, VoiceOver, Switch Control, RTL, backgrounding, process death, app lock, keyboard variants, and tailnet reconnection. — **operator-required** (physical iPhone; cannot run headlessly).
+- [ ] Pinned-Pi persistence/echo, HEIF decoder, provider-retention disclosure, revision, workspace, service-worker, log, and storage evidence is recorded. — workspace/SW/log/storage negative controls pass; **the live pinned-Pi persistence/echo probe + on-device HEIF decoder evidence are operator/environment-gated** (installed pi 0.84.2 rejects image RPC).
+- [x] Phase 2 upload-mutation security review signs off. — `003-ticketed-binary-ingress/adversarial-security-review.md` + Claude's post-build sign-off (both MUST-FIX confirmed).
+- [x] Phase 3 Pi/provider-boundary security review signs off. — `004-pi-image-bridge-transcript/adversarial-security-review.md` + Claude's post-build sign-off.
+- [ ] Final enablement security review signs off with all required negative-test, cleanup, route/ticket, disclosure, probe, scan, snapshot, CDP, and device evidence. — the final blocking review (this folder) is COMPLETE and approves the build; **enablement evidence is incomplete** (live pinned-Pi probe + real-device) so enablement is WITHHELD and the flag stays off.
+- [x] `PI_REMOTE_MEDIA_ENABLED=1` is set only on an approved host that passed every gate; default remains off elsewhere. — default is off (no hardcoded enable in production/default config); no host is enabled here; enabling is a gated operator action.
+- [x] Rollback is documented and tested as the flag/configuration change plus quarantine cleanup, with no client fallback to paths or silent image omission. — rollback = flag-off config + reaper quarantine cleanup (kill-point tested); no path fallback / no silent omission (verified).

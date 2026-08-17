@@ -53,6 +53,7 @@ export interface AttachmentDraftContextValue {
   readonly appLock: () => void;
   readonly openPreview: (id: string, trigger?: HTMLElement | null) => void;
   readonly closePreview: () => void;
+  readonly getFile: (id: string) => File | null;
   readonly getObjectUrl: (id: string) => string | null;
 }
 
@@ -71,6 +72,7 @@ const EMPTY_CONTEXT: AttachmentDraftContextValue = {
   appLock: () => undefined,
   openPreview: () => undefined,
   closePreview: () => undefined,
+  getFile: () => null,
   getObjectUrl: () => null,
 };
 
@@ -234,6 +236,7 @@ export function AttachmentDraftProvider({
     previewTriggerRef.current = null;
     queueMicrotask(() => trigger?.focus({ preventScroll: true }));
   }, []);
+  const getFile = useCallback((id: string) => storedRef.current.get(id)?.file ?? null, []);
   const getObjectUrl = useCallback(
     (id: string) => storedRef.current.get(id)?.objectUrl ?? null,
     [],
@@ -262,6 +265,7 @@ export function AttachmentDraftProvider({
       appLock,
       openPreview,
       closePreview,
+      getFile,
       getObjectUrl,
     }),
     [
@@ -271,6 +275,7 @@ export function AttachmentDraftProvider({
       cancelPicker,
       clearDraft,
       closePreview,
+      getFile,
       getObjectUrl,
       logout,
       mediaAvailable,

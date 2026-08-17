@@ -51,6 +51,7 @@ interface ManagedPart extends AttachmentPartRecord {
   sourcePath: string | null;
   normalizedPath: string | null;
   normalizedBytes: number;
+  normalizedMime: 'image/jpeg' | 'image/png' | null;
 }
 
 interface ManagedSet extends AttachmentReservationRecord {
@@ -113,6 +114,7 @@ export class AttachmentService {
   private readonly rateLimiter: AttachmentRateLimiter;
   private readonly sets = new Map<string, ManagedSet>();
   private readonly submissions = new Map<string, SubmissionRecord>();
+  private readonly deliveredSets = new Set<string>();
   private readonly deviceReservedBytes = new Map<string, number>();
   private relayReservedBytes = 0;
   private initialized: Promise<void> | null = null;
@@ -233,6 +235,11 @@ export class AttachmentService {
         }));
   }
 
+  public getOwnerForDevice(setId: string, deviceId: string): AttachmentOwner | null {
+    const owner = this.sets.get(setId)?.owner;
+    return owner === undefined || owner.deviceId !== deviceId ? null : owner;
+  }
+
   public canIssueTicket(owner: AttachmentOwner, binding: AttachmentTicketBinding): boolean {
     if (binding.operation === 'reserve') {
       return (
@@ -244,6 +251,7 @@ export class AttachmentService {
     const set = this.sets.get(binding.setId);
     return (
       set !== undefined &&
+      !this.deliveredSets.has(set.setId) &&
       set.expiresAt > this.now() &&
       !isCancelledState(set.state) &&
       set.state !== 'rejected' &&
@@ -353,6 +361,7 @@ export class AttachmentService {
       part.normalizedBytes = normalizedReservationBytes;
       normalizedReservationBytes = 0;
       part.status = 'ready';
+      part.normalizedMime = normalized.image.mimeType;
       if (set.parts.every((candidate) => candidate.status === 'ready')) set.state = 'ready';
       return {
         setId: set.setId,
@@ -398,6 +407,57 @@ export class AttachmentService {
         status: part.status,
       })),
     };
+  }
+
+  /** Read one normalized derivative only across the private bridge capability. */
+  public async loadNormalizedDerivative(
+    setId: string,
+    attachmentId: string,
+  ): Promise<{ readonly bytes: Uint8Array; readonly mimeType: 'image/jpeg' | 'image/png' } | null> {
+    await this.initialize();
+    const set = this.sets.get(setId);
+    const part = set?.parts.find((candidate) => candidate.attachmentId === attachmentId);
+    if (
+      set === undefined ||
+      this.deliveredSets.has(setId) ||
+      set.state !== 'ready' ||
+      part === undefined ||
+      part.status !== 'ready' ||
+      part.normalizedPath === null ||
+      part.normalizedMime === null
+    ) {
+      return null;
+    }
+    try {
+      const bytes = new Uint8Array(await readFile(part.normalizedPath));
+      if (bytes.byteLength !== part.normalizedBytes) {
+        bytes.fill(0);
+        return null;
+      }
+      return { bytes, mimeType: part.normalizedMime };
+    } catch {
+      return null;
+    }
+  }
+
+  /** Delete every derivative after a confirmed host delivery and block replay. */
+  public async acknowledgeDelivered(setId: string): Promise<void> {
+    const set = this.sets.get(setId);
+    if (set === undefined) throw new AttachmentServiceError('not_found');
+    if (set.state !== 'ready' || this.deliveredSets.has(setId)) {
+      throw new AttachmentServiceError('invalid_binding');
+    }
+    await this.removeBytes(set);
+    this.deliveredSets.add(setId);
+  }
+
+  public async discardRejected(setId: string): Promise<void> {
+    const set = this.sets.get(setId);
+    if (set === undefined) return;
+    set.cancelRequested = true;
+    set.state = 'rejected';
+    for (const part of set.parts) part.status = 'rejected';
+    await this.removeBytes(set);
   }
 
   public async cancel(
@@ -509,6 +569,7 @@ export class AttachmentService {
       part.sourcePath = null;
       part.normalizedPath = null;
       part.normalizedBytes = 0;
+      part.normalizedMime = null;
     }
     set.normalizedBytes = 0;
     if (set.quotaBytes > 0) {
@@ -660,6 +721,7 @@ function managedPart(setId: string, item: AttachmentManifestItem): ManagedPart {
     sourcePath: null,
     normalizedPath: null,
     normalizedBytes: 0,
+    normalizedMime: null,
   };
 }
 

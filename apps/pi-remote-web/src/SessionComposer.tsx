@@ -48,10 +48,14 @@ import { useAttachmentDraft } from './attachments/AttachmentDraftProvider.js';
 import { AttachmentPreviewDialog } from './attachments/AttachmentPreviewDialog.js';
 import { AttachmentRail } from './attachments/AttachmentRail.js';
 import { ATTACHMENT_ACCEPT, capabilityAllowsPhotos } from './attachments/attachment-state.js';
+import { useAttachmentSubmission } from './attachments/useAttachmentSubmission.js';
 
 const MAX_TRAY_HEIGHT_PX = 140;
 
 export interface SessionComposerProps {
+  readonly sessionId?: string;
+  readonly sessionEpoch?: string | null;
+  readonly expectedPromptRevision?: number | null;
   readonly prompt: string;
   readonly setPrompt: (updater: (current: string) => string) => void;
   readonly onDraftChange: (value: string) => void;
@@ -81,9 +85,13 @@ export interface SessionComposerProps {
   readonly externalOverlayOpen?: boolean;
   /** Host capability fixture; production callers keep this disabled until enablement. */
   readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
+  readonly onAttachmentSubmitted?: () => void;
 }
 
 export function SessionComposer({
+  sessionId = 'session_local',
+  sessionEpoch = null,
+  expectedPromptRevision = null,
   prompt,
   setPrompt,
   onDraftChange,
@@ -106,6 +114,7 @@ export function SessionComposer({
   onInsertCommand,
   externalOverlayOpen = false,
   mediaCapability = null,
+  onAttachmentSubmitted,
 }: SessionComposerProps) {
   // A turn is running when either the relay session card or the host-
   // confirmed runtime snapshot says so; both are authoritative sources and
@@ -121,6 +130,30 @@ export function SessionComposer({
   const mediaAvailable = capabilityAllowsPhotos(mediaCapability);
   const attachmentCanSubmit = !mediaAvailable || attachmentDraft.canSubmit;
   const effectiveSlashSendable = slashSendable && attachmentCanSubmit;
+  const attachmentSubmission = useAttachmentSubmission({
+    sessionId,
+    sessionEpoch,
+    expectedPromptRevision,
+    prompt,
+    connection,
+    mediaEnabled: mediaAvailable,
+    modelCanViewPhotos: attachmentDraft.state.modelCanViewPhotos,
+    runtimeAuthority: runtimeAuthority && runtimeControls.runtime.status === 'ready',
+    onSubmitted: () => {
+      setPrompt(() => '');
+      onAttachmentSubmitted?.();
+    },
+  });
+  const hasAttachments = attachmentDraft.hasAttachments;
+  const attachmentSendable =
+    mediaAvailable &&
+    hasAttachments &&
+    attachmentCanSubmit &&
+    !attachmentSubmission.busy &&
+    attachmentSubmission.state.phase !== 'delivery-unknown' &&
+    connection === 'live' &&
+    !awaitingSnapshot;
+  const canSendMessage = hasAttachments ? attachmentSendable : canSubmit;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const trayRef = useRef<HTMLFormElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -139,6 +172,34 @@ export function SessionComposer({
   // Outside-press dismissal without an Escape latch: any later draft,
   // caret, or textarea interaction re-arms the surface.
   const [outsideDismissed, setOutsideDismissed] = useState(false);
+
+  useEffect(() => {
+    const key = `pi-remote.attachment-text-recovery.${sessionId}`;
+    try {
+      const recovered = sessionStorage.getItem(key);
+      if (recovered !== null && prompt.length === 0) {
+        sessionStorage.removeItem(key);
+        setPrompt(() => recovered);
+        setAnnouncement('Draft restored. Photos need to be attached again.');
+      }
+    } catch {
+      // Draft recovery is optional; media bytes are never placed in storage.
+    }
+  }, [prompt.length, sessionId, setPrompt]);
+
+  useEffect(() => {
+    if (!hasAttachments || prompt.length === 0) return undefined;
+    const key = `pi-remote.attachment-text-recovery.${sessionId}`;
+    const saveTextOnly = () => {
+      try {
+        sessionStorage.setItem(key, prompt);
+      } catch {
+        // The local draft remains in memory when session storage is unavailable.
+      }
+    };
+    window.addEventListener('pagehide', saveTextOnly);
+    return () => window.removeEventListener('pagehide', saveTextOnly);
+  }, [hasAttachments, prompt, sessionId]);
 
   // The persistent mode control: a controlled menu (the keyboard path opens
   // it) and the Plan → Build leave confirmation. Neither holds authority;
@@ -283,6 +344,12 @@ export function SessionComposer({
       sendSlashDraft();
       return;
     }
+    if (hasAttachments) {
+      if (!attachmentSubmission.submit(running ? 'steer' : undefined)) {
+        setAnnouncement(attachmentSubmission.state.error ?? 'Photo sending is not ready.');
+      }
+      return;
+    }
     sendPrompt(running ? 'steer' : undefined);
   };
 
@@ -395,24 +462,27 @@ export function SessionComposer({
 
   // Bounded revalidation progress lives in the composer disclaimer; it is a
   // fixed local string and never carries command content.
-  const disclaimer = slashSubmitting
-    ? 'Checking the command with the relay…'
-    : awaitingSnapshot
-      ? 'Syncing with the relay…'
-      : slashDraft
-        ? binding === null
-          ? 'Choose a command from the list, then send it.'
-          : running
-            ? 'Pi is running — commands can be sent after this turn ends.'
-            : runtimeAuthority
-              ? 'Pi can make mistakes · actions stay read-only'
-              : 'Reconnecting to check what can be sent.'
-        : 'Pi can make mistakes · actions stay read-only';
+  const disclaimer =
+    attachmentSubmission.statusMessage !== null
+      ? attachmentSubmission.statusMessage
+      : slashSubmitting
+        ? 'Checking the command with the relay…'
+        : awaitingSnapshot
+          ? 'Syncing with the relay…'
+          : slashDraft
+            ? binding === null
+              ? 'Choose a command from the list, then send it.'
+              : running
+                ? 'Pi is running — commands can be sent after this turn ends.'
+                : runtimeAuthority
+                  ? 'Pi can make mistakes · actions stay read-only'
+                  : 'Reconnecting to check what can be sent.'
+            : 'Pi can make mistakes · actions stay read-only';
 
   // Stop is the primary action only when a turn is running and the draft is empty;
   // any draft makes the primary Send (idle) or Steer (running). With the inline
   // surface open, the disc becomes the local Insert action — never Send.
-  const showStop = running && !hasText;
+  const showStop = running && !hasText && !hasAttachments && !attachmentSubmission.busy;
 
   // Plan mode is conveyed redundantly: the dashed outline only ever comes
   // from the host-confirmed mode, never from a pending request.
@@ -503,7 +573,13 @@ export function SessionComposer({
             window.setTimeout(() => setIsComposing(false), 0);
           }}
           onKeyDown={onKeyDown}
-          disabled={connection !== 'live' || awaitingSnapshot || sendingPrompt || slashSubmitting}
+          disabled={
+            connection !== 'live' ||
+            awaitingSnapshot ||
+            sendingPrompt ||
+            slashSubmitting ||
+            attachmentSubmission.busy
+          }
           placeholder={placeholder}
         />
         <div className="composer-bar">
@@ -532,12 +608,15 @@ export function SessionComposer({
             />
           </div>
           <div className="composer-right">
-            {running && hasText && !slashDraft && (
+            {running && (hasText || hasAttachments) && !slashDraft && (
               <Button
                 type="button"
                 className="composer-later"
-                onPress={() => sendPrompt('followUp')}
-                isDisabled={!canSubmit || !attachmentCanSubmit}
+                onPress={() => {
+                  if (hasAttachments) attachmentSubmission.submit('followUp');
+                  else sendPrompt('followUp');
+                }}
+                isDisabled={!canSendMessage || attachmentSubmission.busy}
               >
                 Later
               </Button>
@@ -579,9 +658,9 @@ export function SessionComposer({
                 type="submit"
                 className="composer-primary is-send"
                 aria-label={running ? 'Steer the current turn' : 'Send message'}
-                isDisabled={!canSubmit || !attachmentCanSubmit}
+                isDisabled={!canSendMessage || attachmentSubmission.busy}
               >
-                {sendingPrompt ? <SpinnerGlyph /> : <SendGlyph />}
+                {sendingPrompt || attachmentSubmission.busy ? <SpinnerGlyph /> : <SendGlyph />}
               </Button>
             )}
           </div>

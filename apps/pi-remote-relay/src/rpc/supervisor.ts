@@ -7,6 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 
+import { isPiRpcEvent } from '@pi-remote/pi-rpc-protocol';
 import type { PiRpcCommand, PiRpcEvent, PiRpcResponse } from '@pi-remote/pi-rpc-protocol';
 
 import { RpcDemultiplexer } from './demux.js';
@@ -40,6 +41,39 @@ export interface SupervisorHealth {
   readonly state: SupervisorState;
   readonly restartCount: number;
   readonly stderrBytes: number;
+}
+
+/** Remove image-shaped event payloads before any relay framing or projection path. */
+export function stripImagePayloadFromEventFrame(record: unknown): unknown {
+  if (!isPiRpcEvent(record)) return record;
+  return stripImageValue(record, true);
+}
+
+function stripImageValue(value: unknown, root = false): unknown {
+  if (Array.isArray(value)) {
+    return value.filter((child) => !isImageValue(child)).map((child) => stripImageValue(child));
+  }
+  if (typeof value !== 'object' || value === null) return value;
+  if (isImageValue(value) && !root) return null;
+  const source = value as Record<string, unknown>;
+  const output: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(source)) {
+    if (key === 'images' || (key === 'image' && isImageValue(child))) continue;
+    if (isImageValue(child)) continue;
+    output[key] = stripImageValue(child);
+  }
+  return output;
+}
+
+function isImageValue(value: unknown): boolean {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    candidate.type === 'image' ||
+    (typeof candidate.mimeType === 'string' &&
+      candidate.mimeType.startsWith('image/') &&
+      typeof candidate.data === 'string')
+  );
 }
 
 /** Own exactly one persistent Pi RPC child and its serialized command stream. */
@@ -187,7 +221,7 @@ export class RpcSupervisor {
     this.isFallbackActive = false;
 
     const decoder = new StrictJsonlDecoder({
-      onRecord: (record) => this.demultiplexer.accept(record),
+      onRecord: (record) => this.acceptFramedRecord(record),
       onError: (error) => this.emitError(error),
     });
     child.stdout.on('data', (chunk: Buffer) => decoder.push(chunk));
@@ -240,7 +274,7 @@ export class RpcSupervisor {
     try {
       const contents = await readFile(fixturePath, 'utf8');
       const decoder = new StrictJsonlDecoder({
-        onRecord: (record) => this.demultiplexer.accept(record),
+        onRecord: (record) => this.acceptFramedRecord(record),
         onError: (error) => this.emitError(error),
       });
       decoder.push(contents);
@@ -259,6 +293,10 @@ export class RpcSupervisor {
     for (const listener of this.eventListeners) {
       listener(event);
     }
+  }
+
+  private acceptFramedRecord(record: unknown): void {
+    this.demultiplexer.accept(stripImagePayloadFromEventFrame(record));
   }
 
   private emitLifecycle(event: SupervisorLifecycleEvent): void {

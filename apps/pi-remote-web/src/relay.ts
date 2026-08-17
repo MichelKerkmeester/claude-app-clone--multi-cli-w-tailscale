@@ -6,6 +6,9 @@ import {
   isAcceptEditsGrantDto,
   isApprovalCardDto,
   isApprovalDecisionResponse,
+  isAttachmentPartStatusDto,
+  isAttachmentPartTicket,
+  isAttachmentSetManifest,
   isCommandCatalogDto,
   isFilePreviewBlock,
   isOpaqueId,
@@ -50,6 +53,9 @@ import {
   type AcceptEditsGrantDto,
   type ApprovalCardDto,
   type ApprovalDecision,
+  type AttachmentPartStatusDto,
+  type AttachmentPartTicket,
+  type AttachmentSetManifest,
   type SlashSubmitIssueCode,
   type SyncCursor,
   type SyncMessage,
@@ -101,6 +107,7 @@ export class RelayRequestError extends Error {
     code: 'access_denied' | 'request_failed',
     status: number | null = null,
     retryAfterMs: number | null = null,
+    readonly serverCode: string | null = null,
   ) {
     super(code === 'access_denied' ? 'Relay access denied.' : 'Relay request failed.');
     this.name = 'RelayRequestError';
@@ -268,6 +275,242 @@ export async function requestTicket(signal?: AbortSignal): Promise<string> {
     throw new Error('Relay returned an invalid command ticket.');
   }
   return ticketPayload.ticket;
+}
+
+export interface AttachmentTicketResponse {
+  readonly ticket: string;
+  readonly expiresAt: string;
+}
+
+export interface AttachmentReservationResponse {
+  readonly attachmentSetId: string;
+  readonly revision: number;
+  readonly expiresAt: string;
+  readonly parts: readonly AttachmentPartTicket[];
+  readonly statusTicket: AttachmentTicketResponse;
+  readonly cancelTicket: AttachmentTicketResponse;
+}
+
+export type AttachmentSetStatus =
+  | 'reserved'
+  | 'uploading'
+  | 'checking'
+  | 'ready'
+  | 'rejected'
+  | 'cancelled'
+  | 'expired'
+  | 'delivery-unknown';
+
+export interface AttachmentStatusResponse {
+  readonly attachmentSetId: string;
+  readonly revision: number;
+  readonly status: AttachmentSetStatus;
+  readonly expiresAt: string;
+  readonly parts: readonly AttachmentPartStatusDto[];
+}
+
+export interface AttachmentUploadResponse {
+  readonly attachmentSetId: string;
+  readonly partId: string;
+  readonly status: 'ready';
+}
+
+export interface AttachmentReserveBinding {
+  readonly operation: 'reserve';
+  readonly sessionId: string;
+  readonly sessionEpoch: string;
+  readonly expectedPromptRevision: number;
+  readonly submissionId: string;
+}
+
+export type AttachmentUploadProgress = (loaded: number, total: number) => void;
+
+export class AttachmentTransportError extends Error {
+  public constructor(
+    readonly code: 'canceled' | 'unknown',
+    readonly status: number | null = null,
+  ) {
+    super(code === 'canceled' ? 'Attachment transfer canceled.' : 'Attachment transfer failed.');
+    this.name = 'AttachmentTransportError';
+  }
+}
+
+/** Reserve only a reference manifest; image bytes are never part of this request. */
+export async function reserveAttachmentSet(
+  manifest: AttachmentSetManifest,
+  binding: AttachmentReserveBinding,
+  signal?: AbortSignal,
+): Promise<AttachmentReservationResponse> {
+  if (!isAttachmentSetManifest(manifest) || !sameAttachmentBinding(manifest, binding)) {
+    throw new Error('Attachment manifest binding is invalid.');
+  }
+  const ticketPayload = await postJson(
+    '/api/auth/ticket',
+    { action: 'attachment:reserve', binding },
+    signal,
+    [201],
+  );
+  if (!isWebSocketTicketResponse(ticketPayload)) {
+    throw new Error('Relay returned an invalid attachment reservation ticket.');
+  }
+  const payload = await postJsonWithHeaders(
+    '/api/attachment-sets',
+    manifest,
+    { 'x-attachment-ticket': ticketPayload.ticket },
+    signal,
+    [201],
+  );
+  if (!isAttachmentReservationResponse(payload)) {
+    throw new Error('Relay returned an invalid attachment reservation.');
+  }
+  return payload;
+}
+
+/** Upload one exact transfer blob through its one-use ticket and nowhere else. */
+export function uploadAttachmentPart(
+  part: AttachmentPartTicket,
+  bytes: Blob,
+  digest: string,
+  onProgress: AttachmentUploadProgress,
+  signal?: AbortSignal,
+): Promise<AttachmentUploadResponse> {
+  if (!isAttachmentPartTicket(part) || bytes.size <= 0 || digest.length === 0) {
+    return Promise.reject(new Error('Attachment upload input is invalid.'));
+  }
+  if (signal?.aborted === true) {
+    return Promise.reject(new AttachmentTransportError('canceled'));
+  }
+  return new Promise<AttachmentUploadResponse>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    let settled = false;
+    const finish = (callback: () => void): void => {
+      if (settled) return;
+      settled = true;
+      signal?.removeEventListener('abort', abort);
+      callback();
+    };
+    const abort = (): void => {
+      xhr.abort();
+      finish(() => reject(new AttachmentTransportError('canceled')));
+    };
+    xhr.open(
+      'PUT',
+      `/api/attachment-sets/${encodeURIComponent(part.attachmentSetId)}/parts/${encodeURIComponent(part.partId)}`,
+    );
+    xhr.withCredentials = true;
+    xhr.responseType = 'text';
+    xhr.setRequestHeader('content-type', 'application/octet-stream');
+    xhr.setRequestHeader('x-attachment-ticket', part.ticket);
+    xhr.setRequestHeader('x-attachment-sha256', digest);
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.loaded > 0) onProgress(event.loaded, event.total);
+    };
+    xhr.onload = () => {
+      noteRelayHeartbeat();
+      if (xhr.status !== 201) {
+        finish(() =>
+          reject(
+            new RelayRequestError(
+              xhr.status === 401 || xhr.status === 403 ? 'access_denied' : 'request_failed',
+              xhr.status,
+            ),
+          ),
+        );
+        return;
+      }
+      let payload: unknown;
+      try {
+        payload = JSON.parse(xhr.responseText);
+      } catch {
+        finish(() => reject(new Error('Relay returned an invalid attachment upload response.')));
+        return;
+      }
+      if (!isAttachmentUploadResponse(payload)) {
+        finish(() => reject(new Error('Relay returned an invalid attachment upload response.')));
+        return;
+      }
+      finish(() => resolve(payload));
+    };
+    xhr.onerror = () => finish(() => reject(new AttachmentTransportError('unknown')));
+    xhr.ontimeout = () => finish(() => reject(new AttachmentTransportError('unknown')));
+    xhr.onabort = () => {
+      if (!settled) finish(() => reject(new AttachmentTransportError('canceled')));
+    };
+    signal?.addEventListener('abort', abort, { once: true });
+    try {
+      xhr.send(bytes);
+    } catch {
+      finish(() => reject(new AttachmentTransportError('unknown')));
+    }
+  });
+}
+
+/** Reconcile an attachment set through its authenticated read-only ticket. */
+export async function fetchAttachmentStatus(
+  attachmentSetId: string,
+  statusTicket: AttachmentTicketResponse,
+  signal?: AbortSignal,
+): Promise<AttachmentStatusResponse> {
+  const payload = await postJsonWithHeaders(
+    `/api/attachment-sets/${encodeURIComponent(attachmentSetId)}/status`,
+    undefined,
+    { 'x-attachment-ticket': statusTicket.ticket },
+    signal,
+  );
+  if (!isAttachmentStatusResponse(payload) || payload.attachmentSetId !== attachmentSetId) {
+    throw new Error('Relay returned an invalid attachment status.');
+  }
+  return payload;
+}
+
+/** Cancel a still-uncommitted set; callers invoke this only on an explicit abort. */
+export async function cancelAttachmentSet(
+  attachmentSetId: string,
+  cancelTicket: AttachmentTicketResponse,
+  signal?: AbortSignal,
+): Promise<void> {
+  const payload = await postJsonWithHeaders(
+    `/api/attachment-sets/${encodeURIComponent(attachmentSetId)}/cancel`,
+    undefined,
+    { 'x-attachment-ticket': cancelTicket.ticket },
+    signal,
+    [204],
+  );
+  if (payload !== null) throw new Error('Relay returned an invalid attachment cancellation.');
+}
+
+/** Commit references after the set is ready; no image bytes enter this JSON body. */
+export async function submitPromptWithAttachmentRefs(
+  sessionId: string,
+  submissionId: string,
+  message: string,
+  expectedPromptRevision: number,
+  attachmentSetId: string,
+  attachmentIds: readonly string[],
+  streamingBehavior?: 'steer' | 'followUp',
+  signal?: AbortSignal,
+): Promise<TextBlock> {
+  const ticket = await requestTicket(signal);
+  const payload = await postJson(
+    '/api/prompt/submit',
+    {
+      type: 'prompt.submit',
+      submissionId,
+      sessionId,
+      message,
+      ticket,
+      expectedPromptRevision,
+      attachmentSetId,
+      attachmentIds,
+      ...(streamingBehavior === undefined ? {} : { streamingBehavior }),
+    },
+    signal,
+    [202],
+  );
+  if (!isPromptSubmitResponse(payload)) {
+    throw new Error('Relay returned an invalid attachment prompt acknowledgement.');
+  }
+  return payload.block;
 }
 
 export async function submitPrompt(
@@ -1027,24 +1270,138 @@ async function postJson(
   signal?: AbortSignal,
   acceptedStatuses: readonly number[] = [],
 ): Promise<unknown> {
+  return postJsonWithHeaders(
+    path,
+    body,
+    body === undefined ? {} : { 'content-type': 'application/json' },
+    signal,
+    acceptedStatuses,
+  );
+}
+
+async function postJsonWithHeaders(
+  path: string,
+  body: unknown,
+  headers: Readonly<Record<string, string>>,
+  signal?: AbortSignal,
+  acceptedStatuses: readonly number[] = [],
+): Promise<unknown> {
   if (isDemoMode()) return demoPostJson(path, body);
   const response = await fetch(path, {
     method: 'POST',
     cache: 'no-store',
     credentials: 'same-origin',
-    headers: body === undefined ? {} : { 'content-type': 'application/json' },
+    headers,
     body: body === undefined ? null : JSON.stringify(body),
     ...(signal === undefined ? {} : { signal }),
   });
   noteRelayHeartbeat();
   if (!response.ok && !acceptedStatuses.includes(response.status)) {
+    let serverCode: string | null = null;
+    try {
+      const errorBody: unknown = await response.clone().json();
+      if (
+        isRecord(errorBody) &&
+        typeof errorBody.error === 'string' &&
+        errorBody.error.length <= 64
+      ) {
+        serverCode = errorBody.error;
+      }
+    } catch {
+      serverCode = null;
+    }
     throw new RelayRequestError(
       response.status === 401 || response.status === 403 ? 'access_denied' : 'request_failed',
       response.status,
       response.status === 429 ? parseBoundedRetryAfter(response.headers.get('retry-after')) : null,
+      serverCode,
     );
   }
   return response.status === 204 ? null : (response.json() as Promise<unknown>);
+}
+
+function sameAttachmentBinding(
+  manifest: AttachmentSetManifest,
+  binding: AttachmentReserveBinding,
+): boolean {
+  return (
+    manifest.submissionId === binding.submissionId &&
+    manifest.sessionId === binding.sessionId &&
+    manifest.sessionEpoch === binding.sessionEpoch &&
+    manifest.expectedPromptRevision === binding.expectedPromptRevision
+  );
+}
+
+function isAttachmentReservationResponse(value: unknown): value is AttachmentReservationResponse {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'attachmentSetId',
+      'revision',
+      'expiresAt',
+      'parts',
+      'statusTicket',
+      'cancelTicket',
+    ]) &&
+    isOpaqueId(value.attachmentSetId) &&
+    isSafeNonNegativeInteger(value.revision) &&
+    isTimestampLike(value.expiresAt) &&
+    Array.isArray(value.parts) &&
+    value.parts.every(isAttachmentPartTicket) &&
+    isWebSocketTicketResponse(value.statusTicket) &&
+    isWebSocketTicketResponse(value.cancelTicket)
+  );
+}
+
+function isAttachmentStatusResponse(value: unknown): value is AttachmentStatusResponse {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['attachmentSetId', 'revision', 'status', 'expiresAt', 'parts']) &&
+    isOpaqueId(value.attachmentSetId) &&
+    isSafeNonNegativeInteger(value.revision) &&
+    isAttachmentSetStatus(value.status) &&
+    isTimestampLike(value.expiresAt) &&
+    Array.isArray(value.parts) &&
+    value.parts.every(isAttachmentPartStatusDto)
+  );
+}
+
+function isAttachmentUploadResponse(value: unknown): value is AttachmentUploadResponse {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['attachmentSetId', 'partId', 'status']) &&
+    isOpaqueId(value.attachmentSetId) &&
+    isOpaqueId(value.partId) &&
+    value.status === 'ready'
+  );
+}
+
+function isAttachmentSetStatus(value: unknown): value is AttachmentSetStatus {
+  return (
+    value === 'reserved' ||
+    value === 'uploading' ||
+    value === 'checking' ||
+    value === 'ready' ||
+    value === 'rejected' ||
+    value === 'cancelled' ||
+    value === 'expired' ||
+    value === 'delivery-unknown'
+  );
+}
+
+function isTimestampLike(value: unknown): value is string {
+  return typeof value === 'string' && Number.isFinite(Date.parse(value));
+}
+
+function isSafeNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}
+
+function hasOnlyKeys(value: Record<string, unknown>, keys: readonly string[]): boolean {
+  const allowed = new Set(keys);
+  return (
+    Object.keys(value).every((key) => allowed.has(key)) && Object.keys(value).length === keys.length
+  );
 }
 
 function denialMessage(reason: string): string {

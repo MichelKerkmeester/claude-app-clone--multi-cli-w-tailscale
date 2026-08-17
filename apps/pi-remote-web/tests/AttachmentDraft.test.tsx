@@ -50,6 +50,14 @@ function DraftHarness({ files }: { readonly files: readonly File[] }) {
       <output data-testid="state">{JSON.stringify(draft.state)}</output>
       <output data-testid="count">{draft.state.items.length}</output>
       <output data-testid="message">{draft.blockingMessage ?? ''}</output>
+      <output data-testid="stored-file">
+        {draft.state.items[0] !== undefined && draft.getFile(draft.state.items[0].id) === files[0]
+          ? 'same'
+          : 'missing'}
+      </output>
+      <output data-testid="unknown-file">
+        {draft.getFile('attachment-unknown') === null ? 'null' : 'present'}
+      </output>
     </div>
   );
 }
@@ -161,13 +169,29 @@ describe('AttachmentDraftProvider', () => {
 
   it('keeps HEIC valid locally while exposing only a generic unavailable preview', async () => {
     const urls = installObjectUrlStubs();
-    renderDraft({ files: [photo('camera.heic', 'image/heic')] });
+    const file = photo('camera.heic', 'image/heic');
+    renderDraft({ files: [file] });
 
     fireEvent.click(screen.getByRole('button', { name: 'select fixtures' }));
     await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'));
     expect(screen.getByTestId('state')).toHaveTextContent('preview":"unavailable');
     expect(urls.createObjectURL).not.toHaveBeenCalled();
-    expect(screen.getByTestId('state')).not.toHaveTextContent('camera.heic');
+    expect(screen.getByTestId('stored-file')).toHaveTextContent('same');
+    expect(screen.getByTestId('unknown-file')).toHaveTextContent('null');
+    expect(screen.getByTestId('state')).not.toHaveTextContent(file.name);
+    expect(screen.getByTestId('state')).not.toHaveTextContent('File');
+    expect(screen.getByTestId('state')).not.toHaveTextContent('blob:');
+  });
+
+  it('returns the stored File by id and null for an unknown id', async () => {
+    installObjectUrlStubs();
+    const file = photo('one.jpg');
+    renderDraft({ files: [file] });
+
+    fireEvent.click(screen.getByRole('button', { name: 'select fixtures' }));
+    await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'));
+    expect(screen.getByTestId('stored-file')).toHaveTextContent('same');
+    expect(screen.getByTestId('unknown-file')).toHaveTextContent('null');
   });
 
   it('revokes the local URL on removal and acknowledgement', async () => {

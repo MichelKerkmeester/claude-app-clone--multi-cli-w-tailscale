@@ -62,14 +62,17 @@ export interface PiImageAttachmentSource {
   ) => Promise<NormalizedDerivative | null>;
   readonly acknowledgeDelivered: (setId: string) => Promise<void>;
   readonly markDeliveryUnknown: (setId: string) => Promise<void>;
+  readonly discardRejected?: (setId: string) => Promise<void>;
 }
 
 export interface PiImageBridgeOptions {
-  readonly supervisor: { readonly send: (command: PiRpcCommand) => Promise<{
-    readonly success: boolean;
-    readonly command: string;
-    readonly error?: string;
-  }> };
+  readonly supervisor: {
+    readonly send: (command: PiRpcCommand) => Promise<{
+      readonly success: boolean;
+      readonly command: string;
+      readonly error?: string;
+    }>;
+  };
   readonly attachments: PiImageAttachmentSource;
   readonly getRuntimeSnapshot: () => RuntimeSnapshotDto | null | Promise<RuntimeSnapshotDto | null>;
   readonly currentPromptRevision: () => number;
@@ -114,11 +117,11 @@ export class PiImageBridge {
       throw new PiImageBridgeError('replayed');
     }
 
-    await this.assertFinalGate(command, owner, attachmentIds[0]!, 1);
     this.activeSets.add(setId);
     const images: NormalizedPiImage[] = [];
     let totalBytes = 0;
     try {
+      await this.assertFinalGate(command, owner, attachmentIds[0]!, 1);
       for (const [index, attachmentId] of attachmentIds.entries()) {
         // This is intentionally immediately adjacent to the derivative load:
         // a prior check is never reused across an asynchronous boundary.
@@ -132,9 +135,15 @@ export class PiImageBridge {
         }
         if (
           derivative.bytes.byteLength >
-            Math.min(snapshot.media?.policy.maxNormalizedBytesPerImage ?? 0, MAX_NORMALIZED_BYTES_PER_IMAGE) ||
+            Math.min(
+              snapshot.media?.policy.maxNormalizedBytesPerImage ?? 0,
+              MAX_NORMALIZED_BYTES_PER_IMAGE,
+            ) ||
           totalBytes + derivative.bytes.byteLength >
-            Math.min(snapshot.media?.policy.maxNormalizedBytesPerTurn ?? 0, MAX_NORMALIZED_BYTES_PER_TURN) ||
+            Math.min(
+              snapshot.media?.policy.maxNormalizedBytesPerTurn ?? 0,
+              MAX_NORMALIZED_BYTES_PER_TURN,
+            ) ||
           !snapshot.media?.policy.outputMimeTypes.includes(derivative.mimeType)
         ) {
           throw new PiImageBridgeError('not-ready');
@@ -158,7 +167,11 @@ export class PiImageBridge {
         throw new PiImageBridgeError('not-ready');
       }
 
-      let response: { readonly success: boolean; readonly command: string; readonly error?: string };
+      let response: {
+        readonly success: boolean;
+        readonly command: string;
+        readonly error?: string;
+      };
       try {
         response = await this.options.supervisor.send(rpcCommand);
       } catch {
@@ -167,6 +180,13 @@ export class PiImageBridge {
         return { status: 'delivery-unknown', attachmentCount: attachmentIds.length };
       }
       if (!response.success || response.command !== 'prompt') {
+        try {
+          await this.options.attachments.discardRejected?.(setId);
+        } catch {
+          this.consumedSets.add(setId);
+          await this.markUnknown(setId);
+          return { status: 'delivery-unknown', attachmentCount: attachmentIds.length };
+        }
         throw new PiImageBridgeError('rejected');
       }
 
@@ -214,7 +234,11 @@ export class PiImageBridge {
 
     const setId = command.attachmentSetId;
     const attachmentIds = command.attachmentIds;
-    if (setId === undefined || attachmentIds === undefined || attachmentIds[expectedOrdinal - 1] !== attachmentId) {
+    if (
+      setId === undefined ||
+      attachmentIds === undefined ||
+      attachmentIds[expectedOrdinal - 1] !== attachmentId
+    ) {
       throw new PiImageBridgeError('invalid-reference');
     }
     const reservation = this.options.attachments.getReservation(setId);
@@ -258,6 +282,7 @@ export class PiImageBridge {
       statusPart.attachmentSetId !== setId ||
       part.item.ordinal !== expectedOrdinal ||
       statusPart.ordinal !== expectedOrdinal ||
+      statusPart.partId !== part.partId ||
       statusPart.status !== 'ready'
     ) {
       throw new PiImageBridgeError('not-ready');

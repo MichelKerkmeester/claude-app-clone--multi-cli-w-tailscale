@@ -12,11 +12,13 @@ import { startReadOnlyServer } from './http/server.js';
 import { ApprovalService } from './approval/approval-service.js';
 import { AttachmentReaper } from './attachments/attachment-reaper.js';
 import { AttachmentService } from './attachments/attachment-service.js';
+import { PiImageBridge } from './attachments/pi-image-bridge.js';
 import { CommandService } from './commands/command-service.js';
 import { isMediaFeatureEnabled } from './auth/policy.js';
 import { MutationPolicy } from './policy/mutation-policy.js';
 import { PushService, createAttentionPayload } from './push/push-service.js';
 import { PromptService } from './prompt/prompt-service.js';
+import { PromptRevisionCoordinator } from './prompt/prompt-revision-coordinator.js';
 import { SyncHub } from './replay/sync.js';
 import { RpcSupervisor } from './rpc/supervisor.js';
 import { RuntimeService } from './runtime/runtime-service.js';
@@ -106,6 +108,18 @@ export async function runRelay(): Promise<() => Promise<void>> {
         : {}),
   });
   const commands = new CommandService(supervisor, { sessionId: SESSION_ID });
+  const runtime = new RuntimeService(supervisor, {
+    sessionId: SESSION_ID,
+    mediaEnabled,
+  });
+  const revisionCoordinator = new PromptRevisionCoordinator();
+  const imageBridge = new PiImageBridge({
+    supervisor,
+    attachments: attachmentService,
+    getRuntimeSnapshot: () => runtime.getSnapshot(),
+    currentPromptRevision: () => revisionCoordinator.current(),
+    planPolicy: (snapshot) => snapshot.state.mode === 'build' || snapshot.state.mode === 'plan',
+  });
   const prompts = new PromptService({
     store,
     syncHub,
@@ -116,10 +130,12 @@ export async function runRelay(): Promise<() => Promise<void>> {
     sessionId: SESSION_ID,
     epoch,
     commands,
-  });
-  const runtime = new RuntimeService(supervisor, {
-    sessionId: SESSION_ID,
-    mediaEnabled,
+    imageBridge,
+    revisionCoordinator,
+    getAttachmentOwner: (deviceId, attachmentSetId) =>
+      attachmentSetId === undefined
+        ? null
+        : attachmentService.getOwnerForDevice(attachmentSetId, deviceId),
   });
   // A restarted host gets a new epoch: every prior catalog snapshot and binding
   // dies with it, so nothing from the old generation can authorize a submission.
@@ -188,6 +204,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
   return async () => {
     await supervisor.stop();
     stopPushListener();
+    await attachmentReaper.shutdown();
     approvals.close();
     await server.stop();
     store.close();

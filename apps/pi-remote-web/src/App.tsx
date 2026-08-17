@@ -1359,6 +1359,9 @@ export function Session({
       >
         <SessionComposer
           prompt={prompt}
+          sessionId={sessionId}
+          sessionEpoch={transcript.epoch}
+          expectedPromptRevision={runtimeState?.revision ?? null}
           setPrompt={setPrompt}
           onDraftChange={handleDraftChange}
           sendPrompt={sendPrompt}
@@ -1380,6 +1383,11 @@ export function Session({
           onInsertCommand={insertCommand}
           externalOverlayOpen={sheetOpen}
           mediaCapability={mediaCapability}
+          onAttachmentSubmitted={() => {
+            setPromptError(null);
+            setRetrySubmissionId(null);
+            setBinding(null);
+          }}
         />
       </AttachmentDraftProvider>
       <PlanReviewSheet

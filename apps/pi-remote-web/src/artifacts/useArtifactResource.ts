@@ -43,6 +43,8 @@ export interface ArtifactResourceSnapshot {
   readonly text: string | null;
   /** Alias used by export controls. It is always the displayed, verified text. */
   readonly buffer: string | null;
+  /** Verified, displayed binary bytes. This is purged with the request lifecycle. */
+  readonly bytes: Uint8Array | null;
   readonly errorCode: ArtifactReadErrorCode | null;
   readonly reload: () => void;
   readonly close: () => void;
@@ -81,6 +83,7 @@ function snapshotFor(
   text: string | null = null,
   resource: ArtifactResource | null = null,
   errorCode: ArtifactReadErrorCode | null = null,
+  bytes: Uint8Array | null = null,
 ): ArtifactResourceSnapshot {
   return {
     status,
@@ -91,6 +94,7 @@ function snapshotFor(
     contentType: resource?.contentType ?? null,
     text,
     buffer: text,
+    bytes,
     errorCode,
     reload: () => undefined,
     close: () => undefined,
@@ -298,14 +302,20 @@ export function useArtifactResource(
         if (!isCurrent()) return;
         const digest = await digestBytes(resource.bytes);
         if (!isCurrent() || digest !== currentBlock.digest) return;
-        const text = decodeBytes(resource.bytes);
+        const binary = currentBlock.renderer === 'image' || currentBlock.renderer === 'pdf';
+        const text = binary ? null : decodeBytes(resource.bytes);
         if (!isCurrent()) return;
         request.bytes = resource.bytes;
         if (request.timer !== null) window.clearTimeout(request.timer);
         request.timer = null;
-        const status: ArtifactResourceStatus =
-          text.length === 0 ? 'empty' : text.trim().length === 0 ? 'whitespace' : 'ready';
-        setState(snapshotFor(key, currentBlock, status, text, resource));
+        const status: ArtifactResourceStatus = binary
+          ? 'ready'
+          : text === null || text.length === 0
+            ? 'empty'
+            : text.trim().length === 0
+              ? 'whitespace'
+              : 'ready';
+        setState(snapshotFor(key, currentBlock, status, text, resource, null, binary ? resource.bytes : null));
       })
       .catch((error: unknown) => {
         if (!isCurrent()) return;

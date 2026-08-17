@@ -8,6 +8,8 @@ export interface DisplayedArtifactShareInput {
   readonly displayName: string;
   readonly renderer: FilePreviewRenderer | 'markdown';
   readonly displayedBuffer: string;
+  readonly displayedBytes?: Uint8Array;
+  readonly mimeType?: string;
   readonly shareAllowed: boolean;
   readonly redaction: FilePreviewRedaction;
   readonly completeness: FilePreviewCompleteness;
@@ -22,6 +24,14 @@ function shareNavigator(): ShareNavigator | null {
 }
 
 function shareData(input: DisplayedArtifactShareInput): ShareData {
+  if (input.displayedBytes !== undefined) {
+    const bytes = input.displayedBytes.slice();
+    const file = new File([bytes], safeFileName(input.displayName, input.mimeType), {
+      type: safeMimeType(input.mimeType),
+    });
+    bytes.fill(0);
+    return { title: input.displayName, files: [file] };
+  }
   return { title: input.displayName, text: input.displayedBuffer };
 }
 
@@ -31,16 +41,13 @@ function needsDisclosureConfirmation(input: DisplayedArtifactShareInput): boolea
 
 export function canShareDisplayedArtifact(input: DisplayedArtifactShareInput): boolean {
   const currentNavigator = shareNavigator();
-  if (
-    !input.shareAllowed ||
-    input.displayedBuffer.length === 0 ||
-    currentNavigator?.share === undefined
-  ) {
+  if (!hasShareablePayload(input) || currentNavigator?.share === undefined) {
     return false;
   }
-  if (typeof currentNavigator.canShare !== 'function') return true;
+  if (typeof currentNavigator.canShare !== 'function') return input.displayedBytes === undefined;
   try {
-    return currentNavigator.canShare(shareData(input));
+    const data = shareData(input);
+    return currentNavigator.canShare(data);
   } catch {
     return false;
   }
@@ -66,7 +73,7 @@ export function shareDisplayedArtifact(
   confirmDisclosure: (message: string) => boolean = (message) => window.confirm(message),
 ): Promise<ArtifactShareResult> {
   const currentNavigator = shareNavigator();
-  if (!canShareDisplayedArtifact(input) || currentNavigator?.share === undefined) {
+  if (!hasShareablePayload(input) || currentNavigator?.share === undefined) {
     return Promise.resolve('unavailable');
   }
   if (
@@ -75,6 +82,7 @@ export function shareDisplayedArtifact(
   ) {
     return Promise.resolve('cancelled');
   }
+  if (!canShareDisplayedArtifact(input)) return Promise.resolve('unavailable');
   try {
     const result = currentNavigator.share(shareData(input));
     return result.then(
@@ -89,6 +97,15 @@ export function shareDisplayedArtifact(
   }
 }
 
+function hasShareablePayload(input: DisplayedArtifactShareInput): boolean {
+  return (
+    input.shareAllowed &&
+    (input.displayedBytes === undefined
+      ? input.displayedBuffer.length > 0
+      : input.displayedBytes.byteLength > 0)
+  );
+}
+
 function isAbortError(error: unknown): boolean {
   return (
     typeof error === 'object' &&
@@ -96,4 +113,19 @@ function isAbortError(error: unknown): boolean {
     'name' in error &&
     (error as { readonly name?: unknown }).name === 'AbortError'
   );
+}
+
+function safeFileName(displayName: string, mimeType = 'application/octet-stream'): string {
+  const base = displayName
+    .replaceAll(/[\\/:*?"<>|\u0000-\u001f]/gu, '_')
+    .trim()
+    .slice(0, 96);
+  if (base.length > 0) return base;
+  return mimeType === 'application/pdf' ? 'preview.pdf' : 'preview.bin';
+}
+
+function safeMimeType(value = 'application/octet-stream'): string {
+  return /^[a-z0-9][a-z0-9!#$&^_.+-]*\/[a-z0-9][a-z0-9!#$&^_.+-]*$/u.test(value)
+    ? value
+    : 'application/octet-stream';
 }

@@ -430,9 +430,12 @@ async function handleHttp(
       return;
     }
     discardRequest(request);
-    const artifact = options.store.readArtifact(artifactRoute, range, options.now?.() ?? Date.now());
+    const now = options.now?.() ?? Date.now();
+    const artifact = options.store.readArtifact(artifactRoute, range, now);
     if (artifact === null || artifact.bytes.byteLength > MAX_ARTIFACT_READ_BYTES) {
-      sendArtifactFailure(response, 404);
+      const current =
+        range === null ? null : options.store.artifactStore.lookupArtifact(artifactRoute, now);
+      sendArtifactFailure(response, range !== null && current?.status === 'ready' ? 416 : 404);
       return;
     }
     const headers: Record<string, string> = {
@@ -443,6 +446,7 @@ async function handleHttp(
       'cross-origin-resource-policy': 'same-origin',
       'x-content-type-options': 'nosniff',
       etag: artifact.etag,
+      'x-artifact-digest': artifact.digest,
       'x-artifact-revision': artifact.revision,
       'accept-ranges': 'bytes',
     };

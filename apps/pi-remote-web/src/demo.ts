@@ -20,6 +20,12 @@ const SESSION_RUNNING = 'demo-session-triage';
 const EPOCH = 'demo-epoch-01';
 const EMPTY_DIGEST = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 const DEMO_READY_TEXT = 'Relay-sanitized preview bytes for a deterministic local fixture.\n';
+const DEMO_IMAGE_BASE64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+const DEMO_IMAGE_DIGEST = '431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460';
+const DEMO_PDF_BASE64 =
+  'JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNCAwIFIgL1Jlc291cmNlcyA8PCAvRm9udCA8PCAvRjEgNSAwIFIgPj4gPj4gPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCA0NCA+PgpzdHJlYW0KQlQKL0YxIDI0IFRmCjcyIDcyMCBUZAooU2FmZSBQREYgcHJldmlldykgVGoKRVQKZW5kc3RyZWFtCmVuZG9iago1IDAgb2JqCjw8IC9UeXBlIC9Gb250IC9TdWJ0eXBlIC9UeXBlMSAvQmFzZUZvbnQgL0hlbHZldGljYSA+PgplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDAwIDAwMDAwIG4gCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDAxNyAwMDAwMCBuIAowMDAwMDAwMDUxIDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0MDgKJSVFT0YK';
+const DEMO_PDF_DIGEST = '8b624fb6d7b45c2778c2dec0ff0db37dc64b401f03247f49cdaf756a67916ae8';
 
 export const DEMO_DIFF_FIXTURE = Object.freeze({
   sessionId: SESSION_IDLE,
@@ -44,6 +50,7 @@ export const DEMO_ARTIFACT_STATES_FIXTURE = Object.freeze({
   missing: 'missing',
   denied: 'denied',
   unsupported: 'unsupported',
+  imagePdfRelease: 'image-pdf-release',
 });
 
 let cachedEnabled: boolean | null = null;
@@ -310,6 +317,135 @@ export const DEMO_TEXT_CODE_SHARE_BLOCKS: readonly FilePreviewBlock[] = [
   ),
 ];
 
+function binaryFromBase64(value: string): Uint8Array {
+  const binary = atob(value);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
+const DEMO_IMAGE_BYTES = binaryFromBase64(DEMO_IMAGE_BASE64);
+const DEMO_PDF_BYTES = binaryFromBase64(DEMO_PDF_BASE64);
+
+function binaryPreview(
+  id: string,
+  artifactId: string,
+  revision: string,
+  seq: number,
+  displayName: string,
+  renderer: 'image' | 'pdf',
+  mimeType: string,
+  bytes: Uint8Array,
+  digest: string,
+  options: {
+    readonly availability?: FilePreviewBlock['availability'];
+    readonly byteLength?: number | null;
+    readonly redaction?: FilePreviewBlock['redaction'];
+    readonly textLayerSafe?: boolean;
+    readonly shareAllowed?: boolean;
+  } = {},
+): FilePreviewBlock {
+  return {
+    ...artifactBase(id, revision, seq, 1),
+    kind: 'file_preview',
+    artifactId,
+    displayName,
+    renderer,
+    mimeType,
+    byteLength: options.byteLength === undefined ? bytes.byteLength : options.byteLength,
+    digest,
+    ...(options.textLayerSafe === undefined ? {} : { textLayerSafe: options.textLayerSafe }),
+    redaction: options.redaction ?? 'applied',
+    completeness: 'complete',
+    shareAllowed: options.shareAllowed ?? true,
+    availability: options.availability ?? 'ready',
+    content: options.availability === 'withheld' ? { kind: 'none' } : { kind: 'artifact-ref' },
+  };
+}
+
+export const DEMO_IMAGE_PDF_BLOCKS: readonly FilePreviewBlock[] = [
+  binaryPreview(
+    'blk-image-ready',
+    'artifact_image_ready_001',
+    'rev_image_ready_001',
+    13,
+    'sanitized-image.png',
+    'image',
+    'image/png',
+    DEMO_IMAGE_BYTES,
+    DEMO_IMAGE_DIGEST,
+  ),
+  binaryPreview(
+    'blk-pdf-safe',
+    'artifact_pdf_safe_001',
+    'rev_pdf_safe_001',
+    14,
+    'safe-report.pdf',
+    'pdf',
+    'application/pdf',
+    DEMO_PDF_BYTES,
+    DEMO_PDF_DIGEST,
+    { textLayerSafe: true },
+  ),
+  binaryPreview(
+    'blk-pdf-unsafe',
+    'artifact_pdf_unsafe_001',
+    'rev_pdf_unsafe_001',
+    15,
+    'unsafe-report.pdf',
+    'pdf',
+    'application/pdf',
+    new Uint8Array(),
+    EMPTY_DIGEST,
+    { availability: 'withheld', redaction: 'withheld', byteLength: null, shareAllowed: false },
+  ),
+  binaryPreview(
+    'blk-image-too-large',
+    'artifact_image_too_large_001',
+    'rev_image_too_large_001',
+    16,
+    'too-large.png',
+    'image',
+    'image/png',
+    DEMO_IMAGE_BYTES,
+    EMPTY_DIGEST,
+    { byteLength: 50 * 1024 * 1024 },
+  ),
+  binaryPreview(
+    'blk-image-corrupt',
+    'artifact_image_corrupt_001',
+    'rev_image_corrupt_001',
+    17,
+    'corrupt.png',
+    'image',
+    'image/png',
+    new Uint8Array(7),
+    EMPTY_DIGEST,
+    { byteLength: 7 },
+  ),
+  binaryPreview(
+    'blk-image-revision-conflict',
+    'artifact_image_revision_conflict_001',
+    'rev_image_revision_conflict_001',
+    18,
+    'revision-conflict.png',
+    'image',
+    'image/png',
+    DEMO_IMAGE_BYTES,
+    EMPTY_DIGEST,
+    { byteLength: 67 },
+  ),
+  binaryPreview(
+    'blk-image-offline',
+    'artifact_image_offline_001',
+    'rev_image_offline_001',
+    19,
+    'offline-loaded.png',
+    'image',
+    'image/png',
+    DEMO_IMAGE_BYTES,
+    DEMO_IMAGE_DIGEST,
+  ),
+];
+
 interface DemoSession {
   readonly id: string;
   readonly status: 'idle' | 'running';
@@ -337,6 +473,10 @@ function isTextCodeShareFixture(): boolean {
   return fixtureName() === 'text-code-share';
 }
 
+function isImagePdfReleaseFixture(): boolean {
+  return fixtureName() === 'image-pdf-release';
+}
+
 function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   const session = SESSIONS.find((candidate) => candidate.id === sessionId);
   if (session === undefined) return [];
@@ -345,6 +485,9 @@ function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   }
   if (isTextCodeShareFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_TEXT_CODE_SHARE_BLOCKS];
+  }
+  if (isImagePdfReleaseFixture() && sessionId === SESSION_IDLE) {
+    return [...session.blocks, ...DEMO_IMAGE_PDF_BLOCKS];
   }
   return session.blocks;
 }
@@ -696,6 +839,15 @@ export function demoArtifactBytes(block: FilePreviewBlock): Uint8Array {
   if (block.artifactId === 'artifact_ready_001' && block.revision === 'rev_ready_001') {
     return new TextEncoder().encode(DEMO_READY_TEXT);
   }
+  if (block.artifactId === 'artifact_image_ready_001' || block.artifactId === 'artifact_image_offline_001') {
+    return DEMO_IMAGE_BYTES.slice();
+  }
+  if (block.artifactId === 'artifact_pdf_safe_001') return DEMO_PDF_BYTES.slice();
+  if (block.artifactId === 'artifact_image_too_large_001') {
+    return new Uint8Array(50 * 1024 * 1024 + 1);
+  }
+  if (block.artifactId === 'artifact_image_corrupt_001') return new Uint8Array(7);
+  if (block.artifactId === 'artifact_image_revision_conflict_001') return DEMO_IMAGE_BYTES.slice();
   return new Uint8Array();
 }
 

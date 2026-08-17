@@ -360,6 +360,7 @@ export function parseDisplayBlock(value: unknown): DisplayTranscriptBlock | null
 export function filePreviewAvailability(block: FilePreviewBlock): FilePreviewAvailability {
   if (block.availability !== undefined) return block.availability;
   if (block.renderer === 'unsupported') return 'unsupported';
+  if (block.renderer === 'pdf' && block.textLayerSafe !== true) return 'withheld';
   if (block.content.kind !== 'none') return 'ready';
   return block.redaction === 'withheld' ? 'withheld' : 'missing';
 }

@@ -1,4 +1,4 @@
-import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
+import type { FileDiffBlock, FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { ArtifactViewerHost } from './ArtifactViewerHost.js';
@@ -10,7 +10,7 @@ export type ArtifactDismissalReason =
   'close' | 'escape' | 'history' | 'edge-back' | 'voiceover-scrub';
 
 export interface ArtifactPreview {
-  readonly source: Readonly<FileDiffBlock>;
+  readonly source: Readonly<FileDiffBlock | FilePreviewBlock>;
   readonly trigger: HTMLButtonElement | null;
   readonly scrollContainer: HTMLElement | null;
   readonly scrollTop: number;
@@ -22,14 +22,17 @@ export interface ArtifactPreview {
 export interface ArtifactViewerContextValue {
   readonly phase: ArtifactViewerPhase;
   readonly preview: ArtifactPreview | null;
-  readonly openDiff: (block: FileDiffBlock, trigger: HTMLButtonElement | null) => void;
+  readonly openDiff: (
+    block: FileDiffBlock | FilePreviewBlock,
+    trigger: HTMLButtonElement | null,
+  ) => void;
   readonly close: (reason?: ArtifactDismissalReason) => void;
 }
 
 const ArtifactViewerContext = createContext<ArtifactViewerContextValue | null>(null);
 
 function capturePreview(
-  block: FileDiffBlock,
+  block: FileDiffBlock | FilePreviewBlock,
   trigger: HTMLButtonElement | null,
   generation: number,
 ): ArtifactPreview {
@@ -85,7 +88,10 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     exitingTimerRef.current = null;
   };
 
-  const openDiff = (block: FileDiffBlock, trigger: HTMLButtonElement | null) => {
+  const openDiff = (
+    block: FileDiffBlock | FilePreviewBlock,
+    trigger: HTMLButtonElement | null,
+  ) => {
     clearTimers();
     const generation = generationRef.current + 1;
     generationRef.current = generation;
@@ -136,6 +142,19 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     },
     [history],
   );
+
+  useEffect(() => {
+    const closeHiddenViewer = () => {
+      if (document.visibilityState === 'hidden') closeRef.current('close');
+    };
+    const closeBfcacheViewer = () => closeRef.current('close');
+    document.addEventListener('visibilitychange', closeHiddenViewer);
+    window.addEventListener('pagehide', closeBfcacheViewer);
+    return () => {
+      document.removeEventListener('visibilitychange', closeHiddenViewer);
+      window.removeEventListener('pagehide', closeBfcacheViewer);
+    };
+  }, []);
 
   const value: ArtifactViewerContextValue = { phase, preview, openDiff, close };
   return (

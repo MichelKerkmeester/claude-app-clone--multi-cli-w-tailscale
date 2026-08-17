@@ -10,10 +10,11 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.11",
     "@pi-remote/pi-rpc-protocol": "0.1.0",
+    "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-virtual": "^3.13.12",
     "@vitejs/plugin-react": "^5.0.2",
+    "pdfjs-dist": "6.2.108",
     "react": "^19.1.1",
     "react-aria-components": "^1.11.0",
     "react-dom": "^19.1.1",

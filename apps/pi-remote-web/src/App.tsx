@@ -61,6 +61,7 @@ import {
   fetchApprovals,
   fetchSessions,
   fetchTranscript,
+  noteRelayHeartbeat,
   openSyncSocket,
   submitPrompt,
 } from './relay.js';
@@ -132,7 +133,7 @@ export function App() {
       const dark = theme === 'dark' || (theme === 'system' && scheme.matches);
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute('content', dark ? '#101319' : '#f4f5f7');
+        ?.setAttribute('content', dark ? '#24221f' : '#f8f8f6');
     };
     applyTheme();
     try {
@@ -1091,6 +1092,7 @@ export function Session({
         sessionId,
         cursorRef.current,
         (message) => {
+          noteRelayHeartbeat();
           const at = new Date().toISOString();
           if (
             message.kind === 'sync.delta' &&
@@ -1129,6 +1131,7 @@ export function Session({
             return;
           }
           socket = openedSocket;
+          noteRelayHeartbeat();
           openedSocket.addEventListener('close', () => {
             if (stopped) return;
             retryCount += 1;

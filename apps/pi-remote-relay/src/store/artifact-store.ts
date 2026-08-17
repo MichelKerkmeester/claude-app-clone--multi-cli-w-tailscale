@@ -183,7 +183,8 @@ export class ArtifactStore {
     const end = Math.min(range.end, totalByteLength - 1);
     return {
       ...artifact,
-      bytes: artifact.bytes.subarray(range.start, end + 1),
+      // Copy the bounded response so a range cannot retain the full artifact backing buffer.
+      bytes: Buffer.from(artifact.bytes.subarray(range.start, end + 1)),
       rangeStart: range.start,
       rangeEnd: end,
       totalByteLength,
@@ -238,6 +239,8 @@ export class ArtifactStore {
       input.descriptor.revision !== input.revision ||
       input.descriptor.availability !== undefined && input.descriptor.availability !== 'ready' ||
       input.descriptor.content.kind === 'none' ||
+      input.descriptor.renderer === 'pdf' && input.descriptor.textLayerSafe !== true ||
+      input.descriptor.renderer === 'image' && input.descriptor.mimeType !== 'image/png' ||
       !isFilePreviewBlock(input.descriptor)
     ) {
       throw new TypeError('Relay refused an invalid or unavailable artifact snapshot.');

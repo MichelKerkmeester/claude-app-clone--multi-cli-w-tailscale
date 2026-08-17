@@ -94,6 +94,7 @@ describe('authenticated exact artifact reads', () => {
     expect(response.headers.get('x-content-type-options')).toBe('nosniff');
     expect(response.headers.get('cross-origin-resource-policy')).toBe('same-origin');
     expect(response.headers.get('x-artifact-revision')).toBe(IDENTITY.revision);
+    expect(response.headers.get('x-artifact-digest')).toBe(digest(BYTES));
     expect(response.headers.get('etag')).toBe(`"${digest(BYTES)}"`);
 
     const ranged = await get(harness, path, cookie, { range: 'bytes=0-7' });
@@ -101,6 +102,10 @@ describe('authenticated exact artifact reads', () => {
     expect(Buffer.from(await ranged.arrayBuffer()).toString('utf8')).toBe('artifact');
     expect(ranged.headers.get('content-range')).toBe(`bytes 0-7/${BYTES.byteLength}`);
     expect(ranged.headers.get('etag')).toBe(response.headers.get('etag'));
+    expect(ranged.headers.get('x-artifact-digest')).toBe(response.headers.get('x-artifact-digest'));
+
+    const unsatisfiable = await get(harness, path, cookie, { range: 'bytes=999-1000' });
+    expect(unsatisfiable.status).toBe(416);
   });
 
   it('redacts every tuple and authorization failure without disclosing the stored body', async () => {

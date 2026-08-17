@@ -431,13 +431,163 @@ async function exerciseTextCodeShare(client, theme, outputPath, viewportWidth) {
   return state;
 }
 
+async function exerciseImagePdfRelease(client, theme, outputPath, viewportWidth) {
+  await navigate(
+    client,
+    `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=image-pdf-release`,
+  );
+  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  const themeReload = client.waitForEvent('Page.loadEventFired');
+  await runtimeEvaluate(
+    client,
+    `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
+  );
+  await themeReload;
+  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(
+    client,
+    '(() => { const scroll = document.querySelector(".transcript-scroll"); if (scroll !== null) { scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); } return document.querySelectorAll(".file-preview-card").length >= 7; })()',
+  );
+
+  const cards = await runtimeEvaluate(
+    client,
+    `(() => [...document.querySelectorAll(".file-preview-card")].map((card) => card.dataset.previewState))()`,
+  );
+  if (
+    !cards.includes('ready') ||
+    !cards.includes('withheld') ||
+    cards.length < 7
+  ) {
+    throw new Error(`Image/PDF fixture did not expose the required guarded states: ${cards.join(',')}`);
+  }
+
+  await runtimeEvaluate(
+    client,
+    'document.querySelector(".file-preview-card[data-preview-state=ready] .artifact-card")?.click()',
+  );
+  await waitForPage(client, 'document.querySelector(".image-preview") !== null');
+  await waitForPage(client, 'document.querySelector(".image-preview[data-image-state=ready]") !== null');
+  const imageState = await runtimeEvaluate(
+    client,
+    `(() => ({
+      zoomOut: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Zoom out'),
+      fit: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Fit'),
+      zoomIn: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Zoom in'),
+    }))()`,
+  );
+  if (!imageState.zoomOut || !imageState.fit || !imageState.zoomIn) {
+    throw new Error('Image fixture did not expose visible zoom alternatives.');
+  }
+  await runtimeEvaluate(client, 'document.querySelector(".artifact-viewer-close")?.click()');
+  await waitForPage(client, 'document.querySelector("[role=dialog]") === null');
+
+  await runtimeEvaluate(
+    client,
+    'document.querySelectorAll(".file-preview-card")[1]?.querySelector(".artifact-card")?.click()',
+  );
+  await waitForPage(client, 'document.querySelector(".pdf-preview") !== null');
+  await waitForPage(
+    client,
+    'document.querySelector(".pdf-preview[data-pdf-state=ready]") !== null && document.querySelector(".pdf-text-layer") !== null && document.querySelector(".pdf-preview-scroll")?.dataset.pdfRenderedPages !== undefined',
+  );
+  const pdfState = await runtimeEvaluate(
+    client,
+    `(() => {
+      const root = document.documentElement;
+      const pages = Number(document.querySelector('.pdf-preview-scroll')?.dataset.pdfRenderedPages ?? 0);
+      return {
+        pages,
+        textLayer: document.querySelector('.pdf-text-layer') !== null,
+        previous: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Previous'),
+        next: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Next'),
+        fit: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Fit width'),
+        viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
+        clientWidth: root.clientWidth,
+        scrollWidth: root.scrollWidth,
+      };
+    })()`,
+  );
+  if (
+    pdfState.pages < 1 ||
+    pdfState.pages > 3 ||
+    !pdfState.textLayer ||
+    !pdfState.previous ||
+    !pdfState.next ||
+    !pdfState.fit
+  ) {
+    throw new Error('Safe PDF fixture did not expose bounded pages, controls, and verified text.');
+  }
+  if (
+    pdfState.viewportWidth !== viewportWidth ||
+    pdfState.clientWidth !== viewportWidth ||
+    pdfState.scrollWidth > pdfState.clientWidth
+  ) {
+    throw new Error(
+      `Horizontal overflow at ${viewportWidth}px: client=${pdfState.clientWidth}, scroll=${pdfState.scrollWidth}`,
+    );
+  }
+
+  await runtimeEvaluate(client, 'document.querySelector(".artifact-viewer-close")?.click()');
+  await waitForPage(client, 'document.querySelector("[role=dialog]") === null');
+  await runtimeEvaluate(
+    client,
+    'document.querySelector(".file-preview-card[data-preview-state=withheld] .artifact-card")?.click()',
+  );
+  await waitForPage(client, 'document.querySelector("[role=dialog]") !== null');
+  const unsafe = await runtimeEvaluate(
+    client,
+    `(() => ({
+      textLayer: document.querySelector('.pdf-text-layer') !== null,
+      message: document.querySelector('.artifact-unsupported-preview')?.textContent ?? '',
+    }))()`,
+  );
+  if (unsafe.textLayer || !unsafe.message.toLowerCase().includes('withheld')) {
+    throw new Error('Unsafe PDF fixture exposed a text layer or lacked a withheld message.');
+  }
+
+  const state = await runtimeEvaluate(
+    client,
+    `(() => {
+      const root = document.documentElement;
+      return {
+        viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
+        clientWidth: root.clientWidth,
+        scrollWidth: root.scrollWidth,
+        pdf: document.querySelector('.pdf-preview') === null,
+        unsafeWithheld: document.querySelector('[role="alert"]') !== null,
+      };
+    })()`,
+  );
+  if (
+    state.viewportWidth !== viewportWidth ||
+    state.clientWidth !== viewportWidth ||
+    state.scrollWidth > state.clientWidth ||
+    !state.pdf ||
+    !state.unsafeWithheld
+  ) {
+    throw new Error('Image/PDF release fixture failed final layout or state assertions.');
+  }
+  const screenshot = await client.send('Page.captureScreenshot', {
+    format: 'png',
+    fromSurface: true,
+  });
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, Buffer.from(screenshot.data, 'base64'));
+  return state;
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const fixture = requiredOption(options, 'fixture');
   const theme = requiredOption(options, 'theme');
   const output = requiredOption(options, 'output');
   const viewportWidth = Number(requiredOption(options, 'viewport-width'));
-  if (fixture !== 'diff' && fixture !== 'artifact-states' && fixture !== 'text-code-share') {
+  if (
+    fixture !== 'diff' &&
+    fixture !== 'artifact-states' &&
+    fixture !== 'text-code-share' &&
+    fixture !== 'image-pdf-release'
+  ) {
     throw new Error(`Unsupported fixture: ${fixture}`);
   }
   if (theme !== 'light' && theme !== 'dark') throw new Error(`Unsupported theme: ${theme}`);
@@ -489,7 +639,9 @@ async function main() {
         ? await exerciseArtifactStates(cdp, theme, outputPath, viewportWidth)
         : fixture === 'text-code-share'
           ? await exerciseTextCodeShare(cdp, theme, outputPath, viewportWidth)
-          : await exerciseFixture(cdp, theme, outputPath, viewportWidth);
+          : fixture === 'image-pdf-release'
+            ? await exerciseImagePdfRelease(cdp, theme, outputPath, viewportWidth)
+            : await exerciseFixture(cdp, theme, outputPath, viewportWidth);
     console.log(
       `CDP passed: ${theme} ${fixture}, ${state.viewportWidth} CSS-pixel width, no horizontal overflow, screenshot ${outputPath}`,
     );

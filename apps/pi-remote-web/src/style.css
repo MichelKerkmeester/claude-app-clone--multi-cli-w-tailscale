@@ -39,9 +39,9 @@
   --surface: #ffffff;
   --surface-raised: #ffffff;
   --surface-muted: #efeeeb;
-  --surface-code: #0f0f0e;
-  --ink: #121212;
-  --ink-secondary: #373734;
+  --surface-code: #24221f;
+  --ink: #24221f;
+  --ink-secondary: #24221f;
   --ink-muted: #6c6a65;
   --ink-tertiary-safe: #6c6a65;
   --ink-disabled: #6c6a65;
@@ -56,7 +56,7 @@
   --accent-strong: #b85f42;
   --accent-soft: #f3e4de;
   --accent-ink: #8a452f;
-  --action-bg: #121212;
+  --action-bg: #24221f;
   --action-fg: #f8f8f6;
   --success: #37624a;
   --success-soft: #e7eee9;
@@ -93,37 +93,37 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --canvas: #181715;
+  --canvas: #24221f;
   --canvas-subtle: #1f1e1b;
-  --surface: #24221f;
-  --surface-raised: #2b2925;
+  --surface: #2d2a26;
+  --surface-raised: #2d2a26;
   --surface-muted: #302e2a;
-  --surface-code: #0f0f0e;
-  --ink: #f4f1eb;
-  --ink-secondary: #d8d3ca;
-  --ink-muted: #b5afa5;
+  --surface-code: #24221f;
+  --ink: #f8f8f6;
+  --ink-secondary: #f8f8f6;
+  --ink-muted: #9f998f;
   --ink-tertiary-safe: #9f998f;
   --ink-disabled: #9f998f;
   --placeholder: #9f998f;
-  --ink-inverse: #181715;
+  --ink-inverse: #24221f;
   --line: #3b3934;
   --line-hairline: #4a4741;
   --control-border: #807a70;
   --line-strong: #807a70;
   --decoration-low: #777168;
   --accent: #d97757;
-  --accent-strong: #e18b6c;
+  --accent-strong: #b85f42;
   --accent-soft: #3a2720;
   --accent-ink: #f0b19a;
-  --action-bg: #f4f1eb;
-  --action-fg: #181715;
+  --action-bg: #f8f8f6;
+  --action-fg: #24221f;
   --success: #8fc4a4;
   --success-soft: #203129;
   --warning: #f0b19a;
   --warning-soft: #3a2720;
   --danger: #ee9b91;
   --danger-soft: #3a2522;
-  --focus: #f4f1eb;
+  --focus: #f8f8f6;
   --diff-add: #203129;
   --diff-remove: #3a2522;
   --shadow-raised: 0 4px 20px rgb(0 0 0 / 24%);
@@ -132,37 +132,37 @@
 @media (prefers-color-scheme: dark) {
   :root[data-theme='system'] {
     color-scheme: dark;
-    --canvas: #181715;
+    --canvas: #24221f;
     --canvas-subtle: #1f1e1b;
-    --surface: #24221f;
-    --surface-raised: #2b2925;
+    --surface: #2d2a26;
+    --surface-raised: #2d2a26;
     --surface-muted: #302e2a;
-    --surface-code: #0f0f0e;
-    --ink: #f4f1eb;
-    --ink-secondary: #d8d3ca;
-    --ink-muted: #b5afa5;
+    --surface-code: #24221f;
+    --ink: #f8f8f6;
+    --ink-secondary: #f8f8f6;
+    --ink-muted: #9f998f;
     --ink-tertiary-safe: #9f998f;
     --ink-disabled: #9f998f;
     --placeholder: #9f998f;
-    --ink-inverse: #181715;
+    --ink-inverse: #24221f;
     --line: #3b3934;
     --line-hairline: #4a4741;
     --control-border: #807a70;
     --line-strong: #807a70;
     --decoration-low: #777168;
     --accent: #d97757;
-    --accent-strong: #e18b6c;
+    --accent-strong: #b85f42;
     --accent-soft: #3a2720;
     --accent-ink: #f0b19a;
-    --action-bg: #f4f1eb;
-    --action-fg: #181715;
+    --action-bg: #f8f8f6;
+    --action-fg: #24221f;
     --success: #8fc4a4;
     --success-soft: #203129;
     --warning: #f0b19a;
     --warning-soft: #3a2720;
     --danger: #ee9b91;
     --danger-soft: #3a2522;
-    --focus: #f4f1eb;
+    --focus: #f8f8f6;
     --diff-add: #203129;
     --diff-remove: #3a2522;
     --shadow-raised: 0 4px 20px rgb(0 0 0 / 24%);
@@ -4125,6 +4125,109 @@ button[data-pressed]:not([data-disabled]) {
   background: color-mix(in oklch, var(--diff-remove) 90%, transparent);
 }
 
+.image-preview,
+.pdf-preview {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--space-3);
+}
+
+.image-preview-controls,
+.pdf-preview-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.image-preview-stage {
+  display: grid;
+  min-block-size: 15rem;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #24221f;
+  touch-action: none;
+}
+
+.image-preview-image {
+  display: block;
+  max-inline-size: 100%;
+  max-block-size: min(70vh, 42rem);
+  object-fit: contain;
+  user-select: none;
+  transform-origin: center;
+  transition: transform 120ms var(--ease-out, ease);
+}
+
+.artifact-preview-message {
+  margin: 0;
+  color: var(--ink-secondary);
+  line-height: 1.5;
+}
+
+.pdf-page-indicator {
+  min-block-size: 2.75rem;
+  padding-inline: var(--space-2);
+  color: var(--ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pdf-preview-scroll {
+  display: grid;
+  min-block-size: 12rem;
+  max-block-size: min(70vh, 48rem);
+  min-inline-size: 0;
+  gap: var(--space-3);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #24221f;
+}
+
+.pdf-preview-page {
+  display: grid;
+  min-inline-size: 0;
+  place-items: start center;
+}
+
+.pdf-preview-canvas-wrap {
+  position: relative;
+  max-inline-size: 100%;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-raised);
+}
+
+.pdf-preview-canvas-wrap canvas {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+.pdf-text-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: transparent;
+  cursor: text;
+  user-select: text;
+  white-space: pre-wrap;
+}
+
+.pdf-text-layer span {
+  display: inline;
+  color: transparent;
+  font-size: 1rem;
+}
+
+.pdf-text-layer .pdf-text-match {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
 @supports not (height: 100dvh) {
   .artifact-viewer-modal {
     max-block-size: var(--visual-viewport-height, 100vh);
@@ -4160,7 +4263,8 @@ button[data-pressed]:not([data-disabled]) {
   .artifact-card,
   .artifact-viewer-overlay,
   .artifact-viewer-modal,
-  .artifact-viewer-close {
+  .artifact-viewer-close,
+  .image-preview-image {
     animation: none;
     transition: none;
   }

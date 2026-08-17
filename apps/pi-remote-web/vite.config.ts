@@ -34,6 +34,8 @@ function previewAllowedHosts(): string[] {
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  optimizeDeps: { exclude: ['pdfjs-dist'] },
+  worker: { format: 'es' },
   server: { proxy: relayProxy },
   preview: { proxy: relayProxy, allowedHosts: previewAllowedHosts() },
 });

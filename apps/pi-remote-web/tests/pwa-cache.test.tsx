@@ -65,7 +65,7 @@ describe('PWA shell and history-only cache boundary', () => {
   it('keeps standalone rotation enabled and caches only shell/static requests', () => {
     expect(MANIFEST.display).toBe('standalone');
     expect(MANIFEST.orientation).toBe('any');
-    expect(SERVICE_WORKER).toContain("const CACHE_NAME = 'pi-remote-shell-v3'");
+    expect(SERVICE_WORKER).toContain("const CACHE_NAME = 'pi-remote-shell-v4'");
     expect(SERVICE_WORKER).toContain("cache: 'no-store'");
     expect(SERVICE_WORKER).toContain('function isShellRequest');
     expect(SERVICE_WORKER).toContain('if (!isShellRequest(url))');
@@ -125,12 +125,18 @@ describe('PWA shell and history-only cache boundary', () => {
         transcripts: [],
         planToken: staleToken,
         confirmedMode: 'build',
+        artifactBytes: 'BINARY_BODY_CANARY',
+        blobUrl: 'blob:https://pi-remote.example.test/body',
+        shareBuffer: 'SHARE_BUFFER_CANARY',
       }),
     );
 
     const cache = loadCache();
     expect(cache).not.toBeNull();
     expect(JSON.stringify(cache)).not.toContain(staleToken);
+    expect(JSON.stringify(cache)).not.toContain('BINARY_BODY_CANARY');
+    expect(JSON.stringify(cache)).not.toContain('blob:');
+    expect(JSON.stringify(cache)).not.toContain('SHARE_BUFFER_CANARY');
     expect(JSON.stringify(cache)).not.toMatch(/planToken|confirmedMode/u);
 
     saveCache([SESSION], {

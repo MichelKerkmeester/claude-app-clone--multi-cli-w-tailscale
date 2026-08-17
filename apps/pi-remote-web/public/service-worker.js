@@ -2,7 +2,7 @@
 // MODULE: Pi Remote PWA Service Worker
 // ───────────────────────────────────────────────────────────────────
 
-const CACHE_NAME = 'pi-remote-shell-v3';
+const CACHE_NAME = 'pi-remote-shell-v4';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
 const SHELL_PATHS = new Set(SHELL);
 
@@ -28,6 +28,13 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  if (isArtifactRequest(url)) {
+    // Artifact bytes are authenticated, revision-specific data. They must never
+    // become durable shell or runtime cache entries.
+    event.respondWith(fetchWithoutBrowserCache(request));
+    return;
+  }
+
   if (request.mode === 'navigate') {
     event.respondWith(
       fetchWithoutBrowserCache(request)
@@ -40,13 +47,6 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => caches.match('/index.html')),
     );
-    return;
-  }
-
-  if (isArtifactRequest(url)) {
-    // Artifact bytes are authenticated, revision-specific data. They must never
-    // become durable shell or runtime cache entries.
-    event.respondWith(fetchWithoutBrowserCache(request));
     return;
   }
 

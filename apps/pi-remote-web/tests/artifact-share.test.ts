@@ -67,6 +67,58 @@ describe('controlled artifact sharing', () => {
     expect(share).toHaveBeenCalledTimes(1);
   });
 
+  it('shares the exact displayed binary bytes only through canShare({ files })', async () => {
+    const bytes = new Uint8Array([0, 1, 2, 255]);
+    const share = vi.fn(async () => undefined);
+    const canShare = vi.fn((data: ShareData) => {
+      expect(data).not.toHaveProperty('url');
+      expect(data.files).toHaveLength(1);
+      expect(data.files?.[0]).toBeInstanceOf(File);
+      return true;
+    });
+    vi.stubGlobal('navigator', { share, canShare });
+    const input = {
+      displayName: 'safe-image.png',
+      renderer: 'image' as const,
+      displayedBuffer: '',
+      displayedBytes: bytes,
+      mimeType: 'image/png',
+      shareAllowed: true,
+      redaction: 'applied' as const,
+      completeness: 'complete' as const,
+    };
+    expect(canShareDisplayedArtifact(input)).toBe(true);
+    expect(await shareDisplayedArtifact(input, () => true)).toBe('shared');
+    expect(canShare).toHaveBeenCalled();
+    expect(share).toHaveBeenCalled();
+    const sharedFile = share.mock.calls[0]?.[0].files?.[0];
+    if (sharedFile === undefined) throw new Error('Binary share did not provide a File.');
+    expect(sharedFile?.name).toBe('safe-image.png');
+    expect(new Uint8Array(await sharedFile.arrayBuffer())).toEqual(bytes);
+    expect(share.mock.calls[0]?.[0]).not.toHaveProperty('url');
+  });
+
+  it('treats binary share cancellation as a no-op before preparing native share', async () => {
+    const share = vi.fn(async () => undefined);
+    const canShare = vi.fn(() => true);
+    vi.stubGlobal('navigator', { share, canShare });
+    const result = await shareDisplayedArtifact(
+      {
+        displayName: 'safe.pdf',
+        renderer: 'pdf',
+        displayedBuffer: '',
+        displayedBytes: new Uint8Array([1, 2, 3]),
+        mimeType: 'application/pdf',
+        shareAllowed: true,
+        redaction: 'applied',
+        completeness: 'complete',
+      },
+      () => false,
+    );
+    expect(result).toBe('cancelled');
+    expect(share).not.toHaveBeenCalled();
+  });
+
   it('copies the same displayed buffer without requiring share capability', async () => {
     const writeText = vi.fn(async () => undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText } });

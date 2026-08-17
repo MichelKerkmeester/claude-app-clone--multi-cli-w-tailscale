@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useCallback,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
@@ -29,7 +30,9 @@ import type {
 } from './ArtifactViewerProvider.js';
 import { CodePreview } from './CodePreview.js';
 import { DiffPreview } from './DiffPreview.js';
+import { ImagePreview, type ImagePreviewState } from './ImagePreview.js';
 import { MarkdownPreview } from './MarkdownPreview.js';
+import { PdfPreview, type PdfPreviewState } from './PdfPreview.js';
 import { PreviewControls } from './PreviewControls.js';
 import { TextPreview } from './TextPreview.js';
 import { UnsupportedPreview } from './UnsupportedPreview.js';
@@ -46,6 +49,7 @@ const EDGE_BACK_DISTANCE = 64;
 const EDGE_BACK_CROSS_AXIS = 96;
 
 function isReadyDescriptor(block: FilePreviewBlock): boolean {
+  if (block.renderer === 'pdf' && block.textLayerSafe !== true) return false;
   return (block.availability ?? (block.content.kind === 'none' ? 'missing' : 'ready')) === 'ready';
 }
 
@@ -64,9 +68,17 @@ function descriptorSubject(block: FilePreviewBlock): string {
   return block.displayName.length > 0 ? block.displayName : 'redacted file';
 }
 
-function descriptorKind(block: FilePreviewBlock): 'text' | 'markdown' | 'code' | 'diff' | null {
+function descriptorKind(
+  block: FilePreviewBlock,
+): 'image' | 'pdf' | 'text' | 'markdown' | 'code' | 'diff' | null {
   if (block.mimeType === 'text/markdown' || block.mimeType === 'text/x-markdown') return 'markdown';
-  if (block.renderer === 'text' || block.renderer === 'code' || block.renderer === 'diff') {
+  if (
+    block.renderer === 'image' ||
+    block.renderer === 'pdf' ||
+    block.renderer === 'text' ||
+    block.renderer === 'code' ||
+    block.renderer === 'diff'
+  ) {
     return block.renderer;
   }
   return null;
@@ -80,6 +92,9 @@ function unavailableMessage(block: FilePreviewBlock): string {
   if (availability === 'denied') return 'The relay denied this preview.';
   if (availability === 'missing') return 'This exact revision is not available.';
   if (availability === 'unsupported') return 'This file type is not supported by this reader.';
+  if (block.renderer === 'pdf' && block.textLayerSafe !== true) {
+    return 'The relay withheld this PDF because its safety could not be attested.';
+  }
   if (block.renderer === 'image' || block.renderer === 'pdf') {
     return 'Image and PDF previews are not available in this reader.';
   }
@@ -154,16 +169,29 @@ function renderDescriptor(
   block: FilePreviewBlock,
   status: ArtifactResourceStatus,
   text: string | null,
+  bytes: Uint8Array | null,
   wrap: boolean,
   findTerm: string,
+  resourceReady: boolean,
+  onRendererStatus: (status: ArtifactResourceStatus) => void,
+  onPdfRendererStatus: (status: PdfPreviewState) => void,
+  onFindTermChange: (term: string) => void,
 ): React.ReactNode {
   if (!isReadyDescriptor(block)) {
-    return <UnsupportedPreview renderer={block.renderer} message={unavailableMessage(block)} />;
+    return (
+      <div role="alert">
+        <UnsupportedPreview renderer={block.renderer} message={unavailableMessage(block)} />
+      </div>
+    );
   }
   if (descriptorKind(block) === null) {
-    return <UnsupportedPreview renderer={block.renderer} message={unavailableMessage(block)} />;
+    return (
+      <div role="alert">
+        <UnsupportedPreview renderer={block.renderer} message={unavailableMessage(block)} />
+      </div>
+    );
   }
-  if (status === 'loading' || status === 'stalled' || status === 'idle') {
+  if (!resourceReady && (status === 'loading' || status === 'stalled' || status === 'idle')) {
     return (
       <div className="artifact-loading-preview" aria-hidden="true">
         <span />
@@ -172,8 +200,32 @@ function renderDescriptor(
       </div>
     );
   }
-  if (isResourceError(status)) {
-    return <UnsupportedPreview renderer={block.renderer} message={errorPreviewMessage(status)} />;
+  if (!resourceReady && isResourceError(status)) {
+    return (
+      <div role="alert">
+        <UnsupportedPreview renderer={block.renderer} message={errorPreviewMessage(status)} />
+      </div>
+    );
+  }
+  if (block.renderer === 'image') {
+    return (
+      <ImagePreview
+        block={block}
+        bytes={bytes}
+        onStateChange={(nextState: ImagePreviewState) => onRendererStatus(nextState)}
+      />
+    );
+  }
+  if (block.renderer === 'pdf') {
+    return (
+      <PdfPreview
+        block={block}
+        bytes={bytes}
+        findTerm={findTerm}
+        onFindTermChange={onFindTermChange}
+        onStateChange={onPdfRendererStatus}
+      />
+    );
   }
   if (text === null) return <UnsupportedPreview renderer={block.renderer} />;
   if (block.mimeType === 'text/markdown' || block.mimeType === 'text/x-markdown') {
@@ -207,6 +259,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const [findTerm, setFindTerm] = useState('');
   const [copyLabel, setCopyLabel] = useState('Copy');
   const [announcement, setAnnouncement] = useState<string | null>(null);
+  const [rendererStatus, setRendererStatus] = useState<ArtifactResourceStatus | null>(null);
 
   const sourceValue: unknown = preview?.source;
   const legacyDiff: FileDiffBlock | null =
@@ -222,9 +275,42 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const resource = useArtifactResource(sessionId, descriptor, { enabled: resourceEnabled });
   const resourceCloseRef = useRef(resource.close);
   resourceCloseRef.current = resource.close;
+  const resourceReloadRef = useRef(resource.reload);
+  resourceReloadRef.current = resource.reload;
+  const onRendererStatus = useCallback(
+    (status: ArtifactResourceStatus) => setRendererStatus(status),
+    [],
+  );
+  const onPdfRendererStatus = useCallback(
+    (status: PdfPreviewState) =>
+      onRendererStatus(status === 'withheld' ? 'relay-error' : status),
+    [onRendererStatus],
+  );
 
   useEffect(() => {
     if (phase === 'exiting') resourceCloseRef.current();
+  }, [phase]);
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        resourceCloseRef.current();
+      } else if (phase === 'ready-diff') {
+        resourceReloadRef.current();
+      }
+    };
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted && phase === 'ready-diff') {
+        resourceCloseRef.current();
+        resourceReloadRef.current();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pageshow', onPageShow);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pageshow', onPageShow);
+    };
   }, [phase]);
 
   useEffect(() => {
@@ -232,6 +318,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     setFindTerm('');
     setCopyLabel('Copy');
     setAnnouncement(null);
+    setRendererStatus(null);
   }, [preview?.generation]);
 
   useEffect(() => {
@@ -299,7 +386,16 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const title = descriptor === null ? 'File diff' : descriptorSubject(descriptor);
   const resourceStatus = descriptor === null ? null : resource.status;
   const currentStatus =
-    descriptor === null ? null : isReadyDescriptor(descriptor) ? resource.status : null;
+    descriptor === null
+      ? null
+      : isReadyDescriptor(descriptor)
+        ? rendererStatus ?? resource.status
+        : null;
+  const binaryPreviewReady =
+    descriptor !== null &&
+    (descriptor.renderer === 'image' || descriptor.renderer === 'pdf') &&
+    resource.status === 'ready' &&
+    rendererStatus === 'ready';
   const body =
     descriptor === null ? (
       legacyDiff === null ? (
@@ -308,7 +404,18 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
         <DiffPreview patch={legacyDiff.patch} wrap={wrap} findTerm={findTerm} />
       )
     ) : (
-      renderDescriptor(descriptor, resource.status, resource.text, wrap, findTerm)
+      renderDescriptor(
+        descriptor,
+        currentStatus ?? resource.status,
+        resource.text,
+        resource.bytes,
+        wrap,
+        findTerm,
+        resource.status === 'ready',
+        onRendererStatus,
+        onPdfRendererStatus,
+        setFindTerm,
+      )
     );
   const displayedBuffer = descriptor === null ? (legacyDiff?.patch ?? null) : resource.buffer;
   const shareInput: DisplayedArtifactShareInput = {
@@ -318,9 +425,15 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     shareAllowed: descriptor?.shareAllowed ?? false,
     redaction: descriptor?.redaction ?? 'not-needed',
     completeness: descriptor?.completeness ?? 'complete',
+    ...(binaryPreviewReady && resource.bytes !== null
+      ? { displayedBytes: resource.bytes, mimeType: descriptor.mimeType }
+      : {}),
   };
+  const displayedBytes =
+    binaryPreviewReady ? resource.bytes : null;
   const canCopy = displayedBuffer !== null && canCopyDisplayedArtifact();
-  const canShare = displayedBuffer !== null && canShareDisplayedArtifact(shareInput);
+  const canShare =
+    (displayedBuffer !== null || displayedBytes !== null) && canShareDisplayedArtifact(shareInput);
   const terminal =
     legacyDiff === null && descriptor === null
       ? 'The preview source could not be verified.'
@@ -329,7 +442,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
         : descriptor !== null && descriptorKind(descriptor) === null
           ? unavailableMessage(descriptor)
           : resourceStatus !== null
-            ? terminalMessage(resourceStatus)
+            ? terminalMessage(currentStatus ?? resourceStatus)
             : null;
   const statusAnnouncement =
     announcement ??
@@ -402,11 +515,15 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
                 : `${descriptor.mimeType} · ${descriptor.completeness === 'excerpt' ? 'Excerpt' : 'Complete'} · ${descriptor.redaction === 'applied' ? 'Redacted' : 'Relay-sanitized'}`}
             </p>
             <PreviewControls
-              kind={kind ?? 'text'}
+              kind={kind === 'image' || kind === 'pdf' ? 'text' : kind ?? 'text'}
               wrap={wrap}
               findTerm={findTerm}
-              {...(kind === 'markdown' || kind === null ? {} : { onWrapChange: setWrap })}
-              {...(kind === null ? {} : { onFindTermChange: setFindTerm })}
+              {...(kind === 'text' || kind === 'code' || kind === 'diff'
+                ? { onWrapChange: setWrap }
+                : {})}
+              {...(kind === 'text' || kind === 'code' || kind === 'diff' || kind === 'markdown'
+                ? { onFindTermChange: setFindTerm }
+                : {})}
               canCopy={canCopy}
               canShare={canShare}
               onCopy={onCopy}

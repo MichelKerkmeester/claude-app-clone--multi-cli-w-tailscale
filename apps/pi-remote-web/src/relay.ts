@@ -62,7 +62,31 @@ const MAX_PAGES = 100;
 // Retry metadata is bounded before it can reach UI state: only integer
 // delta-seconds are accepted, and any delay beyond the cap is clamped.
 const MAX_RETRY_AFTER_MS = 60_000;
-const MAX_ARTIFACT_BYTES = 50 * 1024 * 1024;
+export const MAX_ARTIFACT_BYTES = 50 * 1024 * 1024;
+const RELAY_HEARTBEAT_MAX_AGE_MS = 15_000;
+let lastRelayHeartbeatAt: number | null = null;
+
+export interface RelayHeartbeat {
+  readonly state: 'fresh' | 'stale' | 'unknown';
+  readonly lastSeenAt: number | null;
+  readonly navigatorOnline: boolean;
+}
+
+/** Transport evidence is kept separate from navigator.onLine, which only describes the device. */
+export function noteRelayHeartbeat(at = Date.now()): void {
+  if (Number.isFinite(at)) lastRelayHeartbeatAt = at;
+}
+
+export function getRelayHeartbeat(now = Date.now()): RelayHeartbeat {
+  const navigatorOnline = typeof navigator === 'undefined' || navigator.onLine;
+  const state =
+    lastRelayHeartbeatAt === null
+      ? 'unknown'
+      : now - lastRelayHeartbeatAt <= RELAY_HEARTBEAT_MAX_AGE_MS
+        ? 'fresh'
+        : 'stale';
+  return { state, lastSeenAt: lastRelayHeartbeatAt, navigatorOnline };
+}
 
 export class RelayRequestError extends Error {
   readonly code: 'access_denied' | 'request_failed';
@@ -87,7 +111,13 @@ export type ArtifactReadErrorCode =
   | 'invalid-response'
   | 'revision-conflict'
   | 'too-large'
-  | 'digest-mismatch';
+  | 'digest-mismatch'
+  | 'denied'
+  | 'expired'
+  | 'missing'
+  | 'revoked'
+  | 'conflict'
+  | 'rate-limited';
 
 export class ArtifactReadError extends Error {
   readonly code: ArtifactReadErrorCode;
@@ -99,6 +129,28 @@ export class ArtifactReadError extends Error {
     this.code = code;
     this.status = status;
   }
+}
+
+/** Return only a local, allowlisted artifact code. Server response text is never surfaced. */
+export function artifactReadDisplayCode(error: unknown): ArtifactReadErrorCode | null {
+  if (error instanceof ArtifactReadError) return error.code;
+  if (!isRecord(error) || typeof error.code !== 'string') return null;
+  const codes: readonly ArtifactReadErrorCode[] = [
+    'unavailable',
+    'invalid-response',
+    'revision-conflict',
+    'too-large',
+    'digest-mismatch',
+    'denied',
+    'expired',
+    'missing',
+    'revoked',
+    'conflict',
+    'rate-limited',
+  ];
+  return codes.includes(error.code as ArtifactReadErrorCode)
+    ? (error.code as ArtifactReadErrorCode)
+    : null;
 }
 
 export class RuntimeRelayError extends Error {
@@ -342,6 +394,7 @@ export function normalizeRuntimeIssue(error: unknown): RuntimeIssueCode {
     if (error.status !== null && error.status >= 500) return 'host-unavailable';
   }
   if (error instanceof SyntaxError) return 'invalid-response';
+  if (getRelayHeartbeat().state === 'stale') return 'offline';
   if (typeof navigator !== 'undefined' && !navigator.onLine) return 'offline';
   if (isAbortError(error)) return 'host-unavailable';
   if (isRecord(error) && isRuntimeIssueCode(error.issueCode)) return error.issueCode;
@@ -743,6 +796,7 @@ export async function readArtifact(
 
   if (isDemoMode()) {
     const bytes = demoArtifactBytes(block);
+    noteRelayHeartbeat();
     return validateArtifactBytes(bytes, block);
   }
 
@@ -762,11 +816,23 @@ export async function readArtifact(
     if (isAbortError(error)) throw error;
     throw new ArtifactReadError('unavailable');
   }
+  noteRelayHeartbeat();
   if (response.status !== 200 || !response.ok) {
-    throw new ArtifactReadError(
-      response.status === 404 || response.status === 410 ? 'unavailable' : 'invalid-response',
-      response.status,
-    );
+    const code: ArtifactReadErrorCode =
+      response.status === 401 || response.status === 403
+        ? 'denied'
+        : response.status === 404
+          ? 'missing'
+          : response.status === 410
+            ? 'expired'
+            : response.status === 409
+              ? 'revision-conflict'
+              : response.status === 429
+                ? 'rate-limited'
+                : response.status >= 500
+                  ? 'unavailable'
+                  : 'invalid-response';
+    throw new ArtifactReadError(code, response.status);
   }
 
   const contentType = response.headers.get('content-type')?.split(';', 1)[0]?.trim() ?? '';
@@ -791,7 +857,7 @@ export async function readArtifact(
   if (declaredLength !== null && declaredLength > MAX_ARTIFACT_BYTES) {
     throw new ArtifactReadError('too-large', response.status);
   }
-  const bytes = new Uint8Array(await response.arrayBuffer());
+  const bytes = await readBoundedBody(response, MAX_ARTIFACT_BYTES);
   return validateArtifactBytes(bytes, block, contentType, revision, etag);
 }
 
@@ -803,6 +869,39 @@ async function digestBytes(bytes: Uint8Array): Promise<string> {
   if (subtle === undefined) throw new ArtifactReadError('invalid-response');
   const hash = await subtle.digest('SHA-256', bytes.slice());
   return [...new Uint8Array(hash)].map((part) => part.toString(16).padStart(2, '0')).join('');
+}
+
+async function readBoundedBody(response: Response, maximumBytes: number): Promise<Uint8Array> {
+  if (response.body === null || typeof response.body.getReader !== 'function') {
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength > maximumBytes) throw new ArtifactReadError('too-large', response.status);
+    return bytes;
+  }
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const next = await reader.read();
+      if (next.done) break;
+      const chunk = next.value;
+      total += chunk.byteLength;
+      if (total > maximumBytes) {
+        await reader.cancel();
+        throw new ArtifactReadError('too-large', response.status);
+      }
+      chunks.push(chunk.slice());
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
 }
 
 function validateArtifactBytes(
@@ -852,6 +951,7 @@ export async function openSyncSocket(
   url.searchParams.set('ticket', ticket);
   const socket = new WebSocket(url);
   socket.addEventListener('open', () => {
+    noteRelayHeartbeat();
     socket.send(
       JSON.stringify({
         type: 'subscribe',
@@ -863,7 +963,10 @@ export async function openSyncSocket(
   socket.addEventListener('message', (event) => {
     try {
       const value: unknown = JSON.parse(String(event.data));
-      if (isSyncMessage(value) && value.sessionId === sessionId) onMessage(value);
+      if (isSyncMessage(value) && value.sessionId === sessionId) {
+        noteRelayHeartbeat();
+        onMessage(value);
+      }
     } catch {
       // Malformed frames cannot enter display state.
     }
@@ -886,6 +989,7 @@ async function postJson(
     body: body === undefined ? null : JSON.stringify(body),
     ...(signal === undefined ? {} : { signal }),
   });
+  noteRelayHeartbeat();
   if (!response.ok && !acceptedStatuses.includes(response.status)) {
     throw new RelayRequestError(
       response.status === 401 || response.status === 403 ? 'access_denied' : 'request_failed',

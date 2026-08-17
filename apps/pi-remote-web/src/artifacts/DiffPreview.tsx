@@ -1,18 +1,28 @@
 import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
-export function DiffPreview({ patch }: Pick<FileDiffBlock, 'patch'>) {
+export interface DiffPreviewProps extends Pick<FileDiffBlock, 'patch'> {
+  readonly wrap?: boolean;
+  readonly findTerm?: string;
+}
+
+export function DiffPreview({ patch, wrap = false, findTerm = '' }: DiffPreviewProps) {
   const lines = patch.split('\n');
   return (
-    <pre className="artifact-diff-preview" aria-label="Redacted file diff">
+    <pre
+      className={`artifact-diff-preview${wrap ? ' is-wrapped' : ''}`}
+      aria-label="Redacted file diff"
+      dir="ltr"
+      data-display-buffer
+    >
       {lines.map((line, index) => (
         <span
-          className={
+          className={`${
             line.startsWith('+')
               ? 'artifact-diff-line artifact-diff-add'
               : line.startsWith('-')
                 ? 'artifact-diff-line artifact-diff-remove'
                 : 'artifact-diff-line artifact-diff-context'
-          }
+          }${findTerm.length > 0 && line.toLocaleLowerCase().includes(findTerm.toLocaleLowerCase()) ? ' is-find-match' : ''}`}
           key={`${index}-${line.slice(0, 12)}`}
         >
           {line}

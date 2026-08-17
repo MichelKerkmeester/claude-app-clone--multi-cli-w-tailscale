@@ -240,6 +240,76 @@ export const DEMO_ARTIFACT_BLOCKS: readonly FilePreviewBlock[] = [
   },
 ];
 
+const DEMO_SHARE_TEXT = 'A tab-local text preview remains selectable and exact.\n';
+const DEMO_SHARE_MARKDOWN =
+  '# Safe Markdown\n\nThis is **sanitized** and has no active links or remote images.\n';
+const DEMO_SHARE_CODE =
+  'export function exactRevision(value: string): string {\n  return value.trim();\n}\n';
+
+function inlinePreview(
+  id: string,
+  artifactId: string,
+  revision: string,
+  seq: number,
+  displayName: string,
+  renderer: 'text' | 'code',
+  mimeType: string,
+  text: string,
+  language?: string,
+): FilePreviewBlock {
+  return {
+    ...artifactBase(id, revision, seq, 1),
+    kind: 'file_preview',
+    artifactId,
+    displayName,
+    renderer,
+    mimeType,
+    byteLength: new TextEncoder().encode(text).byteLength,
+    digest: sha256(text),
+    ...(language === undefined ? {} : { language }),
+    redaction: 'applied',
+    completeness: 'complete',
+    shareAllowed: true,
+    availability: 'ready',
+    content: { kind: 'inline-text', text, firstLine: 1 },
+  };
+}
+
+export const DEMO_TEXT_CODE_SHARE_BLOCKS: readonly FilePreviewBlock[] = [
+  inlinePreview(
+    'blk-artifact-share-text',
+    'artifact_share_text_001',
+    'rev_share_text_001',
+    8,
+    'notes.txt',
+    'text',
+    'text/plain',
+    DEMO_SHARE_TEXT,
+  ),
+  inlinePreview(
+    'blk-artifact-share-markdown',
+    'artifact_share_markdown_001',
+    'rev_share_markdown_001',
+    9,
+    'README.md',
+    'text',
+    'text/markdown',
+    DEMO_SHARE_MARKDOWN,
+    'markdown',
+  ),
+  inlinePreview(
+    'blk-artifact-share-code',
+    'artifact_share_code_001',
+    'rev_share_code_001',
+    10,
+    'revision.ts',
+    'code',
+    'text/typescript',
+    DEMO_SHARE_CODE,
+    'typescript',
+  ),
+];
+
 interface DemoSession {
   readonly id: string;
   readonly status: 'idle' | 'running';
@@ -263,11 +333,18 @@ function isArtifactStatesFixture(): boolean {
   return fixtureName() === 'artifact-states';
 }
 
+function isTextCodeShareFixture(): boolean {
+  return fixtureName() === 'text-code-share';
+}
+
 function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   const session = SESSIONS.find((candidate) => candidate.id === sessionId);
   if (session === undefined) return [];
   if (isArtifactStatesFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_ARTIFACT_BLOCKS];
+  }
+  if (isTextCodeShareFixture() && sessionId === SESSION_IDLE) {
+    return [...session.blocks, ...DEMO_TEXT_CODE_SHARE_BLOCKS];
   }
   return session.blocks;
 }

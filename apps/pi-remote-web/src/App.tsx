@@ -32,9 +32,10 @@ import {
   ToggleButton,
 } from 'react-aria-components';
 
-import { loadCache, saveCache, type ReadOnlyCache } from './cache.js';
+import { installCacheRevalidation, loadCache, saveCache, type ReadOnlyCache } from './cache.js';
 import { ArtifactCard } from './artifacts/ArtifactCard.js';
 import { ArtifactViewerProvider } from './artifacts/ArtifactViewerProvider.js';
+import { useOptionalArtifactViewer } from './artifacts/ArtifactViewerProvider.js';
 import {
   enrollDevice,
   establishSession,
@@ -948,6 +949,7 @@ export function Session({
   // Bounded revalidation progress for one explicit slash Send; the flag is
   // local state only and never carries command content.
   const [slashSubmitting, setSlashSubmitting] = useState(false);
+  const [cacheResumeGeneration, setCacheResumeGeneration] = useState(0);
   const planReviewTriggerRef = useRef<HTMLButtonElement>(null);
   const [leavePlanReadyOpen, setLeavePlanReadyOpen] = useState(false);
 
@@ -1033,6 +1035,11 @@ export function Session({
       .catch((cause: unknown) => setPromptError(messageFrom(cause)))
       .finally(() => setStopping(false));
   };
+
+  useEffect(
+    () => installCacheRevalidation(() => setCacheResumeGeneration((value) => value + 1)),
+    [],
+  );
 
   useEffect(() => {
     dispatchTranscript({ type: 'select', sessionId });
@@ -1150,7 +1157,14 @@ export function Session({
       if (retryTimer !== null) window.clearTimeout(retryTimer);
       socket?.close();
     };
-  }, [cache, dispatchConnection, dispatchTranscript, runtimeControls.refresh, sessionId]);
+  }, [
+    cache,
+    cacheResumeGeneration,
+    dispatchConnection,
+    dispatchTranscript,
+    runtimeControls.refresh,
+    sessionId,
+  ]);
 
   const isStale =
     connection !== 'live' || transcript.source === 'cache' || transcript.awaitingSnapshot;
@@ -1303,7 +1317,11 @@ export function Session({
         }}
       />
       <ArtifactViewerProvider>
-        <TranscriptList blocks={transcript.blocks} running={status === 'running'} />
+        <TranscriptList
+          sessionId={sessionId}
+          blocks={transcript.blocks}
+          running={status === 'running'}
+        />
       </ArtifactViewerProvider>
       <RuntimeStrip
         controls={runtimeControls}
@@ -1402,12 +1420,15 @@ export function RuntimeStatusRegion({ runtime }: { readonly runtime: RuntimeUiSt
 }
 
 export function TranscriptList({
+  sessionId,
   blocks,
   running,
 }: {
+  readonly sessionId?: string;
   readonly blocks: readonly DisplayTranscriptBlock[];
   readonly running: boolean;
 }) {
+  const artifactSessionId = sessionId ?? '';
   const scrollRef = useRef<HTMLDivElement>(null);
   const previousCountRef = useRef(blocks.length);
   const [announcement, setAnnouncement] = useState('');
@@ -1486,9 +1507,9 @@ export function TranscriptList({
                 style={{ transform: `translateY(${virtualItem.start}px)` }}
               >
                 {item.kind === 'activity' ? (
-                  <ActivityGroup blocks={item.blocks} />
+                  <ActivityGroup blocks={item.blocks} sessionId={artifactSessionId} />
                 ) : (
-                  <Block block={item.block} />
+                  <Block block={item.block} sessionId={artifactSessionId} />
                 )}
               </div>
             );
@@ -1614,7 +1635,13 @@ function activitySummary(blocks: readonly DisplayTranscriptBlock[]): string {
   return 'Activity';
 }
 
-function ActivityGroup({ blocks }: { readonly blocks: readonly DisplayTranscriptBlock[] }) {
+function ActivityGroup({
+  blocks,
+  sessionId,
+}: {
+  readonly blocks: readonly DisplayTranscriptBlock[];
+  readonly sessionId: string;
+}) {
   return (
     <div className="activity-group">
       <Disclosure defaultExpanded={false}>
@@ -1629,7 +1656,7 @@ function ActivityGroup({ blocks }: { readonly blocks: readonly DisplayTranscript
         <DisclosurePanel>
           <div className="activity-stack">
             {blocks.map((block) => (
-              <Block key={block.id} block={block} bare />
+              <Block key={block.id} block={block} bare sessionId={sessionId} />
             ))}
           </div>
         </DisclosurePanel>
@@ -1727,9 +1754,11 @@ function ShareGlyph() {
 function Block({
   block,
   bare = false,
+  sessionId,
 }: {
   readonly block: DisplayTranscriptBlock;
   readonly bare?: boolean;
+  readonly sessionId: string;
 }) {
   let content: ReactNode;
   let label: string;
@@ -1775,7 +1804,7 @@ function Block({
       break;
     case 'file_preview':
       label = 'File preview';
-      content = <FilePreviewCard block={block} />;
+      content = <FilePreviewCard block={block} sessionId={sessionId} />;
       break;
     case 'usage':
       label = 'Usage';
@@ -1835,7 +1864,15 @@ function Block({
   );
 }
 
-function FilePreviewCard({ block }: { readonly block: FilePreviewBlock }) {
+function FilePreviewCard({
+  block,
+  sessionId,
+}: {
+  readonly block: FilePreviewBlock;
+  readonly sessionId: string;
+}) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const viewer = useOptionalArtifactViewer();
   const availability = filePreviewAvailability(block);
   const stateLabel = {
     ready: 'Ready',
@@ -1851,20 +1888,36 @@ function FilePreviewCard({ block }: { readonly block: FilePreviewBlock }) {
     block.byteLength === null ? 'Size unavailable' : `${formatArtifactSize(block.byteLength)}`,
     block.redaction === 'withheld' ? 'Relay withheld content' : 'Relay metadata only',
   ].join('\n');
-  // The Phase 1 viewer accepts a diff-shaped source. This adapter carries only safe metadata;
-  // the string artifact revision is never coerced into the viewer's numeric block revision.
-  const viewerBlock: FileDiffBlock = {
-    id: block.id,
-    revision: 1,
-    seq: block.seq,
-    occurredAt: block.occurredAt,
-    kind: 'file_diff',
-    summary: `${block.displayName} · ${stateLabel}`,
-    patch: metadata,
-  };
   return (
     <div className="file-preview-card" data-preview-state={availability}>
-      <ArtifactCard block={viewerBlock} />
+      <Button
+        ref={buttonRef}
+        type="button"
+        className="artifact-card"
+        aria-label={`Open file preview: ${block.displayName}`}
+        data-artifact-session-id={sessionId}
+        onPress={() => viewer?.openDiff(block as unknown as FileDiffBlock, buttonRef.current)}
+      >
+        <span className="artifact-card-glyph" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M5 7h14M5 12h14M5 17h8" />
+            <path d="M16 15v6M13 18h6" />
+          </svg>
+        </span>
+        <span className="artifact-card-body">
+          <span className="artifact-card-meta">
+            <span>File preview</span>
+            <span>{stateLabel}</span>
+          </span>
+          <span className="artifact-card-summary">{block.displayName}</span>
+          <span className="artifact-card-peek" aria-label="Preview metadata">
+            {metadata}
+          </span>
+        </span>
+        <span className="artifact-card-open" aria-hidden="true">
+          Open
+        </span>
+      </Button>
     </div>
   );
 }

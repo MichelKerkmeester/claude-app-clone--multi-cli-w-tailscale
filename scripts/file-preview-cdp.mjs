@@ -330,13 +330,114 @@ async function exerciseArtifactStates(client, theme, outputPath, viewportWidth) 
   return state;
 }
 
+async function exerciseTextCodeShare(client, theme, outputPath, viewportWidth) {
+  await navigate(client, `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=text-code-share`);
+  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  const themeReload = client.waitForEvent('Page.loadEventFired');
+  await runtimeEvaluate(
+    client,
+    `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
+  );
+  await themeReload;
+  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(
+    client,
+    '(() => { const scroll = document.querySelector(".transcript-scroll"); if (scroll !== null) { scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); } return document.querySelectorAll(".file-preview-card .artifact-card").length >= 3; })()',
+  );
+  await runtimeEvaluate(
+    client,
+    'document.querySelectorAll(".file-preview-card .artifact-card")[0]?.click()',
+  );
+  await waitForPage(client, 'document.querySelector(".artifact-text-preview") !== null');
+
+  const textState = await runtimeEvaluate(
+    client,
+    `(() => {
+      const root = document.documentElement;
+      const text = document.querySelector('.artifact-text-preview');
+      return {
+        selectable: text !== null && getComputedStyle(text).userSelect !== 'none',
+        find: document.querySelector('[type="search"]') !== null,
+        wrap: [...document.querySelectorAll('button')].some((button) => button.textContent?.includes('Wrap')),
+        share: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Share'),
+        shareCapability: typeof navigator.share === 'function',
+        clientWidth: root.clientWidth,
+        scrollWidth: root.scrollWidth,
+      };
+    })()`,
+  );
+  if (!textState.selectable || !textState.find || !textState.wrap) {
+    throw new Error('Text fixture did not expose selectable text and usable Find/Wrap controls.');
+  }
+  if (textState.share !== textState.shareCapability) {
+    throw new Error('Share visibility did not follow the browser capability gate.');
+  }
+  if (textState.clientWidth !== viewportWidth || textState.scrollWidth > textState.clientWidth) {
+    throw new Error(
+      `Horizontal overflow at ${viewportWidth}px: client=${textState.clientWidth}, scroll=${textState.scrollWidth}`,
+    );
+  }
+  await runtimeEvaluate(
+    client,
+    `document.querySelector('[aria-label="Close notes.txt viewer"]')?.click()`,
+  );
+  await waitForPage(client, 'document.querySelector("[role=dialog]") === null');
+  await runtimeEvaluate(
+    client,
+    'document.querySelectorAll(".file-preview-card .artifact-card")[2]?.click()',
+  );
+  await waitForPage(client, 'document.querySelector(".artifact-code-preview") !== null');
+
+  const state = await runtimeEvaluate(
+    client,
+    `(() => {
+      const root = document.documentElement;
+      const source = document.querySelector('.artifact-code-source');
+      const gutter = document.querySelector('.artifact-code-gutter');
+      const visualWidth = window.visualViewport?.width ?? window.innerWidth;
+      return {
+        viewportWidth: Math.round(visualWidth),
+        clientWidth: root.clientWidth,
+        scrollWidth: root.scrollWidth,
+        code: source?.textContent?.includes('exactRevision') === true,
+        selectable: source !== null && getComputedStyle(source).userSelect !== 'none',
+        gutterExcluded: gutter !== null && getComputedStyle(gutter).userSelect === 'none',
+        controls: document.querySelector('[aria-label="Preview controls"]') !== null,
+      };
+    })()`,
+  );
+  if (state.viewportWidth !== viewportWidth) {
+    throw new Error(`Expected ${viewportWidth} CSS-pixel width, got ${state.viewportWidth}`);
+  }
+  if (
+    state.clientWidth !== viewportWidth ||
+    state.scrollWidth > state.clientWidth ||
+    !state.code ||
+    !state.selectable ||
+    !state.gutterExcluded ||
+    !state.controls
+  ) {
+    throw new Error(
+      'Code fixture did not expose selectable code, an excluded gutter, and controls.',
+    );
+  }
+
+  const screenshot = await client.send('Page.captureScreenshot', {
+    format: 'png',
+    fromSurface: true,
+  });
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, Buffer.from(screenshot.data, 'base64'));
+  return state;
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const fixture = requiredOption(options, 'fixture');
   const theme = requiredOption(options, 'theme');
   const output = requiredOption(options, 'output');
   const viewportWidth = Number(requiredOption(options, 'viewport-width'));
-  if (fixture !== 'diff' && fixture !== 'artifact-states') {
+  if (fixture !== 'diff' && fixture !== 'artifact-states' && fixture !== 'text-code-share') {
     throw new Error(`Unsupported fixture: ${fixture}`);
   }
   if (theme !== 'light' && theme !== 'dark') throw new Error(`Unsupported theme: ${theme}`);
@@ -386,7 +487,9 @@ async function main() {
     const state =
       fixture === 'artifact-states'
         ? await exerciseArtifactStates(cdp, theme, outputPath, viewportWidth)
-        : await exerciseFixture(cdp, theme, outputPath, viewportWidth);
+        : fixture === 'text-code-share'
+          ? await exerciseTextCodeShare(cdp, theme, outputPath, viewportWidth)
+          : await exerciseFixture(cdp, theme, outputPath, viewportWidth);
     console.log(
       `CDP passed: ${theme} ${fixture}, ${state.viewportWidth} CSS-pixel width, no horizontal overflow, screenshot ${outputPath}`,
     );

@@ -1,12 +1,12 @@
 # Spec 002 — Handover
 
 > **State:** build in progress. All 10 features are research-complete + build-ready.
-> **Features 001 (`change-model`), 002 (`change-effort`), and 003 (`slash-commands`) are
-> BUILT and merged to `main`** (11 build phases; `main` at `0408c3c`). Features 004–010
-> pending. This packet lives in the app repo (`Mobile CLI`), tracked on `main`.
-> **Resume:** read this file → `build-strategy.md` (the how + model roster — note the live
-> route is Devin + DeepSeek v4 Flash Max dangerous-mode) → the target feature's
-> `research/research.md` + its build sub-phase docs, then build.
+> **Features 001 (`change-model`), 002 (`change-effort`), 003 (`slash-commands`), and 004
+> (`plan-mode-tab`) are BUILT and merged to `main`** (16 build phases; `main` at `51b0685`).
+> Features 005–010 pending. This packet lives in the app repo (`Mobile CLI`), tracked on `main`.
+> **Resume:** read this file → `build-strategy.md` (the how + model roster) → the target
+> feature's `research/research.md` + its build sub-phase docs, then build. Next: `005-file-preview`
+> (establishes the shared viewer shell that `006` and `008` reuse — build it before them).
 
 ---
 
@@ -25,9 +25,10 @@ terminal — **without** weakening the two frozen contracts:
 - **Feature 001 `change-model` — SHIPPED to `main`** (`69c0480`→`3b5546c`): bound-ticket protocol/redaction, RAC model-switcher sheet + state machine, iPhone a11y/visual hardening, demo-fixture sync. Verified: typecheck 0, test 140, test:web 74; light+dark 390px screenshots delivered.
 - **Feature 002 `change-effort` — SHIPPED to `main`** (merged at `84b7433`): typed host snapshot + redacted reconcile, complete runtime state machine + mutation boundary, canonical model+effort sheet with effort radio group, a11y/visual hardening. Verified: typecheck 0, test 147, test:web 176; effort-sheet light+dark 390px screenshots delivered.
 - **Feature 003 `slash-commands` — SHIPPED to `main`** (merged at `0408c3c`): versioned catalog authority + fail-closed slash submission, shared in-memory catalog + pure engine, inline autocomplete surface, explicit-Send integration + PWA hardening. Verified: typecheck 0, **test 168/168**, **test:web 358/358**. Autocomplete screenshots DEFERRED to a batched visual pass (needs a `demo.ts` command-catalog fixture sync; functional rendering proven by 358 DOM tests).
-- **Features 004–010 — build-ready, not started.** Each has synthesized `research.md`, build-ready `spec.md` + `implementation-phases.md`, and numbered build sub-phases. **40 build phases total; 11 done.**
-- **Live build route (see `build-strategy.md` §3 session note):** opencode-go hit its 429 weekly cap and the DeepSeek direct API is 402/no-balance, so the working route is **DeepSeek v4 Flash Max via the Devin CLI, `--permission-mode dangerous --respect-workspace-trust false`** (operator-approved; worktree-isolated). Prefer Luna Max via opencode-go once the weekly limit resets. Claude orchestrates + verifies, never writes app code. Per-feature isolated worktree → verify → merge to `main`.
-- **Known flaky test:** `apps/pi-remote-relay/tests/auth.test.ts` "requires foreground..." intermittently fails on a socket-close race (client-close awaited but server hasn't deregistered the socket → 201 instead of 403). Re-run gives the truth; documented in §7. Not yet fixed.
+- **Feature 004 `plan-mode-tab` — SHIPPED to `main`** (merged at `51b0685`; 5 phases): set_mode/execute_plan protocol + relay authority (independent runtime/plan revisions, idempotency, delivery-unknown, planToken redaction); host default-deny enforcement + structured plan lifecycle + fail-closed execution lease + `/plan` isolation; persistent composer Build/Plan control + `Shift+Tab`/`⌘⇧M`; plan-ready card + review sheet + atomic `execute_plan`; a11y/PWA/cache hardening. Verified: typecheck 0, **test 221/221**, **test:web 459/459**. Screenshots DEFERRED to the batched visual pass.
+- **Features 005–010 — build-ready, not started.** Each has synthesized `research.md`, build-ready `spec.md` + `implementation-phases.md`, and numbered build sub-phases. **40 build phases total; 16 done.** Hard security gates before their Phase 1: `007-media-upload`, `008-inbound-media`, `009-ask-question` (adversarial review).
+- **Live build route (see `build-strategy.md` §3 session note):** quotas rotate. opencode-go's weekly cap RESET (Luna Max via `opencode-go/gpt-5.6-luna --variant max` available again — the preferred route); Devin's daily quota exhausted; DeepSeek direct is 402. Use **Luna Max via opencode-go** while available, fall back to **Devin dangerous-mode** (`devin -p --model deepseek-v4-flash-max --permission-mode dangerous --respect-workspace-trust false`) when opencode-go is capped. Claude orchestrates + verifies, never writes app code.
+- **Known issues (non-blocking):** (1) flaky `apps/pi-remote-relay/tests/auth.test.ts` "requires foreground..." — socket-close race, re-run gives truth, not fixed. (2) **Repo-wide prettier debt: ~685 files unformatted** (all features' external-model-built code + docs + specs markdown were committed un-formatted; `npm run format:check` fails repo-wide). A dedicated `npm run format` + commit pass is recommended as a final cleanup. (3) **Batched screenshots** for features 003+004 pending a `demo.ts` command-catalog + plan-artifact fixture sync (functional rendering proven by DOM tests).
 
 ## 3. Structure
 

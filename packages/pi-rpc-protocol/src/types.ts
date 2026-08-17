@@ -228,6 +228,82 @@ export interface FileDiffBlock extends TranscriptBlockBase {
   readonly patch: string;
 }
 
+export const FILE_PREVIEW_RENDERERS = [
+  'image',
+  'pdf',
+  'text',
+  'code',
+  'diff',
+  'unsupported',
+] as const;
+export type FilePreviewRenderer = (typeof FILE_PREVIEW_RENDERERS)[number];
+
+export const FILE_PREVIEW_REDACTION_STATES = ['not-needed', 'applied', 'withheld'] as const;
+export type FilePreviewRedaction = (typeof FILE_PREVIEW_REDACTION_STATES)[number];
+
+export const FILE_PREVIEW_COMPLETENESS_STATES = ['complete', 'excerpt'] as const;
+export type FilePreviewCompleteness = (typeof FILE_PREVIEW_COMPLETENESS_STATES)[number];
+
+export const FILE_PREVIEW_AVAILABILITIES = [
+  'ready',
+  'withheld',
+  'missing',
+  'denied',
+  'unsupported',
+] as const;
+export type FilePreviewAvailability = (typeof FILE_PREVIEW_AVAILABILITIES)[number];
+
+export interface FilePreviewInlineText extends JsonObject {
+  readonly kind: 'inline-text';
+  readonly text: string;
+  readonly firstLine?: number;
+}
+
+export interface FilePreviewArtifactReference extends JsonObject {
+  readonly kind: 'artifact-ref';
+}
+
+export interface FilePreviewNoContent extends JsonObject {
+  readonly kind: 'none';
+}
+
+export type FilePreviewContent =
+  | FilePreviewInlineText
+  | FilePreviewArtifactReference
+  | FilePreviewNoContent;
+
+/** Relay-authored metadata before transcript ordering fields are attached. */
+export interface FilePreviewDescriptor extends JsonObject {
+  readonly kind: 'file_preview';
+  readonly artifactId: string;
+  /** This is the artifact revision. It is intentionally not a numeric block revision. */
+  readonly revision: string;
+  readonly displayName: string;
+  readonly renderer: FilePreviewRenderer;
+  readonly mimeType: string;
+  readonly byteLength: number | null;
+  readonly digest: string;
+  readonly language?: string;
+  readonly pageCount?: number;
+  readonly altText?: string;
+  readonly redaction: FilePreviewRedaction;
+  readonly completeness: FilePreviewCompleteness;
+  readonly shareAllowed: boolean;
+  readonly textLayerSafe?: boolean;
+  readonly thumbnailRef?: string;
+  /** Optional for wire compatibility with the original descriptor shape. */
+  readonly availability?: FilePreviewAvailability;
+  readonly content: FilePreviewContent;
+}
+
+/** A transcript-ordered relay artifact descriptor with a string artifact revision. */
+export interface FilePreviewBlock extends FilePreviewDescriptor {
+  readonly id: string;
+  readonly revision: string;
+  readonly seq: number;
+  readonly occurredAt: string;
+}
+
 export interface UsageBlock extends TranscriptBlockBase {
   readonly kind: 'usage';
   readonly inputTokens: number;
@@ -242,6 +318,7 @@ export type TranscriptBlock =
   | ToolCallBlock
   | ToolResultBlock
   | FileDiffBlock
+  | FilePreviewBlock
   | UsageBlock;
 
 export interface TranscriptPageDto {

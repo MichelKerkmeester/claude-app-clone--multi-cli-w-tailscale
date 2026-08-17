@@ -43,6 +43,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  if (isArtifactRequest(url)) {
+    // Artifact bytes are authenticated, revision-specific data. They must never
+    // become durable shell or runtime cache entries.
+    event.respondWith(fetchWithoutBrowserCache(request));
+    return;
+  }
+
   if (!isShellRequest(url)) {
     event.respondWith(fetchWithoutBrowserCache(request));
     return;
@@ -69,6 +76,10 @@ function isShellRequest(url) {
     url.pathname.startsWith('/assets/') ||
     url.pathname.startsWith('/fonts/')
   );
+}
+
+function isArtifactRequest(url) {
+  return /^\/api\/sessions\/[^/]+\/artifacts\/[^/]+\/revisions\/[^/]+$/.test(url.pathname);
 }
 
 function fetchWithoutBrowserCache(request) {

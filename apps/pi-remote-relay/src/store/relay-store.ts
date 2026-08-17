@@ -15,6 +15,14 @@ import type {
   TranscriptPageDto,
 } from '@pi-remote/pi-rpc-protocol';
 
+import {
+  ArtifactStore,
+  type ArtifactIdentity,
+  type ArtifactRange,
+  type ArtifactRead,
+  type PutArtifactInput,
+  type StoredArtifact,
+} from './artifact-store.js';
 import { MigrationRunner } from './migrations.js';
 import { isControlPlaneProjection, redactEnvelope } from './redaction.js';
 
@@ -66,6 +74,7 @@ export interface SyncPlan {
 export class RelayStore {
   private readonly database: Database.Database;
   private readonly retentionEvents: number;
+  public readonly artifactStore: ArtifactStore;
 
   public constructor(options: RelayStoreOptions = {}) {
     this.database = new Database(options.filename ?? ':memory:');
@@ -74,6 +83,7 @@ export class RelayStore {
     const migrationDirectory =
       options.migrationDirectory ?? fileURLToPath(new URL('../../migrations/', import.meta.url));
     new MigrationRunner(this.database, migrationDirectory).migrateUp();
+    this.artifactStore = new ArtifactStore(this.database);
     this.retentionEvents = Math.min(
       Math.max(options.retentionEvents ?? DEFAULT_RETENTION_EVENTS, 1),
       MAX_RETENTION_EVENTS,
@@ -351,6 +361,20 @@ export class RelayStore {
   /** Share the migrated database with tightly coupled transactional services. */
   public databaseHandle(): Database.Database {
     return this.database;
+  }
+
+  /** Store one already-sanitized immutable artifact inside the relay database boundary. */
+  public putArtifact(input: PutArtifactInput): StoredArtifact {
+    return this.artifactStore.putArtifact(input);
+  }
+
+  /** Read one exact artifact identity without exposing it through transcript pages. */
+  public readArtifact(
+    identity: ArtifactIdentity,
+    range: ArtifactRange | null = null,
+    now?: number,
+  ): ArtifactRead | null {
+    return this.artifactStore.readArtifact(identity, range, now);
   }
 
   /** Report the current epoch without exposing any stored session content. */

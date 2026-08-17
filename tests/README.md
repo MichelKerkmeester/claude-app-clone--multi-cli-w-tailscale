@@ -39,7 +39,7 @@ Current state:
 `rollback-drill.test.ts` asserts the drill report:
 
 - `status` is PASS and `mutationDisabled` is true
-- `restoredMigrationVersion` is 4
+- `restoredMigrationVersion` is 5
 - `relaySessionsPreserved` and `indeterminateRowsPreserved` are 1
 - `nativeSessionSentinelPreserved` is true
 - `drainedApprovalRows` is at least 1

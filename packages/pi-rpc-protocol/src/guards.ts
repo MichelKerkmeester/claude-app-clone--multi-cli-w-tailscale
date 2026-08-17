@@ -27,6 +27,13 @@ import type {
   EnrollmentQr,
   EnrollmentResponse,
   Envelope,
+  FilePreviewAvailability,
+  FilePreviewBlock,
+  FilePreviewCompleteness,
+  FilePreviewContent,
+  FilePreviewDescriptor,
+  FilePreviewRedaction,
+  FilePreviewRenderer,
   JsonValue,
   PiRpcCommand,
   PiRpcEvent,
@@ -73,6 +80,10 @@ import {
   MODEL_AVAILABILITIES,
   MODEL_AVAILABILITY_REASON_CODES,
   MODEL_INPUT_KINDS,
+  FILE_PREVIEW_AVAILABILITIES,
+  FILE_PREVIEW_COMPLETENESS_STATES,
+  FILE_PREVIEW_REDACTION_STATES,
+  FILE_PREVIEW_RENDERERS,
   PLAN_CONTROL_REASON_CODES,
   PLAN_VALIDITY_VALUES,
   RUNTIME_CONTROL_REASON_CODES,
@@ -122,7 +133,21 @@ const RPC_EVENT_TYPES = new Set<PiRpcEventType>([
 
 const OPAQUE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{2,127}$/;
 const OPAQUE_TOKEN_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{15,255}$/;
+const OPAQUE_ARTIFACT_REVISION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const ATTENTION_CLASSES = new Set<AttentionClass>(['needs_input', 'finished', 'error']);
+const FILE_PREVIEW_RENDERER_SET = new Set<FilePreviewRenderer>(FILE_PREVIEW_RENDERERS);
+const FILE_PREVIEW_REDACTION_SET = new Set<FilePreviewRedaction>(FILE_PREVIEW_REDACTION_STATES);
+const FILE_PREVIEW_COMPLETENESS_SET = new Set<FilePreviewCompleteness>(
+  FILE_PREVIEW_COMPLETENESS_STATES,
+);
+const FILE_PREVIEW_AVAILABILITY_SET = new Set<FilePreviewAvailability>(FILE_PREVIEW_AVAILABILITIES);
+const FILE_PREVIEW_MAX_BYTES = 50 * 1024 * 1024;
+const FILE_PREVIEW_MAX_INLINE_TEXT = 256 * 1024;
+const FILE_PREVIEW_MAX_DISPLAY_NAME = 200;
+const FILE_PREVIEW_MAX_MIME_TYPE = 127;
+const FILE_PREVIEW_MAX_LANGUAGE = 64;
+const FILE_PREVIEW_MAX_ALT_TEXT = 500;
+const FILE_PREVIEW_MAX_THUMBNAIL_REF = 200;
 
 /** Return whether a value can be serialized as JSON without coercion. */
 export function isJsonValue(value: unknown): value is JsonValue {
@@ -409,6 +434,9 @@ export function isSessionCardDto(value: unknown): value is SessionCardDto {
 
 /** Narrow an unknown value to one authoritative transcript block. */
 export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
+  if (isRecord(value) && value.kind === 'file_preview') {
+    return isFilePreviewBlock(value);
+  }
   if (!isTranscriptBase(value)) {
     return false;
   }
@@ -430,9 +458,11 @@ export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
         typeof value.output === 'string' &&
         typeof value.isError === 'boolean'
       );
-    case 'file_diff':
-      return typeof value.summary === 'string' && typeof value.patch === 'string';
-    case 'usage':
+      case 'file_diff':
+        return typeof value.summary === 'string' && typeof value.patch === 'string';
+      case 'file_preview':
+        return false;
+      case 'usage':
       return (
         isNonNegativeNumber(value.inputTokens) &&
         isNonNegativeNumber(value.outputTokens) &&
@@ -456,6 +486,175 @@ export function isTranscriptPageDto(value: unknown): value is TranscriptPageDto 
     Number.isSafeInteger(value.coversThrough) &&
     value.coversThrough >= 0
   );
+}
+
+/** Narrow a relay-authored, exact-revision file preview descriptor. */
+export function isFilePreviewDescriptor(value: unknown): value is FilePreviewDescriptor {
+  if (
+    !isRecord(value) ||
+    !hasRequiredAndOptionalKeys(
+      value,
+      [
+        'kind',
+        'artifactId',
+        'revision',
+        'displayName',
+        'renderer',
+        'mimeType',
+        'byteLength',
+        'digest',
+        'redaction',
+        'completeness',
+        'shareAllowed',
+        'content',
+      ],
+      [
+        'language',
+        'pageCount',
+        'altText',
+        'textLayerSafe',
+        'thumbnailRef',
+        'availability',
+        'id',
+        'seq',
+        'occurredAt',
+      ],
+    ) ||
+    value.kind !== 'file_preview' ||
+    !isOpaqueId(value.artifactId) ||
+    !isArtifactRevision(value.revision) ||
+    !isSafeFileDisplayName(value.displayName, FILE_PREVIEW_MAX_DISPLAY_NAME) ||
+    typeof value.renderer !== 'string' ||
+    !FILE_PREVIEW_RENDERER_SET.has(value.renderer as FilePreviewRenderer) ||
+    !isSafeMimeType(value.mimeType) ||
+    !isBoundedArtifactByteLength(value.byteLength) ||
+    typeof value.digest !== 'string' ||
+    !DIGEST_PATTERN.test(value.digest) ||
+    typeof value.redaction !== 'string' ||
+    !FILE_PREVIEW_REDACTION_SET.has(value.redaction as FilePreviewRedaction) ||
+    typeof value.completeness !== 'string' ||
+    !FILE_PREVIEW_COMPLETENESS_SET.has(value.completeness as FilePreviewCompleteness) ||
+    typeof value.shareAllowed !== 'boolean' ||
+    (value.language !== undefined && !isPathFreeToken(value.language, FILE_PREVIEW_MAX_LANGUAGE)) ||
+    (value.pageCount !== undefined && !isBoundedPageCount(value.pageCount)) ||
+    (value.altText !== undefined && !isSafeDisplayString(value.altText, FILE_PREVIEW_MAX_ALT_TEXT)) ||
+    (value.textLayerSafe !== undefined && typeof value.textLayerSafe !== 'boolean') ||
+    (value.thumbnailRef !== undefined &&
+      !isPathFreeToken(value.thumbnailRef, FILE_PREVIEW_MAX_THUMBNAIL_REF)) ||
+    (value.availability !== undefined &&
+      (typeof value.availability !== 'string' ||
+        !FILE_PREVIEW_AVAILABILITY_SET.has(value.availability as FilePreviewAvailability)))
+  ) {
+    return false;
+  }
+
+  return (
+    isFilePreviewContent(value.content) &&
+    isValidFilePreviewCombination(value as unknown as FilePreviewDescriptor)
+  );
+}
+
+/** Narrow a transcript-ordered file preview, including opaque block identity. */
+export function isFilePreviewBlock(value: unknown): value is FilePreviewBlock {
+  return (
+    isRecord(value) &&
+    isFilePreviewDescriptor(value) &&
+    isOpaqueId(value.id) &&
+    isArtifactRevision(value.revision) &&
+    isPositiveInteger(value.seq) &&
+    isTimestamp(value.occurredAt)
+  );
+}
+
+function isFilePreviewContent(value: unknown): value is FilePreviewContent {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['kind', 'text', 'firstLine']) && value.kind === 'inline-text') {
+    return false;
+  }
+  if (value.kind === 'none' || value.kind === 'artifact-ref') {
+    return hasOnlyKeys(value, ['kind']);
+  }
+  return (
+    value.kind === 'inline-text' &&
+    hasRequiredAndOptionalKeys(value, ['kind', 'text'], ['firstLine']) &&
+    isBoundedString(value.text, FILE_PREVIEW_MAX_INLINE_TEXT) &&
+    (value.firstLine === undefined || isBoundedPositiveInteger(value.firstLine))
+  );
+}
+
+function isValidFilePreviewCombination(value: FilePreviewDescriptor): boolean {
+  const availability = value.availability ?? inferAvailability(value);
+  if (!isMimeCompatibleWithRenderer(value.mimeType, value.renderer)) return false;
+  if (value.renderer === 'unsupported' && availability !== 'unsupported') return false;
+  if (value.renderer !== 'pdf' && value.pageCount !== undefined) return false;
+  if (value.renderer !== 'pdf' && value.textLayerSafe !== undefined) return false;
+  if (value.redaction === 'withheld' && availability === 'ready') return false;
+  if (availability === 'ready') {
+    if (value.content.kind === 'none' || value.renderer === 'unsupported') return false;
+    if (value.content.kind === 'inline-text' && !['text', 'code', 'diff'].includes(value.renderer)) {
+      return false;
+    }
+    return true;
+  }
+  return value.content.kind === 'none' && !value.shareAllowed;
+}
+
+function inferAvailability(value: FilePreviewDescriptor): FilePreviewAvailability {
+  if (value.renderer === 'unsupported') return 'unsupported';
+  if (value.content.kind !== 'none') return 'ready';
+  return value.redaction === 'withheld' ? 'withheld' : 'missing';
+}
+
+function isArtifactRevision(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value !== 'latest' &&
+    value !== '.' &&
+    value !== '..' &&
+    OPAQUE_ARTIFACT_REVISION_PATTERN.test(value)
+  );
+}
+
+function isSafeFileDisplayName(value: unknown, maxLength: number): value is string {
+  return (
+    isSafeDisplayString(value, maxLength) &&
+    value !== '.' &&
+    value !== '..' &&
+    !value.includes('/') &&
+    !value.includes('\\')
+  );
+}
+
+function isSafeMimeType(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value.length > 2 &&
+    value.length <= FILE_PREVIEW_MAX_MIME_TYPE &&
+    /^[a-z0-9][a-z0-9!#$&^_.+-]*\/[a-z0-9][a-z0-9!#$&^_.+-]*$/u.test(value)
+  );
+}
+
+function isMimeCompatibleWithRenderer(mimeType: string, renderer: FilePreviewRenderer): boolean {
+  if (renderer === 'image') return mimeType.startsWith('image/');
+  if (renderer === 'pdf') return mimeType === 'application/pdf';
+  if (renderer === 'unsupported') return true;
+  if (renderer === 'text' || renderer === 'code' || renderer === 'diff') {
+    return (
+      mimeType.startsWith('text/') ||
+      mimeType === 'application/json' ||
+      mimeType === 'application/javascript' ||
+      mimeType === 'application/typescript' ||
+      mimeType === 'application/x-diff'
+    );
+  }
+  return false;
+}
+
+function isBoundedArtifactByteLength(value: unknown): value is number | null {
+  return value === null || (isNonNegativeSafeInteger(value) && value <= FILE_PREVIEW_MAX_BYTES);
+}
+
+function isBoundedPageCount(value: unknown): value is number {
+  return isPositiveInteger(value) && value <= 500;
 }
 
 /** Narrow a value to a bounded single-use enrollment payload. */

@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
+import type { FilePreviewBlock, SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
 import { loadCache, saveCache } from '../src/cache.js';
 import { EMPTY_TRANSCRIPT } from '../src/state.js';
@@ -35,6 +36,25 @@ const ARTIFACT = {
   occurredAt: '2026-01-01T00:00:00.000Z',
 };
 
+const FILE_PREVIEW: FilePreviewBlock = {
+  id: 'block_cache_preview_001',
+  revision: 'rev_cache_001',
+  seq: 2,
+  occurredAt: '2026-01-01T00:00:00.000Z',
+  kind: 'file_preview',
+  artifactId: 'artifact_cache_001',
+  displayName: 'safe.txt',
+  renderer: 'text',
+  mimeType: 'text/plain',
+  byteLength: 18,
+  digest: 'a'.repeat(64),
+  redaction: 'applied',
+  completeness: 'complete',
+  shareAllowed: false,
+  availability: 'ready',
+  content: { kind: 'inline-text', text: 'CACHE_ARTIFACT_SECRET' },
+};
+
 afterEach(() => {
   cleanup();
   localStorage.clear();
@@ -52,6 +72,47 @@ describe('PWA shell and history-only cache boundary', () => {
     expect(SERVICE_WORKER).not.toContain('cache.put(request');
     expect(SERVICE_WORKER).toContain("url.pathname.startsWith('/assets/')");
     expect(SERVICE_WORKER).toContain("url.pathname.startsWith('/fonts/')");
+    expect(SERVICE_WORKER).toContain('function isArtifactRequest');
+  });
+
+  it('fetches exact artifact routes network-only and never opens Cache Storage', async () => {
+    const listeners = new Map<string, (event: unknown) => void>();
+    const cacheOpen = vi.fn();
+    const fetchSpy = vi.fn(async (request: Request) => {
+      expect(request.cache).toBe('no-store');
+      return new Response('safe artifact bytes', { status: 200 });
+    });
+    const context = {
+      Request,
+      URL,
+      Promise,
+      Response,
+      fetch: fetchSpy,
+      caches: { open: cacheOpen, keys: vi.fn(), match: vi.fn(), delete: vi.fn() },
+      self: {
+        location: { origin: 'https://pi-remote.example.test' },
+        addEventListener: (type: string, listener: (event: unknown) => void) => {
+          listeners.set(type, listener);
+        },
+        skipWaiting: vi.fn(),
+        clients: { claim: vi.fn(), matchAll: vi.fn(), openWindow: vi.fn() },
+        registration: { showNotification: vi.fn() },
+      },
+    };
+    runInNewContext(SERVICE_WORKER, context);
+    const event: { readonly request: Request; response?: Promise<Response>; respondWith: (value: Promise<Response>) => void } = {
+      request: new Request(
+        'https://pi-remote.example.test/api/sessions/session_local/artifacts/artifact_001/revisions/rev_001',
+        { method: 'GET' },
+      ),
+      respondWith(value) {
+        this.response = value;
+      },
+    };
+    listeners.get('fetch')?.(event);
+    expect(await event.response).toBeInstanceOf(Response);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(cacheOpen).not.toHaveBeenCalled();
   });
 
   it('does not expose a stale token or authority field from persisted history', () => {
@@ -79,6 +140,21 @@ describe('PWA shell and history-only cache boundary', () => {
       epoch: 'epoch_cache_001',
     });
     expect(localStorage.getItem('pi-remote.read-only.v1')).not.toMatch(/planToken|confirmedMode/u);
+  });
+
+  it('strips inline artifact bodies and exact artifact references before persistence', () => {
+    saveCache([SESSION], {
+      ...EMPTY_TRANSCRIPT,
+      sessionId: SESSION.id,
+      source: 'relay',
+      epoch: 'epoch_cache_001',
+      coversThrough: FILE_PREVIEW.seq,
+      blocks: [FILE_PREVIEW],
+    });
+    const serialized = localStorage.getItem('pi-remote.read-only.v1') ?? '';
+    expect(serialized).not.toContain('CACHE_ARTIFACT_SECRET');
+    expect(serialized).not.toContain(FILE_PREVIEW.artifactId);
+    expect(loadCache()?.transcripts[0]?.blocks).toEqual([]);
   });
 
   it('renders no review control from cached plan history and no Execute without live artifact authority', () => {

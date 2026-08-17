@@ -49,7 +49,11 @@ export function loadCache(): ReadOnlyCache | null {
     const transcripts = value.transcripts
       .map(parseCachedTranscript)
       .filter((item): item is CachedTranscript => item !== null);
-    return { sessions: value.sessions, savedAt: value.savedAt, transcripts };
+    const sanitized: ReadOnlyCache = { sessions: value.sessions, savedAt: value.savedAt, transcripts };
+    if (JSON.stringify(sanitized) !== serialized) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(sanitized));
+    }
+    return sanitized;
   } catch {
     localStorage.removeItem(CACHE_KEY);
     return null;
@@ -67,6 +71,7 @@ export function saveCache(sessions: readonly SessionCardDto[], current: Transcri
           epoch: current.epoch,
           coversThrough: current.coversThrough,
           blocks: current.blocks
+            .filter((block) => block.kind !== 'file_preview')
             .filter((block) => !current.pendingPromptIds.includes(block.id))
             .slice(-MAX_BLOCKS),
           savedAt,
@@ -103,7 +108,9 @@ function parseCachedTranscript(value: unknown): CachedTranscript | null {
     return null;
   const blocks = value.blocks
     .map(parseDisplayBlock)
-    .filter((block): block is DisplayTranscriptBlock => block !== null);
+    .filter(
+      (block): block is DisplayTranscriptBlock => block !== null && block.kind !== 'file_preview',
+    );
   return {
     sessionId: value.sessionId,
     epoch: value.epoch,

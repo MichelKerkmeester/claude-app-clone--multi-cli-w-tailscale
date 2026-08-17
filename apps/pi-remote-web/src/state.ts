@@ -6,6 +6,8 @@ import {
   isOpaqueId,
   isTranscriptBlock,
   type Envelope,
+  type FilePreviewAvailability,
+  type FilePreviewBlock,
   type SessionCardDto,
   type SyncDelta,
   type SyncGap,
@@ -354,6 +356,14 @@ export function parseDisplayBlock(value: unknown): DisplayTranscriptBlock | null
   };
 }
 
+/** Resolve the explicit relay state, with a safe legacy inference for descriptors without it. */
+export function filePreviewAvailability(block: FilePreviewBlock): FilePreviewAvailability {
+  if (block.availability !== undefined) return block.availability;
+  if (block.renderer === 'unsupported') return 'unsupported';
+  if (block.content.kind !== 'none') return 'ready';
+  return block.redaction === 'withheld' ? 'withheld' : 'missing';
+}
+
 function blocksFromEnvelopes(
   envelopes: readonly Envelope[],
   sessionId: string,
@@ -381,15 +391,24 @@ function normalizeBlocks(
   const byId = new Map<string, DisplayTranscriptBlock>();
   for (const block of blocks) {
     const current = byId.get(block.id);
-    if (
-      current === undefined ||
-      block.revision > current.revision ||
-      (block.revision === current.revision && block.seq >= current.seq)
-    ) {
+    if (current === undefined || isLaterBlock(block, current)) {
       byId.set(block.id, block);
     }
   }
   return [...byId.values()].sort((left, right) => left.seq - right.seq);
+}
+
+function isLaterBlock(left: DisplayTranscriptBlock, right: DisplayTranscriptBlock): boolean {
+  if (typeof left.revision === 'number' && typeof right.revision === 'number') {
+    return (
+      left.revision > right.revision ||
+      (left.revision === right.revision && left.seq >= right.seq)
+    );
+  }
+  if (typeof left.revision === 'string' && typeof right.revision === 'string') {
+    return left.revision === right.revision ? left.seq >= right.seq : left.seq >= right.seq;
+  }
+  return left.seq >= right.seq;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

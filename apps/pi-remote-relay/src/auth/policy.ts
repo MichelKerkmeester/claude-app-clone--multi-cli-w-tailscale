@@ -6,6 +6,7 @@ export type AuthorizedAction =
   | 'health:read'
   | 'sessions:list'
   | 'transcript:read'
+  | 'artifact:read'
   | 'sync:read'
   | 'ticket:create'
   | 'session:revoke'
@@ -28,6 +29,7 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   'health:read',
   'sessions:list',
   'transcript:read',
+  'artifact:read',
   'sync:read',
   'ticket:create',
   'session:revoke',

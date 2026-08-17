@@ -7,6 +7,8 @@ import {
   isOpaqueId,
   type ApprovalCardDto,
   type AttentionItemDto,
+  type FileDiffBlock,
+  type FilePreviewBlock,
   type PushPreferences,
   type SessionCardDto,
   type SyncMessage,
@@ -64,6 +66,7 @@ import {
 import {
   EMPTY_TRANSCRIPT,
   connectionReducer,
+  filePreviewAvailability,
   sessionListReducer,
   transcriptReducer,
   type ConnectionAction,
@@ -1770,6 +1773,10 @@ function Block({
       label = 'File diff';
       content = <ArtifactCard block={block} />;
       break;
+    case 'file_preview':
+      label = 'File preview';
+      content = <FilePreviewCard block={block} />;
+      break;
     case 'usage':
       label = 'Usage';
       content = (
@@ -1803,6 +1810,7 @@ function Block({
   // already inside an Activity disclosure: show its label and render content directly.
   const showHeader =
     block.kind !== 'file_diff' &&
+    block.kind !== 'file_preview' &&
     (bare ? block.kind !== 'text' : block.kind !== 'text' && !collapsible);
   const renderAsDisclosure = collapsible && !bare;
   return (
@@ -1824,6 +1832,40 @@ function Block({
         <AssistantActions text={block.text} />
       )}
     </article>
+  );
+}
+
+function FilePreviewCard({ block }: { readonly block: FilePreviewBlock }) {
+  const availability = filePreviewAvailability(block);
+  const stateLabel = {
+    ready: 'Ready',
+    withheld: 'Withheld',
+    missing: 'Missing',
+    denied: 'Denied',
+    unsupported: 'Unsupported',
+  }[availability];
+  const metadata = [
+    `${stateLabel} preview`,
+    `${block.renderer} · ${block.mimeType}`,
+    `Revision ${block.revision}`,
+    block.byteLength === null ? 'Size unavailable' : `${formatArtifactSize(block.byteLength)}`,
+    block.redaction === 'withheld' ? 'Relay withheld content' : 'Relay metadata only',
+  ].join('\n');
+  // The Phase 1 viewer accepts a diff-shaped source. This adapter carries only safe metadata;
+  // the string artifact revision is never coerced into the viewer's numeric block revision.
+  const viewerBlock: FileDiffBlock = {
+    id: block.id,
+    revision: 1,
+    seq: block.seq,
+    occurredAt: block.occurredAt,
+    kind: 'file_diff',
+    summary: `${block.displayName} · ${stateLabel}`,
+    patch: metadata,
+  };
+  return (
+    <div className="file-preview-card" data-preview-state={availability}>
+      <ArtifactCard block={viewerBlock} />
+    </div>
   );
 }
 
@@ -1968,6 +2010,7 @@ function blockLabel(block: DisplayTranscriptBlock): string {
     tool_call: 'Tool call',
     tool_result: 'Tool result',
     file_diff: 'File diff',
+    file_preview: 'File preview',
     usage: 'Usage',
     unknown: 'Unsupported',
   };
@@ -2012,6 +2055,12 @@ function formatNumber(value: number): string {
 
 function formatCost(value: number): string {
   return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(value);
+}
+
+function formatArtifactSize(value: number): string {
+  if (value < 1_024) return `${value} B`;
+  if (value < 1_024 * 1_024) return `${Math.round(value / 1_024)} KB`;
+  return `${(value / (1_024 * 1_024)).toFixed(1)} MB`;
 }
 
 function messageFrom(error: unknown): string {

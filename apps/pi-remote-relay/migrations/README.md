@@ -13,7 +13,7 @@ trigger_phrases:
 
 ## 1. OVERVIEW
 
-`migrations/` holds four numbered SQL migration pairs. Each pair is `NNN-name.up.sql` and `NNN-name.down.sql`. `MigrationRunner` in `src/store/migrations.ts` applies pending up migrations in numeric order, one transaction each, and reverses the latest applied migration with the matching down file. Applied versions are recorded in the `schema_migrations` table, so the runner never re-applies a version.
+`migrations/` holds five numbered SQL migration pairs. Each pair is `NNN-name.up.sql` and `NNN-name.down.sql`. `MigrationRunner` in `src/store/migrations.ts` applies pending up migrations in numeric order, one transaction each, and reverses the latest applied migration with the matching down file. Applied versions are recorded in the `schema_migrations` table, so the runner never re-applies a version.
 
 Current state:
 
@@ -101,7 +101,7 @@ Run from the Pi Remote root. Expected result: `tests/store.test.ts` and `tests/k
 npm run rollback:drill
 ```
 
-Expected result: the drill reports `PASS` with `restoredMigrationVersion` equal to 4.
+Expected result: the drill reports `PASS` with `restoredMigrationVersion` equal to 5.
 
 ---
 

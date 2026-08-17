@@ -7,6 +7,7 @@ import {
   isApprovalCardDto,
   isApprovalDecisionResponse,
   isCommandCatalogDto,
+  isFilePreviewBlock,
   isOpaqueId,
   isOpaqueToken,
   isPlanControlResponse,
@@ -28,6 +29,7 @@ import {
   type CommandBindingDto,
   type CommandCatalogDto,
   type ExecutePlanCommand,
+  type FilePreviewBlock,
   type PlanControlOutcome,
   type PlanControlResponse,
   type PromptAbortResponse,
@@ -52,7 +54,7 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { establishSession } from './auth.js';
-import { demoPostJson, demoSocket, isDemoMode } from './demo.js';
+import { demoArtifactBytes, demoPostJson, demoSocket, isDemoMode } from './demo.js';
 
 const PAGE_LIMIT = 100;
 const MAX_PAGES = 100;
@@ -60,6 +62,7 @@ const MAX_PAGES = 100;
 // Retry metadata is bounded before it can reach UI state: only integer
 // delta-seconds are accepted, and any delay beyond the cap is clamped.
 const MAX_RETRY_AFTER_MS = 60_000;
+const MAX_ARTIFACT_BYTES = 50 * 1024 * 1024;
 
 export class RelayRequestError extends Error {
   readonly code: 'access_denied' | 'request_failed';
@@ -76,6 +79,25 @@ export class RelayRequestError extends Error {
     this.code = code;
     this.status = status;
     this.retryAfterMs = retryAfterMs;
+  }
+}
+
+export type ArtifactReadErrorCode =
+  | 'unavailable'
+  | 'invalid-response'
+  | 'revision-conflict'
+  | 'too-large'
+  | 'digest-mismatch';
+
+export class ArtifactReadError extends Error {
+  readonly code: ArtifactReadErrorCode;
+  readonly status: number | null;
+
+  constructor(code: ArtifactReadErrorCode, status: number | null = null) {
+    super('Artifact preview is not available.');
+    this.name = 'ArtifactReadError';
+    this.code = code;
+    this.status = status;
   }
 }
 
@@ -143,6 +165,14 @@ export function parseBoundedRetryAfter(value: string | null): number | null {
 export interface TranscriptLoad {
   readonly items: readonly TranscriptBlock[];
   readonly coversThrough: number;
+}
+
+export interface ArtifactResource {
+  readonly bytes: Uint8Array;
+  readonly contentType: string;
+  readonly revision: string;
+  readonly etag: string;
+  readonly digest: string;
 }
 
 /** The opaque binding is accepted only into the live runtime object. */
@@ -694,6 +724,116 @@ export async function fetchTranscript(
     after = payload.nextSeq;
   }
   throw new Error('Transcript exceeded the bounded page limit.');
+}
+
+/** Read one relay-authored artifact revision without routing bytes through JSON transport. */
+export async function readArtifact(
+  sessionId: string,
+  block: FilePreviewBlock,
+  signal?: AbortSignal,
+): Promise<ArtifactResource> {
+  if (
+    !isOpaqueId(sessionId) ||
+    !isFilePreviewBlock(block) ||
+    (block.availability !== undefined && block.availability !== 'ready') ||
+    block.content.kind !== 'artifact-ref'
+  ) {
+    throw new ArtifactReadError('unavailable');
+  }
+
+  if (isDemoMode()) {
+    const bytes = demoArtifactBytes(block);
+    return validateArtifactBytes(bytes, block);
+  }
+
+  const path = `/api/sessions/${encodeURIComponent(sessionId)}/artifacts/${encodeURIComponent(
+    block.artifactId,
+  )}/revisions/${encodeURIComponent(block.revision)}`;
+  let response: Response;
+  try {
+    response = await fetch(path, {
+      method: 'GET',
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: { accept: block.mimeType },
+      ...(signal === undefined ? {} : { signal }),
+    });
+  } catch (error: unknown) {
+    if (isAbortError(error)) throw error;
+    throw new ArtifactReadError('unavailable');
+  }
+  if (response.status !== 200 || !response.ok) {
+    throw new ArtifactReadError(
+      response.status === 404 || response.status === 410 ? 'unavailable' : 'invalid-response',
+      response.status,
+    );
+  }
+
+  const contentType = response.headers.get('content-type')?.split(';', 1)[0]?.trim() ?? '';
+  const revision = response.headers.get('x-artifact-revision');
+  const etag = response.headers.get('etag');
+  const cacheControl = response.headers.get('cache-control') ?? '';
+  const nosniff = response.headers.get('x-content-type-options');
+  const resourcePolicy = response.headers.get('cross-origin-resource-policy');
+  if (
+    contentType !== block.mimeType ||
+    revision !== block.revision ||
+    etag === null ||
+    etag.startsWith('W/') ||
+    stripEtagQuotes(etag) !== block.digest ||
+    !cacheControl.toLowerCase().includes('no-store') ||
+    nosniff?.toLowerCase() !== 'nosniff' ||
+    resourcePolicy?.toLowerCase() !== 'same-origin'
+  ) {
+    throw new ArtifactReadError('revision-conflict', response.status);
+  }
+  const declaredLength = parseContentLength(response.headers.get('content-length'));
+  if (declaredLength !== null && declaredLength > MAX_ARTIFACT_BYTES) {
+    throw new ArtifactReadError('too-large', response.status);
+  }
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  return validateArtifactBytes(bytes, block, contentType, revision, etag);
+}
+
+export const fetchArtifactRevision = readArtifact;
+export const readArtifactRevision = readArtifact;
+
+async function digestBytes(bytes: Uint8Array): Promise<string> {
+  const subtle = globalThis.crypto?.subtle;
+  if (subtle === undefined) throw new ArtifactReadError('invalid-response');
+  const hash = await subtle.digest('SHA-256', bytes.slice());
+  return [...new Uint8Array(hash)].map((part) => part.toString(16).padStart(2, '0')).join('');
+}
+
+function validateArtifactBytes(
+  bytes: Uint8Array,
+  block: FilePreviewBlock,
+  contentType = block.mimeType,
+  revision = block.revision,
+  etag = `"${block.digest}"`,
+): Promise<ArtifactResource> {
+  if (bytes.byteLength > MAX_ARTIFACT_BYTES) {
+    return Promise.reject(new ArtifactReadError('too-large'));
+  }
+  if (block.byteLength !== null && bytes.byteLength !== block.byteLength) {
+    return Promise.reject(new ArtifactReadError('revision-conflict'));
+  }
+  return digestBytes(bytes).then((digest) => {
+    if (digest !== block.digest || stripEtagQuotes(etag) !== block.digest) {
+      throw new ArtifactReadError('digest-mismatch');
+    }
+    return { bytes, contentType, revision, etag, digest };
+  });
+}
+
+function stripEtagQuotes(value: string): string {
+  return value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value;
+}
+
+function parseContentLength(value: string | null): number | null {
+  if (value === null || !/^\d+$/.test(value)) return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) ? parsed : null;
 }
 
 export async function openSyncSocket(

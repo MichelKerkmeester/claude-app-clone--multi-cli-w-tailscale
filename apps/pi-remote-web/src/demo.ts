@@ -12,12 +12,14 @@
 // the real deployment's authority and redaction are untouched.
 
 import type { DeviceIdentity } from './auth.js';
-import type { AvailableModelDto } from '@pi-remote/pi-rpc-protocol';
+import { sha256, type AvailableModelDto, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 
 // Opaque ids must match the protocol guard pattern ^[A-Za-z0-9][A-Za-z0-9_-]{2,127}$.
 const SESSION_IDLE = 'demo-session-refactor';
 const SESSION_RUNNING = 'demo-session-triage';
 const EPOCH = 'demo-epoch-01';
+const EMPTY_DIGEST = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+const DEMO_READY_TEXT = 'Relay-sanitized preview bytes for a deterministic local fixture.\n';
 
 export const DEMO_DIFF_FIXTURE = Object.freeze({
   sessionId: SESSION_IDLE,
@@ -33,6 +35,15 @@ export const DEMO_DIFF_FIXTURE = Object.freeze({
     ' }',
   ].join('\n'),
   query: '?demo=1&fixture=diff',
+});
+
+export const DEMO_ARTIFACT_STATES_FIXTURE = Object.freeze({
+  query: '?demo=1&fixture=artifact-states',
+  ready: 'ready',
+  withheld: 'withheld',
+  missing: 'missing',
+  denied: 'denied',
+  unsupported: 'unsupported',
 });
 
 let cachedEnabled: boolean | null = null;
@@ -72,6 +83,10 @@ function isoAgo(minutes: number): string {
 
 function base(id: string, seq: number, minutesAgo: number) {
   return { id, revision: 1, seq, occurredAt: isoAgo(minutesAgo) };
+}
+
+function artifactBase(id: string, revision: string, seq: number, minutesAgo: number) {
+  return { id, revision, seq, occurredAt: isoAgo(minutesAgo) };
 }
 
 // A representative completed turn: user request, then the agent's thinking,
@@ -145,6 +160,86 @@ const TRIAGE_BLOCKS = [
   },
 ];
 
+export const DEMO_ARTIFACT_BLOCKS: readonly FilePreviewBlock[] = [
+  {
+    ...artifactBase('blk-artifact-ready', 'rev_ready_001', 8, 5),
+    kind: 'file_preview',
+    artifactId: 'artifact_ready_001',
+    displayName: 'policy.ts',
+    renderer: 'code',
+    mimeType: 'text/typescript',
+    byteLength: new TextEncoder().encode(DEMO_READY_TEXT).byteLength,
+    digest: sha256(DEMO_READY_TEXT),
+    language: 'typescript',
+    redaction: 'not-needed',
+    completeness: 'complete',
+    shareAllowed: false,
+    availability: 'ready',
+    content: { kind: 'artifact-ref' },
+  },
+  {
+    ...artifactBase('blk-artifact-withheld', 'rev_withheld_001', 9, 4),
+    kind: 'file_preview',
+    artifactId: 'artifact_withheld_001',
+    displayName: 'report.pdf',
+    renderer: 'pdf',
+    mimeType: 'application/pdf',
+    byteLength: null,
+    digest: EMPTY_DIGEST,
+    redaction: 'withheld',
+    completeness: 'complete',
+    shareAllowed: false,
+    availability: 'withheld',
+    content: { kind: 'none' },
+  },
+  {
+    ...artifactBase('blk-artifact-missing', 'rev_missing_001', 10, 3),
+    kind: 'file_preview',
+    artifactId: 'artifact_missing_001',
+    displayName: 'settings.json',
+    renderer: 'code',
+    mimeType: 'application/json',
+    byteLength: null,
+    digest: EMPTY_DIGEST,
+    language: 'json',
+    redaction: 'not-needed',
+    completeness: 'complete',
+    shareAllowed: false,
+    availability: 'missing',
+    content: { kind: 'none' },
+  },
+  {
+    ...artifactBase('blk-artifact-denied', 'rev_denied_001', 11, 2),
+    kind: 'file_preview',
+    artifactId: 'artifact_denied_001',
+    displayName: 'secrets.env',
+    renderer: 'text',
+    mimeType: 'text/plain',
+    byteLength: null,
+    digest: EMPTY_DIGEST,
+    redaction: 'withheld',
+    completeness: 'complete',
+    shareAllowed: false,
+    availability: 'denied',
+    content: { kind: 'none' },
+  },
+  {
+    ...artifactBase('blk-artifact-unsupported', 'rev_unsupported_001', 12, 1),
+    kind: 'file_preview',
+    artifactId: 'artifact_unsupported_001',
+    displayName: 'archive.bin',
+    renderer: 'unsupported',
+    mimeType: 'application/octet-stream',
+    byteLength: null,
+    digest: EMPTY_DIGEST,
+    redaction: 'not-needed',
+    completeness: 'complete',
+    shareAllowed: false,
+    availability: 'unsupported',
+    content: { kind: 'none' },
+  },
+];
+
 interface DemoSession {
   readonly id: string;
   readonly status: 'idle' | 'running';
@@ -155,6 +250,27 @@ const SESSIONS: readonly DemoSession[] = [
   { id: SESSION_IDLE, status: 'idle', blocks: REFACTOR_BLOCKS },
   { id: SESSION_RUNNING, status: 'running', blocks: TRIAGE_BLOCKS },
 ];
+
+function fixtureName(): string | null {
+  try {
+    return new URLSearchParams(window.location.search).get('fixture');
+  } catch {
+    return null;
+  }
+}
+
+function isArtifactStatesFixture(): boolean {
+  return fixtureName() === 'artifact-states';
+}
+
+function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
+  const session = SESSIONS.find((candidate) => candidate.id === sessionId);
+  if (session === undefined) return [];
+  if (isArtifactStatesFixture() && sessionId === SESSION_IDLE) {
+    return [...session.blocks, ...DEMO_ARTIFACT_BLOCKS];
+  }
+  return session.blocks;
+}
 
 const DEFAULT_MODEL: AvailableModelDto = {
   provider: 'anthropic',
@@ -407,8 +523,7 @@ export function demoPostJson(path: string, body: unknown): unknown {
   const transcriptMatch = TRANSCRIPT_PATH.exec(path);
   if (transcriptMatch !== null) {
     const sessionId = decodeURIComponent(transcriptMatch[1] ?? '');
-    const session = SESSIONS.find((candidate) => candidate.id === sessionId);
-    const blocks = session?.blocks ?? [];
+    const blocks = blocksFor(sessionId);
     return {
       sessionId,
       items: blocks,
@@ -424,7 +539,7 @@ export function demoPostJson(path: string, body: unknown): unknown {
           id: session.id,
           status: session.status,
           updatedAt: isoAgo(session.status === 'running' ? 1 : 6),
-          messageCount: session.blocks.length,
+          messageCount: blocksFor(session.id).length,
         })),
       };
     case '/api/auth/ticket':
@@ -500,6 +615,13 @@ export function demoPostJson(path: string, body: unknown): unknown {
   }
 }
 
+export function demoArtifactBytes(block: FilePreviewBlock): Uint8Array {
+  if (block.artifactId === 'artifact_ready_001' && block.revision === 'rev_ready_001') {
+    return new TextEncoder().encode(DEMO_READY_TEXT);
+  }
+  return new Uint8Array();
+}
+
 interface FakeSocketListeners {
   [type: string]: Array<(event: unknown) => void>;
 }
@@ -509,8 +631,7 @@ interface FakeSocketListeners {
  * disturbing the transcript already loaded from the fixture page. */
 export function demoSocket(sessionId: string, onMessage: (message: unknown) => void): WebSocket {
   const listeners: FakeSocketListeners = {};
-  const session = SESSIONS.find((candidate) => candidate.id === sessionId);
-  const coversThrough = session?.blocks.length ?? 0;
+  const coversThrough = blocksFor(sessionId).length;
   window.setTimeout(() => {
     onMessage({
       kind: 'sync.delta',

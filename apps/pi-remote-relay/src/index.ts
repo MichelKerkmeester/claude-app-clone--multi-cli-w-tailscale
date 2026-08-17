@@ -19,6 +19,9 @@ import { RpcSupervisor } from './rpc/supervisor.js';
 import { RuntimeService } from './runtime/runtime-service.js';
 import { SessionCatalog } from './sessions/catalog.js';
 import { RelayStore } from './store/relay-store.js';
+import {
+  getAllowlistedArtifactSnapshot,
+} from './store/artifact-sanitizer.js';
 import { TranscriptProjector } from './store/transcript-projector.js';
 
 const HOST_ID = 'host_local';
@@ -77,7 +80,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
           PI_REMOTE_APPROVAL_EPOCH: epoch,
         }
       : null;
-  const transcriptProjector = new TranscriptProjector();
+  const transcriptProjector = new TranscriptProjector(store.artifactStore);
   catalog.register(SESSION_ID, 'idle', 0);
 
   const supervisor = new RpcSupervisor({
@@ -235,7 +238,7 @@ export function publishPiEvent(
     seq: store.nextSequence(identity, epoch),
     occurredAt: new Date().toISOString(),
     causedBy,
-    payload: event as JsonValue,
+    payload: stripArtifactSnapshotSources(event as JsonValue),
     redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
     replay: { eligible: true, snapshotEligible: true },
   };
@@ -244,6 +247,7 @@ export function publishPiEvent(
   for (const block of transcriptProjector.project(event, {
     occurredAt: envelope.occurredAt,
     nextSequence: () => nextProjectedSequence++,
+    sessionId: identity.sessionId,
   })) {
     syncHub.publish({
       ...envelope,
@@ -263,6 +267,24 @@ export function publishPiEvent(
       payload: createAttentionPayload(attentionClass, envelope.seq),
     });
   }
+}
+
+function stripArtifactSnapshotSources(value: JsonValue): JsonValue {
+  if (Array.isArray(value)) return value.map(stripArtifactSnapshotSources);
+  if (value === null || typeof value !== 'object') return value;
+  const source = value as Record<string, JsonValue>;
+  let changed = false;
+  const output: Record<string, JsonValue> = {};
+  for (const [key, child] of Object.entries(source)) {
+    if ((key === 'artifactSnapshot' || key === 'snapshot') && getAllowlistedArtifactSnapshot(child) !== null) {
+      changed = true;
+      continue;
+    }
+    const next = stripArtifactSnapshotSources(child);
+    output[key] = next;
+    changed ||= next !== child;
+  }
+  return changed ? output : value;
 }
 
 function attentionClassFor(event: PiRpcEvent): 'needs_input' | 'finished' | 'error' | null {

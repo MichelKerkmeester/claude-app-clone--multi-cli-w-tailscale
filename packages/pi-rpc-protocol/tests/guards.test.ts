@@ -13,6 +13,7 @@ import {
   isCommandCatalogDto,
   isCommandDescriptorDto,
   isEnrollmentQr,
+  isFilePreviewBlock,
   isApprovalDecisionCommand,
   isEnvelope,
   isExecutePlanCommand,
@@ -171,6 +172,66 @@ describe('protocol guards', () => {
     expect(blocks.every(isTranscriptBlock)).toBe(true);
     expect(isTranscriptBlock({ ...blocks[0], revision: 0 })).toBe(false);
     expect(isTranscriptBlock({ ...common, kind: 'unknown' })).toBe(false);
+  });
+
+  it('accepts exact relay artifact descriptors and rejects unsafe state combinations', () => {
+    const ready = {
+      id: 'block_preview_001',
+      revision: 'rev_001',
+      seq: 8,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'file_preview',
+      artifactId: 'artifact_001',
+      displayName: 'policy.ts',
+      renderer: 'code',
+      mimeType: 'text/typescript',
+      byteLength: 12,
+      digest: 'a'.repeat(64),
+      language: 'typescript',
+      redaction: 'applied',
+      completeness: 'complete',
+      shareAllowed: false,
+      availability: 'ready',
+      content: { kind: 'artifact-ref' },
+    } as const;
+    expect(isFilePreviewBlock(ready)).toBe(true);
+    expect(isTranscriptBlock(ready)).toBe(true);
+    expect(
+      isFilePreviewBlock({
+        ...ready,
+        content: { kind: 'inline-text', text: 'safe text', firstLine: 1 },
+      }),
+    ).toBe(true);
+    expect(
+      isFilePreviewBlock({
+        ...ready,
+        renderer: 'pdf',
+        mimeType: 'application/pdf',
+        byteLength: null,
+        digest: 'b'.repeat(64),
+        redaction: 'withheld',
+        availability: 'withheld',
+        content: { kind: 'none' },
+        pageCount: 1,
+      }),
+    ).toBe(true);
+    expect(isFilePreviewBlock({ ...ready, extra: true })).toBe(false);
+    expect(isFilePreviewBlock({ ...ready, displayName: '/Users/private/policy.ts' })).toBe(false);
+    expect(isFilePreviewBlock({ ...ready, artifactId: '../artifact' })).toBe(false);
+    expect(isFilePreviewBlock({ ...ready, revision: 'latest' })).toBe(false);
+    expect(isFilePreviewBlock({ ...ready, digest: 'A'.repeat(64) })).toBe(false);
+    expect(isFilePreviewBlock({ ...ready, byteLength: 50 * 1024 * 1024 + 1 })).toBe(false);
+    expect(isFilePreviewBlock({ ...ready, renderer: 'image' })).toBe(false);
+    expect(isFilePreviewBlock({ ...ready, redaction: 'withheld' })).toBe(false);
+    expect(isFilePreviewBlock({ ...ready, availability: 'ready', content: { kind: 'none' } })).toBe(
+      false,
+    );
+    expect(
+      isFilePreviewBlock({
+        ...ready,
+        content: { kind: 'inline-text', text: 'safe', firstLine: 0 },
+      }),
+    ).toBe(false);
   });
 
   it('validates exact-origin enrollment payloads and stable proofs', () => {

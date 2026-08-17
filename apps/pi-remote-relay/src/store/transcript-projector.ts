@@ -4,7 +4,15 @@
 
 import { createHash } from 'node:crypto';
 
-import type { JsonValue, PiRpcEvent, TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
+import type {
+  FilePreviewBlock,
+  JsonValue,
+  PiRpcEvent,
+  TranscriptBlock,
+} from '@pi-remote/pi-rpc-protocol';
+
+import type { ArtifactStore } from './artifact-store.js';
+import { getAllowlistedArtifactSnapshot, sanitizeArtifactSnapshot } from './artifact-sanitizer.js';
 
 type TranscriptBlockBody =
   | { readonly kind: 'text'; readonly text: string; readonly role?: 'assistant' | 'user' }
@@ -31,6 +39,7 @@ type TranscriptBlockBody =
 export interface TranscriptProjectionContext {
   readonly occurredAt: string;
   readonly nextSequence: () => number;
+  readonly sessionId?: string;
 }
 
 /** Convert Pi's event stream into typed, revisable transcript blocks. */
@@ -45,6 +54,8 @@ export class TranscriptProjector {
   private turnOrdinal = 0;
   private messageOrdinal = 0;
   private activeMessage: number | null = null;
+
+  public constructor(private readonly artifactStore?: ArtifactStore) {}
 
   public project(
     event: PiRpcEvent,
@@ -217,6 +228,9 @@ export class TranscriptProjector {
         });
     }
 
+    const artifact = this.projectArtifact(event, context);
+    if (artifact !== null) blocks.push(artifact);
+
     if (blocks.length === 0) {
       emit(this.eventKey(event.type), { kind: 'text', text: `Pi event: ${event.type}` });
     }
@@ -356,7 +370,7 @@ export class TranscriptProjector {
     const callId = stringValue(event['toolCallId']) ?? `event_${this.eventOrdinal}`;
     const toolName = stringValue(event['toolName']) ?? 'unknown';
     const key = `tool:${callId}:result`;
-    const output = textFromContent(recordValue(resultValue)?.['content'] ?? resultValue);
+    const output = textFromContent(stripArtifactSnapshotSource(resultValue));
     this.toolResultBuffers.set(key, output);
     emit(key, { kind: 'tool_result', toolName, output, isError });
     this.projectUsage(recordValue(resultValue)?.['usage'], `tool:${callId}:usage`, emit);
@@ -418,6 +432,33 @@ export class TranscriptProjector {
   private eventKey(type: string): string {
     return `event:${this.eventOrdinal}:${type}`;
   }
+
+  private projectArtifact(
+    event: PiRpcEvent,
+    context: TranscriptProjectionContext,
+  ): FilePreviewBlock | null {
+    const sanitized = sanitizeArtifactSnapshot(event);
+    if (sanitized === null) return null;
+    const block: FilePreviewBlock = {
+      ...sanitized.descriptor,
+      id: stableBlockId(`file-preview:${sanitized.descriptor.artifactId}:${sanitized.descriptor.revision}`),
+      revision: sanitized.descriptor.revision,
+      seq: context.nextSequence(),
+      occurredAt: context.occurredAt,
+    };
+    if (sanitized.bytes !== null && this.artifactStore !== undefined && context.sessionId !== undefined) {
+      this.artifactStore.putArtifact({
+        sessionId: context.sessionId,
+        artifactId: block.artifactId,
+        revision: block.revision,
+        descriptor: block,
+        bytes: sanitized.bytes,
+        ...(sanitized.retentionMs === undefined ? {} : { retentionMs: sanitized.retentionMs }),
+        ...(sanitized.expiresAt === undefined ? {} : { expiresAt: sanitized.expiresAt }),
+      });
+    }
+    return block;
+  }
 }
 
 function stableBlockId(key: string): string {
@@ -466,6 +507,23 @@ function textFromContent(value: JsonValue | undefined): string {
       .join('\n');
   }
   return value === undefined ? '' : JSON.stringify(value);
+}
+
+function stripArtifactSnapshotSource(value: JsonValue | undefined): JsonValue | undefined {
+  if (value === undefined || value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) {
+    return value.map((item) => stripArtifactSnapshotSource(item) ?? null);
+  }
+  const record = value as Record<string, JsonValue>;
+  const stripped: Record<string, JsonValue> = {};
+  for (const [key, child] of Object.entries(record)) {
+    if ((key === 'artifactSnapshot' || key === 'snapshot') && getAllowlistedArtifactSnapshot(child) !== null) {
+      continue;
+    } else {
+      stripped[key] = stripArtifactSnapshotSource(child) ?? null;
+    }
+  }
+  return stripped;
 }
 
 function extractPatch(value: JsonValue | undefined): string {

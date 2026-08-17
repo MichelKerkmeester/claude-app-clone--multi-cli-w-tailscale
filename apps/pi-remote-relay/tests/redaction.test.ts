@@ -4,9 +4,18 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { isPlanSnapshotDto, type Envelope, type PlanSnapshotDto } from '@pi-remote/pi-rpc-protocol';
+import {
+  isFilePreviewBlock,
+  isPlanSnapshotDto,
+  type Envelope,
+  type PiRpcEvent,
+  type PlanSnapshotDto,
+} from '@pi-remote/pi-rpc-protocol';
 
+import { publishPiEvent } from '../src/index.js';
+import { SyncHub } from '../src/replay/sync.js';
 import { RelayStore } from '../src/store/relay-store.js';
+import { TranscriptProjector } from '../src/store/transcript-projector.js';
 import {
   isControlPlaneProjection,
   projectPlanSnapshot,
@@ -197,6 +206,67 @@ describe('canonical redaction', () => {
       const serialized = JSON.stringify({ page, replay });
       expect(serialized).not.toContain('Extension requested setStatus');
       expect(serialized).not.toContain('event_control_block');
+    } finally {
+      store.close();
+    }
+  });
+
+  it('publishes a preview only from an explicit approved snapshot and never persists its source bytes', () => {
+    const store = new RelayStore();
+    try {
+      const sync = new SyncHub(store);
+      const approved = {
+        type: 'tool_execution_end',
+        toolCallId: 'call_artifact_001',
+        toolName: 'read',
+        result: {
+          artifactSnapshot: {
+            approved: true,
+            artifactId: 'artifact_redaction_001',
+            revision: 'rev_redaction_001',
+            displayName: 'safe.txt',
+            renderer: 'text',
+            mimeType: 'text/plain',
+            text: 'safe sanitized bytes',
+            redaction: 'applied',
+            completeness: 'complete',
+            shareAllowed: false,
+          },
+        },
+        isError: false,
+      } as unknown as PiRpcEvent;
+      publishPiEvent(store, sync, new TranscriptProjector(store.artifactStore), approved, 'epoch_artifact');
+
+      const page = store.getTranscriptPage({
+        hostId: 'host_local',
+        workspaceRef: 'workspace_default',
+        sessionId: 'session_local',
+      });
+      const preview = page.items.find((item) => item.kind === 'file_preview');
+      expect(preview).toBeDefined();
+      expect(isFilePreviewBlock(preview)).toBe(true);
+      const durable = JSON.stringify({ page, replay: store.createSyncPlan({
+        hostId: 'host_local',
+        workspaceRef: 'workspace_default',
+        sessionId: 'session_local',
+      }) });
+      expect(durable).not.toContain('safe sanitized bytes');
+      expect(durable).not.toContain('artifactSnapshot');
+
+      const unapproved = {
+        type: 'tool_execution_end',
+        toolCallId: 'call_unapproved_001',
+        toolName: 'read',
+        result: { content: [{ type: 'text', text: 'tool output only' }] },
+        isError: false,
+      } as unknown as PiRpcEvent;
+      const blocks = new TranscriptProjector(store.artifactStore).project(unapproved, {
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        nextSequence: () => 99,
+        sessionId: 'session_local',
+      });
+      expect(blocks.some((block) => block.kind === 'file_preview')).toBe(false);
+      expect(blocks.some((block) => block.kind === 'tool_result')).toBe(true);
     } finally {
       store.close();
     }

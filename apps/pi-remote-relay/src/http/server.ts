@@ -47,6 +47,8 @@ const MAX_WS_MESSAGE_BYTES = 65_536;
 const MAX_CONNECTIONS = 32;
 const MAX_CONNECTIONS_PER_DEVICE = 4;
 const MAX_PROMPTS_PER_MINUTE = 20;
+const MAX_ARTIFACT_READS_PER_MINUTE = 60;
+const MAX_ARTIFACT_READ_BYTES = 50 * 1024 * 1024;
 const RUNTIME_RECONCILE_RETRY_AFTER_SECONDS = '1';
 const DEFAULT_PAGE_LIMIT = 50;
 const SESSION_COOKIE = '__Host-pi_remote_session';
@@ -127,6 +129,11 @@ export async function startReadOnlyServer(
     60_000,
     options.now ?? Date.now,
   );
+  const artifactReadLimiter = new FixedWindowRateLimiter(
+    MAX_ARTIFACT_READS_PER_MINUTE,
+    60_000,
+    options.now ?? Date.now,
+  );
   const runtimeControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const runtimeTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
   const runtimeReconcileLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
@@ -146,10 +153,11 @@ export async function startReadOnlyServer(
       response,
       options,
       auth,
-      requestLimiter,
-      enrollmentLimiter,
-      promptLimiter,
-      runtimeTicketLimiter,
+       requestLimiter,
+       enrollmentLimiter,
+       promptLimiter,
+       artifactReadLimiter,
+       runtimeTicketLimiter,
       runtimeControlLimiter,
       runtimeReconcileLimiter,
       planControlLimiter,
@@ -293,6 +301,7 @@ async function handleHttp(
   requestLimiter: FixedWindowRateLimiter,
   enrollmentLimiter: FixedWindowRateLimiter,
   promptLimiter: FixedWindowRateLimiter,
+  artifactReadLimiter: FixedWindowRateLimiter,
   runtimeTicketLimiter: FixedWindowRateLimiter,
   runtimeControlLimiter: FixedWindowRateLimiter,
   runtimeReconcileLimiter: FixedWindowRateLimiter,
@@ -321,7 +330,7 @@ async function handleHttp(
     sendJson(response, 429, { error: 'rate_limited' });
     return;
   }
-  if (request.method !== 'POST') {
+  if (request.method !== 'POST' && parseArtifactRoute(ingress.path) === null) {
     discardRequest(request);
     sendJson(response, 405, { error: 'read_only' });
     return;
@@ -397,6 +406,49 @@ async function handleHttp(
   if (session === null) {
     discardRequest(request);
     sendJson(response, 401, { error: 'unauthorized' });
+    return;
+  }
+
+  const artifactRoute = parseArtifactRoute(ingress.path);
+  if (artifactRoute !== null) {
+    if (request.method !== 'GET' || new URL(request.url ?? '/', 'http://localhost').search.length > 0) {
+      discardRequest(request);
+      sendArtifactFailure(response, 405);
+      return;
+    }
+    if (!artifactReadLimiter.consume(session.deviceId)) {
+      auth.metrics.rateLimited += 1;
+      discardRequest(request);
+      sendArtifactFailure(response, 429);
+      return;
+    }
+    const rangeHeader = singleHeader(request.headers.range);
+    const range = rangeHeader === null ? null : parseArtifactRange(rangeHeader);
+    if (rangeHeader !== null && range === null) {
+      discardRequest(request);
+      sendArtifactFailure(response, 416);
+      return;
+    }
+    discardRequest(request);
+    const artifact = options.store.readArtifact(artifactRoute, range, options.now?.() ?? Date.now());
+    if (artifact === null || artifact.bytes.byteLength > MAX_ARTIFACT_READ_BYTES) {
+      sendArtifactFailure(response, 404);
+      return;
+    }
+    const headers: Record<string, string> = {
+      'content-type': artifact.descriptor.mimeType,
+      'content-length': String(artifact.bytes.byteLength),
+      'cache-control': 'private, no-store, max-age=0',
+      'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+      'cross-origin-resource-policy': 'same-origin',
+      'x-content-type-options': 'nosniff',
+      etag: artifact.etag,
+      'x-artifact-revision': artifact.revision,
+      'accept-ranges': 'bytes',
+    };
+    if (artifact.contentRange !== null) headers['content-range'] = artifact.contentRange;
+    response.writeHead(artifact.contentRange === null ? 200 : 206, headers);
+    response.end(artifact.bytes);
     return;
   }
 
@@ -975,6 +1027,9 @@ function actionForRequest(path: string): string | null {
   if (path === '/api/attention' || path === '/api/attention/open') return 'attention:read';
   if (path.startsWith('/api/push/')) return 'push:manage';
   if (/^\/api\/sessions\/[^/]+\/transcript$/.test(path)) return 'transcript:read';
+  if (/^\/api\/sessions\/[^/]+\/artifacts\/[^/]+\/revisions\/[^/]+$/.test(path)) {
+    return 'artifact:read';
+  }
   if (path === '/api/auth/ticket') return 'ticket:create';
   if (path === '/api/auth/logout') return 'session:revoke';
   if (path === '/api/auth/revoke-device') return 'device:revoke';
@@ -1074,6 +1129,45 @@ function parseSubscribe(serialized: string): SubscribeRequest | null {
   }
 }
 
+interface ArtifactRoute {
+  readonly sessionId: string;
+  readonly artifactId: string;
+  readonly revision: string;
+}
+
+function parseArtifactRoute(path: string): ArtifactRoute | null {
+  const match = /^\/api\/sessions\/([^/]+)\/artifacts\/([^/]+)\/revisions\/([^/]+)$/.exec(path);
+  if (match === null) return null;
+  try {
+    const sessionId = decodeURIComponent(match[1] ?? '');
+    const artifactId = decodeURIComponent(match[2] ?? '');
+    const revision = decodeURIComponent(match[3] ?? '');
+    if (!isOpaqueId(sessionId) || !isOpaqueId(artifactId) || !isArtifactRevision(revision)) {
+      return null;
+    }
+    return { sessionId, artifactId, revision };
+  } catch {
+    return null;
+  }
+}
+
+function parseArtifactRange(value: string): { readonly start: number; readonly end: number } | null {
+  const match = /^bytes=(\d+)-(\d*)$/u.exec(value.trim());
+  if (match === null) return null;
+  const start = Number(match[1]);
+  const endText = match[2] ?? '';
+  const end = endText.length === 0 ? Number.MAX_SAFE_INTEGER : Number(endText);
+  if (
+    !Number.isSafeInteger(start) ||
+    !Number.isSafeInteger(end) ||
+    start < 0 ||
+    end < start
+  ) {
+    return null;
+  }
+  return { start, end };
+}
+
 async function readJsonBody(request: IncomingMessage): Promise<unknown> {
   const serialized = await readBody(request);
   if (serialized.length === 0) throw new Error('Expected a JSON body.');
@@ -1126,6 +1220,15 @@ function sendJson(
   response.end(body);
 }
 
+function sendArtifactFailure(response: ServerResponse, statusCode: number): void {
+  sendJson(
+    response,
+    statusCode,
+    { error: 'artifact_unavailable' },
+    { 'cross-origin-resource-policy': 'same-origin' },
+  );
+}
+
 function rejectUpgrade(
   socket: NodeJS.WritableStream & { destroy: () => void },
   status: number,
@@ -1172,6 +1275,16 @@ function parseInteger(value: unknown, fallback: number, minimum: number): number
 
 function isSafeNonNegativeInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}
+
+function isArtifactRevision(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value !== 'latest' &&
+    value !== '.' &&
+    value !== '..' &&
+    /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(value)
+  );
 }
 
 function countDeviceSockets(sockets: ReadonlySet<ActiveSocket>, deviceId: string): number {

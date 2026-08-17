@@ -20,6 +20,7 @@ import {
   isRuntimeModelTicketResponse,
   isRuntimeSnapshotDto,
   isRuntimeStateDto,
+  isRichTranscriptBlock,
   isSessionCardDto,
   isPromptSubmitResponse,
   isSlashSubmitIssueResponse,
@@ -215,9 +216,14 @@ export function parseBoundedRetryAfter(value: string | null): number | null {
 }
 
 export interface TranscriptLoad {
-  readonly items: readonly TranscriptBlock[];
+  readonly items: readonly RelayTranscriptBlock[];
   readonly coversThrough: number;
 }
+
+export type RelayTranscriptBlock = TranscriptBlock & {
+  readonly provenance: 'relay';
+  readonly richEligible: boolean;
+};
 
 export interface ArtifactResource {
   readonly bytes: Uint8Array;
@@ -761,7 +767,7 @@ export async function fetchTranscript(
   sessionId: string,
   signal: AbortSignal,
 ): Promise<TranscriptLoad> {
-  const items: TranscriptBlock[] = [];
+  const items: RelayTranscriptBlock[] = [];
   let after = 0;
   for (let pageNumber = 0; pageNumber < MAX_PAGES; pageNumber += 1) {
     const payload = await postJson(
@@ -772,11 +778,19 @@ export async function fetchTranscript(
     if (!isTranscriptPageDto(payload) || payload.sessionId !== sessionId) {
       throw new Error('Relay returned an invalid transcript page.');
     }
-    items.push(...payload.items);
+    items.push(...payload.items.map(annotateRelayBlock));
     if (payload.nextSeq === null) return { items, coversThrough: payload.coversThrough };
     after = payload.nextSeq;
   }
   throw new Error('Transcript exceeded the bounded page limit.');
+}
+
+function annotateRelayBlock(block: TranscriptBlock): RelayTranscriptBlock {
+  return {
+    ...block,
+    provenance: 'relay',
+    richEligible: isRichTranscriptBlock(block),
+  };
 }
 
 /** Read one relay-authored artifact revision without routing bytes through JSON transport. */

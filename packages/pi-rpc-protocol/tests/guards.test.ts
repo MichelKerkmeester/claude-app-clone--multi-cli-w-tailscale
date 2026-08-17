@@ -31,6 +31,10 @@ import {
   isPromptAbortResponse,
   isPromptSubmitCommand,
   isPromptSubmitResponse,
+  isRedactionMetadata,
+  isRichToolCallBlock,
+  isRichToolResultBlock,
+  isRichTranscriptBlock,
   isRuntimeControlCommand,
   isRuntimeControlResponse,
   isRuntimeIssueCode,
@@ -47,6 +51,7 @@ import {
   isSlashSubmitIssueResponse,
   isSyncMessage,
   isTranscriptBlock,
+  isTextArtifactBlock,
   PLAN_CONTROL_REASON_CODES,
   PLAN_VALIDITY_VALUES,
   RUNTIME_ISSUE_CODES,
@@ -172,6 +177,104 @@ describe('protocol guards', () => {
     expect(blocks.every(isTranscriptBlock)).toBe(true);
     expect(isTranscriptBlock({ ...blocks[0], revision: 0 })).toBe(false);
     expect(isTranscriptBlock({ ...common, kind: 'unknown' })).toBe(false);
+  });
+
+  it('guards rich identity, lifecycle, completeness, artifacts and redaction provenance', () => {
+    const redaction = { policyVersion: 1, fieldsRedacted: 2, reasons: ['path', 'secret'] };
+    const call = {
+      id: 'block_call_rich',
+      revision: 3,
+      seq: 3,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'tool_call',
+      toolName: 'bash',
+      inputSummary: 'printf safe',
+      callId: 'call_rich_001',
+      shellKind: 'bash',
+      lifecycle: 'running',
+      terminalCheckpoint: 'streaming',
+      redaction,
+    } as const;
+    const result = {
+      id: 'block_result_rich',
+      revision: 4,
+      seq: 4,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'tool_result',
+      toolName: 'bash',
+      output: 'safe output',
+      isError: false,
+      callId: 'call_rich_001',
+      shellKind: 'bash',
+      lifecycle: 'completed',
+      terminalCheckpoint: 'terminal',
+      outputCompleteness: 'complete',
+      redaction,
+    } as const;
+    const artifact = {
+      id: 'block_artifact_rich',
+      revision: 1,
+      seq: 5,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'text_artifact',
+      label: 'goal',
+      source: 'Ship the safe goal.',
+      redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+    } as const;
+
+    expect(isRichToolCallBlock(call)).toBe(true);
+    expect(isRichToolResultBlock(result)).toBe(true);
+    expect(isTextArtifactBlock(artifact)).toBe(true);
+    expect(isRichTranscriptBlock(call)).toBe(true);
+    expect(isTranscriptBlock(artifact)).toBe(true);
+    expect(isRedactionMetadata(redaction)).toBe(true);
+
+    expect(isTranscriptBlock({ ...call, callId: 'bad/id' })).toBe(false);
+    expect(isTranscriptBlock({ ...call, lifecycle: 'future' })).toBe(false);
+    expect(isTranscriptBlock({ ...result, outputCompleteness: 'partial' })).toBe(false);
+    expect(isTranscriptBlock({ ...result, redaction: { ...redaction, fieldsRedacted: -1 } })).toBe(
+      false,
+    );
+    expect(isTranscriptBlock({ ...result, revision: 0 })).toBe(false);
+    expect(isTranscriptBlock({ ...call, shellKind: 'command' })).toBe(false);
+    expect(isTranscriptBlock({ ...artifact, label: 'long-text' })).toBe(false);
+    expect(isTranscriptBlock({ ...artifact, source: 'x'.repeat(256 * 1024 + 1) })).toBe(false);
+    expect(
+      isTranscriptBlock({ ...artifact, redaction: { ...redaction, reasons: ['bad reason'] } }),
+    ).toBe(false);
+    expect(isTranscriptBlock({ ...call, extra: true })).toBe(false);
+
+    const legacy = {
+      id: 'block_legacy_tool',
+      revision: 1,
+      seq: 6,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'tool_call',
+      toolName: 'read',
+      inputSummary: 'legacy input',
+    } as const;
+    expect(isTranscriptBlock(legacy)).toBe(true);
+    expect(isRichTranscriptBlock(legacy)).toBe(false);
+  });
+
+  it('keeps rich records opaque and rejects authority-bearing renderer fields', () => {
+    const canonical = {
+      id: 'block_rich_opaque',
+      revision: 2,
+      seq: 2,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'text_artifact',
+      label: 'document',
+      source: '[REDACTED_SECRET] [REDACTED_PATH]',
+      redaction: { policyVersion: 1, fieldsRedacted: 2, reasons: ['secret', 'path'] },
+    } as const;
+
+    expect(isTextArtifactBlock(canonical)).toBe(true);
+    expect(isRichTranscriptBlock(canonical)).toBe(true);
+    expect(isTranscriptBlock({ ...canonical, ticket: 'ticket_rich_001' })).toBe(false);
+    expect(isTranscriptBlock({ ...canonical, mutationTicket: 'ticket_rich_002' })).toBe(false);
+    expect(isTranscriptBlock({ ...canonical, fetchUrl: '/api/rich-content' })).toBe(false);
+    expect(isTranscriptBlock({ ...canonical, source: 'x'.repeat(256 * 1024 + 1) })).toBe(false);
   });
 
   it('accepts exact relay artifact descriptors and rejects unsafe state combinations', () => {
@@ -437,6 +540,7 @@ describe('runtime control guards', () => {
     expect(isRuntimeControlCommand({ ...command, expectedCatalogRevision: -1 })).toBe(false);
     expect(isRuntimeControlCommand({ ...command, expectedCatalogRevision: 1.5 })).toBe(false);
     const { expectedCatalogRevision: _missing, ...missingCatalogRevision } = command;
+    void _missing;
     expect(isRuntimeControlCommand(missingCatalogRevision)).toBe(false);
     expect(
       isRuntimeControlCommand({
@@ -670,6 +774,7 @@ describe('runtime control guards', () => {
     ).toBe(false);
     // Without a binding the ordinary prompt shape keeps steering.
     const { command: _binding, ...ordinary } = command;
+    void _binding;
     expect(isPromptSubmitCommand({ ...ordinary, streamingBehavior: 'followUp' })).toBe(true);
     expect(isPromptSubmitCommand({ ...ordinary, streamingBehavior: 'steer' })).toBe(true);
     expect(isPromptSubmitCommand(ordinary)).toBe(true);

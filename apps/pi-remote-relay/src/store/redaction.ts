@@ -12,6 +12,7 @@ import type {
   JsonValue,
   ModelPricingDto,
   PlanSnapshotDto,
+  RedactionMetadata,
   RuntimeMode,
   RuntimeModelCatalogDto,
   RuntimeSnapshotDto,
@@ -46,9 +47,14 @@ const SECRET_ASSIGNMENT_PATTERN =
   /\b(api[_-]?key|authorization|cookie|password|secret|token)\s*[:=]\s*[^\s,;]+/gi;
 const BEARER_PATTERN = /\bBearer\s+[A-Za-z0-9._~+/-]+=*/gi;
 const TOKEN_PATTERN = /\b(?:github_pat|ghp|sk|xox[baprs])[-_][A-Za-z0-9_-]{8,}\b/g;
+const URL_CREDENTIAL_PATTERN = /\bhttps?:\/\/[^/\s:@]+:[^@\s/]+@[^\s"'<>]+/gi;
 const POSIX_PATH_PATTERN =
   /(?:~|\/(?:Users|home|private|tmp|var|etc|opt|usr|Volumes))\/[^\s"'<>]*/g;
 const WINDOWS_PATH_PATTERN = /\b[A-Za-z]:\\(?:[^\\\s"'<>]+\\)*[^\\\s"'<>]*/g;
+const CONTROL_OR_BIDI_PATTERN =
+  /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/gu;
+const TOOL_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u;
+const REDACTION_MAX_FIELDS = 10_000;
 
 interface RedactionState {
   fieldsRedacted: number;
@@ -58,16 +64,18 @@ interface RedactionState {
 /** Apply the only redaction policy allowed before persistence or broadcast. */
 export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TPayload>): Envelope {
   const state: RedactionState = { fieldsRedacted: 0, reasons: new Set<string>() };
-  const payload = redactValue(envelope.payload, state, '') as JsonValue;
+  let payload = redactValue(envelope.payload, state, '') as JsonValue;
+  const redaction: RedactionMetadata = {
+    policyVersion: REDACTION_POLICY_VERSION,
+    fieldsRedacted: state.fieldsRedacted,
+    reasons: [...state.reasons].sort(),
+  };
+  payload = attachTranscriptRedaction(payload, redaction);
 
   return {
     ...envelope,
     payload,
-    redaction: {
-      policyVersion: REDACTION_POLICY_VERSION,
-      fieldsRedacted: state.fieldsRedacted,
-      reasons: [...state.reasons].sort(),
-    },
+    redaction,
   };
 }
 
@@ -75,6 +83,18 @@ export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TP
 export function redactJson(value: JsonValue): JsonValue {
   const state: RedactionState = { fieldsRedacted: 0, reasons: new Set<string>() };
   return redactValue(value, state, '');
+}
+
+/** Describe redaction in safe marker-only form for diagnostics and error text. */
+export function redactionMarkerText(metadata: RedactionMetadata): string {
+  const markers: Record<string, string> = {
+    control: '[REDACTED_CONTROL]',
+    'private-text': '[REDACTED_PRIVATE_TEXT]',
+    path: '[REDACTED_PATH]',
+    secret: '[REDACTED_SECRET]',
+    'tool-name': '[REDACTED_TOOL]',
+  };
+  return metadata.reasons.map((reason) => markers[reason] ?? '[REDACTED]').join(' ');
 }
 
 function redactValue(value: JsonValue, state: RedactionState, key: string): JsonValue {
@@ -90,6 +110,11 @@ function redactValue(value: JsonValue, state: RedactionState, key: string): Json
   if (PRIVATE_TEXT_KEYS.has(normalizedKey)) {
     markRedaction(state, 'private-text');
     return '[REDACTED_PRIVATE_TEXT]';
+  }
+  if (normalizedKey === 'toolname' && typeof value === 'string') {
+    if (TOOL_NAME_PATTERN.test(value) || value === '[REDACTED_TOOL]') return value;
+    markRedaction(state, 'tool-name');
+    return '[REDACTED_TOOL]';
   }
   if (typeof value === 'string') {
     return redactString(value, state);
@@ -113,8 +138,10 @@ function redactString(value: string, state: RedactionState): string {
   return replaceSensitive(value, SECRET_ASSIGNMENT_PATTERN, '[REDACTED_SECRET]', 'secret', state)
     .replace(BEARER_PATTERN, () => replacement(state, 'secret', '[REDACTED_SECRET]'))
     .replace(TOKEN_PATTERN, () => replacement(state, 'secret', '[REDACTED_SECRET]'))
+    .replace(URL_CREDENTIAL_PATTERN, () => replacement(state, 'secret', '[REDACTED_SECRET]'))
     .replace(POSIX_PATH_PATTERN, () => replacement(state, 'path', '[REDACTED_PATH]'))
-    .replace(WINDOWS_PATH_PATTERN, () => replacement(state, 'path', '[REDACTED_PATH]'));
+    .replace(WINDOWS_PATH_PATTERN, () => replacement(state, 'path', '[REDACTED_PATH]'))
+    .replace(CONTROL_OR_BIDI_PATTERN, () => replacement(state, 'control', '[REDACTED_CONTROL]'));
 }
 
 function replaceSensitive(
@@ -133,8 +160,22 @@ function replacement(state: RedactionState, reason: string, value: string): stri
 }
 
 function markRedaction(state: RedactionState, reason: string): void {
-  state.fieldsRedacted += 1;
+  state.fieldsRedacted = Math.min(state.fieldsRedacted + 1, REDACTION_MAX_FIELDS);
   state.reasons.add(reason);
+}
+
+function attachTranscriptRedaction(value: JsonValue, redaction: JsonValue): JsonValue {
+  if (
+    value !== null &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    ((value as JsonObject).kind === 'tool_call' ||
+      (value as JsonObject).kind === 'tool_result' ||
+      (value as JsonObject).kind === 'text_artifact')
+  ) {
+    return { ...(value as JsonObject), redaction };
+  }
+  return value;
 }
 
 // ── Explicit safe projectors ──────────────────────────────────────────────────

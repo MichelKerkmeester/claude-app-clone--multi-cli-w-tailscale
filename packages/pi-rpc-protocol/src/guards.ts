@@ -39,6 +39,9 @@ import type {
   PiRpcEvent,
   PiRpcEventType,
   PiRpcResponse,
+  RedactionMetadata,
+  RichToolCallBlock,
+  RichToolResultBlock,
   PlanArtifactDto,
   PlanControlCommand,
   PlanControlReasonCode,
@@ -72,7 +75,13 @@ import type {
   SlashSubmitIssueResponse,
   SyncMessage,
   TranscriptBlock,
+  TextArtifactBlock,
+  TextArtifactLabel,
+  TranscriptLifecycle,
+  TranscriptOutputCompleteness,
   TranscriptPageDto,
+  TranscriptShellKind,
+  TranscriptTerminalCheckpoint,
   WebSocketTicketResponse,
 } from './types.js';
 
@@ -90,6 +99,11 @@ import {
   RUNTIME_ISSUE_CODES,
   RUNTIME_MODES,
   SLASH_SUBMIT_ISSUE_CODES,
+  TEXT_ARTIFACT_LABELS,
+  TRANSCRIPT_LIFECYCLES,
+  TRANSCRIPT_OUTPUT_COMPLETENESS,
+  TRANSCRIPT_SHELL_KINDS,
+  TRANSCRIPT_TERMINAL_CHECKPOINTS,
 } from './types.js';
 
 const APPROVAL_RESULT_STATUSES = new Set([
@@ -148,6 +162,22 @@ const FILE_PREVIEW_MAX_MIME_TYPE = 127;
 const FILE_PREVIEW_MAX_LANGUAGE = 64;
 const FILE_PREVIEW_MAX_ALT_TEXT = 500;
 const FILE_PREVIEW_MAX_THUMBNAIL_REF = 200;
+const REDACTION_MAX_FIELDS = 10_000;
+const REDACTION_MAX_REASONS = 8;
+const REDACTION_MAX_REASON_LENGTH = 32;
+const RICH_TOOL_NAME_MAX_LENGTH = 128;
+const RICH_INPUT_SUMMARY_MAX_LENGTH = 64 * 1024;
+const RICH_OUTPUT_MAX_LENGTH = 128 * 1024;
+const RICH_TEXT_ARTIFACT_SOURCE_MAX_LENGTH = 256 * 1024;
+const TRANSCRIPT_SHELL_KIND_SET = new Set<TranscriptShellKind>(TRANSCRIPT_SHELL_KINDS);
+const TRANSCRIPT_LIFECYCLE_SET = new Set<TranscriptLifecycle>(TRANSCRIPT_LIFECYCLES);
+const TRANSCRIPT_CHECKPOINT_SET = new Set<TranscriptTerminalCheckpoint>(
+  TRANSCRIPT_TERMINAL_CHECKPOINTS,
+);
+const TRANSCRIPT_COMPLETENESS_SET = new Set<TranscriptOutputCompleteness>(
+  TRANSCRIPT_OUTPUT_COMPLETENESS,
+);
+const TEXT_ARTIFACT_LABEL_SET = new Set<TextArtifactLabel>(TEXT_ARTIFACT_LABELS);
 
 /** Return whether a value can be serialized as JSON without coercion. */
 export function isJsonValue(value: unknown): value is JsonValue {
@@ -377,10 +407,7 @@ export function isEnvelope(value: unknown): value is Envelope {
     !Number.isNaN(Date.parse(value.occurredAt)) &&
     (value.causedBy === null || isOpaqueId(value.causedBy)) &&
     isJsonValue(value.payload) &&
-    value.redaction.policyVersion === 1 &&
-    Number.isSafeInteger(value.redaction.fieldsRedacted) &&
-    Array.isArray(value.redaction.reasons) &&
-    value.redaction.reasons.every((reason) => typeof reason === 'string') &&
+    isRedactionMetadata(value.redaction) &&
     typeof value.replay.eligible === 'boolean' &&
     typeof value.replay.snapshotEligible === 'boolean'
   );
@@ -451,18 +478,28 @@ export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
     case 'plan':
       return Array.isArray(value.items) && value.items.every(isPlanItem);
     case 'tool_call':
-      return typeof value.toolName === 'string' && typeof value.inputSummary === 'string';
+      return hasAnyKey(value, ['callId', 'shellKind', 'lifecycle', 'terminalCheckpoint'])
+        ? isRichToolCallBlock(value)
+        : typeof value.toolName === 'string' && typeof value.inputSummary === 'string';
     case 'tool_result':
-      return (
-        typeof value.toolName === 'string' &&
-        typeof value.output === 'string' &&
-        typeof value.isError === 'boolean'
-      );
-      case 'file_diff':
-        return typeof value.summary === 'string' && typeof value.patch === 'string';
-      case 'file_preview':
-        return false;
-      case 'usage':
+      return hasAnyKey(value, [
+        'callId',
+        'shellKind',
+        'lifecycle',
+        'terminalCheckpoint',
+        'outputCompleteness',
+      ])
+        ? isRichToolResultBlock(value)
+        : typeof value.toolName === 'string' &&
+            typeof value.output === 'string' &&
+            typeof value.isError === 'boolean';
+    case 'text_artifact':
+      return isTextArtifactBlock(value);
+    case 'file_diff':
+      return typeof value.summary === 'string' && typeof value.patch === 'string';
+    case 'file_preview':
+      return false;
+    case 'usage':
       return (
         isNonNegativeNumber(value.inputTokens) &&
         isNonNegativeNumber(value.outputTokens) &&
@@ -486,6 +523,131 @@ export function isTranscriptPageDto(value: unknown): value is TranscriptPageDto 
     Number.isSafeInteger(value.coversThrough) &&
     value.coversThrough >= 0
   );
+}
+
+/** Validate the bounded provenance attached to redacted envelopes and blocks. */
+export function isRedactionMetadata(value: unknown): value is RedactionMetadata {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['policyVersion', 'fieldsRedacted', 'reasons']) &&
+    value.policyVersion === 1 &&
+    isNonNegativeSafeInteger(value.fieldsRedacted) &&
+    value.fieldsRedacted <= REDACTION_MAX_FIELDS &&
+    Array.isArray(value.reasons) &&
+    value.reasons.length <= REDACTION_MAX_REASONS &&
+    new Set(value.reasons).size === value.reasons.length &&
+    value.reasons.every(
+      (reason) =>
+        typeof reason === 'string' &&
+        reason.length > 0 &&
+        reason.length <= REDACTION_MAX_REASON_LENGTH &&
+        /^[a-z][a-z0-9-]*$/u.test(reason),
+    )
+  );
+}
+
+/** Return whether a tool-call block has the complete rich projection contract. */
+export function isRichToolCallBlock(value: unknown): value is RichToolCallBlock {
+  return (
+    isRecord(value) &&
+    hasRequiredAndOptionalKeys(
+      value,
+      [
+        'kind',
+        'id',
+        'revision',
+        'seq',
+        'occurredAt',
+        'toolName',
+        'inputSummary',
+        'callId',
+        'shellKind',
+        'lifecycle',
+        'terminalCheckpoint',
+        'redaction',
+      ],
+      [],
+    ) &&
+    value.kind === 'tool_call' &&
+    isTranscriptBase(value) &&
+    isSafeTranscriptToolName(value.toolName) &&
+    isBoundedString(value.inputSummary, RICH_INPUT_SUMMARY_MAX_LENGTH) &&
+    isOpaqueId(value.callId) &&
+    typeof value.shellKind === 'string' &&
+    TRANSCRIPT_SHELL_KIND_SET.has(value.shellKind as TranscriptShellKind) &&
+    typeof value.lifecycle === 'string' &&
+    TRANSCRIPT_LIFECYCLE_SET.has(value.lifecycle as TranscriptLifecycle) &&
+    typeof value.terminalCheckpoint === 'string' &&
+    TRANSCRIPT_CHECKPOINT_SET.has(value.terminalCheckpoint as TranscriptTerminalCheckpoint) &&
+    isRedactionMetadata(value.redaction)
+  );
+}
+
+/** Return whether a tool-result block has the complete rich projection contract. */
+export function isRichToolResultBlock(value: unknown): value is RichToolResultBlock {
+  return (
+    isRecord(value) &&
+    hasRequiredAndOptionalKeys(
+      value,
+      [
+        'kind',
+        'id',
+        'revision',
+        'seq',
+        'occurredAt',
+        'toolName',
+        'output',
+        'isError',
+        'callId',
+        'shellKind',
+        'lifecycle',
+        'terminalCheckpoint',
+        'outputCompleteness',
+        'redaction',
+      ],
+      [],
+    ) &&
+    value.kind === 'tool_result' &&
+    isTranscriptBase(value) &&
+    isSafeTranscriptToolName(value.toolName) &&
+    isBoundedString(value.output, RICH_OUTPUT_MAX_LENGTH) &&
+    typeof value.isError === 'boolean' &&
+    isOpaqueId(value.callId) &&
+    typeof value.shellKind === 'string' &&
+    TRANSCRIPT_SHELL_KIND_SET.has(value.shellKind as TranscriptShellKind) &&
+    typeof value.lifecycle === 'string' &&
+    TRANSCRIPT_LIFECYCLE_SET.has(value.lifecycle as TranscriptLifecycle) &&
+    typeof value.terminalCheckpoint === 'string' &&
+    TRANSCRIPT_CHECKPOINT_SET.has(value.terminalCheckpoint as TranscriptTerminalCheckpoint) &&
+    typeof value.outputCompleteness === 'string' &&
+    TRANSCRIPT_COMPLETENESS_SET.has(value.outputCompleteness as TranscriptOutputCompleteness) &&
+    isRedactionMetadata(value.redaction)
+  );
+}
+
+/** Return whether a text artifact is an explicit, relay-authored projection. */
+export function isTextArtifactBlock(value: unknown): value is TextArtifactBlock {
+  return (
+    isRecord(value) &&
+    hasRequiredAndOptionalKeys(
+      value,
+      ['kind', 'id', 'revision', 'seq', 'occurredAt', 'label', 'source', 'redaction'],
+      [],
+    ) &&
+    value.kind === 'text_artifact' &&
+    isTranscriptBase(value) &&
+    typeof value.label === 'string' &&
+    TEXT_ARTIFACT_LABEL_SET.has(value.label as TextArtifactLabel) &&
+    isBoundedString(value.source, RICH_TEXT_ARTIFACT_SOURCE_MAX_LENGTH) &&
+    isRedactionMetadata(value.redaction)
+  );
+}
+
+/** Rich blocks are eligible only when every relay-authored field is present. */
+export function isRichTranscriptBlock(
+  value: unknown,
+): value is RichToolCallBlock | RichToolResultBlock | TextArtifactBlock {
+  return isRichToolCallBlock(value) || isRichToolResultBlock(value) || isTextArtifactBlock(value);
 }
 
 /** Narrow a relay-authored, exact-revision file preview descriptor. */
@@ -537,7 +699,8 @@ export function isFilePreviewDescriptor(value: unknown): value is FilePreviewDes
     typeof value.shareAllowed !== 'boolean' ||
     (value.language !== undefined && !isPathFreeToken(value.language, FILE_PREVIEW_MAX_LANGUAGE)) ||
     (value.pageCount !== undefined && !isBoundedPageCount(value.pageCount)) ||
-    (value.altText !== undefined && !isSafeDisplayString(value.altText, FILE_PREVIEW_MAX_ALT_TEXT)) ||
+    (value.altText !== undefined &&
+      !isSafeDisplayString(value.altText, FILE_PREVIEW_MAX_ALT_TEXT)) ||
     (value.textLayerSafe !== undefined && typeof value.textLayerSafe !== 'boolean') ||
     (value.thumbnailRef !== undefined &&
       !isPathFreeToken(value.thumbnailRef, FILE_PREVIEW_MAX_THUMBNAIL_REF)) ||
@@ -567,7 +730,10 @@ export function isFilePreviewBlock(value: unknown): value is FilePreviewBlock {
 }
 
 function isFilePreviewContent(value: unknown): value is FilePreviewContent {
-  if (!isRecord(value) || !hasOnlyKeys(value, ['kind', 'text', 'firstLine']) && value.kind === 'inline-text') {
+  if (
+    !isRecord(value) ||
+    (!hasOnlyKeys(value, ['kind', 'text', 'firstLine']) && value.kind === 'inline-text')
+  ) {
     return false;
   }
   if (value.kind === 'none' || value.kind === 'artifact-ref') {
@@ -590,7 +756,10 @@ function isValidFilePreviewCombination(value: FilePreviewDescriptor): boolean {
   if (value.redaction === 'withheld' && availability === 'ready') return false;
   if (availability === 'ready') {
     if (value.content.kind === 'none' || value.renderer === 'unsupported') return false;
-    if (value.content.kind === 'inline-text' && !['text', 'code', 'diff'].includes(value.renderer)) {
+    if (
+      value.content.kind === 'inline-text' &&
+      !['text', 'code', 'diff'].includes(value.renderer)
+    ) {
       return false;
     }
     return true;
@@ -874,6 +1043,10 @@ function hasOnlyKeys(value: Record<string, unknown>, keys: readonly string[]): b
   return Object.keys(value).every((key) => keys.includes(key)) && keys.every((key) => key in value);
 }
 
+function hasAnyKey(value: Record<string, unknown>, keys: readonly string[]): boolean {
+  return keys.some((key) => key in value);
+}
+
 function isTranscriptBase(value: unknown): value is Record<string, unknown> & {
   readonly kind: string;
 } {
@@ -886,7 +1059,16 @@ function isTranscriptBase(value: unknown): value is Record<string, unknown> & {
     Number.isSafeInteger(value.seq) &&
     value.seq > 0 &&
     typeof value.occurredAt === 'string' &&
-    !Number.isNaN(Date.parse(value.occurredAt))
+    !Number.isNaN(Date.parse(value.occurredAt)) &&
+    (value.redaction === undefined || isRedactionMetadata(value.redaction))
+  );
+}
+
+function isSafeTranscriptToolName(value: unknown): value is string {
+  return (
+    isPathFreeToken(value, RICH_TOOL_NAME_MAX_LENGTH) &&
+    (/^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u.test(value) || value === '[REDACTED_TOOL]') &&
+    !/[\u202a-\u202e\u2066-\u2069]/u.test(value)
   );
 }
 

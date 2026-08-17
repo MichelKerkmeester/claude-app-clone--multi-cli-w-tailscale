@@ -107,6 +107,7 @@ export function saveCache(sessions: readonly SessionCardDto[], current: Transcri
           coversThrough: current.coversThrough,
           blocks: current.blocks
             .filter((block) => block.kind !== 'file_preview')
+            .filter((block) => !isRichBodyBlock(block))
             .filter((block) => !current.pendingPromptIds.includes(block.id))
             .slice(-MAX_BLOCKS),
           artifactMetadata: current.blocks
@@ -146,9 +147,10 @@ function parseCachedTranscript(value: unknown): CachedTranscript | null {
   )
     return null;
   const blocks = value.blocks
-    .map(parseDisplayBlock)
+    .map((block) => parseDisplayBlock(block, 'cache'))
     .filter(
-      (block): block is DisplayTranscriptBlock => block !== null && block.kind !== 'file_preview',
+      (block): block is DisplayTranscriptBlock =>
+        block !== null && block.kind !== 'file_preview' && !isRichBodyBlock(block),
     );
   return {
     sessionId: value.sessionId,
@@ -224,4 +226,10 @@ function parseCachedArtifactMetadata(value: unknown): CachedArtifactMetadata | n
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isRichBodyBlock(block: DisplayTranscriptBlock): boolean {
+  if (block.kind === 'text_artifact') return true;
+  if (block.kind !== 'tool_call' && block.kind !== 'tool_result') return false;
+  return 'callId' in block || 'shellKind' in block || 'redaction' in block;
 }

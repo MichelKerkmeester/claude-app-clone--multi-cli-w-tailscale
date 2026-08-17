@@ -9,8 +9,25 @@ export type ArtifactViewerPhase = 'closed' | 'opening' | 'ready-diff' | 'exiting
 export type ArtifactDismissalReason =
   'close' | 'escape' | 'history' | 'edge-back' | 'voiceover-scrub';
 
+export interface InMemoryArtifactDocument {
+  readonly kind: 'in-memory';
+  readonly id: string;
+  readonly displayName: string;
+  readonly renderer: 'text' | 'code' | 'diff';
+  readonly text: string;
+  readonly summary: string;
+  readonly language?: string;
+  readonly redaction: 'applied';
+  readonly revision?: string | number;
+  readonly live?: boolean;
+  readonly sourceState?:
+    'current' | 'stale-cache' | 'connection-lost' | 'terminal-without-result' | 'source-removed';
+}
+
+export type ArtifactViewerSource = FileDiffBlock | FilePreviewBlock | InMemoryArtifactDocument;
+
 export interface ArtifactPreview {
-  readonly source: Readonly<FileDiffBlock | FilePreviewBlock>;
+  readonly source: Readonly<ArtifactViewerSource>;
   readonly trigger: HTMLButtonElement | null;
   readonly scrollContainer: HTMLElement | null;
   readonly scrollTop: number;
@@ -26,13 +43,18 @@ export interface ArtifactViewerContextValue {
     block: FileDiffBlock | FilePreviewBlock,
     trigger: HTMLButtonElement | null,
   ) => void;
+  readonly openInMemory: (
+    document: InMemoryArtifactDocument,
+    trigger: HTMLButtonElement | null,
+  ) => void;
+  readonly updateInMemory: (document: InMemoryArtifactDocument) => void;
   readonly close: (reason?: ArtifactDismissalReason) => void;
 }
 
 const ArtifactViewerContext = createContext<ArtifactViewerContextValue | null>(null);
 
 function capturePreview(
-  block: FileDiffBlock | FilePreviewBlock,
+  block: ArtifactViewerSource,
   trigger: HTMLButtonElement | null,
   generation: number,
 ): ArtifactPreview {
@@ -88,10 +110,7 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     exitingTimerRef.current = null;
   };
 
-  const openDiff = (
-    block: FileDiffBlock | FilePreviewBlock,
-    trigger: HTMLButtonElement | null,
-  ) => {
+  const openDiff = (block: FileDiffBlock | FilePreviewBlock, trigger: HTMLButtonElement | null) => {
     clearTimers();
     const generation = generationRef.current + 1;
     generationRef.current = generation;
@@ -108,6 +127,85 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
       }
       setPhase('ready-diff');
     }, 0);
+  };
+
+  const openInMemory = (document: InMemoryArtifactDocument, trigger: HTMLButtonElement | null) => {
+    clearTimers();
+    const existing = previewRef.current;
+    if (existing?.source.kind === 'in-memory' && existing.source.id === document.id) {
+      updateInMemory(document);
+      return;
+    }
+    const generation = generationRef.current + 1;
+    generationRef.current = generation;
+    const nextPreview = capturePreview(document, trigger, generation);
+    restoredGenerationRef.current = null;
+    if (previewRef.current === null) {
+      history.open();
+      const state = window.history.state;
+      if (state !== null && typeof state === 'object') {
+        window.history.replaceState(
+          { ...(state as Record<string, unknown>), __piRemoteArtifactBlockId: document.id },
+          '',
+          window.location.href,
+        );
+      }
+    } else {
+      const state = window.history.state;
+      if (state !== null && typeof state === 'object') {
+        window.history.replaceState(
+          { ...(state as Record<string, unknown>), __piRemoteArtifactBlockId: document.id },
+          '',
+          window.location.href,
+        );
+      }
+    }
+    previewRef.current = nextPreview;
+    setPreview(nextPreview);
+    setPhase('opening');
+    openingTimerRef.current = window.setTimeout(() => {
+      openingTimerRef.current = null;
+      if (generationRef.current !== generation || previewRef.current?.generation !== generation) {
+        return;
+      }
+      setPhase('ready-diff');
+    }, 0);
+  };
+
+  const updateInMemory = (document: InMemoryArtifactDocument) => {
+    const current = previewRef.current;
+    if (
+      current === null ||
+      current.source.kind !== 'in-memory' ||
+      current.source.id !== document.id
+    ) {
+      return;
+    }
+    const currentDocument = current.source;
+    const removedSource =
+      document.sourceState === 'source-removed' && currentDocument.text.length > 0;
+    const nextDocument: InMemoryArtifactDocument = removedSource
+      ? {
+          ...document,
+          text: currentDocument.text,
+          summary: 'Source removed · showing the last trustworthy redacted snapshot',
+        }
+      : document;
+    if (
+      currentDocument.text === nextDocument.text &&
+      currentDocument.summary === nextDocument.summary &&
+      currentDocument.revision === nextDocument.revision &&
+      currentDocument.sourceState === nextDocument.sourceState &&
+      currentDocument.live === nextDocument.live
+    ) {
+      return;
+    }
+    const nextPreview: ArtifactPreview = {
+      ...current,
+      source: Object.freeze({ ...nextDocument }),
+    };
+    previewRef.current = nextPreview;
+    setPreview(nextPreview);
   };
 
   const close = (reason: ArtifactDismissalReason = 'close') => {
@@ -156,7 +254,14 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     };
   }, []);
 
-  const value: ArtifactViewerContextValue = { phase, preview, openDiff, close };
+  const value: ArtifactViewerContextValue = {
+    phase,
+    preview,
+    openDiff,
+    openInMemory,
+    updateInMemory,
+    close,
+  };
   return (
     <ArtifactViewerContext.Provider value={value}>
       {children}
@@ -165,6 +270,8 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
   );
 }
 
+// These context hooks are exported so viewer seams can share one provider.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useArtifactViewer(): ArtifactViewerContextValue {
   const context = useContext(ArtifactViewerContext);
   if (context === null)
@@ -172,6 +279,7 @@ export function useArtifactViewer(): ArtifactViewerContextValue {
   return context;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useOptionalArtifactViewer(): ArtifactViewerContextValue | null {
   return useContext(ArtifactViewerContext);
 }

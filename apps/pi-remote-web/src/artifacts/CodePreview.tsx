@@ -1,4 +1,10 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+
+import {
+  normalizeHighlightLanguage,
+  useHighlightedCode,
+  type HighlightToken,
+} from '../rich-content/useHighlightedCode.js';
 
 export interface CodePreviewProps {
   readonly text: string;
@@ -7,86 +13,8 @@ export interface CodePreviewProps {
   readonly findTerm?: string;
   readonly ariaLabel?: string;
   readonly enableHighlighting?: boolean;
-}
-
-interface HighlightToken {
-  readonly text: string;
-  readonly kind: 'plain' | 'keyword' | 'string' | 'comment' | 'number';
-}
-
-interface HighlightState {
-  readonly source: string;
-  readonly tokens: readonly HighlightToken[] | null;
-}
-
-const WORKER_SOURCE = `
-self.onmessage = function(event) {
-  const source = String(event.data || '');
-  const pattern = /(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*|#[^\\n]*|"(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*'|\\b(?:const|let|var|function|return|if|else|for|while|class|interface|type|import|export|from|async|await|true|false|null|undefined)\\b|\\b\\d+(?:\\.\\d+)?\\b)/gu;
-  const tokens = [];
-  let cursor = 0;
-  for (const match of source.matchAll(pattern)) {
-    const start = match.index || 0;
-    if (start > cursor) tokens.push({ text: source.slice(cursor, start), kind: 'plain' });
-    const value = match[0];
-    const kind = value.startsWith('//') || value.startsWith('/*') || value.startsWith('#')
-      ? 'comment'
-      : value.startsWith('"') || value.startsWith("'")
-        ? 'string'
-        : /^\\d/u.test(value)
-          ? 'number'
-          : 'keyword';
-    tokens.push({ text: value, kind });
-    cursor = start + value.length;
-  }
-  if (cursor < source.length) tokens.push({ text: source.slice(cursor), kind: 'plain' });
-  self.postMessage(tokens);
-};
-`;
-
-function useLazyHighlight(text: string, enabled: boolean): HighlightState {
-  const [state, setState] = useState<HighlightState>({ source: '', tokens: null });
-  useEffect(() => {
-    setState({ source: text, tokens: null });
-    if (!enabled || typeof Worker === 'undefined' || typeof Blob === 'undefined') return undefined;
-    let worker: Worker | null = null;
-    let objectUrl: string | null = null;
-    let disposed = false;
-    try {
-      objectUrl = URL.createObjectURL(new Blob([WORKER_SOURCE], { type: 'text/javascript' }));
-      worker = new Worker(objectUrl);
-      worker.onmessage = (event: MessageEvent<unknown>) => {
-        if (disposed || !Array.isArray(event.data)) return;
-        const tokens = event.data.filter(isHighlightToken);
-        setState({ source: text, tokens });
-      };
-      worker.onerror = () => {
-        if (!disposed) setState({ source: text, tokens: null });
-      };
-      worker.postMessage(text);
-    } catch {
-      if (!disposed) setState({ source: text, tokens: null });
-    }
-    return () => {
-      disposed = true;
-      worker?.terminate();
-      if (objectUrl !== null) URL.revokeObjectURL(objectUrl);
-    };
-  }, [enabled, text]);
-  return state.source === text ? state : { source: text, tokens: null };
-}
-
-function isHighlightToken(value: unknown): value is HighlightToken {
-  if (typeof value !== 'object' || value === null) return false;
-  const token = value as { readonly text?: unknown; readonly kind?: unknown };
-  return (
-    typeof token.text === 'string' &&
-    (token.kind === 'plain' ||
-      token.kind === 'keyword' ||
-      token.kind === 'string' ||
-      token.kind === 'comment' ||
-      token.kind === 'number')
-  );
+  readonly revision?: string | number;
+  readonly followTail?: boolean;
 }
 
 function renderFindableText(text: string, findTerm: string, keyPrefix: string): ReactNode {
@@ -128,33 +56,80 @@ export function CodePreview({
   findTerm = '',
   ariaLabel = 'Code preview',
   enableHighlighting = true,
+  revision = 1,
+  followTail = false,
 }: CodePreviewProps) {
-  const highlighted = useLazyHighlight(text, enableHighlighting);
+  const safeLanguage = normalizeHighlightLanguage(language);
+  const highlighted = useHighlightedCode({
+    source: text,
+    language: safeLanguage,
+    revision,
+    enabled: enableHighlighting,
+  });
   const lines = text.split('\n');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const atLiveEdgeRef = useRef(true);
+  const [atLiveEdge, setAtLiveEdge] = useState(true);
+  const updateLiveEdge = () => {
+    const scroll = scrollRef.current;
+    if (scroll === null) return;
+    const nextAtLiveEdge = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight <= 96;
+    atLiveEdgeRef.current = nextAtLiveEdge;
+    setAtLiveEdge((current) => (current === nextAtLiveEdge ? current : nextAtLiveEdge));
+  };
+  const jumpToLatest = () => {
+    const scroll = scrollRef.current;
+    if (scroll === null) return;
+    scroll.scrollTop = scroll.scrollHeight;
+    atLiveEdgeRef.current = true;
+    setAtLiveEdge(true);
+  };
+  useLayoutEffect(() => {
+    if (!followTail || !atLiveEdgeRef.current) return;
+    const scroll = scrollRef.current;
+    if (scroll !== null) scroll.scrollTop = scroll.scrollHeight;
+  }, [followTail, revision, text]);
+  useLayoutEffect(() => {
+    if (!followTail) {
+      atLiveEdgeRef.current = true;
+      setAtLiveEdge(true);
+    }
+  }, [followTail]);
   return (
-    <div
-      className={`artifact-code-preview${wrap ? ' is-wrapped' : ''}`}
-      data-language={language}
-      aria-label={ariaLabel}
-      dir="ltr"
-      data-display-buffer
-    >
+    <div className="artifact-code-viewer" data-live-edge={followTail ? atLiveEdge : undefined}>
       <div
-        className="artifact-code-gutter"
-        aria-hidden="true"
-        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+        className={`artifact-code-preview${wrap ? ' is-wrapped' : ''}`}
+        ref={scrollRef}
+        data-language={safeLanguage ?? 'plaintext'}
+        data-highlight-status={highlighted.status}
+        data-revision={highlighted.revisionId}
+        aria-label={ariaLabel}
+        dir="ltr"
+        data-display-buffer
+        onScroll={followTail ? updateLiveEdge : undefined}
       >
-        {lines.map((_, index) => (
-          <span key={index}>{index + 1}</span>
-        ))}
+        <div
+          className="artifact-code-gutter"
+          aria-hidden="true"
+          style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+        >
+          {lines.map((_, index) => (
+            <span key={index}>{index + 1}</span>
+          ))}
+        </div>
+        <pre className="artifact-code-source">
+          <code>
+            {highlighted.tokens === null
+              ? renderFindableText(text, findTerm, 'code-plain')
+              : renderTokens(highlighted.tokens, findTerm)}
+          </code>
+        </pre>
       </div>
-      <pre className="artifact-code-source">
-        <code>
-          {highlighted.tokens === null
-            ? renderFindableText(text, findTerm, 'code-plain')
-            : renderTokens(highlighted.tokens, findTerm)}
-        </code>
-      </pre>
+      {followTail && !atLiveEdge && (
+        <button type="button" className="artifact-jump-latest" onClick={jumpToLatest}>
+          Jump to latest
+        </button>
+      )}
     </div>
   );
 }

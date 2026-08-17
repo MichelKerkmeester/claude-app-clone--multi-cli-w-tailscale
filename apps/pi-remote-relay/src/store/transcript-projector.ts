@@ -8,7 +8,13 @@ import type {
   FilePreviewBlock,
   JsonValue,
   PiRpcEvent,
+  RedactionMetadata,
+  TextArtifactBlock,
   TranscriptBlock,
+  TranscriptLifecycle,
+  TranscriptOutputCompleteness,
+  TranscriptShellKind,
+  TranscriptTerminalCheckpoint,
 } from '@pi-remote/pi-rpc-protocol';
 
 import type { ArtifactStore } from './artifact-store.js';
@@ -21,12 +27,33 @@ type TranscriptBlockBody =
       readonly kind: 'plan';
       readonly items: readonly { readonly text: string; readonly done: boolean }[];
     }
-  | { readonly kind: 'tool_call'; readonly toolName: string; readonly inputSummary: string }
+  | {
+      readonly kind: 'tool_call';
+      readonly toolName: string;
+      readonly inputSummary: string;
+      readonly callId?: string;
+      readonly shellKind?: TranscriptShellKind;
+      readonly lifecycle?: TranscriptLifecycle;
+      readonly terminalCheckpoint?: TranscriptTerminalCheckpoint;
+      readonly redaction?: RedactionMetadata;
+    }
   | {
       readonly kind: 'tool_result';
       readonly toolName: string;
       readonly output: string;
       readonly isError: boolean;
+      readonly callId?: string;
+      readonly shellKind?: TranscriptShellKind;
+      readonly lifecycle?: TranscriptLifecycle;
+      readonly terminalCheckpoint?: TranscriptTerminalCheckpoint;
+      readonly outputCompleteness?: TranscriptOutputCompleteness;
+      readonly redaction?: RedactionMetadata;
+    }
+  | {
+      readonly kind: 'text_artifact';
+      readonly label: TextArtifactBlock['label'];
+      readonly source: string;
+      readonly redaction: RedactionMetadata;
     }
   | { readonly kind: 'file_diff'; readonly summary: string; readonly patch: string }
   | {
@@ -35,6 +62,14 @@ type TranscriptBlockBody =
       readonly outputTokens: number;
       readonly cost: number;
     };
+
+const EMPTY_REDACTION: RedactionMetadata = {
+  policyVersion: 1,
+  fieldsRedacted: 0,
+  reasons: [],
+};
+const MAX_PROJECTED_INPUT = 64 * 1024;
+const MAX_PROJECTED_OUTPUT = 128 * 1024;
 
 export interface TranscriptProjectionContext {
   readonly occurredAt: string;
@@ -49,6 +84,7 @@ export class TranscriptProjector {
   private readonly thinkingBuffers = new Map<string, string>();
   private readonly toolCallBuffers = new Map<string, string>();
   private readonly toolCallKeys = new Map<string, string>();
+  private readonly stableCallIds = new Map<string, string>();
   private readonly toolResultBuffers = new Map<string, string>();
   private eventOrdinal = 0;
   private turnOrdinal = 0;
@@ -109,22 +145,56 @@ export class TranscriptProjector {
         this.activeMessage = null;
         break;
       case 'bash_execution_update': {
-        const commandId = stringValue(event['id']) ?? `event_${this.eventOrdinal}`;
-        const key = `bash:${commandId}:result`;
-        const output = `${this.toolResultBuffers.get(key) ?? ''}${stringValue(event['delta']) ?? ''}`;
+        const commandId = stringValue(event['toolCallId']) ?? stringValue(event['id']);
+        const key = `bash:${commandId ?? `event_${this.eventOrdinal}`}:result`;
+        const output = appendBounded(
+          this.toolResultBuffers.get(key) ?? '',
+          stringValue(event['delta']) ?? '',
+        );
         this.toolResultBuffers.set(key, output);
-        emit(key, { kind: 'tool_result', toolName: 'bash', output, isError: false });
+        const callId = commandId === null ? null : this.callIdForExternal(commandId);
+        if (callId === null) {
+          emit(key, { kind: 'tool_result', toolName: 'bash', output, isError: false });
+        } else {
+          emit(key, {
+            kind: 'tool_result',
+            toolName: 'bash',
+            output,
+            isError: false,
+            callId,
+            shellKind: shellKindFromMetadata(event, 'bash'),
+            lifecycle: lifecycleFromMetadata(event, 'running'),
+            terminalCheckpoint: checkpointFromMetadata(event, 'streaming'),
+            outputCompleteness: completenessFromMetadata(event, 'unknown'),
+            redaction: EMPTY_REDACTION,
+          });
+        }
         break;
       }
       case 'tool_execution_start': {
         const toolCallId = stringValue(event['toolCallId']) ?? `event_${this.eventOrdinal}`;
         const key = this.toolCallKeys.get(toolCallId) ?? `tool:${toolCallId}:call`;
         this.toolCallKeys.set(toolCallId, key);
-        emit(key, {
-          kind: 'tool_call',
-          toolName: stringValue(event['toolName']) ?? 'unknown',
-          inputSummary: summarizeJson(event['args']),
-        });
+        const rawCallId = stringValue(event['toolCallId']);
+        const callId = rawCallId === null ? null : this.callIdForExternal(rawCallId);
+        if (callId === null) {
+          emit(key, {
+            kind: 'tool_call',
+            toolName: stringValue(event['toolName']) ?? 'unknown',
+            inputSummary: summarizeJson(event['args']),
+          });
+        } else {
+          emit(key, {
+            kind: 'tool_call',
+            toolName: stringValue(event['toolName']) ?? 'unknown',
+            inputSummary: summarizeJson(event['args']),
+            callId,
+            shellKind: shellKindFromMetadata(event, 'other'),
+            lifecycle: lifecycleFromMetadata(event, 'running'),
+            terminalCheckpoint: checkpointFromMetadata(event, 'started'),
+            redaction: EMPTY_REDACTION,
+          });
+        }
         break;
       }
       case 'tool_execution_update':
@@ -230,6 +300,8 @@ export class TranscriptProjector {
 
     const artifact = this.projectArtifact(event, context);
     if (artifact !== null) blocks.push(artifact);
+    const textArtifact = this.projectTextArtifact(event, context);
+    if (textArtifact !== null) blocks.push(textArtifact);
 
     if (blocks.length === 0) {
       emit(this.eventKey(event.type), { kind: 'text', text: `Pi event: ${event.type}` });
@@ -297,23 +369,47 @@ export class TranscriptProjector {
       }
       case 'toolcall_start':
         this.toolCallBuffers.set(key, '');
-        emit(key, { kind: 'tool_call', toolName: 'tool', inputSummary: '' });
+        emit(key, {
+          kind: 'tool_call',
+          toolName: 'tool',
+          inputSummary: '',
+          callId: this.callIdForKey(key, toolCallIdFromRecord(update)),
+          shellKind: shellKindFromMetadata(update, 'other'),
+          lifecycle: lifecycleFromMetadata(update, 'running'),
+          terminalCheckpoint: checkpointFromMetadata(update, 'started'),
+          redaction: EMPTY_REDACTION,
+        });
         break;
       case 'toolcall_delta': {
         const inputSummary = `${this.toolCallBuffers.get(key) ?? ''}${stringValue(update['delta']) ?? ''}`;
         this.toolCallBuffers.set(key, inputSummary);
-        emit(key, { kind: 'tool_call', toolName: 'tool', inputSummary });
+        emit(key, {
+          kind: 'tool_call',
+          toolName: 'tool',
+          inputSummary,
+          callId: this.callIdForKey(key, toolCallIdFromRecord(update)),
+          shellKind: shellKindFromMetadata(update, 'other'),
+          lifecycle: lifecycleFromMetadata(update, 'running'),
+          terminalCheckpoint: checkpointFromMetadata(update, 'streaming'),
+          redaction: EMPTY_REDACTION,
+        });
         break;
       }
       case 'toolcall_end': {
         const toolCall = recordValue(update['toolCall']);
         const toolCallId = stringValue(toolCall?.['id']);
         if (toolCallId !== null) this.toolCallKeys.set(toolCallId, key);
+        const callId = this.callIdForKey(key, toolCallId);
         emit(key, {
           kind: 'tool_call',
           toolName: stringValue(toolCall?.['name']) ?? 'tool',
           inputSummary:
             summarizeJson(toolCall?.['arguments']) || this.toolCallBuffers.get(key) || '',
+          callId,
+          shellKind: shellKindFromMetadata(update, 'other'),
+          lifecycle: lifecycleFromMetadata(update, 'running'),
+          terminalCheckpoint: checkpointFromMetadata(update, 'terminal'),
+          redaction: EMPTY_REDACTION,
         });
         break;
       }
@@ -328,14 +424,39 @@ export class TranscriptProjector {
     if (message === null) return;
     const role = stringValue(message['role']);
     if (role === 'toolResult') {
-      const callId = stringValue(message['toolCallId']) ?? `message_${this.ensureActiveMessage()}`;
-      emit(`tool:${callId}:result`, {
-        kind: 'tool_result',
-        toolName: stringValue(message['toolName']) ?? 'unknown',
-        output: textFromContent(message['content']),
-        isError: message['isError'] === true,
-      });
-      this.projectUsage(message['usage'], `tool:${callId}:usage`, emit);
+      const externalCallId = stringValue(message['toolCallId']);
+      const keyCallId = externalCallId ?? `message_${this.ensureActiveMessage()}`;
+      const key = `tool:${keyCallId}:result`;
+      const output = appendBounded(
+        '',
+        textFromContent(stripArtifactSnapshotSource(message['content'])),
+      );
+      const callId = externalCallId === null ? null : this.callIdForExternal(externalCallId);
+      if (callId === null) {
+        emit(key, {
+          kind: 'tool_result',
+          toolName: stringValue(message['toolName']) ?? 'unknown',
+          output,
+          isError: message['isError'] === true,
+        });
+      } else {
+        emit(key, {
+          kind: 'tool_result',
+          toolName: stringValue(message['toolName']) ?? 'unknown',
+          output,
+          isError: message['isError'] === true,
+          callId,
+          shellKind: shellKindFromMetadata(message, 'other'),
+          lifecycle: lifecycleFromMetadata(
+            message,
+            message['isError'] === true ? 'failed' : 'completed',
+          ),
+          terminalCheckpoint: checkpointFromMetadata(message, 'terminal'),
+          outputCompleteness: completenessFromMetadata(message, 'complete'),
+          redaction: EMPTY_REDACTION,
+        });
+      }
+      this.projectUsage(message['usage'], `tool:${keyCallId}:usage`, emit);
       return;
     }
     if (role !== 'assistant') return;
@@ -355,6 +476,11 @@ export class TranscriptProjector {
           kind: 'tool_call',
           toolName: stringValue(contentItem['name']) ?? 'tool',
           inputSummary: summarizeJson(contentItem['arguments']),
+          callId: this.callIdForKey(key, callId),
+          shellKind: shellKindFromMetadata(contentItem, 'other'),
+          lifecycle: lifecycleFromMetadata(contentItem, 'running'),
+          terminalCheckpoint: checkpointFromMetadata(contentItem, 'started'),
+          redaction: EMPTY_REDACTION,
         });
       }
     });
@@ -367,17 +493,43 @@ export class TranscriptProjector {
     isError: boolean,
     emit: (key: string, body: TranscriptBlockBody) => void,
   ): void {
-    const callId = stringValue(event['toolCallId']) ?? `event_${this.eventOrdinal}`;
+    const externalCallId = stringValue(event['toolCallId']);
+    const keyCallId = externalCallId ?? `event_${this.eventOrdinal}`;
     const toolName = stringValue(event['toolName']) ?? 'unknown';
-    const key = `tool:${callId}:result`;
-    const output = textFromContent(stripArtifactSnapshotSource(resultValue));
+    const key = `tool:${keyCallId}:result`;
+    const output = appendBounded('', textFromContent(stripArtifactSnapshotSource(resultValue)));
     this.toolResultBuffers.set(key, output);
-    emit(key, { kind: 'tool_result', toolName, output, isError });
-    this.projectUsage(recordValue(resultValue)?.['usage'], `tool:${callId}:usage`, emit);
+    const callId = externalCallId === null ? null : this.callIdForExternal(externalCallId);
+    if (callId === null) {
+      emit(key, { kind: 'tool_result', toolName, output, isError });
+    } else {
+      emit(key, {
+        kind: 'tool_result',
+        toolName,
+        output,
+        isError,
+        callId,
+        shellKind: shellKindFromMetadata(event, 'other'),
+        lifecycle: lifecycleFromMetadata(
+          event,
+          event.type === 'tool_execution_end' ? (isError ? 'failed' : 'completed') : 'running',
+        ),
+        terminalCheckpoint: checkpointFromMetadata(
+          event,
+          event.type === 'tool_execution_end' ? 'terminal' : 'streaming',
+        ),
+        outputCompleteness: completenessFromMetadata(
+          event,
+          event.type === 'tool_execution_end' ? 'complete' : 'unknown',
+        ),
+        redaction: EMPTY_REDACTION,
+      });
+    }
+    this.projectUsage(recordValue(resultValue)?.['usage'], `tool:${keyCallId}:usage`, emit);
 
     if (isFileMutationTool(toolName)) {
       const patch = extractPatch(resultValue) || output;
-      emit(`tool:${callId}:diff`, {
+      emit(`tool:${keyCallId}:diff`, {
         kind: 'file_diff',
         summary: `${toolName} changed a file`,
         patch,
@@ -441,12 +593,18 @@ export class TranscriptProjector {
     if (sanitized === null) return null;
     const block: FilePreviewBlock = {
       ...sanitized.descriptor,
-      id: stableBlockId(`file-preview:${sanitized.descriptor.artifactId}:${sanitized.descriptor.revision}`),
+      id: stableBlockId(
+        `file-preview:${sanitized.descriptor.artifactId}:${sanitized.descriptor.revision}`,
+      ),
       revision: sanitized.descriptor.revision,
       seq: context.nextSequence(),
       occurredAt: context.occurredAt,
     };
-    if (sanitized.bytes !== null && this.artifactStore !== undefined && context.sessionId !== undefined) {
+    if (
+      sanitized.bytes !== null &&
+      this.artifactStore !== undefined &&
+      context.sessionId !== undefined
+    ) {
       this.artifactStore.putArtifact({
         sessionId: context.sessionId,
         artifactId: block.artifactId,
@@ -458,6 +616,51 @@ export class TranscriptProjector {
       });
     }
     return block;
+  }
+
+  private projectTextArtifact(
+    event: PiRpcEvent,
+    context: TranscriptProjectionContext,
+  ): TextArtifactBlock | null {
+    const metadata = trustedTextArtifactMetadata(event);
+    if (metadata === null) return null;
+    const key = `text-artifact:${metadata.identity}`;
+    return this.createBlock(
+      key,
+      {
+        kind: 'text_artifact',
+        label: metadata.label,
+        source: metadata.source,
+        redaction: EMPTY_REDACTION,
+      },
+      context,
+    ) as TextArtifactBlock;
+  }
+
+  private callIdForExternal(externalCallId: string): string {
+    const current = this.stableCallIds.get(externalCallId);
+    if (current !== undefined) return current;
+    const callId = isOpaqueCallId(externalCallId)
+      ? externalCallId
+      : stableOpaqueId(`external:${externalCallId}`);
+    this.stableCallIds.set(externalCallId, callId);
+    return callId;
+  }
+
+  private callIdForKey(key: string, externalCallId: string | null): string {
+    const current = this.stableCallIds.get(key);
+    if (current !== undefined) {
+      if (externalCallId !== null) this.stableCallIds.set(externalCallId, current);
+      return current;
+    }
+    if (externalCallId !== null) {
+      const callId = this.callIdForExternal(externalCallId);
+      this.stableCallIds.set(key, callId);
+      return callId;
+    }
+    const callId = stableOpaqueId(`key:${key}`);
+    this.stableCallIds.set(key, callId);
+    return callId;
   }
 }
 
@@ -492,7 +695,8 @@ function stringArray(value: JsonValue | undefined): string[] {
 
 function summarizeJson(value: JsonValue | undefined): string {
   if (value === undefined) return '';
-  return typeof value === 'string' ? value : JSON.stringify(value);
+  const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+  return serialized.slice(0, MAX_PROJECTED_INPUT);
 }
 
 function textFromContent(value: JsonValue | undefined): string {
@@ -517,7 +721,10 @@ function stripArtifactSnapshotSource(value: JsonValue | undefined): JsonValue | 
   const record = value as Record<string, JsonValue>;
   const stripped: Record<string, JsonValue> = {};
   for (const [key, child] of Object.entries(record)) {
-    if ((key === 'artifactSnapshot' || key === 'snapshot') && getAllowlistedArtifactSnapshot(child) !== null) {
+    if (
+      (key === 'artifactSnapshot' || key === 'snapshot') &&
+      getAllowlistedArtifactSnapshot(child) !== null
+    ) {
       continue;
     } else {
       stripped[key] = stripArtifactSnapshotSource(child) ?? null;
@@ -540,4 +747,137 @@ function extractPatch(value: JsonValue | undefined): string {
 
 function isFileMutationTool(toolName: string): boolean {
   return ['edit', 'write', 'apply_patch'].includes(toolName.toLowerCase());
+}
+
+function appendBounded(current: string, next: string): string {
+  const combined = `${current}${next}`;
+  return combined.length <= MAX_PROJECTED_OUTPUT
+    ? combined
+    : combined.slice(0, MAX_PROJECTED_OUTPUT);
+}
+
+function isOpaqueCallId(value: string): boolean {
+  return /^[A-Za-z0-9][A-Za-z0-9_-]{2,127}$/.test(value);
+}
+
+function stableOpaqueId(value: string): string {
+  return `call_${createHash('sha256').update(value).digest('hex').slice(0, 24)}`;
+}
+
+function toolCallIdFromRecord(value: Record<string, JsonValue>): string | null {
+  return (
+    stringValue(value['toolCallId']) ??
+    stringValue(recordValue(value['toolCall'])?.['id']) ??
+    stringValue(value['id'])
+  );
+}
+
+function metadataRecord(value: Record<string, JsonValue>): Record<string, JsonValue> {
+  return (
+    recordValue(value['metadata']) ??
+    recordValue(value['meta']) ??
+    recordValue(value['protocolMetadata']) ??
+    value
+  );
+}
+
+function metadataValue(
+  value: Record<string, JsonValue>,
+  keys: readonly string[],
+): JsonValue | undefined {
+  const metadata = metadataRecord(value);
+  for (const key of keys) {
+    if (metadata[key] !== undefined) return metadata[key];
+  }
+  return undefined;
+}
+
+function shellKindFromMetadata(
+  value: Record<string, JsonValue>,
+  fallback: TranscriptShellKind,
+): TranscriptShellKind {
+  const candidate = stringValue(metadataValue(value, ['shellKind', 'shellGenre']));
+  return candidate === 'bash' || candidate === 'shell' || candidate === 'other'
+    ? candidate
+    : fallback;
+}
+
+function lifecycleFromMetadata(
+  value: Record<string, JsonValue>,
+  fallback: TranscriptLifecycle,
+): TranscriptLifecycle {
+  const candidate = stringValue(metadataValue(value, ['lifecycle', 'status']));
+  return candidate === 'queued' ||
+    candidate === 'running' ||
+    candidate === 'completed' ||
+    candidate === 'failed' ||
+    candidate === 'denied' ||
+    candidate === 'cancelled' ||
+    candidate === 'interrupted' ||
+    candidate === 'unknown'
+    ? candidate
+    : fallback;
+}
+
+function checkpointFromMetadata(
+  value: Record<string, JsonValue>,
+  fallback: TranscriptTerminalCheckpoint,
+): TranscriptTerminalCheckpoint {
+  const candidate = stringValue(metadataValue(value, ['terminalCheckpoint', 'checkpoint']));
+  return candidate === 'none' ||
+    candidate === 'started' ||
+    candidate === 'streaming' ||
+    candidate === 'terminal' ||
+    candidate === 'unknown'
+    ? candidate
+    : fallback;
+}
+
+function completenessFromMetadata(
+  value: Record<string, JsonValue>,
+  fallback: TranscriptOutputCompleteness,
+): TranscriptOutputCompleteness {
+  const metadata = metadataRecord(value);
+  const candidate = stringValue(metadataValue(value, ['outputCompleteness', 'completeness']));
+  if (candidate === 'complete' || candidate === 'upstream-truncated' || candidate === 'unknown') {
+    return candidate;
+  }
+  if (metadata['truncated'] === true) return 'upstream-truncated';
+  return fallback;
+}
+
+function trustedTextArtifactMetadata(event: PiRpcEvent): {
+  readonly identity: string;
+  readonly label: TextArtifactBlock['label'];
+  readonly source: string;
+} | null {
+  const metadata = recordValue(event['metadata']);
+  if (metadata === null) return null;
+  const artifact =
+    recordValue(metadata['textArtifact']) ??
+    recordValue(metadata['text_artifact']) ??
+    recordValue(metadata['artifact']);
+  if (artifact === null || artifact['trusted'] !== true || typeof artifact['source'] !== 'string') {
+    return null;
+  }
+  const labelValue = stringValue(artifact['label']) ?? stringValue(artifact['kind']);
+  if (
+    labelValue !== 'prompt' &&
+    labelValue !== 'goal' &&
+    labelValue !== 'plan' &&
+    labelValue !== 'document' &&
+    labelValue !== 'text'
+  ) {
+    return null;
+  }
+  if (artifact['source'].length === 0 || artifact['source'].length > 256 * 1024) return null;
+  const suppliedIdentity = stringValue(artifact['id']) ?? stringValue(artifact['artifactId']);
+  return {
+    identity:
+      suppliedIdentity !== null && isOpaqueCallId(suppliedIdentity)
+        ? suppliedIdentity
+        : stableOpaqueId(`artifact:${labelValue}:${artifact['source']}`),
+    label: labelValue,
+    source: artifact['source'],
+  };
 }

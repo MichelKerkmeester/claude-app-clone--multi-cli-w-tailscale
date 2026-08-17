@@ -167,6 +167,161 @@ const TRIAGE_BLOCKS = [
   },
 ];
 
+const RICH_REDACTION = {
+  policyVersion: 1,
+  fieldsRedacted: 1,
+  reasons: ['command'],
+} as const;
+const RICH_CACHE_REDACTION = {
+  policyVersion: 1,
+  fieldsRedacted: 1,
+  reasons: ['cache', 'command'],
+} as const;
+
+function richCall(
+  id: string,
+  callId: string,
+  seq: number,
+  lifecycle: 'queued' | 'running' | 'completed' | 'failed' | 'denied' | 'cancelled' | 'interrupted',
+) {
+  return {
+    ...base(id, seq, 1),
+    kind: 'tool_call',
+    toolName: 'bash',
+    inputSummary: 'printf "[redacted command]\\n"',
+    callId,
+    shellKind: 'bash',
+    lifecycle,
+    terminalCheckpoint:
+      lifecycle === 'queued' ? 'none' : lifecycle === 'running' ? 'streaming' : 'terminal',
+    redaction: RICH_REDACTION,
+  };
+}
+
+function richResult(
+  id: string,
+  callId: string,
+  seq: number,
+  lifecycle: 'queued' | 'running' | 'completed' | 'failed' | 'denied' | 'cancelled' | 'interrupted',
+  output: string,
+  outputCompleteness: 'complete' | 'upstream-truncated' | 'unknown' | undefined = undefined,
+) {
+  return {
+    ...base(id, seq, 1),
+    kind: 'tool_result',
+    toolName: 'bash',
+    output,
+    isError: lifecycle === 'failed',
+    callId,
+    shellKind: 'bash',
+    lifecycle,
+    terminalCheckpoint: lifecycle === 'running' ? 'streaming' : 'terminal',
+    outputCompleteness: outputCompleteness ?? (lifecycle === 'completed' ? 'complete' : 'unknown'),
+    redaction: RICH_REDACTION,
+  };
+}
+
+export const DEMO_RICH_CONTENT_BLOCKS: readonly Record<string, unknown>[] = [
+  richCall('rich-call-running', 'rich-call-001', 1, 'running'),
+  richResult(
+    'rich-result-running',
+    'rich-call-001',
+    2,
+    'running',
+    'first line\nsecond line\nthird line\nfourth line\nfifth line\nsixth line\nseventh line\ncurrent tail',
+  ),
+  richResult('rich-result-before-call', 'rich-call-002', 3, 'completed', 'result arrived first\n'),
+  richCall('rich-call-before-result', 'rich-call-002', 4, 'completed'),
+  richCall('rich-call-completed', 'rich-call-003', 5, 'completed'),
+  richResult('rich-result-completed', 'rich-call-003', 6, 'completed', 'done\n'),
+  richCall('rich-call-failed', 'rich-call-004', 7, 'failed'),
+  richResult('rich-result-failed', 'rich-call-004', 8, 'failed', 'command failed\n'),
+  richCall('rich-call-denied', 'rich-call-005', 9, 'denied'),
+  richCall('rich-call-cancelled', 'rich-call-006', 10, 'cancelled'),
+  richCall('rich-call-interrupted', 'rich-call-007', 11, 'interrupted'),
+  {
+    ...base('rich-code-source', 12, 1),
+    kind: 'text',
+    role: 'assistant',
+    text: 'Here is the bounded code:\n\n```bash\nprintf "hello\\n"\n# no line numbers\n```\n',
+    settled: true,
+  },
+  {
+    ...base('rich-long-text', 13, 1),
+    kind: 'text',
+    role: 'assistant',
+    text: Array.from({ length: 18 }, (_, index) => `Long text line ${index + 1}`).join('\n'),
+    settled: true,
+  },
+  {
+    ...base('rich-text-artifact', 14, 1),
+    kind: 'text_artifact',
+    label: 'document',
+    source: 'A committed text artifact with an exact trailing newline.\n',
+    redaction: RICH_REDACTION,
+  },
+  {
+    ...base('rich-unknown', 15, 1),
+    kind: 'unknown_payload',
+    payload: '<not rendered>',
+  },
+  {
+    ...base('rich-legacy-incomplete', 16, 1),
+    kind: 'tool_call',
+    toolName: 'legacy-tool',
+    inputSummary: 'legacy content remains read-only',
+  },
+  {
+    ...base('rich-optimistic', 17, 1),
+    kind: 'text',
+    role: 'user',
+    text: 'This optimistic prompt must remain outside rich cards.',
+    provenance: 'optimistic',
+  },
+];
+
+export const DEMO_RICH_RELEASE_BLOCKS: readonly Record<string, unknown>[] = [
+  ...DEMO_RICH_CONTENT_BLOCKS,
+  {
+    ...richCall('rich-release-cache-call', 'rich-release-cache', 18, 'running'),
+    redaction: RICH_CACHE_REDACTION,
+  },
+  {
+    ...richResult(
+      'rich-release-cache-result',
+      'rich-release-cache',
+      19,
+      'running',
+      Array.from({ length: 80 }, (_, index) => `cached tail line ${index + 1}`).join('\n'),
+    ),
+    redaction: RICH_CACHE_REDACTION,
+    revision: 2,
+  },
+  richCall('rich-release-truncated-call', 'rich-release-truncated', 20, 'completed'),
+  richResult(
+    'rich-release-truncated-result',
+    'rich-release-truncated',
+    21,
+    'completed',
+    'first retained line\nlast retained line\n',
+    'upstream-truncated',
+  ),
+  {
+    ...base('rich-release-rtl', 22, 1),
+    kind: 'text',
+    role: 'assistant',
+    text: 'RTL prose: مرحبًا بالعالم\nControl marker: \u202evisible order',
+    settled: true,
+  },
+  {
+    ...base('rich-release-200-text', 23, 1),
+    kind: 'text',
+    role: 'assistant',
+    text: Array.from({ length: 30 }, (_, index) => `200 percent text line ${index + 1}`).join('\n'),
+    settled: true,
+  },
+];
+
 export const DEMO_ARTIFACT_BLOCKS: readonly FilePreviewBlock[] = [
   {
     ...artifactBase('blk-artifact-ready', 'rev_ready_001', 8, 5),
@@ -477,9 +632,33 @@ function isImagePdfReleaseFixture(): boolean {
   return fixtureName() === 'image-pdf-release';
 }
 
+function isRichCoreFixture(): boolean {
+  return fixtureName() === 'rich-core';
+}
+
+function isRichReleaseFixture(): boolean {
+  return fixtureName() === 'rich-release';
+}
+
 function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   const session = SESSIONS.find((candidate) => candidate.id === sessionId);
   if (session === undefined) return [];
+  if (isRichCoreFixture() && sessionId === SESSION_IDLE) {
+    return [
+      ...session.blocks,
+      ...DEMO_RICH_CONTENT_BLOCKS.filter(
+        (block) => block.kind !== 'unknown_payload' && block.provenance !== 'optimistic',
+      ),
+    ];
+  }
+  if (isRichReleaseFixture() && sessionId === SESSION_IDLE) {
+    return [
+      ...session.blocks,
+      ...DEMO_RICH_RELEASE_BLOCKS.filter(
+        (block) => block.kind !== 'unknown_payload' && block.provenance !== 'optimistic',
+      ),
+    ];
+  }
   if (isArtifactStatesFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_ARTIFACT_BLOCKS];
   }
@@ -839,7 +1018,10 @@ export function demoArtifactBytes(block: FilePreviewBlock): Uint8Array {
   if (block.artifactId === 'artifact_ready_001' && block.revision === 'rev_ready_001') {
     return new TextEncoder().encode(DEMO_READY_TEXT);
   }
-  if (block.artifactId === 'artifact_image_ready_001' || block.artifactId === 'artifact_image_offline_001') {
+  if (
+    block.artifactId === 'artifact_image_ready_001' ||
+    block.artifactId === 'artifact_image_offline_001'
+  ) {
     return DEMO_IMAGE_BYTES.slice();
   }
   if (block.artifactId === 'artifact_pdf_safe_001') return DEMO_PDF_BYTES.slice();

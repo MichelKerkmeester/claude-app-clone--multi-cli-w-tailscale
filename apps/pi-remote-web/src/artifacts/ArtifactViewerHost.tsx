@@ -25,6 +25,7 @@ import { ArtifactHeader, type ArtifactHeaderProps } from './ArtifactHeader.js';
 import { ArtifactStatus } from './ArtifactStatus.js';
 import type {
   ArtifactDismissalReason,
+  InMemoryArtifactDocument,
   ArtifactPreview,
   ArtifactViewerPhase,
 } from './ArtifactViewerProvider.js';
@@ -61,6 +62,20 @@ function isLegacyDiffSource(value: unknown): value is FileDiffBlock {
     (value as { readonly kind?: unknown }).kind === 'file_diff' &&
     typeof (value as { readonly summary?: unknown }).summary === 'string' &&
     typeof (value as { readonly patch?: unknown }).patch === 'string'
+  );
+}
+
+function isInMemoryArtifactSource(value: unknown): value is InMemoryArtifactDocument {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value as { readonly kind?: unknown }).kind === 'in-memory' &&
+    typeof (value as { readonly id?: unknown }).id === 'string' &&
+    typeof (value as { readonly displayName?: unknown }).displayName === 'string' &&
+    (value as { readonly renderer?: unknown }).renderer !== undefined &&
+    typeof (value as { readonly text?: unknown }).text === 'string' &&
+    typeof (value as { readonly summary?: unknown }).summary === 'string' &&
+    (value as { readonly redaction?: unknown }).redaction === 'applied'
   );
 }
 
@@ -144,6 +159,21 @@ function errorPreviewMessage(status: ArtifactResourceStatus): string {
       return 'The relay temporarily rate-limited this exact revision.';
     default:
       return 'The exact revision could not be loaded.';
+  }
+}
+
+function inMemoryStatusMessage(document: InMemoryArtifactDocument): string | null {
+  switch (document.sourceState) {
+    case 'stale-cache':
+      return 'This is a stale cached snapshot. No replacement content was loaded.';
+    case 'connection-lost':
+      return 'The connection was lost. The last trustworthy redacted snapshot remains visible.';
+    case 'terminal-without-result':
+      return 'The command reached a terminal state without a result.';
+    case 'source-removed':
+      return 'The source was removed. The last trustworthy redacted snapshot remains visible.';
+    default:
+      return null;
   }
 }
 
@@ -250,8 +280,41 @@ function renderDescriptor(
   }
 }
 
+function renderInMemoryDocument(
+  document: InMemoryArtifactDocument,
+  wrap: boolean,
+  findTerm: string,
+): React.ReactNode {
+  switch (document.renderer) {
+    case 'text':
+      return (
+        <TextPreview
+          text={document.text}
+          wrap={wrap}
+          findTerm={findTerm}
+          ariaLabel={`${document.displayName} preview`}
+        />
+      );
+    case 'code':
+      return (
+        <CodePreview
+          text={document.text}
+          {...(document.language === undefined ? {} : { language: document.language })}
+          {...(document.revision === undefined ? {} : { revision: document.revision })}
+          wrap={wrap}
+          findTerm={findTerm}
+          ariaLabel={`${document.displayName} code preview`}
+          followTail={document.live === true}
+        />
+      );
+    case 'diff':
+      return <DiffPreview patch={document.text} wrap={wrap} findTerm={findTerm} />;
+  }
+}
+
 export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHostProps) {
   useVisualViewportAnchor();
+  const hasPreview = preview !== null;
   const dialogRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const edgeStartRef = useRef<{ readonly x: number; readonly y: number } | null>(null);
@@ -264,6 +327,8 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   const sourceValue: unknown = preview?.source;
   const legacyDiff: FileDiffBlock | null =
     sourceValue !== undefined && isLegacyDiffSource(sourceValue) ? sourceValue : null;
+  const inMemory: InMemoryArtifactDocument | null =
+    sourceValue !== undefined && isInMemoryArtifactSource(sourceValue) ? sourceValue : null;
   const descriptor: FilePreviewBlock | null =
     sourceValue !== undefined && isFilePreviewBlock(sourceValue) ? sourceValue : null;
   const sessionId = preview?.trigger?.dataset.artifactSessionId ?? null;
@@ -282,8 +347,7 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     [],
   );
   const onPdfRendererStatus = useCallback(
-    (status: PdfPreviewState) =>
-      onRendererStatus(status === 'withheld' ? 'relay-error' : status),
+    (status: PdfPreviewState) => onRendererStatus(status === 'withheld' ? 'relay-error' : status),
     [onRendererStatus],
   );
 
@@ -331,12 +395,12 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
   }, [announcement, resource.status]);
 
   useEffect(() => {
-    if (preview === null || (phase !== 'opening' && phase !== 'ready-diff')) return undefined;
+    if (!hasPreview || (phase !== 'opening' && phase !== 'ready-diff')) return undefined;
     const timer = window.setTimeout(() => {
       headingRef.current?.focus({ preventScroll: true });
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [phase, preview?.generation]);
+  }, [hasPreview, phase, preview?.generation]);
 
   useEffect(() => {
     if (phase !== 'ready-diff') return undefined;
@@ -381,15 +445,18 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     if (touch !== undefined) finishEdgeBack(touch.clientX, touch.clientY);
   };
 
-  const kind = descriptor === null ? 'diff' : descriptorKind(descriptor);
-  const subject = descriptor === null ? 'Redacted file diff' : descriptorSubject(descriptor);
-  const title = descriptor === null ? 'File diff' : descriptorSubject(descriptor);
+  const kind = inMemory?.renderer ?? (descriptor === null ? 'diff' : descriptorKind(descriptor));
+  const subject =
+    inMemory?.displayName ??
+    (descriptor === null ? 'Redacted file diff' : descriptorSubject(descriptor));
+  const title =
+    inMemory?.displayName ?? (descriptor === null ? 'File diff' : descriptorSubject(descriptor));
   const resourceStatus = descriptor === null ? null : resource.status;
   const currentStatus =
     descriptor === null
       ? null
       : isReadyDescriptor(descriptor)
-        ? rendererStatus ?? resource.status
+        ? (rendererStatus ?? resource.status)
         : null;
   const binaryPreviewReady =
     descriptor !== null &&
@@ -397,7 +464,9 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     resource.status === 'ready' &&
     rendererStatus === 'ready';
   const body =
-    descriptor === null ? (
+    inMemory !== null ? (
+      renderInMemoryDocument(inMemory, wrap, findTerm)
+    ) : descriptor === null ? (
       legacyDiff === null ? (
         <UnsupportedPreview message="The preview source could not be verified." />
       ) : (
@@ -417,48 +486,60 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
         setFindTerm,
       )
     );
-  const displayedBuffer = descriptor === null ? (legacyDiff?.patch ?? null) : resource.buffer;
+  const displayedBuffer =
+    inMemory !== null
+      ? inMemory.text
+      : descriptor === null
+        ? (legacyDiff?.patch ?? null)
+        : resource.buffer;
   const shareInput: DisplayedArtifactShareInput = {
     displayName: title,
-    renderer: descriptor?.renderer ?? 'diff',
+    renderer: inMemory?.renderer ?? descriptor?.renderer ?? 'diff',
     displayedBuffer: displayedBuffer ?? '',
-    shareAllowed: descriptor?.shareAllowed ?? false,
-    redaction: descriptor?.redaction ?? 'not-needed',
+    shareAllowed: inMemory === null ? (descriptor?.shareAllowed ?? false) : false,
+    redaction: inMemory !== null ? 'applied' : (descriptor?.redaction ?? 'not-needed'),
     completeness: descriptor?.completeness ?? 'complete',
     ...(binaryPreviewReady && resource.bytes !== null
       ? { displayedBytes: resource.bytes, mimeType: descriptor.mimeType }
       : {}),
   };
-  const displayedBytes =
-    binaryPreviewReady ? resource.bytes : null;
+  const displayedBytes = binaryPreviewReady ? resource.bytes : null;
   const canCopy = displayedBuffer !== null && canCopyDisplayedArtifact();
   const canShare =
     (displayedBuffer !== null || displayedBytes !== null) && canShareDisplayedArtifact(shareInput);
   const terminal =
-    legacyDiff === null && descriptor === null
-      ? 'The preview source could not be verified.'
-      : descriptor !== null && !isReadyDescriptor(descriptor)
-        ? unavailableMessage(descriptor)
-        : descriptor !== null && descriptorKind(descriptor) === null
+    inMemory !== null
+      ? inMemoryStatusMessage(inMemory)
+      : inMemory === null && legacyDiff === null && descriptor === null
+        ? 'The preview source could not be verified.'
+        : descriptor !== null && !isReadyDescriptor(descriptor)
           ? unavailableMessage(descriptor)
-          : resourceStatus !== null
-            ? terminalMessage(currentStatus ?? resourceStatus)
-            : null;
+          : descriptor !== null && descriptorKind(descriptor) === null
+            ? unavailableMessage(descriptor)
+            : resourceStatus !== null
+              ? terminalMessage(currentStatus ?? resourceStatus)
+              : null;
   const statusAnnouncement =
     announcement ??
-    (descriptor === null && legacyDiff === null
+    (inMemory === null && descriptor === null && legacyDiff === null
       ? 'The preview source could not be verified.'
       : descriptor !== null &&
           (!isReadyDescriptor(descriptor) || descriptorKind(descriptor) === null)
         ? unavailableMessage(descriptor)
         : null);
-  const kindLabel = descriptor === null ? 'Redacted artifact' : `Redacted ${kind ?? 'artifact'}`;
+  const kindLabel =
+    inMemory !== null
+      ? `Redacted ${kind ?? 'artifact'}`
+      : descriptor === null
+        ? 'Redacted artifact'
+        : `Redacted ${kind ?? 'artifact'}`;
   const headerProps: ArtifactHeaderProps = {
     headingRef,
     onClose: () => onClose('close'),
     title,
     kindLabel,
-    revision: descriptor?.revision ?? null,
+    revision:
+      descriptor?.revision ?? (inMemory?.revision === undefined ? null : String(inMemory.revision)),
   };
   const onCopy = () => {
     if (displayedBuffer === null) return;
@@ -510,12 +591,14 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
           />
           <div className="artifact-viewer-content">
             <p className="artifact-viewer-summary" dir="auto">
-              {descriptor === null
-                ? (legacyDiff?.summary ?? 'Unverified preview source')
-                : `${descriptor.mimeType} · ${descriptor.completeness === 'excerpt' ? 'Excerpt' : 'Complete'} · ${descriptor.redaction === 'applied' ? 'Redacted' : 'Relay-sanitized'}`}
+              {inMemory !== null
+                ? inMemory.summary
+                : descriptor === null
+                  ? (legacyDiff?.summary ?? 'Unverified preview source')
+                  : `${descriptor.mimeType} · ${descriptor.completeness === 'excerpt' ? 'Excerpt' : 'Complete'} · ${descriptor.redaction === 'applied' ? 'Redacted' : 'Relay-sanitized'}`}
             </p>
             <PreviewControls
-              kind={kind === 'image' || kind === 'pdf' ? 'text' : kind ?? 'text'}
+              kind={kind === 'image' || kind === 'pdf' ? 'text' : (kind ?? 'text')}
               wrap={wrap}
               findTerm={findTerm}
               {...(kind === 'text' || kind === 'code' || kind === 'diff'

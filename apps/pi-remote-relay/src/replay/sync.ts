@@ -2,6 +2,7 @@
 // MODULE: Replay and Live Sync Barrier
 // ───────────────────────────────────────────────────────────────────
 
+import { isEnvelope } from '@pi-remote/pi-rpc-protocol';
 import type { Envelope, SyncCursor, SyncDelta, SyncMessage } from '@pi-remote/pi-rpc-protocol';
 
 import type { RelayStore } from '../store/relay-store.js';
@@ -30,6 +31,9 @@ export class SyncHub {
   /** Redact and persist an envelope before notifying any subscriber. */
   public publish(candidate: Envelope): Envelope {
     const result = this.store.appendEnvelope(candidate);
+    if (!isEnvelope(result.envelope)) {
+      throw new TypeError('Sync refused an envelope that failed the redaction contract.');
+    }
     if (result.inserted) {
       this.broadcast(result.envelope);
       for (const listener of this.committedListeners) listener(result.envelope);

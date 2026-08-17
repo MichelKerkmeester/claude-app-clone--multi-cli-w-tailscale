@@ -26,6 +26,11 @@ export {
   RUNTIME_ISSUE_CODES,
   RUNTIME_MODES,
   SLASH_SUBMIT_ISSUE_CODES,
+  TEXT_ARTIFACT_LABELS,
+  TRANSCRIPT_LIFECYCLES,
+  TRANSCRIPT_OUTPUT_COMPLETENESS,
+  TRANSCRIPT_SHELL_KINDS,
+  TRANSCRIPT_TERMINAL_CHECKPOINTS,
 } from './types.js';
 
 export {
@@ -92,6 +97,11 @@ export {
   isSyncMessage,
   isTranscriptBlock,
   isTranscriptPageDto,
+  isRedactionMetadata,
+  isRichToolCallBlock,
+  isRichToolResultBlock,
+  isRichTranscriptBlock,
+  isTextArtifactBlock,
   isWebSocketTicketResponse,
 } from './guards.js';
 
@@ -169,6 +179,8 @@ export type {
   ReadStateCommand,
   RedactionMetadata,
   ReplayMetadata,
+  RichToolCallBlock,
+  RichToolResultBlock,
   RuntimeControlCommand,
   RuntimeControlOutcome,
   RuntimeControlReasonCode,
@@ -197,7 +209,13 @@ export type {
   SyncMessage,
   SyncSnapshot,
   TextBlock,
+  TextArtifactBlock,
+  TextArtifactLabel,
   ThinkingBlock,
+  TranscriptLifecycle,
+  TranscriptOutputCompleteness,
+  TranscriptShellKind,
+  TranscriptTerminalCheckpoint,
   ToolCallBlock,
   ToolResultBlock,
   TranscriptBlock,

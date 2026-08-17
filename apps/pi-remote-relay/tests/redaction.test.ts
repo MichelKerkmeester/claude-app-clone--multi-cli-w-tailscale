@@ -2,14 +2,17 @@
 // MODULE: Canonical Redaction Tests
 // ───────────────────────────────────────────────────────────────────
 
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
 import {
   isFilePreviewBlock,
+  isTranscriptBlock,
+  isRichTranscriptBlock,
   isPlanSnapshotDto,
   type Envelope,
   type PiRpcEvent,
-  type PlanSnapshotDto,
 } from '@pi-remote/pi-rpc-protocol';
 
 import { publishPiEvent } from '../src/index.js';
@@ -38,6 +41,18 @@ const ARTIFACT_EVENT = {
   },
 };
 
+const RICH_FIXTURES = JSON.parse(
+  readFileSync(new URL('../src/fixtures/rich-content-redacted.json', import.meta.url), 'utf8'),
+) as {
+  readonly fixtures: readonly {
+    readonly name: string;
+    readonly event?: unknown;
+    readonly payload?: unknown;
+    readonly expectedMarkers?: readonly string[];
+    readonly expected?: string;
+  }[];
+};
+
 function envelopeWith(payload: Envelope['payload']): Envelope {
   return {
     v: 1,
@@ -57,6 +72,30 @@ function envelopeWith(payload: Envelope['payload']): Envelope {
 }
 
 describe('canonical redaction', () => {
+  it('keeps deterministic rich event fixtures redacted and legacy fixtures non-rich', () => {
+    let sequence = 0;
+    const projector = new TranscriptProjector();
+    for (const fixture of RICH_FIXTURES.fixtures) {
+      if (fixture.payload !== undefined) {
+        expect(isTranscriptBlock(fixture.payload)).toBe(fixture.expected === 'legacy-only');
+        expect(isRichTranscriptBlock(fixture.payload)).toBe(false);
+        continue;
+      }
+      const blocks = projector.project(fixture.event as PiRpcEvent, {
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        nextSequence: () => ++sequence,
+      });
+      const redacted = blocks.map((block) => redactEnvelope(envelopeWith(block)).payload);
+      const serialized = JSON.stringify(redacted);
+      for (const marker of fixture.expectedMarkers ?? []) {
+        expect(serialized).toContain(marker);
+      }
+      for (const forbidden of ['fixture-canary', 'fixture-user:fixture-pass', '/Users/fixture/']) {
+        expect(serialized).not.toContain(forbidden);
+      }
+    }
+  });
+
   it('removes path fields, private prompts and secret fields recursively', () => {
     const redacted = redactEnvelope(
       envelopeWith({
@@ -86,6 +125,138 @@ describe('canonical redaction', () => {
 
     expect(source.payload).toEqual({ path: '/tmp/source.txt' });
     expect(redacted.payload).toEqual({ path: '[REDACTED_PATH]' });
+  });
+
+  it('redacts rich projections before storage, page responses, sync, and errors', () => {
+    const projector = new TranscriptProjector();
+    const block = projector.project(
+      {
+        type: 'tool_execution_end',
+        toolCallId: 'call_redaction_001',
+        toolName: 'custom /Users/private-tool',
+        result: {
+          content: [
+            {
+              type: 'text',
+              text: 'read /Users/alice/private.txt token=rich-canary https://user:pass@example.test/x',
+            },
+          ],
+        },
+        isError: false,
+        metadata: {
+          shellKind: 'bash',
+          lifecycle: 'completed',
+          terminalCheckpoint: 'terminal',
+          outputCompleteness: 'complete',
+          note: '\u001b[31m\u202e rich-canary',
+        },
+      } as PiRpcEvent,
+      { occurredAt: '2026-01-01T00:00:00.000Z', nextSequence: () => 1 },
+    )[0];
+    expect(block).toBeDefined();
+
+    const candidate: Envelope = {
+      ...envelopeWith(block ?? { value: 'missing' }),
+      kind: 'transcript.block',
+      payload: block ?? { value: 'missing' },
+    };
+    const redacted = redactEnvelope(candidate);
+    const direct = JSON.stringify(redacted);
+    expect(isRichTranscriptBlock(redacted.payload)).toBe(true);
+    for (const sentinel of ['rich-canary', '/Users/alice', 'user:pass', 'private-tool']) {
+      expect(direct).not.toContain(sentinel);
+    }
+    expect(direct).toContain('[REDACTED_PATH]');
+    expect(direct).toContain('[REDACTED_SECRET]');
+    expect(direct).toContain('[REDACTED_TOOL]');
+    expect(redacted.redaction.fieldsRedacted).toBeGreaterThan(0);
+    expect(
+      JSON.stringify(
+        redactEnvelope(envelopeWith({ metadata: { note: '\u001b[31m\u202e metadata-canary' } })),
+      ),
+    ).toContain('[REDACTED_CONTROL]');
+
+    const store = new RelayStore();
+    try {
+      const sync = new SyncHub(store);
+      const messages: unknown[] = [];
+      const logs: string[] = [];
+      sync.onCommitted((envelope) => logs.push(JSON.stringify(envelope)));
+      sync.subscribe(
+        {
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: 'session_local',
+        },
+        (message) => messages.push(message),
+      );
+      const stored = sync.publish(candidate);
+      const page = store.getTranscriptPage({
+        hostId: 'host_local',
+        workspaceRef: 'workspace_default',
+        sessionId: 'session_local',
+      });
+      const boundary = JSON.stringify({ stored, page, messages });
+      for (const sentinel of ['rich-canary', '/Users/alice', 'user:pass', 'private-tool']) {
+        expect(boundary).not.toContain(sentinel);
+      }
+      expect(boundary).toContain('[REDACTED_SECRET]');
+      expect(boundary).toContain('[REDACTED_TOOL]');
+      const serializedLogs = logs.join('\n');
+      expect(serializedLogs).toContain('[REDACTED_SECRET]');
+      expect(serializedLogs).toContain('[REDACTED_PATH]');
+      for (const sentinel of ['rich-canary', '/Users/alice', 'user:pass', 'private-tool']) {
+        expect(serializedLogs).not.toContain(sentinel);
+      }
+
+      let errorText = '';
+      try {
+        store.appendEnvelope({
+          ...candidate,
+          eventId: 'event_malformed_rich',
+          payload: {
+            ...(block as unknown as Record<string, unknown>),
+            lifecycle: 'not-a-lifecycle',
+            metadata: 'malformed-canary',
+          } as unknown as Envelope['payload'],
+        });
+      } catch (error: unknown) {
+        errorText = error instanceof Error ? error.message : String(error);
+      }
+      expect(errorText).toContain(
+        'Relay refused a malformed transcript projection after redaction.',
+      );
+      expect(errorText).toContain('[REDACTED_SECRET]');
+      expect(errorText).toContain('[REDACTED_PATH]');
+      expect(errorText).not.toContain('rich-canary');
+      expect(errorText).not.toContain('/Users/alice');
+    } finally {
+      store.close();
+    }
+  });
+
+  it('redacts rich canonical source before it can become a renderer or worker input', () => {
+    const canary = 'rich-source-secret-001';
+    const redacted = redactEnvelope(
+      envelopeWith({
+        id: 'rich-source-block',
+        revision: 4,
+        seq: 4,
+        kind: 'text_artifact',
+        label: 'document',
+        source: `token=${canary} path=/Users/alice/private.txt \u001b[31m\u202e`,
+        redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+      }),
+    );
+    const serialized = JSON.stringify(redacted);
+
+    expect(serialized).not.toContain(canary);
+    expect(serialized).not.toContain('/Users/alice');
+    expect(serialized).not.toContain('\u001b');
+    expect(serialized).not.toContain('\u202e');
+    expect(serialized).toContain('[REDACTED_SECRET]');
+    expect(serialized).toContain('[REDACTED_PATH]');
+    expect(serialized).toContain('[REDACTED_CONTROL]');
   });
 
   it('strips the raw plan binding before any persistence, replay or broadcast', () => {
@@ -235,7 +406,13 @@ describe('canonical redaction', () => {
         },
         isError: false,
       } as unknown as PiRpcEvent;
-      publishPiEvent(store, sync, new TranscriptProjector(store.artifactStore), approved, 'epoch_artifact');
+      publishPiEvent(
+        store,
+        sync,
+        new TranscriptProjector(store.artifactStore),
+        approved,
+        'epoch_artifact',
+      );
 
       const page = store.getTranscriptPage({
         hostId: 'host_local',
@@ -245,11 +422,14 @@ describe('canonical redaction', () => {
       const preview = page.items.find((item) => item.kind === 'file_preview');
       expect(preview).toBeDefined();
       expect(isFilePreviewBlock(preview)).toBe(true);
-      const durable = JSON.stringify({ page, replay: store.createSyncPlan({
-        hostId: 'host_local',
-        workspaceRef: 'workspace_default',
-        sessionId: 'session_local',
-      }) });
+      const durable = JSON.stringify({
+        page,
+        replay: store.createSyncPlan({
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: 'session_local',
+        }),
+      });
       expect(durable).not.toContain('safe sanitized bytes');
       expect(durable).not.toContain('artifactSnapshot');
 

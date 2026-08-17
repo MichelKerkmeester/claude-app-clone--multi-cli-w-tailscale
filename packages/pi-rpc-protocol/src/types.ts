@@ -564,6 +564,113 @@ export interface RedactedAttachmentBlock extends TranscriptBlockBase {
   readonly previewRetained: false;
 }
 
+export const INBOUND_IMAGE_MEDIA_CLASSES = ['screenshot', 'raster', 'generated'] as const;
+export type InboundImageMediaClass = (typeof INBOUND_IMAGE_MEDIA_CLASSES)[number];
+
+export const INBOUND_IMAGE_DISPLAY_NAMES = ['Screenshot', 'Image from pi'] as const;
+export type InboundImageDisplayName = (typeof INBOUND_IMAGE_DISPLAY_NAMES)[number];
+
+export const INBOUND_IMAGE_SOURCES = ['tool_result', 'assistant_output', 'extension'] as const;
+export type InboundImageSource = (typeof INBOUND_IMAGE_SOURCES)[number];
+
+export const INBOUND_IMAGE_AVAILABILITIES = [
+  'processing',
+  'ready',
+  'withheld',
+  'expired',
+  'revoked',
+] as const;
+export type InboundImageAvailability = (typeof INBOUND_IMAGE_AVAILABILITIES)[number];
+
+export const INBOUND_IMAGE_ARTIFACT_MEDIA_TYPES = ['image/png', 'image/jpeg'] as const;
+export type InboundImageArtifactMediaType = (typeof INBOUND_IMAGE_ARTIFACT_MEDIA_TYPES)[number];
+
+export const INBOUND_IMAGE_REDACTION_STATUSES = ['not-needed', 'applied'] as const;
+export type InboundImageRedactionStatus = (typeof INBOUND_IMAGE_REDACTION_STATUSES)[number];
+
+export const INBOUND_IMAGE_TERMINAL_REASONS = [
+  'capture-permission',
+  'unsupported-type',
+  'too-large',
+  'invalid-image',
+  'redaction-unavailable',
+  'policy',
+  'retention',
+] as const;
+export type InboundImageTerminalReason = (typeof INBOUND_IMAGE_TERMINAL_REASONS)[number];
+
+export const INBOUND_IMAGE_CONTENT_KINDS = ['artifact-ref', 'none'] as const;
+export type InboundImageContentKind = (typeof INBOUND_IMAGE_CONTENT_KINDS)[number];
+
+/** Shared identity and provenance fields for the metadata-only inbound image lifecycle. */
+export interface InboundImageBlockBase extends JsonObject {
+  readonly id: string;
+  readonly revision: number;
+  readonly seq: number;
+  readonly occurredAt: string;
+  readonly kind: 'inbound_image';
+  readonly schemaVersion: 1;
+  readonly mediaClass: InboundImageMediaClass;
+  readonly displayName: InboundImageDisplayName;
+  readonly source: InboundImageSource;
+}
+
+export interface InboundImageProcessingBlock extends InboundImageBlockBase {
+  readonly availability: 'processing';
+}
+
+export interface InboundImageArtifactVariant extends JsonObject {
+  readonly digest: string;
+  readonly mediaType: InboundImageArtifactMediaType;
+  readonly width: number;
+  readonly height: number;
+  readonly byteLength: number;
+}
+
+export interface InboundImageArtifact extends JsonObject {
+  readonly id: string;
+  readonly revision: string;
+  readonly expiresAt: string;
+  readonly full: InboundImageArtifactVariant;
+  readonly thumbnail: InboundImageArtifactVariant;
+}
+
+export interface InboundImagePresentation extends JsonObject {
+  readonly safeAlt: string;
+  readonly safeDescription?: string;
+}
+
+export interface InboundImageRedaction extends JsonObject {
+  readonly status: InboundImageRedactionStatus;
+}
+
+export interface InboundImageArtifactReference extends JsonObject {
+  readonly kind: 'artifact-ref';
+}
+
+export interface InboundImageNoContent extends JsonObject {
+  readonly kind: 'none';
+}
+
+export interface InboundImageReadyBlock extends InboundImageBlockBase {
+  readonly availability: 'ready';
+  readonly artifact: InboundImageArtifact;
+  readonly presentation: InboundImagePresentation;
+  readonly redaction: InboundImageRedaction;
+  readonly shareAllowed: false;
+  readonly content: InboundImageArtifactReference;
+}
+
+export interface InboundImageTerminalBlock extends InboundImageBlockBase {
+  readonly availability: 'withheld' | 'expired' | 'revoked';
+  readonly reason: InboundImageTerminalReason;
+  readonly shareAllowed: false;
+  readonly content: InboundImageNoContent;
+}
+
+export type InboundImageBlock =
+  InboundImageProcessingBlock | InboundImageReadyBlock | InboundImageTerminalBlock;
+
 export type TranscriptBlock =
   | TextBlock
   | ThinkingBlock
@@ -574,7 +681,8 @@ export type TranscriptBlock =
   | FileDiffBlock
   | FilePreviewBlock
   | UsageBlock
-  | RedactedAttachmentBlock;
+  | RedactedAttachmentBlock
+  | InboundImageBlock;
 
 export interface TranscriptPageDto {
   readonly sessionId: string;

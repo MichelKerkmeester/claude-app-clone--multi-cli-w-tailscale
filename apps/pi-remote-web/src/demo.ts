@@ -53,6 +53,13 @@ export const DEMO_ARTIFACT_STATES_FIXTURE = Object.freeze({
   imagePdfRelease: 'image-pdf-release',
 });
 
+export const DEMO_INBOUND_MEDIA_FIXTURE = Object.freeze({
+  query: '?demo=1&fixture=inbound-media',
+  availability: 'withheld',
+  reason: 'capture-permission',
+  capability: 'unsupported',
+});
+
 let cachedEnabled: boolean | null = null;
 
 /**
@@ -95,6 +102,19 @@ function base(id: string, seq: number, minutesAgo: number) {
 function artifactBase(id: string, revision: string, seq: number, minutesAgo: number) {
   return { id, revision, seq, occurredAt: isoAgo(minutesAgo) };
 }
+
+const DEMO_INBOUND_MEDIA_BLOCK = {
+  ...base('blk-inbound-disabled', 8, 5),
+  kind: 'inbound_image',
+  schemaVersion: 1,
+  mediaClass: 'screenshot',
+  displayName: 'Screenshot',
+  source: 'tool_result',
+  availability: 'withheld',
+  reason: 'capture-permission',
+  shareAllowed: false,
+  content: { kind: 'none' },
+} as const;
 
 // A representative completed turn: user request, then the agent's thinking,
 // tool calls, a file diff, prose, and usage — so evidence collapse, turn
@@ -624,6 +644,10 @@ function isArtifactStatesFixture(): boolean {
   return fixtureName() === 'artifact-states';
 }
 
+function isInboundMediaFixture(): boolean {
+  return fixtureName() === 'inbound-media';
+}
+
 function isTextCodeShareFixture(): boolean {
   return fixtureName() === 'text-code-share';
 }
@@ -661,6 +685,9 @@ function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   }
   if (isArtifactStatesFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_ARTIFACT_BLOCKS];
+  }
+  if (isInboundMediaFixture() && sessionId === SESSION_IDLE) {
+    return [...session.blocks, DEMO_INBOUND_MEDIA_BLOCK];
   }
   if (isTextCodeShareFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_TEXT_CODE_SHARE_BLOCKS];

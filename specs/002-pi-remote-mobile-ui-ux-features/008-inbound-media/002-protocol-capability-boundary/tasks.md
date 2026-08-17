@@ -61,12 +61,12 @@ All concrete tasks below must be addressed before this phase is shippable.
 See `spec.md`, `plan.md`, and `checklist.md` in this folder.
 <!-- /ANCHOR:cross-refs -->
 
-- [ ] Change `packages/pi-rpc-protocol/src/types.ts` to add `InboundImageBlock`, the processing/ready/terminal unions, artifact descriptors, safe presentation metadata, and exact redaction/share fields.
-- [ ] Change `packages/pi-rpc-protocol/src/guards.ts` to validate the union with strict exact-key checks, bounded safe text, opaque IDs, digests, dimensions, timestamps, MIME types, and availability/content consistency.
-- [ ] Change `packages/pi-rpc-protocol/src/index.ts` to export the new types and guards.
-- [ ] Extend `packages/pi-rpc-protocol/tests/guards.test.ts` with valid lifecycle fixtures, unknown-field rejection, path/URL/base64/OCR rejection, malformed digest/revision tests, bounds, and old transcript fixtures.
-- [ ] Add `extensions/pi-remote-inbound-media/package.json`, `tsconfig.json`, `src/index.ts`, and `tests/publisher-boundary.test.ts` as the isolated host adapter seam; expose no capability when the seam is unavailable.
-- [ ] Review `extensions/pi-remote-plan/src/index.ts` and the host policy contract so Plan mode remains read-only and capture authority remains on the host.
-- [ ] Add the minimal web compatibility branch in `apps/pi-remote-web/src/state.ts` and `apps/pi-remote-web/src/App.tsx` so an inbound image received by an old or not-yet-enabled client renders the existing unsupported/redacted row.
-- [ ] Add a disabled/unsupported lifecycle fixture to `apps/pi-remote-web/src/demo.ts` and the initial `scripts/inbound-media-cdp.mjs` harness for light and dark 390px screenshots.
-- [ ] Add root workspace wiring only for the new extension package and CDP runner; add no binary fixture and modify no application transport limit.
+- [x] Change `packages/pi-rpc-protocol/src/types.ts` to add `InboundImageBlock`, the processing/ready/terminal unions, artifact descriptors, safe presentation metadata, and exact redaction/share fields.
+- [x] Change `packages/pi-rpc-protocol/src/guards.ts` to validate the union with strict exact-key checks, bounded safe text, opaque IDs, digests, dimensions, timestamps, MIME types, and availability/content consistency.
+- [x] Change `packages/pi-rpc-protocol/src/index.ts` to export the new types and guards.
+- [x] Extend `packages/pi-rpc-protocol/tests/guards.test.ts` with valid lifecycle fixtures, unknown-field rejection, path/URL/base64/OCR rejection, malformed digest/revision tests, bounds, and old transcript fixtures.
+- [x] Add `extensions/pi-remote-inbound-media/package.json`, `tsconfig.json`, `src/index.ts`, and `tests/publisher-boundary.test.ts` as the isolated host adapter seam; expose no capability when the seam is unavailable.
+- [x] Review `extensions/pi-remote-plan/src/index.ts` and the host policy contract so Plan mode remains read-only and capture authority remains on the host.
+- [x] Add the minimal web compatibility branch in `apps/pi-remote-web/src/state.ts` and `apps/pi-remote-web/src/App.tsx` so an inbound image received by an old or not-yet-enabled client renders the existing unsupported/redacted row.
+- [x] Add a disabled/unsupported lifecycle fixture to `apps/pi-remote-web/src/demo.ts` and the initial `scripts/inbound-media-cdp.mjs` harness for light and dark 390px screenshots.
+- [x] Add root workspace wiring only for the new extension package and CDP runner; add no binary fixture and modify no application transport limit.

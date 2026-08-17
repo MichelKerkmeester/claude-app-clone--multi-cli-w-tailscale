@@ -1,0 +1,132 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Pi Remote Inbound Media Host Boundary
+// ───────────────────────────────────────────────────────────────────
+
+export type InboundMediaSource = 'tool_result' | 'assistant_output' | 'extension';
+export type InboundMediaClass = 'screenshot' | 'raster' | 'generated';
+
+export interface ApprovedImageOutput {
+  readonly source: InboundMediaSource;
+  readonly mediaClass: InboundMediaClass;
+  readonly capabilityHandle: string;
+}
+
+export interface PreStdoutInterceptionSeam {
+  readonly available: boolean;
+  subscribe(handler: (output: unknown) => void): () => void;
+}
+
+export interface InboundMediaTransportSpy {
+  write(...args: unknown[]): unknown;
+}
+
+export interface InboundMediaAdapterOptions {
+  readonly interception?: PreStdoutInterceptionSeam;
+  readonly onApprovedImage?: (output: ApprovedImageOutput) => void;
+  readonly stdout?: InboundMediaTransportSpy;
+  readonly session?: InboundMediaTransportSpy;
+}
+
+export interface InboundMediaCapability {
+  readonly enabled: true;
+  readonly imageIn: true;
+}
+
+export interface InboundMediaHostAdapter {
+  readonly capability: InboundMediaCapability | undefined;
+  readonly interceptionAvailable: boolean;
+  start(): void;
+  stop(): void;
+}
+
+export interface PiInboundMediaExtensionContext {
+  readonly preStdoutInterception?: PreStdoutInterceptionSeam;
+}
+
+const INBOUND_MEDIA_CAPABILITY: InboundMediaCapability = Object.freeze({
+  enabled: true,
+  imageIn: true,
+});
+
+const INBOUND_MEDIA_SOURCES = new Set<InboundMediaSource>([
+  'tool_result',
+  'assistant_output',
+  'extension',
+]);
+const INBOUND_MEDIA_CLASSES = new Set<InboundMediaClass>(['screenshot', 'raster', 'generated']);
+
+/**
+ * Build the host seam. The callback receives only an opaque capability handle;
+ * transport writers are intentionally never used by this boundary.
+ */
+export function createInboundMediaHostAdapter(
+  options: InboundMediaAdapterOptions = {},
+): InboundMediaHostAdapter {
+  const interception = options.interception;
+  const interceptionAvailable = interception?.available === true;
+  const capability = interceptionAvailable ? INBOUND_MEDIA_CAPABILITY : undefined;
+  let unsubscribe: (() => void) | undefined;
+
+  const start = (): void => {
+    if (!interceptionAvailable || unsubscribe !== undefined || interception === undefined) return;
+    unsubscribe = interception.subscribe((output) => {
+      if (isApprovedImageOutput(output)) options.onApprovedImage?.(output);
+    });
+  };
+
+  const stop = (): void => {
+    unsubscribe?.();
+    unsubscribe = undefined;
+  };
+
+  return { capability, interceptionAvailable, start, stop };
+}
+
+/** Register the seam only when the host exposes the pre-stdout interception API. */
+export function installPiRemoteInboundMedia(
+  pi: PiInboundMediaExtensionContext,
+  options: Omit<InboundMediaAdapterOptions, 'interception'> = {},
+): InboundMediaHostAdapter {
+  const interception = pi.preStdoutInterception;
+  const adapter = createInboundMediaHostAdapter({
+    ...options,
+    ...(interception === undefined ? {} : { interception }),
+  });
+  adapter.start();
+  return adapter;
+}
+
+export default function piRemoteInboundMedia(
+  pi: PiInboundMediaExtensionContext,
+): InboundMediaHostAdapter {
+  return installPiRemoteInboundMedia(pi);
+}
+
+function isApprovedImageOutput(value: unknown): value is ApprovedImageOutput {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['source', 'mediaClass', 'capabilityHandle'])) {
+    return false;
+  }
+  return (
+    typeof value.source === 'string' &&
+    INBOUND_MEDIA_SOURCES.has(value.source as InboundMediaSource) &&
+    typeof value.mediaClass === 'string' &&
+    INBOUND_MEDIA_CLASSES.has(value.mediaClass as InboundMediaClass) &&
+    isOpaqueCapabilityHandle(value.capabilityHandle)
+  );
+}
+
+function isOpaqueCapabilityHandle(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    /^[A-Za-z0-9][A-Za-z0-9_-]{21,255}$/u.test(value) &&
+    !/^[a-f0-9]{43}$|^[a-f0-9]{64}$/u.test(value)
+  );
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasOnlyKeys(value: Record<string, unknown>, keys: readonly string[]): boolean {
+  return Object.keys(value).every((key) => keys.includes(key)) && keys.every((key) => key in value);
+}

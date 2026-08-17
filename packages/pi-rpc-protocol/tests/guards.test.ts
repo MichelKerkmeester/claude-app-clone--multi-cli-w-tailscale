@@ -63,6 +63,7 @@ import {
   isTranscriptBlock,
   isTextArtifactBlock,
   isRedactedAttachmentBlock,
+  isInboundImageBlock,
   PLAN_CONTROL_REASON_CODES,
   PLAN_VALIDITY_VALUES,
   RUNTIME_ISSUE_CODES,
@@ -1294,5 +1295,143 @@ describe('plan control guards', () => {
     expect(isRedactedAttachmentBlock({ ...block, previewRetained: true })).toBe(false);
     expect(isRedactedAttachmentBlock({ ...block, ordinal: 5 })).toBe(false);
     expect(isTranscriptBlock({ ...block, kind: 'future_attachment' })).toBe(false);
+  });
+
+  it('accepts every metadata-only inbound image lifecycle shape', () => {
+    const common = {
+      id: 'inbound_block_001',
+      revision: 1,
+      seq: 20,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'inbound_image',
+      schemaVersion: 1,
+      mediaClass: 'screenshot',
+      displayName: 'Screenshot',
+      source: 'tool_result',
+    } as const;
+    const processing = { ...common, availability: 'processing' } as const;
+    const ready = {
+      ...common,
+      availability: 'ready',
+      artifact: {
+        id: `artifact_${'a'.repeat(32)}`,
+        revision: 'revision_opaque_001',
+        expiresAt: '2026-01-02T00:00:00.000Z',
+        full: {
+          digest: 'a'.repeat(43),
+          mediaType: 'image/png',
+          width: 1_280,
+          height: 720,
+          byteLength: 100_000,
+        },
+        thumbnail: {
+          digest: 'b'.repeat(43),
+          mediaType: 'image/jpeg',
+          width: 320,
+          height: 180,
+          byteLength: 20_000,
+        },
+      },
+      presentation: { safeAlt: 'Screenshot', safeDescription: 'Processed preview' },
+      redaction: { status: 'applied' },
+      shareAllowed: false,
+      content: { kind: 'artifact-ref' },
+    } as const;
+    const terminal = (availability: 'withheld' | 'expired' | 'revoked', reason: string) => ({
+      ...common,
+      availability,
+      reason,
+      shareAllowed: false,
+      content: { kind: 'none' },
+    });
+
+    expect(isInboundImageBlock(processing)).toBe(true);
+    expect(isInboundImageBlock(ready)).toBe(true);
+    expect(isInboundImageBlock(terminal('withheld', 'capture-permission'))).toBe(true);
+    expect(isInboundImageBlock(terminal('expired', 'retention'))).toBe(true);
+    expect(isInboundImageBlock(terminal('revoked', 'policy'))).toBe(true);
+    expect(isTranscriptBlock(ready)).toBe(true);
+  });
+
+  it('rejects unsafe inbound image metadata and inconsistent lifecycle pairs', () => {
+    const common = {
+      id: 'inbound_block_002',
+      revision: 1,
+      seq: 21,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'inbound_image',
+      schemaVersion: 1,
+      mediaClass: 'raster',
+      displayName: 'Image from pi',
+      source: 'extension',
+    } as const;
+    const ready = {
+      ...common,
+      availability: 'ready',
+      artifact: {
+        id: `artifact_${'c'.repeat(32)}`,
+        revision: 'revision_opaque_002',
+        expiresAt: '2026-01-02T00:00:00.000Z',
+        full: {
+          digest: 'c'.repeat(43),
+          mediaType: 'image/png',
+          width: 1_280,
+          height: 720,
+          byteLength: 100_000,
+        },
+        thumbnail: {
+          digest: 'd'.repeat(43),
+          mediaType: 'image/png',
+          width: 320,
+          height: 180,
+          byteLength: 20_000,
+        },
+      },
+      presentation: { safeAlt: 'Image from pi' },
+      redaction: { status: 'not-needed' },
+      shareAllowed: false,
+      content: { kind: 'artifact-ref' },
+    } as const;
+
+    const rejected = [
+      { ...common, availability: 'processing', path: '/tmp/image.png' },
+      { ...ready, data: 'iVBORw0KGgo=' },
+      { ...ready, presentation: { safeAlt: 'https://example.test/image.png' } },
+      { ...ready, presentation: { safeAlt: 'screenshot.png' } },
+      { ...ready, presentation: { safeAlt: 'iVBORw0KGgoAAAANSUhEUg==' } },
+      { ...ready, presentation: { safeAlt: 'OCR: password=secret' } },
+      { ...ready, artifact: { ...ready.artifact, id: 'artifact_short' } },
+      {
+        ...ready,
+        artifact: { ...ready.artifact, full: { ...ready.artifact.full, digest: 'bad' } },
+      },
+      {
+        ...ready,
+        artifact: {
+          ...ready.artifact,
+          full: { ...ready.artifact.full, mediaType: 'image/webp' },
+        },
+      },
+      {
+        ...ready,
+        artifact: { ...ready.artifact, full: { ...ready.artifact.full, width: 2_001 } },
+      },
+      { ...ready, presentation: { safeAlt: 'unsafe\u0000text' } },
+      { ...ready, shareAllowed: true },
+      { ...ready, availability: 'processing' },
+      { ...ready, content: { kind: 'none' } },
+      {
+        ...common,
+        availability: 'withheld',
+        reason: 'capture-permission',
+        shareAllowed: false,
+        content: { kind: 'artifact-ref' },
+      },
+    ];
+
+    for (const value of rejected) {
+      expect(isInboundImageBlock(value)).toBe(false);
+      expect(isTranscriptBlock(value)).toBe(false);
+    }
   });
 });

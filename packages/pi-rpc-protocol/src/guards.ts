@@ -40,6 +40,14 @@ import type {
   FilePreviewDescriptor,
   FilePreviewRedaction,
   FilePreviewRenderer,
+  InboundImageArtifact,
+  InboundImageArtifactVariant,
+  InboundImageBlock,
+  InboundImagePresentation,
+  InboundImageProcessingBlock,
+  InboundImageReadyBlock,
+  InboundImageRedaction,
+  InboundImageTerminalBlock,
   JsonValue,
   MediaPolicyDto,
   NormalizedPiImage,
@@ -121,6 +129,14 @@ import {
   TRANSCRIPT_TERMINAL_CHECKPOINTS,
   MEDIA_OUTPUT_MIME_TYPES,
   MEDIA_SOURCE_MIME_TYPES,
+  INBOUND_IMAGE_ARTIFACT_MEDIA_TYPES,
+  INBOUND_IMAGE_AVAILABILITIES,
+  INBOUND_IMAGE_CONTENT_KINDS,
+  INBOUND_IMAGE_DISPLAY_NAMES,
+  INBOUND_IMAGE_MEDIA_CLASSES,
+  INBOUND_IMAGE_REDACTION_STATUSES,
+  INBOUND_IMAGE_SOURCES,
+  INBOUND_IMAGE_TERMINAL_REASONS,
   REDACTED_ATTACHMENT_STATUSES,
 } from './types.js';
 
@@ -204,6 +220,24 @@ const ATTACHMENT_SUBMISSION_STATUS_SET = new Set<string>(ATTACHMENT_SUBMISSION_S
 const REDACTED_ATTACHMENT_STATUS_SET = new Set<RedactedAttachmentStatus>(
   REDACTED_ATTACHMENT_STATUSES,
 );
+const INBOUND_IMAGE_MEDIA_CLASS_SET = new Set<string>(INBOUND_IMAGE_MEDIA_CLASSES);
+const INBOUND_IMAGE_DISPLAY_NAME_SET = new Set<string>(INBOUND_IMAGE_DISPLAY_NAMES);
+const INBOUND_IMAGE_SOURCE_SET = new Set<string>(INBOUND_IMAGE_SOURCES);
+const INBOUND_IMAGE_AVAILABILITY_SET = new Set<string>(INBOUND_IMAGE_AVAILABILITIES);
+const INBOUND_IMAGE_ARTIFACT_MEDIA_TYPE_SET = new Set<string>(INBOUND_IMAGE_ARTIFACT_MEDIA_TYPES);
+const INBOUND_IMAGE_REDACTION_STATUS_SET = new Set<string>(INBOUND_IMAGE_REDACTION_STATUSES);
+const INBOUND_IMAGE_TERMINAL_REASON_SET = new Set<string>(INBOUND_IMAGE_TERMINAL_REASONS);
+const INBOUND_IMAGE_CONTENT_KIND_SET = new Set<string>(INBOUND_IMAGE_CONTENT_KINDS);
+const INBOUND_IMAGE_FULL_MAX_EDGE = 2_000;
+const INBOUND_IMAGE_THUMBNAIL_MAX_EDGE = 640;
+const INBOUND_IMAGE_FULL_MAX_BYTES = 2 * 1024 * 1024;
+const INBOUND_IMAGE_THUMBNAIL_MAX_BYTES = 256 * 1024;
+const INBOUND_IMAGE_MAX_DECODED_AREA = 60_000_000;
+const INBOUND_IMAGE_ARTIFACT_ID_MIN_LENGTH = 22;
+const INBOUND_IMAGE_SAFE_ALT_MAX_SCALARS = 240;
+const INBOUND_IMAGE_SAFE_ALT_MAX_BYTES = 512;
+const INBOUND_IMAGE_SAFE_DESCRIPTION_MAX_SCALARS = 1_000;
+const INBOUND_IMAGE_SAFE_DESCRIPTION_MAX_BYTES = 4_096;
 const MEDIA_MAX_IMAGES = 4;
 const MEDIA_MAX_SOURCE_BYTES_PER_IMAGE = 15 * 1024 * 1024;
 const MEDIA_MAX_SOURCE_BYTES_PER_BATCH = 30 * 1024 * 1024;
@@ -726,6 +760,179 @@ export function isRedactedAttachmentBlock(value: unknown): value is RedactedAtta
   );
 }
 
+const INBOUND_IMAGE_COMMON_KEYS = [
+  'kind',
+  'id',
+  'revision',
+  'seq',
+  'occurredAt',
+  'schemaVersion',
+  'mediaClass',
+  'displayName',
+  'source',
+] as const;
+
+/** Narrow the metadata-only inbound image lifecycle without accepting content-bearing fields. */
+export function isInboundImageBlock(value: unknown): value is InboundImageBlock {
+  return (
+    isInboundImageProcessingBlock(value) ||
+    isInboundImageReadyBlock(value) ||
+    isInboundImageTerminalBlock(value)
+  );
+}
+
+export function isInboundImageProcessingBlock(
+  value: unknown,
+): value is InboundImageProcessingBlock {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [...INBOUND_IMAGE_COMMON_KEYS, 'availability']) &&
+    isInboundImageCommon(value) &&
+    value.availability === 'processing'
+  );
+}
+
+export function isInboundImageReadyBlock(value: unknown): value is InboundImageReadyBlock {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      ...INBOUND_IMAGE_COMMON_KEYS,
+      'availability',
+      'artifact',
+      'presentation',
+      'redaction',
+      'shareAllowed',
+      'content',
+    ]) &&
+    isInboundImageCommon(value) &&
+    value.availability === 'ready' &&
+    isInboundImageArtifact(value.artifact) &&
+    isInboundImagePresentation(value.presentation) &&
+    isInboundImageRedaction(value.redaction) &&
+    value.shareAllowed === false &&
+    isInboundImageContent(value.content, 'artifact-ref')
+  );
+}
+
+export function isInboundImageTerminalBlock(value: unknown): value is InboundImageTerminalBlock {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      ...INBOUND_IMAGE_COMMON_KEYS,
+      'availability',
+      'reason',
+      'shareAllowed',
+      'content',
+    ]) &&
+    isInboundImageCommon(value) &&
+    typeof value.availability === 'string' &&
+    INBOUND_IMAGE_AVAILABILITY_SET.has(value.availability) &&
+    value.availability !== 'processing' &&
+    value.availability !== 'ready' &&
+    typeof value.reason === 'string' &&
+    INBOUND_IMAGE_TERMINAL_REASON_SET.has(value.reason) &&
+    value.shareAllowed === false &&
+    isInboundImageContent(value.content, 'none')
+  );
+}
+
+export function isInboundImageArtifact(value: unknown): value is InboundImageArtifact {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['id', 'revision', 'expiresAt', 'full', 'thumbnail']) &&
+    isOpaqueInboundArtifactId(value.id) &&
+    isOpaqueInboundRevision(value.revision) &&
+    isInboundIsoTimestamp(value.expiresAt) &&
+    isInboundImageArtifactVariant(
+      value.full,
+      INBOUND_IMAGE_FULL_MAX_EDGE,
+      INBOUND_IMAGE_FULL_MAX_BYTES,
+    ) &&
+    isInboundImageArtifactVariant(
+      value.thumbnail,
+      INBOUND_IMAGE_THUMBNAIL_MAX_EDGE,
+      INBOUND_IMAGE_THUMBNAIL_MAX_BYTES,
+    )
+  );
+}
+
+export function isInboundImageArtifactVariant(
+  value: unknown,
+  maxEdge = INBOUND_IMAGE_FULL_MAX_EDGE,
+  maxBytes = INBOUND_IMAGE_FULL_MAX_BYTES,
+): value is InboundImageArtifactVariant {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['digest', 'mediaType', 'width', 'height', 'byteLength']) &&
+    isInboundSha256Digest(value.digest) &&
+    typeof value.mediaType === 'string' &&
+    INBOUND_IMAGE_ARTIFACT_MEDIA_TYPE_SET.has(value.mediaType) &&
+    isBoundedPositiveInteger(value.width) &&
+    value.width <= maxEdge &&
+    isBoundedPositiveInteger(value.height) &&
+    value.height <= maxEdge &&
+    value.width * value.height <= INBOUND_IMAGE_MAX_DECODED_AREA &&
+    isBoundedPositiveInteger(value.byteLength) &&
+    value.byteLength <= maxBytes
+  );
+}
+
+export function isInboundImagePresentation(value: unknown): value is InboundImagePresentation {
+  return (
+    isRecord(value) &&
+    hasRequiredAndOptionalKeys(value, ['safeAlt'], ['safeDescription']) &&
+    isInboundSafeText(
+      value.safeAlt,
+      INBOUND_IMAGE_SAFE_ALT_MAX_SCALARS,
+      INBOUND_IMAGE_SAFE_ALT_MAX_BYTES,
+    ) &&
+    (value.safeDescription === undefined ||
+      isInboundSafeText(
+        value.safeDescription,
+        INBOUND_IMAGE_SAFE_DESCRIPTION_MAX_SCALARS,
+        INBOUND_IMAGE_SAFE_DESCRIPTION_MAX_BYTES,
+      ))
+  );
+}
+
+export function isInboundImageRedaction(value: unknown): value is InboundImageRedaction {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['status']) &&
+    typeof value.status === 'string' &&
+    INBOUND_IMAGE_REDACTION_STATUS_SET.has(value.status)
+  );
+}
+
+function isInboundImageCommon(value: Record<string, unknown>): boolean {
+  return (
+    value.kind === 'inbound_image' &&
+    value.schemaVersion === 1 &&
+    isOpaqueId(value.id) &&
+    isPositiveInteger(value.revision) &&
+    typeof value.seq === 'number' &&
+    Number.isSafeInteger(value.seq) &&
+    value.seq > 0 &&
+    isTimestamp(value.occurredAt) &&
+    typeof value.mediaClass === 'string' &&
+    INBOUND_IMAGE_MEDIA_CLASS_SET.has(value.mediaClass) &&
+    typeof value.displayName === 'string' &&
+    INBOUND_IMAGE_DISPLAY_NAME_SET.has(value.displayName) &&
+    typeof value.source === 'string' &&
+    INBOUND_IMAGE_SOURCE_SET.has(value.source)
+  );
+}
+
+function isInboundImageContent(value: unknown, expected: 'artifact-ref' | 'none'): boolean {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['kind']) &&
+    typeof value.kind === 'string' &&
+    INBOUND_IMAGE_CONTENT_KIND_SET.has(value.kind) &&
+    value.kind === expected
+  );
+}
+
 export function isMediaPolicy(value: unknown): value is MediaPolicyDto {
   return isMediaPolicyDto(value);
 }
@@ -875,6 +1082,9 @@ export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
   if (isRecord(value) && value.kind === 'file_preview') {
     return isFilePreviewBlock(value);
   }
+  if (isRecord(value) && value.kind === 'inbound_image') {
+    return isInboundImageBlock(value);
+  }
   if (!isTranscriptBase(value)) {
     return false;
   }
@@ -912,6 +1122,8 @@ export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
       return false;
     case 'attachment':
       return isRedactedAttachmentBlock(value);
+    case 'inbound_image':
+      return isInboundImageBlock(value);
     case 'usage':
       return (
         isNonNegativeNumber(value.inputTokens) &&
@@ -1532,6 +1744,61 @@ function normalizedImageByteLength(value: string): number {
 
 function isSha256Digest(value: unknown): value is string {
   return typeof value === 'string' && /^[A-Za-z0-9_-]{43}$/.test(value);
+}
+
+function isInboundSha256Digest(value: unknown): value is string {
+  return isSha256Digest(value) || (typeof value === 'string' && /^[a-f0-9]{64}$/u.test(value));
+}
+
+function isOpaqueInboundArtifactId(value: unknown): value is string {
+  return (
+    isOpaqueId(value) &&
+    value.length >= INBOUND_IMAGE_ARTIFACT_ID_MIN_LENGTH &&
+    !isInboundSha256Digest(value)
+  );
+}
+
+function isOpaqueInboundRevision(value: unknown): value is string {
+  return (
+    isOpaqueToken(value) &&
+    value !== 'latest' &&
+    value !== '.' &&
+    value !== '..' &&
+    !isInboundSha256Digest(value)
+  );
+}
+
+function isInboundIsoTimestamp(value: unknown): value is string {
+  return (
+    isTimestamp(value) &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value)
+  );
+}
+
+function isInboundSafeText(value: unknown, maxScalars: number, maxBytes: number): value is string {
+  if (
+    typeof value !== 'string' ||
+    value.length === 0 ||
+    value !== value.normalize('NFC') ||
+    Array.from(value).length > maxScalars ||
+    new TextEncoder().encode(value).byteLength > maxBytes ||
+    value.includes('/') ||
+    value.includes('\\')
+  ) {
+    return false;
+  }
+  if (!isSafeDisplayString(value, maxScalars * 2)) return false;
+  const compact = value.replace(/\s+/gu, '');
+  return !(
+    /\bocr\b/iu.test(value) ||
+    (compact.length >= 16 &&
+      compact.length % 4 === 0 &&
+      /^(?:[A-Za-z0-9+/]+={0,2})$/u.test(compact) &&
+      (compact.includes('=') || compact.startsWith('iVBOR') || compact.startsWith('JVBER'))) ||
+    /(?:data|blob|javascript):|(?:^|[\s"'`])[^\s"'`]+\.(?:avif|bmp|gif|heic|heif|ico|jpe?g|pdf|png|raw|svg|tiff?|webp)(?:$|[\s"'`])/iu.test(
+      value,
+    )
+  );
 }
 
 function isTimestamp(value: unknown): value is string {

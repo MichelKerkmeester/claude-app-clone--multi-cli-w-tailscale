@@ -1896,7 +1896,7 @@ function Block({
     case 'unknown':
       label = 'Unsupported block';
       content = (
-        <p className="block-copy quiet-copy">
+        <p className="block-copy quiet-copy" data-unsupported-kind={block.originalKind}>
           A redacted “{block.originalKind}” block cannot be displayed by this client.
         </p>
       );

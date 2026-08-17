@@ -1,4 +1,7 @@
 import { createHash } from 'node:crypto';
+import { mkdtempSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 import type { FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
@@ -127,6 +130,93 @@ describe('immutable artifact store', () => {
       expect(artifacts.purgeExpired()).toBe(1);
     } finally {
       store.close();
+    }
+  });
+});
+
+describe('inbound derivative artifact store', () => {
+  it('uses opaque identities, restrictive permissions, immutable variants, and purge-on-revoke', () => {
+    const relay = new RelayStore();
+    const root = mkdtempSync(join(tmpdir(), 'pi-remote-inbound-store-'));
+    const artifacts = new ArtifactStore(relay.databaseHandle(), { quarantineRoot: root });
+    const full = Buffer.from('sanitized-full-pixels');
+    const thumbnail = Buffer.from('sanitized-thumb-pixels');
+    try {
+      const saved = artifacts.putInboundArtifact({
+        sessionId: 'session_local',
+        blockId: 'block_inbound_store_001',
+        blockRevision: 2,
+        ownerPrincipal: 'principal_001',
+        ownerDeviceId: 'device_001',
+        mediaClass: 'raster',
+        source: 'extension',
+        full: { mediaType: 'image/png', width: 2, height: 2, bytes: full },
+        thumbnail: { mediaType: 'image/png', width: 1, height: 1, bytes: thumbnail },
+      });
+      expect(saved.artifactId).toMatch(/^[A-Za-z0-9][A-Za-z0-9_-]{21,127}$/u);
+      expect(saved.artifactId).not.toBe(saved.full.digest);
+      expect(saved.full.digest).toBe(digest(full));
+      expect(saved.thumbnail.digest).toBe(digest(thumbnail));
+      const directories = readdirSync(root);
+      expect(directories).toHaveLength(1);
+      const directory = join(root, directories[0] ?? '');
+      expect(statSync(directory).mode & 0o777).toBe(0o700);
+      const files = readdirSync(directory);
+      expect(files).toHaveLength(2);
+      for (const file of files) expect(statSync(join(directory, file)).mode & 0o777).toBe(0o600);
+      expect(
+        artifacts.readInboundVariant(
+          { sessionId: saved.sessionId, artifactId: saved.artifactId, revision: saved.revision },
+          'full',
+        )?.bytes.equals(full),
+      ).toBe(true);
+      expect(
+        artifacts.revokeInboundArtifact({
+          sessionId: saved.sessionId,
+          artifactId: saved.artifactId,
+          revision: saved.revision,
+        }),
+      ).toBe(true);
+      expect(
+        artifacts.readInboundVariant(
+          { sessionId: saved.sessionId, artifactId: saved.artifactId, revision: saved.revision },
+          'full',
+        ),
+      ).toBeNull();
+      expect(readdirSync(root)).toEqual([]);
+    } finally {
+      artifacts.close();
+      relay.close();
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('enforces the session quota before creating a retrievable directory', () => {
+    const relay = new RelayStore();
+    const root = mkdtempSync(join(tmpdir(), 'pi-remote-inbound-quota-'));
+    const artifacts = new ArtifactStore(relay.databaseHandle(), {
+      quarantineRoot: root,
+      sessionQuotaBytes: 10,
+    });
+    try {
+      expect(() =>
+        artifacts.putInboundArtifact({
+          sessionId: 'session_local',
+          blockId: 'block_inbound_quota_001',
+          blockRevision: 1,
+          ownerPrincipal: 'principal_001',
+          ownerDeviceId: 'device_001',
+          mediaClass: 'screenshot',
+          source: 'extension',
+          full: { mediaType: 'image/png', width: 1, height: 1, bytes: Buffer.from('123456') },
+          thumbnail: { mediaType: 'image/png', width: 1, height: 1, bytes: Buffer.from('123456') },
+        }),
+      ).toThrow(/quota/iu);
+      expect(readdirSync(root)).toEqual([]);
+    } finally {
+      artifacts.close();
+      relay.close();
+      rmSync(root, { recursive: true, force: true });
     }
   });
 });

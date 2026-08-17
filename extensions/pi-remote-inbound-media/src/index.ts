@@ -9,6 +9,16 @@ export interface ApprovedImageOutput {
   readonly source: InboundMediaSource;
   readonly mediaClass: InboundMediaClass;
   readonly capabilityHandle: string;
+  readonly bytes?: Uint8Array;
+}
+
+export interface InboundMediaBinaryPublisher {
+  publish(input: {
+    readonly source: InboundMediaSource;
+    readonly mediaClass: InboundMediaClass;
+    readonly capabilityHandle: string;
+    readonly bytes?: Uint8Array;
+  }): unknown | Promise<unknown>;
 }
 
 export interface PreStdoutInterceptionSeam {
@@ -96,6 +106,20 @@ export function installPiRemoteInboundMedia(
   return adapter;
 }
 
+/** Forward only an approved handle or already-captured bytes to the ticketed transport. */
+export async function publishApprovedImage(
+  output: unknown,
+  publisher: InboundMediaBinaryPublisher,
+): Promise<unknown> {
+  if (!isApprovedImageOutput(output)) throw new Error('Inbound image output was not approved.');
+  return publisher.publish({
+    source: output.source,
+    mediaClass: output.mediaClass,
+    capabilityHandle: output.capabilityHandle,
+    ...(output.bytes === undefined ? {} : { bytes: Uint8Array.from(output.bytes) }),
+  });
+}
+
 export default function piRemoteInboundMedia(
   pi: PiInboundMediaExtensionContext,
 ): InboundMediaHostAdapter {
@@ -103,7 +127,13 @@ export default function piRemoteInboundMedia(
 }
 
 function isApprovedImageOutput(value: unknown): value is ApprovedImageOutput {
-  if (!isRecord(value) || !hasOnlyKeys(value, ['source', 'mediaClass', 'capabilityHandle'])) {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['source', 'mediaClass', 'capabilityHandle'], ['bytes'])) {
+    return false;
+  }
+  if (
+    value.bytes !== undefined &&
+    (!(value.bytes instanceof Uint8Array) || value.bytes.byteLength === 0 || value.bytes.byteLength > 15 * 1024 * 1024)
+  ) {
     return false;
   }
   return (
@@ -127,6 +157,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function hasOnlyKeys(value: Record<string, unknown>, keys: readonly string[]): boolean {
-  return Object.keys(value).every((key) => keys.includes(key)) && keys.every((key) => key in value);
+function hasOnlyKeys(
+  value: Record<string, unknown>,
+  required: readonly string[],
+  optional: readonly string[] = [],
+): boolean {
+  const allowed = [...required, ...optional];
+  return Object.keys(value).every((key) => allowed.includes(key)) && required.every((key) => key in value);
 }

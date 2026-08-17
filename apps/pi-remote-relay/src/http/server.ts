@@ -30,7 +30,11 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 import { WebSocket, WebSocketServer } from 'ws';
 
-import { AuthService, type ApplicationSession } from '../auth/auth-service.js';
+import {
+  AuthService,
+  type ApplicationSession,
+  type ArtifactPublishTicketBinding,
+} from '../auth/auth-service.js';
 import { isAttachmentAction } from '../auth/policy.js';
 import type { ApprovalService } from '../approval/approval-service.js';
 import { FixedWindowRateLimiter } from '../auth/rate-limit.js';
@@ -54,6 +58,7 @@ import type { SyncHub } from '../replay/sync.js';
 import { RuntimeIssueError, type RuntimeService } from '../runtime/runtime-service.js';
 import type { SessionCatalog } from '../sessions/catalog.js';
 import type { RelayStore } from '../store/relay-store.js';
+import type { InboundSecretScanner } from '../store/artifact-sanitizer.js';
 import type { PushService } from '../push/push-service.js';
 import {
   PromptRevisionStaleError,
@@ -116,6 +121,9 @@ export interface ReadOnlyServerOptions {
     readonly sessionId: string;
     readonly epoch: string;
     readonly policyVersion: number;
+    readonly hostExtension?: string;
+    readonly deviceId?: string;
+    readonly runId?: string;
   };
   readonly prompts?: PromptService;
   readonly runtime?: RuntimeService;
@@ -126,6 +134,7 @@ export interface ReadOnlyServerOptions {
   readonly attachments?: AttachmentService;
   readonly attachmentReaper?: AttachmentReaper;
   readonly attachmentSessionId?: string;
+  readonly inboundScanner?: InboundSecretScanner;
 }
 
 export interface RunningReadOnlyServer {
@@ -349,9 +358,10 @@ async function handleHttp(
   if (
     request.socket.remoteAddress === LOOPBACK_HOST &&
     (ingressPath(request) === '/api/extension/approval/request' ||
-      ingressPath(request) === '/api/extension/approval/consume')
+      ingressPath(request) === '/api/extension/approval/consume' ||
+      isInboundPublishRoute(ingressPath(request)))
   ) {
-    await handleExtensionAuthority(request, response, options);
+    await handleExtensionAuthority(request, response, options, auth);
     return;
   }
   const ingress = authenticateIngress(request, options);
@@ -1414,19 +1424,28 @@ async function handleExtensionAuthority(
   request: IncomingMessage,
   response: ServerResponse,
   options: ReadOnlyServerOptions,
+  auth: AuthService,
 ): Promise<void> {
   const authority = options.extensionAuthority;
+  const path = ingressPath(request);
   if (
     request.method !== 'POST' ||
     authority === undefined ||
-    options.approvals === undefined ||
     !matchesSecret(singleHeader(request.headers.authorization), authority.secret)
   ) {
     discardRequest(request);
     sendJson(response, 401, { error: 'unauthorized' });
     return;
   }
-  const path = ingressPath(request);
+  if (isInboundPublishRoute(path)) {
+    await handleInboundPublishRoute(request, response, options, auth, authority);
+    return;
+  }
+  if (options.approvals === undefined) {
+    discardRequest(request);
+    sendJson(response, 404, { error: 'not_found' });
+    return;
+  }
   const body = await readJsonBody(request);
   if (path === '/api/extension/approval/request') {
     if (
@@ -1465,6 +1484,225 @@ async function handleExtensionAuthority(
     result.allowed ? 200 : 403,
     result.allowed ? { allowed: true } : { allowed: false, reason: result.reason },
   );
+}
+
+async function handleInboundPublishRoute(
+  request: IncomingMessage,
+  response: ServerResponse,
+  options: ReadOnlyServerOptions,
+  auth: AuthService,
+  authority: NonNullable<ReadOnlyServerOptions['extensionAuthority']>,
+): Promise<void> {
+  if (singleHeader(request.headers.origin) !== null) {
+    discardRequest(request);
+    sendJson(response, 403, { error: 'browser_origin_rejected' });
+    return;
+  }
+  if (request.method !== 'POST') {
+    discardRequest(request);
+    sendJson(response, 405, { error: 'method_not_allowed' });
+    return;
+  }
+  const path = ingressPath(request);
+  if (path === '/api/extension/artifacts/publish-ticket') {
+    let body: unknown;
+    try {
+      body = await readJsonBody(request);
+    } catch {
+      discardRequest(request);
+      sendJson(response, 400, { error: 'invalid_ticket_request' });
+      return;
+    }
+    const parsed = parseArtifactPublishTicketRequest(body);
+    if (
+      parsed === null ||
+      parsed.binding.sessionId !== authority.sessionId ||
+      (authority.hostExtension !== undefined && parsed.binding.hostExtension !== authority.hostExtension) ||
+      (authority.runId !== undefined && parsed.binding.runId !== authority.runId)
+    ) {
+      sendJson(response, 403, { error: 'invalid_ticket_request' });
+      return;
+    }
+    try {
+      sendJson(
+        response,
+        201,
+        auth.issueArtifactPublishTicketForExtension(
+          authority.principal,
+          parsed.binding.hostExtension,
+          authority.sessionId,
+          parsed.binding,
+        ),
+      );
+    } catch {
+      sendJson(response, 403, { error: 'invalid_ticket_request' });
+    }
+    return;
+  }
+
+  const ticketId = inboundPublishTicketFromRequest(request);
+  const hostExtension = inboundHostExtensionFromRequest(request) ?? authority.hostExtension;
+  const consumed =
+    ticketId === null
+      ? null
+      : auth.consumeArtifactPublishTicket(ticketId, {
+          origin: 'extension',
+          principal: authority.principal,
+          ...(hostExtension === undefined ? {} : { hostExtension }),
+        });
+  if (consumed === null) {
+    discardRequest(request);
+    sendJson(response, 401, { error: 'unauthorized' });
+    return;
+  }
+  const contentLength = exactContentLength(request);
+  const digest = inboundDigestFromRequest(request);
+  const mediaFamily = inboundMediaFamilyFromRequest(request);
+  if (
+    contentLength === null ||
+    contentLength !== consumed.binding.declaredByteLength ||
+    digest === null ||
+    mediaFamily === 'invalid' ||
+    (mediaFamily !== null && mediaFamily !== consumed.binding.declaredMediaFamily)
+  ) {
+    discardRequest(request);
+    sendJson(response, 400, { error: 'invalid_publish_headers' });
+    return;
+  }
+  const deadline = setTimeout(() => request.destroy(), 60_000);
+  deadline.unref?.();
+  try {
+    const result = await options.store.publishInboundImage({
+      identity: {
+        hostId: options.hostId,
+        workspaceRef: options.workspaceRef,
+        sessionId: consumed.binding.sessionId,
+      },
+      epoch: authority.epoch,
+      expectedTranscriptRevision: consumed.binding.expectedTranscriptRevision,
+      blockId: consumed.binding.blockId,
+      submissionId: consumed.binding.submissionId,
+      runId: consumed.binding.runId,
+      turnId: consumed.binding.turnId,
+      mediaClass: consumed.binding.declaredMediaFamily,
+      source: 'extension',
+      ownerPrincipal: consumed.principal,
+      ownerDeviceId: authority.deviceId ?? 'extension',
+      declaredByteLength: contentLength,
+      expectedDigest: digest,
+      ...(singleHeader(request.headers['content-type']) === null
+        ? {}
+        : { claimedMediaType: singleHeader(request.headers['content-type']) as string }),
+      body: request,
+      ...(options.inboundScanner === undefined ? {} : { scanner: options.inboundScanner }),
+      publish: (candidate) => options.syncHub.publish(candidate),
+    });
+    if (result.status === 'conflict') {
+      sendJson(response, 409, { error: 'publish_conflict' });
+    } else {
+      sendJson(response, 201, { status: result.status, block: result.block });
+    }
+  } catch {
+    sendJson(response, 503, { error: 'publish_unavailable' });
+  } finally {
+    clearTimeout(deadline);
+  }
+}
+
+function parseArtifactPublishTicketRequest(
+  value: unknown,
+): { readonly binding: ArtifactPublishTicketBinding } | null {
+  if (
+    !isRecord(value) ||
+    Object.keys(value).length !== 2 ||
+    value.action !== 'artifact:publish' ||
+    !isArtifactPublishBinding(value.binding)
+  ) {
+    return null;
+  }
+  return { binding: value.binding };
+}
+
+function isArtifactPublishBinding(value: unknown): value is ArtifactPublishTicketBinding {
+  if (!isRecord(value)) return false;
+  const allowed = new Set([
+    'hostExtension',
+    'sessionId',
+    'runId',
+    'turnId',
+    'blockId',
+    'submissionId',
+    'expectedTranscriptRevision',
+    'declaredByteLength',
+    'declaredMediaFamily',
+    'principal',
+  ]);
+  if (Object.keys(value).some((key) => !allowed.has(key))) return false;
+  return (
+    isOpaqueId(value.hostExtension) &&
+    isOpaqueId(value.sessionId) &&
+    isOpaqueId(value.runId) &&
+    isOpaqueId(value.turnId) &&
+    isOpaqueId(value.blockId) &&
+    isOpaqueId(value.submissionId) &&
+    isSafeNonNegativeInteger(value.expectedTranscriptRevision) &&
+    typeof value.declaredByteLength === 'number' &&
+    Number.isSafeInteger(value.declaredByteLength) &&
+    value.declaredByteLength > 0 &&
+    value.declaredByteLength <= 15 * 1024 * 1024 &&
+    isInboundMediaClassValue(value.declaredMediaFamily) &&
+    (value.principal === undefined || safePrincipal(value.principal))
+  );
+}
+
+function isInboundMediaClassValue(value: unknown): value is 'screenshot' | 'raster' | 'generated' {
+  return value === 'screenshot' || value === 'raster' || value === 'generated';
+}
+
+function inboundPublishTicketFromRequest(request: IncomingMessage): string | null {
+  const explicit =
+    singleHeader(request.headers['x-artifact-publish-ticket']) ??
+    singleHeader(request.headers['x-pi-artifact-publish-ticket']);
+  if (explicit !== null && isOpaqueId(explicit)) return explicit;
+  const authorization = singleHeader(request.headers.authorization);
+  for (const prefix of ['ArtifactPublishTicket ', 'PublishTicket ']) {
+    if (authorization?.startsWith(prefix)) {
+      const token = authorization.slice(prefix.length);
+      return isOpaqueId(token) ? token : null;
+    }
+  }
+  return null;
+}
+
+function inboundHostExtensionFromRequest(request: IncomingMessage): string | null {
+  return (
+    singleHeader(request.headers['x-pi-host-extension']) ??
+    singleHeader(request.headers['x-host-extension'])
+  );
+}
+
+function inboundMediaFamilyFromRequest(
+  request: IncomingMessage,
+): 'screenshot' | 'raster' | 'generated' | 'invalid' | null {
+  const value = singleHeader(request.headers['x-pi-media-family']);
+  return value !== null && isInboundMediaClassValue(value) ? value : value === null ? null : 'invalid';
+}
+
+function inboundDigestFromRequest(request: IncomingMessage): string | null {
+  const direct =
+    singleHeader(request.headers['x-artifact-sha256']) ??
+    singleHeader(request.headers['x-pi-artifact-digest']) ??
+    singleHeader(request.headers['x-content-sha256']);
+  if (direct !== null && (/^[a-f0-9]{64}$/u.test(direct) || /^[A-Za-z0-9_-]{43}$/u.test(direct))) {
+    return direct;
+  }
+  const digestHeader = singleHeader(request.headers.digest);
+  const match = digestHeader === null ? null : /^sha-256=([A-Za-z0-9_-]{43}|[a-f0-9]{64})$/u.exec(digestHeader);
+  return match?.[1] ?? null;
+}
+
+function safePrincipal(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0 && value.length <= 320 && !/[\u0000-\u001f]/u.test(value);
 }
 
 function matchesAuthorityAction(
@@ -1574,6 +1812,13 @@ function isAttachmentRoute(path: string): boolean {
     /^\/api\/attachment-sets\/[^/]+\/parts\/[^/]+$/.test(path) ||
     /^\/api\/attachment-sets\/[^/]+\/status$/.test(path) ||
     /^\/api\/attachment-sets\/[^/]+\/cancel$/.test(path)
+  );
+}
+
+function isInboundPublishRoute(path: string): boolean {
+  return (
+    path === '/api/extension/artifacts/publish-ticket' ||
+    path === '/api/extension/artifacts/publish'
   );
 }
 

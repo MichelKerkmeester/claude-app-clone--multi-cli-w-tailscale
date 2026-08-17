@@ -141,7 +141,7 @@ export function runRollbackDrill(releaseRoot = defaultReleaseRoot()): RollbackDr
       .get() as { count: number };
     restored.close();
 
-    if (restoredMigrationVersion !== 5 || sessions.count !== 1 || indeterminate.count !== 1) {
+    if (restoredMigrationVersion !== 6 || sessions.count !== 1 || indeterminate.count !== 1) {
       throw new Error('Restore or down-migration silently lost release state.');
     }
     if (hashFile(nativeSessionPath) !== nativeHash) {

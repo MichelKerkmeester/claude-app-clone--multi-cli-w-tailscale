@@ -55,6 +55,8 @@ export const DEMO_ARTIFACT_STATES_FIXTURE = Object.freeze({
 
 export const DEMO_INBOUND_MEDIA_FIXTURE = Object.freeze({
   query: '?demo=1&fixture=inbound-media',
+  processing: 'processing',
+  withheld: 'withheld',
   availability: 'withheld',
   reason: 'capture-permission',
   capability: 'unsupported',
@@ -103,13 +105,24 @@ function artifactBase(id: string, revision: string, seq: number, minutesAgo: num
   return { id, revision, seq, occurredAt: isoAgo(minutesAgo) };
 }
 
-const DEMO_INBOUND_MEDIA_BLOCK = {
-  ...base('blk-inbound-disabled', 8, 5),
+const DEMO_INBOUND_MEDIA_PROCESSING_BLOCK = {
+  ...base('blk-inbound-processing', 8, 6),
   kind: 'inbound_image',
   schemaVersion: 1,
   mediaClass: 'screenshot',
   displayName: 'Screenshot',
-  source: 'tool_result',
+  source: 'extension',
+  availability: 'processing',
+} as const;
+
+const DEMO_INBOUND_MEDIA_BLOCK = {
+  ...base('blk-inbound-processing', 9, 5),
+  kind: 'inbound_image',
+  revision: 2,
+  schemaVersion: 1,
+  mediaClass: 'screenshot',
+  displayName: 'Screenshot',
+  source: 'extension',
   availability: 'withheld',
   reason: 'capture-permission',
   shareAllowed: false,
@@ -687,7 +700,7 @@ function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
     return [...session.blocks, ...DEMO_ARTIFACT_BLOCKS];
   }
   if (isInboundMediaFixture() && sessionId === SESSION_IDLE) {
-    return [...session.blocks, DEMO_INBOUND_MEDIA_BLOCK];
+    return [...session.blocks, DEMO_INBOUND_MEDIA_PROCESSING_BLOCK, DEMO_INBOUND_MEDIA_BLOCK];
   }
   if (isTextCodeShareFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_TEXT_CODE_SHARE_BLOCKS];

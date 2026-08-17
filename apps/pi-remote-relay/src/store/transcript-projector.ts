@@ -6,6 +6,14 @@ import { createHash } from 'node:crypto';
 
 import type {
   FilePreviewBlock,
+  InboundImageArtifact,
+  InboundImageMediaClass,
+  InboundImageReadyBlock,
+  InboundImageRedactionStatus,
+  InboundImageSource,
+  InboundImageTerminalBlock,
+  InboundImageTerminalReason,
+  InboundImageProcessingBlock,
   JsonValue,
   PiRpcEvent,
   RedactionMetadata,
@@ -86,6 +94,54 @@ export interface TranscriptProjectionContext {
   readonly occurredAt: string;
   readonly nextSequence: () => number;
   readonly sessionId?: string;
+}
+
+export interface InboundImageProjectionContext {
+  readonly id: string;
+  readonly revision: number;
+  readonly seq: number;
+  readonly occurredAt: string;
+  readonly mediaClass: InboundImageMediaClass;
+  readonly source: InboundImageSource;
+}
+
+export function projectInboundProcessingBlock(
+  context: InboundImageProjectionContext,
+): InboundImageProcessingBlock {
+  return {
+    ...inboundImageBlockBase(context),
+    availability: 'processing',
+  };
+}
+
+export function projectInboundReadyBlock(
+  context: InboundImageProjectionContext,
+  artifact: InboundImageArtifact,
+  redaction: InboundImageRedactionStatus,
+): InboundImageReadyBlock {
+  return {
+    ...inboundImageBlockBase(context),
+    availability: 'ready',
+    artifact,
+    presentation: { safeAlt: displayNameForMediaClass(context.mediaClass) },
+    redaction: { status: redaction },
+    shareAllowed: false,
+    content: { kind: 'artifact-ref' },
+  };
+}
+
+export function projectInboundTerminalBlock(
+  context: InboundImageProjectionContext,
+  availability: 'withheld' | 'expired' | 'revoked',
+  reason: InboundImageTerminalReason,
+): InboundImageTerminalBlock {
+  return {
+    ...inboundImageBlockBase(context),
+    availability,
+    reason,
+    shareAllowed: false,
+    content: { kind: 'none' },
+  };
 }
 
 /** Convert Pi's event stream into typed, revisable transcript blocks. */
@@ -719,6 +775,34 @@ export class TranscriptProjector {
     this.stableCallIds.set(key, callId);
     return callId;
   }
+}
+
+function inboundImageBlockBase(context: InboundImageProjectionContext): {
+  readonly id: string;
+  readonly revision: number;
+  readonly seq: number;
+  readonly occurredAt: string;
+  readonly kind: 'inbound_image';
+  readonly schemaVersion: 1;
+  readonly mediaClass: InboundImageMediaClass;
+  readonly displayName: 'Screenshot' | 'Image from pi';
+  readonly source: InboundImageSource;
+} {
+  return {
+    id: context.id,
+    revision: context.revision,
+    seq: context.seq,
+    occurredAt: context.occurredAt,
+    kind: 'inbound_image',
+    schemaVersion: 1,
+    mediaClass: context.mediaClass,
+    displayName: displayNameForMediaClass(context.mediaClass),
+    source: context.source,
+  };
+}
+
+function displayNameForMediaClass(mediaClass: InboundImageMediaClass): 'Screenshot' | 'Image from pi' {
+  return mediaClass === 'screenshot' ? 'Screenshot' : 'Image from pi';
 }
 
 function stableBlockId(key: string): string {

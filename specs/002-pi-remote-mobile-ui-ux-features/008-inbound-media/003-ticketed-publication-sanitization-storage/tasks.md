@@ -61,13 +61,13 @@ All concrete tasks below must be addressed before this phase is shippable.
 See `spec.md`, `plan.md`, and `checklist.md` in this folder.
 <!-- /ANCHOR:cross-refs -->
 
-- [ ] Add `apps/pi-remote-relay/src/store/artifact-store.ts` for random immutable artifact IDs, artifact revisions, variant files, digest/ETag, 24-hour retention, 50 MiB session quota, expiry, revocation purge, and filesystem permissions.
-- [ ] Add `apps/pi-remote-relay/src/store/artifact-sanitizer.ts` for streaming source limits, magic-byte/decoder validation, worker isolation, one-frame checks, orientation, sRGB conversion, metadata stripping, exclusion masks, OCR secret/path detection, opaque burned-in masks, deterministic thumbnail/full encoding, and fail-closed withholding.
-- [ ] Change `apps/pi-remote-relay/src/auth/policy.ts` and `apps/pi-remote-relay/src/auth/auth-service.ts` to add `artifact:publish` as a distinct action and bind one-use tickets to the required publication context and 90-second start deadline.
-- [ ] Change `apps/pi-remote-relay/src/http/server.ts` to implement extension-only publish-ticket and binary publish operations; consume the ticket before reading the body, enforce declared and streamed length, reject browser-origin requests, delete partial bodies, and suppress raw errors.
-- [ ] Change `apps/pi-remote-relay/src/store/relay-store.ts` and `apps/pi-remote-relay/src/store/transcript-projector.ts` to insert processing metadata, settle ready/withheld through expected-revision compare-and-swap, preserve block ID/sequence, and finalize abandoned processing after 60 seconds.
-- [ ] Add the next numbered migration under `apps/pi-remote-relay/migrations/` for artifact metadata, lifecycle state, variant digests, expiry, and ownership without source bytes, paths, URLs, OCR, or decoder detail.
-- [ ] Add or update `extensions/pi-remote-inbound-media/src/index.ts` so only approved capture handles or in-memory bytes enter the binary route; reject Markdown paths, arbitrary repository paths, symlinks, and unapproved source tools.
-- [ ] Add relay store, sanitizer, publication, security, and extension tests under the paths specified by the phase.
-- [ ] Add relay-only deterministic processing, ready, withheld, expiry, and scanner-failure fixtures with no committed image bytes and clean temporary directories.
-- [ ] Add processing/withheld demo states to `apps/pi-remote-web/src/demo.ts` without making the web client a publisher.
+- [x] Add `apps/pi-remote-relay/src/store/artifact-store.ts` for random immutable artifact IDs, artifact revisions, variant files, digest/ETag, 24-hour retention, 50 MiB session quota, expiry, revocation purge, and filesystem permissions.
+- [x] Add `apps/pi-remote-relay/src/store/artifact-sanitizer.ts` for streaming source limits, magic-byte/decoder validation, worker isolation, one-frame checks, orientation, sRGB conversion, metadata stripping, exclusion masks, OCR secret/path detection, opaque burned-in masks, deterministic thumbnail/full encoding, and fail-closed withholding.
+- [x] Change `apps/pi-remote-relay/src/auth/policy.ts` and `apps/pi-remote-relay/src/auth/auth-service.ts` to add `artifact:publish` as a distinct action and bind one-use tickets to the required publication context and 90-second start deadline.
+- [x] Change `apps/pi-remote-relay/src/http/server.ts` to implement extension-only publish-ticket and binary publish operations; consume the ticket before reading the body, enforce declared and streamed length, reject browser-origin requests, delete partial bodies, and suppress raw errors.
+- [x] Change `apps/pi-remote-relay/src/store/relay-store.ts` and `apps/pi-remote-relay/src/store/transcript-projector.ts` to insert processing metadata, settle ready/withheld through expected-revision compare-and-swap, preserve block ID/sequence, and finalize abandoned processing after 60 seconds.
+- [x] Add the next numbered migration under `apps/pi-remote-relay/migrations/` for artifact metadata, lifecycle state, variant digests, expiry, and ownership without source bytes, paths, URLs, OCR, or decoder detail.
+- [x] Add or update `extensions/pi-remote-inbound-media/src/index.ts` so only approved capture handles or in-memory bytes enter the binary route; reject Markdown paths, arbitrary repository paths, symlinks, and unapproved source tools.
+- [x] Add relay store, sanitizer, publication, security, and extension tests under the paths specified by the phase.
+- [x] Add relay-only deterministic processing, ready, withheld, expiry, and scanner-failure fixtures with no committed image bytes and clean temporary directories.
+- [x] Add processing/withheld demo states to `apps/pi-remote-web/src/demo.ts` without making the web client a publisher.

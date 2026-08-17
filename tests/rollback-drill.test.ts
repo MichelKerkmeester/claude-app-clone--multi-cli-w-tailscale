@@ -16,7 +16,7 @@ describe('executable rollback drill', () => {
     expect(report).toMatchObject({
       status: 'PASS',
       mutationDisabled: true,
-      restoredMigrationVersion: 5,
+      restoredMigrationVersion: 6,
       relaySessionsPreserved: 1,
       indeterminateRowsPreserved: 1,
       nativeSessionSentinelPreserved: true,

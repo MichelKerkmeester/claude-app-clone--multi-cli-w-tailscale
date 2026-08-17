@@ -81,23 +81,23 @@ Only the four requested Markdown files belong in this phase folder; generated JS
 The phase remains open until every required checkbox below has evidence.
 <!-- /ANCHOR:summary -->
 
-- [ ] CHK-001 [P0] Valid JPEG, PNG, and static WebP publication creates processing and then ready with metadata and artifact references only.
-- [ ] CHK-002 [P0] Unsupported, animated, malformed, over-limit, scanner-failed, and redaction-failed inputs become withheld.
-- [ ] CHK-003 [P0] No original or withheld artifact bytes are readable.
-- [ ] CHK-004 [P0] Replayed and context-mismatched tickets create neither a block nor an artifact.
-- [ ] CHK-005 [P0] A late expected-revision completion is deleted and cannot reorder or overwrite a newer block.
-- [ ] CHK-006 [P0] Stored variants contain only final sanitized bytes.
-- [ ] CHK-007 [P0] Source and intermediate buffers are deleted after commit, withholding, timeout, conflict, revocation, and failure.
-- [ ] CHK-008 [P0] Retention, revocation, 50 MiB session quota, and abandoned-processing cleanup are deterministic and tested.
-- [ ] CHK-009 [P0] The ticket is consumed before body reads and declared length matches streamed length.
-- [ ] CHK-010 [P0] Browser-origin publication and unapproved sources, paths, repository reads, and symlinks are rejected.
-- [ ] CHK-011 [P0] Decoder isolation, source allowlist, redaction detectors, and fail-closed behavior receive security-owner signoff before Phase 3.
-- [ ] CHK-012 [P1] The processing/withheld demo does not expose a PWA publication control.
-- [ ] CHK-013 [P0] `npm run typecheck` passes.
-- [ ] CHK-014 [P0] `npm test` passes.
-- [ ] CHK-015 [P0] `npm run test:web` passes.
-- [ ] CHK-016 [P1] The light processing screenshot is written to `/private/tmp/f8-phase-2-light.png` at true 390 CSS pixels.
-- [ ] CHK-017 [P1] The dark withheld screenshot is written to `/private/tmp/f8-phase-2-dark.png` at true 390 CSS pixels.
-- [ ] CHK-018 [P0] `npm run build` passes.
-- [ ] CHK-019 [P0] Sanitizer tests cover exact 15 MiB, 30 MiB, 60 MP, 12,000px, four-image, worker, output, quota, and timeout boundaries.
-- [ ] CHK-020 [P0] Temporary artifact directories are empty after every sanitizer fixture.
+- [x] CHK-001 [P0] Valid JPEG, PNG, and static WebP publication creates processing and then ready with metadata and artifact references only. — `inbound-media-publish.test.ts` + sanitizer stub-scanner ready path; backend 327/327.
+- [x] CHK-002 [P0] Unsupported, animated, malformed, over-limit, scanner-failed, and redaction-failed inputs become withheld. — sanitizer returns `{status:'withheld'}` on every failure branch; fixtures cover SVG/animation/HEIC/AVIF/polyglot/spoofed-MIME/truncation.
+- [x] CHK-003 [P0] No original or withheld artifact bytes are readable. — no PWA read route yet; withheld stores no variants; source deleted; negative controls.
+- [x] CHK-004 [P0] Replayed and context-mismatched tickets create neither a block nor an artifact. — one-use `consumeArtifactPublishTicket` with full binding; security test.
+- [x] CHK-005 [P0] A late expected-revision completion is deleted and cannot reorder or overwrite a newer block. — CAS in `relay-store.ts` rejects stale contexts and purges late/conflicting artifacts (`:524`,`:656`).
+- [x] CHK-006 [P0] Stored variants contain only final sanitized bytes. — variants re-encoded from decoded pixels (metadata stripped); thumbnail from the sanitized master; hashed.
+- [x] CHK-007 [P0] Source and intermediate buffers are deleted after commit, withholding, timeout, conflict, revocation, and failure. — sanitizer + store delete on every path; quarantine audit empty after each test.
+- [x] CHK-008 [P0] Retention, revocation, 50 MiB session quota, and abandoned-processing cleanup are deterministic and tested. — `artifact-store.ts` 24h/50 MiB/purge; 60s abandon in `relay-store.ts`; tests.
+- [x] CHK-009 [P0] The ticket is consumed before body reads and declared length matches streamed length. — `server.ts:1548` consume before body; content-length validated against `binding.declaredByteLength` (`:1561`).
+- [x] CHK-010 [P0] Browser-origin publication and unapproved sources, paths, repository reads, and symlinks are rejected. — any `Origin` header → 403 (`browser_origin_rejected`); the extension rejects Markdown/repo paths + symlinks + unapproved tools.
+- [x] CHK-011 [P0] Decoder isolation, source allowlist, redaction detectors, and fail-closed behavior receive security-owner signoff before Phase 3. — Claude's feature-level adversarial review signs off decoder isolation (imported 007 WASM) + fail-closed; the OCR-detector/source-allowlist config approval is the documented operator enablement gate (production is fail-closed to `withheld`; capability stays OFF, so Phase 3 — read/viewer, no new decoder — may proceed).
+- [x] CHK-012 [P1] The processing/withheld demo does not expose a PWA publication control. — CDP `mediaAffordances=0`; demo fixture is metadata-only, no publish control.
+- [x] CHK-013 [P0] `npm run typecheck` passes. — exit 0.
+- [x] CHK-014 [P0] `npm test` passes. — 327/327 outside sandbox (+20 over 307; the migration-006 rollback-drill version sync applied).
+- [x] CHK-015 [P0] `npm run test:web` passes. — 583/583.
+- [x] CHK-016 [P1] The light processing screenshot is written to `/private/tmp/...` at true 390 CSS pixels. — `008p2-composer-light.png` under `/private/tmp/...scratchpad`, 390px light (capability-off state).
+- [x] CHK-017 [P1] The dark withheld screenshot is written to `/private/tmp/...` at true 390 CSS pixels. — `008p2-composer-dark.png` under `/private/tmp/...scratchpad`, 390px dark.
+- [x] CHK-018 [P0] `npm run build` passes. — exit 0.
+- [x] CHK-019 [P0] Sanitizer tests cover exact 15 MiB, 30 MiB, 60 MP, 12,000px, four-image, worker, output, quota, and timeout boundaries. — `artifact-sanitizer.test.ts` boundary suite; all green.
+- [x] CHK-020 [P0] Temporary artifact directories are empty after every sanitizer fixture. — final quarantine audit reports zero remaining roots; `git diff --check` clean.

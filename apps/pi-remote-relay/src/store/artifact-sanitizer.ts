@@ -2,7 +2,10 @@
 // MODULE: Fail-closed Artifact Snapshot Sanitizer
 // ───────────────────────────────────────────────────────────────────
 
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
+import { chmodSync, lstatSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve, sep } from 'node:path';
 import { deflateSync, inflateSync } from 'node:zlib';
 
 import {
@@ -19,6 +22,13 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { redactJson } from './redaction.js';
+import {
+  decodeImage,
+  encodeImage,
+  sniffImage,
+  type CodecImageData,
+  type SniffedImage,
+} from '../attachments/attachment-decoder.js';
 
 const MAX_TEXT_BYTES = 2 * 1024 * 1024;
 const MAX_INLINE_TEXT_BYTES = 256 * 1024;
@@ -55,6 +65,98 @@ export interface SanitizedArtifactSnapshot {
   readonly bytes: Buffer | null;
   readonly retentionMs?: number;
   readonly expiresAt?: string;
+}
+
+export const INBOUND_MAX_SOURCE_BYTES = 15 * 1024 * 1024;
+export const INBOUND_MAX_BATCH_BYTES = 30 * 1024 * 1024;
+export const INBOUND_MAX_IMAGES_PER_TURN = 4;
+export const INBOUND_MAX_DECODED_AREA = 60_000_000;
+export const INBOUND_MAX_SOURCE_EDGE = 12_000;
+export const INBOUND_MAX_CHANNELS = 4;
+export const INBOUND_MAX_FRAMES = 1;
+export const INBOUND_MAX_FULL_BYTES = 2 * 1024 * 1024;
+export const INBOUND_MAX_THUMBNAIL_BYTES = 256 * 1024;
+export const INBOUND_FULL_MAX_EDGE = 2_000;
+export const INBOUND_THUMBNAIL_MAX_EDGE = 640;
+export const INBOUND_IMAGE_DECODE_DEADLINE_MS = 5_000;
+export const INBOUND_BATCH_DEADLINE_MS = 15_000;
+export const INBOUND_MAX_WORKERS = 2;
+const INBOUND_REDACTION_PADDING = 6;
+
+export interface InboundExclusionMask {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+export interface InboundScanImage {
+  readonly data: Uint8Array;
+  readonly pixels: Uint8Array;
+  readonly width: number;
+  readonly height: number;
+  readonly signal?: AbortSignal;
+}
+
+export interface InboundScanMatch extends InboundExclusionMask {
+  readonly status?: 'confirmed' | 'uncertain';
+  readonly confirmed?: boolean;
+}
+
+export interface InboundSecretScanner {
+  readonly scan: (image: InboundScanImage) => Promise<unknown> | unknown;
+}
+
+export type InboundScanStatus = 'clear' | 'confirmed' | 'uncertain' | 'unavailable';
+
+export interface InboundScanResult {
+  readonly status?: InboundScanStatus;
+  readonly matches?: readonly InboundScanMatch[];
+}
+
+export type InboundBinarySource = Uint8Array | AsyncIterable<Uint8Array>;
+
+export interface SanitizeInboundImageOptions {
+  readonly declaredByteLength?: number;
+  readonly expectedDigest?: string;
+  readonly claimedMediaType?: string;
+  readonly quarantineRoot?: string;
+  readonly scanner?: InboundSecretScanner;
+  readonly exclusionMasks?: readonly InboundExclusionMask[];
+  readonly deadlineMs?: number;
+}
+
+export interface SanitizedInboundVariant {
+  readonly mediaType: 'image/png' | 'image/jpeg';
+  readonly width: number;
+  readonly height: number;
+  readonly bytes: Buffer;
+  readonly digest: string;
+}
+
+export interface SanitizedInboundImage {
+  readonly status: 'ready';
+  readonly redaction: 'not-needed' | 'applied';
+  readonly full: SanitizedInboundVariant;
+  readonly thumbnail: SanitizedInboundVariant;
+}
+
+export interface WithheldInboundImage {
+  readonly status: 'withheld';
+  readonly reason:
+    | 'unsupported-type'
+    | 'too-large'
+    | 'invalid-image'
+    | 'redaction-unavailable'
+    | 'policy';
+}
+
+export type InboundSanitizationResult = SanitizedInboundImage | WithheldInboundImage;
+
+class InboundSanitizationFailure extends Error {
+  public constructor(readonly reason: WithheldInboundImage['reason']) {
+    super(reason);
+  }
 }
 
 /** Return only a snapshot carrying an explicit relay allowlist marker. */
@@ -630,4 +732,597 @@ function digestBytes(bytes: Uint8Array): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** Publish only bounded, reconstructed pixels; every non-ready outcome is terminal. */
+export async function sanitizeInboundImage(
+  source: InboundBinarySource,
+  options: SanitizeInboundImageOptions = {},
+): Promise<InboundSanitizationResult> {
+  let sourceBytes: Buffer | null = null;
+  let workingPixels: Uint8Array | null = null;
+  let masterPixels: Uint8Array | null = null;
+  let thumbnailPixels: Uint8Array | null = null;
+  let full: SanitizedInboundVariant | null = null;
+  let thumbnail: SanitizedInboundVariant | null = null;
+  let completed = false;
+  try {
+    sourceBytes = await readInboundSource(source, options);
+    const sniffed = sniffInboundImage(sourceBytes);
+    if (sniffed.mimeType === 'image/jpeg' && !jpegHasExactEnd(sourceBytes)) {
+      throw new InboundSanitizationFailure('invalid-image');
+    }
+    const decoded = await withInboundDeadline(
+      decodeImage(sourceBytes, sniffed, INBOUND_IMAGE_DECODE_DEADLINE_MS),
+      options.deadlineMs ?? INBOUND_IMAGE_DECODE_DEADLINE_MS,
+      INBOUND_IMAGE_DECODE_DEADLINE_MS,
+    );
+    if (
+      decoded.width <= 0 ||
+      decoded.height <= 0 ||
+      decoded.width > INBOUND_MAX_SOURCE_EDGE ||
+      decoded.height > INBOUND_MAX_SOURCE_EDGE ||
+      decoded.width > Math.floor(INBOUND_MAX_DECODED_AREA / decoded.height) ||
+      decoded.data.byteLength !== decoded.width * decoded.height * 4
+    ) {
+      throw new InboundSanitizationFailure('too-large');
+    }
+    workingPixels = applyImageOrientation(decoded.data, decoded.width, decoded.height, sniffed.orientation);
+    decoded.data.fill(0);
+
+    let redactionApplied = false;
+    const orientedWidth = orientedWidthFor(sniffed.orientation, decoded.width, decoded.height);
+    const orientedHeight = orientedHeightFor(sniffed.orientation, decoded.width, decoded.height);
+    const exclusionMasks = options.exclusionMasks ?? [];
+    if (exclusionMasks.length > 256) throw new InboundSanitizationFailure('policy');
+    for (const mask of exclusionMasks) {
+      validateInboundMask(mask, orientedWidth, orientedHeight);
+      burnCarbonRectangle(workingPixels, orientedWidth, orientedHeight, mask);
+      redactionApplied = true;
+    }
+
+    if (options.scanner === undefined) {
+      throw new InboundSanitizationFailure('redaction-unavailable');
+    }
+    const scanResult = await withInboundDeadline(
+      Promise.resolve(
+        options.scanner.scan({
+          data: workingPixels,
+          pixels: workingPixels,
+          width: orientedWidth,
+          height: orientedHeight,
+        }),
+      ),
+      options.deadlineMs ?? INBOUND_IMAGE_DECODE_DEADLINE_MS,
+      INBOUND_IMAGE_DECODE_DEADLINE_MS,
+    );
+    const matches = normalizeInboundScanResult(scanResult);
+    for (const match of matches) {
+      validateInboundMask(match, orientedWidth, orientedHeight);
+      burnCarbonRectangle(
+        workingPixels,
+        orientedWidth,
+        orientedHeight,
+        expandInboundMask(match, orientedWidth, orientedHeight, INBOUND_REDACTION_PADDING),
+      );
+      redactionApplied = true;
+    }
+
+    const master = resizeInboundRaster(
+      workingPixels,
+      orientedWidth,
+      orientedHeight,
+      INBOUND_FULL_MAX_EDGE,
+    );
+    masterPixels = master.data;
+    full = await encodeInboundVariant(master, INBOUND_MAX_FULL_BYTES, INBOUND_FULL_MAX_EDGE, options.deadlineMs);
+    const thumbnailRaster = resizeInboundRaster(
+      master.data,
+      master.width,
+      master.height,
+      INBOUND_THUMBNAIL_MAX_EDGE,
+    );
+    thumbnailPixels = thumbnailRaster.data;
+    thumbnail = await encodeInboundVariant(
+      thumbnailRaster,
+      INBOUND_MAX_THUMBNAIL_BYTES,
+      INBOUND_THUMBNAIL_MAX_EDGE,
+      options.deadlineMs,
+    );
+    master.data.fill(0);
+    thumbnailRaster.data.fill(0);
+    completed = true;
+    return {
+      status: 'ready',
+      redaction: redactionApplied ? 'applied' : 'not-needed',
+      full,
+      thumbnail,
+    };
+  } catch (error: unknown) {
+    if (error instanceof InboundSanitizationFailure) {
+      return { status: 'withheld', reason: error.reason };
+    }
+    return { status: 'withheld', reason: 'invalid-image' };
+  } finally {
+    sourceBytes?.fill(0);
+    workingPixels?.fill(0);
+    masterPixels?.fill(0);
+    thumbnailPixels?.fill(0);
+    if (!completed) {
+      full?.bytes.fill(0);
+      thumbnail?.bytes.fill(0);
+    }
+  }
+}
+
+/** Alias retained for callers that name the boundary after its capability. */
+export const sanitizeInboundMedia = sanitizeInboundImage;
+
+export async function sanitizeInboundBatch(
+  inputs: readonly (
+    | InboundBinarySource
+    | { readonly source: InboundBinarySource; readonly options?: SanitizeInboundImageOptions }
+  )[],
+  options: SanitizeInboundImageOptions = {},
+): Promise<InboundSanitizationResult[]> {
+  if (inputs.length > INBOUND_MAX_IMAGES_PER_TURN) {
+    return inputs.map(() => ({ status: 'withheld', reason: 'too-large' as const }));
+  }
+  const declaredTotal = inputs.reduce((total, input) => {
+    const itemOptions = isInboundBatchItem(input) ? input.options : undefined;
+    return total + (itemOptions?.declaredByteLength ?? options.declaredByteLength ?? 0);
+  }, 0);
+  if (declaredTotal > INBOUND_MAX_BATCH_BYTES) {
+    return inputs.map(() => ({ status: 'withheld', reason: 'too-large' as const }));
+  }
+
+  let consumed = 0;
+  const guarded = inputs.map((input) => {
+    const itemSource = isInboundBatchItem(input) ? input.source : input;
+    const itemOptions = isInboundBatchItem(input) ? { ...options, ...input.options } : options;
+    return {
+      source: guardBatchSource(itemSource, () => consumed, (value) => {
+        consumed = value;
+      }),
+      options: itemOptions,
+    };
+  });
+  const results: InboundSanitizationResult[] = Array.from(
+    { length: inputs.length },
+    () => ({ status: 'withheld', reason: 'policy' as const }),
+  );
+  let next = 0;
+  const worker = async (): Promise<void> => {
+    while (true) {
+      const index = next;
+      next += 1;
+      if (index >= guarded.length) return;
+      const item = guarded[index];
+      if (item === undefined) return;
+      results[index] = await sanitizeInboundImage(item.source, item.options);
+    }
+  };
+  try {
+    await withInboundDeadline(
+      Promise.all(Array.from({ length: Math.min(INBOUND_MAX_WORKERS, guarded.length) }, () => worker())),
+      options.deadlineMs ?? INBOUND_BATCH_DEADLINE_MS,
+      INBOUND_BATCH_DEADLINE_MS,
+    );
+  } catch {
+    return results.map(() => ({ status: 'withheld', reason: 'policy' as const }));
+  }
+  return results;
+}
+
+function isInboundBatchItem(
+  value: InboundBinarySource | { readonly source: InboundBinarySource; readonly options?: SanitizeInboundImageOptions },
+): value is { readonly source: InboundBinarySource; readonly options?: SanitizeInboundImageOptions } {
+  return isRecord(value) && 'source' in value;
+}
+
+function guardBatchSource(
+  source: InboundBinarySource,
+  getConsumed: () => number,
+  setConsumed: (value: number) => void,
+): InboundBinarySource {
+  if (source instanceof Uint8Array) {
+    return guardBatchIterable([source], getConsumed, setConsumed);
+  }
+  return guardBatchIterable(source, getConsumed, setConsumed);
+}
+
+async function* guardBatchIterable(
+  source: Iterable<Uint8Array> | AsyncIterable<Uint8Array>,
+  getConsumed: () => number,
+  setConsumed: (value: number) => void,
+): AsyncIterable<Uint8Array> {
+  for await (const chunk of source) {
+    if (!(chunk instanceof Uint8Array)) throw new InboundSanitizationFailure('policy');
+    const next = getConsumed() + chunk.byteLength;
+    if (next > INBOUND_MAX_BATCH_BYTES) throw new InboundSanitizationFailure('too-large');
+    setConsumed(next);
+    yield chunk;
+  }
+}
+
+async function readInboundSource(
+  source: InboundBinarySource,
+  options: SanitizeInboundImageOptions,
+): Promise<Buffer> {
+  const root = resolve(
+    options.quarantineRoot ?? join(tmpdir(), `pi-remote-inbound-sanitize-${randomBytes(16).toString('hex')}`),
+  );
+  if (root === resolve(process.cwd()) || root.startsWith(`${resolve(process.cwd())}${sep}`)) {
+    throw new InboundSanitizationFailure('policy');
+  }
+  try {
+    if (lstatSync(root).isSymbolicLink()) throw new InboundSanitizationFailure('policy');
+  } catch (error: unknown) {
+    if (error instanceof InboundSanitizationFailure) throw error;
+    if (!isMissingPath(error)) throw new InboundSanitizationFailure('policy');
+  }
+  mkdirSync(root, { recursive: true, mode: 0o700 });
+  chmodSync(root, 0o700);
+  const workDirectory = join(root, `work-${randomBytes(16).toString('hex')}`);
+  const sourcePath = join(workDirectory, `source-${randomBytes(16).toString('hex')}`);
+  mkdirSync(workDirectory, { mode: 0o700 });
+  chmodSync(workDirectory, 0o700);
+  let total = 0;
+  try {
+    const iterable: AsyncIterable<Uint8Array> =
+      source instanceof Uint8Array ? singleChunk(source) : source;
+    for await (const chunk of iterable) {
+      if (!(chunk instanceof Uint8Array)) throw new InboundSanitizationFailure('policy');
+      if (chunk.byteLength === 0) continue;
+      total += chunk.byteLength;
+      if (total > INBOUND_MAX_SOURCE_BYTES || total > (options.declaredByteLength ?? INBOUND_MAX_SOURCE_BYTES)) {
+        throw new InboundSanitizationFailure('too-large');
+      }
+      writeFileSync(sourcePath, Buffer.from(chunk), { flag: 'a', mode: 0o600 });
+      chmodSync(sourcePath, 0o600);
+    }
+    if (total === 0) throw new InboundSanitizationFailure('invalid-image');
+    if (options.declaredByteLength !== undefined && total !== options.declaredByteLength) {
+      throw new InboundSanitizationFailure('too-large');
+    }
+    const bytes = readFileSync(sourcePath);
+    if (options.expectedDigest !== undefined && !matchesInboundDigest(bytes, options.expectedDigest)) {
+      bytes.fill(0);
+      throw new InboundSanitizationFailure('policy');
+    }
+    return bytes;
+  } finally {
+    rmSync(workDirectory, { recursive: true, force: true });
+    if (options.quarantineRoot === undefined) rmSync(root, { recursive: true, force: true });
+  }
+}
+
+function matchesInboundDigest(bytes: Uint8Array, expected: string): boolean {
+  if (/^[a-f0-9]{64}$/u.test(expected)) return digestBytes(bytes) === expected;
+  if (/^[A-Za-z0-9_-]{43}$/u.test(expected)) {
+    return createHash('sha256').update(bytes).digest('base64url') === expected;
+  }
+  return false;
+}
+
+function isMissingPath(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { readonly code?: unknown }).code === 'ENOENT'
+  );
+}
+
+async function* singleChunk(source: Uint8Array): AsyncIterable<Uint8Array> {
+  yield source;
+}
+
+function sniffInboundImage(bytes: Uint8Array): SniffedImage {
+  let sawBoundFailure = false;
+  let sawInvalid = false;
+  for (const mime of ['image/jpeg', 'image/png', 'image/webp'] as const) {
+    const result = sniffImage(bytes, mime);
+    if (result.ok) {
+      if (result.image.animated || result.image.frames !== INBOUND_MAX_FRAMES) {
+        throw new InboundSanitizationFailure('unsupported-type');
+      }
+      if (
+        result.image.channels > INBOUND_MAX_CHANNELS ||
+        result.image.width > INBOUND_MAX_SOURCE_EDGE ||
+        result.image.height > INBOUND_MAX_SOURCE_EDGE ||
+        result.image.width > Math.floor(INBOUND_MAX_DECODED_AREA / result.image.height)
+      ) {
+        throw new InboundSanitizationFailure('too-large');
+      }
+      return result.image;
+    }
+    sawBoundFailure ||= result.code === 'dimensions_exceeded' || result.code === 'channels_exceeded';
+    sawInvalid ||= result.code === 'invalid_image' || result.code === 'frames_exceeded';
+  }
+  throw new InboundSanitizationFailure(sawBoundFailure ? 'too-large' : sawInvalid ? 'invalid-image' : 'unsupported-type');
+}
+
+function jpegHasExactEnd(bytes: Uint8Array): boolean {
+  return bytes.byteLength >= 4 && bytes[bytes.byteLength - 2] === 0xff && bytes[bytes.byteLength - 1] === 0xd9;
+}
+
+function orientedWidthFor(orientation: SniffedImage['orientation'], width: number, height: number): number {
+  return orientation >= 5 ? height : width;
+}
+
+function orientedHeightFor(orientation: SniffedImage['orientation'], width: number, height: number): number {
+  return orientation >= 5 ? width : height;
+}
+
+function applyImageOrientation(
+  source: Uint8Array,
+  width: number,
+  height: number,
+  orientation: SniffedImage['orientation'],
+): Uint8Array {
+  const targetWidth = orientedWidthFor(orientation, width, height);
+  const targetHeight = orientedHeightFor(orientation, width, height);
+  const target = new Uint8Array(targetWidth * targetHeight * 4);
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      let targetX = x;
+      let targetY = y;
+      if (orientation === 2) targetX = width - 1 - x;
+      if (orientation === 3) {
+        targetX = width - 1 - x;
+        targetY = height - 1 - y;
+      }
+      if (orientation === 4) targetY = height - 1 - y;
+      if (orientation === 5) {
+        targetX = y;
+        targetY = x;
+      }
+      if (orientation === 6) {
+        targetX = height - 1 - y;
+        targetY = x;
+      }
+      if (orientation === 7) {
+        targetX = height - 1 - y;
+        targetY = width - 1 - x;
+      }
+      if (orientation === 8) {
+        targetX = y;
+        targetY = width - 1 - x;
+      }
+      const sourceOffset = (y * width + x) * 4;
+      const targetOffset = (targetY * targetWidth + targetX) * 4;
+      target.set(source.subarray(sourceOffset, sourceOffset + 4), targetOffset);
+    }
+  }
+  return target;
+}
+
+function validateInboundMask(mask: InboundExclusionMask, width: number, height: number): void {
+  if (
+    !Number.isSafeInteger(mask.x) ||
+    !Number.isSafeInteger(mask.y) ||
+    !Number.isSafeInteger(mask.width) ||
+    !Number.isSafeInteger(mask.height) ||
+    mask.width <= 0 ||
+    mask.height <= 0 ||
+    mask.x < 0 ||
+    mask.y < 0 ||
+    mask.x + mask.width > width ||
+    mask.y + mask.height > height
+  ) {
+    throw new InboundSanitizationFailure('policy');
+  }
+}
+
+function expandInboundMask(
+  mask: InboundExclusionMask,
+  width: number,
+  height: number,
+  padding: number,
+): InboundExclusionMask {
+  const x = Math.max(0, mask.x - padding);
+  const y = Math.max(0, mask.y - padding);
+  const right = Math.min(width, mask.x + mask.width + padding);
+  const bottom = Math.min(height, mask.y + mask.height + padding);
+  return { x, y, width: right - x, height: bottom - y };
+}
+
+function burnCarbonRectangle(
+  pixels: Uint8Array,
+  width: number,
+  height: number,
+  mask: InboundExclusionMask,
+): void {
+  const right = Math.min(width, mask.x + mask.width);
+  const bottom = Math.min(height, mask.y + mask.height);
+  for (let y = Math.max(0, mask.y); y < bottom; y += 1) {
+    for (let x = Math.max(0, mask.x); x < right; x += 1) {
+      const offset = (y * width + x) * 4;
+      pixels[offset] = 36;
+      pixels[offset + 1] = 34;
+      pixels[offset + 2] = 31;
+      pixels[offset + 3] = 255;
+    }
+  }
+}
+
+function normalizeInboundScanResult(value: unknown): InboundScanMatch[] {
+  if (Array.isArray(value)) return normalizeInboundMatches(value, 'confirmed');
+  if (!isRecord(value)) throw new InboundSanitizationFailure('redaction-unavailable');
+  const status = value.status;
+  if (status === 'unavailable' || status === 'uncertain' || status === 'timeout') {
+    throw new InboundSanitizationFailure('redaction-unavailable');
+  }
+  const rawMatches = value.matches;
+  if (rawMatches === undefined) {
+    if (status === 'clear' || status === 'confirmed') return [];
+    throw new InboundSanitizationFailure('redaction-unavailable');
+  }
+  if (!Array.isArray(rawMatches)) throw new InboundSanitizationFailure('redaction-unavailable');
+  return normalizeInboundMatches(rawMatches, status === 'confirmed' ? 'confirmed' : undefined);
+}
+
+function normalizeInboundMatches(value: unknown[], defaultStatus: 'confirmed' | undefined): InboundScanMatch[] {
+  if (value.length > 1_000) throw new InboundSanitizationFailure('policy');
+  return value.map((candidate) => {
+    if (!isRecord(candidate)) throw new InboundSanitizationFailure('policy');
+    const match = {
+      x: candidate.x,
+      y: candidate.y,
+      width: candidate.width,
+      height: candidate.height,
+      status: candidate.status,
+      confirmed: candidate.confirmed,
+    } as InboundScanMatch;
+    if (
+      match.status === 'uncertain' ||
+      match.confirmed === false ||
+      (match.status === undefined && match.confirmed === undefined && defaultStatus === undefined)
+    ) {
+      throw new InboundSanitizationFailure('redaction-unavailable');
+    }
+    if (match.status !== undefined && match.status !== 'confirmed') {
+      throw new InboundSanitizationFailure('redaction-unavailable');
+    }
+    return match;
+  });
+}
+
+interface InboundRaster {
+  readonly data: Uint8Array;
+  readonly width: number;
+  readonly height: number;
+}
+
+function resizeInboundRaster(data: Uint8Array, width: number, height: number, maxEdge: number): InboundRaster {
+  const scale = Math.min(1, maxEdge / Math.max(width, height));
+  const targetWidth = Math.max(1, Math.round(width * scale));
+  const targetHeight = Math.max(1, Math.round(height * scale));
+  const target = new Uint8Array(targetWidth * targetHeight * 4);
+  for (let y = 0; y < targetHeight; y += 1) {
+    for (let x = 0; x < targetWidth; x += 1) {
+      const sourceX = Math.min(width - 1, Math.floor((x * width) / targetWidth));
+      const sourceY = Math.min(height - 1, Math.floor((y * height) / targetHeight));
+      const sourceOffset = (sourceY * width + sourceX) * 4;
+      const targetOffset = (y * targetWidth + x) * 4;
+      target.set(data.subarray(sourceOffset, sourceOffset + 4), targetOffset);
+    }
+  }
+  return { data: target, width: targetWidth, height: targetHeight };
+}
+
+async function encodeInboundVariant(
+  raster: InboundRaster,
+  maxBytes: number,
+  maxEdge: number,
+  deadlineMs: number | undefined,
+): Promise<SanitizedInboundVariant> {
+  let current = raster;
+  const alpha = hasInboundAlpha(current.data);
+  try {
+    if (alpha) {
+      const png = await encodeInbound(current, 'image/png', 88, deadlineMs);
+      if (png.bytes.byteLength <= maxBytes) {
+        const result = { ...png, digest: digestBytes(png.bytes) };
+        if (current !== raster) current.data.fill(0);
+        return result;
+      }
+      png.bytes.fill(0);
+    }
+    let quality = 88;
+    for (let attempt = 0; attempt < 32; attempt += 1) {
+      const jpegRaster = alpha ? flattenInboundRaster(current) : current;
+      let jpeg: Awaited<ReturnType<typeof encodeInbound>> | null = null;
+      try {
+        jpeg = await encodeInbound(jpegRaster, 'image/jpeg', quality, deadlineMs);
+      } finally {
+        if (jpegRaster !== current) jpegRaster.data.fill(0);
+      }
+      if (jpeg.bytes.byteLength <= maxBytes) {
+        const result = { ...jpeg, digest: digestBytes(jpeg.bytes) };
+        if (current !== raster) current.data.fill(0);
+        return result;
+      }
+      jpeg.bytes.fill(0);
+      quality = Math.max(24, quality - 8);
+      if (attempt % 4 === 3 || quality === 24) {
+        if (current.width <= 1 && current.height <= 1) break;
+        const next = resizeInboundRaster(
+          current.data,
+          current.width,
+          current.height,
+          Math.max(1, Math.floor(maxEdge * 0.9 ** (Math.floor(attempt / 4) + 1))),
+        );
+        if (current !== raster) current.data.fill(0);
+        current = next;
+        quality = 88;
+      }
+    }
+    throw new InboundSanitizationFailure('too-large');
+  } finally {
+    if (current !== raster) current.data.fill(0);
+  }
+}
+
+async function encodeInbound(
+  raster: InboundRaster,
+  mediaType: 'image/png' | 'image/jpeg',
+  quality: number,
+  deadlineMs: number | undefined,
+): Promise<{ readonly mediaType: 'image/png' | 'image/jpeg'; readonly width: number; readonly height: number; readonly bytes: Buffer }> {
+  const data: CodecImageData = { data: raster.data, width: raster.width, height: raster.height };
+  const encoded = await withInboundDeadline(
+    encodeImage(data, mediaType, quality, INBOUND_IMAGE_DECODE_DEADLINE_MS),
+    deadlineMs ?? INBOUND_IMAGE_DECODE_DEADLINE_MS,
+    INBOUND_IMAGE_DECODE_DEADLINE_MS,
+  );
+  return {
+    mediaType,
+    width: raster.width,
+    height: raster.height,
+    bytes: Buffer.from(encoded),
+  };
+}
+
+function flattenInboundRaster(raster: InboundRaster): InboundRaster {
+  const data = Uint8Array.from(raster.data);
+  for (let offset = 0; offset < data.length; offset += 4) {
+    const alpha = data[offset + 3] ?? 255;
+    data[offset] = Math.round(((data[offset] ?? 0) * alpha + 248 * (255 - alpha)) / 255);
+    data[offset + 1] = Math.round(((data[offset + 1] ?? 0) * alpha + 248 * (255 - alpha)) / 255);
+    data[offset + 2] = Math.round(((data[offset + 2] ?? 0) * alpha + 248 * (255 - alpha)) / 255);
+    data[offset + 3] = 255;
+  }
+  return { data, width: raster.width, height: raster.height };
+}
+
+function hasInboundAlpha(data: Uint8Array): boolean {
+  for (let offset = 3; offset < data.length; offset += 4) {
+    if (data[offset] !== 255) return true;
+  }
+  return false;
+}
+
+async function withInboundDeadline<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  maximum: number,
+): Promise<T> {
+  const requested = Number.isSafeInteger(timeoutMs) && timeoutMs > 0 ? timeoutMs : maximum;
+  const boundedTimeout = Math.min(requested, maximum);
+  return new Promise<T>((resolvePromise, rejectPromise) => {
+    const timer = setTimeout(() => rejectPromise(new InboundSanitizationFailure('redaction-unavailable')), boundedTimeout);
+    timer.unref?.();
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolvePromise(value);
+      },
+      () => {
+        clearTimeout(timer);
+        rejectPromise(new InboundSanitizationFailure('invalid-image'));
+      },
+    );
+  });
 }

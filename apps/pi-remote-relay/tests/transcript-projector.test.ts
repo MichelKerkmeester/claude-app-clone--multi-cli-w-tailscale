@@ -3,6 +3,7 @@
 // ───────────────────────────────────────────────────────────────────
 
 import {
+  isRedactedAttachmentBlock,
   isRichTranscriptBlock,
   type Envelope,
   type PiRpcEvent,
@@ -681,6 +682,45 @@ describe('Pi transcript projector', () => {
     expect(project(event)).toEqual([
       expect.objectContaining({ kind: 'text', text: 'Pi event: future_event' }),
     ]);
+  });
+
+  it('projects image turns as fixed redacted cards and drops image content from text projections', () => {
+    let sequence = 1;
+    const projector = new TranscriptProjector();
+    const cards = projector.projectSubmittedAttachments('prompt_image_cards', 2, 'delivered', {
+      occurredAt: OCCURRED_AT,
+      nextSequence: () => sequence++,
+    });
+
+    expect(cards).toHaveLength(2);
+    expect(cards.every(isRedactedAttachmentBlock)).toBe(true);
+    expect(cards.map((card) => card.ordinal)).toEqual([1, 2]);
+    expect(cards.map((card) => card.seq)).toEqual([1, 2]);
+    expect(Object.keys(cards[0] ?? {}).sort()).toEqual(
+      ['kind', 'id', 'revision', 'seq', 'occurredAt', 'role', 'mediaKind', 'ordinal', 'status', 'previewRetained'].sort(),
+    );
+
+    const projected = projector.project(
+      {
+        type: 'tool_execution_end',
+        toolCallId: 'call_image_content',
+        toolName: 'read',
+        result: {
+          content: [
+            {
+              type: 'image',
+              mimeType: 'image/png',
+              data: 'PIXEL_CANARY',
+              filename: 'private-name.png',
+            },
+          ],
+        },
+        isError: false,
+      } as unknown as PiRpcEvent,
+      { occurredAt: OCCURRED_AT, nextSequence: () => sequence++ },
+    );
+    expect(JSON.stringify(projected)).not.toContain('PIXEL_CANARY');
+    expect(JSON.stringify(projected)).not.toContain('private-name.png');
   });
 });
 

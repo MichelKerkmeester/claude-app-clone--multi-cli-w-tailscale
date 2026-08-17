@@ -4,7 +4,12 @@
 
 import { fileURLToPath } from 'node:url';
 
-import { isEnvelope, isSessionCardDto, isTranscriptBlock } from '@pi-remote/pi-rpc-protocol';
+import {
+  isEnvelope,
+  isRedactedAttachmentBlock,
+  isSessionCardDto,
+  isTranscriptBlock,
+} from '@pi-remote/pi-rpc-protocol';
 import Database from 'better-sqlite3';
 import type {
   Envelope,
@@ -102,6 +107,14 @@ export class RelayStore {
           envelope.redaction,
         )}`.trim(),
       );
+    }
+    if (
+      envelope.kind === 'transcript.block' &&
+      isTranscriptBlock(envelope.payload) &&
+      envelope.payload.kind === 'attachment' &&
+      !isRedactedAttachmentBlock(envelope.payload)
+    ) {
+      throw new TypeError('Relay refused an attachment projection outside the fixed allowlist.');
     }
     if (envelope.kind === 'transcript.block' && isControlPlaneProjection(envelope.payload)) {
       // Control-plane residue is never persisted, replayed, synced or broadcast.

@@ -6,8 +6,10 @@ import { generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
 import {
+  DEFAULT_MEDIA_POLICY,
   approvalActionDigest,
   enrollmentProof,
+  isPiRpcCommand,
   sessionProof,
   type ApprovalAction,
   type ApprovalDecisionCommand,
@@ -22,8 +24,17 @@ import { describe, expect, it, vi } from 'vitest';
 import { ApprovalService } from '../../src/approval/approval-service.js';
 import { verifyFinalGate } from '../../src/approval/final-gate.js';
 import { AuthService } from '../../src/auth/auth-service.js';
+import type {
+  AttachmentOwner,
+  AttachmentStatusDto,
+} from '../../src/attachments/attachment-types.js';
+import {
+  PiImageBridge,
+  type PiImageAttachmentSource,
+} from '../../src/attachments/pi-image-bridge.js';
 import { CommandService } from '../../src/commands/command-service.js';
 import { MutationPolicy } from '../../src/policy/mutation-policy.js';
+import { PromptRevisionCoordinator } from '../../src/prompt/prompt-revision-coordinator.js';
 import { serializePushHint } from '../../src/push/push-service.js';
 import { SyncHub } from '../../src/replay/sync.js';
 import type { RpcSupervisor } from '../../src/rpc/supervisor.js';
@@ -438,6 +449,178 @@ describe('consolidated fail-closed negative controls', () => {
     }
   });
 
+  it('keeps normalized bytes inside the Pi request and out of durable outbound surfaces', async () => {
+    const pixelCanary = 'PIXEL_CANARY_SECURITY';
+    const owner: AttachmentOwner = {
+      sessionToken: 'session_token_security',
+      sessionId: 'session_local',
+      sessionEpoch: 'epoch_security',
+      deviceId: 'device_security',
+      principal: PRINCIPAL,
+      origin: ORIGIN,
+    };
+    const reservation = {
+      setId: 'set_security_image',
+      owner,
+      binding: {
+        sessionId: 'session_local',
+        sessionEpoch: 'epoch_security',
+        expectedPromptRevision: 0,
+        submissionId: 'submission_security_image',
+      },
+      manifest: {
+        submissionId: 'submission_security_image',
+        sessionId: 'session_local',
+        ticket: 'ticket_security_image',
+        expiresAt: '2026-01-01T00:01:00.000Z',
+      },
+      modelId: 'model_label_must_not_be_used_as_gate',
+      policyVersion: 1,
+      expiresAt: NOW + 60_000,
+    };
+    const part = {
+      setId: reservation.setId,
+      attachmentId: 'attachment_security_image',
+      partId: 'part_security_image',
+      item: {
+        clientId: 'client_security_image',
+        ordinal: 1,
+        declaredType: 'image/png' as const,
+        byteLength: pixelCanary.length,
+        sha256: 'c'.repeat(43),
+      },
+    };
+    const status: AttachmentStatusDto = {
+      attachmentSetId: reservation.setId,
+      revision: 0,
+      status: 'ready',
+      expiresAt: reservation.manifest.expiresAt,
+      parts: [
+        {
+          attachmentSetId: reservation.setId,
+          attachmentId: part.attachmentId,
+          partId: part.partId,
+          ordinal: 1,
+          status: 'ready',
+        },
+      ],
+    };
+    let piRequest: PiRpcCommand | undefined;
+    const send = vi.fn(async (command: PiRpcCommand): Promise<PiRpcResponse> => {
+      piRequest = command;
+      return { id: command.id, type: 'response', command: command.type, success: true };
+    });
+    const source: PiImageAttachmentSource = {
+      getReservation: () => reservation,
+      getPartRecords: () => [part],
+      status: () => status,
+      loadNormalizedDerivative: async () => ({
+        bytes: new Uint8Array(Buffer.from(pixelCanary, 'utf8')),
+        mimeType: 'image/png',
+      }),
+      acknowledgeDelivered: async () => undefined,
+      markDeliveryUnknown: async () => undefined,
+    };
+    const bridge = new PiImageBridge({
+      supervisor: { send },
+      attachments: source,
+      getRuntimeSnapshot: () => securityRuntimeSnapshot(),
+      currentPromptRevision: () => 0,
+      planPolicy: () => true,
+      now: () => new Date(NOW),
+    });
+
+    await bridge.submit(
+      {
+        type: 'prompt.submit',
+        submissionId: 'submission_security_image',
+        sessionId: 'session_local',
+        message: '',
+        ticket: 'ticket_security_image',
+        expectedPromptRevision: 0,
+        attachmentSetId: reservation.setId,
+        attachmentIds: [part.attachmentId],
+      },
+      owner,
+    );
+    expect(piRequest).toBeDefined();
+    expect(isPiRpcCommand(piRequest)).toBe(true);
+    expect(JSON.stringify(piRequest)).not.toContain(pixelCanary);
+
+    const attachmentEnvelope = {
+      v: 1 as const,
+      eventId: 'event_security_attachment',
+      kind: 'transcript.block',
+      hostId: IDENTITY.hostId,
+      workspaceRef: IDENTITY.workspaceRef,
+      sessionId: 'session_local',
+      epoch: 'epoch_security',
+      seq: 1,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      causedBy: null,
+      payload: {
+        kind: 'attachment',
+        id: 'attachment_card_security',
+        revision: 1,
+        seq: 1,
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        role: 'user',
+        mediaKind: 'image',
+        ordinal: 1,
+        status: 'delivered',
+        previewRetained: false,
+        filename: 'private.png',
+        path: '/Users/private.png',
+        hash: 'private-hash',
+        url: 'https://private.example/image',
+        providerPayload: { data: pixelCanary },
+      },
+      redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+      replay: { eligible: true, snapshotEligible: true },
+    } as const;
+    const store = new RelayStore();
+    try {
+      const committed = store.appendEnvelope(attachmentEnvelope);
+      const pushBytes = Buffer.from(
+        serializePushHint({
+          lookupId: 'hint_security_image',
+          attentionClass: 'needs_input',
+          generation: 1,
+          nonce: 'nonce_security_image',
+          transcript: pixelCanary,
+        }),
+      );
+      const surfaces = JSON.stringify({
+        committed,
+        page: store.getTranscriptPage({
+          hostId: IDENTITY.hostId,
+          workspaceRef: IDENTITY.workspaceRef,
+          sessionId: 'session_local',
+        }),
+        sync: store.createSyncPlan({
+          hostId: IDENTITY.hostId,
+          workspaceRef: IDENTITY.workspaceRef,
+          sessionId: 'session_local',
+        }),
+        push: pushBytes.toString('utf8'),
+      });
+      expect(surfaces).not.toContain(pixelCanary);
+      expect(surfaces).not.toContain('private.png');
+      expect(surfaces).not.toContain('private-hash');
+      expect(surfaces).not.toContain('https://private.example/image');
+
+      const bridgeSource = readFileSync(
+        new URL('../../src/attachments/pi-image-bridge.ts', import.meta.url),
+        'utf8',
+      );
+      expect(bridgeSource).not.toContain("from 'node:fs'");
+      expect(bridgeSource).not.toContain('writeFile');
+      expect(bridgeSource).not.toContain('process.cwd');
+    } finally {
+      store.close();
+    }
+  });
+
   it('revalidates slash bindings fail-closed on every identity or availability mismatch', async () => {
     const supervisor = new FakeCommandSupervisor();
     const service = new CommandService(supervisor as unknown as RpcSupervisor, {
@@ -518,6 +701,32 @@ async function currentBinding(service: CommandService): Promise<CommandBindingDt
     name: 'compact',
     sessionRevision: fresh.sessionRevision,
     catalogRevision: fresh.catalogRevision,
+  };
+}
+
+function securityRuntimeSnapshot() {
+  return {
+    sessionId: 'session_local',
+    state: {
+      sessionId: 'session_local',
+      revision: 0,
+      model: null,
+      thinkingLevel: 'unknown',
+      availableThinkingLevels: [],
+      mode: 'build' as const,
+      streaming: false,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    },
+    models: {
+      sessionId: 'session_local',
+      catalogRevision: 1,
+      runtimeRevision: 0,
+      currentModel: null,
+      streaming: false,
+      canSetModelWhileStreaming: false,
+      models: [],
+    },
+    media: { enabled: true, imageIn: true, policy: DEFAULT_MEDIA_POLICY },
   };
 }
 

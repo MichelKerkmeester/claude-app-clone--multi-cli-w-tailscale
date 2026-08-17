@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   isFilePreviewBlock,
+  isRedactedAttachmentBlock,
   isTranscriptBlock,
   isRichTranscriptBlock,
   isPlanSnapshotDto,
@@ -125,6 +126,79 @@ describe('canonical redaction', () => {
 
     expect(source.payload).toEqual({ path: '/tmp/source.txt' });
     expect(redacted.payload).toEqual({ path: '[REDACTED_PATH]' });
+  });
+
+  it('structurally allowlists attachment cards before storage and sync', () => {
+    const candidate: Envelope = {
+      ...envelopeWith({
+        kind: 'attachment',
+        id: 'attachment_block_001',
+        revision: 1,
+        seq: 1,
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        role: 'user',
+        mediaKind: 'image',
+        ordinal: 1,
+        status: 'delivered',
+        previewRetained: false,
+        filename: 'private.png',
+        path: '/Users/private.png',
+        hash: 'digest-canary',
+        url: 'https://private.example/image',
+        exif: { gps: 'private' },
+        ocr: 'private words',
+        generatedCaption: 'private caption',
+        providerPayload: { data: 'PIXEL_CANARY' },
+        decoderError: 'private decoder detail',
+      }),
+      kind: 'transcript.block',
+    };
+    const redacted = redactEnvelope(candidate);
+    expect(isRedactedAttachmentBlock(redacted.payload)).toBe(true);
+    expect(redacted.payload).toEqual({
+      kind: 'attachment',
+      id: 'attachment_block_001',
+      revision: 1,
+      seq: 1,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      role: 'user',
+      mediaKind: 'image',
+      ordinal: 1,
+      status: 'delivered',
+      previewRetained: false,
+    });
+
+    const store = new RelayStore();
+    try {
+      const committed = store.appendEnvelope(candidate);
+      const durable = JSON.stringify({
+        committed,
+        page: store.getTranscriptPage({
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: 'session_local',
+        }),
+        sync: store.createSyncPlan({
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: 'session_local',
+        }),
+      });
+      for (const forbidden of [
+        'private.png',
+        '/Users/private.png',
+        'digest-canary',
+        'https://private.example/image',
+        'private words',
+        'private caption',
+        'PIXEL_CANARY',
+        'private decoder detail',
+      ]) {
+        expect(durable).not.toContain(forbidden);
+      }
+    } finally {
+      store.close();
+    }
   });
 
   it('redacts rich projections before storage, page responses, sync, and errors', () => {

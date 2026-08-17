@@ -351,9 +351,7 @@ export function isPiRpcCommand(value: unknown): value is PiRpcCommand {
       hasRequiredAndOptionalKeys(value, ['type', 'message'], optional) &&
       typeof value.message === 'string' &&
       (value.images === undefined ||
-        (Array.isArray(value.images) &&
-          value.images.length <= MEDIA_MAX_IMAGES &&
-          value.images.every(isNormalizedPiImage))) &&
+        isNormalizedPiImageArray(value.images)) &&
       (value.type !== 'prompt' ||
         value.streamingBehavior === undefined ||
         value.streamingBehavior === 'steer' ||
@@ -687,6 +685,17 @@ export function isNormalizedPiImage(value: unknown): value is NormalizedPiImage 
     MEDIA_OUTPUT_MIME_TYPE_SET.has(value.mimeType) &&
     isBase64(value.data, 4, MEDIA_MAX_NORMALIZED_BASE64, MEDIA_MAX_NORMALIZED_BYTES_PER_IMAGE)
   );
+}
+
+function isNormalizedPiImageArray(value: unknown): value is readonly NormalizedPiImage[] {
+  if (!Array.isArray(value) || value.length > MEDIA_MAX_IMAGES) return false;
+  let totalBytes = 0;
+  for (const image of value) {
+    if (!isNormalizedPiImage(image)) return false;
+    totalBytes += normalizedImageByteLength(image.data);
+    if (totalBytes > MEDIA_MAX_NORMALIZED_BYTES_PER_TURN) return false;
+  }
+  return true;
 }
 
 /** Narrow the structural, metadata-only durable attachment block. */
@@ -1514,6 +1523,11 @@ function isBase64(
     return value.length / 4 * 3 - padding <= decodedMaximum;
   }
   return false;
+}
+
+function normalizedImageByteLength(value: string): number {
+  const padding = value.endsWith('==') ? 2 : value.endsWith('=') ? 1 : 0;
+  return (value.length / 4) * 3 - padding;
 }
 
 function isSha256Digest(value: unknown): value is string {

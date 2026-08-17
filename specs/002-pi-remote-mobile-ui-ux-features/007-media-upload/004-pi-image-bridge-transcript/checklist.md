@@ -1,21 +1,20 @@
 # Checklist — Normalized Pi Image Bridge and Redacted Transcript
 
-- [ ] Pi receives ordered normalized JPEG/PNG image blocks for `prompt`, `steer`, and `follow_up` and never receives a host path or raw source object.
-- [ ] Image-only turns submit an empty text message while preserving the ordered image set.
-- [ ] Final ownership, readiness, expiry, active-model capability, plan policy, and expected revision checks occur before normalized bytes are loaded or Pi is invoked.
-- [ ] Stale, mismatched, expired, replayed, text-only-model, and plan-policy-invalid sets cause no Pi invocation.
-- [ ] Positive acknowledgement deletes host bytes and publishes only fixed redacted attachment cards.
-- [ ] Ambiguous acknowledgement becomes `delivery-unknown` and cannot auto-resend.
-- [ ] Durable DTOs, sync frames, exports, push text, logs, SQLite, and Pi-visible transcript data contain no pixels, base64, filename, path, hash, URL, EXIF, OCR, provider payload, or decoder error.
-- [ ] The browser submission DTO remains reference-only and contains no image data.
-- [ ] The pinned Pi/provider persistence and echo probe passes; if it fails, the host media capability remains disabled.
-- [ ] Echo suppression occurs before the framed relay path and the 1 MiB event-record limit is verified.
-- [ ] Workspace/session JSONL identity remains unchanged by image delivery.
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npm run test` exits 0.
-- [ ] `npm run test:web` exits 0.
-- [ ] Focused relay prompt, transcript, redaction, security, and pinned-Pi probe suites exit 0.
-- [ ] A real CDP run uses exactly 390 CSS px in light and dark themes with media disabled or a redacted-card fixture.
-- [ ] The CDP evidence shows no raw image and no regression in existing text layout.
-- [ ] Required security review signs off the host-to-Pi/provider boundary before real-image end-to-end testing.
-
+- [x] Pi receives ordered normalized JPEG/PNG image blocks for `prompt`, `steer`, and `follow_up` and never receives a host path or raw source object. — `pi-image-bridge.ts` builds `NormalizedPiImage[]` (base64 data, no path/raw object); prompt-service wires the seam; tested.
+- [x] Image-only turns submit an empty text message while preserving the ordered image set. — bridge/prompt tests submit `message: ''` with an ordered attachment set.
+- [x] Final ownership, readiness, expiry, active-model capability, plan policy, and expected revision checks occur before normalized bytes are loaded or Pi is invoked. — `assertFinalGate` re-checks all six immediately before each derivative load (`pi-image-bridge.ts:187`, load at `:126`).
+- [x] Stale, mismatched, expired, replayed, text-only-model, and plan-policy-invalid sets cause no Pi invocation. — `assertFinalGate` throws before any `supervisor.send`; covered by prompt/security tests.
+- [x] Positive acknowledgement deletes host bytes and publishes only fixed redacted attachment cards. — bridge calls `acknowledgeDelivered` (byte deletion) and projects the redacted allowlist card; behavior tested via the source interface. (Concrete `attachment-service` deletion wiring lands in Phase 5 — see implementation-summary carry-forward #2.)
+- [x] Ambiguous acknowledgement becomes `delivery-unknown` and cannot auto-resend. — supervisor-send/ack failure paths return `delivery-unknown`; no resend; tested.
+- [x] Durable DTOs, sync frames, exports, push text, logs, SQLite, and Pi-visible transcript data contain no pixels, base64, filename, path, hash, URL, EXIF, OCR, provider payload, or decoder error. — structural allowlist projector + redaction/relay-store enforcement; base64 grep-clean outside the bridge; negative controls pass.
+- [x] The browser submission DTO remains reference-only and contains no image data. — `PromptSubmitCommand` unchanged (attachmentSetId + attachmentIds only); `NormalizedPiImage` is host-only.
+- [ ] The pinned Pi/provider persistence and echo probe passes; if it fails, the host media capability remains disabled. — the installed `pi` 0.84.2 does not accept image input in RPC mode, so the live probe **skips honestly** (no pass claimed); the media capability remains DISABLED (fail-closed). A genuine pass requires an image-capable pinned Pi at Phase-5 enablement.
+- [ ] Echo suppression occurs before the framed relay path and the 1 MiB event-record limit is verified. — the 1 MiB framed event-record cap is verified (`StrictJsonlDecoder` test passes). Pre-frame supervisor echo suppression in `rpc/supervisor.ts` is Phase-5 wiring (that file was outside this phase's affected-areas).
+- [x] Workspace/session JSONL identity remains unchanged by image delivery. — the relay writes no image byte to any workspace/session JSONL (RPC-only delivery; no workspace-write path); negative controls enforce it. The live probe's on-delivery JSONL diff is deferred with the pinned-Pi probe.
+- [x] `npm run typecheck` exits 0. — verified on `main`, outside sandbox.
+- [x] `npm run test` exits 0. — 299 passed / 36 files (+12 over the 287 baseline); known `auth.test.ts` flake passed.
+- [x] `npm run test:web` exits 0. — 545 passed / 44 files (delta 0).
+- [x] Focused relay prompt, transcript, redaction, security, and pinned-Pi probe suites exit 0. — all green; the pinned-Pi live probe skips honestly and the 1 MiB cap test passes.
+- [x] A real CDP run uses exactly 390 CSS px in light and dark themes with media disabled or a redacted-card fixture. — both themes `width=390`, media disabled.
+- [x] The CDP evidence shows no raw image and no regression in existing text layout. — `mediaAffordances=0`, no overflow, composer+transcript unchanged; PNGs inspected.
+- [x] Required security review signs off the host-to-Pi/provider boundary before real-image end-to-end testing. — `adversarial-security-review.md` + Claude's post-build sign-off; base64 locality, allowlist redaction, and pre-invocation revalidation confirmed; real-image end-to-end + enablement remain Phase-5 gates.

@@ -5,7 +5,9 @@
 import { generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
 
 import {
+  DEFAULT_MEDIA_POLICY,
   enrollmentProof,
+  isPiRpcCommand,
   sessionProof,
   type DevicePublicKeyJwk,
   type EnrollmentQr,
@@ -17,10 +19,16 @@ import {
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthService } from '../src/auth/auth-service.js';
+import type { AttachmentOwner, AttachmentStatusDto } from '../src/attachments/attachment-types.js';
+import {
+  PiImageBridge,
+  type PiImageAttachmentSource,
+} from '../src/attachments/pi-image-bridge.js';
 import { authorizeAction } from '../src/auth/policy.js';
 import { startReadOnlyServer, type RunningReadOnlyServer } from '../src/http/server.js';
 import { MutationPolicy } from '../src/policy/mutation-policy.js';
 import { PromptService } from '../src/prompt/prompt-service.js';
+import { PromptRevisionCoordinator } from '../src/prompt/prompt-revision-coordinator.js';
 import { SyncHub } from '../src/replay/sync.js';
 import type { RpcSupervisor } from '../src/rpc/supervisor.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
@@ -268,6 +276,400 @@ describe('live prompt command transport', () => {
     expect(mutation.isAllowed('edit')).toBe(false);
   });
 });
+
+describe('normalized image prompt lane', () => {
+  it('returns the committed redacted text projection rather than the raw prompt', async () => {
+    const harness = createImagePromptHarness();
+    const canary = 'PROMPT_SECRET_CANARY';
+    try {
+      const result = await harness.prompts.submit(
+        {
+          type: 'prompt.submit',
+          submissionId: 'text_submission',
+          sessionId: SESSION_ID,
+          message: `Continue token=${canary}`,
+          ticket: 'ticket_text_submission',
+        },
+        'device_image',
+      );
+      expect(result.text).toBe('Continue [REDACTED_SECRET]');
+      expect(JSON.stringify(result)).not.toContain(canary);
+    } finally {
+      harness.store.close();
+    }
+  });
+
+  it('submits ordered images through the bridge and publishes only redacted cards', async () => {
+    const harness = createImagePromptHarness();
+    try {
+      const result = await harness.prompts.submit(imagePromptCommand(), 'device_image');
+      expect(result).toMatchObject({ kind: 'text', text: '' });
+      expect(harness.send).toHaveBeenCalledTimes(1);
+      const [rpcCommand] = harness.send.mock.calls[0] ?? [];
+      expect(rpcCommand).toBeDefined();
+      expect(isPiRpcCommand(rpcCommand)).toBe(true);
+      if (rpcCommand === undefined || rpcCommand.type !== 'prompt') {
+        throw new Error('The bridge did not issue a prompt command.');
+      }
+      expect(rpcCommand).toMatchObject({
+        type: 'prompt',
+        message: '',
+        streamingBehavior: 'steer',
+      });
+      expect(rpcCommand.images?.map((image) => image.mimeType)).toEqual([
+        'image/png',
+        'image/jpeg',
+      ]);
+      expect(rpcCommand.images?.every((image) => image.data.length > 0)).toBe(true);
+      expect(harness.acknowledged).toBe(true);
+      expect(harness.revision.current()).toBe(8);
+
+      const blocks = harness.store.getTranscriptPage({
+        hostId: 'host_local',
+        workspaceRef: 'workspace_default',
+        sessionId: SESSION_ID,
+      }).items;
+      const attachmentBlocks = blocks.filter(
+        (block): block is Extract<typeof block, { readonly kind: 'attachment' }> =>
+          block.kind === 'attachment',
+      );
+      expect(attachmentBlocks.map((block) => [block.kind, block.ordinal, block.status])).toEqual([
+        ['attachment', 1, 'delivered'],
+        ['attachment', 2, 'delivered'],
+      ]);
+      const durable = JSON.stringify(blocks);
+      expect(durable).not.toContain('attachment_1');
+      expect(durable).not.toContain('attachment_2');
+      expect(durable).not.toContain('image/png');
+      expect(durable).not.toContain('image/jpeg');
+      expect(durable).not.toContain('base64');
+    } finally {
+      harness.store.close();
+    }
+  });
+
+  it('deduplicates concurrent sends and advances only on accepted mutations', async () => {
+    const harness = createImagePromptHarness();
+    try {
+      const command = imagePromptCommand();
+      const first = harness.prompts.submit(command, 'device_image');
+      const second = harness.prompts.submit(command, 'device_image');
+      await Promise.all([first, second]);
+      expect(harness.send).toHaveBeenCalledTimes(1);
+      expect(harness.revision.current()).toBe(8);
+
+      const revision = new PromptRevisionCoordinator(4);
+      expect(revision.observeStreamingToken()).toBe(4);
+      expect(revision.accept('user')).toBe(5);
+      expect(revision.accept('runtime')).toBe(6);
+      expect(revision.observeStreamingToken()).toBe(6);
+    } finally {
+      harness.store.close();
+    }
+  });
+
+  it('rejects stale, mismatched, expired, text-only, and plan-invalid sets before Pi', async () => {
+    const cases = [
+      { name: 'stale', options: { revision: 8 } },
+      { name: 'mismatched', options: { bindingRevision: 8 } },
+      { name: 'expired', options: { expiresAt: Date.parse('2025-12-31T23:59:59.000Z') } },
+      { name: 'plan-invalid', options: { planAllowed: false } },
+    ] as const;
+    for (const testCase of cases) {
+      const harness = createImagePromptHarness(testCase.options);
+      try {
+        await expect(
+          harness.prompts.submit(imagePromptCommand({ submissionId: `reject_${testCase.name}` }), 'device_image'),
+        ).rejects.toThrow();
+        expect(harness.send).not.toHaveBeenCalled();
+        expect(harness.loadCount).toBe(0);
+      } finally {
+        harness.store.close();
+      }
+    }
+
+    const textOnly = createImagePromptHarness();
+    try {
+      await expect(
+        textOnly.prompts.submit(
+          imagePromptCommand({ attachmentIds: [] as unknown as readonly string[] }),
+          'device_image',
+        ),
+      ).rejects.toThrow();
+      expect(textOnly.send).not.toHaveBeenCalled();
+      expect(textOnly.loadCount).toBe(0);
+    } finally {
+      textOnly.store.close();
+    }
+  });
+
+  it('does not invoke Pi when the final capability check changes before load', async () => {
+    let snapshotCalls = 0;
+    const harness = createImagePromptHarness({
+      getRuntimeSnapshot: () => {
+        snapshotCalls += 1;
+        const snapshot = imageRuntimeSnapshot();
+        return snapshotCalls === 1
+          ? snapshot
+          : { ...snapshot, media: { ...snapshot.media!, imageIn: false } };
+      },
+    });
+    try {
+      await expect(harness.prompts.submit(imagePromptCommand(), 'device_image')).rejects.toThrow();
+      expect(snapshotCalls).toBeGreaterThanOrEqual(2);
+      expect(harness.loadCount).toBe(0);
+      expect(harness.send).not.toHaveBeenCalled();
+    } finally {
+      harness.store.close();
+    }
+  });
+
+  it('marks a dropped acknowledgement delivery-unknown and never auto-resends', async () => {
+    const harness = createImagePromptHarness({ sendThrows: true });
+    try {
+      const command = imagePromptCommand();
+      await harness.prompts.submit(command, 'device_image');
+      expect(harness.markedUnknown).toBe(true);
+      expect(harness.send).toHaveBeenCalledTimes(1);
+      const blocks = harness.store.getTranscriptPage({
+        hostId: 'host_local',
+        workspaceRef: 'workspace_default',
+        sessionId: SESSION_ID,
+      }).items;
+      expect(
+        blocks.every(
+          (block) => block.kind === 'attachment' && block.status === 'delivery-unknown',
+        ),
+      ).toBe(true);
+      await expect(harness.prompts.submit(command, 'device_image')).rejects.toThrow(
+        'automatic retry is blocked',
+      );
+      expect(harness.send).toHaveBeenCalledTimes(1);
+    } finally {
+      harness.store.close();
+    }
+  });
+
+  it('keeps an explicit Pi rejection retryable without acknowledging bytes', async () => {
+    const harness = createImagePromptHarness({ responseSuccess: false });
+    try {
+      await expect(harness.prompts.submit(imagePromptCommand(), 'device_image')).rejects.toThrow();
+      expect(harness.acknowledged).toBe(false);
+      expect(harness.markedUnknown).toBe(false);
+      expect(
+        harness.store.getTranscriptPage({
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: SESSION_ID,
+        }).items,
+      ).toHaveLength(0);
+    } finally {
+      harness.store.close();
+    }
+  });
+});
+
+interface ImagePromptHarnessOptions {
+  readonly revision?: number;
+  readonly bindingRevision?: number;
+  readonly expiresAt?: number;
+  readonly planAllowed?: boolean;
+  readonly responseSuccess?: boolean;
+  readonly sendThrows?: boolean;
+  readonly getRuntimeSnapshot?: () => ReturnType<typeof imageRuntimeSnapshot>;
+}
+
+function createImagePromptHarness(options: ImagePromptHarnessOptions = {}) {
+  const now = Date.parse('2026-01-01T00:00:00.000Z');
+  const revision = options.revision ?? 7;
+  const expiresAt = options.expiresAt ?? now + 60_000;
+  const owner: AttachmentOwner = {
+    sessionToken: 'session_token_image',
+    sessionId: SESSION_ID,
+    sessionEpoch: EPOCH,
+    deviceId: 'device_image',
+    principal: PRINCIPAL,
+    origin: ORIGIN,
+  };
+  const partRows = [
+    {
+      setId: 'set_image_001',
+      attachmentId: 'attachment_1',
+      partId: 'part_1',
+      item: {
+        clientId: 'client_1',
+        ordinal: 1,
+        declaredType: 'image/png' as const,
+        byteLength: 4,
+        sha256: 'a'.repeat(43),
+      },
+    },
+    {
+      setId: 'set_image_001',
+      attachmentId: 'attachment_2',
+      partId: 'part_2',
+      item: {
+        clientId: 'client_2',
+        ordinal: 2,
+        declaredType: 'image/jpeg' as const,
+        byteLength: 4,
+        sha256: 'b'.repeat(43),
+      },
+    },
+  ];
+  const reservation = {
+    setId: 'set_image_001',
+    owner,
+    binding: {
+      sessionId: SESSION_ID,
+      sessionEpoch: EPOCH,
+      expectedPromptRevision: options.bindingRevision ?? revision,
+      submissionId: 'image_submission',
+    },
+    manifest: {
+      submissionId: 'image_submission',
+      sessionId: SESSION_ID,
+      ticket: 'ticket_image_001',
+      expiresAt: new Date(expiresAt).toISOString(),
+    },
+    modelId: 'model_hidden_from_gate',
+    policyVersion: 1,
+    expiresAt,
+  };
+  let status: AttachmentStatusDto = {
+    attachmentSetId: 'set_image_001',
+    revision: options.bindingRevision ?? revision,
+    status: 'ready',
+    expiresAt: new Date(expiresAt).toISOString(),
+    parts: partRows.map((part) => ({
+      attachmentSetId: part.setId,
+      attachmentId: part.attachmentId,
+      partId: part.partId,
+      ordinal: part.item.ordinal,
+      status: 'ready' as const,
+    })),
+  };
+  const bytes = new Map<string, Uint8Array>([
+    ['attachment_1', new Uint8Array([137, 80, 78, 71])],
+    ['attachment_2', new Uint8Array([255, 216, 255, 224])],
+  ]);
+  let acknowledged = false;
+  let markedUnknown = false;
+  let loadCount = 0;
+  const defaultSnapshot = imageRuntimeSnapshot();
+  const getRuntimeSnapshot = options.getRuntimeSnapshot ?? (() => defaultSnapshot);
+  const send = vi.fn(async (command: PiRpcCommand): Promise<PiRpcResponse> => {
+    if (options.sendThrows === true) throw new Error('transport dropped');
+    return {
+      id: command.id,
+      type: 'response',
+      command: command.type,
+      success: options.responseSuccess ?? true,
+    };
+  });
+  const source: PiImageAttachmentSource = {
+    getReservation: () => reservation,
+    getPartRecords: () => partRows,
+    status: () => status,
+    loadNormalizedDerivative: async (_setId, attachmentId) => {
+      loadCount += 1;
+      const value = bytes.get(attachmentId);
+      return value === undefined
+        ? null
+        : { bytes: new Uint8Array(value), mimeType: attachmentId === 'attachment_1' ? 'image/png' : 'image/jpeg' };
+    },
+    acknowledgeDelivered: async () => {
+      acknowledged = true;
+    },
+    markDeliveryUnknown: async () => {
+      markedUnknown = true;
+      status = { ...status, status: 'delivery-unknown' };
+    },
+  };
+  const revisionCoordinator = new PromptRevisionCoordinator(revision);
+  const bridge = new PiImageBridge({
+    supervisor: { send },
+    attachments: source,
+    getRuntimeSnapshot,
+    currentPromptRevision: () => revisionCoordinator.current(),
+    planPolicy: () => options.planAllowed !== false,
+    now: () => new Date(now),
+  });
+  const store = new RelayStore();
+  const prompts = new PromptService({
+    store,
+    syncHub: new SyncHub(store),
+    supervisor: { send } as unknown as RpcSupervisor,
+    projector: new TranscriptProjector(),
+    hostId: 'host_local',
+    workspaceRef: 'workspace_default',
+    sessionId: SESSION_ID,
+    epoch: EPOCH,
+    now: () => new Date(now),
+    imageBridge: bridge,
+    getAttachmentOwner: () => owner,
+    revisionCoordinator,
+  });
+  return {
+    prompts,
+    bridge,
+    revision: revisionCoordinator,
+    store,
+    send,
+    get acknowledged() {
+      return acknowledged;
+    },
+    get markedUnknown() {
+      return markedUnknown;
+    },
+    get loadCount() {
+      return loadCount;
+    },
+  };
+}
+
+function imagePromptCommand(
+  overrides: Partial<PromptSubmitCommand> = {},
+): PromptSubmitCommand {
+  return {
+    type: 'prompt.submit',
+    submissionId: 'image_submission',
+    sessionId: SESSION_ID,
+    message: '',
+    ticket: 'ticket_image_001',
+    expectedPromptRevision: 7,
+    attachmentSetId: 'set_image_001',
+    attachmentIds: ['attachment_1', 'attachment_2'],
+    streamingBehavior: 'steer',
+    ...overrides,
+  };
+}
+
+function imageRuntimeSnapshot() {
+  return {
+    sessionId: SESSION_ID,
+    state: {
+      sessionId: SESSION_ID,
+      revision: 7,
+      model: null,
+      thinkingLevel: 'unknown',
+      availableThinkingLevels: [],
+      mode: 'build' as const,
+      streaming: false,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    },
+    models: {
+      sessionId: SESSION_ID,
+      catalogRevision: 1,
+      runtimeRevision: 7,
+      currentModel: null,
+      streaming: false,
+      canSetModelWhileStreaming: false,
+      models: [],
+    },
+    media: { enabled: true, imageIn: true, policy: DEFAULT_MEDIA_POLICY },
+  };
+}
 
 async function createHarness(): Promise<Harness> {
   const now = Date.parse('2026-01-01T00:00:00.000Z');

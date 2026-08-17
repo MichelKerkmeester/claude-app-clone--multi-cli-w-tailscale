@@ -29,6 +29,7 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import type { ParsedPlanArtifact } from '../runtime/plan-status.js';
+import { allowlistRedactedAttachmentBlock } from '../attachments/attachment-transcript-projector.js';
 
 const REDACTION_POLICY_VERSION = 1 as const;
 const PATH_KEYS = new Set(['cwd', 'fulloutputpath', 'path', 'sessionfile', 'workspacepath']);
@@ -43,6 +44,19 @@ const SECRET_KEYS = new Set([
   'plantoken',
 ]);
 const PRIVATE_TEXT_KEYS = new Set(['prompt']);
+const MEDIA_FORBIDDEN_KEYS = new Set([
+  'base64',
+  'pixels',
+  'thumbnail',
+  'filename',
+  'hash',
+  'url',
+  'exif',
+  'ocr',
+  'generatedcaption',
+  'providerpayload',
+  'decodererror',
+]);
 const SECRET_ASSIGNMENT_PATTERN =
   /\b(api[_-]?key|authorization|cookie|password|secret|token)\s*[:=]\s*[^\s,;]+/gi;
 const BEARER_PATTERN = /\bBearer\s+[A-Za-z0-9._~+/-]+=*/gi;
@@ -64,7 +78,7 @@ interface RedactionState {
 /** Apply the only redaction policy allowed before persistence or broadcast. */
 export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TPayload>): Envelope {
   const state: RedactionState = { fieldsRedacted: 0, reasons: new Set<string>() };
-  let payload = redactValue(envelope.payload, state, '') as JsonValue;
+  let payload = redactPayload(envelope.payload, state);
   const redaction: RedactionMetadata = {
     policyVersion: REDACTION_POLICY_VERSION,
     fieldsRedacted: state.fieldsRedacted,
@@ -82,7 +96,7 @@ export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TP
 /** Redact an arbitrary JSON value with the canonical relay policy. */
 export function redactJson(value: JsonValue): JsonValue {
   const state: RedactionState = { fieldsRedacted: 0, reasons: new Set<string>() };
-  return redactValue(value, state, '');
+  return redactPayload(value, state);
 }
 
 /** Describe redaction in safe marker-only form for diagnostics and error text. */
@@ -99,6 +113,20 @@ export function redactionMarkerText(metadata: RedactionMetadata): string {
 
 function redactValue(value: JsonValue, state: RedactionState, key: string): JsonValue {
   const normalizedKey = key.replaceAll(/[^A-Za-z]/g, '').toLowerCase();
+  if (isAttachmentPayload(value)) {
+    const projected = allowlistRedactedAttachmentBlock(value);
+    if (projected !== null) return projected;
+    markRedaction(state, 'image-content');
+    return null;
+  }
+  if (isImageContent(value)) {
+    markRedaction(state, 'image-content');
+    return null;
+  }
+  if (MEDIA_FORBIDDEN_KEYS.has(normalizedKey)) {
+    markRedaction(state, 'image-content');
+    return null;
+  }
   if (PATH_KEYS.has(normalizedKey)) {
     markRedaction(state, 'path');
     return '[REDACTED_PATH]';
@@ -132,6 +160,34 @@ function redactValue(value: JsonValue, state: RedactionState, key: string): Json
     return redacted;
   }
   return value;
+}
+
+function redactPayload(value: JsonValue, state: RedactionState): JsonValue {
+  if (isAttachmentPayload(value)) {
+    const projected = allowlistRedactedAttachmentBlock(value);
+    if (projected !== null) return projected;
+    markRedaction(state, 'image-content');
+    return null;
+  }
+  return redactValue(value, state, '');
+}
+
+function isAttachmentPayload(value: JsonValue): boolean {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    (value as JsonObject).kind === 'attachment'
+  );
+}
+
+function isImageContent(value: JsonValue): boolean {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    (value as JsonObject).type === 'image'
+  );
 }
 
 function redactString(value: string, state: RedactionState): string {

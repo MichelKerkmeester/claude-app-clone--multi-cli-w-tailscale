@@ -164,7 +164,9 @@ export interface PromptAttachmentReference extends JsonObject {
 }
 
 /** Host-only image content; browser submission DTOs never carry this shape. */
-export interface NormalizedPiImage extends ImageContent {
+export interface NormalizedPiImage extends JsonObject {
+  readonly type: 'image';
+  readonly data: string;
   readonly mimeType: MediaOutputMimeType;
 }
 
@@ -186,7 +188,7 @@ interface PiRpcCommandBase extends JsonObject {
 export interface PromptCommand extends PiRpcCommandBase {
   readonly type: 'prompt';
   readonly message: string;
-  readonly images?: readonly ImageContent[];
+  readonly images?: readonly NormalizedPiImage[];
   readonly streamingBehavior?: 'steer' | 'followUp';
 }
 
@@ -212,13 +214,13 @@ export interface PromptSubmitCommand {
 export interface SteerCommand extends PiRpcCommandBase {
   readonly type: 'steer';
   readonly message: string;
-  readonly images?: readonly ImageContent[];
+  readonly images?: readonly NormalizedPiImage[];
 }
 
 export interface FollowUpCommand extends PiRpcCommandBase {
   readonly type: 'follow_up';
   readonly message: string;
-  readonly images?: readonly ImageContent[];
+  readonly images?: readonly NormalizedPiImage[];
 }
 
 export interface AbortCommand extends PiRpcCommandBase {

@@ -9,6 +9,8 @@ import type {
   JsonValue,
   PiRpcEvent,
   RedactionMetadata,
+  RedactedAttachmentBlock,
+  RedactedAttachmentStatus,
   TextArtifactBlock,
   TranscriptBlock,
   TranscriptLifecycle,
@@ -18,6 +20,7 @@ import type {
 } from '@pi-remote/pi-rpc-protocol';
 
 import type { ArtifactStore } from './artifact-store.js';
+import { projectRedactedAttachmentBlock } from '../attachments/attachment-transcript-projector.js';
 import { getAllowlistedArtifactSnapshot, sanitizeArtifactSnapshot } from './artifact-sanitizer.js';
 
 type TranscriptBlockBody =
@@ -61,6 +64,14 @@ type TranscriptBlockBody =
       readonly inputTokens: number;
       readonly outputTokens: number;
       readonly cost: number;
+    }
+  | {
+      readonly kind: 'attachment';
+      readonly role: 'user';
+      readonly mediaKind: 'image';
+      readonly ordinal: number;
+      readonly status: RedactedAttachmentStatus;
+      readonly previewRetained: false;
     };
 
 const EMPTY_REDACTION: RedactionMetadata = {
@@ -324,6 +335,52 @@ export class TranscriptProjector {
       },
       context,
     );
+  }
+
+  /** Project only fixed, metadata-free cards for the accepted image set. */
+  public projectSubmittedAttachments(
+    submissionId: string,
+    attachmentCount: number,
+    status: RedactedAttachmentStatus,
+    context: TranscriptProjectionContext,
+  ): readonly RedactedAttachmentBlock[] {
+    if (!Number.isSafeInteger(attachmentCount) || attachmentCount < 1 || attachmentCount > 4) {
+      throw new TypeError('Invalid attachment card count.');
+    }
+    const cards: RedactedAttachmentBlock[] = [];
+    let nextSequence = context.nextSequence();
+    const cardContext: TranscriptProjectionContext = {
+      ...context,
+      nextSequence: () => nextSequence++,
+    };
+    for (let index = 0; index < attachmentCount; index += 1) {
+      const block = this.createBlock(
+        `prompt:${submissionId}:attachment:${index + 1}`,
+        {
+          kind: 'attachment',
+          role: 'user',
+          mediaKind: 'image',
+          ordinal: index + 1,
+          status,
+          previewRetained: false,
+        },
+        cardContext,
+      );
+      if (block.kind !== 'attachment') {
+        throw new TypeError('Relay failed to create the attachment projection.');
+      }
+      cards.push(
+        projectRedactedAttachmentBlock({
+          id: block.id,
+          revision: block.revision,
+          seq: block.seq,
+          occurredAt: block.occurredAt,
+          ordinal: index + 1,
+          status,
+        }),
+      );
+    }
+    return cards;
   }
 
   private projectMessageUpdate(
@@ -695,7 +752,9 @@ function stringArray(value: JsonValue | undefined): string[] {
 
 function summarizeJson(value: JsonValue | undefined): string {
   if (value === undefined) return '';
-  const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+  const safeValue = stripUntrustedImageContent(value);
+  if (safeValue === undefined) return '';
+  const serialized = typeof safeValue === 'string' ? safeValue : JSON.stringify(safeValue);
   return serialized.slice(0, MAX_PROJECTED_INPUT);
 }
 
@@ -710,7 +769,43 @@ function textFromContent(value: JsonValue | undefined): string {
       .filter((text) => text.length > 0)
       .join('\n');
   }
-  return value === undefined ? '' : JSON.stringify(value);
+  const safeValue = value === undefined ? undefined : stripUntrustedImageContent(value);
+  return safeValue === undefined ? '' : JSON.stringify(safeValue);
+}
+
+function stripUntrustedImageContent(value: JsonValue): JsonValue | undefined {
+  if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => stripUntrustedImageContent(item))
+      .filter((item): item is JsonValue => item !== undefined);
+  }
+  const record = value as Record<string, JsonValue>;
+  if (record.type === 'image') return undefined;
+  const safe: Record<string, JsonValue> = {};
+  for (const [key, child] of Object.entries(record)) {
+    const normalizedKey = key.replaceAll(/[^A-Za-z]/g, '').toLowerCase();
+    if (
+      normalizedKey === 'base64' ||
+      normalizedKey === 'pixels' ||
+      normalizedKey === 'thumbnail' ||
+      normalizedKey === 'filename' ||
+      normalizedKey === 'hash' ||
+      normalizedKey === 'url' ||
+      normalizedKey === 'exif' ||
+      normalizedKey === 'ocr' ||
+      normalizedKey === 'generatedcaption' ||
+      normalizedKey === 'providerpayload' ||
+      normalizedKey === 'decodererror'
+    ) {
+      continue;
+    }
+    const sanitized = stripUntrustedImageContent(child);
+    if (sanitized !== undefined) safe[key] = sanitized;
+  }
+  return safe;
 }
 
 function stripArtifactSnapshotSource(value: JsonValue | undefined): JsonValue | undefined {

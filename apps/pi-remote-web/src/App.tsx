@@ -10,6 +10,7 @@ import {
   type FileDiffBlock,
   type FilePreviewBlock,
   type PushPreferences,
+  type RuntimeMediaCapabilityDto,
   type SessionCardDto,
   type SyncMessage,
 } from '@pi-remote/pi-rpc-protocol';
@@ -67,6 +68,7 @@ import {
 } from './relay.js';
 import {
   EMPTY_TRANSCRIPT,
+  DEFAULT_MEDIA_CAPABILITY_OFF,
   connectionReducer,
   filePreviewAvailability,
   sessionListReducer,
@@ -84,6 +86,7 @@ import { PlanReviewSheet } from './PlanReviewSheet.js';
 import { RuntimeModeAnnouncer } from './RuntimeModeAnnouncer.js';
 import { RuntimeStrip } from './RuntimeStrip.js';
 import { SessionComposer } from './SessionComposer.js';
+import { AttachmentDraftProvider } from './attachments/AttachmentDraftProvider.js';
 import { SessionHeader } from './SessionHeader.js';
 import {
   bindingMatchesSnapshot,
@@ -104,7 +107,12 @@ import {
 const initialCache = loadCache();
 type ThemePreference = 'system' | 'light' | 'dark';
 
-export function App() {
+export interface AppProps {
+  /** Typed fixture injection keeps production media disabled until host enablement. */
+  readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
+}
+
+export function App({ mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF }: AppProps = {}) {
   const [device, setDevice] = useState<DeviceIdentity | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [authAttempt, setAuthAttempt] = useState(0);
@@ -323,6 +331,7 @@ export function App() {
           onSelect={(sessionId) => navigate(sessionId)}
           device={device}
           onRevoke={() => {
+            window.dispatchEvent(new Event('pi-remote:app-lock'));
             void revokeDevice().finally(() => {
               setAuthReady(false);
               setDevice(null);
@@ -330,6 +339,7 @@ export function App() {
             });
           }}
           onLogout={() => {
+            window.dispatchEvent(new Event('pi-remote:logout'));
             void unsubscribeFromPush()
               .catch(() => undefined)
               .then(logoutDevice)
@@ -356,6 +366,7 @@ export function App() {
           onReview={openReview}
           theme={theme}
           onThemeChange={setTheme}
+          mediaCapability={mediaCapability}
         />
       )}
     </div>
@@ -926,6 +937,7 @@ export function Session({
   onReview,
   theme,
   onThemeChange,
+  mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF,
 }: {
   readonly connection: ConnectionPhase;
   readonly sessionId: string;
@@ -939,6 +951,7 @@ export function Session({
   readonly onReview: () => void;
   readonly theme: 'system' | 'light' | 'dark';
   readonly onThemeChange: (theme: 'system' | 'light' | 'dark') => void;
+  readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
 }) {
   const cursorRef = useRef<{ epoch: string; seq: number } | null>(null);
   const frameRef = useRef<number | null>(null);
@@ -950,6 +963,7 @@ export function Session({
   const [promptError, setPromptError] = useState<string | null>(null);
   const [retrySubmissionId, setRetrySubmissionId] = useState<string | null>(null);
   const runtimeControls = useRuntime(sessionId);
+  const modelCanViewPhotos = runtimeModelCanViewPhotos(runtimeControls.runtime);
   const commandCatalog = useHostCommandCatalog(sessionId, connection);
   const [stopping, setStopping] = useState(false);
   const [binding, setBinding] = useState<SelectedCommandBinding | null>(null);
@@ -1338,29 +1352,36 @@ export function Session({
         onOpenEffortSheet={() => openSheet('effort', stripTriggerRef)}
         effortTriggerRef={stripTriggerRef}
       />
-      <SessionComposer
-        prompt={prompt}
-        setPrompt={setPrompt}
-        onDraftChange={handleDraftChange}
-        sendPrompt={sendPrompt}
-        sendSlashDraft={sendSlashDraft}
-        stopRun={stopRun}
-        canSubmit={canSubmit}
-        status={status}
-        connection={connection}
-        awaitingSnapshot={transcript.awaitingSnapshot}
-        sendingPrompt={sendingPrompt}
-        stopping={stopping}
-        promptError={promptError}
-        runtimeControls={runtimeControls}
-        catalog={commandCatalog}
-        binding={binding}
-        slashSubmitting={slashSubmitting}
-        runtimeAuthority={runtimeAuthority}
-        runtimeRunning={runtimeRunning}
-        onInsertCommand={insertCommand}
-        externalOverlayOpen={sheetOpen}
-      />
+      <AttachmentDraftProvider
+        capability={mediaCapability}
+        sessionId={sessionId}
+        modelCanViewPhotos={modelCanViewPhotos}
+      >
+        <SessionComposer
+          prompt={prompt}
+          setPrompt={setPrompt}
+          onDraftChange={handleDraftChange}
+          sendPrompt={sendPrompt}
+          sendSlashDraft={sendSlashDraft}
+          stopRun={stopRun}
+          canSubmit={canSubmit}
+          status={status}
+          connection={connection}
+          awaitingSnapshot={transcript.awaitingSnapshot}
+          sendingPrompt={sendingPrompt}
+          stopping={stopping}
+          promptError={promptError}
+          runtimeControls={runtimeControls}
+          catalog={commandCatalog}
+          binding={binding}
+          slashSubmitting={slashSubmitting}
+          runtimeAuthority={runtimeAuthority}
+          runtimeRunning={runtimeRunning}
+          onInsertCommand={insertCommand}
+          externalOverlayOpen={sheetOpen}
+          mediaCapability={mediaCapability}
+        />
+      </AttachmentDraftProvider>
       <PlanReviewSheet
         isOpen={runtimeControls.runtime.reviewOpen === true}
         onOpenChange={(open) => {
@@ -1465,7 +1486,10 @@ export function TranscriptList({
       }),
     [artifactSessionId, blocks, running],
   );
-  const renderItems = useMemo(() => groupNormalizedTranscript(normalizedBlocks), [normalizedBlocks]);
+  const renderItems = useMemo(
+    () => groupNormalizedTranscript(normalizedBlocks),
+    [normalizedBlocks],
+  );
   const turnStartIds = useMemo(() => {
     // Mark the first block of every turn after the first so a boundary rule can space
     // consecutive turns; the derivation never mutates or drops a block.
@@ -1504,11 +1528,7 @@ export function TranscriptList({
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
-      <div
-        className="transcript-scroll"
-        ref={scrollRef}
-        onScroll={onScroll}
-      >
+      <div className="transcript-scroll" ref={scrollRef} onScroll={onScroll}>
         <div
           className="transcript-virtual"
           style={{ height: virtualizer.getTotalSize() + (running ? 72 : 0) }}
@@ -1517,9 +1537,7 @@ export function TranscriptList({
             const item = renderItems[virtualItem.index];
             if (item === undefined) return null;
             const leadId =
-              item.kind === 'block'
-                ? item.block.sourceBlockId
-                : item.blocks[0]?.sourceBlockId;
+              item.kind === 'block' ? item.block.sourceBlockId : item.blocks[0]?.sourceBlockId;
             const isTurnStart = leadId !== undefined && turnStartIds.has(leadId);
             return (
               <div
@@ -1532,10 +1550,7 @@ export function TranscriptList({
                 {item.kind === 'activity' ? (
                   <NormalizedActivityGroup blocks={item.blocks} />
                 ) : (
-                  <NormalizedTranscriptBlockView
-                    block={item.block}
-                    sessionId={artifactSessionId}
-                  />
+                  <NormalizedTranscriptBlockView block={item.block} sessionId={artifactSessionId} />
                 )}
               </div>
             );
@@ -1615,9 +1630,7 @@ type RenderItem =
       readonly blocks: readonly NormalizedActivityBlock[];
     };
 
-function groupNormalizedTranscript(
-  blocks: readonly NormalizedTranscriptBlock[],
-): RenderItem[] {
+function groupNormalizedTranscript(blocks: readonly NormalizedTranscriptBlock[]): RenderItem[] {
   const items: RenderItem[] = [];
   let run: NormalizedActivityBlock[] = [];
   const flush = () => {
@@ -1682,16 +1695,10 @@ function NormalizedTranscriptBlockView({
   readonly block: NormalizedTranscriptBlock;
   readonly sessionId: string;
 }) {
-  if (
-    block.kind === 'fallback' &&
-    block.sourceBlock !== null
-  ) {
+  if (block.kind === 'fallback' && block.sourceBlock !== null) {
     return <Block block={block.sourceBlock} sessionId={sessionId} />;
   }
-  if (
-    block.kind === 'diff' &&
-    block.sourceBlock.kind === 'file_diff'
-  ) {
+  if (block.kind === 'diff' && block.sourceBlock.kind === 'file_diff') {
     return <Block block={block.sourceBlock} sessionId={sessionId} />;
   }
   return <RichContentRouter block={block} />;
@@ -1858,6 +1865,25 @@ function Block({
         </div>
       );
       collapsible = true;
+      break;
+    case 'attachment':
+      label = 'Photo attachment';
+      content = (
+        <div className="redacted-attachment-card" role="status">
+          <span className="redacted-attachment-glyph" aria-hidden="true">
+            ◇
+          </span>
+          <div>
+            <strong>Preview not retained</strong>
+            <p>
+              Photo {block.ordinal} was delivered without keeping image content in this transcript.
+            </p>
+          </div>
+          <span className="redacted-attachment-status">
+            {block.status === 'delivered' ? 'Delivered' : 'Delivery unknown'}
+          </span>
+        </div>
+      );
       break;
     case 'unknown':
       label = 'Unsupported block';
@@ -2101,10 +2127,21 @@ function blockLabel(block: DisplayTranscriptBlock): string {
     tool_result: 'Tool result',
     file_diff: 'File diff',
     file_preview: 'File preview',
+    attachment: 'Photo attachment',
     usage: 'Usage',
     unknown: 'Unsupported',
   };
   return labels[block.kind];
+}
+
+function runtimeModelCanViewPhotos(runtime: RuntimeUiState): boolean {
+  const current = runtime.state?.model;
+  if (current === null || current === undefined) return true;
+  const catalogModel = runtime.models.find(
+    (model) => model.provider === current.provider && model.id === current.id,
+  );
+  const input = catalogModel?.input ?? current.input;
+  return input === undefined || input.includes('image');
 }
 
 function readThemePreference(): ThemePreference {

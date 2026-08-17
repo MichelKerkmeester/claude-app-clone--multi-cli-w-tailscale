@@ -28,6 +28,12 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  if (isAttachmentRequest(url)) {
+    // Attachment-bearing resources are transient and must never enter the shell cache.
+    event.respondWith(fetchWithoutBrowserCache(request));
+    return;
+  }
+
   if (isArtifactRequest(url)) {
     // Artifact bytes are authenticated, revision-specific data. They must never
     // become durable shell or runtime cache entries.
@@ -80,6 +86,10 @@ function isShellRequest(url) {
 
 function isArtifactRequest(url) {
   return /^\/api\/sessions\/[^/]+\/artifacts\/[^/]+\/revisions\/[^/]+$/.test(url.pathname);
+}
+
+function isAttachmentRequest(url) {
+  return /^\/api\/(?:attachments?|media|uploads?)(?:\/|$)/.test(url.pathname);
 }
 
 function fetchWithoutBrowserCache(request) {

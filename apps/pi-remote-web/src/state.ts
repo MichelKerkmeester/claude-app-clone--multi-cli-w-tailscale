@@ -4,6 +4,7 @@
 
 import {
   isOpaqueId,
+  isRedactedAttachmentBlock,
   isRichTranscriptBlock,
   isRuntimeMediaCapabilityDto,
   isTranscriptBlock,
@@ -15,6 +16,7 @@ import {
   type SyncGap,
   type SyncSnapshot,
   type RuntimeMediaCapabilityDto,
+  type RedactedAttachmentBlock,
   type TextArtifactBlock,
   type TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
@@ -22,6 +24,12 @@ import {
 export function parseRuntimeMediaCapability(value: unknown): RuntimeMediaCapabilityDto | null {
   return isRuntimeMediaCapabilityDto(value) ? value : null;
 }
+
+export const DEFAULT_MEDIA_CAPABILITY_OFF: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> =
+  {
+    enabled: false,
+    imageIn: false,
+  };
 
 // ── Composer keyboard preference ──────────────────────────────────────────────
 // A preference, not a mode state: it only gates whether the composer
@@ -162,6 +170,7 @@ type WebTranscriptBlock = Exclude<
 export type DisplayTranscriptBlock =
   | (WebTranscriptBlock & DisplayBlockMetadata)
   | (TextArtifactBlock & DisplayBlockMetadata)
+  | (RedactedAttachmentBlock & DisplayBlockMetadata)
   | (UnknownTranscriptBlock & DisplayBlockMetadata);
 
 export interface TranscriptState {
@@ -360,7 +369,9 @@ export function parseDisplayBlock(
   const protocolValue = stripDisplayMetadata(value);
   if (isTranscriptBlock(protocolValue)) {
     if (protocolValue.kind === 'attachment') {
-      return toUnknownDisplayBlock(protocolValue, provenance);
+      return isRedactedAttachmentBlock(protocolValue)
+        ? annotateDisplayBlock(protocolValue, provenance)
+        : toUnknownDisplayBlock(protocolValue, provenance);
     }
     return annotateDisplayBlock(protocolValue as DisplayTranscriptBlock, provenance);
   }
@@ -440,7 +451,9 @@ function toDisplayBlock(
   block: DisplayTranscriptBlock | TranscriptBlock,
   provenance: TranscriptProvenance,
 ): DisplayTranscriptBlock {
-  if (block.kind === 'attachment') return toUnknownDisplayBlock(block, provenance);
+  if (block.kind === 'attachment') {
+    return annotateDisplayBlock(block as RedactedAttachmentBlock, provenance);
+  }
   return annotateDisplayBlock(block as DisplayTranscriptBlock, provenance);
 }
 

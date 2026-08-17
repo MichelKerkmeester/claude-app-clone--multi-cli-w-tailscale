@@ -28,6 +28,7 @@ import {
   isSyncMessage,
   isTranscriptPageDto,
   isWebSocketTicketResponse,
+  DEFAULT_MEDIA_POLICY,
   type CommandBindingDto,
   type CommandCatalogDto,
   type ExecutePlanCommand,
@@ -350,9 +351,28 @@ export function parseRuntimeMediaCapability(value: unknown): RuntimeMediaCapabil
   return isRuntimeMediaCapabilityDto(value) ? value : null;
 }
 
+/** Typed local fixtures keep the media UI testable while production remains disabled by default. */
+export const MEDIA_CAPABILITY_OFF_FIXTURE: RuntimeMediaCapabilityDto = {
+  enabled: false,
+  imageIn: false,
+  policy: DEFAULT_MEDIA_POLICY,
+};
+
+export const MEDIA_CAPABILITY_ON_FIXTURE: RuntimeMediaCapabilityDto = {
+  enabled: true,
+  imageIn: true,
+  policy: DEFAULT_MEDIA_POLICY,
+};
+
+export function mediaCapabilityFixture(enabled: boolean): RuntimeMediaCapabilityDto {
+  return enabled ? MEDIA_CAPABILITY_ON_FIXTURE : MEDIA_CAPABILITY_OFF_FIXTURE;
+}
+
 export function parseRuntimeSnapshot(value: unknown): RuntimeSnapshotDto | null {
   if (!isRuntimeSnapshotDto(value)) return null;
-  return value.media === undefined || parseRuntimeMediaCapability(value.media) !== null ? value : null;
+  return value.media === undefined || parseRuntimeMediaCapability(value.media) !== null
+    ? value
+    : null;
 }
 
 export async function fetchRuntimeSnapshot(signal?: AbortSignal): Promise<RuntimeSnapshotDto> {

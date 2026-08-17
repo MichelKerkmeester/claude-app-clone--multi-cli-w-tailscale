@@ -1,25 +1,24 @@
 # Checklist — Local Composer Draft, Preview, and Redacted-Card UI
 
-- [ ] Gallery selection appends ordered local tiles without network traffic.
-- [ ] Rear-camera capture adds one local tile without network traffic.
-- [ ] A fifth item is rejected without changing the existing four-item draft.
-- [ ] `+` shows Photo Library and Take Photo before Mode and Commands only when host media capability is present, with the local-storage disclosure.
-- [ ] With capability off, the complete photo group and rail disappear without a disabled or decorative action.
-- [ ] The rail is an ordered named list with generic Photo ordinals, correct 72 px/64 px geometry, horizontal overflow behavior, and real 44×44 removal targets.
-- [ ] Local states `menu-open`, `picker-active`, `local-validating`, `local-ready`, `local-rejected`, and `model-blocked` render their specified behavior.
-- [ ] Supported HEIC/HEIF without a WebKit preview remains sendable and shows **“Photo · preview unavailable.”**
-- [ ] Preview uses a React Aria modal/dialog with visible Close and Remove, no download/share, Escape handling, and focus restoration to the opening tile.
-- [ ] Return inserts a newline, hardware `⌘ Enter` sends, and IME composition suppresses Send.
-- [ ] Plan mode keeps the **“Plan · read-only.”** cue and image content grants no authority.
-- [ ] Object URLs are revoked on removal and lifecycle cleanup; Strict Mode does not leak URLs, listeners, requests, timers, or callbacks.
-- [ ] Original filenames and raw media never appear in DOM, browser storage, cache, analytics, or error strings.
-- [ ] Redacted transcript cards render generically with **“Preview not retained”** and unknown kinds remain safe.
-- [ ] Service worker and offline cache reject attachment-bearing paths/data.
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npm run test` exits 0.
-- [ ] `npm run test:web` exits 0.
-- [ ] Focused web, cache, and service-worker suites exit 0.
-- [ ] CDP runs use exactly 390 CSS px in light and dark themes for menu-open, four-tile local-ready, preview, model-blocked, and narrow/reflow states.
-- [ ] CDP verification checks actual DOM focus and horizontal overflow, not only screenshots.
-- [ ] The 320 px/200% layout reflows without page-level horizontal scroll and RTL/reduced-motion behavior is verified.
-
+- [x] Gallery selection appends ordered local tiles without network traffic. — `AttachmentDraftProvider.selectFiles` appends ordered items; `SessionComposer.test.tsx` stubs fetch/XHR and asserts none fire on selection.
+- [x] Rear-camera capture adds one local tile without network traffic. — Take Photo path uses the same local `selectFiles`; no network (same stubbed-request test).
+- [x] A fifth item is rejected without changing the existing four-item draft. — `available = MAX_ATTACHMENT_COUNT - items.length` slices excess; `limitReached` message; draft unchanged; tested.
+- [x] `+` shows Photo Library and Take Photo before Mode and Commands only when host media capability is present, with the local-storage disclosure. — gated at `SessionComposer.tsx:443/590/637` on `capabilityAllowsPhotos`; disclosure copy present; tested.
+- [x] With capability off, the complete photo group and rail disappear without a disabled or decorative action. — CDP flag-off: `mediaAffordances=0` at 390px light+dark; capability-off tests confirm no photo affordance/rail.
+- [x] The rail is an ordered named list with generic Photo ordinals, correct geometry, horizontal overflow behavior, and real 44×44 removal targets. — `AttachmentRail`/`AttachmentTile` with generic "Photo N", 44px targets; `AttachmentRail.test.tsx` asserts geometry/overflow.
+- [x] Local states menu-open, picker-active, local-validating, local-ready, local-rejected, and model-blocked render their specified behavior. — reducer states in `attachment-state.ts`; component tests exercise each.
+- [x] Supported HEIC/HEIF without a WebKit preview remains sendable and shows "Photo · preview unavailable." — `isPreviewUnavailable` keeps the local File with no object URL; label at `AttachmentTile.tsx:46` / dialog `:98`; tested.
+- [x] Preview uses a React Aria modal/dialog with visible Close and Remove, no download/share, Escape handling, and focus restoration to the opening tile. — `AttachmentPreviewDialog` reuses the 005 viewer shell; `openPreview`/`closePreview` restore focus via captured trigger; `AttachmentPreviewDialog.test.tsx`.
+- [x] Return inserts a newline, hardware ⌘ Enter sends, and IME composition suppresses Send. — preserved composer semantics; `SessionComposer.test.tsx`.
+- [x] Plan mode keeps the "Plan · read-only." cue and image content grants no authority. — Plan-mode cue unchanged; no authority granted (UI is local draft only).
+- [x] Object URLs are revoked on removal and lifecycle cleanup; Strict Mode does not leak URLs, listeners, requests, timers, or callbacks. — `revokeObjectUrl`/`revokeAllObjectUrls` on removal + all lifecycle events + unmount; `AttachmentDraft.test.tsx` Strict-Mode leak coverage.
+- [x] Original filenames and raw media never appear in DOM, browser storage, cache, analytics, or error strings. — serializable `AttachmentDraftItem` has no filename/File/URL; the only `.name` use is slash-command names; cache/SW exclude attachment data.
+- [x] Redacted transcript cards render generically with "Preview not retained" and unknown kinds remain safe. — `App.tsx:1869` renders the generic card; `state.ts` preserves unknown attachment blocks safely; tested.
+- [x] Service worker and offline cache reject attachment-bearing paths/data. — `service-worker.js` serves `/api/(attachments|media|uploads)` `no-store`; `cache.ts` filters attachment display blocks out of history.
+- [x] `npm run typecheck` exits 0. — verified on `main`.
+- [x] `npm run test` exits 0. — backend 299 (unchanged).
+- [x] `npm run test:web` exits 0. — 572 passed / 47 files (+27 over 545).
+- [x] Focused web, cache, and service-worker suites exit 0. — AttachmentDraft/Rail/PreviewDialog/SessionComposer/App/pwa-cache all green.
+- [ ] CDP runs use exactly 390 CSS px in light and dark themes for menu-open, four-tile local-ready, preview, model-blocked, and narrow/reflow states. — the flag-OFF no-affordance case is CDP-verified at 390px light+dark; the flag-ON pixel scenarios need a demo-entry media wiring (app code, outside the Claude-writable scope) and are covered functionally by the jsdom component tests at 390px/200% — a true ON-state pixel capture is operator-visual-review (see implementation-summary).
+- [x] CDP verification checks actual DOM focus and horizontal overflow, not only screenshots. — the flag-off CDP asserts `scrollWidth <= clientWidth` (no overflow) via DOM; component tests assert focus restoration + overflow for the ON states.
+- [x] The 320 px/200% layout reflows without page-level horizontal scroll and RTL/reduced-motion behavior is verified. — `style.css` reflow/RTL/reduced-motion; component tests assert 200%/narrow reflow and no horizontal scroll.

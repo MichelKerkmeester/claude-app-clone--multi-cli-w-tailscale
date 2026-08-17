@@ -20,9 +20,11 @@ import {
   Checkbox,
   Dialog,
   DialogTrigger,
+  FileTrigger,
   Popover,
 } from 'react-aria-components';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+import type { RuntimeMediaCapabilityDto } from '@pi-remote/pi-rpc-protocol';
 
 import { CommandPalette } from './CommandPalette.js';
 import {
@@ -32,22 +34,20 @@ import {
   hasRows,
   type SlashPanelDerivation,
 } from './ComposerCommandAutocomplete.js';
-import type {
-  HostCommandCatalogState,
-  SelectedCommandBinding,
-} from './commands.js';
+import type { HostCommandCatalogState, SelectedCommandBinding } from './commands.js';
 import { bindingFor } from './commands.js';
 import { insertSlashCommand } from './insertSlashCommand.js';
 import { LeavePlanSheet } from './LeavePlanSheet.js';
 import { PlanModeButton } from './PlanModeButton.js';
 import { rankHostCommands } from './rankHostCommands.js';
 import { modeAuthority, type RuntimeControls } from './runtime.js';
-import {
-  readComposerShiftTabPreference,
-  writeComposerShiftTabPreference,
-} from './state.js';
+import { readComposerShiftTabPreference, writeComposerShiftTabPreference } from './state.js';
 import { slashDismissalSignature, useSlashTrigger } from './useSlashTrigger.js';
 import { usePlanModeShortcut } from './usePlanModeShortcut.js';
+import { useAttachmentDraft } from './attachments/AttachmentDraftProvider.js';
+import { AttachmentPreviewDialog } from './attachments/AttachmentPreviewDialog.js';
+import { AttachmentRail } from './attachments/AttachmentRail.js';
+import { ATTACHMENT_ACCEPT, capabilityAllowsPhotos } from './attachments/attachment-state.js';
 
 const MAX_TRAY_HEIGHT_PX = 140;
 
@@ -79,6 +79,8 @@ export interface SessionComposerProps {
   readonly onInsertCommand: (name: string, binding: SelectedCommandBinding) => void;
   /** True while an outside overlay (the shared model/effort sheet) is open. */
   readonly externalOverlayOpen?: boolean;
+  /** Host capability fixture; production callers keep this disabled until enablement. */
+  readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
 }
 
 export function SessionComposer({
@@ -103,6 +105,7 @@ export function SessionComposer({
   runtimeRunning,
   onInsertCommand,
   externalOverlayOpen = false,
+  mediaCapability = null,
 }: SessionComposerProps) {
   // A turn is running when either the relay session card or the host-
   // confirmed runtime snapshot says so; both are authoritative sources and
@@ -114,6 +117,10 @@ export function SessionComposer({
   const slashSendable =
     slashDraft && binding !== null && runtimeAuthority && !running && canSubmit && !slashSubmitting;
   const hasText = prompt.trim().length > 0;
+  const attachmentDraft = useAttachmentDraft();
+  const mediaAvailable = capabilityAllowsPhotos(mediaCapability);
+  const attachmentCanSubmit = !mediaAvailable || attachmentDraft.canSubmit;
+  const effectiveSlashSendable = slashSendable && attachmentCanSubmit;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const trayRef = useRef<HTMLFormElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -255,8 +262,14 @@ export function SessionComposer({
   // the unchanged send/steer behavior. A slash draft is never converted to
   // steer/followUp and never falls back to the text lane.
   const submit = () => {
+    if (!attachmentCanSubmit) {
+      setAnnouncement(
+        attachmentDraft.blockingMessage ?? 'Finish checking the selected photos first.',
+      );
+      return;
+    }
     if (slashDraft) {
-      if (!slashSendable) {
+      if (!effectiveSlashSendable) {
         setAnnouncement(
           binding === null
             ? 'Choose a command from the list, then send it.'
@@ -427,6 +440,12 @@ export function SessionComposer({
           submit();
         }}
       >
+        {mediaAvailable && <AttachmentRail />}
+        {mediaAvailable && attachmentDraft.blockingMessage !== null && (
+          <p className="attachment-draft-message" aria-live="polite">
+            {attachmentDraft.blockingMessage}
+          </p>
+        )}
         <ComposerCommandAutocomplete
           prompt={prompt}
           open={effectivePanelOpen}
@@ -494,6 +513,11 @@ export function SessionComposer({
               catalog={catalog}
               onInsert={insertCommand}
               onOpenChange={setToolsOpen}
+              mediaAvailable={mediaAvailable}
+              onFilesSelected={(files) => {
+                attachmentDraft.selectFiles(files);
+                setToolsOpen(false);
+              }}
               shiftTabEnabled={shiftTabEnabled}
               onShiftTabPreferenceChange={setShiftTabEnabled}
             />
@@ -513,7 +537,7 @@ export function SessionComposer({
                 type="button"
                 className="composer-later"
                 onPress={() => sendPrompt('followUp')}
-                isDisabled={!canSubmit}
+                isDisabled={!canSubmit || !attachmentCanSubmit}
               >
                 Later
               </Button>
@@ -546,7 +570,7 @@ export function SessionComposer({
                 type="submit"
                 className="composer-primary is-send"
                 aria-label="Send command"
-                isDisabled={!slashSendable}
+                isDisabled={!effectiveSlashSendable}
               >
                 {slashSubmitting ? <SpinnerGlyph /> : <SendGlyph />}
               </Button>
@@ -555,7 +579,7 @@ export function SessionComposer({
                 type="submit"
                 className="composer-primary is-send"
                 aria-label={running ? 'Steer the current turn' : 'Send message'}
-                isDisabled={!canSubmit}
+                isDisabled={!canSubmit || !attachmentCanSubmit}
               >
                 {sendingPrompt ? <SpinnerGlyph /> : <SendGlyph />}
               </Button>
@@ -563,6 +587,7 @@ export function SessionComposer({
           </div>
         </div>
       </form>
+      {mediaAvailable && <AttachmentPreviewDialog />}
       <LeavePlanSheet
         isOpen={leavePlanOpen}
         onOpenChange={setLeavePlanOpen}
@@ -576,14 +601,14 @@ export function SessionComposer({
   );
 }
 
-/** The "+" popover: slash commands and the keyboard preference. Mode lives in
- * the persistent PlanModeButton beside "+", so this surface holds no mode
- * authority at all. */
+/** The "+" popover: local photo actions, slash commands, and the keyboard preference. */
 function ComposerTools({
   runtimeControls,
   catalog,
   onInsert,
   onOpenChange,
+  mediaAvailable,
+  onFilesSelected,
   shiftTabEnabled,
   onShiftTabPreferenceChange,
 }: {
@@ -591,6 +616,8 @@ function ComposerTools({
   readonly catalog: HostCommandCatalogState;
   readonly onInsert: (name: string, binding: SelectedCommandBinding) => void;
   readonly onOpenChange: (open: boolean) => void;
+  readonly mediaAvailable: boolean;
+  readonly onFilesSelected: (files: FileList | null) => void;
   readonly shiftTabEnabled: boolean;
   readonly onShiftTabPreferenceChange: (enabled: boolean) => void;
 }) {
@@ -598,14 +625,55 @@ function ComposerTools({
 
   return (
     <DialogTrigger onOpenChange={onOpenChange}>
-      <Button className="composer-plus" aria-label="Mode and commands">
+      <Button
+        className="composer-plus"
+        data-attachment-plus={mediaAvailable ? true : undefined}
+        aria-label={mediaAvailable ? 'Add photo, mode, or command' : 'Mode and commands'}
+      >
         <PlusGlyph />
       </Button>
       <Popover className="composer-tools-popover" placement="top start">
         <Dialog aria-label="Session tools" className="composer-tools">
+          {mediaAvailable && (
+            <>
+              <section
+                className="tools-group tools-photo-group"
+                aria-labelledby="photo-tools-label"
+              >
+                <span className="tools-label" id="photo-tools-label">
+                  Photos
+                </span>
+                <div className="tools-photo-actions">
+                  <FileTrigger
+                    acceptedFileTypes={[...ATTACHMENT_ACCEPT.split(',')]}
+                    allowsMultiple
+                    onSelect={onFilesSelected}
+                  >
+                    <Button className="tools-action">Photo Library</Button>
+                  </FileTrigger>
+                  <FileTrigger
+                    acceptedFileTypes={[...ATTACHMENT_ACCEPT.split(',')]}
+                    defaultCamera="environment"
+                    onSelect={onFilesSelected}
+                  >
+                    <Button className="tools-action">Take Photo</Button>
+                  </FileTrigger>
+                </div>
+                <p className="tools-disclosure">
+                  Photos stay on this iPhone until Send. Pi and its model provider receive a
+                  prepared copy.
+                </p>
+              </section>
+              <div className="tools-divider" />
+            </>
+          )}
           <section className="tools-group">
             <span className="tools-label">Commands</span>
-            <CommandPalette catalog={catalog} onInsert={onInsert} isDisabled={catalog.snapshot === null} />
+            <CommandPalette
+              catalog={catalog}
+              onInsert={onInsert}
+              isDisabled={catalog.snapshot === null}
+            />
           </section>
 
           <section className="tools-group">
@@ -676,7 +744,15 @@ function SpinnerGlyph() {
       focusable="false"
       className="composer-spinner"
     >
-      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2.2" opacity="0.25" />
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        opacity="0.25"
+      />
       <path
         d="M21 12a9 9 0 0 0-9-9"
         fill="none"

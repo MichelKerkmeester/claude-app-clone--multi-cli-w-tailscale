@@ -234,6 +234,15 @@ it('renders every projected transcript block kind', () => {
       outputTokens: 45,
       cost: 0.02,
     }),
+    block({
+      id: 'block_attachment_001',
+      kind: 'attachment',
+      role: 'user',
+      mediaKind: 'image',
+      ordinal: 1,
+      status: 'delivered',
+      previewRetained: false,
+    }),
   ];
   const selected = transcriptReducer(EMPTY_TRANSCRIPT, { type: 'select', sessionId });
   const projected = transcriptReducer(selected, {
@@ -257,12 +266,15 @@ it('renders every projected transcript block kind', () => {
     'Tool result · read',
     'File diff',
     'Usage',
+    'Photo attachment',
   ]) {
     expect(screen.getAllByText(label).length).toBeGreaterThanOrEqual(1);
   }
   expect(screen.getByText('Projected answer')).toBeInTheDocument();
   expect(screen.getByText('Projected step')).toBeInTheDocument();
   expect(screen.getByText('projected output')).toBeInTheDocument();
+  expect(screen.getByText('Preview not retained')).toBeInTheDocument();
+  expect(screen.getByText(/without keeping image content/u)).toBeInTheDocument();
 });
 
 it('submits the compose box through the relay command path', async () => {
@@ -376,6 +388,8 @@ it('inserts a command through the + browser without any ticket, prompt, or mutat
   await waitFor(() =>
     expect(screen.getByRole('combobox', { name: 'Insert a command' })).toBeEnabled(),
   );
+  expect(screen.queryByRole('button', { name: 'Photo Library' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Take Photo' })).not.toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: 'Show commands' }));
   await user.click(screen.getByRole('option', { name: /plan/ }));
 
@@ -388,6 +402,32 @@ it('inserts a command through the + browser without any ticket, prompt, or mutat
   // Route parity: the + browser produces the exact same "Not sent"
   // announcement as the inline surface.
   expect(await screen.findByText('Inserted slash command plan. Not sent.')).toBeInTheDocument();
+});
+
+it('renders the fixture-gated photo group only when image input is advertised', async () => {
+  const user = userEvent.setup();
+  render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={{ ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' }}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+      onInbox={vi.fn()}
+      onReview={vi.fn()}
+      theme="system"
+      onThemeChange={vi.fn()}
+      mediaCapability={{ enabled: true, imageIn: true }}
+    />,
+  );
+
+  await waitFor(() => expect(relay.fetchCommands).toHaveBeenCalledOnce());
+  await user.click(screen.getByRole('button', { name: 'Add photo, mode, or command' }));
+  expect(screen.getByRole('button', { name: 'Photo Library' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Take Photo' })).toBeInTheDocument();
 });
 
 it('Enter with the inline surface open inserts locally and never submits; the next Enter is the explicit slash send', async () => {

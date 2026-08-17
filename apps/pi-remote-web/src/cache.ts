@@ -107,6 +107,7 @@ export function saveCache(sessions: readonly SessionCardDto[], current: Transcri
           coversThrough: current.coversThrough,
           blocks: current.blocks
             .filter((block) => block.kind !== 'file_preview')
+            .filter((block) => !isAttachmentDisplayBlock(block))
             .filter((block) => !isRichBodyBlock(block))
             .filter((block) => !current.pendingPromptIds.includes(block.id))
             .slice(-MAX_BLOCKS),
@@ -150,7 +151,10 @@ function parseCachedTranscript(value: unknown): CachedTranscript | null {
     .map((block) => parseDisplayBlock(block, 'cache'))
     .filter(
       (block): block is DisplayTranscriptBlock =>
-        block !== null && block.kind !== 'file_preview' && !isRichBodyBlock(block),
+        block !== null &&
+        block.kind !== 'file_preview' &&
+        !isAttachmentDisplayBlock(block) &&
+        !isRichBodyBlock(block),
     );
   return {
     sessionId: value.sessionId,
@@ -232,4 +236,10 @@ function isRichBodyBlock(block: DisplayTranscriptBlock): boolean {
   if (block.kind === 'text_artifact') return true;
   if (block.kind !== 'tool_call' && block.kind !== 'tool_result') return false;
   return 'callId' in block || 'shellKind' in block || 'redaction' in block;
+}
+
+function isAttachmentDisplayBlock(block: DisplayTranscriptBlock): boolean {
+  return (
+    block.kind === 'attachment' || (block.kind === 'unknown' && block.originalKind === 'attachment')
+  );
 }

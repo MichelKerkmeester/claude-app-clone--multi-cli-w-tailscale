@@ -15,6 +15,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
 import { SessionComposer } from '../src/SessionComposer.js';
+import {
+  AttachmentDraftProvider,
+  useAttachmentDraft,
+} from '../src/attachments/AttachmentDraftProvider.js';
 import type {
   HostCommandCatalogState,
   ScopedCommandSnapshot,
@@ -92,6 +96,9 @@ interface HarnessProps {
   readonly runtimeAuthority?: boolean;
   readonly runtimeRunning?: boolean;
   readonly initialPrompt?: string;
+  readonly mediaCapability?: { readonly enabled: boolean; readonly imageIn: boolean } | null;
+  readonly modelCanViewPhotos?: boolean;
+  readonly localFiles?: readonly File[];
 }
 
 function Harness({
@@ -106,35 +113,51 @@ function Harness({
   runtimeAuthority = true,
   runtimeRunning = false,
   initialPrompt = '',
+  mediaCapability = null,
+  modelCanViewPhotos = true,
+  localFiles,
 }: HarnessProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [binding, setBinding] = useState<SelectedCommandBinding | null>(initialBinding);
   return (
-    <SessionComposer
-      prompt={prompt}
-      setPrompt={(updater) => setPrompt((current) => updater(current))}
-      onDraftChange={(value) => setPrompt(value)}
-      sendPrompt={sendPrompt}
-      sendSlashDraft={sendSlashDraft}
-      stopRun={vi.fn()}
-      canSubmit={canSubmit}
-      status={status}
-      connection="live"
-      awaitingSnapshot={false}
-      sendingPrompt={false}
-      stopping={false}
-      promptError={null}
-      runtimeControls={runtimeControls()}
-      catalog={catalog}
-      binding={binding}
-      slashSubmitting={slashSubmitting}
-      runtimeAuthority={runtimeAuthority}
-      runtimeRunning={runtimeRunning}
-      onInsertCommand={(name, inserted) => {
-        setBinding(inserted);
-        onInsertCommand(name, inserted);
-      }}
-    />
+    <AttachmentDraftProvider capability={mediaCapability} modelCanViewPhotos={modelCanViewPhotos}>
+      {localFiles !== undefined && <DraftTestControls files={localFiles} />}
+      <SessionComposer
+        prompt={prompt}
+        setPrompt={(updater) => setPrompt((current) => updater(current))}
+        onDraftChange={(value) => setPrompt(value)}
+        sendPrompt={sendPrompt}
+        sendSlashDraft={sendSlashDraft}
+        stopRun={vi.fn()}
+        canSubmit={canSubmit}
+        status={status}
+        connection="live"
+        awaitingSnapshot={false}
+        sendingPrompt={false}
+        stopping={false}
+        promptError={null}
+        runtimeControls={runtimeControls()}
+        catalog={catalog}
+        binding={binding}
+        slashSubmitting={slashSubmitting}
+        runtimeAuthority={runtimeAuthority}
+        runtimeRunning={runtimeRunning}
+        onInsertCommand={(name, inserted) => {
+          setBinding(inserted);
+          onInsertCommand(name, inserted);
+        }}
+        mediaCapability={mediaCapability}
+      />
+    </AttachmentDraftProvider>
+  );
+}
+
+function DraftTestControls({ files }: { readonly files: readonly File[] }) {
+  const draft = useAttachmentDraft();
+  return (
+    <button type="button" onClick={() => draft.selectFiles(files)}>
+      select local photos
+    </button>
   );
 }
 
@@ -289,7 +312,10 @@ describe('insertion', () => {
     expect(composer.value).toBe('/model ');
     await waitFor(() => expect(composer.selectionStart).toBe(7));
     expect(sendPrompt).not.toHaveBeenCalled();
-    expect(onInsertCommand).toHaveBeenCalledWith('model', expect.objectContaining({ name: 'model' }));
+    expect(onInsertCommand).toHaveBeenCalledWith(
+      'model',
+      expect.objectContaining({ name: 'model' }),
+    );
   });
 
   it('the primary disc becomes the local Insert action while open and never sends', async () => {
@@ -754,5 +780,84 @@ describe('accessibility surface', () => {
     await user.click(disabled);
     expect(statusText()).toBe('Unavailable: demo');
     expect((screen.getByLabelText('Message Pi') as HTMLTextAreaElement).value).toBe('/');
+  });
+});
+
+describe('local photo composer surface', () => {
+  const enabled = { enabled: true, imageIn: true } as const;
+
+  it('orders Photo Library and Take Photo before commands and keeps disclosure copy local', async () => {
+    const user = userEvent.setup();
+    renderComposer({ mediaCapability: enabled });
+    await user.click(screen.getByRole('button', { name: 'Add photo, mode, or command' }));
+
+    const library = screen.getByRole('button', { name: 'Photo Library' });
+    const take = screen.getByRole('button', { name: 'Take Photo' });
+    const commands = screen.getByText('Commands');
+    expect(
+      library.compareDocumentPosition(commands) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(take.compareDocumentPosition(commands) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Photos stay on this iPhone until Send. Pi and its model provider receive a prepared copy.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('has no photo action or rail when the host capability is off', async () => {
+    const user = userEvent.setup();
+    renderComposer();
+    await user.click(screen.getByRole('button', { name: 'Mode and commands' }));
+    expect(screen.queryByRole('button', { name: 'Photo Library' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Take Photo' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: /Draft photos/u })).not.toBeInTheDocument();
+  });
+
+  it('does not fetch or open XHR during local selection, preview, or removal', async () => {
+    const user = userEvent.setup();
+    const fetchSpy = vi.fn();
+    const xhrSpy = vi.fn();
+    const sendPrompt = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+    vi.stubGlobal('XMLHttpRequest', xhrSpy);
+    renderComposer({
+      mediaCapability: enabled,
+      localFiles: [new File(['image'], 'secret.jpg', { type: 'image/jpeg' })],
+      sendPrompt,
+    });
+
+    await user.click(screen.getByRole('button', { name: 'select local photos' }));
+    await user.click(await screen.findByRole('button', { name: 'Preview Photo 1' }));
+    await user.click(screen.getByRole('button', { name: 'Close preview' }));
+    await user.click(screen.getByRole('button', { name: 'Preview Photo 1' }));
+    await user.click(screen.getByRole('button', { name: 'Remove Photo 1' }));
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(xhrSpy).not.toHaveBeenCalled();
+    expect(screen.queryByText('secret.jpg')).not.toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Message Pi'), 'caption');
+    expect(sendPrompt).not.toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Send message' }));
+    expect(sendPrompt).toHaveBeenCalledOnce();
+  });
+
+  it('blocks Send for a locally selected photo when the current model cannot view images', async () => {
+    const user = userEvent.setup();
+    const sendPrompt = vi.fn();
+    renderComposer({
+      mediaCapability: enabled,
+      modelCanViewPhotos: false,
+      localFiles: [new File(['image'], 'blocked.jpg', { type: 'image/png' })],
+      sendPrompt,
+    });
+    await user.click(screen.getByRole('button', { name: 'select local photos' }));
+    await waitFor(() =>
+      expect(screen.getByText('Current model cannot view photos.')).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled();
+    expect(sendPrompt).not.toHaveBeenCalled();
   });
 });

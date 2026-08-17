@@ -1,6 +1,11 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Pi Remote Web Read-Only Cache
 // ───────────────────────────────────────────────────────────────────
+// INVARIANT: this cache may render history but can never enable mode
+// controls. It stores only session cards and transcript blocks — never
+// runtime state, mode, tickets, or revisions — and the app's mode
+// authority comes exclusively from a live read-only hydrate, so a cached
+// Build or Plan can never be presented as current authority.
 
 import { isOpaqueId, isSessionCardDto, type SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 

@@ -26,6 +26,40 @@ import { runtimeIssueMessage, type RuntimeIssueCode } from './runtime-issues.js'
 
 export type RuntimeStatus = 'checking' | 'ready' | 'pending' | 'stale' | 'error';
 
+// ── Plan-mode authority projection ────────────────────────────────────────────
+// The browser models mode authority as INDEPENDENT fields, never one `isPlan`
+// flag: the host-confirmed mode, the client's pending transition intent, the
+// delivery verdict, the structured plan phase, the host runtime revision, and
+// the turn state each come from a different source and fail closed separately.
+
+/** The host-confirmed mode. Only a host snapshot can move this value. */
+export type ConfirmedMode = 'build' | 'plan' | 'executing-plan' | 'unknown';
+
+/** Client-side mode transition intent; never committed, always host-confirmed. */
+export type ModeTransition = 'entering-plan' | 'leaving-plan' | null;
+
+/** Whether the last mode mutation's delivery is known. */
+export type ModeDelivery = 'settled' | 'unknown';
+
+/**
+ * The structured plan lifecycle phase. `drafting` is part of the authority
+ * contract but cannot be derived here: this phase ships no plan artifact
+ * surfaces, so the derivation only ever yields `none`, `ready`, or
+ * `superseded` from the host snapshot.
+ */
+export type PlanPhase = 'none' | 'drafting' | 'ready' | 'superseded';
+
+export type TurnState = 'idle' | 'running';
+
+export interface ModeAuthority {
+  readonly confirmedMode: ConfirmedMode;
+  readonly transition: ModeTransition;
+  readonly delivery: ModeDelivery;
+  readonly planPhase: PlanPhase;
+  readonly runtimeRevision: number | null;
+  readonly turnState: TurnState;
+}
+
 /** The complete runtime state table, including readiness refinements and issue states. */
 export type RuntimePhase =
   | 'checking'
@@ -303,6 +337,35 @@ function phaseForIssue(issueCode: RuntimeIssueCode): RuntimePhase {
   }
 }
 
+/**
+ * The one authority projection every mode surface reads. Everything is
+ * derived straight from the committed host snapshot and the pending intent;
+ * no optimistic value can leak in because `state` only ever changes to a
+ * value the host confirmed.
+ */
+export function modeAuthority(runtime: RuntimeUiState): ModeAuthority {
+  const state = runtime.state;
+  const transition: ModeTransition =
+    runtime.pending?.type === 'set_mode'
+      ? runtime.pending.mode === 'plan'
+        ? 'entering-plan'
+        : 'leaving-plan'
+      : null;
+  return {
+    confirmedMode: state?.mode ?? 'unknown',
+    transition,
+    delivery: runtime.deliveryUnknown ? 'unknown' : 'settled',
+    planPhase:
+      state?.plan !== undefined && state.plan.artifact !== null && state.plan.validity === 'valid'
+        ? 'ready'
+        : state?.plan?.validity === 'superseded'
+          ? 'superseded'
+          : 'none',
+    runtimeRevision: state?.revision ?? null,
+    turnState: state?.streaming === true ? 'running' : 'idle',
+  };
+}
+
 export type RefreshReason =
   'initial' | 'open' | 'foreground' | 'manual' | 'online' | 'live' | 'reconcile';
 
@@ -367,11 +430,15 @@ export function useRuntime(sessionId: string): RuntimeControls {
         timedOut = true;
         controller.abort();
       }, HYDRATE_TIMEOUT_MS);
-      dispatch({
+      const checkingPhase =
+        reason === 'initial' && runtimeRef.current.models.length === 0 ? 'opening' : 'refreshing';
+      // React may not commit this dispatch before a same-tick control event;
+      // keep the imperative mutation boundary fail-closed until that render.
+      runtimeRef.current = runtimeReducer(runtimeRef.current, {
         type: 'checking',
-        phase:
-          reason === 'initial' && runtimeRef.current.models.length === 0 ? 'opening' : 'refreshing',
+        phase: checkingPhase,
       });
+      dispatch({ type: 'checking', phase: checkingPhase });
       try {
         const snapshot = await hydrateSnapshot(controller.signal);
         if (controller.signal.aborted || generation !== authorityGenerationRef.current) return;
@@ -461,13 +528,19 @@ export function useRuntime(sessionId: string): RuntimeControls {
       const deadline = window.setTimeout(() => controller.abort(), MUTATION_DEADLINE_MS);
       dispatch({ type: 'control-start', operation });
       try {
-        const response = await relay.controlRuntime(
-          sessionId,
-          expectedRevision,
-          operation,
-          expectedCatalogRevision,
-          controller.signal,
-        );
+        // Mode switches ride the dedicated plan-control lane with their own
+        // one-use ticket and expected-runtime-revision guard; they never mix
+        // with prompt traffic or the generic runtime lane in production.
+        const response =
+          operation.type === 'set_mode'
+            ? await relay.setMode(sessionId, expectedRevision, operation.mode, controller.signal)
+            : await relay.controlRuntime(
+                sessionId,
+                expectedRevision,
+                operation,
+                expectedCatalogRevision,
+                controller.signal,
+              );
         if (generation !== authorityGenerationRef.current) return null;
         dispatch({ type: 'control-settled', response });
         if (response.outcome.status === 'stale' || response.outcome.status === 'unsupported') {

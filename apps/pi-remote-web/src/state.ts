@@ -13,6 +13,30 @@ import {
   type TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 
+// ── Composer keyboard preference ──────────────────────────────────────────────
+// A preference, not a mode state: it only gates whether the composer
+// intercepts Shift+Tab. It never changes host authority and cannot enable
+// any mutation by itself.
+
+const COMPOSER_SHIFT_TAB_KEY = 'pi-remote.composer-shift-tab';
+
+/** Default on: target-product parity, with the toggle restoring reverse focus. */
+export function readComposerShiftTabPreference(): boolean {
+  try {
+    return window.localStorage.getItem(COMPOSER_SHIFT_TAB_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
+
+export function writeComposerShiftTabPreference(enabled: boolean): void {
+  try {
+    window.localStorage.setItem(COMPOSER_SHIFT_TAB_KEY, enabled ? '1' : '0');
+  } catch {
+    // The preference applies for this session when storage is unavailable.
+  }
+}
+
 export type ConnectionPhase =
   'unenrolled' | 'authenticating' | 'offline' | 'connecting' | 'live' | 'reconnecting' | 'error';
 

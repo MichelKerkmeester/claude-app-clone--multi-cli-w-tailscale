@@ -17,11 +17,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogTrigger,
   Popover,
-  ToggleButton,
-  ToggleButtonGroup,
 } from 'react-aria-components';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 
@@ -39,9 +38,16 @@ import type {
 } from './commands.js';
 import { bindingFor } from './commands.js';
 import { insertSlashCommand } from './insertSlashCommand.js';
+import { LeavePlanSheet } from './LeavePlanSheet.js';
+import { PlanModeButton } from './PlanModeButton.js';
 import { rankHostCommands } from './rankHostCommands.js';
-import type { RuntimeControls } from './runtime.js';
+import { modeAuthority, type RuntimeControls } from './runtime.js';
+import {
+  readComposerShiftTabPreference,
+  writeComposerShiftTabPreference,
+} from './state.js';
 import { slashDismissalSignature, useSlashTrigger } from './useSlashTrigger.js';
+import { usePlanModeShortcut } from './usePlanModeShortcut.js';
 
 const MAX_TRAY_HEIGHT_PX = 140;
 
@@ -71,6 +77,8 @@ export interface SessionComposerProps {
   /** Authoritative host running state from the runtime snapshot. */
   readonly runtimeRunning: boolean;
   readonly onInsertCommand: (name: string, binding: SelectedCommandBinding) => void;
+  /** True while an outside overlay (the shared model/effort sheet) is open. */
+  readonly externalOverlayOpen?: boolean;
 }
 
 export function SessionComposer({
@@ -94,6 +102,7 @@ export function SessionComposer({
   runtimeAuthority,
   runtimeRunning,
   onInsertCommand,
+  externalOverlayOpen = false,
 }: SessionComposerProps) {
   // A turn is running when either the relay session card or the host-
   // confirmed runtime snapshot says so; both are authoritative sources and
@@ -123,6 +132,17 @@ export function SessionComposer({
   // Outside-press dismissal without an Escape latch: any later draft,
   // caret, or textarea interaction re-arms the surface.
   const [outsideDismissed, setOutsideDismissed] = useState(false);
+
+  // The persistent mode control: a controlled menu (the keyboard path opens
+  // it) and the Plan → Build leave confirmation. Neither holds authority;
+  // the leave sheet is the only path that can lead to a Build mutation.
+  const [modeMenuOpen, setModeMenuOpen] = useState(false);
+  const [leavePlanOpen, setLeavePlanOpen] = useState(false);
+  const modeButtonRef = useRef<HTMLButtonElement>(null);
+  const [shiftTabEnabled, setShiftTabEnabled] = useState(readComposerShiftTabPreference);
+  useEffect(() => {
+    writeComposerShiftTabPreference(shiftTabEnabled);
+  }, [shiftTabEnabled]);
 
   const trigger = useSlashTrigger({
     draft: prompt,
@@ -155,6 +175,22 @@ export function SessionComposer({
   });
   const rowsVisible =
     effectivePanelOpen && hasRows(panelDerivation.panelState) && ranked.items.length > 0;
+
+  // Composer-scoped mode keyboard: Shift+Tab (preference-gated) and ⌘⇧M.
+  // The overlay set covers every surface that must keep reverse-tab normal:
+  // the slash panel, the tools popover, the leave sheet, and any sheet the
+  // app opens above the composer.
+  const planShortcut = usePlanModeShortcut({
+    enabled: shiftTabEnabled,
+    overlayOpen: effectivePanelOpen || toolsOpen || leavePlanOpen || externalOverlayOpen,
+    composerRef: textareaRef,
+    runtime: runtimeControls.runtime,
+    connection,
+    onRequestPlan: () => void runtimeControls.setMode('plan'),
+    onRequestBuildExit: () => setLeavePlanOpen(true),
+    onOpenMenu: () => setModeMenuOpen(true),
+    onAnnounce: setAnnouncement,
+  });
 
   // Adopt the ranked active row (first enabled, or the retained name when
   // still visible); virtual focus resets when the panel closes.
@@ -304,6 +340,9 @@ export function SessionComposer({
   const onKeyDown = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     // IME composition owns every key: no filtering, insertion, or submit.
     if (isComposing) return;
+    // The mode shortcut consumes Shift+Tab and ⌘⇧M only when every guard
+    // passes; otherwise the key keeps its ordinary behavior below.
+    if (planShortcut(event)) return;
     if (effectivePanelOpen) {
       switch (event.key) {
         case 'ArrowDown':
@@ -362,6 +401,16 @@ export function SessionComposer({
   // surface open, the disc becomes the local Insert action — never Send.
   const showStop = running && !hasText;
 
+  // Plan mode is conveyed redundantly: the dashed outline only ever comes
+  // from the host-confirmed mode, never from a pending request.
+  const confirmedMode = modeAuthority(runtimeControls.runtime).confirmedMode;
+  const trayOutlineClass =
+    confirmedMode === 'plan'
+      ? ' is-plan-mode'
+      : confirmedMode === 'executing-plan'
+        ? ' is-executing-mode'
+        : '';
+
   return (
     <div className="composer-region">
       {promptError !== null && <div className="inline-alert">{promptError}</div>}
@@ -371,7 +420,7 @@ export function SessionComposer({
       </div>
       <form
         ref={trayRef}
-        className="composer-tray"
+        className={`composer-tray${trayOutlineClass}`}
         onSubmit={(event) => {
           event.preventDefault();
           if (showStop) return;
@@ -445,6 +494,17 @@ export function SessionComposer({
               catalog={catalog}
               onInsert={insertCommand}
               onOpenChange={setToolsOpen}
+              shiftTabEnabled={shiftTabEnabled}
+              onShiftTabPreferenceChange={setShiftTabEnabled}
+            />
+            <PlanModeButton
+              runtime={runtimeControls.runtime}
+              connection={connection}
+              isOpen={modeMenuOpen}
+              onOpenChange={setModeMenuOpen}
+              onSelectPlan={() => void runtimeControls.setMode('plan')}
+              onSelectBuild={() => setLeavePlanOpen(true)}
+              buttonRef={modeButtonRef}
             />
           </div>
           <div className="composer-right">
@@ -503,27 +563,38 @@ export function SessionComposer({
           </div>
         </div>
       </form>
+      <LeavePlanSheet
+        isOpen={leavePlanOpen}
+        onOpenChange={setLeavePlanOpen}
+        onSwitchToBuild={() => {
+          setLeavePlanOpen(false);
+          void runtimeControls.setMode('build');
+        }}
+        triggerRef={modeButtonRef}
+      />
     </div>
   );
 }
 
-/** The "+" popover: model, effort, Build/Plan, and slash commands — everything that used
- * to stack in the reading path, now one tap away and out of the transcript. */
+/** The "+" popover: slash commands and the keyboard preference. Mode lives in
+ * the persistent PlanModeButton beside "+", so this surface holds no mode
+ * authority at all. */
 function ComposerTools({
   runtimeControls,
   catalog,
   onInsert,
   onOpenChange,
+  shiftTabEnabled,
+  onShiftTabPreferenceChange,
 }: {
   readonly runtimeControls: RuntimeControls;
   readonly catalog: HostCommandCatalogState;
   readonly onInsert: (name: string, binding: SelectedCommandBinding) => void;
   readonly onOpenChange: (open: boolean) => void;
+  readonly shiftTabEnabled: boolean;
+  readonly onShiftTabPreferenceChange: (enabled: boolean) => void;
 }) {
-  const { runtime, setMode } = runtimeControls;
-  const state = runtime.state;
-  const disabled = runtime.status !== 'ready' || state === null;
-  const planActive = state?.mode === 'plan' || state?.mode === 'executing-plan';
+  const { runtime } = runtimeControls;
 
   return (
     <DialogTrigger onOpenChange={onOpenChange}>
@@ -533,30 +604,19 @@ function ComposerTools({
       <Popover className="composer-tools-popover" placement="top start">
         <Dialog aria-label="Session tools" className="composer-tools">
           <section className="tools-group">
-            <span className="tools-label">Mode</span>
-            <ToggleButtonGroup
-              className="tools-mode"
-              aria-label="Build or Plan"
-              selectionMode="single"
-              disallowEmptySelection
-              selectedKeys={state ? [planActive ? 'plan' : 'build'] : []}
-              onSelectionChange={(keys) => {
-                const next = [...keys][0];
-                if (next === 'build' || next === 'plan') void setMode(next);
-              }}
-            >
-              <ToggleButton id="build" isDisabled={disabled}>
-                Build
-              </ToggleButton>
-              <ToggleButton id="plan" isDisabled={disabled}>
-                {state?.mode === 'plan' ? 'Plan · read-only' : 'Plan'}
-              </ToggleButton>
-            </ToggleButtonGroup>
+            <span className="tools-label">Commands</span>
+            <CommandPalette catalog={catalog} onInsert={onInsert} isDisabled={catalog.snapshot === null} />
           </section>
 
           <section className="tools-group">
-            <span className="tools-label">Commands</span>
-            <CommandPalette catalog={catalog} onInsert={onInsert} isDisabled={catalog.snapshot === null} />
+            <span className="tools-label">Keyboard</span>
+            <Checkbox
+              className="tools-checkbox"
+              isSelected={shiftTabEnabled}
+              onChange={onShiftTabPreferenceChange}
+            >
+              CLI-style Shift+Tab in composer
+            </Checkbox>
           </section>
 
           <span className="tools-status" role="status" aria-live="polite">

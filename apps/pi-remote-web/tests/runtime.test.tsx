@@ -19,6 +19,7 @@ import type {
 import { runtimeIssueMessage } from '../src/runtime-issues.js';
 import {
   INITIAL_RUNTIME_STATE,
+  modeAuthority,
   runtimeAnnouncement,
   runtimeReducer,
   useRuntime,
@@ -44,6 +45,7 @@ const relay = vi.hoisted(() => {
     fetchRuntimeState: vi.fn(),
     fetchRuntimeModels: vi.fn(),
     controlRuntime: vi.fn(),
+    setMode: vi.fn(),
   };
 });
 
@@ -662,6 +664,233 @@ describe('plan-mode isolation', () => {
     );
     expect(result.current.runtime.state?.mode).toBe('plan');
     expect(result.current.runtime.state?.thinkingLevel).toBe('max');
+  });
+});
+
+describe('mode authority projection', () => {
+  it('starts unknown with no revision, settled delivery, and idle turns', () => {
+    const authority = modeAuthority(INITIAL_RUNTIME_STATE);
+    expect(authority.confirmedMode).toBe('unknown');
+    expect(authority.transition).toBeNull();
+    expect(authority.delivery).toBe('settled');
+    expect(authority.planPhase).toBe('none');
+    expect(authority.runtimeRevision).toBeNull();
+    expect(authority.turnState).toBe('idle');
+  });
+
+  it('derives the host-confirmed mode, revision, and turn state', () => {
+    const authority = modeAuthority(ready());
+    expect(authority.confirmedMode).toBe('build');
+    expect(authority.runtimeRevision).toBe(4);
+    expect(authority.turnState).toBe('idle');
+    const running = modeAuthority(readyWith({ ...HOST_STATE, streaming: true }));
+    expect(running.turnState).toBe('running');
+    expect(running.confirmedMode).toBe('build');
+  });
+
+  it('keeps the confirmed mode while an entering-plan intent is pending', () => {
+    const pending = runtimeReducer(ready(), {
+      type: 'control-start',
+      operation: { type: 'set_mode', mode: 'plan' },
+    });
+    const authority = modeAuthority(pending);
+    expect(authority.confirmedMode).toBe('build');
+    expect(authority.transition).toBe('entering-plan');
+  });
+
+  it('tracks leaving-plan separately from entering-plan', () => {
+    const planState: RuntimeStateDto = { ...HOST_STATE, mode: 'plan' };
+    const leaving = runtimeReducer(readyWith(planState), {
+      type: 'control-start',
+      operation: { type: 'set_mode', mode: 'build' },
+    });
+    expect(modeAuthority(leaving).transition).toBe('leaving-plan');
+    expect(modeAuthority(leaving).confirmedMode).toBe('plan');
+    // Non-mode pending intents never look like a mode transition.
+    const effort = runtimeReducer(ready(), {
+      type: 'control-start',
+      operation: { type: 'set_thinking_level', level: 'max' },
+    });
+    expect(modeAuthority(effort).transition).toBeNull();
+  });
+
+  it('keeps delivery independent: unknown only after an uncertain settle', () => {
+    expect(modeAuthority(ready()).delivery).toBe('settled');
+    const unknown = runtimeReducer(ready(), {
+      type: 'control-settled',
+      response: { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } },
+    });
+    expect(modeAuthority(unknown).delivery).toBe('unknown');
+  });
+
+  it('derives the plan phase from the host plan snapshot only', () => {
+    expect(modeAuthority(ready()).planPhase).toBe('none');
+    const planReady = modeAuthority(
+      readyWith({
+        ...HOST_STATE,
+        mode: 'plan',
+        plan: {
+          planId: 'plan_001',
+          planRevision: 2,
+          validity: 'valid',
+          artifact: {
+            planId: 'plan_001',
+            planRevision: 2,
+            title: 'Refactor',
+            summary: 'A plan.',
+            stepCount: 3,
+            approachCount: 1,
+            validity: 'valid',
+            occurredAt: HOST_STATE.updatedAt,
+          },
+        },
+      }),
+    );
+    expect(planReady.planPhase).toBe('ready');
+    const superseded = modeAuthority(
+      readyWith({
+        ...HOST_STATE,
+        plan: { planId: 'plan_001', planRevision: 3, validity: 'superseded', artifact: null },
+      }),
+    );
+    expect(superseded.planPhase).toBe('superseded');
+    // An absent plan snapshot is never misread as a ready plan.
+    expect(modeAuthority(ready()).planPhase).toBe('none');
+  });
+});
+
+describe('plan-mode mutation lane', () => {
+  it('routes mode switches through the dedicated setMode lane, never the generic lane', async () => {
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.phase).toBe('ready-adjustable'));
+    relay.setMode.mockResolvedValue({
+      outcome: { status: 'accepted', state: { ...HOST_STATE, revision: 5, mode: 'plan' } },
+    });
+    await act(async () => {
+      await result.current.setMode('plan');
+    });
+    expect(relay.setMode).toHaveBeenCalledTimes(1);
+    expect(relay.setMode).toHaveBeenCalledWith('session_local', 4, 'plan', expect.any(AbortSignal));
+    expect(relay.controlRuntime).not.toHaveBeenCalled();
+    expect(result.current.runtime.state?.mode).toBe('plan');
+    expect(result.current.runtime.phase).toBe('accepted');
+  });
+
+  it('ten rapid activations produce at most one in-flight mode request', async () => {
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.phase).toBe('ready-adjustable'));
+    relay.setMode.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({
+              outcome: {
+                status: 'accepted',
+                state: { ...HOST_STATE, revision: 5, mode: 'plan' },
+              },
+            });
+          }, 10);
+        }),
+    );
+    const calls: Promise<unknown>[] = [];
+    await act(async () => {
+      for (let index = 0; index < 10; index += 1) {
+        calls.push(result.current.setMode('plan'));
+      }
+      await Promise.all(calls);
+    });
+    expect(relay.setMode).toHaveBeenCalledTimes(1);
+    expect(result.current.runtime.state?.mode).toBe('plan');
+  });
+
+  it('reconciles read-only once after a stale mode switch and never retries the mutation', async () => {
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.phase).toBe('ready-adjustable'));
+    relay.setMode.mockResolvedValue({
+      outcome: { status: 'stale', state: { ...HOST_STATE, revision: 9, mode: 'plan' } },
+    });
+    relay.fetchRuntimeSnapshot.mockResolvedValueOnce(
+      snapshot({ ...HOST_STATE, revision: 9, mode: 'plan' }),
+    );
+    await act(async () => {
+      await result.current.setMode('plan');
+    });
+    expect(relay.setMode).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(relay.fetchRuntimeSnapshot).toHaveBeenCalledTimes(2));
+    expect(result.current.runtime.state?.mode).toBe('plan');
+    expect(result.current.runtime.state?.revision).toBe(9);
+    expect(relay.setMode).toHaveBeenCalledTimes(1);
+  });
+
+  it('maps a mode delivery-unknown terminal and blocks until a read-only hydrate', async () => {
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.phase).toBe('ready-adjustable'));
+    relay.setMode.mockResolvedValue({
+      outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' },
+    });
+    await act(async () => {
+      await result.current.setMode('plan');
+    });
+    expect(result.current.runtime.phase).toBe('delivery-unknown');
+    expect(modeAuthority(result.current.runtime).delivery).toBe('unknown');
+    expect(modeAuthority(result.current.runtime).confirmedMode).toBe('build');
+    await act(async () => {
+      await expect(result.current.setMode('plan')).resolves.toBeNull();
+    });
+    expect(relay.setMode).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      await result.current.refresh('manual');
+    });
+    expect(result.current.runtime.deliveryUnknown).toBe(false);
+    expect(modeAuthority(result.current.runtime).confirmedMode).toBe('build');
+  });
+
+  it('sends zero mode requests while the runtime is not settled ready', async () => {
+    let resolveSnapshot!: (value: unknown) => void;
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.phase).toBe('ready-adjustable'));
+    relay.setMode.mockResolvedValue({
+      outcome: { status: 'accepted', state: { ...HOST_STATE, mode: 'plan' } },
+    });
+    relay.fetchRuntimeSnapshot.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveSnapshot = resolve)),
+    );
+    let refreshing!: Promise<void>;
+    let modeAttempt!: Promise<unknown>;
+    act(() => {
+      // A held-open read-only hydrate keeps the runtime checking; the mode
+      // request in that window is blocked before any ticket or transport
+      // work, exactly as the fail-closed gate requires.
+      refreshing = result.current.refresh('manual');
+      modeAttempt = result.current.setMode('plan');
+    });
+    await act(async () => {
+      await expect(modeAttempt).resolves.toBeNull();
+    });
+    expect(result.current.runtime.phase).toBe('checking');
+    expect(relay.setMode).not.toHaveBeenCalled();
+    await act(async () => {
+      resolveSnapshot(snapshot());
+      await refreshing;
+    });
+    expect(result.current.runtime.phase).toBe('ready-adjustable');
+  });
+
+  it('normalizes unavailable mode outcomes to the bounded issue shape', async () => {
+    const { result } = renderHook(() => useRuntime('session_local'));
+    await waitFor(() => expect(result.current.runtime.phase).toBe('ready-adjustable'));
+    relay.setMode.mockResolvedValue({
+      outcome: {
+        status: 'unavailable',
+        reasonCode: 'runtime_unavailable',
+        issueCode: 'foreground-required',
+      },
+    });
+    await act(async () => {
+      await result.current.setMode('plan');
+    });
+    expect(result.current.runtime.phase).toBe('foreground-required');
+    expect(result.current.runtime.issue).toEqual(issue('foreground-required'));
   });
 });
 

@@ -71,6 +71,7 @@ import {
   type TranscriptState,
 } from './state.js';
 import { ModelEffortSheet, type EffortSheetSection } from './ModelEffortSheet.js';
+import { RuntimeModeAnnouncer } from './RuntimeModeAnnouncer.js';
 import { RuntimeStrip } from './RuntimeStrip.js';
 import { SessionComposer } from './SessionComposer.js';
 import { SessionHeader } from './SessionHeader.js';
@@ -1243,6 +1244,7 @@ export function Session({
   return (
     <main className="session-view">
       <RuntimeStatusRegion runtime={runtimeControls.runtime} />
+      <RuntimeModeAnnouncer runtime={runtimeControls.runtime} connection={connection} />
       <SessionHeader
         onBack={onBack}
         onInbox={onInbox}
@@ -1299,6 +1301,7 @@ export function Session({
         runtimeAuthority={runtimeAuthority}
         runtimeRunning={runtimeRunning}
         onInsertCommand={insertCommand}
+        externalOverlayOpen={sheetOpen}
       />
       <ModelEffortSheet
         isOpen={sheetOpen}

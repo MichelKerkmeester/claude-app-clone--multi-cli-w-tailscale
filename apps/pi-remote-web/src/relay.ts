@@ -7,6 +7,7 @@ import {
   isApprovalCardDto,
   isApprovalDecisionResponse,
   isCommandCatalogDto,
+  isPlanControlResponse,
   isPromptAbortResponse,
   isRuntimeControlResponse,
   isRuntimeIssueCode,
@@ -24,6 +25,8 @@ import {
   isWebSocketTicketResponse,
   type CommandBindingDto,
   type CommandCatalogDto,
+  type PlanControlOutcome,
+  type PlanControlResponse,
   type PromptAbortResponse,
   type RuntimeControlCommand,
   type RuntimeControlResponse,
@@ -34,6 +37,7 @@ import {
   type RuntimeSnapshotDto,
   type RuntimeStateDto,
   type SessionCardDto,
+  type SetModeCommand,
   type AcceptEditsGrantDto,
   type ApprovalCardDto,
   type ApprovalDecision,
@@ -385,6 +389,94 @@ export async function controlRuntime(
     // Once the command submission starts, transport failure is terminal and ambiguous.
     // A retry could apply the same user intent twice, so reconciliation is the only safe path.
     return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
+  }
+}
+
+/**
+ * Send one host-confirmed Build/Plan mode switch through the dedicated plan
+ * control lane. A fresh one-use ticket is obtained immediately before the
+ * write and a unique control ID is minted per attempt; neither is cached or
+ * persisted. The request carries the expected runtime revision so a stale
+ * client can never move authority, and every outcome — accepted, stale,
+ * unsupported, and delivery-unknown — returns as a bounded response so the UI
+ * reconciles read-only instead of retrying an uncertain mutation.
+ */
+export async function setMode(
+  sessionId: string,
+  expectedRuntimeRevision: number,
+  target: 'build' | 'plan',
+  signal?: AbortSignal,
+): Promise<RuntimeControlResponse> {
+  if (isDemoMode()) {
+    // The preview fixture answers mode switches on the generic lane; real
+    // deployments never send a mode switch through that lane.
+    return controlRuntime(
+      sessionId,
+      expectedRuntimeRevision,
+      { type: 'set_mode', mode: target },
+      undefined,
+      signal,
+    );
+  }
+  const controlId = `control_${crypto.randomUUID().replaceAll('-', '_')}`;
+  let controlStarted = false;
+  try {
+    const oneUseTicket = await requestTicket(signal);
+    const command: SetModeCommand = {
+      type: 'set_mode',
+      target,
+      expectedRuntimeRevision,
+      controlId,
+      oneUseTicket,
+    };
+    controlStarted = true;
+    const payload = await postJson('/api/plan/control', command, signal, [202, 409, 422, 503]);
+    if (!isPlanControlResponse(payload)) {
+      return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
+    }
+    return normalizePlanControlResponse(payload);
+  } catch (error: unknown) {
+    if (!controlStarted) {
+      // The mutation never reached the host: map transport blocks to bounded issues.
+      const issueCode = runtimeIssueForTransportError(error);
+      return {
+        outcome: {
+          status: 'unavailable',
+          reasonCode: 'runtime_unavailable',
+          ...(issueCode === null ? {} : { issueCode }),
+        },
+      };
+    }
+    // Once submission starts, transport failure is terminal and ambiguous:
+    // reconciliation is the only safe path, never an automatic retry.
+    return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
+  }
+}
+
+/**
+ * Fold the plan control outcome into the shared runtime response shape. Only
+ * the status and the bounded issue code are load-bearing for the reducer; the
+ * plan-specific reason codes are intentionally dropped so no raw reason text
+ * can reach UI state.
+ */
+function normalizePlanControlResponse(response: PlanControlResponse): RuntimeControlResponse {
+  const outcome: PlanControlOutcome = response.outcome;
+  switch (outcome.status) {
+    case 'accepted':
+    case 'stale':
+      return { outcome };
+    case 'unsupported':
+    case 'policy_blocked':
+    case 'delivery-unknown':
+      return { outcome };
+    case 'unavailable':
+      return {
+        outcome: {
+          status: 'unavailable',
+          reasonCode: 'runtime_unavailable',
+          ...(outcome.issueCode === undefined ? {} : { issueCode: outcome.issueCode }),
+        },
+      };
   }
 }
 

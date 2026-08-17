@@ -4009,3 +4009,203 @@ body:has(.slash-panel) .scroll-to-latest {
     color: CanvasText;
   }
 }
+
+/* Keep interactive surfaces clear of rounded-device edges and keyboard-safe
+   areas while allowing the document to use the full installed-PWA viewport. */
+html {
+  min-block-size: 100%;
+}
+
+body,
+#root {
+  min-block-size: 100svh;
+  min-block-size: 100dvh;
+}
+
+.topbar,
+.session-header {
+  padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+  padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+}
+
+.home-view,
+.session-view,
+.review-view,
+.inbox-view {
+  padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+  padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+}
+
+.composer-region {
+  padding-inline-start: max(var(--space-3), env(safe-area-inset-left, 0px));
+  padding-inline-end: max(var(--space-3), env(safe-area-inset-right, 0px));
+}
+
+.composer-tray {
+  min-inline-size: 0;
+  margin-inline-start: max(0px, env(safe-area-inset-left, 0px));
+  margin-inline-end: max(0px, env(safe-area-inset-right, 0px));
+}
+
+.leave-plan-sheet {
+  padding-block-start: max(var(--space-4), env(safe-area-inset-top, 0px));
+  padding-block-end: max(var(--space-4), env(safe-area-inset-bottom, 0px));
+  padding-inline-start: max(var(--space-4), env(safe-area-inset-left, 0px));
+  padding-inline-end: max(var(--space-4), env(safe-area-inset-right, 0px));
+}
+
+.plan-review-modal {
+  max-block-size: 100svh;
+  max-block-size: 100dvh;
+}
+
+.plan-review-dialog {
+  padding-block-start: max(var(--space-6), env(safe-area-inset-top, 0px));
+  padding-block-end: max(var(--space-6), env(safe-area-inset-bottom, 0px));
+  padding-inline-start: max(var(--space-6), env(safe-area-inset-left, 0px));
+  padding-inline-end: max(var(--space-6), env(safe-area-inset-right, 0px));
+}
+
+.plan-ready-header,
+.plan-review-header {
+  min-inline-size: 0;
+  flex-wrap: wrap;
+}
+
+.plan-ready-header > div,
+.plan-review-header > div {
+  min-inline-size: 0;
+}
+
+.plan-ready-title,
+.plan-review-title,
+.plan-ready-summary,
+.plan-review-summary {
+  overflow-wrap: anywhere;
+  unicode-bidi: plaintext;
+}
+
+.plan-review-revision,
+.plan-ready-meta dd[dir='ltr'],
+.plan-review-details dd[dir='ltr'] {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+[dir='auto'] {
+  unicode-bidi: plaintext;
+}
+
+button:focus-visible,
+textarea:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[role='button']:focus-visible,
+[role='menuitem']:focus-visible,
+[role='option']:focus-visible,
+[role='switch']:focus-visible,
+[data-focus-visible] {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.composer-plus,
+.composer-primary,
+.plan-mode-button,
+.composer-later {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+}
+
+.composer-plus,
+.composer-primary {
+  inline-size: 44px;
+  block-size: 44px;
+}
+
+.plan-mode-label {
+  min-inline-size: 0;
+}
+
+/* Clay is an accent, not the foreground for normal-size action labels. */
+.composer-primary.is-send,
+.enrollment-actions button,
+.approval-actions button {
+  background: var(--ink);
+  color: var(--ink-inverse);
+}
+
+.composer-primary.is-send[data-hovered],
+.enrollment-actions button[data-hovered],
+.approval-actions button[data-hovered],
+.push-settings > button[data-hovered] {
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.scroll-badge {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+@media (max-width: 27rem) {
+  .composer-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .composer-left {
+    min-inline-size: 0;
+    flex-wrap: wrap;
+  }
+
+  .plan-mode-button {
+    min-inline-size: 44px;
+    flex: 1 1 9rem;
+  }
+
+  .plan-mode-label {
+    max-inline-size: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .plan-ready-meta,
+  .plan-review-details,
+  .plan-review-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-ready-review,
+  .plan-review-safe,
+  .plan-review-revise,
+  .plan-review-leave,
+  .plan-review-execute {
+    inline-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  button:active:not(:disabled),
+  button[data-pressed]:not([data-disabled]),
+  .session-card[data-hovered],
+  .model-sheet-modal,
+  .model-sheet-modal.is-dragging,
+  .model-sheet-modal.is-snapping,
+  .plan-review-modal,
+  [role='switch'][data-selected] .switch-track > span,
+  .evidence-trigger[data-expanded] .evidence-chevron {
+    transform: none !important;
+  }
+}

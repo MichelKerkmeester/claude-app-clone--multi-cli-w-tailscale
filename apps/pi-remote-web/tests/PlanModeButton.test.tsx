@@ -13,12 +13,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { RuntimeModelCatalogDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 
-import {
-  INITIAL_RUNTIME_STATE,
-  runtimeReducer,
-  type RuntimeUiState,
-} from '../src/runtime.js';
+import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/runtime.js';
 import { planModePresentation, PlanModeButton } from '../src/PlanModeButton.js';
+import { RuntimeModeAnnouncer } from '../src/RuntimeModeAnnouncer.js';
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -53,7 +50,10 @@ function pendingMode(target: 'build' | 'plan'): RuntimeUiState {
   });
 }
 
-function failedWith(phase: RuntimeUiState['phase'], lastOutcome?: RuntimeUiState['lastOutcome']): RuntimeUiState {
+function failedWith(
+  phase: RuntimeUiState['phase'],
+  lastOutcome?: RuntimeUiState['lastOutcome'],
+): RuntimeUiState {
   return {
     ...readyWith(HOST_STATE),
     status: 'error',
@@ -149,10 +149,7 @@ describe('planModePresentation derivation', () => {
   });
 
   it('disables mode control while a turn is running and explains why', () => {
-    const running = planModePresentation(
-      readyWith({ ...HOST_STATE, streaming: true }),
-      'live',
-    );
+    const running = planModePresentation(readyWith({ ...HOST_STATE, streaming: true }), 'live');
     expect(running.kind).toBe('running');
     expect(running.label).toBe('Build');
     expect(running.disabled).toBe(true);
@@ -324,9 +321,7 @@ describe('PlanModeButton DOM behavior', () => {
     for (const row of within(menu).getAllByRole('menuitem')) {
       expect(row).toHaveAttribute('aria-disabled', 'true');
     }
-    expect(
-      await screen.findByText('Plan execution is in progress.'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Plan execution is in progress.')).toBeInTheDocument();
   });
 
   it('never leaks raw host or issue text into the accessible name', () => {
@@ -352,5 +347,40 @@ describe('PlanModeButton DOM behavior', () => {
     expect(presentation.kind).toBe('stale');
     expect(presentation.label).toBe('Build');
     expect(presentation.disabled).toBe(true);
+  });
+
+  it('announces a settled mode change once without moving focus', async () => {
+    const user = userEvent.setup();
+    const focusTarget = document.createElement('button');
+    focusTarget.type = 'button';
+    focusTarget.textContent = 'Focus target';
+    document.body.append(focusTarget);
+    focusTarget.focus();
+    const { rerender } = render(
+      <RuntimeModeAnnouncer runtime={readyWith(HOST_STATE)} connection="live" />,
+    );
+
+    rerender(
+      <RuntimeModeAnnouncer
+        runtime={readyWith({ ...HOST_STATE, mode: 'plan' })}
+        connection="live"
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('Plan mode on. Pi is read-only.'),
+    );
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+    expect(focusTarget).toHaveFocus();
+
+    await user.click(focusTarget);
+    rerender(
+      <RuntimeModeAnnouncer
+        runtime={readyWith({ ...HOST_STATE, mode: 'plan' })}
+        connection="live"
+      />,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('Plan mode on. Pi is read-only.');
+    focusTarget.remove();
   });
 });

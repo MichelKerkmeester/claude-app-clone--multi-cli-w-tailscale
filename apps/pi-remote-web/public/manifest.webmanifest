@@ -2,9 +2,11 @@
   "name": "Pi Remote",
   "short_name": "Pi Remote",
   "description": "A private Pi session viewer with content-free attention hints.",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#f8f8f6",
   "theme_color": "#f8f8f6",
   "icons": [

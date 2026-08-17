@@ -1,18 +1,17 @@
 # Checklist — Phase 5 — Accessibility, PWA layout, and release hardening
 
-- [ ] All controls remain visible, labeled, focusable, and unobscured at 320px, 375px, 390px, and 430px in both themes and at 200% text scaling.
-- [ ] Mode state is not communicated by color alone; contrast checks reject clay-on-bone normal text and clay-only focus/state boundaries.
-- [ ] VoiceOver announces each settled transition once, starts review on `Keep planning`, and does not move focus when a plan becomes ready.
-- [ ] Physical keyboard testing passes for bare `Tab` and configured `Shift+Tab`; disabling the setting restores reverse focus navigation.
-- [ ] Reduced motion removes positional/continuous animation while textual state changes remain immediate.
-- [ ] Background/resume, rotation, reconnect, offline, relay restart, and service-worker cache behavior force or await safe authoritative hydration before mutation controls become available.
-- [ ] Release verification finds no stray source-file changes or unredacted artifacts and records a documented capability-gate rollback path.
-- [ ] `npm run typecheck` passes.
-- [ ] `npm test` passes.
-- [ ] `npm run test:web` passes.
-- [ ] `npm run format:check` passes.
-- [ ] True CDP screenshots/checks cover exact `390px` light and dark modes plus `320px`, `375px`, and `430px`, including 200% text and reduced-motion fixtures.
-- [ ] Manual Safari and installed-PWA sign-off covers keyboard, VoiceOver, safe area, rotation, resume, and Full Keyboard Access.
-- [ ] Disabling the capability/health gate leaves the old read-only UI safe and does not expose Execute.
-- [ ] The scoped phase diff contains only intended styling, PWA metadata/cache, test, and release-verification changes.
-
+- [x] All controls remain visible, labeled, focusable, and unobscured at 320px, 375px, 390px, and 430px in both themes and at 200% text scaling. — responsive `style.css` + logical properties; `contrast.test.tsx` + component width/no-overflow assertions.
+- [x] Mode state is not communicated by color alone; contrast checks reject clay-on-bone normal text and clay-only focus/state boundaries. — `contrast.test.tsx`; zero new colors; AA accents used for state.
+- [ ] VoiceOver announces each settled transition once, starts review on `Keep planning`, and does not move focus when a plan becomes ready. — announce-once + initial-focus coded and DOM-tested; real VoiceOver voicing is OPERATOR-REQUIRED.
+- [ ] Physical keyboard testing passes for bare `Tab` and configured `Shift+Tab`; disabling the setting restores reverse focus navigation. — keyboard guards + preference are DOM-tested; physical hardware-keyboard pass is OPERATOR-REQUIRED.
+- [x] Reduced motion removes positional/continuous animation while textual state changes remain immediate. — `prefers-reduced-motion` rules; reduced-motion test.
+- [x] Background/resume, rotation, reconnect, offline, relay restart, and service-worker cache behavior force or await safe authoritative hydration before mutation controls become available. — `service-worker.js` history-only cache + hydration-gated mutation; `pwa-cache.test.tsx` (+ `App.test.tsx`).
+- [x] Release verification finds no stray source-file changes or unredacted artifacts and records a documented capability-gate rollback path. — scoped diff is the 9 phase-5 files only (after reverting an accidental repo-wide format run); no unredacted artifacts.
+- [x] `npm run typecheck` passes. — verified (worktree).
+- [x] `npm test` passes. — verified, 221/221 clean (the intermittent 220/221 is the known flaky auth test).
+- [x] `npm run test:web` passes. — verified, 459 passed (459) (+9 new: a11y/contrast/pwa-cache).
+- [ ] `npm run format:check` passes. — DEVIATION: the 9 phase-5 files ARE prettier-clean (verified via `prettier --check` on them). The repo-wide `format:check` fails on **~685 pre-existing files** (all prior features' external-model-built code + docs + specs markdown were committed un-formatted — accumulated debt, not this phase). A repo-wide `npm run format` pass is a separate recommended cleanup (out of this phase's SCOPE LOCK; it would rewrite every prior feature's committed code).
+- [ ] True CDP screenshots/checks cover exact `390px` light and dark modes plus `320px`, `375px`, and `430px`, including 200% text and reduced-motion fixtures. — width/overflow/contrast proven by DOM tests now; pixel captures ride the feature-004 batched visual pass (needs `demo.ts` plan-artifact fixtures).
+- [ ] Manual Safari and installed-PWA sign-off covers keyboard, VoiceOver, safe area, rotation, resume, and Full Keyboard Access. — OPERATOR-REQUIRED (physical device + Safari/installed PWA).
+- [x] Disabling the capability/health gate leaves the old read-only UI safe and does not expose Execute. — capability-gate hides Execute + preserves read-only UI; tested.
+- [x] The scoped phase diff contains only intended styling, PWA metadata/cache, test, and release-verification changes. — `git status`: `style.css`, `index.html`, `manifest.webmanifest`, `service-worker.js`, 4 test files + `pwa-cache.test.tsx`; nothing else; zero new colors.

@@ -3,6 +3,9 @@
 // ───────────────────────────────────────────────────────────────────
 
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+
+const STYLE = readFileSync('apps/pi-remote-web/src/style.css', 'utf8');
 
 // The exact Claude semantic values applied in style.css. This computes the real WCAG
 // 2.x contrast ratio for each meaningful foreground/background pair so the "meets WCAG
@@ -120,9 +123,24 @@ const EFFORT_SHEET_LIGHT: readonly Pair[] = [
   { name: 'muted on raised sheet', fg: '#6c6a65', bg: '#ffffff', min: NORMAL_TEXT },
   { name: 'AA text accent on raised sheet', fg: '#8a452f', bg: '#ffffff', min: NORMAL_TEXT },
   { name: 'AA text accent on selection', fg: '#8a452f', bg: '#f3e4de', min: NORMAL_TEXT },
-  { name: 'carbon on selection (promoted row copy)', fg: '#24221f', bg: '#f3e4de', min: NORMAL_TEXT },
-  { name: 'AA UI accent border on raised sheet', fg: '#b85f42', bg: '#ffffff', min: LARGE_OR_NON_TEXT },
-  { name: 'AA UI accent border on selection', fg: '#b85f42', bg: '#f3e4de', min: LARGE_OR_NON_TEXT },
+  {
+    name: 'carbon on selection (promoted row copy)',
+    fg: '#24221f',
+    bg: '#f3e4de',
+    min: NORMAL_TEXT,
+  },
+  {
+    name: 'AA UI accent border on raised sheet',
+    fg: '#b85f42',
+    bg: '#ffffff',
+    min: LARGE_OR_NON_TEXT,
+  },
+  {
+    name: 'AA UI accent border on selection',
+    fg: '#b85f42',
+    bg: '#f3e4de',
+    min: LARGE_OR_NON_TEXT,
+  },
   { name: 'AA focus ring on raised sheet', fg: '#b85f42', bg: '#ffffff', min: LARGE_OR_NON_TEXT },
 ];
 
@@ -132,7 +150,12 @@ const EFFORT_SHEET_DARK: readonly Pair[] = [
   { name: 'muted on selection', fg: '#9f998f', bg: '#3a2720', min: NORMAL_TEXT },
   { name: 'accent text on raised sheet', fg: '#f0b19a', bg: '#2d2a26', min: NORMAL_TEXT },
   { name: 'accent on selection', fg: '#f0b19a', bg: '#3a2720', min: NORMAL_TEXT },
-  { name: 'accent focus ring on raised sheet', fg: '#f0b19a', bg: '#2d2a26', min: LARGE_OR_NON_TEXT },
+  {
+    name: 'accent focus ring on raised sheet',
+    fg: '#f0b19a',
+    bg: '#2d2a26',
+    min: LARGE_OR_NON_TEXT,
+  },
 ];
 
 describe('frozen effort-sheet palette meets WCAG contrast', () => {
@@ -149,5 +172,41 @@ describe('frozen effort-sheet palette meets WCAG contrast', () => {
 
   it('raw clay fails 3:1 against bone, so it can never be the sole indicator', () => {
     expect(contrast('#d97757', '#f8f8f6')).toBeLessThan(LARGE_OR_NON_TEXT);
+  });
+});
+
+describe('plan-mode hardening style contract', () => {
+  it('keeps the required narrow-width layout and target-size rules in CSS', () => {
+    expect(STYLE).toMatch(/min-width: 320px/u);
+    expect(STYLE).toMatch(/@media \(max-width: 27rem\)/u);
+    expect(STYLE).toMatch(
+      /\.composer-plus,[\s\S]*?\.composer-primary,[\s\S]*?min-inline-size: 44px;[\s\S]*?min-block-size: 44px;/u,
+    );
+    expect(STYLE).toMatch(/\.plan-ready-review,[\s\S]*?min-block-size: 44px;/u);
+  });
+
+  it('uses carbon-contrast boundaries and never raw clay as a plan focus ring', () => {
+    expect(STYLE).toMatch(
+      /\.plan-mode-button\.is-plan \{[\s\S]*?border-color: var\(--line-strong\);[\s\S]*?color: var\(--accent-ink\);/u,
+    );
+    expect(STYLE).toMatch(
+      /\.composer-tray\.is-plan-mode \{[\s\S]*?border-color: var\(--line-strong\);/u,
+    );
+    const focusRule = STYLE.match(/\.plan-mode-button\[data-focus-visible\]\s*\{[^}]*\}/u)?.[0];
+    expect(focusRule).toContain('outline: 2px solid var(--focus);');
+    expect(focusRule).not.toContain('var(--accent)');
+  });
+
+  it('isolates prose direction and LTR revision values', () => {
+    expect(STYLE).toMatch(/\[dir='auto'\][\s\S]*?unicode-bidi: plaintext;/u);
+    expect(STYLE).toMatch(
+      /\.plan-review-revision,[\s\S]*?direction: ltr;[\s\S]*?unicode-bidi: isolate;/u,
+    );
+  });
+
+  it('removes positional and continuous motion under reduced motion', () => {
+    expect(STYLE).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?animation: none !important;[\s\S]*?transition: none !important;[\s\S]*?transform: none !important;/u,
+    );
   });
 });

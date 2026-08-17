@@ -200,6 +200,7 @@ it('opts the installed PWA viewport into safe-area coverage', () => {
   expect(html).toMatch(
     /<meta name="viewport" content="width=device-width, initial-scale=1\.0, viewport-fit=cover" \/>/u,
   );
+  expect(html).toMatch(/<html lang="en" dir="auto" data-theme="system">/u);
 });
 
 it('renders every projected transcript block kind', () => {
@@ -740,7 +741,9 @@ it('the inline panel and the + browser are mutually exclusive', async () => {
   await screen.findByRole('listbox', { name: 'Available host commands' });
   await user.click(screen.getByRole('button', { name: 'Mode and commands' }));
   await waitFor(() =>
-    expect(screen.queryByRole('listbox', { name: 'Available host commands' })).not.toBeInTheDocument(),
+    expect(
+      screen.queryByRole('listbox', { name: 'Available host commands' }),
+    ).not.toBeInTheDocument(),
   );
   expect(screen.getByRole('combobox', { name: 'Insert a command' })).toBeInTheDocument();
 
@@ -755,7 +758,9 @@ it('the inline panel and the + browser are mutually exclusive', async () => {
   await waitFor(() =>
     expect(screen.queryByRole('combobox', { name: 'Insert a command' })).not.toBeInTheDocument(),
   );
-  expect(await screen.findByRole('listbox', { name: 'Available host commands' })).toBeInTheDocument();
+  expect(
+    await screen.findByRole('listbox', { name: 'Available host commands' }),
+  ).toBeInTheDocument();
 });
 
 it('reconciles runtime state when the session returns to the foreground', async () => {

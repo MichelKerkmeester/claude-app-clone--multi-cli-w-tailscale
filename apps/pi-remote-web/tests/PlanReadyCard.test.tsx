@@ -58,4 +58,22 @@ describe('PlanReadyCard', () => {
     expect(screen.getByRole('button', { name: 'Waiting for live confirmation' })).toBeDisabled();
     expect(screen.queryByText(/token_plan_binding/)).not.toBeInTheDocument();
   });
+
+  it('keeps direction-sensitive values isolated and does not move existing focus when ready arrives', () => {
+    const focusTarget = document.createElement('button');
+    focusTarget.type = 'button';
+    focusTarget.textContent = 'Focus target';
+    document.body.append(focusTarget);
+    focusTarget.focus();
+    const { rerender } = render(
+      <PlanReadyCard artifact={null} isLive={false} onReview={vi.fn()} />,
+    );
+
+    rerender(<PlanReadyCard artifact={ARTIFACT} isLive onReview={vi.fn()} />);
+
+    expect(screen.getByText('A redacted implementation outline.')).toHaveAttribute('dir', 'auto');
+    expect(screen.getByText('4')).toHaveAttribute('dir', 'ltr');
+    expect(focusTarget).toHaveFocus();
+    focusTarget.remove();
+  });
 });

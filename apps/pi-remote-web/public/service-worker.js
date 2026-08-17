@@ -2,8 +2,9 @@
 // MODULE: Pi Remote PWA Service Worker
 // ───────────────────────────────────────────────────────────────────
 
-const CACHE_NAME = 'pi-remote-shell-v2';
+const CACHE_NAME = 'pi-remote-shell-v3';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
+const SHELL_PATHS = new Set(SHELL);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL)));
@@ -25,14 +26,16 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-  if (url.pathname.startsWith('/api/') || url.pathname === '/health') return;
+  if (url.origin !== self.location.origin) return;
 
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
+      fetchWithoutBrowserCache(request)
         .then((response) => {
-          const copy = response.clone();
-          void caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', copy));
+          if (response.ok) {
+            const copy = response.clone();
+            void caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', copy));
+          }
           return response;
         })
         .catch(() => caches.match('/index.html')),
@@ -40,20 +43,37 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  if (!isShellRequest(url)) {
+    event.respondWith(fetchWithoutBrowserCache(request));
+    return;
+  }
+
   event.respondWith(
-    caches.match(request).then(
+    caches.match(url.pathname).then(
       (cached) =>
         cached ??
-        fetch(request).then((response) => {
-          if (url.origin === self.location.origin) {
+        fetchWithoutBrowserCache(request).then((response) => {
+          if (response.ok) {
             const copy = response.clone();
-            void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            void caches.open(CACHE_NAME).then((cache) => cache.put(url.pathname, copy));
           }
           return response;
         }),
     ),
   );
 });
+
+function isShellRequest(url) {
+  return (
+    SHELL_PATHS.has(url.pathname) ||
+    url.pathname.startsWith('/assets/') ||
+    url.pathname.startsWith('/fonts/')
+  );
+}
+
+function fetchWithoutBrowserCache(request) {
+  return fetch(new Request(request, { cache: 'no-store' }));
+}
 
 self.addEventListener('push', (event) => {
   event.waitUntil(

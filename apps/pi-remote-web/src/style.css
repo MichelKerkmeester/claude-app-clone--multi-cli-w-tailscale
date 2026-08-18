@@ -24,6 +24,8 @@
   --font-mono: 'SFMono-Regular', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
   --radius-control: 0.625rem;
   --radius-panel: 0.875rem;
+  /* @ds edit: tokens — motion scale: the interface-settle expo-out easing read by sheets, trays and
+     raised overlays; part of the motion-scale family with the --duration-* / --ease-out pair in :root. */
   --ease-out-interface: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -104,6 +106,10 @@
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
+  /* @ds edit: tokens — motion scale: --duration-fast (quick affordance feedback — hover washes, pulse
+     settles) · --duration-state (state transitions — open/settle/swap) · --ease-out (the shared
+     expo-out settle). Buttons, pills, cards, sheets, overlays and live cues read these; the timings and
+     easings are frozen. The interface-settle easing --ease-out-interface is declared in @theme above. */
   --duration-fast: 120ms;
   --duration-state: 220ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -249,6 +255,10 @@ button {
   touch-action: manipulation;
 }
 
+/* @ds surface: focus-ring — the shared AA focus ring every control shares; colour + offset, never
+   colour-only. */
+/* @ds guardrail: do-not-edit — the shared focus ring is an accessibility guarantee: a designer may
+   retune its look but never remove the visible outline/offset from a focusable control. */
 /* @ds state: focus-visible — canonical global focus ring every control shares. */
 button:focus-visible,
 textarea:focus-visible,
@@ -413,6 +423,14 @@ button[data-pressed]:not([data-disabled]) {
 }
 /* @ds end surface: theme-switcher */
 
+/* @ds surface: status — DOCUMENTED CONVENTION (no shared class): the status/badge families recur across
+   the connection status-pill, the runtime/mode glyphs, the artifact resource-status, the slash-panel
+   header states, and the file-preview availability — each rendered per-surface today. Physical
+   unification onto one shared badge class is a follow-up; the resolved rules here stay as-is. */
+/* @ds state: idle · loading · stalled · ready · empty · offline · stale · denied · expired · missing ·
+   error — the shared status-family vocabulary that each surface below maps onto its own classes. */
+/* @ds guardrail: do-not-edit — the per-surface STATE MACHINES and status-TEXT sources are off-limits to
+   a designer edit: presentation/style is editable here; the state logic and status copy are not. */
 /* @ds slot: status — connection-phase readout in the topbar. */
 /* @ds surface: status-pill — connection-phase status. */
 .status-pill {
@@ -700,6 +718,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 680;
 }
 
+/* @ds surface: status — per-session runtime glyph joining the shared vocabulary (idle · running). */
 /* @ds surface: session-state-icon — per-session status glyph. */
 /* @ds state: running */
 .state-running {
@@ -1365,6 +1384,8 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface-muted);
 }
 
+/* @ds surface: status — runtime/mode status glyph (idle · running via .agent-running), part of the
+   shared status vocabulary. */
 .agent-state-icon {
   color: var(--ink-muted);
 }
@@ -6241,6 +6262,8 @@ button[data-pressed]:not([data-disabled]) {
   background: transparent;
 }
 
+/* @ds surface: status — file-preview availability maps onto the shared families (ready · missing ·
+   denied · error/unsupported) via data-preview-state. */
 /* @ds surface: file-preview-card — read-only preview card reusing the artifact-card
    surface; states come from data-preview-state (ready · withheld · missing · denied · unsupported). */
 /* @ds surface: artifact-card — the in-transcript read-only card that opens the diff viewer. */
@@ -6510,6 +6533,9 @@ button[data-pressed]:not([data-disabled]) {
   outline-offset: 3px;
 }
 
+/* @ds surface: status — artifact resource-status; the exhaustive ArtifactResourceStatus state list
+   below maps onto the shared families (idle · loading · stalled · ready · empty · offline · stale ·
+   denied · expired · missing · error). */
 /* @ds surface: artifact-status — the polite status + assertive terminal-alert live regions. */
 /* @ds slot: status — the phase/status readout line. */
 /* @ds state: ArtifactResourceStatus — one exact state per value (idle · loading · stalled · ready ·
@@ -7110,6 +7136,9 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds edit: motion — system-wide reduced-motion primitive: animation/transition duration zeroed. */
+/* @ds guardrail: do-not-edit — reduced-motion duration/iteration zeroing is an accessibility
+   guarantee; never restore animation or transition duration. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -7197,6 +7226,8 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds end surface: slash-autocomplete */
 
+/* @ds surface: status — slash-panel header states map loading · ready..empty · ready..stale-offline ·
+   error..denied onto the shared families. */
 /* @ds slot: header — the panel's status / error / empty-catalog copy line. */
 /* @ds state: loading.initial · ready.emptyCatalog · ready.noMatches ·
    ready.staleOffline · session.running — copy-led panel states; the loading
@@ -7409,6 +7440,10 @@ body:has(.slash-panel) .scroll-to-latest {
 
 /* ── High-contrast preference: borders carry the hierarchy the palette
    otherwise implies with fill, using the frozen tokens unchanged. ─── */
+/* @ds edit: contrast — system-wide prefers-contrast primitive: borders carry the hierarchy the palette
+   otherwise implies with fill, using the frozen tokens unchanged. */
+/* @ds guardrail: do-not-edit — the high-contrast re-render is an accessibility guarantee; never drop
+   the border/outline carry for interactive and raised surfaces. */
 @media (prefers-contrast: more) {
   .composer-tray,
   .composer-plus,
@@ -7430,6 +7465,10 @@ body:has(.slash-panel) .scroll-to-latest {
 /* ── Forced-colors (Windows high contrast): the scoped slash palette and
    card surfaces yield to system colors so every interactive edge stays
    visible under the user's chosen scheme. ─────────────────────────── */
+/* @ds edit: contrast — system-wide forced-colors primitive: the scoped palettes yield to the user's
+   system scheme (Canvas / CanvasText / Highlight). */
+/* @ds guardrail: do-not-edit — forced-colors yield is an accessibility guarantee; never restore a
+   hard-coded surface/ink over the system scheme. */
 @media (forced-colors: active) {
   .composer-tray,
   .composer-plus,
@@ -7659,6 +7698,9 @@ select:focus-visible,
   }
 }
 
+/* @ds edit: motion — system-wide reduced-motion primitive: animation/transition/scroll zeroed. */
+/* @ds guardrail: do-not-edit — reduced-motion zeroing is an accessibility guarantee; never re-enable
+   motion for any element. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

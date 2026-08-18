@@ -47,10 +47,15 @@ export function EffortRadioGroup({
   onSelect,
 }: EffortRadioGroupProps) {
   return (
+    // @ds slot: effort-group
+    // @ds state: group aria-busy / pending-effort — set while a request is in flight.
+    // @ds guardrail: do-not-edit — react-aria RadioGroup wiring: aria-labelledby,
+    // aria-describedby, data-pending, and isReadOnly while pending.
     <RadioGroup
       aria-labelledby={labelledBy}
       {...(describedBy === undefined ? {} : { 'aria-describedby': describedBy })}
       ref={(element) => {
+        // @ds guardrail: do-not-edit — aria-busy mirrors an in-flight request.
         // The group's own aria-busy state: pending rows are read-only but
         // the group stays focusable, so busy marks the in-flight window.
         if (element === null) return;
@@ -63,6 +68,8 @@ export function EffortRadioGroup({
       isDisabled={isDisabled}
       isReadOnly={isPending}
       onChange={(level) => {
+        // @ds guardrail: do-not-edit — a row selection here is the only request path,
+        // never a commit; the read-only guard keeps a stale event from firing.
         // Read-only event guards: pending or disabled input is ignored even
         // if a stale event slips past the group's own read-only state.
         if (isPending || isDisabled) return;
@@ -105,6 +112,10 @@ function EffortRadioRow({
   const description = effortRowDescription(level);
   const descriptionId = `effort-row-description-${ordinal}`;
   return (
+    // @ds slot: effort-group row
+    // @ds state: effort-confirmed (✓) / effort-requested (spinner)
+    // @ds guardrail: do-not-edit — react-aria Radio wiring: aria-label, aria-describedby,
+    // roving focus, and the 44px target.
     <Radio
       value={level}
       className={`effort-radio-row${isRequested ? ' is-requested' : ''}`}

@@ -366,10 +366,10 @@ describe('state fixtures and non-color indicators', () => {
   it('applies the frozen light and dark tokens to the sheet surface', () => {
     const css = readFileSync('apps/pi-remote-web/src/style.css', 'utf8');
     expect(css).toMatch(
-      /\.model-sheet-overlay \{[\s\S]*?--model-sheet-raised: #ffffff;[\s\S]*?--model-sheet-ink: #24221f;[\s\S]*?--model-sheet-ui-accent: #b85f42;/u,
+      /\.model-sheet-overlay \{[\s\S]*?--model-sheet-raised: var\(--surface\);[\s\S]*?--model-sheet-ink: var\(--ink\);[\s\S]*?--model-sheet-ui-accent: var\(--accent-strong\);/u,
     );
     expect(css).toMatch(
-      /:root\[data-theme='dark'\] \.model-sheet-overlay \{[\s\S]*?--model-sheet-raised: #2d2a26;[\s\S]*?--model-sheet-ink: #f8f8f6;[\s\S]*?--model-sheet-ui-accent: #f0b19a;/u,
+      /:root\[data-theme='dark'\] \.model-sheet-overlay \{[\s\S]*?--model-sheet-raised: var\(--surface\);[\s\S]*?--model-sheet-ink: var\(--ink\);[\s\S]*?--model-sheet-ui-accent: var\(--accent-ink\);/u,
     );
 
     const light = renderEffortSheet(readyRuntime());
@@ -484,9 +484,9 @@ describe('reduced motion removes transforms, springs, stagger, and spinners', ()
     expect(css).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?animation-duration: 0\.01ms !important;/u,
     );
-    expect(css).toMatch(/\.model-sheet-overlay \{[\s\S]*?--model-sheet-ink: #24221f;/u);
+    expect(css).toMatch(/\.model-sheet-overlay \{[\s\S]*?--model-sheet-ink: var\(--ink\);/u);
     expect(css).toMatch(
-      /:root\[data-theme='dark'\] \.model-sheet-overlay \{[\s\S]*?--model-sheet-ink: #f8f8f6;/u,
+      /:root\[data-theme='dark'\] \.model-sheet-overlay \{[\s\S]*?--model-sheet-ink: var\(--ink\);/u,
     );
   });
 });

@@ -131,19 +131,28 @@ The role tokens the app actually reads. Roles whose source is a primitive refere
 ## Component tokens (per-surface)
 
 Component tokens are **thin aliases to semantic roles**: a designer retints one surface here
-without touching the global roles. The existing sets stay literal because re-pointing must be
-pixel-identical in every theme first; they resolve to the semantic values documented above.
+without touching the global roles. Every component token resolves through the chain
+**primitive → semantic → component** — its value in a theme is exactly the semantic role it
+points at, so a surface follows global retints. The tables below record each token's resolved-to
+role; sets still carrying literals resolve to the same semantic value today and get re-pointed as
+they are migrated.
 
-### Model sheet (`--model-sheet-*`, surface `model-sheet`)
+### Model sheet (`--model-sheet-*`, surface `model-effort-sheet`)
 
-| Token                     | Light     | Dark      |
-| ------------------------- | --------- | --------- |
-| `--model-sheet-raised`    | `#ffffff` | `#2d2a26` |
-| `--model-sheet-ink`       | `#24221f` | `#f8f8f6` |
-| `--model-sheet-muted`     | `#6c6a65` | `#9f998f` |
-| `--model-sheet-accent`    | `#8a452f` | `#f0b19a` |
-| `--model-sheet-ui-accent` | `#b85f42` | `#f0b19a` |
-| `--model-sheet-selection` | `#f3e4de` | `#3a2720` |
+A component token is an alias to the semantic role in its row; the theme block decides which
+semantic value each role resolves to, so the resolved-to role is per theme. The `ui-accent` role
+diverges between themes: light uses `--accent-strong` (the AA UI accent), dark uses `--accent-ink`
+(because `--accent-strong` carries no dark override). Light and dark columns record the resolved
+value.
+
+| Token                     | Resolved to                 | Light     | Dark      |
+| ------------------------- | --------------------------- | --------- | --------- |
+| `--model-sheet-raised`    | `--surface`                 | `#ffffff` | `#2d2a26` |
+| `--model-sheet-ink`       | `--ink`                     | `#24221f` | `#f8f8f6` |
+| `--model-sheet-muted`     | `--ink-muted`               | `#6c6a65` | `#9f998f` |
+| `--model-sheet-accent`    | `--accent-ink`              | `#8a452f` | `#f0b19a` |
+| `--model-sheet-ui-accent` | `--accent-strong` / `--accent-ink` | `#b85f42` | `#f0b19a` |
+| `--model-sheet-selection` | `--accent-soft`             | `#f3e4de` | `#3a2720` |
 
 ### Slash panel (`--slash-*`, surface `slash-panel`)
 

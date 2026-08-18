@@ -4222,18 +4222,18 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds end surface: session-header */
-/* @ds surface: model-sheet — the model picker + effort sheet overlay. */
-/* The model catalog is host-authored, so the sheet contains and wraps every value. */
+/* @ds surface: model-effort-sheet — the model picker + effort sheet overlay. */
+/* The model catalog is host-authored; the sheet can only request a host-authorized change. */
 .model-sheet-overlay {
-  /* @ds edit: tokens — per-component palette. A component token is a thin alias that
-     resolves to a semantic role; these stay literal because re-pointing must be
-     pixel-identical in every theme first. Retint this surface here instead of :root. */
-  --model-sheet-raised: #ffffff;
-  --model-sheet-ink: #24221f;
-  --model-sheet-muted: #6c6a65;
-  --model-sheet-accent: #8a452f;
-  --model-sheet-ui-accent: #b85f42;
-  --model-sheet-selection: #f3e4de;
+  /* @ds edit: tokens — component tokens. Each is a thin alias to a semantic role,
+     so this surface retints by editing the role it points at (primitive → semantic
+     → component). Edit them here instead of on :root. */
+  --model-sheet-raised: var(--surface);
+  --model-sheet-ink: var(--ink);
+  --model-sheet-muted: var(--ink-muted);
+  --model-sheet-accent: var(--accent-ink);
+  --model-sheet-ui-accent: var(--accent-strong);
+  --model-sheet-selection: var(--accent-soft);
   position: fixed;
   z-index: 100;
   inset: 0;
@@ -4250,31 +4250,36 @@ button[data-pressed]:not([data-disabled]) {
   animation: model-sheet-backdrop-out 220ms ease-in;
 }
 
-/* @ds edit: tokens — theme remap, dark. This surface block remaps the model-sheet
-   component tokens onto the dark palette; the values are frozen and stay literal. */
+/* @ds edit: tokens — theme remap, dark. The same component tokens resolve to their
+   dark semantic roles here. The ui-accent points at --accent-ink, not --accent-strong,
+   because --accent-strong carries no dark override and would not match the dark
+   UI accent. */
 :root[data-theme='dark'] .model-sheet-overlay {
-  --model-sheet-raised: #2d2a26;
-  --model-sheet-ink: #f8f8f6;
-  --model-sheet-muted: #9f998f;
-  --model-sheet-accent: #f0b19a;
-  --model-sheet-ui-accent: #f0b19a;
-  --model-sheet-selection: #3a2720;
+  --model-sheet-raised: var(--surface);
+  --model-sheet-ink: var(--ink);
+  --model-sheet-muted: var(--ink-muted);
+  --model-sheet-accent: var(--accent-ink);
+  --model-sheet-ui-accent: var(--accent-ink);
+  --model-sheet-selection: var(--accent-soft);
 }
 
 @media (prefers-color-scheme: dark) {
-  /* @ds edit: tokens — theme remap, system-dark. Same model-sheet remap, frozen literals. */
+  /* @ds edit: tokens — theme remap, system-dark. Dark semantic roles again, driven
+     by the OS-dark signal; ui-accent resolves to --accent-ink for the same reason
+     as the explicit dark block. */
   :root[data-theme='system'] .model-sheet-overlay {
-    --model-sheet-raised: #2d2a26;
-    --model-sheet-ink: #f8f8f6;
-    --model-sheet-muted: #9f998f;
-    --model-sheet-accent: #f0b19a;
-    --model-sheet-ui-accent: #f0b19a;
-    --model-sheet-selection: #3a2720;
+    --model-sheet-raised: var(--surface);
+    --model-sheet-ink: var(--ink);
+    --model-sheet-muted: var(--ink-muted);
+    --model-sheet-accent: var(--accent-ink);
+    --model-sheet-ui-accent: var(--accent-ink);
+    --model-sheet-selection: var(--accent-soft);
   }
 }
 
-/* @ds end surface: model-sheet */
+/* @ds end surface: model-effort-sheet */
 
+/* @ds edit: layout — sheet stacking, sizing, and the live drag-offset pull. */
 .model-sheet-modal {
   inline-size: min(92vw, 24rem);
   max-inline-size: 100vw;
@@ -4287,11 +4292,13 @@ button[data-pressed]:not([data-disabled]) {
   animation: model-sheet-in 280ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+/* @ds state: dragging — free drag while a swipe is in flight. */
 .model-sheet-modal.is-dragging {
   animation: none;
   transition: none;
 }
 
+/* @ds state: snapping — settle back to rest after a swipe. */
 .model-sheet-modal.is-snapping {
   transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
 }
@@ -4300,6 +4307,8 @@ button[data-pressed]:not([data-disabled]) {
   animation: model-sheet-out 220ms ease-in;
 }
 
+/* @ds edit: layout — sheet body column with symmetric block-end and intentionally
+   asymmetric inline safe-area insets (left/right preserved). */
 .model-sheet-dialog {
   display: flex;
   min-inline-size: 0;
@@ -4316,6 +4325,7 @@ button[data-pressed]:not([data-disabled]) {
   display: contents;
 }
 
+/* @ds slot: drag-handle — grabber + swipe surface. */
 .model-sheet-drag-region {
   flex: 0 0 auto;
   cursor: grab;
@@ -4338,6 +4348,7 @@ button[data-pressed]:not([data-disabled]) {
   opacity: 0.65;
 }
 
+/* @ds slot: header */
 .model-sheet-header {
   display: flex;
   align-items: center;
@@ -4375,6 +4386,8 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--model-sheet-selection);
 }
 
+/* @ds slot: status-lines — policy, catalog state, mutation, and empty copy. */
+/* @ds state: model-open — the model picker panel. */
 .model-sheet-policy,
 .model-sheet-catalog-state,
 .model-sheet-mutation,
@@ -4392,6 +4405,7 @@ button[data-pressed]:not([data-disabled]) {
   padding-inline: var(--space-4);
 }
 
+/* @ds state: terminal-blocked — streaming or delivery barrier seam. */
 .model-sheet-policy,
 .model-sheet-mutation.is-barrier {
   border-block: 1px solid var(--model-sheet-ui-accent);
@@ -4409,6 +4423,8 @@ button[data-pressed]:not([data-disabled]) {
   text-underline-offset: 0.15em;
 }
 
+/* @ds slot: search — rendered only when the catalog reaches the search threshold. */
+/* @ds state: search-shown — the ≥8-model finder seam. */
 .model-sheet-search {
   display: grid;
   gap: 0.35rem;
@@ -4459,6 +4475,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 620;
 }
 
+/* @ds slot: model-list — catalog rows, on the model-open section. */
 .model-sheet-list {
   display: grid;
   min-inline-size: 0;
@@ -4529,6 +4546,7 @@ button[data-pressed]:not([data-disabled]) {
   outline-offset: 2px;
 }
 
+/* @ds state: read-only / disabled — model row not actionable. */
 .model-sheet-row[data-disabled] {
   cursor: default;
   opacity: 0.72;
@@ -4616,6 +4634,7 @@ button[data-pressed]:not([data-disabled]) {
   min-block-size: 2.5rem;
 }
 
+/* @ds slot: footer */
 .model-sheet-footer {
   display: grid;
   flex: 0 0 auto;
@@ -4648,6 +4667,8 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--model-sheet-raised);
 }
 
+/* @ds state: committing / disabled — model & effort actions locked while a request
+   is in flight or change authority is blocked. */
 .model-sheet-switch[data-disabled],
 .model-sheet-cancel[data-disabled],
 .model-sheet-close[data-disabled] {
@@ -4738,6 +4759,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* ── Effort section: one full-width radio row per host-advertised level ── */
+/* @ds state: effort-open — the sheet draws its effort section. */
 .effort-sheet-section {
   display: flex;
   min-inline-size: 0;
@@ -4746,6 +4768,7 @@ button[data-pressed]:not([data-disabled]) {
   flex-direction: column;
 }
 
+/* @ds state: pending-effort — the status line reporting the in-flight effort request. */
 .effort-sheet-status {
   flex: 0 0 auto;
   margin: 0;
@@ -4782,6 +4805,9 @@ button[data-pressed]:not([data-disabled]) {
   padding-inline: var(--space-3);
 }
 
+/* @ds slot: effort-group — the controlled list of effort radio rows. */
+/* @ds state: group aria-busy — while a set-thinking-level mutation is in flight the
+   group is read-only (still focusable) and marked busy. */
 .effort-radio-group {
   display: grid;
   min-inline-size: 0;
@@ -4822,6 +4848,7 @@ button[data-pressed]:not([data-disabled]) {
   outline-offset: 2px;
 }
 
+/* @ds state: read-only / disabled — effort row not actionable. */
 .effort-radio-row[data-disabled] {
   cursor: default;
   opacity: 0.72;
@@ -4853,6 +4880,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 700;
 }
 
+/* @ds state: effort-confirmed — ✓ on the settled row. */
 .effort-state-confirmed {
   display: inline-flex;
   align-items: center;
@@ -4861,6 +4889,8 @@ button[data-pressed]:not([data-disabled]) {
   animation: effort-check-in 120ms ease-out;
 }
 
+/* @ds state: effort-requested — in-flight application spinner; also the visual for
+   the group's pending-effort / aria-busy window. */
 .effort-state-requested {
   display: inline-flex;
   align-items: center;

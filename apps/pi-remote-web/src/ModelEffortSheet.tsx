@@ -225,6 +225,9 @@ export function ModelEffortSheet({
     onOpenChange(false);
     restoreTriggerFocus();
   };
+  // @ds slot: drag-handle — grabber + swipe surface.
+  // @ds guardrail: do-not-edit — swipe-dismiss gesture wiring; pairs with the
+  // react-aria modal drag choreography.
   const beginSwipe = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (isCommitting || event.button !== 0) return;
     if (
@@ -273,6 +276,7 @@ export function ModelEffortSheet({
     if (snapTimerRef.current !== null) window.clearTimeout(snapTimerRef.current);
     snapTimerRef.current = window.setTimeout(() => setIsSnapping(false), 220);
   };
+  // @ds guardrail: do-not-edit — sheet keyboard wiring (Escape and '/' shortcuts).
   const handleSheetKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape' && section === 'model' && query.length > 0 && !isCommitting) {
       event.preventDefault();
@@ -288,6 +292,8 @@ export function ModelEffortSheet({
       searchRef.current?.focus();
     }
   };
+  // @ds guardrail: do-not-edit — the model commit path. A row selection only stages a
+  // draft; commit is the single request to the host (setModel), guarded by canCommit.
   const commit = async () => {
     if (!canCommit || draft === null) return;
     setIsCommitting(true);
@@ -303,6 +309,8 @@ export function ModelEffortSheet({
     }
     handleOutcome(response, draft);
   };
+  // @ds guardrail: do-not-edit — outcome reconciliation: accepted / stale /
+  // policy_blocked / delivery-unknown map the host's authoritative answer.
   const handleOutcome = (response: RuntimeControlResponse, target: AvailableModelDto) => {
     switch (response.outcome.status) {
       case 'accepted':
@@ -336,6 +344,9 @@ export function ModelEffortSheet({
   // Any in-flight mutation makes the group read-only (focusable, inert);
   // only a missing ready authority or a phase that forbids mutation
   // disables the rows outright.
+  // @ds guardrail: do-not-edit — effort mutation gating. anyPending / groupDisabled
+  // decide whether a request may fire; requestEffort is the single request path
+  // (setThinkingLevel), one in-flight request at a time.
   const anyPending = runtime.phase === 'pending' && runtime.pending !== null;
   const isEffortPending = anyPending && runtime.pending?.type === 'set_thinking_level';
   const pendingEffortLevel = isEffortPending ? runtime.pending.level : null;
@@ -351,6 +362,7 @@ export function ModelEffortSheet({
     void setThinkingLevel(level);
   };
 
+  // @ds guardrail: do-not-edit — effort outcome declaration + revision tracking.
   // Effort outcomes announce exactly once through the single polite status
   // region: applying when the request goes in flight, then the bounded
   // accepted, stale, or failure copy when it settles. The ref marks the
@@ -385,6 +397,7 @@ export function ModelEffortSheet({
     }
   }, [isEffortPending, isOpen, levels, pendingEffortLevel, runtime.phase, runtime.state?.thinkingLevel]);
 
+  // @ds slot: model-list — catalog rows on the model-open section.
   const list = (
     <ModelList
       catalog={catalog}
@@ -402,6 +415,9 @@ export function ModelEffortSheet({
     />
   );
 
+  // @ds surface: model-effort-sheet — host-backed modal overlay.
+  // @ds guardrail: do-not-edit — react-aria Modal/ModalOverlay wiring (open, dismiss,
+  // isKeyboardDismissDisabled) and the polite live announcer.
   return (
     <>
       <span
@@ -440,6 +456,8 @@ export function ModelEffortSheet({
             className="model-sheet-dialog"
           >
             <div className="model-sheet-content" onKeyDownCapture={handleSheetKeyDown}>
+              {/* @ds slot: drag-handle — grabber + swipe region.
+                  @ds guardrail: do-not-edit — pointer swipe handlers. */}
               <div
                 className="model-sheet-drag-region"
                 data-testid="model-sheet-drag-region"
@@ -449,6 +467,7 @@ export function ModelEffortSheet({
                 onPointerCancel={(event) => endSwipe(event, false)}
               >
                 <div className="model-sheet-grabber" aria-hidden="true" />
+                {/* @ds slot: header */}
                 <header className="model-sheet-header">
                   <Heading id="model-effort-title" slot="title" className="model-sheet-title">
                     {section === 'model'
@@ -484,6 +503,8 @@ export function ModelEffortSheet({
                       ))}
                     </div>
                   ) : showSearch ? (
+                    // @ds slot: search — shown at the search threshold.
+                    // @ds guardrail: do-not-edit — Autocomplete/SearchField wiring.
                     <Autocomplete inputValue={query} onInputChange={setQuery} filter={() => true}>
                       <SearchField className="model-sheet-search">
                         <Label>{modelSwitcherStrings.searchLabel}</Label>
@@ -530,6 +551,7 @@ export function ModelEffortSheet({
                       <ChevronRightGlyph />
                     </Button>
                   </div>
+                  {/* @ds slot: footer */}
                   <footer className="model-sheet-footer">
                     <Button
                       className="model-sheet-cancel"
@@ -593,6 +615,9 @@ function EffortSection({
   const showReconcile = RECONCILE_PHASES.has(runtime.phase ?? 'checking');
 
   return (
+    // @ds slot: effort-group — the effort section of the sheet (effort-open).
+    // @ds state: group aria-busy / pending-effort — while a request is in flight.
+    // @ds guardrail: do-not-edit — effort radio group wiring.
     <section className="effort-sheet-section" aria-label={effortStrings.thinkingEffort}>
       {status !== null && (
         <p id="effort-sheet-status" className="effort-sheet-status">
@@ -783,6 +808,9 @@ function ModelRow({
     isApplying,
   });
   return (
+    // @ds slot: model-list row.
+    // @ds guardrail: do-not-edit — react-aria ListBoxItem wiring: aria-current,
+    // aria-busy, aria-describedby, roving focus, onAction/onKeyDown.
     <ListBoxItem
       ref={(element) => {
         if (isCurrent) element?.setAttribute('aria-current', 'true');

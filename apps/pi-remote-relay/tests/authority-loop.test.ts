@@ -20,6 +20,7 @@ import {
   type SetModeCommand,
 } from '@pi-remote/pi-rpc-protocol';
 import {
+  createAskQuestionAnswerAdapter,
   createFinalBoundaryHandler,
   createRelayLeaseAuthorizer,
 } from '../../../extensions/pi-remote-approval/src/index.js';
@@ -82,6 +83,43 @@ describe('live protected-mutation authority loop', () => {
     expect(args).not.toContain('--no-tools');
     expect(args.join(' ')).not.toContain('bash');
     expect(args.join(' ')).not.toContain('fetch');
+  });
+
+  it('rejects authority-bearing ask-question data and never enables full-access', async () => {
+    const args = mutationPiArguments('filesystem');
+    expect(args).not.toContain('--full-access');
+
+    const submitAnswer = vi.fn(async () => ({ status: 'accepted' as const }));
+    const adapter = createAskQuestionAnswerAdapter({
+      readCurrentPendingQuestion: vi.fn(async () => ({
+        sessionId: SESSION_ID,
+        questionId: 'question_authority_001',
+        revision: 1,
+        selectionMode: 'single',
+        display: {
+          prompt: 'Choose a safe operation.',
+          options: [{ id: 'option_authority_001', label: 'Continue' }],
+          freeText: { allowed: false, required: false },
+          minSelections: 1,
+          maxSelections: 1,
+        },
+        planMode: 'build',
+        fullAccess: true,
+      })),
+      submitAnswer,
+    });
+
+    await expect(
+      adapter({
+        sessionId: SESSION_ID,
+        questionId: 'question_authority_001',
+        expectedRevision: 1,
+        principal: PRINCIPAL,
+        answer: { optionIds: ['option_authority_001'] },
+        clientMutationId: 'mutation_authority_001',
+      }),
+    ).resolves.toEqual({ status: 'rejected', reason: 'question-withdrawn' });
+    expect(submitAnswer).not.toHaveBeenCalled();
   });
 
   it('requests, pushes, approves, consumes, and returns tool authority', async () => {

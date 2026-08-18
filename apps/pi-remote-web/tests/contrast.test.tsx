@@ -158,6 +158,30 @@ const EFFORT_SHEET_DARK: readonly Pair[] = [
   },
 ];
 
+const ASK_QUESTION_LIGHT: readonly Pair[] = [
+  { name: 'bone text on selected carbon row', fg: '#f8f8f6', bg: '#24221f', min: NORMAL_TEXT },
+  { name: 'carbon text on raised answer row', fg: '#24221f', bg: '#ffffff', min: NORMAL_TEXT },
+  {
+    name: 'clay focus ring on raised answer row',
+    fg: '#8a452f',
+    bg: '#ffffff',
+    min: LARGE_OR_NON_TEXT,
+  },
+  { name: 'clay error text on bone', fg: '#8a452f', bg: '#f8f8f6', min: NORMAL_TEXT },
+];
+
+const ASK_QUESTION_DARK: readonly Pair[] = [
+  { name: 'bone text on selected carbon row', fg: '#f8f8f6', bg: '#24221f', min: NORMAL_TEXT },
+  { name: 'bone text on raised answer row', fg: '#f8f8f6', bg: '#2d2a26', min: NORMAL_TEXT },
+  {
+    name: 'clay focus ring on raised answer row',
+    fg: '#f0b19a',
+    bg: '#2d2a26',
+    min: LARGE_OR_NON_TEXT,
+  },
+  { name: 'clay error text on dark parchment', fg: '#f0b19a', bg: '#24221f', min: NORMAL_TEXT },
+];
+
 describe('frozen effort-sheet palette meets WCAG contrast', () => {
   for (const pair of EFFORT_SHEET_LIGHT) {
     it(`light: ${pair.name} ≥ ${pair.min}:1`, () => {
@@ -172,6 +196,43 @@ describe('frozen effort-sheet palette meets WCAG contrast', () => {
 
   it('raw clay fails 3:1 against bone, so it can never be the sole indicator', () => {
     expect(contrast('#d97757', '#f8f8f6')).toBeLessThan(LARGE_OR_NON_TEXT);
+  });
+});
+
+describe('ask-question accessibility palette and state contract', () => {
+  for (const pair of ASK_QUESTION_LIGHT) {
+    it(`light: ${pair.name} >= ${pair.min}:1`, () => {
+      expect(contrast(pair.fg, pair.bg)).toBeGreaterThanOrEqual(pair.min);
+    });
+  }
+  for (const pair of ASK_QUESTION_DARK) {
+    it(`dark: ${pair.name} >= ${pair.min}:1`, () => {
+      expect(contrast(pair.fg, pair.bg)).toBeGreaterThanOrEqual(pair.min);
+    });
+  }
+
+  it('uses carbon selected rows, clay focus rings, and safe responsive primitives', () => {
+    expect(STYLE).toMatch(
+      /\.ask-question-option-row\[aria-pressed='true'\][\s\S]*?background: var\(--surface-code\);[\s\S]*?color: var\(--ink-inverse\);/u,
+    );
+    expect(STYLE).toMatch(
+      /\.ask-question-option-row:focus-visible,[\s\S]*?outline: 3px solid var\(--accent-ink\);[\s\S]*?box-shadow: 0 0 0 1px var\(--surface-raised\);/u,
+    );
+    expect(STYLE).toMatch(/\.ask-question-card[\s\S]*?max-inline-size: 100%;/u);
+    expect(STYLE).toMatch(/\.ask-question-free-text textarea[\s\S]*?scroll-margin-block:/u);
+    expect(STYLE).toMatch(/\.ask-question-option-row[\s\S]*?min-block-size: 44px;/u);
+    expect(STYLE).toMatch(/\.ask-question-submit[\s\S]*?min-block-size: 44px;/u);
+    expect(STYLE).not.toMatch(
+      /\.ask-question-option-row\[aria-pressed='true'\]\s*\{[^}]*background: var\(--accent\);/u,
+    );
+  });
+
+  it('removes ask-question progress motion without removing status text', () => {
+    expect(STYLE).toMatch(/\.ask-question-card-submitting::before[\s\S]*?animation:/u);
+    expect(STYLE).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.ask-question-card-submitting::before[\s\S]*?display: none;/u,
+    );
+    expect(STYLE).toMatch(/\.ask-question-status[\s\S]*?line-height: 1\.4;/u);
   });
 });
 

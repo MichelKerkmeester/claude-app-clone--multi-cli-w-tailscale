@@ -12,6 +12,7 @@ import {
   isTranscriptBlock,
   isRichTranscriptBlock,
   isPlanSnapshotDto,
+  type AskQuestionTranscriptMeta,
   type Envelope,
   type PiRpcEvent,
 } from '@pi-remote/pi-rpc-protocol';
@@ -196,6 +197,95 @@ describe('canonical redaction', () => {
       ]) {
         expect(durable).not.toContain(forbidden);
       }
+    } finally {
+      store.close();
+    }
+  });
+
+  it('rejects ask-question display at redaction and keeps metadata-only replay content-free', () => {
+    const displayPayload = {
+      type: 'session.ask-question.presented',
+      sessionId: 'session_local',
+      questionId: 'question_release_001',
+      activityId: 'activity_release_001',
+      revision: 3,
+      display: {
+        prompt: 'question-content-canary',
+        options: [{ id: 'option_release_001', label: 'option-content-canary' }],
+        freeText: {
+          allowed: true,
+          required: false,
+          placeholder: 'placeholder-content-canary',
+          maxLength: 80,
+        },
+      },
+      selectionMode: 'single',
+      answerCapability: {
+        scope: 'ask-question.answer',
+        ticketRef: 'ticket-content-canary',
+        boundRevision: 3,
+        expiresAt: '2099-01-01T00:00:10.000Z',
+      },
+      redaction: {
+        applied: true,
+        policyVersion: 1,
+        contentAvailability: 'available',
+        redactedFields: [],
+      },
+      requiresReadOnlyHint: true,
+    };
+    expect(() => redactEnvelope(envelopeWith(displayPayload as Envelope['payload']))).toThrow(
+      'authenticated volatile read',
+    );
+
+    const metadata: AskQuestionTranscriptMeta = {
+      id: 'block_release_question_001',
+      revision: 1,
+      seq: 1,
+      occurredAt: '2026-01-01T00:00:00.000Z',
+      kind: 'ask-question',
+      activityId: 'activity_release_001',
+      questionId: 'question_release_001',
+      sessionId: 'session_local',
+      presentedRevision: 3,
+      status: 'presented',
+    };
+    const store = new RelayStore();
+    try {
+      const sync = new SyncHub(store);
+      const messages: unknown[] = [];
+      sync.subscribe(
+        {
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: 'session_local',
+        },
+        (message) => messages.push(message),
+      );
+      sync.publish({
+        ...envelopeWith(metadata as unknown as Envelope['payload']),
+        kind: 'transcript.block',
+      });
+      const boundary = JSON.stringify({
+        page: store.getTranscriptPage({
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: 'session_local',
+        }),
+        messages,
+      });
+      for (const forbidden of [
+        'question-content-canary',
+        'option-content-canary',
+        'placeholder-content-canary',
+        'ticket-content-canary',
+        'answer-content-canary',
+        'digest-content-canary',
+      ]) {
+        expect(boundary).not.toContain(forbidden);
+      }
+      expect(boundary).toContain('question_release_001');
+      expect(boundary).toContain('presented');
     } finally {
       store.close();
     }

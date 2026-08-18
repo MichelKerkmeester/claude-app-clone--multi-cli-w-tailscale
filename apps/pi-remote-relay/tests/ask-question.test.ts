@@ -243,6 +243,55 @@ describe('host-owned ask-question mutation lane', () => {
       harness.store.close();
     }
   });
+
+  it('keeps a committed answer out of persisted, broadcast, push, and result boundaries', async () => {
+    const handoff = vi.fn(async () => ({ status: 'accepted' as const }));
+    const harness = createHarness(handoff);
+    try {
+      const answer: AskQuestionAnswer = {
+        optionIds: ['option_a'],
+        freeText: 'answer-content-canary',
+      };
+      const ticket = await issueTicket(harness, answer, 'mutation_boundary');
+      const result = await harness.service.commitAnswer(
+        SESSION,
+        answerRequest(ticket.ticket, answer, 'mutation_boundary'),
+        harness.auth,
+      );
+      expect(result).toMatchObject({ status: 'accepted' });
+
+      const boundary = JSON.stringify({
+        page: harness.store.getTranscriptPage({
+          hostId: IDENTITY.hostId,
+          workspaceRef: IDENTITY.workspaceRef,
+          sessionId: IDENTITY.sessionId,
+        }),
+        sync: harness.store.createSyncPlan({
+          hostId: IDENTITY.hostId,
+          workspaceRef: IDENTITY.workspaceRef,
+          sessionId: IDENTITY.sessionId,
+        }),
+        pushed: serializePushHint(createAttentionPayload('finished', 2)),
+        result,
+      });
+      for (const forbidden of [
+        'question-content-canary',
+        'label-content-canary',
+        'description-content-canary',
+        'placeholder-content-canary',
+        'answer-content-canary',
+        'ticket-content-canary',
+        'digest-content-canary',
+      ]) {
+        expect(boundary).not.toContain(forbidden);
+      }
+      expect(handoff).toHaveBeenCalledWith(
+        expect.objectContaining({ answer: { optionIds: ['option_a'], freeText: 'answer-content-canary' } }),
+      );
+    } finally {
+      harness.store.close();
+    }
+  });
 });
 
 function createHarness(

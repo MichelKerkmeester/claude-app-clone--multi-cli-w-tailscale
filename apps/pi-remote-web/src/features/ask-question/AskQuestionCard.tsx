@@ -1,5 +1,5 @@
 import type { AskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 
 import { fetchAskQuestionDisplay } from '../../relay.js';
 import { releaseAskQuestionEphemeral, setAskQuestionDisplay } from './askQuestionEphemeralStore.js';
@@ -14,6 +14,7 @@ import { AskQuestionOptionList } from './AskQuestionOptionList.js';
 import { AskQuestionPrompt } from './AskQuestionPrompt.js';
 import { AskQuestionStatus } from './AskQuestionStatus.js';
 import { AskQuestionSubmitButton } from './AskQuestionSubmitButton.js';
+import { useAskQuestionKeyboardNavigation } from './useAskQuestionKeyboardNavigation.js';
 import { useAskQuestionMutation } from './useAskQuestionMutation.js';
 import { useAskQuestionState } from './useAskQuestionState.js';
 
@@ -44,6 +45,51 @@ export function AskQuestionCard({
     viewModel,
     principal,
     onResult,
+  });
+
+  const labelId = useId();
+  const optionsLabelId = useId();
+  const statusId = useId();
+  const errorId = useId();
+  const lifecyclePhase = transcriptStatusToUiState(block.status);
+  const lifecycleLocks =
+    lifecyclePhase === 'submitting' || isAskQuestionTerminalState(lifecyclePhase);
+  const effectivePhase =
+    viewModel === null
+      ? lifecyclePhase
+      : lifecycleLocks
+        ? lifecyclePhase
+        : stateApi.state.phase;
+  const effectiveState =
+    effectivePhase === stateApi.state.phase
+      ? stateApi.state
+      : { ...stateApi.state, phase: effectivePhase };
+  const terminal = isAskQuestionTerminalState(effectivePhase);
+  const submitting = effectivePhase === 'submitting' || mutation.submitting;
+  const controlsDisabled = !canAnswer || submitting || terminal;
+  const validationVisible =
+    stateApi.validationMessage !== null &&
+    (effectivePhase === 'selecting' || effectivePhase === 'error');
+  const beginSubmit = stateApi.beginSubmit;
+  const submitMutation = mutation.submit;
+  const submitAnswer = useCallback(() => {
+    if (terminal || submitting) return;
+    const intent = beginSubmit();
+    if (intent !== null) void submitMutation(intent);
+  }, [beginSubmit, submitting, submitMutation, terminal]);
+  const cardRef = useAskQuestionKeyboardNavigation({
+    identity: `${block.questionId}:${block.presentedRevision}`,
+    enabled: viewModel !== null && canAnswer && !submitting && !terminal,
+    terminal,
+    optionCount: viewModel?.display.options.length ?? 0,
+    hasFreeText: viewModel?.display.freeText.allowed ?? false,
+    freeTextRequired: viewModel?.display.freeText.required ?? false,
+    labelId,
+    optionsLabelId,
+    statusId,
+    errorId,
+    errorVisible: validationVisible,
+    submit: submitAnswer,
   });
 
   useEffect(() => {
@@ -95,33 +141,32 @@ export function AskQuestionCard({
 
   if (viewModel === null) {
     return (
-      <article className="ask-question-card ask-question-card-loading" data-ask-question-card>
+      <article
+        ref={cardRef}
+        className="ask-question-card ask-question-card-loading"
+        data-ask-question-card
+        role="status"
+        aria-live="polite"
+        aria-label="Loading question"
+        tabIndex={-1}
+      >
         <span className="sr-only">Loading question</span>
       </article>
     );
   }
 
-  const lifecyclePhase = transcriptStatusToUiState(block.status);
-  const lifecycleLocks =
-    lifecyclePhase === 'submitting' || isAskQuestionTerminalState(lifecyclePhase);
-  const effectivePhase = lifecycleLocks ? lifecyclePhase : stateApi.state.phase;
-  const effectiveState =
-    effectivePhase === stateApi.state.phase
-      ? stateApi.state
-      : { ...stateApi.state, phase: effectivePhase };
-  const terminal = isAskQuestionTerminalState(effectivePhase);
-  const submitting = effectivePhase === 'submitting' || mutation.submitting;
-  const controlsDisabled =
-    !canAnswer || submitting || terminal;
-  const validationVisible =
-    stateApi.validationMessage !== null &&
-    (effectivePhase === 'selecting' || effectivePhase === 'error');
-
   return (
     <article
+      ref={cardRef}
       className={`ask-question-card ask-question-card-${effectivePhase}`}
       data-ask-question-card
+      data-ask-question-phase={effectivePhase}
+      role="region"
+      aria-label="Ask question"
+      aria-labelledby={labelId}
+      aria-describedby={statusId}
       aria-busy={submitting}
+      tabIndex={-1}
     >
       <AskQuestionPrompt viewModel={viewModel} />
       {viewModel.requiresReadOnlyHint && (
@@ -132,13 +177,17 @@ export function AskQuestionCard({
       {!terminal && (
         <form
           className="ask-question-form"
+          aria-describedby={statusId}
           onSubmit={(event) => {
             event.preventDefault();
-            if (terminal || submitting) return;
-            const intent = stateApi.beginSubmit();
-            if (intent !== null) void mutation.submit(intent);
+            submitAnswer();
           }}
         >
+          {viewModel.display.options.length > 0 && (
+            <span id={optionsLabelId} className="sr-only">
+              Answer options
+            </span>
+          )}
           <AskQuestionOptionList
             viewModel={viewModel}
             selectedOptionIds={stateApi.state.selectedOptionIds}
@@ -153,7 +202,13 @@ export function AskQuestionCard({
             onChange={stateApi.setFreeText}
           />
           {validationVisible && (
-            <p className="ask-question-validation" role="alert">
+            <p
+              id={errorId}
+              className="ask-question-validation"
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+            >
               {stateApi.validationMessage}
             </p>
           )}
@@ -164,7 +219,9 @@ export function AskQuestionCard({
       )}
       <AskQuestionStatus state={effectiveState} />
       {effectiveState.phase === 'answered-immutable' && effectiveState.errorReason === null && (
-        <p className="ask-question-answered-line">Answer accepted by Pi.</p>
+        <p className="ask-question-answered-line" aria-hidden="true">
+          Answer accepted by Pi.
+        </p>
       )}
       {!canAnswer && !terminal && (
         <p className="ask-question-read-only-hint">Reconnect before submitting an answer.</p>

@@ -12,7 +12,7 @@ import type {
   TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 import { readFileSync } from 'node:fs';
-import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
@@ -93,6 +93,7 @@ vi.mock('../src/attention.js', () => ({
 }));
 
 import { AttentionInbox, Home, Review, Session, TranscriptList } from '../src/App.js';
+import { AskQuestionCard } from '../src/features/ask-question/AskQuestionCard.js';
 import { EMPTY_TRANSCRIPT, transcriptReducer } from '../src/state.js';
 
 const occurredAt = '2026-08-13T10:00:00.000Z';
@@ -235,6 +236,34 @@ it('opts the installed PWA viewport into safe-area coverage', () => {
     /<meta name="viewport" content="width=device-width, initial-scale=1\.0, viewport-fit=cover" \/>/u,
   );
   expect(html).toMatch(/<html lang="en" dir="auto" data-theme="system">/u);
+});
+
+it('keeps fonts, manifest, service worker, and push notifications content-free', () => {
+  const fontAssets = JSON.parse(
+    readFileSync('apps/pi-remote-web/public/fonts/font-assets.json', 'utf8'),
+  ) as { readonly fonts: readonly { readonly family: string; readonly role: string }[] };
+  expect(fontAssets.fonts).toEqual([
+    expect.objectContaining({ family: 'Source Serif 4', role: 'display' }),
+    expect.objectContaining({ family: 'Inter', role: 'ui' }),
+  ]);
+  expect(fontAssets.fonts).toHaveLength(2);
+
+  const manifest = readFileSync('apps/pi-remote-web/public/manifest.webmanifest', 'utf8');
+  expect(manifest).toContain('content-free attention hints');
+  for (const forbidden of ['question-content-canary', 'answer-content-canary', 'ticket_', 'digest']) {
+    expect(manifest).not.toContain(forbidden);
+  }
+
+  const serviceWorker = readFileSync('apps/pi-remote-web/public/service-worker.js', 'utf8');
+  expect(serviceWorker).toContain("const CACHE_NAME = 'pi-remote-shell-v5';");
+  expect(serviceWorker).toContain("if (request.mode === 'navigate')");
+  expect(serviceWorker).toContain("cache.put('/index.html', copy)");
+  expect(serviceWorker).toContain("cache: 'no-store'");
+  expect(serviceWorker).toContain("data: { lookupId: hint.lookupId }");
+  expect(serviceWorker).not.toMatch(
+    /ask-question|question-content-canary|answer-content-canary|ticket|digest/iu,
+  );
+  expect(serviceWorker).not.toMatch(/hint\.(prompt|options|answer|ticket|digest)/u);
 });
 
 it('renders every projected transcript block kind', () => {
@@ -390,6 +419,178 @@ it('renders a hydrated ask-question block once at its transcript position throug
     question.presentedRevision,
     expect.any(AbortSignal),
   );
+});
+
+it('exposes safe ask-question semantics and follows the card-local answer-stop sequence', async () => {
+  const user = userEvent.setup();
+  const navigationDisplay: AskQuestionDisplayDto = {
+    ...askQuestionDisplay,
+    display: {
+      ...askQuestionDisplay.display,
+      options: [
+        { id: 'option_web_tests', label: 'Run focused tests', description: 'Fast local confidence.' },
+        { id: 'option_web_review', label: 'Run the review lane', description: 'Check the release boundary.' },
+      ],
+      minSelections: 1,
+      maxSelections: 2,
+    },
+    selectionMode: 'multiple',
+  };
+  relay.fetchAskQuestionDisplay.mockResolvedValue(navigationDisplay);
+  const question = block<AskQuestionTranscriptMeta>({
+    id: 'block_access_question_001',
+    kind: 'ask-question',
+    activityId: navigationDisplay.activityId,
+    questionId: navigationDisplay.questionId,
+    sessionId,
+    presentedRevision: navigationDisplay.revision,
+    status: 'presented',
+  });
+
+  render(<AskQuestionCard block={question} principal="operator@example.test" />);
+
+  const region = await screen.findByRole('region', { name: navigationDisplay.display.prompt });
+  const first = screen.getByRole('button', { name: 'Run focused tests' });
+  const second = screen.getByRole('button', { name: 'Run the review lane' });
+  const textarea = screen.getByPlaceholderText('Optional note');
+  expect(screen.getByRole('group', { name: 'Answer options' })).toBeInTheDocument();
+  expect(first).toHaveAttribute('aria-pressed', 'false');
+  expect(second).toHaveAttribute('aria-pressed', 'false');
+  expect(first).toHaveAttribute('aria-describedby');
+  expect(
+    document.getElementById(first.getAttribute('aria-describedby') ?? '')?.textContent,
+  ).toContain('Fast local confidence.');
+  expect(textarea).toHaveAttribute('aria-required', 'false');
+  expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+  expect(region).toHaveAttribute('aria-busy', 'false');
+
+  await waitFor(() => expect(first).toHaveAttribute('tabindex', '0'));
+  expect(second).toHaveAttribute('tabindex', '-1');
+  expect(document.activeElement).toBe(first);
+  await user.keyboard('{ArrowDown}');
+  expect(document.activeElement).toBe(second);
+  expect(second).toHaveAttribute('aria-pressed', 'false');
+  await user.keyboard('{Home}');
+  expect(document.activeElement).toBe(first);
+  await user.keyboard('{End}');
+  expect(document.activeElement).toBe(second);
+  await user.keyboard('{Tab}');
+  expect(document.activeElement).toBe(textarea);
+  await user.keyboard('{Shift>}{Tab}{/Shift}');
+  expect(document.activeElement).toBe(second);
+  await user.click(first);
+  expect(first).toHaveAttribute('aria-pressed', 'true');
+  expect(within(first).getByText('✓')).toBeInTheDocument();
+  expect(relay.requestTicket).not.toHaveBeenCalled();
+});
+
+it('preserves long translated order and safe error associations under RTL and large text', async () => {
+  const user = userEvent.setup();
+  const root = document.documentElement;
+  const previousDirection = root.getAttribute('dir');
+  const previousFontSize = root.style.fontSize;
+  root.setAttribute('dir', 'rtl');
+  root.style.fontSize = '200%';
+  const longDisplay: AskQuestionDisplayDto = {
+    ...askQuestionDisplay,
+    display: {
+      ...askQuestionDisplay.display,
+      prompt: 'Choose the answer that remains readable at large text sizes.',
+      options: [
+        {
+          id: 'option_long_001',
+          label:
+            'An exceptionally long translated answer label that must wrap naturally without being truncated',
+          description: 'Its description also remains available to assistive technology.',
+        },
+      ],
+      freeText: {
+        allowed: true,
+        required: true,
+        placeholder: 'Required response',
+        maxLength: 120,
+      },
+      minSelections: 1,
+      maxSelections: 1,
+    },
+    selectionMode: 'single',
+  };
+  relay.fetchAskQuestionDisplay.mockResolvedValue(longDisplay);
+  const question = block<AskQuestionTranscriptMeta>({
+    id: 'block_rtl_question_001',
+    kind: 'ask-question',
+    activityId: longDisplay.activityId,
+    questionId: longDisplay.questionId,
+    sessionId,
+    presentedRevision: longDisplay.revision,
+    status: 'presented',
+  });
+
+  try {
+    render(<AskQuestionCard block={question} principal="operator@example.test" />);
+    const region = await screen.findByRole('region', { name: longDisplay.display.prompt });
+    const option = screen.getByRole('button', {
+      name: longDisplay.display.options[0]?.label,
+    });
+    const textarea = screen.getByPlaceholderText('Required response');
+    expect(root).toHaveAttribute('dir', 'rtl');
+    expect(option.textContent).toContain(longDisplay.display.options[0]?.label);
+    expect(
+      [...region.querySelectorAll('.ask-question-option-row')].map((row) => row.textContent),
+    ).toEqual([expect.stringContaining('exceptionally long translated answer label')]);
+
+    await user.type(textarea, ' ');
+    const error = await screen.findByRole('alert');
+    expect(error).toHaveTextContent('Select at least one option.');
+    expect(textarea).toHaveAttribute('aria-errormessage', error.id);
+    expect(textarea.getAttribute('aria-describedby')).toContain(error.id);
+  } finally {
+    if (previousDirection === null) root.removeAttribute('dir');
+    else root.setAttribute('dir', previousDirection);
+    root.style.fontSize = previousFontSize;
+  }
+});
+
+it('does not steal unrelated focus, preserves IME entry, and focuses the safe terminal state', async () => {
+  const user = userEvent.setup();
+  const external = document.createElement('button');
+  external.type = 'button';
+  external.textContent = 'Transcript control';
+  document.body.append(external);
+  external.focus();
+  const question = block<AskQuestionTranscriptMeta>({
+    id: 'block_focus_question_001',
+    kind: 'ask-question',
+    activityId: askQuestionDisplay.activityId,
+    questionId: askQuestionDisplay.questionId,
+    sessionId,
+    presentedRevision: askQuestionDisplay.revision,
+    status: 'presented',
+  });
+
+  const { rerender } = render(
+    <AskQuestionCard block={question} principal="operator@example.test" />,
+  );
+  const textarea = await screen.findByPlaceholderText('Optional note');
+  expect(document.activeElement).toBe(external);
+
+  textarea.focus();
+  fireEvent.compositionStart(textarea);
+  fireEvent.keyDown(textarea, { key: 'Enter', code: 'Enter', isComposing: true });
+  fireEvent.compositionEnd(textarea);
+  await user.type(textarea, '日本語の回答');
+  expect(textarea).toHaveValue('日本語の回答');
+  expect(relay.requestTicket).not.toHaveBeenCalled();
+
+  const option = screen.getByRole('button', { name: 'Run focused tests' });
+  option.focus();
+  const expired = { ...question, status: 'expired' as const };
+  rerender(<AskQuestionCard block={expired} principal="operator@example.test" />);
+  const region = await screen.findByRole('region', { name: askQuestionDisplay.display.prompt });
+  await waitFor(() => expect(screen.getByText('This question is no longer available.')).toBeInTheDocument());
+  expect(region).toHaveAttribute('data-ask-question-phase', 'expired');
+  expect(document.activeElement).toBe(region);
+  external.remove();
 });
 
 it('submits the compose box through the relay command path', async () => {

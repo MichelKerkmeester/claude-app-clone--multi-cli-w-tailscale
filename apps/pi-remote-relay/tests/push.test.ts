@@ -53,6 +53,25 @@ describe('privacy-minimized push and Attention Inbox', () => {
     for (const value of forbidden) expect(bytes.includes(Buffer.from(value))).toBe(false);
   });
 
+  it('keeps ask-question display, answer, ticket, and digest fields out of push bytes', () => {
+    const payload = createAttentionPayload('needs_input', 7);
+    const serialized = serializePushHint(payload);
+    const decoded = JSON.parse(serialized) as Record<string, unknown>;
+    expect(Object.keys(decoded).sort()).toEqual(['attentionClass', 'lookupId']);
+    for (const forbidden of [
+      'prompt',
+      'options',
+      'option-content-canary',
+      'answer-content-canary',
+      'ticket-content-canary',
+      'digest-content-canary',
+      'revision',
+      'secret',
+    ]) {
+      expect(serialized).not.toContain(forbidden);
+    }
+  });
+
   it('enforces exactly the three attention classes and exact event shape', () => {
     expect(['needs_input', 'finished', 'error'].every(isAttentionClass)).toBe(true);
     expect(isAttentionClass('approval')).toBe(false);

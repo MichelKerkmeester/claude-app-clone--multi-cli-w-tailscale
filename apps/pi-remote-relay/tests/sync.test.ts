@@ -4,7 +4,12 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { isRichTranscriptBlock, type Envelope, type SyncMessage } from '@pi-remote/pi-rpc-protocol';
+import {
+  isRichTranscriptBlock,
+  type AskQuestionTranscriptMeta,
+  type Envelope,
+  type SyncMessage,
+} from '@pi-remote/pi-rpc-protocol';
 
 import { SyncHub } from '../src/replay/sync.js';
 import { RelayStore } from '../src/store/relay-store.js';
@@ -124,6 +129,64 @@ describe('sync barrier', () => {
       if (delta?.kind === 'sync.delta') {
         expect(isRichTranscriptBlock(delta.envelopes[0]?.payload)).toBe(true);
       }
+    } finally {
+      store.close();
+    }
+  });
+
+  it('syncs only ask-question metadata and rejects display, answer, ticket, and digest carriers', () => {
+    const store = new RelayStore();
+    try {
+      const hub = new SyncHub(store);
+      const messages: SyncMessage[] = [];
+      hub.subscribe(IDENTITY, (message) => messages.push(message));
+      const metadata: AskQuestionTranscriptMeta = {
+        id: 'block_sync_question_001',
+        revision: 1,
+        seq: 1,
+        occurredAt: '2026-01-01T00:00:01.000Z',
+        kind: 'ask-question',
+        activityId: 'activity_sync_question_001',
+        questionId: 'question_sync_001',
+        sessionId: IDENTITY.sessionId,
+        presentedRevision: 3,
+        status: 'presented',
+      };
+      hub.publishAskQuestionMetadata({
+        ...makeEnvelope(1),
+        kind: 'transcript.block',
+        payload: metadata,
+      });
+      const serialized = JSON.stringify(messages);
+      expect(serialized).toContain('question_sync_001');
+      for (const forbidden of [
+        'question-content-canary',
+        'answer-content-canary',
+        'ticket-content-canary',
+        'digest-content-canary',
+        'prompt',
+        'options',
+      ]) {
+        expect(serialized).not.toContain(forbidden);
+      }
+
+      const displayCarrier = {
+        ...makeEnvelope(2),
+        kind: 'transcript.block' as const,
+        payload: {
+          kind: 'ask-question',
+          display: {
+            prompt: 'question-content-canary',
+            options: [],
+          },
+          answer: 'answer-content-canary',
+          ticket: 'ticket-content-canary',
+          digest: 'digest-content-canary',
+        } as unknown as Envelope['payload'],
+      };
+      expect(() => hub.publish(displayCarrier)).toThrow(
+        'Relay refused ask-question display content before the persistence redaction boundary.',
+      );
     } finally {
       store.close();
     }

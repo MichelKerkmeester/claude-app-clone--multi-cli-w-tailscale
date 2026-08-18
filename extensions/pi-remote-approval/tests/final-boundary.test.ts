@@ -112,6 +112,32 @@ describe('Pi final-boundary fixture', () => {
     expect(submitAnswer).not.toHaveBeenCalled();
   });
 
+  it('re-validates the final pending-question shape and rejects plan or full-access fields', async () => {
+    const submitAnswer = vi.fn(async () => ({ status: 'accepted' }));
+    const readCurrentPendingQuestion = vi.fn(async () => ({
+      ...PENDING_QUESTION,
+      planMode: 'build',
+      fullAccess: true,
+    }));
+    const adapter = createAskQuestionAnswerAdapter({
+      readCurrentPendingQuestion,
+      submitAnswer,
+    });
+
+    await expect(
+      adapter({
+        sessionId: 'session_local',
+        questionId: 'question_local',
+        expectedRevision: 3,
+        principal: 'operator@example.com',
+        answer: { optionIds: ['option_a'] },
+        clientMutationId: 'mutation_authority_fields',
+      }),
+    ).resolves.toEqual({ status: 'rejected', reason: 'question-withdrawn' });
+    expect(readCurrentPendingQuestion).toHaveBeenCalledOnce();
+    expect(submitAnswer).not.toHaveBeenCalled();
+  });
+
   it('maps a lost callback acknowledgement to terminal delivery-unknown', async () => {
     const submitAnswer = vi.fn(async () => {
       throw new Error('callback transport unavailable');

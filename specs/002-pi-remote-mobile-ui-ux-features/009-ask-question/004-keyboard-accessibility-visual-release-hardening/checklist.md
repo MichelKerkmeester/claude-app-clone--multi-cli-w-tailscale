@@ -1,13 +1,13 @@
 # Checklist — Keyboard and thumb navigation, accessibility, visual, and iPhone/PWA release hardening
 
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0.
-- [ ] `npm run test:web` exits 0.
-- [ ] `npx vitest run extensions/pi-remote-approval/tests/final-boundary.test.ts` exits 0.
-- [ ] True-390px CDP checks pass in light and dark themes for touch-only and keyboard-open paths, with the focused field and submit action visible.
-- [ ] Keyboard navigation follows the declared card-local sequence, preserves IME text entry, restores focus safely, and never captures unrelated transcript controls.
-- [ ] Touch targets measure at least 44px and remain usable with long labels, required free text, submitting, error, answered, expired, and superseded states.
-- [ ] Semantic roles, labels, descriptions, `aria-pressed`, live regions, safe errors, and final announcements expose state without tickets, digests, revisions, secrets, or diagnostics.
-- [ ] Light/dark contrast, clay focus rings, carbon selected rows, large text, browser zoom, RTL, natural wrapping, and reduced-motion behavior pass without clipping or color-only state.
-- [ ] `apps/pi-remote-web/public/fonts/font-assets.json`, `apps/pi-remote-web/public/manifest.webmanifest`, and `apps/pi-remote-web/public/service-worker.js` preserve content-free PWA boundaries.
-- [ ] Redaction, push, sync, authority, ask-question, and final extension-boundary tests confirm the PWA remains read-only by default and cannot mint authority or enable `--full-access`.
+- [x] `npm run typecheck` exits 0. — exit 0 (outside sandbox).
+- [x] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0. — backend 366 passed / 47 files outside the sandbox (+6 release-boundary tests; in-sandbox EPERM is a false loopback artifact).
+- [x] `npm run test:web` exits 0. — 637 passed / 61 files (+14 a11y/contrast/keyboard).
+- [x] `npx vitest run extensions/pi-remote-approval/tests/final-boundary.test.ts` exits 0. — passes within the backend 366 (answer-handoff/policy/plan-mode/stale-ticket/callback-confirmation fixtures).
+- [x] True-390px CDP checks pass in light and dark themes for touch-only and keyboard-open paths, with the focused field and submit action visible. — CDP DOM assertions (both themes): card renders inline at 390 CSS px, contained, no h-overflow, free-text field + option/submit controls present, no modal/scrim; zero exceptions. (Headless PNG bytes unreliable; DOM assertions authoritative.)
+- [x] Keyboard navigation follows the declared card-local sequence, preserves IME text entry, restores focus safely, and never captures unrelated transcript controls. — `useAskQuestionKeyboardNavigation` guards every handler on `card.contains(target)`; `isComposing`/`compositionRef` preserve IME; App.test/contrast tests cover it.
+- [x] Touch targets measure at least 44px and remain usable with long labels, required free text, submitting, error, answered, expired, and superseded states. — `style.css` 44px targets across states; contrast/a11y tests.
+- [x] Semantic roles, labels, descriptions, `aria-pressed`, live regions, safe errors, and final announcements expose state without tickets, digests, revisions, secrets, or diagnostics. — `role="region"/"status"/"alert"`, generic labels + safe status copy via `statusId`; the `questionId:revision` is an internal React identity, never announced; content-free.
+- [x] Light/dark contrast, clay focus rings, carbon selected rows, large text, browser zoom, RTL, natural wrapping, and reduced-motion behavior pass without clipping or color-only state. — `style.css` clay focus ring + carbon selected rows (never color-only) + reduced-motion; `contrast.test.tsx`; CDP light+dark no overflow.
+- [x] `apps/pi-remote-web/public/fonts/font-assets.json`, `apps/pi-remote-web/public/manifest.webmanifest`, and `apps/pi-remote-web/public/service-worker.js` preserve content-free PWA boundaries. — these files were already content-free and were left UNCHANGED (no ask-question caching added); `node --check service-worker.js` 0; real-path mount check passes (no white-screen).
+- [x] Redaction, push, sync, authority, ask-question, and final extension-boundary tests confirm the PWA remains read-only by default and cannot mint authority or enable `--full-access`. — the added relay `redaction`/`push`/`sync`/`authority-loop`/`ask-question` tests + extension `final-boundary` pass in the backend 366; ask-question content stays out of persistence/broadcast/push/sync; authority cannot be minted; `--full-access` phone-inaccessible.

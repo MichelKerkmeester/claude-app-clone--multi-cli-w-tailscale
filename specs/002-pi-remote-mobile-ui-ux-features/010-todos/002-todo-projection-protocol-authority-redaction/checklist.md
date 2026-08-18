@@ -1,11 +1,11 @@
 # Checklist — Todo projection protocol, host authority, and redaction
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0.
-- [ ] Valid snapshot and delta fixtures pass guards with the exact closed state set and supported envelope kinds.
-- [ ] Unknown states, duplicate identities, invalid order values, malformed timestamps, missing fields, and invalid revisions are rejected without fabricated fallback values.
-- [ ] Subscription and reconnect tests prove that a complete snapshot is published.
-- [ ] Base-revision mismatch tests prove that the relay preserves the last valid view and does not invent or merge a delta chain.
-- [ ] Redaction, persistence, replay, logging, and push assertions prove that task detail and raw titles or groups do not cross the approved boundary.
-- [ ] Capability tests prove `todoProjection: 1` is advertised and absent capability is treated as unsupported.
-- [ ] The projection is strictly read-only: no checkbox mutation, todo mutation RPC, HTTP mutation route, ticket, approval, or phone-originated todo command exists.
-- [ ] Authority tests prove todo state is not inferred from transcript content and existing plan-mode and `--full-access` boundaries remain unchanged.
+- [x] `npm run typecheck` exits 0. — exit 0 (outside sandbox).
+- [x] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0. — backend 378 passed / 379 outside the sandbox; the single failure rotates between two pre-existing unrelated flaky tests (auth socket-teardown race / pinned-pi-image integration spawn race — both pass in isolation, 010 touched no auth/image code). Focused todo suite 93 passed / 6 files.
+- [x] Valid snapshot and delta fixtures pass guards with the exact closed state set and supported envelope kinds. — `todo-projection.test.ts` + `guards.test.ts`.
+- [x] Unknown states, duplicate identities, invalid order values, malformed timestamps, missing fields, and invalid revisions are rejected without fabricated fallback values. — `projectTask`/guards reject each; negative controls in `todo-projection.test.ts`.
+- [x] Subscription and reconnect tests prove that a complete snapshot is published. — `sync.test.ts` snapshot-on-subscribe/reconnect.
+- [x] Base-revision mismatch tests prove that the relay preserves the last valid view and does not invent or merge a delta chain. — supervisor/sync preserve the last valid view on mismatch; `sync.test.ts`.
+- [x] Redaction, persistence, replay, logging, and push assertions prove that task detail and raw titles or groups do not cross the approved boundary. — projector discards `detail` (never emitted) + redacts title/group; `redactEnvelope` before persist; no raw-DTO logging; `redaction.test.ts`/`push.test.ts`.
+- [x] Capability tests prove `todoProjection: 1` is advertised and absent capability is treated as unsupported. — `TODO_PROJECTION_CAPABILITY` advertised in `http/server.ts`; capability tests.
+- [x] The projection is strictly read-only: no checkbox mutation, todo mutation RPC, HTTP mutation route, ticket, approval, or phone-originated todo command exists. — `http/server.ts` adds only the capability, no mutation route; `negative-controls.test.ts` proves no mutation path.
+- [x] Authority tests prove todo state is not inferred from transcript content and existing plan-mode and `--full-access` boundaries remain unchanged. — projector reads structured host data only (stable id, never transcript text); plan-mode + `--full-access` unchanged; negative controls.

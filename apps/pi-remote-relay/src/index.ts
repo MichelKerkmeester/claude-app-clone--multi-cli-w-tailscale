@@ -25,6 +25,11 @@ import { RuntimeService } from './runtime/runtime-service.js';
 import { SessionCatalog } from './sessions/catalog.js';
 import { RelayStore } from './store/relay-store.js';
 import { getAllowlistedArtifactSnapshot } from './store/artifact-sanitizer.js';
+import {
+  isAuthoritativeTodoProjectionEvent,
+  TodoProjector,
+  type TodoProjectionUpdate,
+} from './store/todo-projector.js';
 import { TranscriptProjector } from './store/transcript-projector.js';
 
 const HOST_ID = 'host_local';
@@ -94,6 +99,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
         }
       : null;
   const transcriptProjector = new TranscriptProjector(store.artifactStore);
+  const todoProjector = new TodoProjector();
   catalog.register(SESSION_ID, 'idle', 0);
 
   const supervisor = new RpcSupervisor({
@@ -142,10 +148,16 @@ export async function runRelay(): Promise<() => Promise<void>> {
   supervisor.onLifecycle((event) => {
     if (event.reason === 'exit' || event.reason === 'restart' || event.reason === 'failed') {
       commands.invalidate();
+      todoProjector.reset();
       void attachmentReaper.onEpochChange(epoch);
     }
   });
+  supervisor.onTodoProjection((source) => {
+    const update = todoProjector.project(source);
+    if (update !== null) publishTodoProjection(store, syncHub, update, epoch);
+  });
   supervisor.onEvent((event) => {
+    if (isAuthoritativeTodoProjectionEvent(event)) return;
     publishPiEvent(store, syncHub, transcriptProjector, event, epoch);
     if (event.type === 'agent_start') {
       catalog.register(SESSION_ID, 'running', 0);
@@ -259,6 +271,7 @@ export function publishPiEvent(
   event: PiRpcEvent,
   epoch: string,
 ): void {
+  if (isAuthoritativeTodoProjectionEvent(event)) return;
   const identity = {
     hostId: HOST_ID,
     workspaceRef: WORKSPACE_REF,
@@ -303,6 +316,32 @@ export function publishPiEvent(
       payload: createAttentionPayload(attentionClass, envelope.seq),
     });
   }
+}
+
+export function publishTodoProjection(
+  store: RelayStore,
+  syncHub: SyncHub,
+  update: TodoProjectionUpdate,
+  epoch: string,
+  identity: {
+    readonly hostId: string;
+    readonly workspaceRef: string;
+    readonly sessionId: string;
+  } = { hostId: HOST_ID, workspaceRef: WORKSPACE_REF, sessionId: SESSION_ID },
+): void {
+  syncHub.publish({
+    v: 1,
+    eventId: `event_${randomUUID()}`,
+    kind: update.kind,
+    ...identity,
+    epoch,
+    seq: store.nextSequence(identity, epoch),
+    occurredAt: new Date().toISOString(),
+    causedBy: null,
+    payload: update.payload,
+    redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+    replay: { eligible: true, snapshotEligible: true },
+  });
 }
 
 function stripArtifactSnapshotSources(value: JsonValue): JsonValue {

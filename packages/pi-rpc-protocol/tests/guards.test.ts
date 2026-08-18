@@ -19,6 +19,7 @@ import {
   isAskQuestionDisplay,
   isAskQuestionPresentedEvent,
   isAskQuestionTranscriptMeta,
+  isApplicationSessionResponse,
   isAvailableModelDto,
   isCommandBindingDto,
   isCommandCatalogDto,
@@ -65,6 +66,13 @@ import {
   isSlashSubmitIssueCode,
   isSlashSubmitIssueResponse,
   isSyncMessage,
+  isTodoProjection,
+  isTodoProjectionCapabilityDto,
+  isTodoProjectionDeltaV1,
+  isTodoProjectionEnvelopeKind,
+  isTodoProjectionEnvelopePayload,
+  isTodoProjectionV1,
+  isTodoTaskProjectionV1,
   isTranscriptBlock,
   isTextArtifactBlock,
   isRedactedAttachmentBlock,
@@ -73,6 +81,8 @@ import {
   PLAN_VALIDITY_VALUES,
   RUNTIME_ISSUE_CODES,
   SLASH_SUBMIT_ISSUE_CODES,
+  TODO_PROJECTION_ENVELOPE_KINDS,
+  TODO_TASK_STATES,
   sha256,
 } from '../src/index.js';
 
@@ -161,6 +171,85 @@ describe('protocol guards', () => {
         epoch: 'epoch_001',
         coversThrough: 1,
         envelopes: [{ ...ENVELOPE, eventId: 'event_002', seq: 2 }],
+      }),
+    ).toBe(false);
+  });
+
+  it('validates the closed, metadata-only todo projection family', () => {
+    const task = {
+      id: 'task_001',
+      title: 'Redacted task title',
+      state: 'pending',
+      group: null,
+      order: 0,
+      revision: 1,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    } as const;
+    const snapshot = {
+      planId: 'plan_001',
+      source: 'pi',
+      revision: 1,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      tasks: [task],
+    } as const;
+    const delta = {
+      planId: 'plan_001',
+      baseRevision: 1,
+      revision: 2,
+      upsertedTasks: [{ ...task, state: 'active', revision: 2 }],
+      removedTaskIds: [],
+      updatedAt: '2026-01-01T00:00:01.000Z',
+    } as const;
+
+    expect(TODO_TASK_STATES).toEqual(['pending', 'active', 'done', 'blocked']);
+    expect(TODO_PROJECTION_ENVELOPE_KINDS).toEqual([
+      'todo.snapshot.v1',
+      'todo.delta.v1',
+    ]);
+    expect(isTodoTaskProjectionV1(task)).toBe(true);
+    expect(isTodoProjectionV1(snapshot)).toBe(true);
+    expect(isTodoProjectionDeltaV1(delta)).toBe(true);
+    expect(isTodoProjection(snapshot)).toBe(true);
+    expect(isTodoProjection(delta)).toBe(true);
+    expect(isTodoProjectionEnvelopeKind('todo.snapshot.v1')).toBe(true);
+    expect(isTodoProjectionEnvelopeKind('todo.complete')).toBe(false);
+    expect(isTodoProjectionEnvelopePayload('todo.snapshot.v1', snapshot)).toBe(true);
+    expect(isTodoProjectionEnvelopePayload('todo.delta.v1', delta)).toBe(true);
+
+    expect(isTodoProjectionV1({ ...snapshot, tasks: [{ ...task, state: 'unknown' }] })).toBe(false);
+    expect(
+      isTodoProjectionV1({ ...snapshot, tasks: [task, { ...task, title: 'duplicate' }] }),
+    ).toBe(false);
+    expect(isTodoTaskProjectionV1({ ...task, order: -1 })).toBe(false);
+    expect(isTodoTaskProjectionV1({ ...task, order: 1.5 })).toBe(false);
+    expect(isTodoTaskProjectionV1({ ...task, updatedAt: 'not-a-timestamp' })).toBe(false);
+    expect(isTodoProjectionV1({ ...snapshot, revision: 0 })).toBe(false);
+    expect(isTodoProjectionDeltaV1({ ...delta, revision: 1 })).toBe(false);
+    expect(
+      isTodoProjectionDeltaV1({ ...delta, removedTaskIds: ['task_001'] }),
+    ).toBe(false);
+    expect(isTodoProjectionV1({ ...snapshot, detail: 'discard-me' })).toBe(false);
+    expect(isTodoTaskProjectionV1({ ...task, detail: 'discard-me' })).toBe(false);
+  });
+
+  it('treats the todo capability as optional and fail-closed when malformed', () => {
+    const expiresAt = '2026-01-01T00:00:00.000Z';
+    expect(isTodoProjectionCapabilityDto({ todoProjection: 1 })).toBe(true);
+    expect(isTodoProjectionCapabilityDto({ todoProjection: 2 })).toBe(false);
+    expect(isTodoProjectionCapabilityDto({ todoProjection: 1, extra: true })).toBe(false);
+    expect(
+      isApplicationSessionResponse({
+        expiresAt,
+        mode: 'read-only',
+        capabilities: { todoProjection: 1 },
+      }),
+    ).toBe(true);
+    expect(isApplicationSessionResponse({ expiresAt, mode: 'read-only' })).toBe(true);
+    expect(
+      isApplicationSessionResponse({
+        expiresAt,
+        mode: 'read-only',
+        capabilities: { todoProjection: 2 },
       }),
     ).toBe(false);
   });

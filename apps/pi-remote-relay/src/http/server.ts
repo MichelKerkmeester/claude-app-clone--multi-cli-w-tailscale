@@ -25,6 +25,7 @@ import {
   isRuntimeControlCommand,
   isRuntimeModelTicketRequest,
   isRuntimeSnapshotDto,
+  TODO_PROJECTION_CAPABILITY,
   type EnrollmentRequest,
   type PlanControlResponse,
   type RuntimeIssueCode,
@@ -460,7 +461,11 @@ async function handleHttp(
     sendJson(
       response,
       201,
-      { expiresAt: session.expiresAt, mode: 'read-only' },
+      {
+        expiresAt: session.expiresAt,
+        mode: 'read-only',
+        capabilities: TODO_PROJECTION_CAPABILITY,
+      },
       {
         'set-cookie': sessionCookie(
           session.token,

@@ -16,6 +16,7 @@ import {
   PushService,
   createAttentionPayload,
   serializePushHint,
+  serializeTodoProjectionPushHint,
 } from '../src/push/push-service.js';
 import { SyncHub } from '../src/replay/sync.js';
 import { RelayStore } from '../src/store/relay-store.js';
@@ -69,6 +70,58 @@ describe('privacy-minimized push and Attention Inbox', () => {
       'secret',
     ]) {
       expect(serialized).not.toContain(forbidden);
+    }
+  });
+
+  it('wakes for a todo projection without sending projection content or persisting it', async () => {
+    const { store, service, sendNotification } = harness();
+    try {
+      service.subscribe('device_one', SUBSCRIPTION);
+      const envelope: Envelope = {
+        v: 1,
+        eventId: 'event_todo_push_001',
+        kind: 'todo.delta.v1',
+        hostId: 'host_local',
+        workspaceRef: 'workspace_default',
+        sessionId: 'session_local',
+        epoch: 'epoch_one',
+        seq: 1,
+        occurredAt: '2026-01-01T00:00:01.000Z',
+        causedBy: null,
+        payload: {
+          planId: 'plan_push_001',
+          baseRevision: 1,
+          revision: 2,
+          upsertedTasks: [
+            {
+              id: 'task_push_001',
+              title: 'Private /Users/push/title',
+              state: 'done',
+              group: 'push-group',
+              order: 0,
+              revision: 2,
+              updatedAt: null,
+            },
+          ],
+          removedTaskIds: [],
+          updatedAt: null,
+        },
+        redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+        replay: { eligible: true, snapshotEligible: true },
+      };
+      expect(await service.publish(envelope, { committed: true })).toBe(1);
+      const pushed = sendNotification.mock.calls.at(-1)?.[1];
+      expect(pushed).toBe(serializeTodoProjectionPushHint());
+      expect(pushed).not.toContain('Private');
+      expect(pushed).not.toContain('push-group');
+      expect(pushed).not.toContain('plan_push_001');
+      expect(
+        (store.databaseHandle().prepare('SELECT COUNT(*) AS count FROM attention_items').get() as {
+          count: number;
+        }).count,
+      ).toBe(0);
+    } finally {
+      store.close();
     }
   });
 

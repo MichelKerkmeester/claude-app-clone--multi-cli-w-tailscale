@@ -18,6 +18,9 @@ import type {
   RuntimeModelCatalogDto,
   RuntimeSnapshotDto,
   RuntimeStateDto,
+  TodoProjectionDeltaV1,
+  TodoProjectionV1,
+  TodoTaskProjectionV1,
 } from '@pi-remote/pi-rpc-protocol';
 import {
   isAskQuestionPresentedEvent,
@@ -29,6 +32,10 @@ import {
   isRuntimeModelCatalogDto,
   isRuntimeSnapshotDto,
   isRuntimeStateDto,
+  isTodoProjectionDeltaV1,
+  isTodoProjectionEnvelopeKind,
+  isTodoProjectionV1,
+  isTodoTaskProjectionV1,
 } from '@pi-remote/pi-rpc-protocol';
 
 import type { ParsedPlanArtifact } from '../runtime/plan-status.js';
@@ -86,7 +93,7 @@ export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TP
     throw new TypeError('Ask-question display content requires the authenticated volatile read.');
   }
   const state: RedactionState = { fieldsRedacted: 0, reasons: new Set<string>() };
-  let payload = redactPayload(envelope.payload, state);
+  let payload = redactPayloadForKind(envelope.payload, state, envelope.kind);
   const redaction: RedactionMetadata = {
     policyVersion: REDACTION_POLICY_VERSION,
     fieldsRedacted: state.fieldsRedacted,
@@ -180,6 +187,17 @@ function redactValue(value: JsonValue, state: RedactionState, key: string): Json
 }
 
 function redactPayload(value: JsonValue, state: RedactionState): JsonValue {
+  return redactPayloadForKind(value, state, null);
+}
+
+function redactPayloadForKind(
+  value: JsonValue,
+  state: RedactionState,
+  kind: string | null,
+): JsonValue {
+  if (kind !== null && isTodoProjectionEnvelopeKind(kind)) {
+    return redactTodoProjectionPayload(value, state, kind);
+  }
   if (isAttachmentPayload(value)) {
     const projected = allowlistRedactedAttachmentBlock(value);
     if (projected !== null) return projected;
@@ -187,6 +205,86 @@ function redactPayload(value: JsonValue, state: RedactionState): JsonValue {
     return null;
   }
   return redactValue(value, state, '');
+}
+
+function redactTodoProjectionPayload(
+  value: JsonValue,
+  state: RedactionState,
+  kind: 'todo.snapshot.v1' | 'todo.delta.v1',
+): TodoProjectionV1 | TodoProjectionDeltaV1 {
+  if (kind === 'todo.snapshot.v1') {
+    if (!isPlainObject(value) || !hasExactKeys(value, ['planId', 'source', 'revision', 'updatedAt', 'tasks'])) {
+      throw new TypeError('Relay refused a malformed todo snapshot projection.');
+    }
+    if (!Array.isArray(value.tasks)) {
+      throw new TypeError('Relay refused a malformed todo snapshot projection.');
+    }
+    const projected = {
+      planId: value.planId,
+      source: value.source,
+      revision: value.revision,
+      updatedAt: value.updatedAt,
+      tasks: value.tasks.map((task) => redactTodoTaskPayload(task as JsonValue, state)),
+    } as unknown as TodoProjectionV1;
+    if (!isTodoProjectionV1(projected)) {
+      throw new TypeError('Relay refused a malformed todo snapshot projection.');
+    }
+    return projected;
+  }
+
+  if (
+    !isPlainObject(value) ||
+    !hasExactKeys(value, [
+      'planId',
+      'baseRevision',
+      'revision',
+      'upsertedTasks',
+      'removedTaskIds',
+      'updatedAt',
+    ]) ||
+    !Array.isArray(value.upsertedTasks) ||
+    !Array.isArray(value.removedTaskIds)
+  ) {
+    throw new TypeError('Relay refused a malformed todo delta projection.');
+  }
+  const projected = {
+    planId: value.planId,
+    baseRevision: value.baseRevision,
+    revision: value.revision,
+    upsertedTasks: value.upsertedTasks.map((task) => redactTodoTaskPayload(task as JsonValue, state)),
+    removedTaskIds: value.removedTaskIds,
+    updatedAt: value.updatedAt,
+  } as unknown as TodoProjectionDeltaV1;
+  if (!isTodoProjectionDeltaV1(projected)) {
+    throw new TypeError('Relay refused a malformed todo delta projection.');
+  }
+  return projected;
+}
+
+function redactTodoTaskPayload(value: JsonValue, state: RedactionState): TodoTaskProjectionV1 {
+  if (
+    !isPlainObject(value) ||
+    !hasExactKeys(value, ['id', 'title', 'state', 'group', 'order', 'revision', 'updatedAt'])
+  ) {
+    throw new TypeError('Relay refused a malformed todo task projection.');
+  }
+  const projected = {
+    id: value.id,
+    title: redactValue(value.title as JsonValue, state, 'title'),
+    state: value.state,
+    group: value.group === null ? null : redactValue(value.group as JsonValue, state, 'group'),
+    order: value.order,
+    revision: value.revision,
+    updatedAt: value.updatedAt,
+  } as unknown as TodoTaskProjectionV1;
+  if (!isTodoTaskProjectionV1(projected)) {
+    throw new TypeError('Relay refused a malformed todo task projection.');
+  }
+  return projected;
+}
+
+function hasExactKeys(value: Record<string, unknown>, keys: readonly string[]): boolean {
+  return Object.keys(value).length === keys.length && Object.keys(value).every((key) => keys.includes(key));
 }
 
 function isAttachmentPayload(value: JsonValue): boolean {

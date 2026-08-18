@@ -16,6 +16,10 @@ import {
   type AskQuestionCallbackRoute,
 } from './demux.js';
 import { StrictJsonlDecoder } from './framing.js';
+import {
+  authoritativeTodoProjectionSource,
+  isAuthoritativeTodoProjectionEvent,
+} from '../store/todo-projector.js';
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 15_000;
 const DEFAULT_MAX_RESTARTS = 3;
@@ -94,6 +98,7 @@ export class RpcSupervisor {
   private readonly askQuestionCallbackListeners = new Set<
     (outcome: AskQuestionCallbackOutcome) => void
   >();
+  private readonly todoProjectionListeners = new Set<(source: unknown) => void>();
   private readonly demultiplexer: RpcDemultiplexer;
   private state: SupervisorState = 'stopped';
   private restartCount = 0;
@@ -216,6 +221,12 @@ export class RpcSupervisor {
     return () => this.askQuestionCallbackListeners.delete(listener);
   }
 
+  /** Subscribe to the explicit host-owned todo source, never to transcript text. */
+  public onTodoProjection(listener: (source: unknown) => void): () => void {
+    this.todoProjectionListeners.add(listener);
+    return () => this.todoProjectionListeners.delete(listener);
+  }
+
   /** Return metadata-only supervisor health. */
   public health(): SupervisorHealth {
     return {
@@ -319,6 +330,11 @@ export class RpcSupervisor {
   }
 
   private emitEvent(event: PiRpcEvent): void {
+    if (isAuthoritativeTodoProjectionEvent(event)) {
+      const source = authoritativeTodoProjectionSource(event);
+      for (const listener of this.todoProjectionListeners) listener(source);
+      return;
+    }
     for (const listener of this.eventListeners) {
       listener(event);
     }

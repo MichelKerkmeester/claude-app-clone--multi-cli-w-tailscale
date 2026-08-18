@@ -12,6 +12,7 @@ import {
   isTranscriptBlock,
   isRichTranscriptBlock,
   isPlanSnapshotDto,
+  isTodoProjectionV1,
   type AskQuestionTranscriptMeta,
   type Envelope,
   type PiRpcEvent,
@@ -119,6 +120,81 @@ describe('canonical redaction', () => {
     expect(serialized).toContain('[REDACTED_SECRET]');
     expect(redacted.redaction.fieldsRedacted).toBeGreaterThanOrEqual(4);
     expect(redacted.redaction.reasons).toEqual(['path', 'private-text', 'secret']);
+  });
+
+  it('redacts todo display fields and refuses detail-bearing projection payloads', () => {
+    const candidate: Envelope = {
+      ...envelopeWith({
+        planId: 'plan_redaction_001',
+        source: 'pi',
+        revision: 1,
+        updatedAt: null,
+        tasks: [
+          {
+            id: 'task_redaction_001',
+            title: 'Read /Users/private/project.txt',
+            state: 'pending',
+            group: 'token=todo-group-secret',
+            order: 0,
+            revision: 1,
+            updatedAt: null,
+          },
+        ],
+      }),
+      kind: 'todo.snapshot.v1',
+    };
+    const redacted = redactEnvelope(candidate);
+    expect(isTodoProjectionV1(redacted.payload)).toBe(true);
+    const serialized = JSON.stringify(redacted);
+    expect(serialized).not.toContain('/Users/private');
+    expect(serialized).not.toContain('todo-group-secret');
+
+    const store = new RelayStore();
+    try {
+      const sync = new SyncHub(store);
+      const logs: string[] = [];
+      const messages: unknown[] = [];
+      sync.onCommitted((envelope) => logs.push(JSON.stringify(envelope)));
+      sync.subscribe(
+        {
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: 'session_local',
+        },
+        (message) => messages.push(message),
+      );
+      sync.publish(candidate);
+      const boundary = JSON.stringify({
+        page: store.createSyncPlan({
+          hostId: 'host_local',
+          workspaceRef: 'workspace_default',
+          sessionId: 'session_local',
+        }),
+        logs,
+        messages,
+      });
+      expect(boundary).not.toContain('/Users/private');
+      expect(boundary).not.toContain('todo-group-secret');
+      expect(boundary).toContain('[REDACTED_PATH]');
+      expect(boundary).toContain('[REDACTED_SECRET]');
+    } finally {
+      store.close();
+    }
+
+    expect(() =>
+      redactEnvelope({
+        ...candidate,
+        payload: {
+          ...(candidate.payload as object),
+          tasks: [
+            {
+              ...((candidate.payload as { tasks: readonly object[] }).tasks[0] ?? {}),
+              detail: 'detail-canary',
+            },
+          ],
+        },
+      }),
+    ).toThrow('Relay refused a malformed todo task projection.');
   });
 
   it('does not mutate the incoming envelope', () => {

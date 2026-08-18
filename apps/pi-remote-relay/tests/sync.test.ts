@@ -6,6 +6,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   isRichTranscriptBlock,
+  isTodoProjectionDeltaV1,
+  isTodoProjectionV1,
   type AskQuestionTranscriptMeta,
   type Envelope,
   type SyncMessage,
@@ -187,6 +189,68 @@ describe('sync barrier', () => {
       expect(() => hub.publish(displayCarrier)).toThrow(
         'Relay refused ask-question display content before the persistence redaction boundary.',
       );
+    } finally {
+      store.close();
+    }
+  });
+
+  it('replays typed todo snapshots and deltas only after the redaction boundary', () => {
+    const store = new RelayStore();
+    try {
+      const hub = new SyncHub(store);
+      const snapshot = {
+        planId: 'plan_sync_001',
+        source: 'pi' as const,
+        revision: 1,
+        updatedAt: null,
+        tasks: [
+          {
+            id: 'task_sync_001',
+            title: 'Read [REDACTED_PATH]',
+            state: 'pending' as const,
+            group: '[REDACTED_SECRET]',
+            order: 0,
+            revision: 1,
+            updatedAt: null,
+          },
+        ],
+      };
+      const delta = {
+        planId: snapshot.planId,
+        baseRevision: 1,
+        revision: 2,
+        upsertedTasks: [
+          {
+            ...snapshot.tasks[0],
+            state: 'done' as const,
+            revision: 2,
+          },
+        ],
+        removedTaskIds: [],
+        updatedAt: '2026-01-01T00:00:02.000Z',
+      };
+      hub.publish({
+        ...makeEnvelope(1),
+        kind: 'todo.snapshot.v1',
+        payload: snapshot,
+      });
+      hub.publish({
+        ...makeEnvelope(2),
+        eventId: 'event_sync_todo_delta',
+        kind: 'todo.delta.v1',
+        seq: 2,
+        payload: delta,
+      });
+
+      const messages: SyncMessage[] = [];
+      hub.subscribe(IDENTITY, (message) => messages.push(message));
+      expect(messages).toHaveLength(1);
+      const serialized = JSON.stringify(messages);
+      expect(serialized).not.toContain('/Users/sync');
+      expect(serialized).not.toContain('sync-group');
+      if (messages[0]?.kind !== 'sync.snapshot') return;
+      expect(isTodoProjectionV1(messages[0].envelopes[0]?.payload)).toBe(true);
+      expect(isTodoProjectionDeltaV1(messages[0].envelopes[1]?.payload)).toBe(true);
     } finally {
       store.close();
     }

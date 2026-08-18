@@ -9,9 +9,13 @@ import {
   isInboundImageBlock,
   isAskQuestionTranscriptMeta,
   isEnvelope,
+  isJsonValue,
   isOpaqueId,
   isRedactedAttachmentBlock,
+  isRedactionMetadata,
   isSessionCardDto,
+  isTodoProjectionEnvelopeKind,
+  isTodoProjectionEnvelopePayload,
   isTranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 import Database from 'better-sqlite3';
@@ -180,7 +184,7 @@ export class RelayStore {
 
   /** Redact then commit one monotonic envelope before it can be broadcast. */
   public appendEnvelope(candidate: Envelope): AppendResult {
-    if (!isEnvelope(candidate)) {
+    if (!isEnvelope(candidate) && !isTodoEnvelopeCandidate(candidate)) {
       throw new TypeError('Relay refused an invalid envelope before persistence.');
     }
     if (candidate.kind === 'transcript.block' && isInboundImageBlock(candidate.payload)) {
@@ -192,6 +196,12 @@ export class RelayStore {
       );
     }
     const envelope = redactEnvelope(candidate);
+    if (
+      isTodoProjectionEnvelopeKind(envelope.kind) &&
+      !isTodoProjectionEnvelopePayload(envelope.kind, envelope.payload)
+    ) {
+      throw new TypeError('Relay refused an invalid todo projection before persistence.');
+    }
     if (envelope.kind === 'transcript.block' && !isTranscriptBlock(envelope.payload)) {
       throw new TypeError(
         `Relay refused a malformed transcript projection after redaction. ${redactionMarkerText(
@@ -1070,6 +1080,36 @@ export class RelayStore {
       throw new Error(`A new relay epoch must begin at sequence 1, received ${sequence}.`);
     }
   }
+}
+
+function isTodoEnvelopeCandidate(value: unknown): value is Envelope {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  const replay = record.replay;
+  const replayRecord =
+    replay !== null && typeof replay === 'object' && !Array.isArray(replay)
+      ? (replay as Record<string, unknown>)
+      : null;
+  return (
+    record.v === 1 &&
+    isTodoProjectionEnvelopeKind(record.kind) &&
+    isOpaqueId(record.eventId) &&
+    isOpaqueId(record.hostId) &&
+    isOpaqueId(record.workspaceRef) &&
+    isOpaqueId(record.sessionId) &&
+    isOpaqueId(record.epoch) &&
+    typeof record.seq === 'number' &&
+    Number.isSafeInteger(record.seq) &&
+    record.seq > 0 &&
+    typeof record.occurredAt === 'string' &&
+    !Number.isNaN(Date.parse(record.occurredAt)) &&
+    (record.causedBy === null || isOpaqueId(record.causedBy)) &&
+    isJsonValue(record.payload) &&
+    isRedactionMetadata(record.redaction) &&
+    replayRecord !== null &&
+    typeof replayRecord.eligible === 'boolean' &&
+    typeof replayRecord.snapshotEligible === 'boolean'
+  );
 }
 
 function isAskQuestionDisplayBearingTranscript(candidate: Envelope): boolean {

@@ -346,6 +346,50 @@ export interface Envelope<TPayload extends JsonValue = JsonValue> {
   readonly replay: ReplayMetadata;
 }
 
+export const TODO_TASK_STATES = ['pending', 'active', 'done', 'blocked'] as const;
+export type TodoTaskState = (typeof TODO_TASK_STATES)[number];
+
+export const TODO_PROJECTION_ENVELOPE_KINDS = [
+  'todo.snapshot.v1',
+  'todo.delta.v1',
+] as const;
+export type TodoProjectionEnvelopeKind = (typeof TODO_PROJECTION_ENVELOPE_KINDS)[number];
+
+export interface TodoTaskProjectionV1 extends JsonObject {
+  readonly id: string;
+  readonly title: string;
+  readonly state: TodoTaskState;
+  readonly group: string | null;
+  readonly order: number;
+  readonly revision: number;
+  readonly updatedAt: string | null;
+}
+
+export interface TodoProjectionV1 extends JsonObject {
+  readonly planId: string;
+  readonly source: 'pi';
+  readonly revision: number;
+  readonly updatedAt: string | null;
+  readonly tasks: readonly TodoTaskProjectionV1[];
+}
+
+export interface TodoProjectionDeltaV1 extends JsonObject {
+  readonly planId: string;
+  readonly baseRevision: number;
+  readonly revision: number;
+  readonly upsertedTasks: readonly TodoTaskProjectionV1[];
+  readonly removedTaskIds: readonly string[];
+  readonly updatedAt: string | null;
+}
+
+export interface TodoProjectionCapabilityDto extends JsonObject {
+  readonly todoProjection: 1;
+}
+
+export const TODO_PROJECTION_CAPABILITY = {
+  todoProjection: 1,
+} as const satisfies TodoProjectionCapabilityDto;
+
 export interface SyncCursor {
   readonly epoch: string;
   readonly seq: number;
@@ -899,6 +943,7 @@ export interface SessionChallengeResponse {
 export interface ApplicationSessionResponse {
   readonly expiresAt: string;
   readonly mode: 'read-only';
+  readonly capabilities?: TodoProjectionCapabilityDto;
 }
 
 export interface WebSocketTicketResponse {

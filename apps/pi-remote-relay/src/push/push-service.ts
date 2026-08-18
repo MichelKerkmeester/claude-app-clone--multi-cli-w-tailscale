@@ -8,6 +8,7 @@ import {
   isAttentionChangedPayload,
   isPushPreferences,
   isPushSubscriptionInput,
+  isTodoProjectionEnvelopeKind,
   type AttentionChangedPayload,
   type AttentionClass,
   type AttentionItemDto,
@@ -212,12 +213,13 @@ export class PushService {
   }
 
   public async publish(envelope: Envelope, context: PublishContext): Promise<number> {
-    if (
-      !context.committed ||
-      envelope.kind !== 'attention.changed' ||
-      !isAttentionChangedPayload(envelope.payload)
-    )
+    if (!context.committed) return 0;
+    if (isTodoProjectionEnvelopeKind(envelope.kind)) {
+      return this.sendHint(serializeTodoProjectionPushHint(), context);
+    }
+    if (envelope.kind !== 'attention.changed' || !isAttentionChangedPayload(envelope.payload)) {
       return 0;
+    }
     const payload = envelope.payload;
     const latest = this.database
       .prepare(
@@ -254,6 +256,18 @@ export class PushService {
     this.trimAttention();
 
     const hint = serializePushHint(payload);
+    return this.sendHint(hint, context, payload.attentionClass);
+  }
+
+  public sendContentFreeHint(hint: string, context: PublishContext): Promise<number> {
+    return this.sendHint(hint, context);
+  }
+
+  private async sendHint(
+    hint: string,
+    context: PublishContext,
+    attentionClass?: AttentionClass,
+  ): Promise<number> {
     const rows = this.database
       .prepare(
         `
@@ -266,12 +280,18 @@ export class PushService {
     let sent = 0;
     await Promise.all(
       rows.map(async (row) => {
+        const preferences = this.parsePreferences(row.preferencesJson);
+        const enabled =
+          attentionClass === undefined
+            ? Object.values(preferences).some(Boolean)
+            : preferences[attentionClass];
         if (
           this.foregroundDevices.has(row.deviceId) ||
           context.foregroundDeviceIds?.has(row.deviceId) ||
-          !this.parsePreferences(row.preferencesJson)[payload.attentionClass]
-        )
+          !enabled
+        ) {
           return;
+        }
         try {
           await this.sender.sendNotification(this.decryptSubscription(row), hint);
           sent += 1;
@@ -360,6 +380,30 @@ export function serializePushHint(payload: AttentionChangedPayload): string {
     attentionClass: payload.attentionClass,
   };
   return JSON.stringify(hint);
+}
+
+/** Wake the app for a read-only projection refresh without carrying projection data. */
+export function serializeTodoProjectionPushHint(): string {
+  return serializePushHint({
+    lookupId: 'todo_sync_available',
+    attentionClass: 'finished',
+    generation: 1,
+    nonce: 'todo_sync_nonce',
+  });
+}
+
+export const serializeTodoSyncAvailability = serializeTodoProjectionPushHint;
+
+export const serializeTodoProjectionHint = serializeTodoProjectionPushHint;
+
+// Push delivery is deliberately separated from attention persistence: todo data is
+// already available through authenticated sync and must not enter the push database.
+export async function sendContentFreePushHint(
+  service: PushService,
+  hint: string,
+  context: PublishContext,
+): Promise<number> {
+  return service.sendContentFreeHint(hint, context);
 }
 
 function toItem(row: AttentionRow): AttentionItemDto {

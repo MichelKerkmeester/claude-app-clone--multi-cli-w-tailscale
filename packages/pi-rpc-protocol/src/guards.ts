@@ -106,6 +106,12 @@ import type {
   SessionChallengeResponse,
   SetModeCommand,
   ExecutePlanCommand,
+  TodoProjectionCapabilityDto,
+  TodoProjectionDeltaV1,
+  TodoProjectionEnvelopeKind,
+  TodoProjectionV1,
+  TodoTaskProjectionV1,
+  TodoTaskState,
   PushHintPayload,
   PushPreferences,
   PushSubscriptionInput,
@@ -162,6 +168,8 @@ import {
   INBOUND_IMAGE_SOURCES,
   INBOUND_IMAGE_TERMINAL_REASONS,
   REDACTED_ATTACHMENT_STATUSES,
+  TODO_PROJECTION_ENVELOPE_KINDS,
+  TODO_TASK_STATES,
 } from './types.js';
 
 const APPROVAL_RESULT_STATUSES = new Set([
@@ -261,6 +269,8 @@ const INBOUND_IMAGE_ARTIFACT_MEDIA_TYPE_SET = new Set<string>(INBOUND_IMAGE_ARTI
 const INBOUND_IMAGE_REDACTION_STATUS_SET = new Set<string>(INBOUND_IMAGE_REDACTION_STATUSES);
 const INBOUND_IMAGE_TERMINAL_REASON_SET = new Set<string>(INBOUND_IMAGE_TERMINAL_REASONS);
 const INBOUND_IMAGE_CONTENT_KIND_SET = new Set<string>(INBOUND_IMAGE_CONTENT_KINDS);
+const TODO_PROJECTION_ENVELOPE_KIND_SET = new Set<string>(TODO_PROJECTION_ENVELOPE_KINDS);
+const TODO_TASK_STATE_SET = new Set<TodoTaskState>(TODO_TASK_STATES);
 const ASK_QUESTION_SELECTION_MODE_SET = new Set<AskQuestionSelectionMode>(
   ASK_QUESTION_SELECTION_MODES,
 );
@@ -1055,6 +1065,14 @@ export function isEnvelope(value: unknown): value is Envelope {
   if (!isRecord(value) || !isRecord(value.redaction) || !isRecord(value.replay)) {
     return false;
   }
+  if (
+    typeof value.kind === 'string' &&
+    value.kind.startsWith('todo.') &&
+    (!isTodoProjectionEnvelopeKind(value.kind) ||
+      !isTodoProjectionEnvelopePayload(value.kind, value.payload))
+  ) {
+    return false;
+  }
   return (
     value.v === 1 &&
     isOpaqueId(value.eventId) &&
@@ -1075,6 +1093,103 @@ export function isEnvelope(value: unknown): value is Envelope {
     typeof value.replay.eligible === 'boolean' &&
     typeof value.replay.snapshotEligible === 'boolean'
   );
+}
+
+/** Narrow one host-owned, metadata-only todo task. */
+export function isTodoTaskProjectionV1(value: unknown): value is TodoTaskProjectionV1 {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['id', 'title', 'state', 'group', 'order', 'revision', 'updatedAt']) &&
+    isOpaqueId(value.id) &&
+    isSafeDisplayString(value.title, 500) &&
+    typeof value.state === 'string' &&
+    TODO_TASK_STATE_SET.has(value.state as TodoTaskState) &&
+    (value.group === null || isSafeDisplayString(value.group, 200)) &&
+    isBoundedNonNegativeInteger(value.order, 1_000_000) &&
+    isBoundedPositiveInteger(value.revision) &&
+    (value.updatedAt === null || isTodoTimestamp(value.updatedAt))
+  );
+}
+
+/** Narrow a complete host todo snapshot without accepting duplicate identities. */
+export function isTodoProjectionV1(value: unknown): value is TodoProjectionV1 {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, ['planId', 'source', 'revision', 'updatedAt', 'tasks']) ||
+    !isOpaqueId(value.planId) ||
+    value.source !== 'pi' ||
+    !isBoundedPositiveInteger(value.revision) ||
+    (value.updatedAt !== null && !isTodoTimestamp(value.updatedAt)) ||
+    !Array.isArray(value.tasks) ||
+    value.tasks.length > 1_000 ||
+    !value.tasks.every(isTodoTaskProjectionV1)
+  ) {
+    return false;
+  }
+  const taskIds = value.tasks.map((task) => task.id);
+  return new Set(taskIds).size === taskIds.length;
+}
+
+/** Narrow a host todo delta with one unambiguous operation per task identity. */
+export function isTodoProjectionDeltaV1(value: unknown): value is TodoProjectionDeltaV1 {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      'planId',
+      'baseRevision',
+      'revision',
+      'upsertedTasks',
+      'removedTaskIds',
+      'updatedAt',
+    ]) ||
+    !isOpaqueId(value.planId) ||
+    !isBoundedNonNegativeInteger(value.baseRevision, 1_000_000_000) ||
+    !isBoundedPositiveInteger(value.revision) ||
+    value.revision <= value.baseRevision ||
+    (value.updatedAt !== null && !isTodoTimestamp(value.updatedAt)) ||
+    !Array.isArray(value.upsertedTasks) ||
+    value.upsertedTasks.length > 1_000 ||
+    !value.upsertedTasks.every(isTodoTaskProjectionV1) ||
+    !Array.isArray(value.removedTaskIds) ||
+    value.removedTaskIds.length > 1_000 ||
+    !value.removedTaskIds.every(isOpaqueId)
+  ) {
+    return false;
+  }
+  const upsertedIds = value.upsertedTasks.map((task) => task.id);
+  const removedIds = value.removedTaskIds;
+  return (
+    new Set(upsertedIds).size === upsertedIds.length &&
+    new Set(removedIds).size === removedIds.length &&
+    removedIds.every((id) => !upsertedIds.includes(id))
+  );
+}
+
+/** Narrow the optional authenticated-session capability advertisement. */
+export function isTodoProjectionCapabilityDto(
+  value: unknown,
+): value is TodoProjectionCapabilityDto {
+  return isRecord(value) && hasOnlyKeys(value, ['todoProjection']) && value.todoProjection === 1;
+}
+
+/** Return whether an envelope kind is one of the typed todo projection kinds. */
+export function isTodoProjectionEnvelopeKind(value: unknown): value is TodoProjectionEnvelopeKind {
+  return typeof value === 'string' && TODO_PROJECTION_ENVELOPE_KIND_SET.has(value);
+}
+
+/** Validate a todo payload according to its exact envelope kind. */
+export function isTodoProjectionEnvelopePayload(
+  kind: unknown,
+  value: unknown,
+): value is TodoProjectionV1 | TodoProjectionDeltaV1 {
+  if (kind === 'todo.snapshot.v1') return isTodoProjectionV1(value);
+  if (kind === 'todo.delta.v1') return isTodoProjectionDeltaV1(value);
+  return false;
+}
+
+/** Narrow either supported host todo projection payload. */
+export function isTodoProjection(value: unknown): value is TodoProjectionV1 | TodoProjectionDeltaV1 {
+  return isTodoProjectionV1(value) || isTodoProjectionDeltaV1(value);
 }
 
 /** Narrow an unknown value to a replay, snapshot or gap sync message. */
@@ -1887,7 +2002,13 @@ export function isSessionChallengeResponse(value: unknown): value is SessionChal
 }
 
 export function isApplicationSessionResponse(value: unknown): value is ApplicationSessionResponse {
-  return isRecord(value) && value.mode === 'read-only' && isTimestamp(value.expiresAt);
+  return (
+    isRecord(value) &&
+    hasRequiredAndOptionalKeys(value, ['expiresAt', 'mode'], ['capabilities']) &&
+    value.mode === 'read-only' &&
+    isTimestamp(value.expiresAt) &&
+    (value.capabilities === undefined || isTodoProjectionCapabilityDto(value.capabilities))
+  );
 }
 
 export function isWebSocketTicketResponse(value: unknown): value is WebSocketTicketResponse {
@@ -2201,6 +2322,14 @@ function isInboundSafeText(value: unknown, maxScalars: number, maxBytes: number)
 
 function isTimestamp(value: unknown): value is string {
   return typeof value === 'string' && !Number.isNaN(Date.parse(value));
+}
+
+function isTodoTimestamp(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:\d{2})$/u.test(value) &&
+    !Number.isNaN(Date.parse(value))
+  );
 }
 
 function isExactOrigin(value: unknown): value is string {

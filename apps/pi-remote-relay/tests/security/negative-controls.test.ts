@@ -14,6 +14,8 @@ import {
   enrollmentProof,
   isPiRpcCommand,
   sessionProof,
+  isTodoProjectionDeltaV1,
+  isTodoProjectionV1,
   type ApprovalAction,
   type ApprovalDecisionCommand,
   type CommandBindingDto,
@@ -48,6 +50,10 @@ import type { RpcSupervisor } from '../../src/rpc/supervisor.js';
 import { RelayStore } from '../../src/store/relay-store.js';
 import { sanitizeInboundImage } from '../../src/store/artifact-sanitizer.js';
 import { projectCommandCatalog } from '../../src/store/redaction.js';
+import {
+  applyTodoProjectionDelta,
+  projectTodoSnapshot,
+} from '../../src/store/todo-projector.js';
 import { publishApprovedImage } from '../../../../extensions/pi-remote-inbound-media/src/index.js';
 
 const ORIGIN = 'https://pi-remote.example.test';
@@ -124,6 +130,68 @@ describe('consolidated fail-closed negative controls', () => {
     expect(auth.revokeSession(session.token)).toBe(true);
     expect(auth.authenticate(session.token, ORIGIN, PRINCIPAL, 'sessions:list')).toBeNull();
     expect(auth.consumeTicket(revokedTicket.ticket, ORIGIN, PRINCIPAL)).toBeNull();
+  });
+
+  it('keeps todo strictly read-only and rejects unknown phone commands', () => {
+    for (const forbidden of [
+      'todo.complete',
+      'todo.update',
+      'todo.reorder',
+      'todo.create',
+      'todo.delete',
+      'todo.cancel',
+      'todo.check',
+      'todo.edit',
+      'todo.abort',
+      'todo.ticket',
+      'todo.approval',
+      '/api/todo',
+      'todo:control',
+    ]) {
+      expect(READ_ONLY_SERVER_SOURCE).not.toContain(forbidden);
+    }
+    expect(READ_ONLY_SERVER_SOURCE).toContain('TODO_PROJECTION_CAPABILITY');
+    expect(isPiRpcCommand({ type: 'todo.complete', taskId: 'task_001' })).toBe(false);
+    expect(isPiRpcCommand({ type: 'todo.update', taskId: 'task_001' })).toBe(false);
+    expect(isPiRpcCommand({ type: 'todo.reorder', taskId: 'task_001' })).toBe(false);
+  });
+
+  it('preserves the last valid todo view on an invalid or mismatched revision chain', () => {
+    const current = projectTodoSnapshot({
+      planId: 'plan_security_001',
+      revision: 1,
+      updatedAt: null,
+      tasks: [
+        {
+          id: 'task_security_001',
+          title: 'Safe title',
+          state: 'pending',
+          group: null,
+          order: 0,
+          revision: 1,
+          updatedAt: null,
+        },
+      ],
+    });
+    expect(current).not.toBeNull();
+    if (current === null) throw new Error('Security projection fixture was rejected.');
+    const malformed = {
+      planId: current.planId,
+      baseRevision: 9,
+      revision: 10,
+      upsertedTasks: [
+        {
+          ...current.tasks[0],
+          title: 'Raw /Users/private/title',
+          detail: 'detail-canary',
+        },
+      ],
+      removedTaskIds: [],
+      updatedAt: 'not-a-timestamp',
+    };
+    expect(isTodoProjectionV1(current)).toBe(true);
+    expect(isTodoProjectionDeltaV1(malformed)).toBe(false);
+    expect(applyTodoProjectionDelta(current, malformed)).toBe(current);
   });
 
   it('keeps publication host-authoritative across origin, principal, device, revision, replay, and expiry checks', () => {

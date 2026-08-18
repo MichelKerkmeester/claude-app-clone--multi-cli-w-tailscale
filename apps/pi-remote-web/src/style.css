@@ -1393,6 +1393,13 @@ button[data-pressed]:not([data-disabled]) {
 /* ── Composer: one bottom-anchored input island (Claude-style). ─────────
    The card position, left "+" and text baseline stay fixed; only the
    right-hand primary action changes across send / steer / stop / sending. */
+/* @ds state: idle — composer idle: send disc, editable input, live disclaimer. */
+/* @ds state: running — composer running: steer/stop disc, waiting disclaimer. */
+/* @ds state: interrupted — composer interrupted: wait for the host to settle before acting. */
+/* @ds state: unknown — composer/relay state unknown: disabled input with a reconnect hint. */
+/* @ds state: promptError — inline-alert rendered above the tray (shared error surface). */
+/* @ds edit: layout — sticky bottom-anchor + canvas fade; the keyboard-anchor
+   --visual-viewport-height var feeds the anchor and stays the layout input. */
 .composer-region {
   position: sticky;
   z-index: 5;
@@ -1412,6 +1419,8 @@ button[data-pressed]:not([data-disabled]) {
   text-align: center;
 }
 
+/* @ds surface: composer — the input island. */
+/* @ds edit: layout — tray geometry; safe gutters are token-driven. */
 .composer-tray {
   display: grid;
   gap: var(--space-1);
@@ -1422,6 +1431,7 @@ button[data-pressed]:not([data-disabled]) {
   box-shadow: var(--shadow-raised);
 }
 
+/* @ds slot: input — the single editing field; colour/type stay token-driven. */
 .composer-input {
   width: 100%;
   min-height: 1.75rem;
@@ -1440,6 +1450,8 @@ button[data-pressed]:not([data-disabled]) {
   outline: none;
 }
 
+/* @ds state: awaitingSnapshot · sendingPrompt · slashSubmitting — the input is
+   disabled while the composer is busy or syncing (plus a non-live connection). */
 .composer-input:disabled {
   cursor: not-allowed;
   opacity: 0.55;
@@ -1463,6 +1475,7 @@ button[data-pressed]:not([data-disabled]) {
   gap: var(--space-2);
 }
 
+/* @ds slot: tools-trigger — the "+" popover trigger. */
 .composer-plus {
   display: grid;
   place-items: center;
@@ -3960,6 +3973,7 @@ button[data-pressed]:not([data-disabled]) {
   color: #f0b19a;
 }
 
+/* @ds slot: primary-action — the single circular morphing disc (send/steer/stop/sending). */
 .composer-primary {
   display: grid;
   place-items: center;
@@ -3974,6 +3988,7 @@ button[data-pressed]:not([data-disabled]) {
     opacity var(--duration-state, 120ms) var(--ease-out, ease);
 }
 
+/* @ds state: send · steer — the morphing primary disc; steer shares this form. */
 .composer-primary.is-send {
   background: var(--accent);
   color: #fff;
@@ -3983,11 +3998,13 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--accent-strong);
 }
 
+/* @ds state: stop — the primary disc on the stop form (running, empty draft). */
 .composer-primary.is-stop {
   background: var(--action-bg);
   color: var(--action-fg);
 }
 
+/* @ds state: stopping · sending-inhibit — the disc's disabled affordance. */
 .composer-primary[data-disabled] {
   cursor: not-allowed;
   opacity: 0.4;
@@ -4025,6 +4042,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds surface: spinner — shared inline pending/busy indicator. */
+/* @ds state: sending · slashSubmitting — the disc's busy form. */
 .composer-spinner {
   animation: composer-spin 0.8s linear infinite;
 }
@@ -5117,6 +5135,7 @@ button[data-pressed]:not([data-disabled]) {
 /* Popover sheets + every react-aria dropdown (Select / ComboBox / Dialog). */
 /* @ds end surface: session-view */
 /* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
+/* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
 .session-sheet-popover,
 .composer-tools-popover {
   border: 1px solid var(--line);

@@ -322,6 +322,8 @@ export function SessionComposer({
   // lane (or fails closed with a disclosed reason); ordinary drafts keep
   // the unchanged send/steer behavior. A slash draft is never converted to
   // steer/followUp and never falls back to the text lane.
+  // @ds guardrail: mutation path — submit / steer / stop / snapshot / slash-draft / attachment
+  // flow; presentation may not reach past here.
   const submit = () => {
     if (!attachmentCanSubmit) {
       setAnnouncement(
@@ -417,6 +419,8 @@ export function SessionComposer({
     });
   };
 
+  // @ds guardrail: react-aria + keyboard wiring — textarea handlers, IME, the plan shortcut,
+  // and Enter routing; presentation may not alter event semantics or the aria pattern.
   const onKeyDown = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
     // IME composition owns every key: no filtering, insertion, or submit.
     if (isComposing) return;
@@ -494,6 +498,11 @@ export function SessionComposer({
         ? ' is-executing-mode'
         : '';
 
+  // @ds surface: composer — the presentational seam. The tray and its slot JSX below stay
+  // presentation-only; the keyboard-anchor vars (--visual-viewport-height / --trigger-width)
+  // feed layout unchanged.
+  // @ds guardrail: send / steer / stop / snapshot / prompt-submission and the keyboard
+  // anchoring hook stay fenced; presentation may not reach past them.
   return (
     <div className="composer-region">
       {promptError !== null && <div className="inline-alert">{promptError}</div>}
@@ -538,6 +547,7 @@ export function SessionComposer({
           onRetry={() => void catalog.refresh('manual')}
           onAnnounce={setAnnouncement}
         />
+        {/* @ds slot: input — the single editing field. */}
         <textarea
           ref={textareaRef}
           id="session-prompt"
@@ -608,6 +618,7 @@ export function SessionComposer({
             />
           </div>
           <div className="composer-right">
+            {/* @ds slot: primary-action — the single morphing disc (send/steer/stop/sending). */}
             {running && (hasText || hasAttachments) && !slashDraft && (
               <Button
                 type="button"
@@ -702,8 +713,10 @@ function ComposerTools({
 }) {
   const { runtime } = runtimeControls;
 
+  // @ds guardrail: tools popover react-aria wiring (DialogTrigger / Popover / Dialog) — unchanged.
   return (
     <DialogTrigger onOpenChange={onOpenChange}>
+      {/* @ds slot: tools-trigger — the "+" popover trigger. */}
       <Button
         className="composer-plus"
         data-attachment-plus={mediaAvailable ? true : undefined}

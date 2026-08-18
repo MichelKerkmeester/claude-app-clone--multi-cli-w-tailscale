@@ -1588,6 +1588,9 @@ button[data-pressed]:not([data-disabled]) {
 /* The two-row mode menu: focus movement only, activation alone reports. */
 /* @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. */
 /* @ds slot: popover — floating placement chrome + raised elevation. */
+/* @ds surface: overlay — plan-mode-popover is an INSTANCE of the shared overlay
+   primitive (a raised panel over its anchored trigger). Physical unification
+   of the per-surface overlay chrome is a documented follow-up. */
 .plan-mode-popover {
   min-inline-size: min(88vw, 18rem);
   padding: var(--space-1);
@@ -1712,6 +1715,9 @@ button[data-pressed]:not([data-disabled]) {
 
 /* ── Leave plan mode confirmation sheet ────────────────────────────── */
 /* @ds surface: leave-plan-sheet — confirmation before Plan → Build expands host authority. */
+/* @ds surface: overlay — leave-plan-sheet is an INSTANCE of the shared overlay
+   primitive (backdrop → raised panel → header/body/actions). Physical unification
+   of the per-surface overlay chrome is a documented follow-up. */
 /* @ds slot: overlay — fixed scrim + bottom-sheet placement.
    @ds edit: layout — z-index 60 keeps it above the mode surfaces and below the review sheet. */
 .leave-plan-overlay {
@@ -1725,6 +1731,11 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds slot: sheet — constraint + raised sheet + entry. */
+/* @ds slot: panel — the raised bottom-sheet surface. */
+/* @ds state: open — the resting raised sheet (settle transition). */
+/* @ds guardrail: do-not-edit — leave-plan is an authority-gating overlay; its
+   dismissal and safe-action semantics live in .tsx. Edit look + motion only,
+   never the dismissal behaviour. */
 .leave-plan-sheet {
   inline-size: 100%;
   max-inline-size: 34rem;
@@ -1941,6 +1952,11 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds end surface: plan-ready-card */
 
 /* @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. */
+/* @ds surface: overlay — plan-review-sheet is an INSTANCE of the shared overlay
+   primitive (backdrop → raised panel → grabber → header/body/footer).
+   Physical unification of the per-surface overlay chrome is a documented follow-up. */
+/* @ds guardrail: do-not-edit — the review sheet is the only atomic execute path;
+   dismissal + execute-authority semantics live in .tsx. Edit look + motion only. */
 /* @ds slot: overlay — fixed scrim + centring.
    @ds edit: layout — z-index 100 keeps it above every mode surface. */
 .plan-review-overlay {
@@ -1954,6 +1970,8 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds slot: modal — bottom-docked sheet + entry motion. */
+/* @ds slot: panel — the Modal raised surface. */
+/* @ds state: opening · open — entry fade/rise, then rest. */
 .plan-review-modal {
   inline-size: min(100%, 44rem);
   max-block-size: 100dvh;
@@ -4538,6 +4556,10 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds end surface: session-header */
 /* @ds surface: model-effort-sheet — the model picker + effort sheet overlay. */
+/* @ds surface: overlay — model-effort-sheet is an INSTANCE of the shared overlay
+   primitive (backdrop → raised panel → grabber → header/body/footer).
+   Physical unification of the per-surface overlay chrome is a documented follow-up. */
+/* @ds slot: backdrop — the ModalOverlay scrim + placement. */
 /* The model catalog is host-authored; the sheet can only request a host-authorized change. */
 .model-sheet-overlay {
   /* @ds edit: tokens — component tokens. Each is a thin alias to a semantic role,
@@ -4561,6 +4583,10 @@ button[data-pressed]:not([data-disabled]) {
   animation: model-sheet-backdrop-in 180ms ease-out;
 }
 
+/* @ds state: exiting — backdrop fade-out while the overlay unmounts. */
+/* @ds guardrail: do-not-edit — the data-exiting / drag / snap choreography is
+   driven by the Modal exit + swipe-dismiss handlers in .tsx; the dismissal
+   semantics never change here. */
 .model-sheet-overlay[data-exiting] {
   animation: model-sheet-backdrop-out 220ms ease-in;
 }
@@ -4595,6 +4621,10 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds end surface: model-effort-sheet */
 
 /* @ds edit: layout — sheet stacking, sizing, and the live drag-offset pull. */
+/* @ds slot: panel — the Modal raised surface; the --model-sheet-drag-offset var
+   stays the layout input for swipe-dismiss. */
+/* @ds state: opening · open — entry rise/settle, then rest; exiting, dragging and
+   snapping are separate state rules below. */
 .model-sheet-modal {
   inline-size: min(92vw, 24rem);
   max-inline-size: 100vw;
@@ -4618,6 +4648,7 @@ button[data-pressed]:not([data-disabled]) {
   transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+/* @ds state: exiting — panel slides down + fades while the overlay unmounts. */
 .model-sheet-overlay[data-exiting] .model-sheet-modal {
   animation: model-sheet-out 220ms ease-in;
 }
@@ -5489,6 +5520,10 @@ button[data-pressed]:not([data-disabled]) {
   box-shadow: var(--shadow-raised);
 }
 
+/* @ds surface: overlay — the base react-aria Popover is an INSTANCE of the shared
+   overlay primitive (a raised panel over its anchored trigger; the runtime model
+   and effort selectors). Physical unification is a documented follow-up. */
+/* @ds slot: panel — the Popover raised surface. */
 .react-aria-Popover {
   max-width: 88vw;
   padding: var(--space-1);

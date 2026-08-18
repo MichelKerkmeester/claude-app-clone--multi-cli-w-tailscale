@@ -506,6 +506,8 @@ function Header({
 }) {
   return (
     <header className="topbar">
+      {/* @ds surface: chrome-button — wordmark + nav react-aria Buttons. */}
+      {/* @ds guardrail: react-aria Button wiring (press + aria-label) — presentation only in style.css. */}
       <Button className="wordmark" onPress={onHome} aria-label="Pi Remote home">
         <span className="pi-mark" aria-hidden="true">
           π
@@ -516,11 +518,13 @@ function Header({
         </span>
       </Button>
       <div className="topbar-actions">
+        {/* @ds slot: nav-inbox */}
         {reviewAvailable && (
           <Button className="nav-button" onPress={onInbox}>
             Inbox
           </Button>
         )}
+        {/* @ds slot: nav-review */}
         {reviewAvailable && (
           <Button className="nav-button" onPress={onReview}>
             Review
@@ -540,8 +544,10 @@ function ThemeControl({
   readonly value: ThemePreference;
   readonly onChange: (value: ThemePreference) => void;
 }) {
+  // @ds surface: theme-switcher — segmented theme selector. react-aria owns selection.
   return (
     <div className="theme-control" role="group" aria-label="Color theme">
+      {/* @ds guardrail: react-aria ToggleButton wiring (isSelected/onChange/aria-label) — not designer-editable. */}
       {(['system', 'light', 'dark'] as const).map((theme) => (
         <ToggleButton
           key={theme}
@@ -615,6 +621,7 @@ export function Review({
   return (
     <main className="review-view">
       <div className="session-toolbar">
+        {/* @ds surface: back-button — quiet back arrow. react-aria Button wiring guarded. */}
         <Button className="back-button" onPress={onBack}>
           Back to sessions
         </Button>
@@ -838,6 +845,7 @@ export function AttentionInbox({
   return (
     <main className="inbox-view">
       <div className="session-toolbar">
+        {/* @ds surface: back-button — quiet back arrow. react-aria Button wiring guarded. */}
         <Button className="back-button" onPress={onBack}>
           Back to sessions
         </Button>
@@ -1739,8 +1747,10 @@ function CollapsedEvidence({
 }) {
   // The trigger names what it reveals (e.g. "Tool call · grep") instead of a generic "Show",
   // so routine evidence reads as a quiet, truthful disclosure beside the assistant's prose.
+  // @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel.
   return (
     <Disclosure defaultExpanded={false}>
+      {/* @ds guardrail: react-aria Disclosure wiring (expansion + trigger slot + aria) — not designer-editable. */}
       <Heading>
         <Button slot="trigger" className="evidence-trigger">
           <span className="evidence-chevron" aria-hidden="true">
@@ -1925,8 +1935,10 @@ function NormalizedActivityGroup({
 }: {
   readonly blocks: readonly NormalizedActivityBlock[];
 }) {
+  // @ds surface: evidence-disclosure — grouped activity disclosure.
   return (
     <div className="activity-group">
+      {/* @ds guardrail: react-aria Disclosure wiring — not designer-editable. */}
       <Disclosure defaultExpanded={false}>
         <Heading>
           <Button slot="trigger" className="evidence-trigger">
@@ -1984,6 +1996,7 @@ function AssistantActions({ text }: { readonly text: string }) {
   const canShare =
     typeof navigator !== 'undefined' && typeof (navigator as Navigator).share === 'function';
   if (!canCopy && !canShare) return null;
+  // @ds surface: turn-actions — Copy / Share answer actions + inline glyphs.
   return (
     <div className="turn-actions">
       {canCopy && (
@@ -2001,6 +2014,7 @@ function AssistantActions({ text }: { readonly text: string }) {
               .catch(() => undefined);
           }}
         >
+          {/* @ds guardrail: aria-label + clipboard handler — not designer-editable. */}
           <CopyGlyph />
           <span>{copied ? 'Copied' : 'Copy'}</span>
         </button>
@@ -2014,6 +2028,7 @@ function AssistantActions({ text }: { readonly text: string }) {
             void (navigator as Navigator).share({ text }).catch(() => undefined);
           }}
         >
+          {/* @ds guardrail: aria-label + share handler — not designer-editable. */}
           <ShareGlyph />
           <span>Share</span>
         </button>
@@ -2022,6 +2037,7 @@ function AssistantActions({ text }: { readonly text: string }) {
   );
 }
 
+/* @ds slot: copy-glyph — inline clipboard glyph; strokes inherit currentColor. */
 function CopyGlyph() {
   return (
     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
@@ -2046,6 +2062,7 @@ function CopyGlyph() {
   );
 }
 
+/* @ds slot: share-glyph — inline share glyph; strokes inherit currentColor. */
 function ShareGlyph() {
   return (
     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
@@ -2283,8 +2300,10 @@ function StatusPill({ phase }: { readonly phase: ConnectionPhase }) {
     live: 'Relay live',
     error: 'Relay unavailable',
   };
+  // @ds surface: status-pill — connection-phase status.
   return (
     <span className={`status-pill status-${phase}`} role="status">
+      {/* @ds guardrail: role="status" live announce + phase label — not designer-editable. */}
       <i />
       {labels[phase]}
     </span>
@@ -2292,6 +2311,7 @@ function StatusPill({ phase }: { readonly phase: ConnectionPhase }) {
 }
 
 function Freshness({ stale, at }: { readonly stale: boolean; readonly at: string | null }) {
+  // @ds surface: freshness — sync staleness readout.
   return (
     <div className={`freshness ${stale ? 'is-stale' : ''}`}>
       <span>{stale ? 'Stale, input disabled' : 'Live, steering enabled'}</span>
@@ -2307,6 +2327,7 @@ function EmptyState({
   readonly loading: boolean;
   readonly error: string | null;
 }) {
+  // @ds surface: empty-state — empty/unavailable list state.
   return (
     <div className="empty-state">
       <span className="empty-glyph" aria-hidden="true">
@@ -2403,8 +2424,10 @@ function sessionStatusLabel(value: SessionCardDto['status']): string {
 }
 
 function SessionStateIcon({ status }: { readonly status: SessionCardDto['status'] }) {
+  // @ds surface: session-state-icon — per-session status glyph.
   return (
     <span className="state-icon" aria-hidden="true">
+      {/* @ds guardrail: aria-hidden + glyph mapping — not designer-editable. */}
       {status === 'idle' ? '✓' : status === 'running' ? '•' : status === 'interrupted' ? '!' : '?'}
     </span>
   );

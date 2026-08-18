@@ -42,6 +42,7 @@ export function RuntimeStrip({
   const effortText = effortTriggerText(state?.thinkingLevel, state?.availableThinkingLevels ?? []);
   const planActive = state?.mode === 'plan' || state?.mode === 'executing-plan';
 
+  // @ds surface: runtime-strip — host-backed readout + controls strip.
   return (
     <div className="runtime-strip" role="group" aria-label="Runtime controls">
       <span className="runtime-readout runtime-model-readout">
@@ -49,6 +50,8 @@ export function RuntimeStrip({
         <span className="runtime-readout-value">{modelLabel}</span>
       </span>
 
+      {/* @ds surface: effort-trigger — opens the shared model/effort sheet. */}
+      {/* @ds guardrail: react-aria Button wiring (ref, aria-haspopup/expanded, onPress) — not designer-editable. */}
       <Button
         ref={effortTriggerRef}
         className="runtime-effort-trigger"
@@ -64,6 +67,8 @@ export function RuntimeStrip({
         <ChevronUpGlyph />
       </Button>
 
+      {/* @ds surface: build-plan-toggle — Build / Plan segmented toggle. */}
+      {/* @ds guardrail: react-aria ToggleButtonGroup wiring (selection + onChange + aria) — not designer-editable. */}
       <ToggleButtonGroup
         className="runtime-control runtime-mode"
         aria-label="Build or Plan"
@@ -105,6 +110,7 @@ function statusHint(status: RuntimeControls['runtime']['status'], hasPending: bo
   }
 }
 
+/* @ds slot: chevron-up — inline glyph; strokes inherit currentColor. */
 function ChevronUpGlyph() {
   return (
     <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">

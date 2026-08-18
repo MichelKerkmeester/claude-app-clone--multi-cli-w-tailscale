@@ -246,6 +246,7 @@ button {
   touch-action: manipulation;
 }
 
+/* @ds state: focus-visible — canonical global focus ring every control shares. */
 button:focus-visible,
 textarea:focus-visible,
 [data-focus-visible] {
@@ -253,6 +254,7 @@ textarea:focus-visible,
   outline-offset: 3px;
 }
 
+/* @ds state: pressed — canonical global press feedback every control shares. */
 button:active:not(:disabled),
 button[data-pressed]:not([data-disabled]) {
   transform: scale(0.98);
@@ -347,6 +349,7 @@ button[data-pressed]:not([data-disabled]) {
   gap: var(--space-2);
 }
 
+/* @ds surface: chrome-button — shared quiet transparent chrome button (nav/back/theme). */
 .nav-button,
 .theme-option,
 .back-button {
@@ -365,6 +368,7 @@ button[data-pressed]:not([data-disabled]) {
     color var(--duration-fast) ease;
 }
 
+/* @ds state: hover */
 .nav-button[data-hovered],
 .back-button[data-hovered],
 .theme-option[data-hovered] {
@@ -372,6 +376,9 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink);
 }
 
+/* @ds end surface: chrome-button */
+
+/* @ds surface: theme-switcher — segmented theme selector (ToggleButton group). */
 .theme-control {
   display: flex;
   padding: 0.2rem;
@@ -380,17 +387,21 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface);
 }
 
+/* @ds state: default */
 .theme-option {
   min-height: 2.25rem;
   padding-inline: 0.65rem;
   font-size: 0.68rem;
 }
 
+/* @ds state: selected */
 .theme-option[data-selected] {
   background: var(--ink);
   color: var(--ink-inverse);
 }
+/* @ds end surface: theme-switcher */
 
+/* @ds surface: status-pill — connection-phase status. */
 .status-pill {
   display: flex;
   min-height: 2.75rem;
@@ -403,6 +414,7 @@ button[data-pressed]:not([data-disabled]) {
   white-space: nowrap;
 }
 
+/* @ds slot: dot */
 .status-pill i {
   width: 0.48rem;
   height: 0.48rem;
@@ -410,10 +422,12 @@ button[data-pressed]:not([data-disabled]) {
   background: currentColor;
 }
 
+/* @ds state: live */
 .status-live {
   color: var(--success);
 }
 
+/* @ds state: pulsing — transitional connection phases (and running glyphs). */
 .status-authenticating i,
 .status-connecting i,
 .status-reconnecting i,
@@ -422,10 +436,12 @@ button[data-pressed]:not([data-disabled]) {
   animation: signal-pulse 1.4s ease-in-out infinite;
 }
 
+/* @ds state: error */
 .status-error,
 .state-interrupted {
   color: var(--danger);
 }
+/* @ds end surface: status-pill */
 
 .home-view,
 .session-view,
@@ -581,6 +597,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.55;
 }
 
+/* @ds surface: freshness — sync staleness readout. */
 .freshness {
   display: grid;
   justify-items: end;
@@ -592,6 +609,7 @@ button[data-pressed]:not([data-disabled]) {
   text-transform: uppercase;
 }
 
+/* @ds slot: time — last-sync timestamp. */
 .freshness time {
   color: var(--ink-muted);
   font-weight: 550;
@@ -599,9 +617,11 @@ button[data-pressed]:not([data-disabled]) {
   text-transform: none;
 }
 
+/* @ds state: stale */
 .freshness.is-stale {
   color: var(--warning);
 }
+/* @ds end surface: freshness */
 
 .session-grid {
   display: grid;
@@ -659,13 +679,17 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 680;
 }
 
+/* @ds surface: session-state-icon — per-session status glyph. */
+/* @ds state: running */
 .state-running {
   color: var(--accent-ink);
 }
+/* @ds state: idle */
 .state-idle {
   color: var(--success);
 }
 
+/* @ds slot: icon */
 .state-icon {
   display: inline-grid;
   width: 1.25rem;
@@ -677,6 +701,7 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.72rem;
   line-height: 1;
 }
+/* @ds end surface: session-state-icon */
 
 .session-card > strong {
   align-self: end;
@@ -962,16 +987,19 @@ button[data-pressed]:not([data-disabled]) {
   margin-bottom: clamp(2rem, 7vw, 4rem);
 }
 
+/* @ds surface: back-button — quiet back arrow, built on the shared chrome-button base. */
 .back-button {
   position: relative;
   padding-inline-start: 1.65rem;
 }
 
+/* @ds slot: chevron */
 .back-button::before {
   position: absolute;
   inset-inline-start: 0.65rem;
   content: '←';
 }
+/* @ds end surface: back-button */
 
 .review-count {
   color: var(--warning);
@@ -1232,6 +1260,7 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--danger);
 }
 
+/* @ds surface: empty-state — empty/unavailable list state. */
 .empty-state,
 .empty-transcript {
   padding: clamp(3rem, 8vw, 6rem) var(--space-4);
@@ -1241,6 +1270,7 @@ button[data-pressed]:not([data-disabled]) {
   text-align: center;
 }
 
+/* @ds slot: glyph */
 .empty-glyph {
   display: inline-grid;
   width: 3rem;
@@ -1253,17 +1283,20 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 700;
 }
 
+/* @ds slot: title */
 .empty-state h3 {
   margin: var(--space-4) 0 var(--space-2);
   color: var(--ink);
   font-size: 1.15rem;
 }
 
+/* @ds slot: body */
 .empty-state p {
   max-width: 32rem;
   margin: 0 auto;
   line-height: 1.6;
 }
+/* @ds end surface: empty-state */
 
 .session-title {
   align-items: end;
@@ -3949,16 +3982,20 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 650;
 }
 
+/* @ds surface: spinner — shared inline pending/busy indicator. */
 .composer-spinner {
   animation: composer-spin 0.8s linear infinite;
 }
 
+/* @ds slot: spin — the rotating frame. */
 @keyframes composer-spin {
   to {
     transform: rotate(360deg);
   }
 }
+/* @ds end surface: spinner */
 
+/* @ds guardrail: reduced-motion keeps the shared spinner static — never remove. */
 @media (prefers-reduced-motion: reduce) {
   .composer-spinner {
     animation: none;
@@ -4843,6 +4880,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* ── Runtime strip: composer-adjacent confirmed readouts + shared trigger ── */
+/* @ds surface: runtime-strip — host-backed readout + controls strip. */
 .runtime-strip {
   display: flex;
   min-inline-size: 0;
@@ -4856,6 +4894,7 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.75rem;
 }
 
+/* @ds slot: readout — confirmed model / effort readout. */
 .runtime-readout {
   display: inline-flex;
   align-items: baseline;
@@ -4863,6 +4902,7 @@ button[data-pressed]:not([data-disabled]) {
   white-space: nowrap;
 }
 
+/* @ds slot: readout-label */
 .runtime-readout-label {
   color: var(--ink-muted);
   font-size: 0.65rem;
@@ -4871,11 +4911,14 @@ button[data-pressed]:not([data-disabled]) {
   text-transform: uppercase;
 }
 
+/* @ds slot: readout-value */
 .runtime-readout-value {
   color: var(--ink-secondary);
   font-weight: 620;
 }
 
+/* @ds surface: effort-trigger — opens the shared model/effort sheet. */
+/* @ds state: default */
 .runtime-effort-trigger {
   display: inline-flex;
   min-inline-size: 44px;
@@ -4890,15 +4933,19 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: hover */
 .runtime-effort-trigger[data-hovered] {
   background: var(--surface-muted);
 }
 
+/* @ds state: focus-visible */
 .runtime-effort-trigger[data-focus-visible] {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
+/* @ds end surface: effort-trigger */
 
+/* @ds surface: build-plan-toggle — the Build / Plan segmented toggle. */
 .runtime-control.runtime-mode {
   display: inline-flex;
   padding: 0.2rem;
@@ -4907,6 +4954,7 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface);
 }
 
+/* @ds state: default */
 .runtime-mode .react-aria-ToggleButton {
   min-block-size: 2rem;
   padding-inline: 0.7rem;
@@ -4919,20 +4967,25 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: selected */
 .runtime-mode .react-aria-ToggleButton[data-selected] {
   background: var(--ink);
   color: var(--ink-inverse);
 }
 
+/* @ds state: disabled */
 .runtime-mode .react-aria-ToggleButton[data-disabled] {
   cursor: default;
   opacity: 0.5;
 }
+/* @ds end surface: build-plan-toggle */
 
+/* @ds slot: status — applied runtime status hint. */
 .runtime-status {
   min-block-size: 1rem;
   white-space: nowrap;
 }
+/* @ds end surface: runtime-strip */
 
 /* Narrow widths give the mode control its own toolbar row above the
    textarea: the left group wraps so the label never truncates Plan ·
@@ -5474,12 +5527,14 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* Under-answer action row — quiet monochrome, like the Claude app. */
+/* @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. */
 .turn-actions {
   display: flex;
   gap: var(--space-1);
   margin-top: var(--space-2);
 }
 
+/* @ds slot: action — a Copy / Share answer button. */
 .turn-action {
   display: inline-flex;
   align-items: center;
@@ -5495,15 +5550,18 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: hover */
 .turn-action:hover {
   background: var(--surface-muted);
   color: var(--ink-secondary);
 }
 
+/* @ds state: focus-visible */
 .turn-action:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
+/* @ds end surface: turn-actions */
 
 .quiet-copy {
   padding-top: 0;
@@ -5512,6 +5570,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* Routine evidence: a quiet, self-describing disclosure that sits calmly beside prose. */
+/* @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. */
 .evidence-trigger {
   display: inline-flex;
   align-items: center;
@@ -5526,10 +5585,12 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: hover */
 .evidence-trigger[data-hovered] .evidence-summary {
   color: var(--ink-secondary);
 }
 
+/* @ds slot: chevron */
 .evidence-chevron {
   display: inline-block;
   font-size: 1rem;
@@ -5537,9 +5598,11 @@ button[data-pressed]:not([data-disabled]) {
   transition: transform var(--duration-state) var(--ease-out);
 }
 
+/* @ds state: expanded */
 .evidence-trigger[data-expanded] .evidence-chevron {
   transform: rotate(90deg);
 }
+/* @ds end surface: evidence-disclosure */
 
 .plan-list {
   display: grid;
@@ -6135,6 +6198,7 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface);
 }
 
+/* @ds slot: panel-body — the DisclosurePanel content stack of an evidence disclosure. */
 .activity-stack {
   display: grid;
   gap: var(--space-2);

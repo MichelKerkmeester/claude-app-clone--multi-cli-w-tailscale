@@ -18,12 +18,24 @@ import {
 import { SafeMarkdown } from './SafeMarkdown.js';
 import { TextArtifactCard } from './TextArtifactCard.js';
 
+// @ds surface: rich-content-router — dispatches each normalized transcript block
+// to its card/view. The block-kind dispatch, the viewer handoff, and the
+// redaction handling below are guardrailed and not designer-editable.
+
+// @ds guardrail: do-not-edit — the router's block-kind switch is the single
+// dispatch point; isNormalizedRichContentBlock / isRichCardBlock are exported
+// type guards used by security tests. Not designer-editable.
 export interface RichContentRouterProps {
   readonly block: NormalizedTranscriptBlock;
   readonly onOpen?: (block: F6RichBlock, trigger?: HTMLButtonElement | null) => void;
 }
 
 export function RichContentRouter({ block, onOpen }: RichContentRouterProps) {
+  // @ds guardrail: do-not-edit — the viewer handoff. useOptionalArtifactViewer
+  // binds an in-memory, in-viewer document (F6ViewerAdapter ⊆
+  // createInMemoryArtifactDocument). The open-handoff state is a pure handoff
+  // into the existing viewer: no fetch, endpoint, ticket, download, or host-file
+  // read is added. The effect keeps an in-memory doc current for hosted blocks.
   const viewer = useOptionalArtifactViewer();
   const canOpen = onOpen !== undefined || viewer !== null;
   useEffect(() => {
@@ -31,6 +43,9 @@ export function RichContentRouter({ block, onOpen }: RichContentRouterProps) {
     viewer.updateInMemory(createInMemoryArtifactDocument(block));
   }, [block, onOpen, viewer]);
   const open = (richBlock: F6RichBlock, trigger: HTMLButtonElement | null = null) => {
+    // @ds guardrail: do-not-edit — the open-handoff state. Delegates to the
+    // bound onOpen or falls back to the viewer's openInMemory with the same
+    // in-memory document; nothing is fetched, written, or read from the host.
     if (onOpen !== undefined) {
       onOpen(richBlock, trigger);
       return;
@@ -38,6 +53,8 @@ export function RichContentRouter({ block, onOpen }: RichContentRouterProps) {
     viewer?.openInMemory(createInMemoryArtifactDocument(richBlock), trigger);
   };
 
+  // @ds guardrail: do-not-edit — block-kind dispatch. Each case renders the
+  // matching card; prose/diff/fallback stay redaction-bounded.
   switch (block.kind) {
     case 'command':
       return (
@@ -97,12 +114,17 @@ export function isRichCardBlock(
 function ProseBlock({ block }: { readonly block: NormalizedProseBlock }) {
   return (
     <div className={`rich-prose-block block-role-${block.role ?? 'assistant'}`}>
+      {/* @ds surface: safe-markdown — @ds guardrail: do-not-edit. Passthrough into
+          the safe-Markdown renderer; sanitization (allowlist, scheme filtering,
+          escaping) is fenced inside SafeMarkdown.tsx and unchanged. */}
       <SafeMarkdown source={block.canonicalSource} ariaLabel="Transcript response" />
     </div>
   );
 }
 
 function ActivityBlock({ block }: { readonly block: NormalizedActivityBlock }) {
+  // @ds guardrail: do-not-edit — activity blocks render only a bounded redacted
+  // summary of the underlying block; the source stays host-side and unread.
   const source = activitySource(block.sourceBlock);
   return (
     <RichBlockFrame
@@ -133,6 +155,8 @@ function activityTitle(block: DisplayTranscriptBlock): string {
 }
 
 function DiffBlock({ block }: { readonly block: NormalizedDiffBlock }) {
+  // @ds guardrail: do-not-edit — diff blocks present only the already-redacted
+  // patch text sent by the host; no host-file read or resource fetch.
   const source = block.sourceBlock as DisplayTranscriptBlock & { readonly patch?: unknown };
   return (
     <RichBlockFrame title="File diff" eyebrow="Diff" className="rich-diff-card">
@@ -144,6 +168,8 @@ function DiffBlock({ block }: { readonly block: NormalizedDiffBlock }) {
 }
 
 function FallbackBlock({ block }: { readonly block: NormalizedFallbackBlock }) {
+  // @ds guardrail: do-not-edit — fallback blocks present only the kind label;
+  // their content is redacted and cannot be displayed by this client.
   return (
     <RichBlockFrame title="Unsupported block" className="rich-fallback-card">
       <p className="block-copy quiet-copy">

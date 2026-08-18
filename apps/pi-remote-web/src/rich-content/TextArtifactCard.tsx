@@ -5,6 +5,14 @@ import type { NormalizedTextArtifactBlock } from './normalizeTranscriptBlocks.js
 import { RichBlockFrame } from './RichBlockFrame.js';
 import { useCopyFeedback } from './useCopyFeedback.js';
 
+// @ds surface: text-artifact-card — substantial text artifact preview with a
+// full-screen Open handoff. Presentation lives in src/style.css under the same
+// surface name; the clipboard + react-aria wiring below is guardrailed and not
+// designer-editable.
+
+// @ds guardrail: do-not-edit — exact-copy clipboard boundary. The canonical source
+// is written to the clipboard unaltered; the Open action is a pass-through into
+// the existing viewer with no fetch, endpoint, ticket, download, or host-file read.
 export interface TextArtifactCardProps {
   readonly block: NormalizedTextArtifactBlock;
   readonly onOpen?: (trigger?: HTMLButtonElement | null) => void;
@@ -13,6 +21,7 @@ export interface TextArtifactCardProps {
 const PREVIEW_LINES = 6;
 
 export function TextArtifactCard({ block, onOpen }: TextArtifactCardProps) {
+  // @ds guardrail: do-not-edit — exact-copy clipboard boundary (useCopyFeedback).
   const feedback = useCopyFeedback();
   const lines = displayLines(block.canonicalSource);
   const preview = lines.slice(0, PREVIEW_LINES).join('\n');
@@ -28,6 +37,10 @@ export function TextArtifactCard({ block, onOpen }: TextArtifactCardProps) {
       redaction={block.redaction}
       className="rich-text-artifact-card"
       actions={
+        // @ds slot: actions — Copy text + full-screen Open handoff.
+        // @ds guardrail: do-not-edit — react-aria Button wiring and the exact-copy
+        // clipboard boundary; Open is a pass-through with no fetch/endpoint/ticket/
+        // download/host-file read.
         feedback.canCopy || canOpen ? (
           <>
             {feedback.canCopy && (
@@ -52,12 +65,14 @@ export function TextArtifactCard({ block, onOpen }: TextArtifactCardProps) {
         ) : undefined
       }
     >
+      {/* @ds slot: preview — clipped text-artifact preview column. */}
       <div className="rich-text-artifact-preview">
         <pre>{preview}</pre>
       </div>
       {lines.length > PREVIEW_LINES && (
         <p className="rich-continuation">{lines.length - PREVIEW_LINES} more lines</p>
       )}
+      {/* @ds guardrail: do-not-edit — polite live region announcing Copy outcomes. */}
       <p className="rich-copy-status" role="status" aria-live="polite">
         {feedback.announcement}
       </p>

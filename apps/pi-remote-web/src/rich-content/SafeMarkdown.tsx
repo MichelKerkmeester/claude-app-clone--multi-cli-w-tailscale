@@ -1,5 +1,15 @@
 import { createElement, type ElementType, type ReactNode } from 'react';
 
+// @ds surface: safe-markdown — renders already-redacted Markdown to safe prose.
+// @ds guardrail: do-not-edit — this module is the read-only sanitization
+// boundary. The allowlist, URL/scheme filtering, and character escaping below
+// are frozen and NOT designer-editable; the exact-copy affordance in the cards
+// and the data-verbatim-copy seam depend on the canonical source staying
+// unaltered.
+
+// @ds guardrail: do-not-edit — the sanitization patterns. Raw HTML/markup,
+// unsafe URL schemes, and control/bidi characters are matched and rejected
+// verbatim; do not add, remove, or broaden any pattern here.
 interface ParagraphNode {
   readonly kind: 'paragraph';
   readonly text: string;
@@ -81,6 +91,9 @@ export function SafeMarkdown({
   const classes = `safe-markdown${className.length > 0 ? ` ${className}` : ''}`;
   if (ast === null) {
     const controlPresentation = presentInvisibleCharacters(source);
+    // @ds guardrail: do-not-edit — the fail-closed fallback. If the AST boundary
+    // rejects the source it renders verbatim (escaping only control characters),
+    // and data-verbatim-copy marks the canonical source as the exact-copy text.
     return (
       <div
         className={`${classes} safe-markdown-fallback`}
@@ -106,6 +119,9 @@ export function SafeMarkdown({
   );
 }
 
+// @ds guardrail: do-not-edit — parseSafeMarkdown is the fail-closed AST boundary:
+// on any unsafe input it returns null and SafeMarkdown falls back to escaped
+// verbatim text. It is exported so security tests verify that boundary.
 // The parser is exported so security tests can verify the fail-closed AST boundary.
 // eslint-disable-next-line react-refresh/only-export-components
 export function parseSafeMarkdown(source: string): readonly SafeMarkdownNode[] | null {
@@ -270,6 +286,9 @@ function renderNode(node: SafeMarkdownNode, key: number): ReactNode {
   }
 }
 
+// @ds guardrail: do-not-edit — inline rendering interprets only the fixed inline
+// tokenPattern (code, strong, em, del, links); every other run renders as plain
+// text and every link destination is scheme-filtered before it is emitted.
 function renderInline(source: string, keyPrefix: string): ReactNode {
   const nodes: ReactNode[] = [];
   let remaining = source;
@@ -306,6 +325,9 @@ function renderInline(source: string, keyPrefix: string): ReactNode {
   return nodes;
 }
 
+// @ds guardrail: do-not-edit — the sanitization gate: raw HTML/markup rejection,
+// control-character rejection, and unsafe-scheme rejection of every Markdown
+// destination. The allowlist and scheme filtering are frozen.
 function isUnsafeMarkdown(source: string): boolean {
   if (
     RAW_HTML_PATTERN.test(source) ||
@@ -324,6 +346,8 @@ function isUnsafeMarkdown(source: string): boolean {
   return false;
 }
 
+// @ds guardrail: do-not-edit — normalizes a destination for the unsafe-scheme
+// check (strips control characters and decodes percent-encoding before matching).
 function normalizeForSchemeCheck(value: string): string {
   const schemeControlPattern = new RegExp(
     `[${characterRange(0x00, 0x20)}${characterRange(0x7f, 0x9f)}]`,
@@ -342,6 +366,8 @@ function normalizeForSchemeCheck(value: string): string {
   return normalized;
 }
 
+// @ds guardrail: do-not-edit — control/bidi characters are shown as visible
+// markers (never executed) so the copied canonical text stays verbatim.
 function presentInvisibleCharacters(value: string): {
   readonly value: string;
   readonly changed: boolean;
@@ -413,6 +439,8 @@ function splitTableRow(line: string): readonly string[] {
     .map((cell) => cell.trim());
 }
 
+// @ds guardrail: do-not-edit — the language allowlist. Any fenced language label
+// outside this set renders unlabeled/plain; the set is frozen.
 function safeLanguageLabel(value: string): string | null {
   const normalized = value.toLocaleLowerCase();
   const allowed = new Set([

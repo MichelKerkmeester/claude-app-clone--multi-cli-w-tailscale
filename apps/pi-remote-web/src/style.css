@@ -3119,8 +3119,15 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds surface: rich-content-cards — the rich-content card group: command/output,
+   code, and text-artifact cards, their shared rich-block-frame, and the prose
+   rendered by the safe-Markdown renderer. Rules below already read semantic
+   tokens; these @ds labels make each presentational seam and every state explicit. */
 /* Rich content release hardening: bounded reading surfaces keep text selectable,
    directional prose stable, and interactive targets usable at narrow widths. */
+/* @ds guardrail: do-not-edit — bounded reading surfaces must never overflow the
+   page horizontally; the minimum inline size is a shared invariant across the
+   cards and the read-only regions they render. */
 .rich-block-frame,
 .rich-block-content,
 .rich-prose-block,
@@ -3133,6 +3140,10 @@ button[data-pressed]:not([data-disabled]) {
   max-inline-size: 100%;
 }
 
+/* @ds slot: prose — bidirectional-safe read-out for rendered plain prose and
+   safe-Markdown output. */
+/* @ds guardrail: do-not-edit — unicode-bidi: plaintext keeps directional text
+   stable and un-clickable-into; do not weaken. */
 .rich-prose-block,
 .safe-markdown,
 .safe-markdown-fallback {
@@ -3141,6 +3152,8 @@ button[data-pressed]:not([data-disabled]) {
   unicode-bidi: plaintext;
 }
 
+/* @ds guardrail: do-not-edit — scrollable code/text wells contain their own
+   overscroll so panning never chains to the page. */
 .rich-shell-well,
 .rich-code-preview,
 .safe-markdown-code,
@@ -3151,6 +3164,7 @@ button[data-pressed]:not([data-disabled]) {
   overscroll-behavior: contain;
 }
 
+/* @ds guardrail: do-not-edit — panning previews do not shift scroll anchoring. */
 .rich-code-preview,
 .artifact-code-preview,
 .artifact-diff-preview,
@@ -3159,6 +3173,8 @@ button[data-pressed]:not([data-disabled]) {
   overflow-anchor: none;
 }
 
+/* @ds guardrail: do-not-edit — >=44px interactive targets (WCAG). The Copy/Open
+   card actions and the viewer controls all share this floor. */
 .rich-block-action,
 .artifact-control-button,
 .artifact-stale-action,
@@ -3167,6 +3183,8 @@ button[data-pressed]:not([data-disabled]) {
   min-inline-size: 44px;
 }
 
+/* @ds guardrail: do-not-edit — canonical focus-visible ring for card actions and
+   viewer controls. Presentational a11y invariant; never colour-only. */
 .rich-block-action:focus-visible,
 .artifact-control-button:focus-visible,
 .artifact-stale-action:focus-visible,
@@ -3255,6 +3273,8 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds edit: layout — narrow reflow of the cards at <=20rem: card padding,
+   header/actions/status stacking, and full-width actions. */
 @media (max-width: 20rem) {
   .rich-block-frame {
     padding: var(--space-3);
@@ -3285,6 +3305,7 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds edit: layout — short-landscape reflow: cards compact their vertical rhythm. */
 @media (orientation: landscape) and (max-height: 30rem) {
   .artifact-viewer-modal {
     max-block-size: 100dvh;
@@ -3299,6 +3320,8 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds guardrail: do-not-edit — reduced-motion: card actions and panning previews
+   collapse their transition/scroll motion. */
 @media (prefers-reduced-motion: reduce) {
   .rich-block-action,
   .artifact-control-button,
@@ -3310,6 +3333,9 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds surface: rich-block-frame — shared chrome for every rich card: header,
+   content column, and footer action row. */
+/* @ds edit: layout — card geometry, padding, radius, shadow, frame width. */
 .rich-block-frame {
   min-inline-size: 0;
   inline-size: 100%;
@@ -3322,6 +3348,8 @@ button[data-pressed]:not([data-disabled]) {
   box-shadow: var(--shadow-raised);
 }
 
+/* @ds slot: header — title/eyebrow/metadata versus status/redaction row. */
+/* @ds edit: layout — header gap, alignment, space-between rhythm. */
 .rich-block-header {
   display: flex;
   gap: var(--space-3);
@@ -3331,10 +3359,12 @@ button[data-pressed]:not([data-disabled]) {
   margin-block-end: var(--space-3);
 }
 
+/* @ds slot: heading — eyebrow + title + metadata column. */
 .rich-block-heading {
   min-inline-size: 0;
 }
 
+/* @ds slot: title — card title (h3) and the command-region subheadings (h4). */
 .rich-block-heading h3,
 .rich-command-region h4 {
   margin: 0;
@@ -3347,6 +3377,7 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1rem;
 }
 
+/* @ds slot: label — eyebrow kicker above the card title. */
 .rich-block-eyebrow {
   margin: 0 0 var(--space-1);
   color: var(--ink-muted);
@@ -3355,6 +3386,7 @@ button[data-pressed]:not([data-disabled]) {
   text-transform: uppercase;
 }
 
+/* @ds slot: metadata · status · actions · output-heading — shared flex row rhythm. */
 .rich-block-metadata,
 .rich-block-status,
 .rich-command-region-heading,
@@ -3365,17 +3397,20 @@ button[data-pressed]:not([data-disabled]) {
   align-items: center;
 }
 
+/* @ds slot: metadata — quiet factual chips (language, call, lines, labels). */
 .rich-block-metadata {
   margin-block-start: var(--space-2);
   color: var(--ink-muted);
   font-size: 0.75rem;
 }
 
+/* @ds slot: metadata — inter-chip bullet separator. */
 .rich-block-metadata span + span::before {
   margin-inline-end: var(--space-2);
   content: '·';
 }
 
+/* @ds slot: status — lifecycle caption and redaction badge. */
 .rich-block-status {
   flex: 0 1 auto;
   justify-content: flex-end;
@@ -3384,6 +3419,8 @@ button[data-pressed]:not([data-disabled]) {
   text-align: end;
 }
 
+/* @ds guardrail: do-not-edit — redaction affordance chip. Its presence signals
+   content is already redacted read-only; never remove or restyle it away. */
 .rich-redaction-badge {
   padding: 0.2rem 0.45rem;
   border: 1px solid var(--line-strong);
@@ -3393,14 +3430,23 @@ button[data-pressed]:not([data-disabled]) {
   white-space: nowrap;
 }
 
+/* @ds slot: content — the card body holding the per-card preview regions. */
 .rich-block-content {
   min-inline-size: 0;
 }
 
+/* @ds slot: actions — footer row of Copy/Open unit actions. */
+/* @ds state: open-handoff — the Open full screen action is a handoff into the
+   existing artifacts viewer; it adds no fetch, endpoint, ticket, download, or
+   host-file read. Behaviour is guardrailed in the cards' tsx. */
 .rich-block-actions {
   margin-block-start: var(--space-4);
 }
 
+/* @ds slot: actions — a single unit action button. */
+/* @ds state: copy — success · failure · unavailable are behavioural states driven
+   by clipboard availability and result; the affordance chrome is this base. */
+/* @ds guardrail: do-not-edit — >=44px target floor and the base chrome. */
 .rich-block-action {
   min-inline-size: 44px;
   min-block-size: 44px;
@@ -3414,24 +3460,33 @@ button[data-pressed]:not([data-disabled]) {
   white-space: nowrap;
 }
 
+/* @ds state: hover — react-aria data-hovered press/pointer feedback on card actions. */
+/* @ds guardrail: do-not-edit — reads react-aria's data-hovered attribute. */
 .rich-block-action[data-hovered] {
   background: var(--accent-soft);
   color: var(--accent-ink);
 }
 
+/* @ds surface: command-output-card — Bash command + output preview with unit
+   Copy and a full-screen Open handoff. */
+/* @ds slot: output — vertical spacing between the command and output regions. */
 .rich-command-region + .rich-command-region {
   margin-block-start: var(--space-4);
 }
 
+/* @ds slot: output-heading — Output title + earlier-lines-clipped count row. */
 .rich-command-region-heading {
   justify-content: space-between;
   margin-block-end: var(--space-2);
 }
 
+/* @ds slot: label — Command / Output region subheadings. */
 .rich-command-region h4 {
   font-size: 0.8125rem;
 }
 
+/* @ds slot: command / output / code well — mono well shared by the command and
+   the diff preview; no horizontal page overflow (scrolls inside its own box). */
 .rich-shell-well {
   min-inline-size: 0;
   margin: 0;
@@ -3446,11 +3501,16 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds slot: output-preview — tail-window preview of command output. */
+/* @ds state: running-tail — React sets data-tail-first='true'; the preview shows
+   the newest output lines at the bottom while a command streams. */
 .rich-output-preview {
   block-size: 8.5rem;
   contain: content;
 }
 
+/* @ds slot: labels — clipped-count, output-meta, and code/text continuation
+   captions share the same muted small type. */
 .rich-clipped-count,
 .rich-output-meta,
 .rich-continuation {
@@ -3458,11 +3518,17 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.75rem;
 }
 
+/* @ds slot: labels — output-meta and continuation caption rhythm. */
 .rich-output-meta,
 .rich-continuation {
   margin: var(--space-2) 0 0;
 }
 
+/* @ds surface: code-card — fenced source preview with optional progressive
+   highlighting and a full-screen Open handoff. */
+/* @ds slot: code-preview — horizontally panning code viewport. */
+/* @ds state: code — plaintext-first; progressively highlighted via the
+   data-highlight-status hook that React owns (plain · pending · highlighted). */
 .rich-code-preview {
   max-block-size: 228px;
   min-inline-size: 0;
@@ -3472,6 +3538,7 @@ button[data-pressed]:not([data-disabled]) {
   scrollbar-width: thin;
 }
 
+/* @ds slot: code well — the code lines scroll inside this mono well. */
 .rich-code-preview pre {
   inline-size: max-content;
   min-inline-size: 100%;
@@ -3485,12 +3552,16 @@ button[data-pressed]:not([data-disabled]) {
   white-space: pre;
 }
 
+/* @ds surface: text-artifact-card — substantial text artifact preview with a
+   full-screen Open handoff. */
+/* @ds slot: preview — clipped text-artifact preview column. */
 .rich-text-artifact-preview {
   max-block-size: 9.5rem;
   overflow: hidden;
   border-block: 1px solid var(--line);
 }
 
+/* @ds slot: preview — text-artifact lines (display serif, wrap-safe). */
 .rich-text-artifact-preview pre {
   margin: 0;
   padding-block: var(--space-3);
@@ -3500,12 +3571,16 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds slot: prose — plain-text block read-out; capped to reading width. */
 .rich-prose-block {
   min-inline-size: 0;
   max-inline-size: var(--reading-width);
   margin-block: var(--space-3);
 }
 
+/* @ds slot: safe-markdown — the safe-Markdown renderer's prose output. */
+/* @ds guardrail: do-not-edit — this is the presentation of already-sanitized
+   Markdown; the allowlist and scheme-filtering live in SafeMarkdown.tsx. */
 .safe-markdown,
 .safe-markdown-fallback {
   min-inline-size: 0;
@@ -3514,6 +3589,7 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds slot: prose spacing — block-level rhythm for headings and quotes. */
 .safe-markdown p,
 .safe-markdown h1,
 .safe-markdown h2,
@@ -3525,18 +3601,21 @@ button[data-pressed]:not([data-disabled]) {
   margin-block: 0 var(--space-3);
 }
 
+/* @ds slot: prose-quote — blockquote border + muted ink. */
 .safe-markdown blockquote {
   padding-inline-start: var(--space-3);
   border-inline-start: 3px solid var(--line-strong);
   color: var(--ink-muted);
 }
 
+/* @ds slot: prose-list — ordered/unordered list rhythm and indent. */
 .safe-markdown ul,
 .safe-markdown ol {
   margin-block: 0 var(--space-3);
   padding-inline-start: 1.4rem;
 }
 
+/* @ds slot: prose-inline-code — inline code chip. */
 .safe-markdown code {
   padding: 0.1rem 0.25rem;
   border-radius: var(--radius-sm);
@@ -3545,6 +3624,7 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.88em;
 }
 
+/* @ds slot: safe-markdown-code — fenced code block rendered by SafeMarkdown. */
 .safe-markdown-code {
   max-inline-size: 100%;
   margin-block: 0 var(--space-3);
@@ -3558,11 +3638,14 @@ button[data-pressed]:not([data-disabled]) {
   white-space: pre;
 }
 
+/* @ds slot: safe-markdown-code — neutralizes the inline-chip chrome inside a
+   fenced block. */
 .safe-markdown-code code {
   padding: 0;
   background: transparent;
 }
 
+/* @ds slot: prose-table — table rhythm, borders, and start-aligned cells. */
 .safe-markdown table {
   inline-size: 100%;
   margin-block: 0 var(--space-3);
@@ -3578,6 +3661,9 @@ button[data-pressed]:not([data-disabled]) {
   vertical-align: top;
 }
 
+/* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
+   polite live region whose text carries the outcome; the presence styles are this. */
+/* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
 .rich-copy-status {
   min-block-size: 1.25rem;
   margin: var(--space-2) 0 0;
@@ -3585,11 +3671,16 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.75rem;
 }
 
+/* @ds surface: fallback/activity cards — quiet presentation for non-card blocks. */
+/* @ds state: malformed-fallback — unsupported/undisplayable blocks present as a
+   quiet card without card chrome. */
 .rich-fallback-card,
 .rich-activity-card {
   box-shadow: none;
 }
 
+/* @ds edit: layout — narrow reflow at <=27rem: card padding, header stack, and
+   full-width action buttons. */
 @media (max-width: 27rem) {
   .rich-block-frame {
     padding: var(--space-3);

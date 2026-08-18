@@ -17,6 +17,7 @@
   font-display: swap;
 }
 
+/* @ds theme [fonts|radius|ease] — the shared design-scale block: type stacks, radius, easing. */
 @theme {
   --font-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-display: 'Source Serif 4', Charter, Georgia, Cambria, 'Times New Roman', serif;
@@ -34,34 +35,51 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --canvas: #f8f8f6;
+  /* @ds guardrail: do-not-edit — frozen source. Primitive tokens, light. */
+  /* The raw ink-on-parchment palette. These names are theme-abstract: each theme block
+     re-declares the same names with that theme's frozen source values, so one role token
+     can reference the same primitive everywhere and still resolve per theme. */
+  --pi-bone: #f8f8f6;      /* light canvas         */
+  --pi-raised: #ffffff;    /* light surface-raised */
+  --pi-carbon: #24221f;    /* ink / dark page      */
+  --pi-muted: #6c6a65;     /* light muted text     */
+  --pi-clay: #d97757;      /* accent               */
+  --pi-accent-txt: #8a452f; /* AA text accent      */
+  --pi-accent-ui: #b85f42; /* AA UI accent         */
+  --pi-selection: #f3e4de; /* soft selection       */
+
+  /* @ds edit: tokens — semantic roles, light. */
+  /* The role tokens the app reads. A role whose source is a primitive references it;
+     the remaining roles (lines, success/danger state, focus, shadow, spacing/radius/
+     duration/ease/layout) are the raw scales and stay literal at the semantic layer. */
+  --canvas: var(--pi-bone);
   --canvas-subtle: #efeeeb;
-  --surface: #ffffff;
-  --surface-raised: #ffffff;
+  --surface: var(--pi-raised);
+  --surface-raised: var(--pi-raised);
   --surface-muted: #efeeeb;
   --surface-code: #24221f;
-  --ink: #24221f;
-  --ink-secondary: #24221f;
-  --ink-muted: #6c6a65;
-  --ink-tertiary-safe: #6c6a65;
-  --ink-disabled: #6c6a65;
-  --placeholder: #6c6a65;
-  --ink-inverse: #f8f8f6;
+  --ink: var(--pi-carbon);
+  --ink-secondary: var(--pi-carbon);
+  --ink-muted: var(--pi-muted);
+  --ink-tertiary-safe: var(--pi-muted);
+  --ink-disabled: var(--pi-muted);
+  --placeholder: var(--pi-muted);
+  --ink-inverse: var(--pi-bone);
   --line: #e7e6e1;
   --line-hairline: #b7b7b5;
   --control-border: #7b7974;
   --line-strong: #7b7974;
   --decoration-low: #9c9a92;
-  --accent: #d97757;
-  --accent-strong: #b85f42;
-  --accent-soft: #f3e4de;
-  --accent-ink: #8a452f;
-  --action-bg: #24221f;
-  --action-fg: #f8f8f6;
+  --accent: var(--pi-clay);
+  --accent-strong: var(--pi-accent-ui);
+  --accent-soft: var(--pi-selection);
+  --accent-ink: var(--pi-accent-txt);
+  --action-bg: var(--pi-carbon);
+  --action-fg: var(--pi-bone);
   --success: #37624a;
   --success-soft: #e7eee9;
-  --warning: #8a452f;
-  --warning-soft: #f3e4de;
+  --warning: var(--pi-accent-txt);
+  --warning-soft: var(--pi-selection);
   --danger: #8d382e;
   --danger-soft: #f4e7e4;
   --focus: #121212;
@@ -93,34 +111,45 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --canvas: #24221f;
+  /* @ds guardrail: do-not-edit — frozen source. Primitive tokens, dark — remaps the same names. */
+  --pi-bone: #24221f;       /* dark page            */
+  --pi-raised: #2d2a26;     /* dark surface-raised  */
+  --pi-carbon: #f8f8f6;     /* dark text / ink      */
+  --pi-muted: #9f998f;      /* dark muted text      */
+  --pi-clay: #d97757;       /* accent (unchanged)   */
+  --pi-accent-txt: #f0b19a; /* dark accent text     */
+  --pi-selection: #3a2720;  /* dark soft selection  */
+  /* --pi-accent-ui has no distinct dark source value; the accent-strong role keeps its fixed literal below. */
+
+  /* @ds edit: tokens — semantic roles, dark. */
+  --canvas: var(--pi-bone);
   --canvas-subtle: #1f1e1b;
-  --surface: #2d2a26;
-  --surface-raised: #2d2a26;
+  --surface: var(--pi-raised);
+  --surface-raised: var(--pi-raised);
   --surface-muted: #302e2a;
   --surface-code: #24221f;
-  --ink: #f8f8f6;
-  --ink-secondary: #f8f8f6;
-  --ink-muted: #9f998f;
-  --ink-tertiary-safe: #9f998f;
-  --ink-disabled: #9f998f;
-  --placeholder: #9f998f;
-  --ink-inverse: #24221f;
+  --ink: var(--pi-carbon);
+  --ink-secondary: var(--pi-carbon);
+  --ink-muted: var(--pi-muted);
+  --ink-tertiary-safe: var(--pi-muted);
+  --ink-disabled: var(--pi-muted);
+  --placeholder: var(--pi-muted);
+  --ink-inverse: var(--pi-bone);
   --line: #3b3934;
   --line-hairline: #4a4741;
   --control-border: #807a70;
   --line-strong: #807a70;
   --decoration-low: #777168;
-  --accent: #d97757;
+  --accent: var(--pi-clay);
   --accent-strong: #b85f42;
-  --accent-soft: #3a2720;
-  --accent-ink: #f0b19a;
-  --action-bg: #f8f8f6;
-  --action-fg: #24221f;
+  --accent-soft: var(--pi-selection);
+  --accent-ink: var(--pi-accent-txt);
+  --action-bg: var(--pi-carbon);
+  --action-fg: var(--pi-bone);
   --success: #8fc4a4;
   --success-soft: #203129;
-  --warning: #f0b19a;
-  --warning-soft: #3a2720;
+  --warning: var(--pi-accent-txt);
+  --warning-soft: var(--pi-selection);
   --danger: #ee9b91;
   --danger-soft: #3a2522;
   --focus: #f8f8f6;
@@ -132,34 +161,45 @@
 @media (prefers-color-scheme: dark) {
   :root[data-theme='system'] {
     color-scheme: dark;
-    --canvas: #24221f;
+    /* @ds guardrail: do-not-edit — frozen source. Primitive tokens, system-dark — remaps the same names. */
+    --pi-bone: #24221f;       /* dark page            */
+    --pi-raised: #2d2a26;     /* dark surface-raised  */
+    --pi-carbon: #f8f8f6;     /* dark text / ink      */
+    --pi-muted: #9f998f;      /* dark muted text      */
+    --pi-clay: #d97757;       /* accent (unchanged)   */
+    --pi-accent-txt: #f0b19a; /* dark accent text     */
+    --pi-selection: #3a2720;  /* dark soft selection  */
+    /* --pi-accent-ui has no distinct dark source value; the accent-strong role keeps its fixed literal below. */
+
+    /* @ds edit: tokens — semantic roles, system-dark. */
+    --canvas: var(--pi-bone);
     --canvas-subtle: #1f1e1b;
-    --surface: #2d2a26;
-    --surface-raised: #2d2a26;
+    --surface: var(--pi-raised);
+    --surface-raised: var(--pi-raised);
     --surface-muted: #302e2a;
     --surface-code: #24221f;
-    --ink: #f8f8f6;
-    --ink-secondary: #f8f8f6;
-    --ink-muted: #9f998f;
-    --ink-tertiary-safe: #9f998f;
-    --ink-disabled: #9f998f;
-    --placeholder: #9f998f;
-    --ink-inverse: #24221f;
+    --ink: var(--pi-carbon);
+    --ink-secondary: var(--pi-carbon);
+    --ink-muted: var(--pi-muted);
+    --ink-tertiary-safe: var(--pi-muted);
+    --ink-disabled: var(--pi-muted);
+    --placeholder: var(--pi-muted);
+    --ink-inverse: var(--pi-bone);
     --line: #3b3934;
     --line-hairline: #4a4741;
     --control-border: #807a70;
     --line-strong: #807a70;
     --decoration-low: #777168;
-    --accent: #d97757;
+    --accent: var(--pi-clay);
     --accent-strong: #b85f42;
-    --accent-soft: #3a2720;
-    --accent-ink: #f0b19a;
-    --action-bg: #f8f8f6;
-    --action-fg: #24221f;
+    --accent-soft: var(--pi-selection);
+    --accent-ink: var(--pi-accent-txt);
+    --action-bg: var(--pi-carbon);
+    --action-fg: var(--pi-bone);
     --success: #8fc4a4;
     --success-soft: #203129;
-    --warning: #f0b19a;
-    --warning-soft: #3a2720;
+    --warning: var(--pi-accent-txt);
+    --warning-soft: var(--pi-selection);
     --danger: #ee9b91;
     --danger-soft: #3a2522;
     --focus: #f8f8f6;
@@ -4071,8 +4111,12 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 700;
 }
 
+/* @ds surface: model-sheet — the model picker + effort sheet overlay. */
 /* The model catalog is host-authored, so the sheet contains and wraps every value. */
 .model-sheet-overlay {
+  /* @ds edit: tokens — per-component palette. A component token is a thin alias that
+     resolves to a semantic role; these stay literal because re-pointing must be
+     pixel-identical in every theme first. Retint this surface here instead of :root. */
   --model-sheet-raised: #ffffff;
   --model-sheet-ink: #24221f;
   --model-sheet-muted: #6c6a65;
@@ -4095,6 +4139,8 @@ button[data-pressed]:not([data-disabled]) {
   animation: model-sheet-backdrop-out 220ms ease-in;
 }
 
+/* The same model-sheet tokens, remapped for dark. The per-surface theme re-declaration
+   is the existing theming mechanism and is left untouched. */
 :root[data-theme='dark'] .model-sheet-overlay {
   --model-sheet-raised: #2d2a26;
   --model-sheet-ink: #f8f8f6;
@@ -4105,6 +4151,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 @media (prefers-color-scheme: dark) {
+  /* System-dark remap of the same model-sheet tokens. */
   :root[data-theme='system'] .model-sheet-overlay {
     --model-sheet-raised: #2d2a26;
     --model-sheet-ink: #f8f8f6;
@@ -4114,6 +4161,8 @@ button[data-pressed]:not([data-disabled]) {
     --model-sheet-selection: #3a2720;
   }
 }
+
+/* @ds end surface: model-sheet */
 
 .model-sheet-modal {
   inline-size: min(92vw, 24rem);
@@ -6339,7 +6388,11 @@ button[data-pressed]:not([data-disabled]) {
   display: contents;
 }
 
+/* @ds surface: slash-panel — the inline slash autocomplete card. */
 .slash-panel {
+  /* @ds edit: tokens — per-component palette. A component token is a thin alias that
+     resolves to a semantic role; these stay literal because re-pointing must be
+     pixel-identical in every theme first. Retint this surface here instead of :root. */
   --slash-raised: #ffffff;
   --slash-ink: #24221f;
   --slash-muted: #6c6a65;
@@ -6363,6 +6416,8 @@ button[data-pressed]:not([data-disabled]) {
   font-family: var(--font-sans);
 }
 
+/* The same slash-panel tokens, remapped for dark. The per-surface theme re-declaration
+   is the existing theming mechanism and is left untouched. */
 :root[data-theme='dark'] .slash-panel {
   --slash-raised: #2d2a26;
   --slash-ink: #f8f8f6;
@@ -6373,6 +6428,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 @media (prefers-color-scheme: dark) {
+  /* System-dark remap of the same slash-panel tokens. */
   :root[data-theme='system'] .slash-panel {
     --slash-raised: #2d2a26;
     --slash-ink: #f8f8f6;
@@ -6382,6 +6438,8 @@ button[data-pressed]:not([data-disabled]) {
     --slash-selection: #3a2720;
   }
 }
+
+/* @ds end surface: slash-panel */
 
 .slash-status {
   padding: 8px 12px;

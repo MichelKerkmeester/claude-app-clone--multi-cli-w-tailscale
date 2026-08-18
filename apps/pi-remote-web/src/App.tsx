@@ -1545,6 +1545,9 @@ export function Session({
  * sheet dismissal without competing live regions; copy is bounded local text.
  */
 export function RuntimeStatusRegion({ runtime }: { readonly runtime: RuntimeUiState }) {
+  // @ds surface: runtime-status-region — sr-only live status region.
+  // @ds guardrail: role="status" + aria-live polite + aria-atomic + the runtime announcement
+  //   string are a11y wiring, not designer-editable.
   return (
     <div
       className="sr-only"
@@ -1577,12 +1580,17 @@ export function TranscriptList({
   readonly onRefreshTodos?: () => void;
   readonly onClearTodoAnnouncement?: () => void;
 }) {
+  // @ds surface: transcript-list — the virtualized typed-transcript list and its live-edge
+  //   controls (scroll-to-latest pill + badge, streaming marker, sr-only announcer).
+  // @ds guardrail: virtualization, turn-grouping, block normalization, and streaming state
+  //   below (hooks, effects, measurement, scroll and announce handlers) are not designer-editable.
   const artifactSessionId = sessionId ?? '';
   const scrollRef = useRef<HTMLDivElement>(null);
   const previousCountRef = useRef(blocks.length);
   const [announcement, setAnnouncement] = useState('');
   const [atLiveEdge, setAtLiveEdge] = useState(true);
   const [newAway, setNewAway] = useState(0);
+  // @ds guardrail: live-edge measurement + scroll handlers (followToBottom, onScroll) — not designer-editable.
   const followToBottom = () => {
     const element = scrollRef.current;
     if (element !== null) element.scrollTop = element.scrollHeight;
@@ -1596,6 +1604,8 @@ export function TranscriptList({
     setAtLiveEdge(nearBottom);
     if (nearBottom) setNewAway(0);
   };
+  // @ds guardrail: block normalization (normalizeTranscriptBlocks), turn grouping
+  //   (groupNormalizedTranscript, groupBlocksIntoTurns) and todo-row insertion — not designer-editable.
   const normalizedBlocks = useMemo(
     () =>
       normalizeTranscriptBlocks({
@@ -1620,6 +1630,7 @@ export function TranscriptList({
     const turns = groupBlocksIntoTurns(blocks);
     return new Set(turns.slice(1).map((turn) => turn.blocks[0]?.id));
   }, [blocks]);
+  // @ds guardrail: virtualization — count/estimateSize/measureElement/overscan; rows are measured.
   const virtualizer = useVirtualizer({
     count: renderItems.length,
     getScrollElement: () => scrollRef.current,
@@ -1627,6 +1638,7 @@ export function TranscriptList({
     overscan: 6,
   });
 
+  // @ds guardrail: live-edge auto-scroll effect + sr-only block-arrival announcements — not designer-editable.
   useEffect(() => {
     if (blocks.length > previousCountRef.current) {
       const addedBlocks = blocks.slice(previousCountRef.current);
@@ -1649,15 +1661,19 @@ export function TranscriptList({
     previousCountRef.current = blocks.length;
   }, [blocks, atLiveEdge]);
 
+  // @ds state: empty-transcript — shown when there are no blocks and no todo projection.
   if (blocks.length === 0 && todoProjection.projection === null) {
     return <div className="empty-transcript">No transcript blocks are available yet.</div>;
   }
 
+  // @ds slot: frame — labelled, focussable transcript region.
   return (
     <section className="transcript-frame" aria-label="Typed transcript" tabIndex={-1}>
+      {/* @ds guardrail: sr-only polite live announcer — not designer-editable. */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
+      {/* @ds slot: scroll-region — the scrollable clip of the virtual list. */}
       <div className="transcript-scroll" ref={scrollRef} onScroll={onScroll}>
         <div
           className="transcript-virtual"
@@ -1675,6 +1691,7 @@ export function TranscriptList({
                     : item.sourceBlockId
                   : item.blocks[0]?.sourceBlockId;
             const isTurnStart = leadId !== undefined && turnStartIds.has(leadId);
+            // @ds guardrail: virtualized row — measureElement + translateY come from the virtualizer.
             return (
               <div
                 className={isTurnStart ? 'virtual-row turn-start' : 'virtual-row'}
@@ -1718,6 +1735,7 @@ export function TranscriptList({
               </div>
             );
           })}
+          {/* @ds state: streaming — @ds slot: streaming-marker. */}
           {running && (
             <div
               className="streaming-marker"
@@ -1733,6 +1751,7 @@ export function TranscriptList({
           )}
         </div>
       </div>
+      {/* @ds state: not-live-edge — @ds slot: scroll-to-latest pill + count badge. */}
       {!atLiveEdge && (
         <button
           type="button"
@@ -1958,6 +1977,7 @@ function NormalizedActivityGroup({
 }: {
   readonly blocks: readonly NormalizedActivityBlock[];
 }) {
+  // @ds surface: activity-group — grouped bare evidence surface.
   // @ds surface: evidence-disclosure — grouped activity disclosure.
   return (
     <div className="activity-group">
@@ -2114,12 +2134,16 @@ function Block({
   readonly canAnswer?: boolean;
   readonly askQuestionPrincipal?: string | undefined;
 }) {
+  // @ds surface: transcript-block — one message block; each kind is its own state seam below.
+  // @ds guardrail: the kind switch, collapsibility, role and header decisions are presentation
+  //   logic that must stay in lockstep with the block model; not designer-editable.
   let content: ReactNode;
   let label: string;
   // Routine evidence collapses to a recoverable disclosure; high-signal blocks
   // (text, plan, diffs, and tool errors) stay expanded and prominent.
   let collapsible = false;
   switch (block.kind) {
+    // @ds state: text — user bubble vs assistant serif prose via the role class.
     case 'text':
       label = block.role === 'user' ? 'You' : 'Assistant';
       content = <p className="block-copy">{block.text}</p>;
@@ -2128,11 +2152,13 @@ function Block({
       label = `Text artifact · ${block.label}`;
       content = <pre className="block-copy">{block.source}</pre>;
       break;
+    // @ds state: thinking
     case 'thinking':
       label = 'Thinking summary';
       content = <p className="block-copy quiet-copy">{block.summary}</p>;
       collapsible = true;
       break;
+    // @ds state: plan
     case 'plan':
       label = 'Plan / todo';
       content = (
@@ -2146,24 +2172,29 @@ function Block({
         </ul>
       );
       break;
+    // @ds state: tool_call
     case 'tool_call':
       label = `Tool call · ${block.toolName}`;
       content = <pre>{block.inputSummary}</pre>;
       collapsible = true;
       break;
+    // @ds state: tool_result (+ error)
     case 'tool_result':
       label = `${block.isError ? 'Tool error' : 'Tool result'} · ${block.toolName}`;
       content = <pre className={block.isError ? 'error-output' : ''}>{block.output}</pre>;
       collapsible = !block.isError;
       break;
+    // @ds state: file_diff — rich-content card seam.
     case 'file_diff':
       label = 'File diff';
       content = <ArtifactCard block={block} />;
       break;
+    // @ds state: file_preview
     case 'file_preview':
       label = 'File preview';
       content = <FilePreviewCard block={block} sessionId={sessionId} />;
       break;
+    // @ds state: usage
     case 'usage':
       label = 'Usage';
       content = (
@@ -2215,6 +2246,7 @@ function Block({
         />
       );
       break;
+    // @ds state: unknown
     case 'unknown':
       label = 'Unsupported block';
       content = (
@@ -2236,10 +2268,13 @@ function Block({
     block.kind !== 'ask-question' &&
     (bare ? block.kind !== 'text' : block.kind !== 'text' && !collapsible);
   const renderAsDisclosure = collapsible && !bare;
+  // @ds slot: rich-content-cards — a documented seam where the rich-content card group
+  //   (code, command output, text artifacts) slots onto a block; not rendered here yet.
   return (
     <article
       className={`transcript-block block-${block.kind}${roleClass}${bare ? ' block-bare' : ''}`}
     >
+      {/* @ds slot: header — block label + timestamp. */}
       {showHeader && (
         <header>
           <span>{label}</span>
@@ -2262,6 +2297,9 @@ function FilePreviewCard({
   readonly block: FilePreviewBlock;
   readonly sessionId: string;
 }) {
+  // @ds surface: file-preview-card — read-only preview card; states read from
+  //   data-preview-state (ready · withheld · missing · denied · unsupported).
+  // @ds guardrail: react-aria Button press, aria-label, and viewer open (onPress) — not designer-editable.
   const buttonRef = useRef<HTMLButtonElement>(null);
   const viewer = useOptionalArtifactViewer();
   const availability = filePreviewAvailability(block);

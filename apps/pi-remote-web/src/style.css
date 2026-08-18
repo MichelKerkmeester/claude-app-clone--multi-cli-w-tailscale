@@ -1301,6 +1301,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds surface: empty-state — empty/unavailable list state. */
+/* @ds state: empty-transcript — the TranscriptList "no blocks yet" message. */
 .empty-state,
 .empty-transcript {
   padding: clamp(3rem, 8vw, 6rem) var(--space-4);
@@ -1383,6 +1384,7 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.66rem;
 }
 
+/* @ds slot: frame — transcript region wrapper (positioning only). */
 .transcript-frame {
   position: relative;
   margin-top: var(--space-6);
@@ -5207,7 +5209,9 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* Reader-controlled live edge: a pill to jump to the newest blocks when scrolled up. */
-/* Scroll-to-latest: a soft circular chevron above the composer, with an optional count. */
+/* @ds surface: transcript-list — the virtualized transcript list and its live-edge controls. */
+/* @ds slot: scroll-to-latest — pill, shown only away from the live edge. */
+/* @ds state: not-live-edge */
 .scroll-to-latest {
   position: absolute;
   bottom: var(--space-4);
@@ -5231,6 +5235,7 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface-muted);
 }
 
+/* @ds slot: scroll-badge — new-message count pill. */
 .scroll-badge {
   position: absolute;
   top: -0.35rem;
@@ -5247,6 +5252,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 700;
 }
 
+/* @ds slot: scroll-region — the scrollable clip of the virtual list. */
 .transcript-scroll {
   height: min(70dvh, 54rem);
   overflow: auto;
@@ -5254,11 +5260,14 @@ button[data-pressed]:not([data-disabled]) {
   scrollbar-color: var(--line-strong) transparent;
 }
 
+/* @ds slot: virtual-list — reserves total height; rows are absolutely positioned below. */
+/* @ds guardrail: virtualization layout — measured rows; do not change row height math. */
 .transcript-virtual {
   position: relative;
   width: 100%;
 }
 
+/* @ds guardrail: virtual row + streaming marker share the measured absolute row slot. */
 .virtual-row,
 .streaming-marker {
   position: absolute;
@@ -5274,13 +5283,14 @@ button[data-pressed]:not([data-disabled]) {
   content: none;
 }
 
-/* A conversational turn boundary: hairline + breathing room before each new prompt. */
+/* @ds state: turn-start — hairline + breathing room before each new prompt. */
 .virtual-row.turn-start {
   margin-top: var(--space-6);
   padding-top: var(--space-6);
   border-top: 1px solid var(--line);
 }
 
+/* @ds surface: transcript-block — one message block; each kind is a state seam below. */
 .transcript-block {
   overflow: hidden;
   border: 1px solid var(--line);
@@ -5288,6 +5298,7 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface);
 }
 
+/* @ds state: text */
 .block-text {
   border-color: color-mix(in oklch, var(--accent) 30%, var(--line));
   background: var(--surface-raised);
@@ -5297,17 +5308,20 @@ button[data-pressed]:not([data-disabled]) {
   scroll-margin-block: 6rem;
 }
 
+/* @ds slot: header — block label + timestamp row. */
 .transcript-block > header {
   display: flex;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  padding-block: var(--space-3);
+  padding-inline: var(--space-4);
   border-bottom: 1px solid var(--line);
   color: var(--ink-muted);
   font-size: 0.68rem;
   font-weight: 680;
 }
 
+/* @ds slot: header-time — mono timestamp. */
 .transcript-block > header time {
   font-family: var(--font-mono);
   font-size: 0.64rem;
@@ -5319,6 +5333,7 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--accent-ink);
 }
 
+/* @ds slot: copy — the plain prose/artifact body of a block. */
 .block-copy,
 .diff-summary {
   max-width: var(--reading-width);
@@ -5335,7 +5350,7 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1rem;
 }
 
-/* User prompts read as compact, trailing-aligned bubbles; assistant replies are prose. */
+/* @ds state: text-user — compact, trailing-aligned bubble. */
 .transcript-block.block-role-user {
   width: fit-content;
   max-width: min(82%, 46ch);
@@ -5352,6 +5367,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.5;
 }
 
+/* @ds state: text-assistant — borderless serif prose reply. */
 .transcript-block.block-role-assistant {
   border: none;
   border-radius: 0;
@@ -5623,6 +5639,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 /* @ds end surface: turn-actions */
 
+/* @ds state: thinking · unknown — softened plain copy shared by these block kinds. */
 .quiet-copy {
   padding-top: 0;
   color: var(--ink-muted);
@@ -5664,6 +5681,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 /* @ds end surface: evidence-disclosure */
 
+/* @ds state: plan — checklist items. */
 .plan-list {
   display: grid;
   gap: var(--space-3);
@@ -5693,6 +5711,7 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--success);
 }
 
+/* @ds state: tool_call · tool_result — monospace output (danger variant below). */
 .transcript-block pre {
   max-height: 26rem;
   margin: 0;
@@ -5707,6 +5726,7 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds state: tool_result+error — danger output. */
 .transcript-block .error-output {
   color: oklch(0.82 0.1 25);
 }
@@ -5739,12 +5759,15 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* ── Read-only artifact card and viewer ──────────────────────────────── */
+/* @ds state: file_diff — diff card (the rich-content card seam slots here). */
 .transcript-block.block-file_diff {
   overflow: visible;
   border: 0;
   background: transparent;
 }
 
+/* @ds surface: file-preview-card — read-only preview card reusing the artifact-card
+   surface; states come from data-preview-state (ready · withheld · missing · denied · unsupported). */
 .artifact-card {
   display: grid;
   min-inline-size: 0;
@@ -6182,6 +6205,7 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds state: usage — input/output/cost grid. */
 .usage-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -6209,13 +6233,16 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* Inline streaming marker: a small pulsing cue attached under the active answer. */
+/* @ds state: streaming · @ds slot: streaming-marker — the "Working…" live cue. */
 .streaming-marker {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) 0;
+  padding-block: var(--space-2);
+  padding-inline: 0;
 }
 
+/* @ds slot: streaming-glyph — pulsing dots. */
 .streaming-glyph {
   display: inline-flex;
   align-items: center;
@@ -6239,19 +6266,21 @@ button[data-pressed]:not([data-disabled]) {
   animation-delay: 240ms;
 }
 
+/* @ds slot: streaming-label */
 .streaming-label {
   color: var(--ink-muted);
   font-size: 0.85rem;
   font-weight: 550;
 }
 
+/* @ds guardrail: streaming reduced-motion — a11y invariant; do not remove. */
 @media (prefers-reduced-motion: reduce) {
   .streaming-glyph i {
     animation: none;
   }
 }
 
-/* Grouped evidence: one quiet Activity disclosure; bare children stack without card chrome. */
+/* @ds surface: activity-group — grouped bare evidence blocks in one quiet disclosure. */
 .activity-group {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);

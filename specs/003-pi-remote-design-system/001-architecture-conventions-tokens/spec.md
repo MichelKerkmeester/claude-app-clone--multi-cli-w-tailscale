@@ -7,17 +7,20 @@ importance_tier: "important"
 _memory:
   continuity:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/001-architecture-conventions-tokens"
-    last_updated_at: "2026-08-17T00:00:00Z"
+    last_updated_at: "2026-08-18T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Scaffolded research-first phase with brief and 20-iteration research structure"
-    next_safe_action: "Prepare the research model roster, then run the 20 iterations"
+    recent_action: "Research synthesized into the build-ready decision (research/research.md) with six single-lens cited iterations; decision verified against the real code and frozen contracts"
+    next_safe_action: "Begin Phase 2 migration (002-implement-migrate-component-library) following the Phase-2 migration contract in research/research.md"
     blockers: []
     key_files:
       - "spec.md"
-    completion_pct: 0
-    open_questions:
-      - "Which executor models run the 20 research iterations (operator-defined, TBD)?"
-    answered_questions: []
+      - "research/research.md"
+      - "001-research/implementation-summary.md"
+    completion_pct: 100
+    open_questions: []
+    answered_questions:
+      - "Which executor models run the research iterations? — DeepSeek V4 Flash MAX via the Cline CLI ran an agent-invoked synthesis pass (six single-lens iterations), not the 20-pass /deep:research state machine; recorded in research/PROVENANCE.md."
+      - "Is the inline-comment grammar prefix @ds? — Yes; the decision fixes @ds surface/slot/state/variant/edit/guardrail/theme/catalog."
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -25,18 +28,22 @@ _memory:
 
 # Phase 1 — Architecture, Conventions & Token Library
 
-> **Research-first phase parent.** This file documents the phase's purpose and structure only.
-> The research phase is recorded in [`001-research/`](001-research/); the research artifacts —
-> the brief, the synthesized decision, and the iterations scaffold — live in
-> [`research/`](research/). Build detail for the decision this phase produces lives in Phase 2.
+> **Research-first phase parent — research DECIDED.** This file documents the phase's purpose and
+> structure only. The research phase is recorded in [`001-research/`](001-research/); the research
+> artifacts — the brief, the synthesized build-ready decision, and the cited iterations — live in
+> [`research/`](research/). The decision is final for this phase; build detail lives in Phase 2.
 
 ## 1. METADATA
 
 - **Phase:** `app-mobile-cli/003-pi-remote-design-system/001-architecture-conventions-tokens`
 - **Kind:** research-first phase parent; first sub-phase is `001-research/`.
 - **Deliverable:** one build-ready decision (`research/research.md`) governing all of Phase 2.
-- **Status in this packet:** scaffolded only. The research **models are TBD** (operator-defined
-  later) and the **20 iterations are not run** here.
+- **Status in this packet:** DECIDED. `research/research.md` is the synthesized build-ready
+  decision (three areas: component architecture, the designer-editability `@ds` grammar, and the
+  primitive→semantic→component token library), backed by six single-lens cited iterations. It was
+  produced by an agent-invoked synthesis pass (DeepSeek V4 Flash MAX via the Cline CLI), **not**
+  the planned 20-pass `/deep:research` state machine — recorded honestly in `research/PROVENANCE.md`.
+  It changes no source value and weakens no security boundary.
 
 ## 2. PROBLEM & PURPOSE
 
@@ -82,31 +89,38 @@ architecture with light/dark theming and WCAG AA contrast guaranteed at the toke
 - [`research/`](research/) — the deep-research artifacts, laid out to match the `/deep:research`
   conventions:
   - [`research/BRIEF.md`](research/BRIEF.md) — the research brief and the questions to answer.
-  - [`research/research.md`](research/research.md) — the build-ready synthesized decision
-    (a labelled **placeholder** in this packet; written after the iterations run).
-  - [`research/deep-research-config.json`](research/deep-research-config.json) — the run manifest
-    (20 iterations planned, executors **TBD**, status `pending`).
-  - [`research/PROVENANCE.md`](research/PROVENANCE.md) — how the research will be run and why
-    runtime-state artifacts are intentionally absent.
-  - `research/iterations/` — the scaffold expecting ~20 cited passes; a template pass is included.
+  - [`research/research.md`](research/research.md) — the **written** build-ready synthesized
+    decision (three decisions + security/contrast implications + citations + the Phase-2 migration
+    contract). Replaces the former placeholder.
+  - [`research/deep-research-config.json`](research/deep-research-config.json) — the original run
+    manifest (20 iterations planned). Left unchanged; `PROVENANCE.md` records that this run was an
+    agent-invoked synthesis pass rather than the 20-pass state machine the manifest scoped.
+  - [`research/PROVENANCE.md`](research/PROVENANCE.md) — the honest record of how the research was
+    actually run and which deep-loop runtime artifacts are intentionally absent (not fabricated).
+  - `research/iterations/` — six single-lens cited passes (`iteration-001`…`006`) plus the
+    authoring template.
 
-## 5. ACCEPTANCE CRITERIA (this packet)
+## 5. ACCEPTANCE CRITERIA (this packet) — all met
 
-- The research structure exists, links internally, and states plainly that the models are TBD
-  and the 20 iterations are not yet run.
-- `research/research.md` exists as a labelled placeholder that names the three decisions it will
-  carry and marks the decision as pending.
-- The decision, once synthesized, stays within the frozen source values and the read-only
-  security posture; any security-crossing implication is flagged for Phase 2 to design
-  security-first.
-- The `001-research/` phase validates as a lean spec-kit phase.
+- ✅ The research structure exists and links internally; `PROVENANCE.md` states plainly how the
+  research was actually run (agent-invoked synthesis, six iterations — not the planned 20-pass
+  state machine) and which runtime artifacts are intentionally absent.
+- ✅ `research/research.md` is the written, build-ready decision covering the three areas
+  (component architecture; the designer-editability `@ds` grammar; the primitive→semantic→component
+  token library), each with choice / evidence / rejected alternative / Phase-2 implication, and a
+  closing Phase-2 migration contract.
+- ✅ The decision stays within the frozen source values and the read-only security posture: it
+  changes no palette value and weakens no security boundary. The one contrast-adjacent implication
+  (the `--ink-disabled` / `--ink-muted` / `--placeholder` token pooling) is **flagged and deferred**
+  to the Phase-2 `002-theming-light-dark` grandchild — not changed here.
+- ✅ The `001-research/` phase validates as a lean spec-kit phase (`validate.sh --strict` exit 0).
 
-## 6. OPEN QUESTIONS
+## 6. OPEN QUESTIONS — resolved
 
-- **Research models are TBD.** The operator defines the executor roster (and whether it runs
-  through `/deep:research` or external-CLI orchestration) before the 20 iterations run.
-- Whether the inline-comment grammar prefix is `@ds` (working proposal) or another marker is a
-  research output; Phase 2 adopts whatever the decision fixes.
+- **Research models — resolved.** DeepSeek V4 Flash MAX via the Cline CLI ran the synthesis
+  (external-CLI orchestration, agent-invoked), recorded in `research/PROVENANCE.md`.
+- **Grammar prefix — resolved.** The decision fixes `@ds` as the prefix
+  (`@ds surface/slot/state/variant/edit/guardrail/theme/catalog`); Phase 2 adopts it.
 
 ## RELATED DOCUMENTS
 

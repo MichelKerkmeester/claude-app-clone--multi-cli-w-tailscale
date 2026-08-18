@@ -36,6 +36,7 @@ export function TodoProjectionBlock({
   readonly locale?: string | string[];
   readonly now?: () => number;
 }) {
+  // @ds slot: projection-block — mount wrapper for the read-only todo projection inside a transcript.
   if (state.availability !== 'available' || state.projection === null) return null;
   return (
     <article className="todo-projection-block" data-todo-projection-block="true">
@@ -64,6 +65,10 @@ export function TodoPanel({
   locale,
   now,
 }: TodoPanelProps) {
+  // @ds surface: todos — the read-only todo projection panel (pi's plan). Slot seams below.
+  // @ds guardrail: READ-ONLY projection — the phone NEVER mutates pi's task list. Section
+  //   grouping and per-task states come from buildTodoDisplayModel over the projection, and
+  //   the react-aria Disclosure/Button wiring is owned by this component; none designer-editable.
   const model = buildTodoDisplayModel(projection);
   return (
     <section
@@ -78,6 +83,7 @@ export function TodoPanel({
         refreshing={refreshing}
         {...(onRefresh === undefined ? {} : { onRefresh })}
       />
+      {/* @ds slot: progress-hairline — the done/total progress bar. */}
       {model.progressPercent !== null && (
         <TodoProgressHairline
           doneCount={model.doneCount}
@@ -85,12 +91,16 @@ export function TodoPanel({
           percent={model.progressPercent}
         />
       )}
+      {/* @ds slot: sync-note · @ds state: syncing — note shown while the read-only view refreshes. */}
       {needsRefresh && (
         <p className="todo-sync-note" role="status">
           The last verified plan is shown while the read-only view refreshes.
         </p>
       )}
+      {/* @ds slot: body — the panel content area; all-done / empty / sectioned-rows states below. */}
       <div className="todo-panel-body">
+        {/* @ds state: all-done — every task done; a quiet summary line replaces the rows. */}
+        {/* @ds state: empty — no tasks in pi's current plan. */}
         {model.allDone ? (
           <TodoAllDoneLine doneCount={model.doneCount} totalCount={model.totalCount} />
         ) : model.totalCount === 0 ? (
@@ -105,11 +115,13 @@ export function TodoPanel({
           ))
         )}
       </div>
+      {/* @ds slot: provenance-updated — the relative "Updated …" timestamp. */}
       <TodoUpdatedLabel
         updatedAt={projection.updatedAt}
         {...(locale === undefined ? {} : { locale })}
         {...(now === undefined ? {} : { now })}
       />
+      {/* @ds guardrail: literal sr-only polite live region — never layout space, focus, or scroll. */}
       <TodoLiveRegion
         announcement={announcement}
         {...(onAnnouncementConsumed === undefined ? {} : { onConsumed: onAnnouncementConsumed })}
@@ -129,18 +141,23 @@ export function TodoPanelHeader({
   readonly refreshing: boolean;
   readonly onRefresh?: () => void;
 }) {
+  // @ds slot: header — sticky panel header; heading + progress-count + refresh control.
   return (
     <header className="todo-panel-header">
+      {/* @ds slot: heading — the provenance eyebrow + read-only label. */}
       <div className="todo-panel-heading">
         <p className="todo-provenance">pi's plan · todo</p>
+        {/* @ds slot: read-only-label — the "Read-only host projection" note. */}
         <p className="todo-read-only-label">Read-only host projection</p>
       </div>
+      {/* @ds slot: progress-count — the done/total counter. */}
       <span
         className="todo-progress-count"
         aria-label={`${doneCount} of ${totalCount} tasks done`}
       >
         {doneCount}/{totalCount}
       </span>
+      {/* @ds slot: refresh — the react-aria Button that refreshes the read-only projection. */}
       <Button
         type="button"
         className="todo-refresh"
@@ -166,6 +183,7 @@ export function TodoProgressHairline({
   readonly totalCount: number;
   readonly percent: number;
 }) {
+  // @ds slot: progress-hairline — the done/total progress bar (aria progressbar is guarded).
   return (
     <div
       className="todo-progress-hairline"
@@ -187,9 +205,12 @@ export function TodoStateSection({
   readonly planId: string;
   readonly section: TodoDisplaySection;
 }) {
+  // @ds slot: section — one state's task rows in a collapsible Disclosure; section state read from
+  //   `data-todo-state` (pending · active/in-progress · done) in style.css.
   return (
     <Disclosure defaultExpanded className="todo-state-section" data-todo-state={section.state}>
       <Heading>
+        {/* @ds slot: section-trigger — the section header; chevron + label + count. */}
         <Button
           slot="trigger"
           className="todo-section-trigger"
@@ -222,6 +243,7 @@ export function TodoStateSection({
 }
 
 export function TodoTaskRow({ task }: { readonly task: TodoTaskProjectionV1 }) {
+  // @ds slot: row — one task; state read from `data-todo-task-state` (pending · active/in-progress · done).
   return (
     <li
       className="todo-task-row"
@@ -248,6 +270,7 @@ export function TodoTaskRow({ task }: { readonly task: TodoTaskProjectionV1 }) {
 }
 
 export function TodoStateGlyph({ state }: { readonly state: TodoTaskProjectionV1['state'] }) {
+  // @ds slot: glyph — the per-state marker; variants via .todo-state-glyph-{state}.
   return (
     <span className={`todo-state-glyph todo-state-glyph-${state}`} aria-hidden="true">
       <svg viewBox="0 0 16 16" focusable="false">
@@ -273,6 +296,7 @@ export function TodoUpdatedLabel({
   readonly now?: () => number;
 }) {
   if (updatedAt === null) return null;
+  // @ds slot: provenance-updated — the relative "Updated …" timestamp.
   return (
     <time className="todo-updated-label" dateTime={updatedAt} title={updatedAt}>
       Updated {relativeTimestamp(updatedAt, locale, now)}
@@ -287,6 +311,7 @@ export function TodoAllDoneLine({
   readonly doneCount: number;
   readonly totalCount: number;
 }) {
+  // @ds state: all-done — every task done; a quiet glowing summary line.
   return (
     <p className="todo-all-done" role="status">
       All done · {doneCount}/{totalCount}
@@ -306,6 +331,7 @@ export function TodoLiveRegion({
   readonly announcement: string;
   readonly onConsumed?: () => void;
 }) {
+  // @ds guardrail: sr-only polite live region — must stay out of layout and never auto-scroll.
   const lastSeen = useRef('');
   const mounted = useRef(false);
   useEffect(() => {

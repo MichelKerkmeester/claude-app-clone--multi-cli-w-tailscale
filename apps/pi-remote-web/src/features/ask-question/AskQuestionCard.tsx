@@ -30,6 +30,11 @@ export function AskQuestionCard({
   canAnswer = true,
   principal,
 }: AskQuestionCardProps) {
+  // @ds surface: ask-question — the one-use interactive question card; slot seams below.
+  // @ds guardrail: one-use ticketed, revision-bound, FAIL-CLOSED mutation path. The ticket,
+  //   revision binding, non-optimistic submit, and react-aria wiring live in the hooks
+  //   (useAskQuestionState / useAskQuestionMutation / useAskQuestionKeyboardNavigation) and are
+  //   NOT designer-editable. Only style.css @ds surface: ask-question is editable.
   const [viewModel, setViewModel] = useState<AskQuestionViewModel | null>(null);
   const stateApi = useAskQuestionState(viewModel, {
     initialState: transcriptStatusToUiState(block.status),
@@ -140,6 +145,7 @@ export function AskQuestionCard({
   }, [stateApi.state.phase, viewModel]);
 
   if (viewModel === null) {
+    // @ds state: loading — the display is being fetched; no interactive controls yet.
     return (
       <article
         ref={cardRef}
@@ -168,12 +174,15 @@ export function AskQuestionCard({
       aria-busy={submitting}
       tabIndex={-1}
     >
+      {/* @ds slot: prompt — question eyebrow + display headline. */}
       <AskQuestionPrompt viewModel={viewModel} />
+      {/* @ds slot: read-only-hint — note shown while this authenticated read-only session gates answers. */}
       {viewModel.requiresReadOnlyHint && (
         <p className="ask-question-read-only-hint">
           Answers are sent only while this authenticated read-only session is active.
         </p>
       )}
+      {/* @ds slot: form — answer controls; the guarded one-use submit mutation is not editable. */}
       {!terminal && (
         <form
           className="ask-question-form"
@@ -188,12 +197,14 @@ export function AskQuestionCard({
               Answer options
             </span>
           )}
+          {/* @ds slot: options — the option-row list + selection, disabled in guarded states. */}
           <AskQuestionOptionList
             viewModel={viewModel}
             selectedOptionIds={stateApi.state.selectedOptionIds}
             disabled={controlsDisabled}
             onToggle={stateApi.selectOption}
           />
+          {/* @ds slot: free-text — optional/required response textarea. */}
           <AskQuestionFreeText
             viewModel={viewModel}
             value={stateApi.state.freeText}
@@ -212,17 +223,21 @@ export function AskQuestionCard({
               {stateApi.validationMessage}
             </p>
           )}
+          {/* @ds slot: submit — the guarded one-use submit button; disabled binding preserved. */}
           <AskQuestionSubmitButton
             disabled={!canAnswer || !stateApi.canSubmit || submitting || terminal}
           />
         </form>
       )}
+      {/* @ds slot: status — live form-state line (sent ✓ · error ! · idle •). */}
       <AskQuestionStatus state={effectiveState} />
+      {/* @ds state: sent — answer accepted by Pi; the immutable ✓ line. */}
       {effectiveState.phase === 'answered-immutable' && effectiveState.errorReason === null && (
         <p className="ask-question-answered-line" aria-hidden="true">
           Answer accepted by Pi.
         </p>
       )}
+      {/* @ds slot: read-only-hint — reconnect note shown when the session cannot answer. */}
       {!canAnswer && !terminal && (
         <p className="ask-question-read-only-hint">Reconnect before submitting an answer.</p>
       )}

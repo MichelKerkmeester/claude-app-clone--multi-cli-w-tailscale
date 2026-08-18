@@ -5,6 +5,7 @@ export interface AskQuestionSubmitButtonProps {
 export function AskQuestionSubmitButton({
   disabled,
 }: AskQuestionSubmitButtonProps) {
+  // @ds slot: submit — the form's guarded one-use submit button; disabled binding preserved.
   return (
     <button
       type="submit"

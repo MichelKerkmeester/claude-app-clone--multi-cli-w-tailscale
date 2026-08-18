@@ -2106,6 +2106,10 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* Ask-question answers stay in the transcript; the host remains the only authority. */
+/* @ds surface: ask-question — the one-use interactive question card; slot seams below. */
+/* @ds guardrail: one-use ticketed, revision-bound, FAIL-CLOSED mutation path. The ticket,
+   revision binding, non-optimistic submit, and react-aria wiring live in the ask-question
+   hooks; the styling here is the only designer-editable part. */
 .block-ask-question {
   overflow: visible;
   border: 0;
@@ -2128,6 +2132,7 @@ button[data-pressed]:not([data-disabled]) {
   overscroll-behavior: contain;
 }
 
+/* @ds state: submitting — progress bar over the card while the guarded submit is in flight. */
 .ask-question-card-submitting::before {
   position: absolute;
   inset-block-start: -1px;
@@ -2141,6 +2146,7 @@ button[data-pressed]:not([data-disabled]) {
   animation: ask-question-progress 1.2s var(--ease-out-interface) infinite;
 }
 
+/* @ds guardrail: keyframes — the submitting progress choreography; not designer-editable. */
 @keyframes ask-question-progress {
   0% {
     opacity: 0.45;
@@ -2156,16 +2162,19 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds state: loading — display fetch in progress; no interactive controls yet. */
 .ask-question-card-loading {
   min-block-size: 2rem;
   border-color: var(--line);
 }
 
+/* @ds slot: prompt — the question eyebrow + display headline. */
 .ask-question-prompt {
   display: grid;
   gap: var(--space-1);
 }
 
+/* @ds slot: kicker — the "Pi asks" eyebrow. */
 .ask-question-kicker {
   margin: 0;
   color: var(--accent-ink);
@@ -2186,6 +2195,7 @@ button[data-pressed]:not([data-disabled]) {
   text-wrap: pretty;
 }
 
+/* @ds slot: read-only-hint · @ds state: read-only — note when this authenticated read-only session gates answers. */
 .ask-question-read-only-hint {
   max-inline-size: var(--reading-width);
   margin: 0;
@@ -2194,12 +2204,14 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.45;
 }
 
+/* @ds slot: form — the answer controls column; the guarded one-use submit lives here. */
 .ask-question-form {
   display: grid;
   min-inline-size: 0;
   gap: var(--space-4);
 }
 
+/* @ds slot: options — the choice fieldset. */
 .ask-question-options {
   min-inline-size: 0;
   margin: 0;
@@ -2214,12 +2226,14 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 650;
 }
 
+/* @ds slot: option-list — the stacked option rows. */
 .ask-question-option-list {
   display: grid;
   min-inline-size: 0;
   gap: var(--space-2);
 }
 
+/* @ds slot: option-row · @ds state: idle — one answer option; hover/pressed/selected/disabled follow. */
 .ask-question-option-row {
   display: flex;
   min-block-size: 44px;
@@ -2237,17 +2251,20 @@ button[data-pressed]:not([data-disabled]) {
   touch-action: manipulation;
 }
 
+/* @ds state: hover — the option row under pointer hover. */
 .ask-question-option-row:hover:not(:disabled) {
   border-color: var(--accent-ink);
   background: var(--accent-soft);
 }
 
+/* @ds state: selected (aria-pressed) — the chosen option row. */
 .ask-question-option-row[aria-pressed='true'] {
   border-color: var(--ink);
   background: var(--surface-code);
   color: var(--ink-inverse);
 }
 
+/* @ds guardrail: focus-visible — the shared AA focus ring across option rows, free text, and submit. */
 .ask-question-option-row:focus-visible,
 .ask-question-free-text textarea:focus-visible,
 .ask-question-submit:focus-visible {
@@ -2256,6 +2273,7 @@ button[data-pressed]:not([data-disabled]) {
   box-shadow: 0 0 0 1px var(--surface-raised);
 }
 
+/* @ds state: disabled — option rows, submit, and free text fail-closed to reduced emphasis. */
 .ask-question-option-row:disabled,
 .ask-question-submit:disabled,
 .ask-question-free-text textarea:disabled {
@@ -2263,6 +2281,7 @@ button[data-pressed]:not([data-disabled]) {
   opacity: 0.58;
 }
 
+/* @ds slot: option-indicator — single (circle) / multiple (square) selection glyph. */
 .ask-question-option-indicator {
   display: grid;
   flex: 0 0 1.25rem;
@@ -2276,10 +2295,12 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1;
 }
 
+/* @ds variant: indicator-single — circular single-choice glyph. */
 .ask-question-option-indicator-single {
   border-radius: 999px;
 }
 
+/* @ds slot: option-copy — the option label + optional description. */
 .ask-question-option-copy {
   display: grid;
   min-inline-size: 0;
@@ -2302,11 +2323,13 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.4;
 }
 
+/* @ds state: selected · description — re-ink the description inside a selected row. */
 .ask-question-option-row[aria-pressed='true'] .ask-question-option-description {
   color: inherit;
   opacity: 0.82;
 }
 
+/* @ds slot: free-text — the response textarea + optional character count. */
 .ask-question-free-text {
   display: grid;
   position: relative;
@@ -2333,6 +2356,7 @@ button[data-pressed]:not([data-disabled]) {
   scroll-margin-block: var(--space-8);
 }
 
+/* @ds state: error (aria-invalid) — invalid free-text input. */
 .ask-question-free-text textarea[aria-invalid='true'] {
   border-color: var(--accent-ink);
 }
@@ -2344,6 +2368,7 @@ button[data-pressed]:not([data-disabled]) {
   font-variant-numeric: tabular-nums;
 }
 
+/* @ds slot: validation · @ds state: error — the assertive alert for a validation problem. */
 .ask-question-validation {
   margin: 0;
   color: var(--accent-ink);
@@ -2351,6 +2376,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.4;
 }
 
+/* @ds slot: submit — the guarded one-use submit button; disabled binding preserved. */
 .ask-question-submit {
   min-block-size: 44px;
   min-inline-size: 44px;
@@ -2367,6 +2393,7 @@ button[data-pressed]:not([data-disabled]) {
   scroll-margin-block: var(--space-8);
 }
 
+/* @ds slot: status — the live form-state line. */
 .ask-question-status {
   display: flex;
   min-block-size: 1.5rem;
@@ -2377,6 +2404,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.4;
 }
 
+/* @ds slot: status-mark — the per-phase glyph (sent ✓ · error ! · idle •). */
 .ask-question-status-mark {
   display: inline-grid;
   flex: 0 0 1.25rem;
@@ -2389,15 +2417,18 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 750;
 }
 
+/* @ds state: sent — answered-and-immutable; status + answered line tint to accent. */
 .ask-question-card-answered-immutable .ask-question-status,
 .ask-question-answered-line {
   color: var(--accent-ink);
 }
 
+/* @ds state: error — the status line signals a failed state. */
 .ask-question-status-error {
   color: var(--accent-ink);
 }
 
+/* @ds slot: answered-line · @ds state: sent — the "Answer accepted by Pi." line. */
 .ask-question-answered-line {
   margin: 0;
   font-family: var(--font-display);
@@ -2432,8 +2463,12 @@ button[data-pressed]:not([data-disabled]) {
 :root[data-theme='dark'] .ask-question-option-row[aria-pressed='true'] {
   color: var(--ink);
 }
+/* @ds end surface: ask-question */
 
 /* The todo projection is a transcript annotation, not an editable task surface. */
+/* @ds surface: todos — the read-only todo projection panel (pi's plan). */
+/* @ds guardrail: READ-ONLY projection — the phone NEVER mutates pi's task list. The grouped
+   sections and per-task states come from the projection only; edit styling, never the model. */
 .todo-projection-block {
   min-inline-size: 0;
   overflow: visible;
@@ -2455,11 +2490,13 @@ button[data-pressed]:not([data-disabled]) {
   scroll-margin-block: var(--space-8);
 }
 
+/* @ds state: all-done — every task done; the panel is quiet (no progress hairline replaces rows). */
 .todo-panel[data-todo-all-done='true'] {
   /* The all-done rendering is quiet: no progress hairline replaces the row list. */
   gap: var(--space-2);
 }
 
+/* @ds slot: header — sticky panel header; heading + progress-count + refresh control. */
 .todo-panel-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
@@ -2474,12 +2511,14 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--canvas);
 }
 
+/* @ds slot: heading — the provenance eyebrow + read-only label. */
 .todo-panel-heading {
   display: grid;
   min-inline-size: 0;
   gap: 0.15rem;
 }
 
+/* @ds slot: provenance · @ds slot: read-only-label · @ds slot: progress-count · @ds slot: sync-note · @ds slot: empty-line · @ds slot: all-done — shared margin reset. */
 .todo-provenance,
 .todo-read-only-label,
 .todo-progress-count,
@@ -2489,6 +2528,7 @@ button[data-pressed]:not([data-disabled]) {
   margin: 0;
 }
 
+/* @ds slot: provenance — the "pi's plan · todo" eyebrow. */
 .todo-provenance {
   color: var(--ink);
   font-family: var(--font-display);
@@ -2496,6 +2536,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.25;
 }
 
+/* @ds slot: read-only-label · @ds slot: sync-note · @ds state: syncing · @ds slot: empty-line · @ds state: empty — quiet meta + status lines. */
 .todo-read-only-label,
 .todo-sync-note,
 .todo-empty-line,
@@ -2505,6 +2546,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.45;
 }
 
+/* @ds slot: progress-count — the done/total counter. */
 .todo-progress-count {
   color: var(--ink);
   font-size: 0.82rem;
@@ -2512,6 +2554,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 700;
 }
 
+/* @ds slot: refresh · @ds slot: section-trigger — the shared 44px interactive base. */
 .todo-refresh,
 .todo-section-trigger {
   min-inline-size: 44px;
@@ -2524,6 +2567,7 @@ button[data-pressed]:not([data-disabled]) {
   touch-action: manipulation;
 }
 
+/* @ds slot: refresh — refreshes the read-only projection. */
 .todo-refresh {
   display: inline-flex;
   align-items: center;
@@ -2545,6 +2589,7 @@ button[data-pressed]:not([data-disabled]) {
   stroke-width: 1.7;
 }
 
+/* @ds state: hover · pressed — refresh + section triggers. */
 .todo-refresh[data-hovered],
 .todo-refresh[data-pressed],
 .todo-section-trigger[data-hovered],
@@ -2552,17 +2597,20 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--canvas-subtle);
 }
 
+/* @ds guardrail: focus-visible — the shared AA focus ring across refresh + section triggers. */
 .todo-refresh[data-focus-visible],
 .todo-section-trigger[data-focus-visible] {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 
+/* @ds state: disabled — refresh fails back to a quiet, parked control. */
 .todo-refresh[data-disabled] {
   cursor: default;
   opacity: 0.65;
 }
 
+/* @ds slot: progress-hairline — the done/total progress bar (aria progressbar is guarded). */
 .todo-progress-hairline {
   block-size: 3px;
   overflow: hidden;
@@ -2578,12 +2626,14 @@ button[data-pressed]:not([data-disabled]) {
   transform-origin: inline-start;
 }
 
+/* @ds slot: body — the panel content area; all-done / empty / sectioned-rows states below. */
 .todo-panel-body {
   display: grid;
   min-inline-size: 0;
   gap: var(--space-2);
 }
 
+/* @ds slot: rows — a collapsible state group; section state via data-todo-state (pending · in-progress · done). */
 .todo-state-section {
   min-inline-size: 0;
   border-block-start: 1px solid var(--line);
@@ -2594,6 +2644,7 @@ button[data-pressed]:not([data-disabled]) {
   margin: 0;
 }
 
+/* @ds slot: section-trigger — the section header; chevron + label + count. */
 .todo-section-trigger {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -2607,16 +2658,19 @@ button[data-pressed]:not([data-disabled]) {
   text-align: start;
 }
 
+/* @ds slot: section-chevron — the collapse/expand chevron. */
 .todo-section-chevron {
   color: var(--ink-muted);
   font-size: 1rem;
   transform: rotate(90deg);
 }
 
+/* @ds state: collapsed — closed section chevron. */
 .todo-section-trigger[aria-expanded='false'] .todo-section-chevron {
   transform: none;
 }
 
+/* @ds slot: section-count — the per-section task count. */
 .todo-section-count {
   min-inline-size: 1.5rem;
   color: var(--ink-muted);
@@ -2633,6 +2687,7 @@ button[data-pressed]:not([data-disabled]) {
   margin-block-start: var(--space-2);
 }
 
+/* @ds slot: group-heading — a named group label inside a section. */
 .todo-group-heading {
   margin: 0;
   padding: var(--space-1) 0 var(--space-1) 1.75rem;
@@ -2642,6 +2697,7 @@ button[data-pressed]:not([data-disabled]) {
   letter-spacing: 0.035em;
 }
 
+/* @ds slot: rows — the task row list. */
 .todo-task-list {
   display: grid;
   min-inline-size: 0;
@@ -2650,6 +2706,7 @@ button[data-pressed]:not([data-disabled]) {
   list-style: none;
 }
 
+/* @ds slot: row — one task; state read from data-todo-task-state (pending · active/in-progress · done). */
 .todo-task-row {
   display: grid;
   grid-template-columns: 1.1rem minmax(0, 1fr) auto;
@@ -2665,6 +2722,7 @@ button[data-pressed]:not([data-disabled]) {
   border-block-start: 0;
 }
 
+/* @ds slot: glyph — the per-state marker; variants via .todo-state-glyph-{state}. */
 .todo-state-glyph {
   display: inline-grid;
   inline-size: 1rem;
@@ -2683,15 +2741,18 @@ button[data-pressed]:not([data-disabled]) {
   stroke-width: 1.6;
 }
 
+/* @ds state: in-progress (active) — the running/highlighted task marker. */
 .todo-state-glyph-active svg {
   fill: var(--accent);
   stroke: var(--ink);
 }
 
+/* @ds state: done — the completed task marker. */
 .todo-state-glyph-done svg {
   stroke-width: 2;
 }
 
+/* @ds slot: title — the task title copy. */
 .todo-task-title {
   min-inline-size: 0;
   color: var(--ink);
@@ -2701,6 +2762,7 @@ button[data-pressed]:not([data-disabled]) {
   unicode-bidi: plaintext;
 }
 
+/* @ds slot: task-state — the localized state label. */
 .todo-task-state {
   color: var(--ink-muted);
   font-size: 0.72rem;
@@ -2708,6 +2770,7 @@ button[data-pressed]:not([data-disabled]) {
   white-space: nowrap;
 }
 
+/* @ds slot: updated-at — the per-task relative timestamp. */
 .todo-task-updated-at {
   grid-column: 2 / -1;
   color: var(--ink-muted);
@@ -2717,6 +2780,7 @@ button[data-pressed]:not([data-disabled]) {
   white-space: nowrap;
 }
 
+/* @ds state: all-done — every task done; a quiet glowing summary line. */
 .todo-all-done {
   padding-block: var(--space-3);
   color: var(--ink);
@@ -2724,10 +2788,12 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1rem;
 }
 
+/* @ds slot: provenance-updated — the relative "Updated …" timestamp. */
 .todo-updated-label {
   justify-self: end;
 }
 
+/* @ds guardrail: sr-only polite live region — must never take layout space, move focus, or scroll. */
 .todo-live-region {
   /* The live region is purely a screen-reader polite queue; it must never
      take layout space, never move focus, and never cause a scroll. */
@@ -2816,6 +2882,7 @@ button[data-pressed]:not([data-disabled]) {
     transition: none !important;
   }
 }
+/* @ds end surface: todos */
 
 @media (prefers-color-scheme: dark) {
   :root[data-theme='system'] .ask-question-option-row[aria-pressed='true'] {
@@ -6080,7 +6147,10 @@ button[data-pressed]:not([data-disabled]) {
 }
 /* @ds end surface: evidence-disclosure */
 
+/* @ds surface: plan-todo — the plan-block ✓/○ checklist. States: pending (○) · done (✓). */
 /* @ds state: plan — checklist items. */
+/* @ds guardrail: the item `done` state comes from the plan block model; done derivation and
+   plan-mode gating live in the model/reducer, never in a style edit. */
 .plan-list {
   display: grid;
   gap: var(--space-3);
@@ -6089,6 +6159,7 @@ button[data-pressed]:not([data-disabled]) {
   list-style: none;
 }
 
+/* @ds state: pending — an open (○) item; the glyph renders in `li > span`. */
 .plan-list li {
   display: grid;
   grid-template-columns: 1.4rem 1fr;
@@ -6097,18 +6168,23 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.5;
 }
 
+/* @ds slot: glyph — the ✓/○ marker. */
 .plan-list li > span {
   color: var(--accent-ink);
   font-weight: 700;
 }
 
+/* @ds state: done — a completed (✓) item. */
 .plan-list .done {
   color: var(--ink-muted);
 }
 
+/* @ds state: done · glyph — the ✓ marker switches to success. */
 .plan-list .done > span {
   color: var(--success);
 }
+
+/* @ds end surface: plan-todo */
 
 /* @ds state: tool_call · tool_result — monospace output (danger variant below). */
 .transcript-block pre {

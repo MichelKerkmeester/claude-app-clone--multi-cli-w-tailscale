@@ -15,6 +15,7 @@ export function AskQuestionOptionRow({
   disabled,
   onToggle,
 }: AskQuestionOptionRowProps) {
+  // @ds slot: option-row — one answer option; states idle · hover · pressed · selected · disabled.
   return (
     <button
       type="button"
@@ -24,12 +25,14 @@ export function AskQuestionOptionRow({
       disabled={disabled}
       onClick={() => onToggle(option.id)}
     >
+      {/* @ds slot: option-indicator — single (circle) / multiple (square) selection glyph. */}
       <span
         className={`ask-question-option-indicator ask-question-option-indicator-${selectionMode}`}
         aria-hidden="true"
       >
         {selected ? '✓' : ''}
       </span>
+      {/* @ds slot: option-copy — the option label + optional description. */}
       <span className="ask-question-option-copy">
         <span className="ask-question-option-label">{option.label}</span>
         {option.description !== undefined && (

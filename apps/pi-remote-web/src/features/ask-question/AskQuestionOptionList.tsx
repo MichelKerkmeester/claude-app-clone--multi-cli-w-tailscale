@@ -17,9 +17,11 @@ export function AskQuestionOptionList({
   if (viewModel.display.options.length === 0) return null;
   const selected = new Set(selectedOptionIds);
   const selectionLabel = viewModel.selectionMode === 'single' ? 'Choose one' : 'Choose one or more';
+  // @ds slot: options — the choice fieldset; legend + the stacked option-row list.
   return (
     <fieldset className="ask-question-options" disabled={disabled}>
       <legend>{selectionLabel}</legend>
+      {/* @ds slot: option-list — the stacked option rows. */}
       <div className="ask-question-option-list">
         {viewModel.display.options.map((option) => (
           <AskQuestionOptionRow

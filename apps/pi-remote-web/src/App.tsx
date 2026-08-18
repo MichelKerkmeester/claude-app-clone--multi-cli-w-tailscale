@@ -2159,11 +2159,17 @@ function Block({
       collapsible = true;
       break;
     // @ds state: plan
+    // @ds surface: plan-todo — the plan-block ✓/○ checklist surface; item states pending (○) · done (✓).
+    // @ds guardrail: the block.items and each item's `done` flag come from the plan block model;
+    //   done-state derivation and plan-mode gating live there and in the reducer, never editable here.
     case 'plan':
       label = 'Plan / todo';
       content = (
+        // @ds slot: checklist — the plan-list row grid; each row exposes a pending/done state below.
         <ul className="plan-list">
           {block.items.map((item, index) => (
+            // @ds state: pending (○) · done (✓) — the `done` class selects the item state; the
+            //   inline glyph and text below are rendered by this branch.
             <li key={`${block.id}-${index}`} className={item.done ? 'done' : ''}>
               <span aria-hidden="true">{item.done ? '✓' : '○'}</span>
               {item.text}

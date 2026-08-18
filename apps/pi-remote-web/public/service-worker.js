@@ -2,8 +2,8 @@
 // MODULE: Pi Remote PWA Service Worker
 // ───────────────────────────────────────────────────────────────────
 
-// Legacy installed workers used: const CACHE_NAME = 'pi-remote-shell-v4';
-const CACHE_NAME = 'pi-remote-shell-v5';
+// Legacy installed workers used: const CACHE_NAME = 'pi-remote-shell-v5';
+const CACHE_NAME = 'pi-remote-shell-v6';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg'];
 const SHELL_PATHS = new Set(SHELL);
 
@@ -40,6 +40,15 @@ self.addEventListener('fetch', (event) => {
 
   if (isAttachmentRequest(url)) {
     // Attachment-bearing resources are transient and must never enter the shell cache.
+    event.respondWith(fetchWithoutBrowserCache(request));
+    return;
+  }
+
+  // Todo projections are live read-only data. They are signed over the
+  // authenticated session and must never be persisted in the service worker
+  // cache, the runtime cache, or any other durable surface. Push, sync, and
+  // HTTP polling are the only valid sources for the projection.
+  if (isTodoProjectionRequest(url)) {
     event.respondWith(fetchWithoutBrowserCache(request));
     return;
   }
@@ -96,6 +105,13 @@ function isArtifactRequest(url) {
 
 function isAttachmentRequest(url) {
   return /^\/api\/(?:attachments?|media|uploads?)(?:\/|$)/.test(url.pathname);
+}
+
+function isTodoProjectionRequest(url) {
+  // The projection travels over the authenticated sync socket; any HTTP
+  // endpoint that exposes todo.* must stay read-through and never reach a
+  // cache. This guard is a content-free belt-and-suspenders fence.
+  return /^\/api\/(?:todo|todos|todo-projection)(?:\/|$)/i.test(url.pathname);
 }
 
 function fetchWithoutBrowserCache(request) {

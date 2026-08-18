@@ -271,6 +271,33 @@ describe('todo projection accessibility and frozen visual contract', () => {
       /\.todo-refresh\[data-focus-visible\],[\s\S]*?outline: 2px solid var\(--focus\);/u,
     );
   });
+
+  it('honors safe-area padding, sticky header, and no layout height transitions', () => {
+    const panelRule = STYLE.match(/\.todo-panel\s*\{[^}]*\}/u)?.[0] ?? '';
+    expect(panelRule).toContain('env(safe-area-inset-bottom)');
+    expect(STYLE).toMatch(
+      /\.todo-panel-header[\s\S]*?position: sticky;[\s\S]*?inset-block-start: 0;/u,
+    );
+    expect(STYLE).toMatch(/\.todo-live-region[\s\S]*?position: absolute;[\s\S]*?clip: rect/u);
+  });
+
+  it('removes pulse and layout transitions under reduced motion and stops the live region from scrolling', () => {
+    expect(STYLE).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.todo-panel \*[\s\S]*?animation: none !important;[\s\S]*?transition: none !important;[\s\S]*?transform: none !important;/u,
+    );
+    expect(STYLE).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.todo-progress-hairline > span[\s\S]*?transition: none !important;/u,
+    );
+  });
+
+  it('mirrors the chevron and progress origin in RTL without inverting row order', () => {
+    expect(STYLE).toMatch(
+      /\[dir='rtl'\][\s\S]*?\.todo-section-chevron[\s\S]*?transform: rotate\(-90deg\);/u,
+    );
+    expect(STYLE).toMatch(
+      /\[dir='rtl'\][\s\S]*?\.todo-progress-hairline > span[\s\S]*?transform-origin: inline-end;/u,
+    );
+  });
 });
 
 describe('plan-mode hardening style contract', () => {

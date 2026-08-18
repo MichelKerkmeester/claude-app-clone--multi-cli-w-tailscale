@@ -1413,6 +1413,7 @@ export function Session({
             dispatchTodoProjection({ type: 'refreshRequested' });
             setTodoRefreshGeneration((generation) => generation + 1);
           }}
+          onClearTodoAnnouncement={() => dispatchTodoProjection({ type: 'clearAnnouncement' })}
         />
       </ArtifactViewerProvider>
       <RuntimeStrip
@@ -1534,6 +1535,7 @@ export function TranscriptList({
   askQuestionPrincipal,
   todoProjection = EMPTY_TODO_PROJECTION_STATE,
   onRefreshTodos,
+  onClearTodoAnnouncement,
 }: {
   readonly sessionId?: string;
   readonly blocks: readonly DisplayTranscriptBlock[];
@@ -1542,6 +1544,7 @@ export function TranscriptList({
   readonly askQuestionPrincipal?: string | undefined;
   readonly todoProjection?: TodoProjectionState;
   readonly onRefreshTodos?: () => void;
+  readonly onClearTodoAnnouncement?: () => void;
 }) {
   const artifactSessionId = sessionId ?? '';
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -1653,6 +1656,9 @@ export function TranscriptList({
                   <TodoProjectionBlock
                     state={item.state}
                     {...(onRefreshTodos === undefined ? {} : { onRefresh: onRefreshTodos })}
+                    {...(onClearTodoAnnouncement === undefined
+                      ? {}
+                      : { onAnnouncementConsumed: onClearTodoAnnouncement })}
                   />
                 ) : item.kind === 'activity' ? (
                   <NormalizedActivityGroup blocks={item.blocks} />

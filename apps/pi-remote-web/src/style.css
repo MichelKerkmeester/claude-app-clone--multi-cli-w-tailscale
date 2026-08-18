@@ -2211,6 +2211,7 @@ button[data-pressed]:not([data-disabled]) {
   max-inline-size: 100%;
   gap: var(--space-3);
   padding: var(--space-4);
+  padding-block-end: max(var(--space-4), env(safe-area-inset-bottom));
   overflow-wrap: anywhere;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
@@ -2220,11 +2221,23 @@ button[data-pressed]:not([data-disabled]) {
   scroll-margin-block: var(--space-8);
 }
 
+.todo-panel[data-todo-all-done='true'] {
+  /* The all-done rendering is quiet: no progress hairline replaces the row list. */
+  gap: var(--space-2);
+}
+
 .todo-panel-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: var(--space-2);
+  /* Section heading stays anchored inside the bounded panel; never underneath
+     the safe-area or global navigation. */
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  padding-block-end: var(--space-1);
+  background: var(--canvas);
 }
 
 .todo-panel-heading {
@@ -2461,6 +2474,15 @@ button[data-pressed]:not([data-disabled]) {
   white-space: nowrap;
 }
 
+.todo-task-updated-at {
+  grid-column: 2 / -1;
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
 .todo-all-done {
   padding-block: var(--space-3);
   color: var(--ink);
@@ -2470,6 +2492,20 @@ button[data-pressed]:not([data-disabled]) {
 
 .todo-updated-label {
   justify-self: end;
+}
+
+.todo-live-region {
+  /* The live region is purely a screen-reader polite queue; it must never
+     take layout space, never move focus, and never cause a scroll. */
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (max-width: 24rem) {
@@ -2494,13 +2530,55 @@ button[data-pressed]:not([data-disabled]) {
   .todo-task-state {
     grid-column: 2;
   }
+
+  .todo-task-updated-at {
+    grid-column: 2 / -1;
+  }
 }
 
+/* Dynamic text scaling must keep the panel usable and never overflow
+   horizontally. Inter + Source Serif 4 stay <= 1.4rem at +200% scaling. */
+@media (min-resolution: 1dppx) {
+  .todo-panel {
+    container-type: inline-size;
+  }
+
+  .todo-task-title {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+[dir='rtl'] .todo-section-chevron {
+  transform: rotate(-90deg);
+}
+
+[dir='rtl'] .todo-section-trigger[aria-expanded='false'] .todo-section-chevron {
+  transform: none;
+}
+
+[dir='rtl'] .todo-progress-hairline > span {
+  transform-origin: inline-end;
+}
+
+/* Under reduced motion the row pulse is suppressed and no layout animation
+   runs. Background updates must not auto-scroll the transcript or move
+   focus; the live region uses absolute positioning so it never affects the
+   scroll container. */
 @media (prefers-reduced-motion: reduce) {
   .todo-panel *,
   .todo-panel *::before,
   .todo-panel *::after {
     animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .todo-panel {
+    scroll-behavior: auto;
+  }
+
+  .todo-progress-hairline > span {
     transition: none !important;
   }
 }

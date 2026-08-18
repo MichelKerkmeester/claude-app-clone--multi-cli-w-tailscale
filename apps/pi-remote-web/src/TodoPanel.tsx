@@ -1,4 +1,5 @@
 import type { TodoProjectionV1, TodoTaskProjectionV1 } from '@pi-remote/pi-rpc-protocol';
+import { useEffect, useRef } from 'react';
 import { Button, Disclosure, DisclosurePanel, Heading } from 'react-aria-components';
 
 import { buildTodoDisplayModel, TODO_STATE_LABELS, type TodoDisplaySection } from './todo-model.js';
@@ -10,14 +11,30 @@ export interface TodoPanelProps {
   readonly needsRefresh?: boolean;
   readonly announcement?: string;
   readonly onRefresh?: () => void;
+  /**
+   * Called after the panel has rendered an announcement so the parent can
+   * clear the announcement slot on the next render pass. The reducer keeps
+   * the source-of-truth; the panel owns only the visual lifecycle.
+   */
+  readonly onAnnouncementConsumed?: () => void;
+  /** Optional locale used for the relative timestamp. Defaults to the platform. */
+  readonly locale?: string | string[];
+  /** Override the wall-clock used for the relative timestamp. */
+  readonly now?: () => number;
 }
 
 export function TodoProjectionBlock({
   state,
   onRefresh,
+  onAnnouncementConsumed,
+  locale,
+  now,
 }: {
   readonly state: TodoProjectionState;
   readonly onRefresh?: () => void;
+  readonly onAnnouncementConsumed?: () => void;
+  readonly locale?: string | string[];
+  readonly now?: () => number;
 }) {
   if (state.availability !== 'available' || state.projection === null) return null;
   return (
@@ -29,6 +46,9 @@ export function TodoProjectionBlock({
         needsRefresh={state.needsRefresh}
         announcement={state.announcement}
         {...(onRefresh === undefined ? {} : { onRefresh })}
+        {...(onAnnouncementConsumed === undefined ? {} : { onAnnouncementConsumed })}
+        {...(locale === undefined ? {} : { locale })}
+        {...(now === undefined ? {} : { now })}
       />
     </article>
   );
@@ -40,10 +60,18 @@ export function TodoPanel({
   needsRefresh = false,
   announcement = '',
   onRefresh,
+  onAnnouncementConsumed,
+  locale,
+  now,
 }: TodoPanelProps) {
   const model = buildTodoDisplayModel(projection);
   return (
-    <section className="todo-panel" aria-label="pi's plan" data-todo-panel="true">
+    <section
+      className="todo-panel"
+      aria-label="pi's plan"
+      data-todo-panel="true"
+      data-todo-all-done={model.allDone ? 'true' : 'false'}
+    >
       <TodoPanelHeader
         doneCount={model.doneCount}
         totalCount={model.totalCount}
@@ -77,8 +105,15 @@ export function TodoPanel({
           ))
         )}
       </div>
-      <TodoUpdatedLabel updatedAt={projection.updatedAt} />
-      <TodoLiveRegion announcement={announcement} />
+      <TodoUpdatedLabel
+        updatedAt={projection.updatedAt}
+        {...(locale === undefined ? {} : { locale })}
+        {...(now === undefined ? {} : { now })}
+      />
+      <TodoLiveRegion
+        announcement={announcement}
+        {...(onAnnouncementConsumed === undefined ? {} : { onConsumed: onAnnouncementConsumed })}
+      />
     </section>
   );
 }
@@ -100,7 +135,10 @@ export function TodoPanelHeader({
         <p className="todo-provenance">pi's plan · todo</p>
         <p className="todo-read-only-label">Read-only host projection</p>
       </div>
-      <span className="todo-progress-count" aria-label={`${doneCount} of ${totalCount} tasks done`}>
+      <span
+        className="todo-progress-count"
+        aria-label={`${doneCount} of ${totalCount} tasks done`}
+      >
         {doneCount}/{totalCount}
       </span>
       <Button
@@ -185,12 +223,26 @@ export function TodoStateSection({
 
 export function TodoTaskRow({ task }: { readonly task: TodoTaskProjectionV1 }) {
   return (
-    <li className="todo-task-row" data-todo-task-id={task.id} data-todo-task-state={task.state}>
+    <li
+      className="todo-task-row"
+      data-todo-task-id={task.id}
+      data-todo-task-state={task.state}
+      data-todo-task-revision={task.revision}
+    >
       <TodoStateGlyph state={task.state} />
       <span className="todo-task-title" dir="auto">
         {task.title}
       </span>
       <span className="todo-task-state">{TODO_STATE_LABELS[task.state]}</span>
+      {task.updatedAt !== null && (
+        <time
+          className="todo-task-updated-at"
+          dateTime={task.updatedAt}
+          title={task.updatedAt}
+        >
+          {relativeTimestamp(task.updatedAt)}
+        </time>
+      )}
     </li>
   );
 }
@@ -211,11 +263,19 @@ export function TodoStateGlyph({ state }: { readonly state: TodoTaskProjectionV1
   );
 }
 
-export function TodoUpdatedLabel({ updatedAt }: { readonly updatedAt: string | null }) {
+export function TodoUpdatedLabel({
+  updatedAt,
+  locale,
+  now,
+}: {
+  readonly updatedAt: string | null;
+  readonly locale?: string | string[];
+  readonly now?: () => number;
+}) {
   if (updatedAt === null) return null;
   return (
     <time className="todo-updated-label" dateTime={updatedAt} title={updatedAt}>
-      Updated {relativeTimestamp(updatedAt)}
+      Updated {relativeTimestamp(updatedAt, locale, now)}
     </time>
   );
 }
@@ -228,29 +288,56 @@ export function TodoAllDoneLine({
   readonly totalCount: number;
 }) {
   return (
-    <p className="todo-all-done">
+    <p className="todo-all-done" role="status">
       All done · {doneCount}/{totalCount}
     </p>
   );
 }
 
-export function TodoLiveRegion({ announcement }: { readonly announcement: string }) {
+/**
+ * The live region speaks only the redacted title and the localized state. The
+ * region is removed from the DOM between announcements so screen readers do
+ * not re-announce stale text and the polite queue is never backlogged.
+ */
+export function TodoLiveRegion({
+  announcement,
+  onConsumed,
+}: {
+  readonly announcement: string;
+  readonly onConsumed?: () => void;
+}) {
+  const lastSeen = useRef('');
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      lastSeen.current = announcement;
+      return;
+    }
+    if (announcement !== '' && announcement !== lastSeen.current) {
+      lastSeen.current = announcement;
+      onConsumed?.();
+    }
+  }, [announcement, onConsumed]);
+  if (announcement === '') return null;
   return (
-    <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+    <div className="todo-live-region sr-only" role="status" aria-live="polite" aria-atomic="true">
       {announcement}
     </div>
   );
 }
 
-function relativeTimestamp(value: string): string {
-  const elapsedMinutes = Math.round((Date.parse(value) - Date.now()) / 60_000);
-  if (!Number.isFinite(elapsedMinutes)) return 'recently';
+function relativeTimestamp(
+  value: string,
+  locale?: string | string[],
+  now: () => number = Date.now,
+): string {
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return 'recently';
+  const elapsedMinutes = Math.round((parsed - now()) / 60_000);
   if (Math.abs(elapsedMinutes) < 60) {
-    return new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' }).format(
-      elapsedMinutes,
-      'minute',
-    );
+    return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(elapsedMinutes, 'minute');
   }
   const elapsedHours = Math.round(elapsedMinutes / 60);
-  return new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' }).format(elapsedHours, 'hour');
+  return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(elapsedHours, 'hour');
 }

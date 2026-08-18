@@ -21,6 +21,12 @@ export interface TodoProjectionState {
   readonly anchorSeq: number | null;
   readonly refreshing: boolean;
   readonly needsRefresh: boolean;
+  /**
+   * One concise polite announcement per change. The string is empty until the
+   * next applicable diff, and the live region only speaks when the value is
+   * non-empty. Timestamps, provenance, and group counts are exposed through
+   * the panel itself, never here.
+   */
   readonly announcement: string;
 }
 
@@ -33,7 +39,8 @@ export type TodoProjectionAction =
   | { readonly type: 'snapshot'; readonly message: SyncSnapshot }
   | { readonly type: 'delta'; readonly message: SyncDelta }
   | { readonly type: 'gap'; readonly message: SyncGap }
-  | { readonly type: 'refreshRequested' };
+  | { readonly type: 'refreshRequested' }
+  | { readonly type: 'clearAnnouncement' };
 
 export const EMPTY_TODO_PROJECTION_STATE: TodoProjectionState = {
   sessionId: null,
@@ -55,6 +62,8 @@ export function todoProjectionReducer(
       return state.sessionId === action.sessionId
         ? state
         : { ...EMPTY_TODO_PROJECTION_STATE, sessionId: action.sessionId };
+    case 'clearAnnouncement':
+      return state.announcement === '' ? state : { ...state, announcement: '' };
     case 'capability':
       return action.capability?.todoProjection === 1
         ? { ...state, availability: state.projection === null ? 'waiting' : 'available' }
@@ -132,13 +141,16 @@ function applySnapshot(
   projection: TodoProjectionV1,
   anchorSeq: number,
 ): TodoProjectionState {
-  if (
-    state.projection !== null &&
-    state.projection.planId === projection.planId &&
-    state.projection.revision > projection.revision
-  ) {
+  // A plan-identity change replaces the prior projection; a same-plan snapshot
+  // with a newer revision also replaces. A same-plan snapshot whose incoming
+  // revision is not strictly newer is stale and is discarded without mutating
+  // the rendered view.
+  const planChanged = state.projection === null || state.projection.planId !== projection.planId;
+  if (!planChanged && state.projection !== null && state.projection.revision >= projection.revision) {
     return state;
   }
+  const previousTasks = state.projection?.tasks ?? [];
+  const previousRevision = state.projection?.revision ?? 0;
   return {
     ...state,
     availability: 'available',
@@ -146,12 +158,15 @@ function applySnapshot(
     anchorSeq,
     refreshing: false,
     needsRefresh: false,
-    announcement: `Pi todo plan updated. ${doneCount(projection.tasks)} of ${projection.tasks.length} done.`,
+    announcement: snapshotAnnouncement(projection, previousTasks, previousRevision, planChanged),
   };
 }
 
 function applyDelta(state: TodoProjectionState, delta: TodoProjectionDeltaV1): TodoProjectionState {
   const current = state.projection;
+  // A delta that arrives before any snapshot, or against a different plan,
+  // cannot be applied safely. Surface a read-only refresh instead of inventing
+  // a delta chain.
   if (current === null || current.planId !== delta.planId) {
     return { ...state, refreshing: true, needsRefresh: true };
   }
@@ -164,14 +179,21 @@ function applyDelta(state: TodoProjectionState, delta: TodoProjectionDeltaV1): T
   const byId = new Map(
     current.tasks.filter((task) => !removed.has(task.id)).map((task) => [task.id, task]),
   );
+
   let announcedTask: TodoTaskProjectionV1 | null = null;
+  let changed = removed.size > 0;
   for (const task of delta.upsertedTasks) {
     const previous = byId.get(task.id);
     if (previous === undefined || task.revision > previous.revision) {
       byId.set(task.id, task);
-      announcedTask ??= task;
+      changed = true;
+      if (previous === undefined || previous.state !== task.state) {
+        announcedTask ??= task;
+      }
     }
   }
+  if (!changed) return state;
+
   const tasks = [...byId.values()].sort((left, right) => left.order - right.order);
   const projection: TodoProjectionV1 = {
     planId: current.planId,
@@ -186,11 +208,49 @@ function applyDelta(state: TodoProjectionState, delta: TodoProjectionDeltaV1): T
     projection,
     refreshing: false,
     needsRefresh: false,
-    announcement:
-      announcedTask === null
-        ? `Pi todo plan updated. ${doneCount(tasks)} of ${tasks.length} done.`
-        : `${announcedTask.title} is now ${stateLabel(announcedTask.state)}.`,
+    announcement: deltaAnnouncement(projection, announcedTask),
   };
+}
+
+function snapshotAnnouncement(
+  projection: TodoProjectionV1,
+  previousTasks: readonly TodoTaskProjectionV1[],
+  previousRevision: number,
+  planChanged: boolean,
+): string {
+  if (planChanged || previousRevision === 0) {
+    if (projection.tasks.length === 0) return '';
+    return `Pi todo plan updated. ${doneCount(projection.tasks)} of ${projection.tasks.length} done.`;
+  }
+  const diff = firstStateChange(projection.tasks, previousTasks);
+  if (diff === null) return '';
+  return `${diff.title} is now ${stateLabel(diff.state)}.`;
+}
+
+function deltaAnnouncement(
+  projection: TodoProjectionV1,
+  announcedTask: TodoTaskProjectionV1 | null,
+): string {
+  if (announcedTask === null) {
+    return `Pi todo plan updated. ${doneCount(projection.tasks)} of ${projection.tasks.length} done.`;
+  }
+  return `${announcedTask.title} is now ${stateLabel(announcedTask.state)}.`;
+}
+
+function firstStateChange(
+  next: readonly TodoTaskProjectionV1[],
+  previous: readonly TodoTaskProjectionV1[],
+): TodoTaskProjectionV1 | null {
+  const previousById = new Map(previous.map((task) => [task.id, task]));
+  const nextById = new Map(next.map((task) => [task.id, task]));
+  for (const task of next) {
+    const prior = previousById.get(task.id);
+    if (prior === undefined || prior.state !== task.state) return task;
+  }
+  for (const task of previous) {
+    if (!nextById.has(task.id)) return null;
+  }
+  return null;
 }
 
 function doneCount(tasks: readonly TodoTaskProjectionV1[]): number {

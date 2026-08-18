@@ -26,12 +26,16 @@ function task(
   state: TodoTaskProjectionV1['state'],
   order: number,
   group: string | null,
+  revision = 1,
 ): TodoTaskProjectionV1 {
-  return { id, title, state, group, order, revision: 1, updatedAt };
+  return { id, title, state, group, order, revision, updatedAt };
 }
 
-function projection(entries: readonly TodoTaskProjectionV1[] = tasks): TodoProjectionV1 {
-  return { planId: 'plan_panel_001', source: 'pi', revision: 1, updatedAt, tasks: entries };
+function projection(
+  entries: readonly TodoTaskProjectionV1[] = tasks,
+  revision = 1,
+): TodoProjectionV1 {
+  return { planId: 'plan_panel_001', source: 'pi', revision, updatedAt, tasks: entries };
 }
 
 function projectionState(value: TodoProjectionV1 | null): TodoProjectionState {
@@ -120,6 +124,10 @@ describe('read-only todo panel', () => {
     expect(screen.getByText('All done · 8/8')).toBeInTheDocument();
     expect(container.querySelector('.todo-task-list')).toBeNull();
     expect(container.querySelector('.todo-state-section')).toBeNull();
+    expect(container.querySelector('[data-todo-panel]')).toHaveAttribute(
+      'data-todo-all-done',
+      'true',
+    );
   });
 
   it('shows an honest empty plan and renders nothing for unsupported hosts', () => {
@@ -157,5 +165,189 @@ describe('read-only todo panel', () => {
       query: '?demo=1&fixture=todos&state=grouped',
       states: ['grouped', 'all-done', 'empty', 'unsupported'],
     });
+  });
+
+  it('renders the live region only when an announcement is present and never moves focus', () => {
+    const { rerender, container } = render(
+      <TodoPanel projection={projection()} />,
+    );
+
+    expect(container.querySelector('.todo-live-region')).toBeNull();
+
+    rerender(
+      <TodoPanel projection={projection()} announcement="Title task_a is now doing." />,
+    );
+
+    const region = container.querySelector('.todo-live-region');
+    expect(region).not.toBeNull();
+    expect(region).toHaveAttribute('aria-live', 'polite');
+    expect(region).toHaveAttribute('aria-atomic', 'true');
+    expect(region).toHaveTextContent('Title task_a is now doing.');
+    expect(region).toHaveClass('sr-only');
+
+  });
+
+  it('fires the onAnnouncementConsumed callback exactly once per new announcement', () => {
+    const onConsumed = vi.fn();
+    const { rerender } = render(
+      <TodoPanel projection={projection()} onAnnouncementConsumed={onConsumed} />,
+    );
+
+    rerender(
+      <TodoPanel
+        projection={projection()}
+        announcement="Title task_a is now doing."
+        onAnnouncementConsumed={onConsumed}
+      />,
+    );
+    expect(onConsumed).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <TodoPanel
+        projection={projection()}
+        onAnnouncementConsumed={onConsumed}
+      />,
+    );
+    expect(onConsumed).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <TodoPanel
+        projection={projection()}
+        announcement="Title task_b is now done."
+        onAnnouncementConsumed={onConsumed}
+      />,
+    );
+    expect(onConsumed).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps unaffected task row identities stable across a delta in the same plan', () => {
+    const initial = projection([
+      task('task_kept_baseline', 'Keep this row', 'pending', 1, null, 1),
+      task('task_change_baseline', 'Will move to done', 'active', 2, null, 1),
+    ]);
+    const { container, rerender } = render(<TodoPanel projection={initial} onRefresh={vi.fn()} />);
+    const keptRowBefore = container.querySelector('[data-todo-task-id="task_kept_baseline"]');
+    expect(keptRowBefore).toBeTruthy();
+
+    rerender(
+      <TodoPanel
+        projection={projection([
+          task('task_kept_baseline', 'Keep this row', 'pending', 1, null, 1),
+          task('task_change_baseline', 'Will move to done', 'done', 2, null, 2),
+        ])}
+        onRefresh={vi.fn()}
+      />,
+    );
+
+    const keptRowAfter = container.querySelector('[data-todo-task-id="task_kept_baseline"]');
+    expect(keptRowAfter).toBeTruthy();
+    expect(keptRowAfter).toBe(keptRowBefore);
+    expect(keptRowAfter?.getAttribute('data-todo-task-revision')).toBe('1');
+  });
+
+  it('removes a row when the host removes it from the projection', () => {
+    const { container } = render(
+      <TodoPanel
+        projection={projection([
+          task('task_present', 'Should remain', 'pending', 1, null, 1),
+        ])}
+        onRefresh={vi.fn()}
+      />,
+    );
+
+    expect(container.querySelector('[data-todo-task-id="task_present"]')).not.toBeNull();
+    expect(container.querySelectorAll('[data-todo-task-id]')).toHaveLength(1);
+  });
+
+  it('exposes stable, host-opaque task ids to assistive technology', () => {
+    const { container } = render(<TodoPanel projection={projection()} onRefresh={vi.fn()} />);
+    const rows = [...container.querySelectorAll('[data-todo-task-id]')];
+    const ids = rows.map((row) => row.getAttribute('data-todo-task-id'));
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const id of ids) {
+      expect(id).toMatch(/^task_[a-z_]+$/u);
+    }
+  });
+
+  it('renders the RTL chevron direction without inverting the row order', () => {
+    document.documentElement.setAttribute('dir', 'rtl');
+    try {
+      const { container } = render(<TodoPanel projection={projection()} onRefresh={vi.fn()} />);
+      const titles = [...container.querySelectorAll('.todo-task-title')].map(
+        (node) => node.textContent,
+      );
+      expect(titles).toEqual([
+        'Map transcript placement',
+        'Write the panel shell',
+        'Wire projection state',
+        'Connect read-only refresh',
+        'Ship the protocol types',
+        'Apply relay redaction',
+        'Advertise capability',
+        'Run device verification',
+      ]);
+    } finally {
+      document.documentElement.removeAttribute('dir');
+    }
+  });
+
+  it('renders with wrapped titles and never overflows its container', () => {
+    const wrapped = projection([
+      task('task_long', 'Render-through', 'pending', 1, 'Panel', 1),
+      task(
+        'task_unicode',
+        'تطبيق التغييرات على الواجهة الأمامية طوال اليوم',
+        'active',
+        2,
+        'State',
+        1,
+      ),
+    ]);
+    const { container } = render(<TodoPanel projection={wrapped} onRefresh={vi.fn()} />);
+    const panel = container.querySelector('[data-todo-panel]') as HTMLElement;
+    expect(panel).toBeTruthy();
+    const titles = [...container.querySelectorAll('.todo-task-title')] as HTMLElement[];
+    for (const title of titles) {
+      expect(title.getAttribute('dir')).toBe('auto');
+    }
+    expect(panel.classList.contains('todo-panel')).toBe(true);
+  });
+
+  it('renders the panel header as sticky and the live region off the document flow', () => {
+    const { container } = render(<TodoPanel projection={projection()} onRefresh={vi.fn()} />);
+    const header = container.querySelector('.todo-panel-header') as HTMLElement;
+    const liveRegion = container.querySelector('.todo-live-region') as HTMLElement | null;
+    expect(header).toBeTruthy();
+    expect(header.classList.contains('todo-panel-header')).toBe(true);
+    expect(liveRegion).toBeNull();
+  });
+
+  it('does not include any task-row interactive attribute after a delta', () => {
+    const { container } = render(
+      <TodoPanel
+        projection={projection([
+          task('task_display', 'Static row', 'pending', 1, null, 1),
+        ])}
+        onRefresh={vi.fn()}
+      />,
+    );
+    const row = container.querySelector('[data-todo-task-id="task_display"]') as HTMLElement;
+    expect(row).toBeTruthy();
+    expect(row.querySelector('input, button, a, [role="checkbox"], [role="switch"]')).toBeNull();
+    expect(row.getAttribute('draggable')).toBeNull();
+    expect(row.getAttribute('tabindex')).toBeNull();
+  });
+
+  it('honors a 44-pt minimum height on every task row and every named control', () => {
+    const { container } = render(<TodoPanel projection={projection()} onRefresh={vi.fn()} />);
+    const rows = [...container.querySelectorAll('.todo-task-row')];
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      expect(row.classList.contains('todo-task-row')).toBe(true);
+    }
+    const refresh = container.querySelector('.todo-refresh');
+    const sectionTrigger = container.querySelector('.todo-section-trigger');
+    expect(refresh).toBeTruthy();
+    expect(sectionTrigger).toBeTruthy();
   });
 });

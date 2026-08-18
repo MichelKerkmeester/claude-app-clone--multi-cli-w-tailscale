@@ -95,7 +95,7 @@ describe('PWA shell and history-only cache boundary', () => {
   it('keeps standalone rotation enabled and caches only shell/static requests', () => {
     expect(MANIFEST.display).toBe('standalone');
     expect(MANIFEST.orientation).toBe('any');
-    expect(SERVICE_WORKER).toContain("const CACHE_NAME = 'pi-remote-shell-v4'");
+    expect(SERVICE_WORKER).toContain("const CACHE_NAME = 'pi-remote-shell-v6'");
     expect(SERVICE_WORKER).toContain("cache: 'no-store'");
     expect(SERVICE_WORKER).toContain('function isShellRequest');
     expect(SERVICE_WORKER).toContain('if (!isShellRequest(url))');
@@ -105,6 +105,8 @@ describe('PWA shell and history-only cache boundary', () => {
     expect(SERVICE_WORKER).toContain('function isArtifactRequest');
     expect(SERVICE_WORKER).toContain('function isAttachmentRequest');
     expect(SERVICE_WORKER).toContain('Attachment-bearing resources');
+    expect(SERVICE_WORKER).toContain('function isTodoProjectionRequest');
+    expect(SERVICE_WORKER).toContain('Todo projections are live read-only data');
   });
 
   it('fetches exact artifact routes network-only and never opens Cache Storage', async () => {
@@ -234,6 +236,53 @@ describe('PWA shell and history-only cache boundary', () => {
     listeners.get('fetch')?.(event);
     expect(await event.response).toBeInstanceOf(Response);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(cacheOpen).not.toHaveBeenCalled();
+  });
+
+  it('fetches todo projection routes network-only and never opens Cache Storage', async () => {
+    const listeners = new Map<string, (event: unknown) => void>();
+    const cacheOpen = vi.fn();
+    const fetchSpy = vi.fn(async (request: Request) => {
+      expect(request.cache).toBe('no-store');
+      return new Response('projection bytes', { status: 200 });
+    });
+    const context = {
+      Request,
+      URL,
+      Promise,
+      Response,
+      fetch: fetchSpy,
+      caches: { open: cacheOpen, keys: vi.fn(), match: vi.fn(), delete: vi.fn() },
+      self: {
+        location: { origin: 'https://pi-remote.example.test' },
+        addEventListener: (type: string, listener: (event: unknown) => void) => {
+          listeners.set(type, listener);
+        },
+        skipWaiting: vi.fn(),
+        clients: { claim: vi.fn(), matchAll: vi.fn(), openWindow: vi.fn() },
+        registration: { showNotification: vi.fn() },
+      },
+    };
+    runInNewContext(SERVICE_WORKER, context);
+    for (const path of [
+      '/api/todos/snapshot',
+      '/api/todos/delta',
+      '/api/todo-projection/rev-2',
+    ]) {
+      const event: {
+        readonly request: Request;
+        response?: Promise<Response>;
+        readonly respondWith: (value: Promise<Response>) => void;
+      } = {
+        request: new Request(`https://pi-remote.example.test${path}`, { method: 'GET' }),
+        respondWith(value) {
+          this.response = value;
+        },
+      };
+      listeners.get('fetch')?.(event);
+      expect(await event.response).toBeInstanceOf(Response);
+    }
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
     expect(cacheOpen).not.toHaveBeenCalled();
   });
 

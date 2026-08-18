@@ -3,9 +3,13 @@
 // ───────────────────────────────────────────────────────────────────
 // INVARIANT: this cache may render history but can never enable mode
 // controls. It stores only session cards and transcript blocks — never
-// runtime state, mode, tickets, or revisions — and the app's mode
-// authority comes exclusively from a live read-only hydrate, so a cached
-// Build or Plan can never be presented as current authority.
+// runtime state, mode, tickets, revisions, or todo projections — and the
+// app's mode authority comes exclusively from a live read-only hydrate,
+// so a cached Build or Plan can never be presented as current authority.
+// Todo projections are read-only host data and are intentionally kept in
+// memory only: persistence would expand the surface for stale content
+// and would not survive the redaction boundary in either browser storage
+// or service-worker storage.
 
 import {
   isFilePreviewBlock,

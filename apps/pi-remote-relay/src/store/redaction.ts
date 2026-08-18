@@ -3,6 +3,7 @@
 // ───────────────────────────────────────────────────────────────────
 
 import type {
+  AskQuestionDisplayDto,
   AvailableModelDto,
   CommandCatalogDto,
   CommandDescriptorDto,
@@ -19,6 +20,8 @@ import type {
   RuntimeStateDto,
 } from '@pi-remote/pi-rpc-protocol';
 import {
+  isAskQuestionPresentedEvent,
+  isAskQuestionDisplayDto,
   MODEL_AVAILABILITIES,
   MODEL_AVAILABILITY_REASON_CODES,
   isCommandCatalogDto,
@@ -65,7 +68,9 @@ const URL_CREDENTIAL_PATTERN = /\bhttps?:\/\/[^/\s:@]+:[^@\s/]+@[^\s"'<>]+/gi;
 const POSIX_PATH_PATTERN =
   /(?:~|\/(?:Users|home|private|tmp|var|etc|opt|usr|Volumes))\/[^\s"'<>]*/g;
 const WINDOWS_PATH_PATTERN = /\b[A-Za-z]:\\(?:[^\\\s"'<>]+\\)*[^\\\s"'<>]*/g;
+// Control and bidi characters are removed before any text reaches a DTO.
 const CONTROL_OR_BIDI_PATTERN =
+  // eslint-disable-next-line no-control-regex
   /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/gu;
 const TOOL_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u;
 const REDACTION_MAX_FIELDS = 10_000;
@@ -77,6 +82,9 @@ interface RedactionState {
 
 /** Apply the only redaction policy allowed before persistence or broadcast. */
 export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TPayload>): Envelope {
+  if (isAskQuestionDisplayCarrier(envelope.payload)) {
+    throw new TypeError('Ask-question display content requires the authenticated volatile read.');
+  }
   const state: RedactionState = { fieldsRedacted: 0, reasons: new Set<string>() };
   let payload = redactPayload(envelope.payload, state);
   const redaction: RedactionMetadata = {
@@ -91,6 +99,15 @@ export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TP
     payload,
     redaction,
   };
+}
+
+function isAskQuestionDisplayCarrier(value: JsonValue): boolean {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, JsonValue>;
+  return (
+    (record.type === 'session.ask-question.presented' || record.kind === 'ask-question') &&
+    'display' in record
+  );
 }
 
 /** Redact an arbitrary JSON value with the canonical relay policy. */
@@ -247,6 +264,49 @@ const COMMAND_ALIAS_CAP = 16;
 // Identity used only by legacy projector callers that predate versioned catalogs;
 // the command service always passes the live host epoch.
 const DEFAULT_COMMAND_HOST_EPOCH = 'epoch_host_local';
+
+/** Project only the bounded display fields for the authenticated volatile read. */
+export function projectAskQuestionDisplay(rawData: unknown): AskQuestionDisplayDto | null {
+  if (!isAskQuestionPresentedEvent(rawData)) return null;
+  const display = rawData.display;
+  const projectedDisplay = {
+    prompt: display.prompt,
+    options: display.options.map((option) => ({
+      id: option.id,
+      label: option.label,
+      ...(option.description === undefined ? {} : { description: option.description }),
+    })),
+    freeText: {
+      allowed: display.freeText.allowed,
+      required: display.freeText.required,
+      ...(display.freeText.placeholder === undefined
+        ? {}
+        : { placeholder: display.freeText.placeholder }),
+      ...(display.freeText.maxLength === undefined
+        ? {}
+        : { maxLength: display.freeText.maxLength }),
+    },
+    ...(display.minSelections === undefined ? {} : { minSelections: display.minSelections }),
+    ...(display.maxSelections === undefined ? {} : { maxSelections: display.maxSelections }),
+  };
+  const projected: AskQuestionDisplayDto = {
+    type: 'session.ask-question.display',
+    sessionId: rawData.sessionId,
+    questionId: rawData.questionId,
+    activityId: rawData.activityId,
+    revision: rawData.revision,
+    display: projectedDisplay,
+    selectionMode: rawData.selectionMode,
+    redaction: {
+      applied: true,
+      policyVersion: rawData.redaction.policyVersion,
+      contentAvailability: rawData.redaction.contentAvailability,
+      redactedFields: [...rawData.redaction.redactedFields],
+    },
+    requiresReadOnlyHint: rawData.requiresReadOnlyHint,
+  };
+  return isAskQuestionDisplayDto(projected) ? projected : null;
+}
 
 /** Project a raw pi model list into the bounded, path-free browser catalog. */
 export function projectRuntimeModelCatalog(
@@ -574,6 +634,7 @@ function pathFreeToken(value: unknown, max: number): string | null {
     token === '..' ||
     token.includes('/') ||
     token.includes('\\') ||
+    // eslint-disable-next-line no-control-regex
     /[\u0000-\u001f\u007f-\u009f]/u.test(token)
   ) {
     return null;
@@ -584,6 +645,7 @@ function pathFreeToken(value: unknown, max: number): string | null {
 function safeDisplayString(value: unknown, max: number): string | null {
   if (typeof value !== 'string') return null;
   const sanitized = value
+    // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/gu, '')
     .trim();
   if (

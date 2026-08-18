@@ -4,6 +4,25 @@
 
 import type {
   AcceptEditsGrantDto,
+  AskQuestionAnswer,
+  AskQuestionAnswerRequest,
+  AskQuestionAnswerResult,
+  AskQuestionAnswerTicketRequest,
+  AskQuestionAnswerTicketResponse,
+  AskQuestionAnswerCapability,
+  AskQuestionContentAvailability,
+  AskQuestionDisplay,
+  AskQuestionDisplayDto,
+  AskQuestionDisplayReadRequest,
+  AskQuestionFreeText,
+  AskQuestionLifecycleEvent,
+  AskQuestionOption,
+  AskQuestionPresentedEvent,
+  AskQuestionRedaction,
+  AskQuestionRedactedField,
+  AskQuestionSelectionMode,
+  AskQuestionTranscriptMeta,
+  AskQuestionTranscriptStatus,
   AttentionChangedPayload,
   AttentionClass,
   AttentionItemDto,
@@ -106,6 +125,11 @@ import type {
 } from './types.js';
 
 import {
+  ASK_QUESTION_CONTENT_AVAILABILITIES,
+  ASK_QUESTION_REDACTED_FIELDS,
+  ASK_QUESTION_RESULT_REASONS,
+  ASK_QUESTION_SELECTION_MODES,
+  ASK_QUESTION_TRANSCRIPT_STATUSES,
   MODEL_AVAILABILITIES,
   MODEL_AVAILABILITY_REASON_CODES,
   MODEL_INPUT_KINDS,
@@ -199,6 +223,15 @@ const FILE_PREVIEW_MAX_THUMBNAIL_REF = 200;
 const REDACTION_MAX_FIELDS = 10_000;
 const REDACTION_MAX_REASONS = 8;
 const REDACTION_MAX_REASON_LENGTH = 32;
+const ASK_QUESTION_OPTION_CAP = 64;
+const ASK_QUESTION_ANSWER_OPTION_CAP = 64;
+const ASK_QUESTION_PROMPT_MAX_LENGTH = 4_096;
+const ASK_QUESTION_LABEL_MAX_LENGTH = 512;
+const ASK_QUESTION_DESCRIPTION_MAX_LENGTH = 1_024;
+const ASK_QUESTION_PLACEHOLDER_MAX_LENGTH = 256;
+const ASK_QUESTION_FREE_TEXT_MAX_LENGTH = 4_096;
+const ASK_QUESTION_FREE_TEXT_MAX_BYTES = 8 * 1_024;
+const ASK_QUESTION_SELECTION_CAP = 64;
 const RICH_TOOL_NAME_MAX_LENGTH = 128;
 const RICH_INPUT_SUMMARY_MAX_LENGTH = 64 * 1024;
 const RICH_OUTPUT_MAX_LENGTH = 128 * 1024;
@@ -228,6 +261,19 @@ const INBOUND_IMAGE_ARTIFACT_MEDIA_TYPE_SET = new Set<string>(INBOUND_IMAGE_ARTI
 const INBOUND_IMAGE_REDACTION_STATUS_SET = new Set<string>(INBOUND_IMAGE_REDACTION_STATUSES);
 const INBOUND_IMAGE_TERMINAL_REASON_SET = new Set<string>(INBOUND_IMAGE_TERMINAL_REASONS);
 const INBOUND_IMAGE_CONTENT_KIND_SET = new Set<string>(INBOUND_IMAGE_CONTENT_KINDS);
+const ASK_QUESTION_SELECTION_MODE_SET = new Set<AskQuestionSelectionMode>(
+  ASK_QUESTION_SELECTION_MODES,
+);
+const ASK_QUESTION_CONTENT_AVAILABILITY_SET = new Set<AskQuestionContentAvailability>(
+  ASK_QUESTION_CONTENT_AVAILABILITIES,
+);
+const ASK_QUESTION_REDACTED_FIELD_SET = new Set<AskQuestionRedactedField>(
+  ASK_QUESTION_REDACTED_FIELDS,
+);
+const ASK_QUESTION_TRANSCRIPT_STATUS_SET = new Set<AskQuestionTranscriptStatus>(
+  ASK_QUESTION_TRANSCRIPT_STATUSES,
+);
+const ASK_QUESTION_RESULT_REASON_SET = new Set<string>(ASK_QUESTION_RESULT_REASONS);
 const INBOUND_IMAGE_FULL_MAX_EDGE = 2_000;
 const INBOUND_IMAGE_THUMBNAIL_MAX_EDGE = 640;
 const INBOUND_IMAGE_FULL_MAX_BYTES = 2 * 1024 * 1024;
@@ -1077,6 +1123,353 @@ export function isSessionCardDto(value: unknown): value is SessionCardDto {
   );
 }
 
+export function isAskQuestionOption(value: unknown): value is AskQuestionOption {
+  if (!isRecord(value)) return false;
+  const hasDescription = hasOnlyKeys(value, ['id', 'label', 'description']);
+  const withoutDescription = hasOnlyKeys(value, ['id', 'label']);
+  return (
+    (hasDescription || withoutDescription) &&
+    isOpaqueId(value.id) &&
+    isSafeDisplayString(value.label, ASK_QUESTION_LABEL_MAX_LENGTH) &&
+    (value.description === undefined ||
+      isSafeDisplayString(value.description, ASK_QUESTION_DESCRIPTION_MAX_LENGTH))
+  );
+}
+
+export function isAskQuestionFreeText(value: unknown): value is AskQuestionFreeText {
+  if (!isRecord(value)) return false;
+  const exactShape =
+    hasOnlyKeys(value, ['allowed', 'required']) ||
+    hasOnlyKeys(value, ['allowed', 'required', 'placeholder']) ||
+    hasOnlyKeys(value, ['allowed', 'required', 'maxLength']) ||
+    hasOnlyKeys(value, ['allowed', 'required', 'placeholder', 'maxLength']);
+  if (
+    !exactShape ||
+    typeof value.allowed !== 'boolean' ||
+    typeof value.required !== 'boolean' ||
+    (value.required && !value.allowed) ||
+    (value.placeholder !== undefined &&
+      !isSafeDisplayString(value.placeholder, ASK_QUESTION_PLACEHOLDER_MAX_LENGTH)) ||
+    (value.maxLength !== undefined &&
+      (!isBoundedPositiveInteger(value.maxLength) ||
+        value.maxLength > ASK_QUESTION_FREE_TEXT_MAX_LENGTH))
+  ) {
+    return false;
+  }
+  return value.allowed || (value.placeholder === undefined && value.maxLength === undefined);
+}
+
+export function isAskQuestionDisplay(value: unknown): value is AskQuestionDisplay {
+  if (!isRecord(value)) return false;
+  const exactShape =
+    hasOnlyKeys(value, ['prompt', 'options', 'freeText']) ||
+    hasOnlyKeys(value, ['prompt', 'options', 'freeText', 'minSelections']) ||
+    hasOnlyKeys(value, ['prompt', 'options', 'freeText', 'maxSelections']) ||
+    hasOnlyKeys(value, ['prompt', 'options', 'freeText', 'minSelections', 'maxSelections']);
+  if (
+    !exactShape ||
+    !isSafeDisplayString(value.prompt, ASK_QUESTION_PROMPT_MAX_LENGTH) ||
+    !Array.isArray(value.options) ||
+    value.options.length > ASK_QUESTION_OPTION_CAP ||
+    !value.options.every(isAskQuestionOption) ||
+    !isAskQuestionFreeText(value.freeText)
+  ) {
+    return false;
+  }
+  const optionIds = value.options.map((option) => option.id);
+  if (new Set(optionIds).size !== optionIds.length) return false;
+  if (optionIds.length === 0 && !value.freeText.allowed) return false;
+  if (
+    value.minSelections !== undefined &&
+    (!isBoundedPositiveInteger(value.minSelections) ||
+      value.minSelections > ASK_QUESTION_SELECTION_CAP)
+  ) {
+    return false;
+  }
+  if (
+    value.maxSelections !== undefined &&
+    (!isBoundedPositiveInteger(value.maxSelections) ||
+      value.maxSelections > ASK_QUESTION_SELECTION_CAP)
+  ) {
+    return false;
+  }
+  return (
+    value.minSelections === undefined ||
+    value.maxSelections === undefined ||
+    value.minSelections <= value.maxSelections
+  );
+}
+
+export function isAskQuestionAnswerCapability(
+  value: unknown,
+): value is AskQuestionAnswerCapability {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['scope', 'ticketRef', 'boundRevision', 'expiresAt']) &&
+    value.scope === 'ask-question.answer' &&
+    isOpaqueId(value.ticketRef) &&
+    isPositiveInteger(value.boundRevision) &&
+    isTimestamp(value.expiresAt)
+  );
+}
+
+export function isAskQuestionRedaction(value: unknown): value is AskQuestionRedaction {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['applied', 'policyVersion', 'contentAvailability', 'redactedFields']) &&
+    value.applied === true &&
+    isPositiveInteger(value.policyVersion) &&
+    typeof value.contentAvailability === 'string' &&
+    ASK_QUESTION_CONTENT_AVAILABILITY_SET.has(
+      value.contentAvailability as AskQuestionContentAvailability,
+    ) &&
+    Array.isArray(value.redactedFields) &&
+    value.redactedFields.length <= ASK_QUESTION_REDACTED_FIELDS.length &&
+    new Set(value.redactedFields).size === value.redactedFields.length &&
+    value.redactedFields.every(
+      (field) =>
+        typeof field === 'string' &&
+        ASK_QUESTION_REDACTED_FIELD_SET.has(field as AskQuestionRedactedField),
+    )
+  );
+}
+
+export function isAskQuestionPresentedEvent(value: unknown): value is AskQuestionPresentedEvent {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'type',
+      'sessionId',
+      'questionId',
+      'activityId',
+      'revision',
+      'display',
+      'selectionMode',
+      'answerCapability',
+      'redaction',
+      'requiresReadOnlyHint',
+    ]) &&
+    value.type === 'session.ask-question.presented' &&
+    isOpaqueId(value.sessionId) &&
+    isOpaqueId(value.questionId) &&
+    isOpaqueId(value.activityId) &&
+    isPositiveInteger(value.revision) &&
+    isAskQuestionDisplay(value.display) &&
+    typeof value.selectionMode === 'string' &&
+    ASK_QUESTION_SELECTION_MODE_SET.has(value.selectionMode as AskQuestionSelectionMode) &&
+    isAskQuestionAnswerCapability(value.answerCapability) &&
+    value.answerCapability.boundRevision === value.revision &&
+    isAskQuestionRedaction(value.redaction) &&
+    value.redaction.contentAvailability !== 'unavailable' &&
+    typeof value.requiresReadOnlyHint === 'boolean'
+  );
+}
+
+export function isAskQuestionDisplayDto(value: unknown): value is AskQuestionDisplayDto {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'type',
+      'sessionId',
+      'questionId',
+      'activityId',
+      'revision',
+      'display',
+      'selectionMode',
+      'redaction',
+      'requiresReadOnlyHint',
+    ]) &&
+    value.type === 'session.ask-question.display' &&
+    isOpaqueId(value.sessionId) &&
+    isOpaqueId(value.questionId) &&
+    isOpaqueId(value.activityId) &&
+    isPositiveInteger(value.revision) &&
+    isAskQuestionDisplay(value.display) &&
+    typeof value.selectionMode === 'string' &&
+    ASK_QUESTION_SELECTION_MODE_SET.has(value.selectionMode as AskQuestionSelectionMode) &&
+    isAskQuestionRedaction(value.redaction) &&
+    value.redaction.contentAvailability !== 'unavailable' &&
+    typeof value.requiresReadOnlyHint === 'boolean'
+  );
+}
+
+export function isAskQuestionDisplayReadRequest(
+  value: unknown,
+): value is AskQuestionDisplayReadRequest {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['sessionId', 'questionId', 'revision']) &&
+    isOpaqueId(value.sessionId) &&
+    isOpaqueId(value.questionId) &&
+    isPositiveInteger(value.revision)
+  );
+}
+
+export function isAskQuestionTranscriptMeta(
+  value: unknown,
+): value is AskQuestionTranscriptMeta {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'kind',
+      'id',
+      'revision',
+      'seq',
+      'occurredAt',
+      'activityId',
+      'questionId',
+      'sessionId',
+      'presentedRevision',
+      'status',
+    ]) &&
+    value.kind === 'ask-question' &&
+    isOpaqueId(value.id) &&
+    isPositiveInteger(value.revision) &&
+    isPositiveInteger(value.seq) &&
+    isTimestamp(value.occurredAt) &&
+    isOpaqueId(value.activityId) &&
+    isOpaqueId(value.questionId) &&
+    isOpaqueId(value.sessionId) &&
+    isPositiveInteger(value.presentedRevision) &&
+    typeof value.status === 'string' &&
+    ASK_QUESTION_TRANSCRIPT_STATUS_SET.has(value.status as AskQuestionTranscriptStatus)
+  );
+}
+
+export function isAskQuestionLifecycleEvent(value: unknown): value is AskQuestionLifecycleEvent {
+  if (!isRecord(value)) return false;
+  const exactShape =
+    hasOnlyKeys(value, ['type', 'sessionId', 'questionId', 'revision']) ||
+    hasOnlyKeys(value, ['type', 'sessionId', 'questionId', 'revision', 'reason']);
+  return (
+    exactShape &&
+    (value.type === 'session.ask-question.withdrawn' ||
+      value.type === 'session.ask-question.expired' ||
+      value.type === 'session.ask-question.superseded') &&
+    isOpaqueId(value.sessionId) &&
+    isOpaqueId(value.questionId) &&
+    isPositiveInteger(value.revision) &&
+    (value.reason === undefined ||
+      value.reason === 'host-cancelled' ||
+      value.reason === 'revision-moved' ||
+      value.reason === 'session-ended' ||
+      value.reason === 'timeout')
+  );
+}
+
+export function isAskQuestionAnswer(value: unknown): value is AskQuestionAnswer {
+  const validText = (text: unknown): text is string =>
+    typeof text === 'string' &&
+    new TextEncoder().encode(text).byteLength <= ASK_QUESTION_FREE_TEXT_MAX_BYTES &&
+    text.length <= ASK_QUESTION_FREE_TEXT_MAX_LENGTH &&
+    // Free text rejects controls and bidi overrides before hashing or handoff.
+    // eslint-disable-next-line no-control-regex
+    !/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(text);
+  return (
+    isRecord(value) &&
+    (hasOnlyKeys(value, ['optionIds']) || hasOnlyKeys(value, ['optionIds', 'freeText'])) &&
+    Array.isArray(value.optionIds) &&
+    value.optionIds.length <= ASK_QUESTION_ANSWER_OPTION_CAP &&
+    value.optionIds.every(isOpaqueId) &&
+    new Set(value.optionIds).size === value.optionIds.length &&
+    (value.freeText === undefined || validText(value.freeText))
+  );
+}
+
+export function isAskQuestionAnswerTicketRequest(
+  value: unknown,
+): value is AskQuestionAnswerTicketRequest {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'type',
+      'sessionId',
+      'questionId',
+      'expectedRevision',
+      'answerDigest',
+      'clientMutationId',
+    ]) &&
+    value.type === 'session.ask-question.answer-ticket' &&
+    isOpaqueId(value.sessionId) &&
+    isOpaqueId(value.questionId) &&
+    isPositiveInteger(value.expectedRevision) &&
+    typeof value.answerDigest === 'string' &&
+    DIGEST_PATTERN.test(value.answerDigest) &&
+    isOpaqueId(value.clientMutationId)
+  );
+}
+
+export function isAskQuestionAnswerTicketResponse(
+  value: unknown,
+): value is AskQuestionAnswerTicketResponse {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ['ticket', 'expiresAt']) &&
+    isOpaqueToken(value.ticket) &&
+    isTimestamp(value.expiresAt)
+  );
+}
+
+export function isAskQuestionAnswerRequest(value: unknown): value is AskQuestionAnswerRequest {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      'type',
+      'sessionId',
+      'questionId',
+      'expectedRevision',
+      'ticket',
+      'answer',
+      'answerDigest',
+      'clientMutationId',
+    ]) &&
+    value.type === 'session.ask-question.answer' &&
+    isOpaqueId(value.sessionId) &&
+    isOpaqueId(value.questionId) &&
+    isPositiveInteger(value.expectedRevision) &&
+    isOpaqueToken(value.ticket) &&
+    isAskQuestionAnswer(value.answer) &&
+    typeof value.answerDigest === 'string' &&
+    DIGEST_PATTERN.test(value.answerDigest) &&
+    isOpaqueId(value.clientMutationId)
+  );
+}
+
+export function isAskQuestionAnswerResult(value: unknown): value is AskQuestionAnswerResult {
+  if (!isRecord(value)) return false;
+  const exactShape =
+    hasOnlyKeys(value, [
+      'type',
+      'sessionId',
+      'questionId',
+      'revision',
+      'clientMutationId',
+      'status',
+    ]) ||
+    hasOnlyKeys(value, [
+      'type',
+      'sessionId',
+      'questionId',
+      'revision',
+      'clientMutationId',
+      'status',
+      'reason',
+    ]);
+  if (
+    !exactShape ||
+    value.type !== 'session.ask-question.answer-result' ||
+    !isOpaqueId(value.sessionId) ||
+    !isOpaqueId(value.questionId) ||
+    !isPositiveInteger(value.revision) ||
+    !isOpaqueId(value.clientMutationId) ||
+    (value.status !== 'accepted' && value.status !== 'rejected')
+  ) {
+    return false;
+  }
+  if (value.status === 'accepted') return value.reason === undefined;
+  return typeof value.reason === 'string' && ASK_QUESTION_RESULT_REASON_SET.has(value.reason);
+}
+
 /** Narrow an unknown value to one authoritative transcript block. */
 export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
   if (isRecord(value) && value.kind === 'file_preview') {
@@ -1084,6 +1477,9 @@ export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
   }
   if (isRecord(value) && value.kind === 'inbound_image') {
     return isInboundImageBlock(value);
+  }
+  if (isRecord(value) && value.kind === 'ask-question') {
+    return isAskQuestionTranscriptMeta(value);
   }
   if (!isTranscriptBase(value)) {
     return false;
@@ -1124,6 +1520,8 @@ export function isTranscriptBlock(value: unknown): value is TranscriptBlock {
       return isRedactedAttachmentBlock(value);
     case 'inbound_image':
       return isInboundImageBlock(value);
+    case 'ask-question':
+      return isAskQuestionTranscriptMeta(value);
     case 'usage':
       return (
         isNonNegativeNumber(value.inputTokens) &&
@@ -2386,6 +2784,8 @@ function isPathFreeToken(value: unknown, maxLength: number): value is string {
     value !== '..' &&
     !value.includes('/') &&
     !value.includes('\\') &&
+    // Path-like identifiers reject control characters before use.
+    // eslint-disable-next-line no-control-regex
     !/[\u0000-\u001f\u007f-\u009f]/u.test(value)
   );
 }
@@ -2393,6 +2793,8 @@ function isPathFreeToken(value: unknown, maxLength: number): value is string {
 function isSafeDisplayString(value: unknown, maxLength: number): value is string {
   return (
     isNonEmptyBoundedString(value, maxLength) &&
+    // Display strings reject controls and bidi overrides before projection.
+    // eslint-disable-next-line no-control-regex
     !/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(value) &&
     !/(?:https?|file):\/\/|(?:^|\s)\/(?:Users|home|private|tmp|var|etc|opt|usr|Volumes)\/|\b[A-Za-z]:\\|\b(?:api[_-]?key|authorization|cookie|password|secret|token)\s*[:=]|\bBearer\s+/iu.test(
       value,

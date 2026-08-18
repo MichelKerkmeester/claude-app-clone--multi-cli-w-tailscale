@@ -5,6 +5,8 @@
 import { createHash } from 'node:crypto';
 
 import type {
+  AskQuestionTranscriptMeta,
+  AskQuestionTranscriptStatus,
   FilePreviewBlock,
   InboundImageArtifact,
   InboundImageMediaClass,
@@ -26,6 +28,7 @@ import type {
   TranscriptShellKind,
   TranscriptTerminalCheckpoint,
 } from '@pi-remote/pi-rpc-protocol';
+import { isAskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
 
 import type { ArtifactStore } from './artifact-store.js';
 import { projectRedactedAttachmentBlock } from '../attachments/attachment-transcript-projector.js';
@@ -103,6 +106,36 @@ export interface InboundImageProjectionContext {
   readonly occurredAt: string;
   readonly mediaClass: InboundImageMediaClass;
   readonly source: InboundImageSource;
+}
+
+/** Project only the durable identity of a host-owned question. */
+export function projectAskQuestionTranscriptMeta(input: {
+  readonly id: string;
+  readonly revision: number;
+  readonly seq: number;
+  readonly occurredAt: string;
+  readonly activityId: string;
+  readonly questionId: string;
+  readonly sessionId: string;
+  readonly presentedRevision: number;
+  readonly status: AskQuestionTranscriptStatus;
+}): AskQuestionTranscriptMeta {
+  const block: AskQuestionTranscriptMeta = {
+    kind: 'ask-question',
+    id: input.id,
+    revision: input.revision,
+    seq: input.seq,
+    occurredAt: input.occurredAt,
+    activityId: input.activityId,
+    questionId: input.questionId,
+    sessionId: input.sessionId,
+    presentedRevision: input.presentedRevision,
+    status: input.status,
+  };
+  if (!isAskQuestionTranscriptMeta(block)) {
+    throw new TypeError('Relay refused an invalid ask-question metadata projection.');
+  }
+  return block;
 }
 
 export function projectInboundProcessingBlock(

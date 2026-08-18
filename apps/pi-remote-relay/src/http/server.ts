@@ -12,6 +12,10 @@ import {
   isApprovalAuthorityConsumeRequest,
   isApprovalAuthorityRequest,
   isApprovalDecisionCommand,
+  isAskQuestionAnswerRequest,
+  isAskQuestionAnswerTicketRequest,
+  isAskQuestionDisplayDto,
+  isAskQuestionDisplayReadRequest,
   isOpaqueId,
   isPlanControlCommand,
   isPromptSubmitCommand,
@@ -37,6 +41,7 @@ import {
 } from '../auth/auth-service.js';
 import { isAttachmentAction } from '../auth/policy.js';
 import type { ApprovalService } from '../approval/approval-service.js';
+import type { AskQuestionService } from '../ask-question/ask-question-service.js';
 import {
   ArtifactReadRateLimiter,
   FixedWindowRateLimiter,
@@ -52,8 +57,6 @@ import {
   AttachmentServiceError,
   isAttachmentTicketBinding,
   type AttachmentOwner,
-  type AttachmentSetBinding,
-  type AttachmentStatusDto,
   type AttachmentTicketBinding,
 } from '../attachments/attachment-types.js';
 import { PiImageBridgeError } from '../attachments/pi-image-bridge.js';
@@ -131,6 +134,7 @@ export interface ReadOnlyServerOptions {
   };
   readonly prompts?: PromptService;
   readonly runtime?: RuntimeService;
+  readonly askQuestions?: AskQuestionService;
   readonly commands?: CommandService;
   readonly push?: PushService;
   readonly now?: () => number;
@@ -180,6 +184,8 @@ export async function startReadOnlyServer(
   const runtimeReconcileLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const planControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const planBindingLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
+  const askQuestionTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
+  const askQuestionAnswerLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const activeSockets = new Set<ActiveSocket>();
   // A runtime mutation is only valid from a device that also holds a live, authenticated
   // sync socket — a background or stale device can never steer the host.
@@ -204,6 +210,8 @@ export async function startReadOnlyServer(
       runtimeReconcileLimiter,
       planControlLimiter,
       planBindingLimiter,
+      askQuestionTicketLimiter,
+      askQuestionAnswerLimiter,
       isForegroundDevice,
     ).catch(() => sendJson(response, 400, { error: 'invalid_request' }));
   });
@@ -360,6 +368,8 @@ async function handleHttp(
   runtimeReconcileLimiter: FixedWindowRateLimiter,
   planControlLimiter: FixedWindowRateLimiter,
   planBindingLimiter: FixedWindowRateLimiter,
+  askQuestionTicketLimiter: FixedWindowRateLimiter,
+  askQuestionAnswerLimiter: FixedWindowRateLimiter,
   isForegroundDevice: (deviceId: string, token: string) => boolean,
 ): Promise<void> {
   if (
@@ -487,6 +497,71 @@ async function handleHttp(
       attachmentRoute,
       isForegroundDevice,
     );
+    return;
+  }
+
+  if (ingress.path === '/api/ask-question/display') {
+    const body = await readJsonBody(request);
+    if (options.askQuestions === undefined || !isAskQuestionDisplayReadRequest(body)) {
+      sendJson(response, options.askQuestions === undefined ? 503 : 400, {
+        error: options.askQuestions === undefined ? 'ask_question_unavailable' : 'invalid_request',
+      });
+      return;
+    }
+    const display = options.askQuestions.getDisplay(body.sessionId, body.questionId, body.revision);
+    if (display === null || !isAskQuestionDisplayDto(display)) {
+      sendJson(response, 404, { error: 'question_not_found' });
+      return;
+    }
+    sendJson(response, 200, display);
+    return;
+  }
+
+  if (ingress.path === '/api/ask-question/ticket') {
+    const body = await readJsonBody(request);
+    if (options.askQuestions === undefined || !isAskQuestionAnswerTicketRequest(body)) {
+      sendJson(response, options.askQuestions === undefined ? 503 : 400, {
+        error: options.askQuestions === undefined ? 'ask_question_unavailable' : 'invalid_ticket_request',
+      });
+      return;
+    }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (!askQuestionTicketLimiter.consume(session.deviceId)) {
+      auth.metrics.rateLimited += 1;
+      sendJson(response, 429, { error: 'rate_limited' });
+      return;
+    }
+    const result = await options.askQuestions.issueAnswerTicket(session, body, auth);
+    if (result.status === 'issued') {
+      sendJson(response, 201, result.ticket);
+      return;
+    }
+    sendJson(response, statusForAskQuestionReason(result.reason), { error: result.reason });
+    return;
+  }
+
+  if (ingress.path === '/api/ask-question/answer') {
+    const body = await readJsonBody(request);
+    if (options.askQuestions === undefined || !isAskQuestionAnswerRequest(body)) {
+      sendJson(response, options.askQuestions === undefined ? 503 : 400, {
+        error: options.askQuestions === undefined ? 'ask_question_unavailable' : 'invalid_answer_request',
+      });
+      return;
+    }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (!askQuestionAnswerLimiter.consume(session.deviceId)) {
+      auth.metrics.rateLimited += 1;
+      sendJson(response, 429, { error: 'rate_limited' });
+      return;
+    }
+    const result = await options.askQuestions.commitAnswer(session, body, auth);
+    sendJson(response, result.status === 'accepted' ? 202 : statusForAskQuestionReason(result.reason), result);
     return;
   }
 
@@ -1865,6 +1940,8 @@ function inboundDigestFromRequest(request: IncomingMessage): string | null {
 }
 
 function safePrincipal(value: unknown): value is string {
+  // Ingress principals reject C0 controls before entering the auth boundary.
+  // eslint-disable-next-line no-control-regex
   return typeof value === 'string' && value.length > 0 && value.length <= 320 && !/[\u0000-\u001f]/u.test(value);
 }
 
@@ -1954,6 +2031,13 @@ function actionForRequest(path: string, mediaEnabled = false): string | null {
   if (path === '/api/approval/decide') return 'approval:decide';
   if (path === '/api/prompt/submit') return 'prompt:submit';
   if (path === '/api/prompt/abort') return 'prompt:abort';
+  if (
+    path === '/api/ask-question/display' ||
+    path === '/api/ask-question/ticket' ||
+    path === '/api/ask-question/answer'
+  ) {
+    return 'ask-question.answer';
+  }
   if (path === '/api/accept-edits') return 'accept-edits:create';
   if (
     path === '/api/runtime/state' ||
@@ -1968,6 +2052,18 @@ function actionForRequest(path: string, mediaEnabled = false): string | null {
   if (path === '/api/plan/binding') return 'plan:control';
   if (path === '/api/commands/list') return 'commands:list';
   return null;
+}
+
+function statusForAskQuestionReason(reason: string | undefined): number {
+  if (reason === 'invalid-ticket') {
+    return 401;
+  }
+  if (reason === 'revision-mismatch' || reason === 'question-withdrawn' || reason === 'question-already-answered') {
+    return 409;
+  }
+  if (reason === 'plan-mode-blocked' || reason === 'redaction-policy-blocked') return 403;
+  if (reason === 'delivery-unknown' || reason === 'host-unavailable') return 503;
+  return 422;
 }
 
 function isAttachmentRoute(path: string): boolean {

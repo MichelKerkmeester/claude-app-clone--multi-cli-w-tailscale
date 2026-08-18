@@ -5,6 +5,7 @@ import type { ChildProcessWithoutNullStreams, spawn as nodeSpawn } from 'node:ch
 import { describe, expect, it, vi } from 'vitest';
 
 import { RpcSupervisor } from '../src/rpc/supervisor.js';
+import { RpcDemultiplexer } from '../src/rpc/demux.js';
 
 function response(id: string, command: string): string {
   return `${JSON.stringify({ id, type: 'response', command, success: true })}\n`;
@@ -63,6 +64,35 @@ describe('supervisor settled mutation lane', () => {
       'write:mutation_2',
       'response:mutation_2',
     ]);
+  });
+});
+
+describe('ask-question callback demultiplexing', () => {
+  it('emits only a safe callback outcome and never forwards callback payload data', () => {
+    const outcomes: unknown[] = [];
+    const protocolErrors: Error[] = [];
+    const demultiplexer = new RpcDemultiplexer({
+      onEvent: () => undefined,
+      onProtocolError: (error) => protocolErrors.push(error),
+      askQuestionCallback: {
+        matches: (record) =>
+          typeof record === 'object' && record !== null && 'questionCallback' in record,
+        map: () => ({ status: 'delivery-unknown' as const }),
+        onOutcome: (outcome) => outcomes.push(outcome),
+      },
+    });
+
+    demultiplexer.accept({
+      type: 'response',
+      id: 'callback_1',
+      command: 'integration-defined',
+      success: true,
+      questionCallback: { prompt: 'callback-content-canary' },
+    });
+
+    expect(outcomes).toEqual([{ status: 'delivery-unknown' }]);
+    expect(JSON.stringify(outcomes)).not.toContain('callback-content-canary');
+    expect(protocolErrors).toEqual([]);
   });
 });
 

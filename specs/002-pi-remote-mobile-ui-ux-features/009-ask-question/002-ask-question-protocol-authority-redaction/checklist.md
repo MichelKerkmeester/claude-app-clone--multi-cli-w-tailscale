@@ -1,13 +1,13 @@
 # Checklist — Ask-question protocol, host authority, and redaction
 
-- [ ] **Prerequisite:** the release-blocking adversarial security/redaction review (`roadmap.md` → Hard gates §3) is signed off before this phase begins.
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0.
-- [ ] `npx vitest run extensions/pi-remote-approval/tests/final-boundary.test.ts` exits 0.
-- [ ] A valid presentation passes guards, receives redaction metadata, and travels through the existing authenticated envelope and relay.
-- [ ] Malformed, duplicate, stale, withdrawn, expired, superseded, unavailable, and policy-blocked questions fail closed.
-- [ ] Ticket requests bind the exact session, question, revision, device, scope, digest, and expiry, and consumed tickets cannot be reused.
-- [ ] Answer commit recomputes the digest and prevents extension handoff on binding, revision, validation, or authority failure.
-- [ ] Accepted results occur only after Pi confirmation; unknown delivery remains non-accepted without automatic retry.
-- [ ] Transcript, sync, push, logs, telemetry, diagnostics, and extension fixtures contain no question content, answer text, ticket, digest, or raw callback data.
-- [ ] Security review confirms plan-mode enforcement, content-free push, redaction-before-persistence, and phone-inaccessible `--full-access`.
+- [x] **Prerequisite:** the release-blocking adversarial security/redaction review is signed off before this phase begins. — `../adversarial-security-review.md` (5 MUST-FIX); resolutions folded into this phase's spec and committed `861b74c` before build.
+- [x] `npm run typecheck` exits 0. — exit 0 (outside sandbox).
+- [x] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0. — full backend 360 passed / 47 files outside the sandbox (+17; the new ask-question/mutation-lane/negative-control tests; the in-sandbox `listen EPERM` is a false loopback artifact).
+- [x] `npx vitest run extensions/pi-remote-approval/tests/final-boundary.test.ts` exits 0. — passes within the 360 (extension final-boundary revalidation).
+- [x] A valid presentation passes guards, receives redaction metadata, and travels through the existing authenticated envelope and relay. — `isAskQuestionPresentedEvent` guard + metadata-only `AskQuestionTranscriptMeta` block through `appendEnvelope`; `ask-question.test.ts`.
+- [x] Malformed, duplicate, stale, withdrawn, expired, superseded, unavailable, and policy-blocked questions fail closed. — host `answerMatches` + `readFreshQuestion` re-check + default-deny policy; negative controls in `ask-question.test.ts` / `mutation-lane.test.ts`.
+- [x] Ticket requests bind the exact session, question, revision, device, scope, digest, and expiry, and consumed tickets cannot be reused. — `consumeAskQuestionTicket` (atomic one-use, deletes before compare); mint only after fresh pending re-read; double-ticket + replay negative controls.
+- [x] Answer commit recomputes the digest and prevents extension handoff on binding, revision, validation, or authority failure. — `askQuestionAnswerDigest` recompute vs `ticket.boundDigest` (sorted optionIds + bound question/revision/principal); single-flight `pending→settling` barrier + pre-handoff `readFreshQuestion`; answer-swap + stale-revision + double-answer negative controls.
+- [x] Accepted results occur only after Pi confirmation; unknown delivery remains non-accepted without automatic retry. — handoff `accepted` ⇒ `answered`; exception/undefined ⇒ terminal `delivery-unknown` (reconcile-only by `clientMutationId`, never auto-retried); MF5 negative control.
+- [x] Transcript, sync, push, logs, telemetry, diagnostics, and extension fixtures contain no question content, answer text, ticket, digest, or raw callback data. — `redaction.ts` THROWS if a display carrier reaches the envelope path; display served only via the `projectAskQuestionDisplay` allowlist volatile read; push reuses content-free `serializePushHint` (unchanged); display-leakage negative control.
+- [x] Security review confirms plan-mode enforcement, content-free push, redaction-before-persistence, and phone-inaccessible `--full-access`. — Claude diff review: `ask-question.answer` added phone-grantable/not-host-authoritative in default-deny `policy.ts`; plan-mode unchanged; MF1 redaction-before-persistence; push content-free; phone cannot enable `--full-access`.

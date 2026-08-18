@@ -5,7 +5,10 @@
 import { approvalActionDigest } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createFinalBoundaryHandler } from '../src/index.js';
+import {
+  createAskQuestionAnswerAdapter,
+  createFinalBoundaryHandler,
+} from '../src/index.js';
 
 const context = { sessionManager: { getSessionId: () => 'session_local' } };
 
@@ -65,9 +68,91 @@ describe('Pi final-boundary fixture', () => {
     });
     expect(consume).not.toHaveBeenCalled();
   });
+
+  it('re-reads the current question and maps a confirmed callback to accepted', async () => {
+    const readCurrentPendingQuestion = vi.fn(async () => PENDING_QUESTION);
+    const submitAnswer = vi.fn(async () => ({ status: 'accepted' }));
+    const adapter = createAskQuestionAnswerAdapter({
+      readCurrentPendingQuestion,
+      submitAnswer,
+    });
+
+    await expect(
+      adapter({
+        sessionId: 'session_local',
+        questionId: 'question_local',
+        expectedRevision: 3,
+        principal: 'operator@example.com',
+        answer: { optionIds: ['option_b', 'option_a'] },
+        clientMutationId: 'mutation_local',
+      }),
+    ).resolves.toEqual({ status: 'accepted' });
+    expect(submitAnswer).toHaveBeenCalledWith(
+      expect.objectContaining({ answer: { optionIds: ['option_a', 'option_b'] } }),
+    );
+  });
+
+  it('rejects a superseded pending question before invoking the callback', async () => {
+    const submitAnswer = vi.fn(async () => ({ status: 'accepted' }));
+    const adapter = createAskQuestionAnswerAdapter({
+      readCurrentPendingQuestion: vi.fn(async () => ({ ...PENDING_QUESTION, revision: 4 })),
+      submitAnswer,
+    });
+
+    await expect(
+      adapter({
+        sessionId: 'session_local',
+        questionId: 'question_local',
+        expectedRevision: 3,
+        principal: 'operator@example.com',
+        answer: { optionIds: ['option_a'] },
+        clientMutationId: 'mutation_stale',
+      }),
+    ).resolves.toEqual({ status: 'rejected', reason: 'revision-mismatch' });
+    expect(submitAnswer).not.toHaveBeenCalled();
+  });
+
+  it('maps a lost callback acknowledgement to terminal delivery-unknown', async () => {
+    const submitAnswer = vi.fn(async () => {
+      throw new Error('callback transport unavailable');
+    });
+    const adapter = createAskQuestionAnswerAdapter({
+      readCurrentPendingQuestion: vi.fn(async () => PENDING_QUESTION),
+      submitAnswer,
+    });
+
+    await expect(
+      adapter({
+        sessionId: 'session_local',
+        questionId: 'question_local',
+        expectedRevision: 3,
+        principal: 'operator@example.com',
+        answer: { optionIds: ['option_a'] },
+        clientMutationId: 'mutation_unknown',
+      }),
+    ).resolves.toEqual({ status: 'delivery-unknown' });
+    expect(submitAnswer).toHaveBeenCalledOnce();
+  });
 });
 
 const FIXTURE_INPUT = { path: 'safe.txt', content: 'hello' } as const;
+
+const PENDING_QUESTION = {
+  sessionId: 'session_local',
+  questionId: 'question_local',
+  revision: 3,
+  selectionMode: 'multiple' as const,
+  display: {
+    prompt: 'Choose an operation.',
+    options: [
+      { id: 'option_a', label: 'Allow' },
+      { id: 'option_b', label: 'Deny' },
+    ],
+    freeText: { allowed: false, required: false },
+    minSelections: 1,
+    maxSelections: 2,
+  },
+};
 
 function fixtureOptions(
   authorizer = {

@@ -2,7 +2,7 @@
 // MODULE: Pi Remote Protocol Canonical Approval Hashing
 // ───────────────────────────────────────────────────────────────────
 
-import type { ApprovalAction, JsonValue } from './types.js';
+import type { ApprovalAction, AskQuestionAnswer, JsonValue } from './types.js';
 
 const SHA256_INITIAL = new Uint32Array([
   0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
@@ -51,6 +51,36 @@ export function canonicalizeApprovalAction(action: ApprovalAction): string {
 /** Compute the browser-safe SHA-256 digest of the canonical action bytes. */
 export function approvalActionDigest(action: ApprovalAction): string {
   return sha256(canonicalizeApprovalAction(action));
+}
+
+/** Normalize the only answer fields that are allowed to enter the digest. */
+export function normalizeAskQuestionAnswer(answer: AskQuestionAnswer): AskQuestionAnswer {
+  return {
+    optionIds: [...answer.optionIds].sort(),
+    ...(answer.freeText === undefined ? {} : { freeText: answer.freeText }),
+  };
+}
+
+/** Canonical answer bytes bind the logical answer to its host context. */
+export function canonicalizeAskQuestionAnswer(
+  answer: AskQuestionAnswer,
+  binding: { readonly questionId: string; readonly expectedRevision: number; readonly principal: string },
+): string {
+  const normalized = normalizeAskQuestionAnswer(answer);
+  return canonicalizeJson({
+    answer: normalized,
+    expectedRevision: binding.expectedRevision,
+    principal: binding.principal,
+    questionId: binding.questionId,
+  });
+}
+
+/** Compute the host-comparable digest for one bound ask-question answer. */
+export function askQuestionAnswerDigest(
+  answer: AskQuestionAnswer,
+  binding: { readonly questionId: string; readonly expectedRevision: number; readonly principal: string },
+): string {
+  return sha256(canonicalizeAskQuestionAnswer(answer, binding));
 }
 
 /** Compute SHA-256 without relying on a host-specific crypto module. */

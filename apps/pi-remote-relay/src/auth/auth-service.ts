@@ -8,6 +8,8 @@ import {
   sessionProof,
   type EnrollmentRequest,
   type EnrollmentResponse,
+  type AskQuestionAnswerRequest,
+  type AskQuestionAnswerTicketResponse,
   type SessionChallengeResponse,
   type RuntimeControlCommand,
   type RuntimeModelTicketRequest,
@@ -33,6 +35,7 @@ import {
 const DEFAULT_SESSION_TTL_MS = 15 * 60_000;
 const DEFAULT_TICKET_TTL_MS = 20_000;
 const DEFAULT_RUNTIME_TICKET_TTL_MS = 10_000;
+const DEFAULT_ASK_QUESTION_TICKET_TTL_MS = 10_000;
 const DEFAULT_CHALLENGE_TTL_MS = 60_000;
 const DEFAULT_ARTIFACT_PUBLISH_TICKET_TTL_MS = 90_000;
 const MAX_ARTIFACT_PUBLISH_BYTES = 15 * 1024 * 1024;
@@ -69,6 +72,30 @@ interface RuntimeModelTicket extends RuntimeModelTicketResponse {
   readonly action: 'runtime:control';
   readonly binding: RuntimeModelTicketRequest;
   consumed: boolean;
+}
+
+export interface AskQuestionTicketBinding {
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly expectedRevision: number;
+  readonly answerDigest: string;
+}
+
+interface AskQuestionTicket {
+  readonly ticket: string;
+  readonly expiresAt: string;
+  readonly sessionToken: string;
+  readonly deviceId: string;
+  readonly principal: string;
+  readonly origin: string;
+  readonly action: 'ask-question.answer';
+  readonly binding: AskQuestionTicketBinding;
+  consumed: boolean;
+}
+
+export interface ConsumedAskQuestionTicket {
+  readonly session: ApplicationSession;
+  readonly binding: AskQuestionTicketBinding;
 }
 
 interface AttachmentTicket extends AttachmentTicketDto {
@@ -150,6 +177,7 @@ export interface AuthServiceOptions {
   readonly sessionTtlMs?: number;
   readonly ticketTtlMs?: number;
   readonly runtimeTicketTtlMs?: number;
+  readonly askQuestionTicketTtlMs?: number;
   readonly attachmentTicketTtlMs?: number;
   readonly artifactPublishTicketTtlMs?: number;
 }
@@ -161,12 +189,14 @@ export class AuthService {
   private readonly sessionTtlMs: number;
   private readonly ticketTtlMs: number;
   private readonly runtimeTicketTtlMs: number;
+  private readonly askQuestionTicketTtlMs: number;
   private readonly attachmentTicketTtlMs: number;
   private readonly artifactPublishTicketTtlMs: number;
   private readonly sessionChallenges = new Map<string, PendingSessionChallenge>();
   private readonly sessions = new Map<string, ApplicationSession>();
   private readonly tickets = new Map<string, WebSocketTicket>();
   private readonly runtimeTickets = new Map<string, RuntimeModelTicket>();
+  private readonly askQuestionTickets = new Map<string, AskQuestionTicket>();
   private readonly attachmentTickets = new Map<string, AttachmentTicket>();
   private readonly artifactPublishTickets = new Map<string, ArtifactPublishTicket>();
   private readonly revocationListeners = new Set<
@@ -190,6 +220,8 @@ export class AuthService {
     this.sessionTtlMs = options.sessionTtlMs ?? DEFAULT_SESSION_TTL_MS;
     this.ticketTtlMs = options.ticketTtlMs ?? DEFAULT_TICKET_TTL_MS;
     this.runtimeTicketTtlMs = options.runtimeTicketTtlMs ?? DEFAULT_RUNTIME_TICKET_TTL_MS;
+    this.askQuestionTicketTtlMs =
+      options.askQuestionTicketTtlMs ?? DEFAULT_ASK_QUESTION_TICKET_TTL_MS;
     this.attachmentTicketTtlMs = options.attachmentTicketTtlMs ?? 90_000;
     this.artifactPublishTicketTtlMs = Math.min(
       Math.max(options.artifactPublishTicketTtlMs ?? DEFAULT_ARTIFACT_PUBLISH_TICKET_TTL_MS, 1),
@@ -610,6 +642,64 @@ export class AuthService {
     );
   }
 
+  /** Issue the shared one-use ticket for the host-owned question lane. */
+  public issueAskQuestionTicket(
+    session: ApplicationSession,
+    binding: AskQuestionTicketBinding,
+  ): AskQuestionAnswerTicketResponse {
+    this.prune();
+    if (!isAskQuestionTicketBinding(binding)) {
+      throw new Error('Invalid ask-question ticket binding.');
+    }
+    const ticket: AskQuestionTicket = {
+      ticket: opaqueId('ask_question_ticket'),
+      expiresAt: new Date(this.now() + this.askQuestionTicketTtlMs).toISOString(),
+      sessionToken: session.token,
+      deviceId: session.deviceId,
+      principal: session.principal,
+      origin: session.origin,
+      action: 'ask-question.answer',
+      binding: { ...binding },
+      consumed: false,
+    };
+    this.askQuestionTickets.set(ticket.ticket, ticket);
+    this.metrics.ticketsIssued += 1;
+    return { ticket: ticket.ticket, expiresAt: ticket.expiresAt };
+  }
+
+  /** Consume before comparing request bindings so every attempt burns the ticket. */
+  public consumeAskQuestionTicket(
+    ticketId: string,
+    session: ApplicationSession,
+    request: AskQuestionAnswerRequest,
+  ): ConsumedAskQuestionTicket | null {
+    this.prune();
+    const ticket = this.askQuestionTickets.get(ticketId);
+    if (
+      ticket === undefined ||
+      ticket.consumed ||
+      Date.parse(ticket.expiresAt) <= this.now() ||
+      ticket.sessionToken !== session.token ||
+      ticket.deviceId !== session.deviceId ||
+      ticket.origin !== session.origin ||
+      ticket.principal !== session.principal ||
+      ticket.action !== 'ask-question.answer'
+    ) {
+      return null;
+    }
+
+    ticket.consumed = true;
+    this.askQuestionTickets.delete(ticketId);
+    this.metrics.ticketsConsumed += 1;
+
+    const bindingMatches =
+      request.sessionId === ticket.binding.sessionId &&
+      request.questionId === ticket.binding.questionId &&
+      request.expectedRevision === ticket.binding.expectedRevision &&
+      request.answerDigest === ticket.binding.answerDigest;
+    return bindingMatches ? { session, binding: ticket.binding } : null;
+  }
+
   public revokeSession(sessionToken: string): boolean {
     const session = this.sessions.get(sessionToken);
     if (session === undefined || session.revoked) return false;
@@ -660,6 +750,14 @@ export class AuthService {
         this.runtimeTickets.delete(id);
       }
     }
+    for (const [id, ticket] of this.askQuestionTickets) {
+      if (
+        ticket.deviceId === deviceId &&
+        (sessionToken === undefined || ticket.sessionToken === sessionToken)
+      ) {
+        this.askQuestionTickets.delete(id);
+      }
+    }
     for (const [id, ticket] of this.attachmentTickets) {
       if (
         ticket.deviceId === deviceId &&
@@ -694,6 +792,11 @@ export class AuthService {
     }
     for (const [id, ticket] of this.runtimeTickets) {
       if (ticket.consumed || Date.parse(ticket.expiresAt) <= now) this.runtimeTickets.delete(id);
+    }
+    for (const [id, ticket] of this.askQuestionTickets) {
+      if (ticket.consumed || Date.parse(ticket.expiresAt) <= now) {
+        this.askQuestionTickets.delete(id);
+      }
     }
     for (const [id, ticket] of this.attachmentTickets) {
       if (ticket.consumed || Date.parse(ticket.expiresAt) <= now) {
@@ -747,6 +850,21 @@ function isArtifactPublishTicketBinding(
   return value.principal === undefined || isSafePrincipal(value.principal);
 }
 
+function isAskQuestionTicketBinding(value: unknown): value is AskQuestionTicketBinding {
+  if (!isRecord(value)) return false;
+  return (
+    Object.keys(value).length === 4 &&
+    Object.keys(value).every((key) =>
+      ['sessionId', 'questionId', 'expectedRevision', 'answerDigest'].includes(key),
+    ) &&
+    isOpaqueToken(value.sessionId) &&
+    isOpaqueToken(value.questionId) &&
+    isPositiveInteger(value.expectedRevision) &&
+    typeof value.answerDigest === 'string' &&
+    /^[a-f0-9]{64}$/u.test(value.answerDigest)
+  );
+}
+
 export function artifactPublishTicketBindingsEqual(
   left: ArtifactPublishTicketBinding,
   right: ArtifactPublishTicketBinding,
@@ -772,6 +890,8 @@ function isOpaqueToken(value: unknown): value is string {
 }
 
 function isSafePrincipal(value: unknown): value is string {
+  // Principal validation intentionally rejects all C0 controls.
+  // eslint-disable-next-line no-control-regex
   return typeof value === 'string' && value.length > 0 && value.length <= 320 && !/[\u0000-\u001f]/u.test(value);
 }
 

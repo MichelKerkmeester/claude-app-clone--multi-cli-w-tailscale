@@ -2,8 +2,14 @@
 // MODULE: Replay and Live Sync Barrier
 // ───────────────────────────────────────────────────────────────────
 
-import { isEnvelope } from '@pi-remote/pi-rpc-protocol';
-import type { Envelope, SyncCursor, SyncDelta, SyncMessage } from '@pi-remote/pi-rpc-protocol';
+import { isAskQuestionTranscriptMeta, isEnvelope } from '@pi-remote/pi-rpc-protocol';
+import type {
+  AskQuestionTranscriptMeta,
+  Envelope,
+  SyncCursor,
+  SyncDelta,
+  SyncMessage,
+} from '@pi-remote/pi-rpc-protocol';
 
 import type { RelayStore } from '../store/relay-store.js';
 
@@ -39,6 +45,16 @@ export class SyncHub {
       for (const listener of this.committedListeners) listener(result.envelope);
     }
     return result.envelope;
+  }
+
+  /** Publish only the metadata representation of a host-owned question. */
+  public publishAskQuestionMetadata(
+    candidate: Envelope<AskQuestionTranscriptMeta>,
+  ): Envelope<AskQuestionTranscriptMeta> {
+    if (candidate.kind !== 'transcript.block' || !isAskQuestionTranscriptMeta(candidate.payload)) {
+      throw new TypeError('Sync refused a display-bearing ask-question payload.');
+    }
+    return this.publish(candidate) as Envelope<AskQuestionTranscriptMeta>;
   }
 
   public onCommitted(listener: (envelope: Envelope) => void): () => void {

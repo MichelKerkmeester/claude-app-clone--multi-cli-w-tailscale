@@ -7,6 +7,7 @@ import { randomBytes } from 'node:crypto';
 
 import {
   isInboundImageBlock,
+  isAskQuestionTranscriptMeta,
   isEnvelope,
   isOpaqueId,
   isRedactedAttachmentBlock,
@@ -184,6 +185,11 @@ export class RelayStore {
     }
     if (candidate.kind === 'transcript.block' && isInboundImageBlock(candidate.payload)) {
       return this.appendInboundEnvelope(candidate);
+    }
+    if (isAskQuestionDisplayBearingTranscript(candidate)) {
+      throw new TypeError(
+        'Relay refused ask-question display content before the persistence redaction boundary.',
+      );
     }
     const envelope = redactEnvelope(candidate);
     if (envelope.kind === 'transcript.block' && !isTranscriptBlock(envelope.payload)) {
@@ -1064,6 +1070,14 @@ export class RelayStore {
       throw new Error(`A new relay epoch must begin at sequence 1, received ${sequence}.`);
     }
   }
+}
+
+function isAskQuestionDisplayBearingTranscript(candidate: Envelope): boolean {
+  if (candidate.kind !== 'transcript.block') return false;
+  const payload = candidate.payload;
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) return false;
+  const record = payload as Record<string, unknown>;
+  return record.kind === 'ask-question' && !isAskQuestionTranscriptMeta(payload);
 }
 
 function makeInboundEnvelope(input: {

@@ -10,7 +10,11 @@ import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import { isPiRpcEvent } from '@pi-remote/pi-rpc-protocol';
 import type { PiRpcCommand, PiRpcEvent, PiRpcResponse } from '@pi-remote/pi-rpc-protocol';
 
-import { RpcDemultiplexer } from './demux.js';
+import {
+  RpcDemultiplexer,
+  type AskQuestionCallbackOutcome,
+  type AskQuestionCallbackRoute,
+} from './demux.js';
 import { StrictJsonlDecoder } from './framing.js';
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 15_000;
@@ -35,6 +39,11 @@ export interface RpcSupervisorOptions {
   readonly fixtureOnly?: boolean;
   readonly spawn?: typeof spawn;
   readonly env?: NodeJS.ProcessEnv;
+  /**
+   * Integration-time verification must bind this route to Pi's exact
+   * ask-question callback/event names before enabling the capability.
+   */
+  readonly askQuestionCallback?: Omit<AskQuestionCallbackRoute, 'onOutcome'>;
 }
 
 export interface SupervisorHealth {
@@ -82,6 +91,9 @@ export class RpcSupervisor {
   private readonly eventListeners = new Set<(event: PiRpcEvent) => void>();
   private readonly errorListeners = new Set<(error: Error) => void>();
   private readonly lifecycleListeners = new Set<(event: SupervisorLifecycleEvent) => void>();
+  private readonly askQuestionCallbackListeners = new Set<
+    (outcome: AskQuestionCallbackOutcome) => void
+  >();
   private readonly demultiplexer: RpcDemultiplexer;
   private state: SupervisorState = 'stopped';
   private restartCount = 0;
@@ -95,6 +107,15 @@ export class RpcSupervisor {
     this.demultiplexer = new RpcDemultiplexer({
       onEvent: (event) => this.emitEvent(event),
       onProtocolError: (error) => this.emitError(error),
+      ...(this.options.askQuestionCallback === undefined
+        ? {}
+        : {
+            askQuestionCallback: {
+              ...this.options.askQuestionCallback,
+              onOutcome: (outcome: AskQuestionCallbackOutcome) =>
+                this.emitAskQuestionCallback(outcome),
+            },
+          }),
     });
   }
 
@@ -185,6 +206,14 @@ export class RpcSupervisor {
   public onError(listener: (error: Error) => void): () => void {
     this.errorListeners.add(listener);
     return () => this.errorListeners.delete(listener);
+  }
+
+  /** Subscribe to safe, confirmed ask-question callback outcomes only. */
+  public onAskQuestionCallback(
+    listener: (outcome: AskQuestionCallbackOutcome) => void,
+  ): () => void {
+    this.askQuestionCallbackListeners.add(listener);
+    return () => this.askQuestionCallbackListeners.delete(listener);
   }
 
   /** Return metadata-only supervisor health. */
@@ -309,5 +338,9 @@ export class RpcSupervisor {
     for (const listener of this.errorListeners) {
       listener(error);
     }
+  }
+
+  private emitAskQuestionCallback(outcome: AskQuestionCallbackOutcome): void {
+    for (const listener of this.askQuestionCallbackListeners) listener(outcome);
   }
 }

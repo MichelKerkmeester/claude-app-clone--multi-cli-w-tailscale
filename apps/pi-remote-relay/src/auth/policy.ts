@@ -25,6 +25,7 @@ export type AuthorizedAction =
   | 'plan:control'
   | 'commands:list'
   | 'commands:submit'
+  | 'ask-question.answer'
   | AttachmentAction;
 
 export const ATTACHMENT_ACTIONS = [
@@ -64,6 +65,7 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   // The slash submission lane is authorized separately from ordinary prompt
   // submission so either can be denied without touching the other.
   'commands:submit',
+  'ask-question.answer',
   ...ATTACHMENT_ACTIONS,
 ]);
 

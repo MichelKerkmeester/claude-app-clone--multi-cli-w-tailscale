@@ -4,9 +4,17 @@
 
 import {
   approvalActionDigest,
+  isAskQuestionAnswer,
+  isAskQuestionDisplay,
+  isOpaqueId,
+  normalizeAskQuestionAnswer,
   isApprovalAuthorityConsumeResponse,
   isApprovalAuthorityRequestResponse,
   type ApprovalAction,
+  type AskQuestionAnswer,
+  type AskQuestionDisplay,
+  type AskQuestionResultReason,
+  type AskQuestionSelectionMode,
   type JsonValue,
 } from '@pi-remote/pi-rpc-protocol';
 
@@ -27,6 +35,97 @@ export interface PiExtensionApi {
       context: PiContext,
     ) => Promise<{ readonly block: true; readonly reason: string } | undefined>,
   ): void;
+}
+
+export interface PiPendingAskQuestion {
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly revision: number;
+  readonly selectionMode: AskQuestionSelectionMode;
+  readonly display: AskQuestionDisplay;
+}
+
+export type AskQuestionCallbackOutcome =
+  | { readonly status: 'accepted' }
+  | { readonly status: 'rejected'; readonly reason: AskQuestionResultReason }
+  | { readonly status: 'delivery-unknown' };
+
+export interface AskQuestionCallbackContract {
+  /** Read Pi's current pending question without changing it. */
+  readonly readCurrentPendingQuestion: (input: {
+    readonly sessionId: string;
+    readonly questionId: string;
+  }) => Promise<unknown | null>;
+  /** Deliver one answer and return Pi's confirmed callback outcome. */
+  readonly submitAnswer: (input: {
+    readonly sessionId: string;
+    readonly questionId: string;
+    readonly expectedRevision: number;
+    readonly principal: string;
+    readonly answer: AskQuestionAnswer;
+    readonly clientMutationId: string;
+  }) => Promise<unknown>;
+}
+
+export interface AskQuestionAdapterInput {
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly expectedRevision: number;
+  readonly principal: string;
+  readonly answer: AskQuestionAnswer;
+  readonly clientMutationId: string;
+}
+
+/**
+ * Adapt the assumed Pi callback contract to the relay handoff boundary.
+ * Integration-time verification must bind these functions to Pi's exact
+ * event and callback names; this adapter intentionally does not fabricate them.
+ */
+export function createAskQuestionAnswerAdapter(
+  contract: AskQuestionCallbackContract,
+): (input: AskQuestionAdapterInput) => Promise<AskQuestionCallbackOutcome> {
+  return async (input) => {
+    if (!isAskQuestionAnswer(input.answer)) {
+      return { status: 'rejected', reason: 'validation-failed' };
+    }
+
+    let current: PiPendingAskQuestion | null;
+    try {
+      const candidate = await contract.readCurrentPendingQuestion({
+        sessionId: input.sessionId,
+        questionId: input.questionId,
+      });
+      current = parsePendingAskQuestion(candidate);
+    } catch {
+      return { status: 'rejected', reason: 'host-unavailable' };
+    }
+    if (current === null) return { status: 'rejected', reason: 'question-withdrawn' };
+    if (
+      current.sessionId !== input.sessionId ||
+      current.questionId !== input.questionId ||
+      current.revision !== input.expectedRevision
+    ) {
+      return { status: 'rejected', reason: 'revision-mismatch' };
+    }
+    if (!answerMatchesPending(current, input.answer)) {
+      return { status: 'rejected', reason: 'validation-failed' };
+    }
+
+    try {
+      return normalizeAskQuestionCallbackOutcome(
+        await contract.submitAnswer({
+          sessionId: input.sessionId,
+          questionId: input.questionId,
+          expectedRevision: input.expectedRevision,
+          principal: input.principal,
+          answer: normalizeAskQuestionAnswer(input.answer),
+          clientMutationId: input.clientMutationId,
+        }),
+      );
+    } catch {
+      return { status: 'delivery-unknown' };
+    }
+  };
 }
 
 export interface RelayLeaseAuthorizer {
@@ -173,6 +272,117 @@ function requiredEnvironment(name: string): string {
   const value = process.env[name];
   if (value === undefined || value.length === 0) throw new Error(`${name} is required.`);
   return value;
+}
+
+function parsePendingAskQuestion(value: unknown): PiPendingAskQuestion | null {
+  if (
+    value === null ||
+    typeof value !== 'object' ||
+    Array.isArray(value) ||
+    !hasExactKeys(value, ['sessionId', 'questionId', 'revision', 'selectionMode', 'display'])
+  ) {
+    return null;
+  }
+  const candidate = value as Record<string, unknown>;
+  if (
+    !isOpaqueId(candidate.sessionId) ||
+    !isOpaqueId(candidate.questionId) ||
+    !Number.isSafeInteger(candidate.revision) ||
+    typeof candidate.revision !== 'number' ||
+    candidate.revision <= 0 ||
+    (candidate.selectionMode !== 'single' && candidate.selectionMode !== 'multiple') ||
+    !isAskQuestionDisplay(candidate.display)
+  ) {
+    return null;
+  }
+  return {
+    sessionId: candidate.sessionId,
+    questionId: candidate.questionId,
+    revision: candidate.revision,
+    selectionMode: candidate.selectionMode,
+    display: candidate.display,
+  };
+}
+
+function answerMatchesPending(
+  pending: PiPendingAskQuestion,
+  answer: AskQuestionAnswer,
+): boolean {
+  const optionIds = new Set(pending.display.options.map((option) => option.id));
+  if (answer.optionIds.some((optionId) => !optionIds.has(optionId))) return false;
+  const selectedCount = answer.optionIds.length;
+  if (pending.selectionMode === 'single' && selectedCount !== 1) return false;
+  const minSelections =
+    pending.display.minSelections ?? (pending.display.options.length === 0 ? 0 : 1);
+  const maxSelections =
+    pending.display.maxSelections ??
+    (pending.selectionMode === 'single' ? 1 : pending.display.options.length);
+  if (
+    selectedCount < minSelections ||
+    selectedCount > maxSelections ||
+    (pending.selectionMode === 'single' && selectedCount !== 1)
+  ) {
+    return false;
+  }
+  if (!pending.display.freeText.allowed && answer.freeText !== undefined) return false;
+  if (
+    pending.display.freeText.required &&
+    (answer.freeText === undefined || answer.freeText.trim().length === 0)
+  ) {
+    return false;
+  }
+  if (
+    answer.freeText !== undefined &&
+    pending.display.freeText.maxLength !== undefined &&
+    answer.freeText.length > pending.display.freeText.maxLength
+  ) {
+    return false;
+  }
+  return selectedCount > 0 || (answer.freeText !== undefined && answer.freeText.trim().length > 0);
+}
+
+function normalizeAskQuestionCallbackOutcome(value: unknown): AskQuestionCallbackOutcome {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return { status: 'delivery-unknown' };
+  }
+  const candidate = value as Record<string, unknown>;
+  if (candidate.status === 'accepted' && hasExactKeys(value, ['status'])) {
+    return { status: 'accepted' };
+  }
+  if (candidate.status === 'delivery-unknown' && hasExactKeys(value, ['status'])) {
+    return { status: 'delivery-unknown' };
+  }
+  if (candidate.status !== 'rejected' || typeof candidate.reason !== 'string') {
+    return { status: 'delivery-unknown' };
+  }
+  const reason =
+    candidate.reason === 'already-answered'
+      ? 'question-already-answered'
+      : candidate.reason;
+  if (!isAskQuestionResultReason(reason) || !hasExactKeys(value, ['status', 'reason'])) {
+    return { status: 'delivery-unknown' };
+  }
+  return { status: 'rejected', reason };
+}
+
+function isAskQuestionResultReason(value: string): value is AskQuestionResultReason {
+  return (
+    value === 'invalid-ticket' ||
+    value === 'revision-mismatch' ||
+    value === 'question-withdrawn' ||
+    value === 'question-already-answered' ||
+    value === 'plan-mode-blocked' ||
+    value === 'redaction-policy-blocked' ||
+    value === 'validation-failed' ||
+    value === 'host-unavailable' ||
+    value === 'delivery-unknown'
+  );
+}
+
+function hasExactKeys(value: object, keys: readonly string[]): boolean {
+  const actual = Object.keys(value).sort();
+  const expected = [...keys].sort();
+  return actual.length === expected.length && actual.every((key, index) => key === expected[index]);
 }
 
 function sleep(delay: number): Promise<void> {

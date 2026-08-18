@@ -392,6 +392,177 @@ interface TranscriptBlockBase extends JsonObject {
   readonly redaction?: RedactionMetadata;
 }
 
+export const ASK_QUESTION_SELECTION_MODES = ['single', 'multiple'] as const;
+export type AskQuestionSelectionMode = (typeof ASK_QUESTION_SELECTION_MODES)[number];
+
+export const ASK_QUESTION_CONTENT_AVAILABILITIES = [
+  'available',
+  'partially-redacted',
+  'unavailable',
+] as const;
+export type AskQuestionContentAvailability =
+  (typeof ASK_QUESTION_CONTENT_AVAILABILITIES)[number];
+
+export const ASK_QUESTION_REDACTED_FIELDS = [
+  'prompt',
+  'option-label',
+  'option-description',
+  'free-text-placeholder',
+] as const;
+export type AskQuestionRedactedField = (typeof ASK_QUESTION_REDACTED_FIELDS)[number];
+
+export const ASK_QUESTION_TRANSCRIPT_STATUSES = [
+  'presented',
+  'submitting',
+  'answered',
+  'error',
+  'expired',
+  'superseded',
+] as const;
+export type AskQuestionTranscriptStatus = (typeof ASK_QUESTION_TRANSCRIPT_STATUSES)[number];
+
+export const ASK_QUESTION_RESULT_REASONS = [
+  'invalid-ticket',
+  'revision-mismatch',
+  'question-withdrawn',
+  'question-already-answered',
+  'plan-mode-blocked',
+  'redaction-policy-blocked',
+  'validation-failed',
+  'host-unavailable',
+  'delivery-unknown',
+] as const;
+export type AskQuestionResultReason = (typeof ASK_QUESTION_RESULT_REASONS)[number];
+
+export interface AskQuestionOption extends JsonObject {
+  readonly id: string;
+  readonly label: string;
+  readonly description?: string;
+}
+
+export interface AskQuestionFreeText extends JsonObject {
+  readonly allowed: boolean;
+  readonly required: boolean;
+  readonly placeholder?: string;
+  readonly maxLength?: number;
+}
+
+export interface AskQuestionDisplay extends JsonObject {
+  readonly prompt: string;
+  readonly options: readonly AskQuestionOption[];
+  readonly freeText: AskQuestionFreeText;
+  /** Optional host bounds; absent means the protocol defaults apply. */
+  readonly minSelections?: number;
+  readonly maxSelections?: number;
+}
+
+export interface AskQuestionAnswerCapability extends JsonObject {
+  readonly scope: 'ask-question.answer';
+  readonly ticketRef: string;
+  readonly boundRevision: number;
+  readonly expiresAt: string;
+}
+
+export interface AskQuestionRedaction extends JsonObject {
+  readonly applied: true;
+  readonly policyVersion: number;
+  readonly contentAvailability: AskQuestionContentAvailability;
+  readonly redactedFields: readonly AskQuestionRedactedField[];
+}
+
+export interface AskQuestionPresentedEvent extends JsonObject {
+  readonly type: 'session.ask-question.presented';
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly activityId: string;
+  readonly revision: number;
+  readonly display: AskQuestionDisplay;
+  readonly selectionMode: AskQuestionSelectionMode;
+  readonly answerCapability: AskQuestionAnswerCapability;
+  readonly redaction: AskQuestionRedaction;
+  readonly requiresReadOnlyHint: boolean;
+}
+
+/** Authenticated, volatile display read; it is never an envelope payload. */
+export interface AskQuestionDisplayDto extends JsonObject {
+  readonly type: 'session.ask-question.display';
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly activityId: string;
+  readonly revision: number;
+  readonly display: AskQuestionDisplay;
+  readonly selectionMode: AskQuestionSelectionMode;
+  readonly redaction: AskQuestionRedaction;
+  readonly requiresReadOnlyHint: boolean;
+}
+
+export interface AskQuestionDisplayReadRequest extends JsonObject {
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly revision: number;
+}
+
+/** Durable transcript identity only; no display, answer, ticket or digest fields. */
+export interface AskQuestionTranscriptMeta extends TranscriptBlockBase {
+  readonly kind: 'ask-question';
+  readonly activityId: string;
+  readonly questionId: string;
+  readonly sessionId: string;
+  readonly presentedRevision: number;
+  readonly status: AskQuestionTranscriptStatus;
+}
+
+export interface AskQuestionLifecycleEvent extends JsonObject {
+  readonly type:
+    | 'session.ask-question.withdrawn'
+    | 'session.ask-question.expired'
+    | 'session.ask-question.superseded';
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly revision: number;
+  readonly reason?: 'host-cancelled' | 'revision-moved' | 'session-ended' | 'timeout';
+}
+
+export interface AskQuestionAnswer extends JsonObject {
+  readonly optionIds: readonly string[];
+  readonly freeText?: string;
+}
+
+export interface AskQuestionAnswerTicketRequest extends JsonObject {
+  readonly type: 'session.ask-question.answer-ticket';
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly expectedRevision: number;
+  readonly answerDigest: string;
+  readonly clientMutationId: string;
+}
+
+export interface AskQuestionAnswerTicketResponse extends JsonObject {
+  readonly ticket: string;
+  readonly expiresAt: string;
+}
+
+export interface AskQuestionAnswerRequest extends JsonObject {
+  readonly type: 'session.ask-question.answer';
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly expectedRevision: number;
+  readonly ticket: string;
+  readonly answer: AskQuestionAnswer;
+  readonly answerDigest: string;
+  readonly clientMutationId: string;
+}
+
+export interface AskQuestionAnswerResult extends JsonObject {
+  readonly type: 'session.ask-question.answer-result';
+  readonly sessionId: string;
+  readonly questionId: string;
+  readonly revision: number;
+  readonly clientMutationId: string;
+  readonly status: 'accepted' | 'rejected';
+  readonly reason?: AskQuestionResultReason;
+}
+
 export interface TextBlock extends TranscriptBlockBase {
   readonly kind: 'text';
   readonly text: string;
@@ -682,7 +853,8 @@ export type TranscriptBlock =
   | FilePreviewBlock
   | UsageBlock
   | RedactedAttachmentBlock
-  | InboundImageBlock;
+  | InboundImageBlock
+  | AskQuestionTranscriptMeta;
 
 export interface TranscriptPageDto {
   readonly sessionId: string;

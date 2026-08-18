@@ -14,6 +14,11 @@ import {
   isAttachmentPartTicket,
   isAttachmentSetManifest,
   isAttachmentSubmissionResult,
+  isAskQuestionAnswer,
+  isAskQuestionAnswerResult,
+  isAskQuestionDisplay,
+  isAskQuestionPresentedEvent,
+  isAskQuestionTranscriptMeta,
   isAvailableModelDto,
   isCommandBindingDto,
   isCommandCatalogDto,
@@ -440,6 +445,83 @@ describe('protocol guards', () => {
     expect(isPromptSubmitResponse({ accepted: true, block: { ...block, role: 'assistant' } })).toBe(
       false,
     );
+  });
+});
+
+describe('ask-question guards', () => {
+  it('rejects unknown ordinals, duplicate options and display-bearing metadata blocks', () => {
+    expect(
+      isAskQuestionDisplay({
+        prompt: 'Choose one.',
+        options: [{ id: 'option_a', label: 'A' }, { id: 'option_a', label: 'A again' }],
+        freeText: { allowed: false, required: false },
+      }),
+    ).toBe(false);
+    expect(
+      isAskQuestionAnswer({ optionIds: ['option_a'], unknownOrdinal: 'future' }),
+    ).toBe(false);
+    expect(
+      isAskQuestionAnswerResult({
+        type: 'session.ask-question.answer-result',
+        sessionId: 'session_local',
+        questionId: 'question_local',
+        revision: 1,
+        clientMutationId: 'mutation_local',
+        status: 'rejected',
+        reason: 'future-reason',
+      }),
+    ).toBe(false);
+    expect(
+      isAskQuestionTranscriptMeta({
+        kind: 'ask-question',
+        id: 'block_question',
+        revision: 1,
+        seq: 1,
+        occurredAt: '2026-08-18T00:00:00.000Z',
+        activityId: 'activity_local',
+        questionId: 'question_local',
+        sessionId: 'session_local',
+        presentedRevision: 1,
+        status: 'presented',
+        display: { prompt: 'must not persist' },
+      }),
+    ).toBe(false);
+  });
+
+  it('rejects unavailable required display content and accepts a valid presentation', () => {
+    const base = {
+      type: 'session.ask-question.presented',
+      sessionId: 'session_local',
+      questionId: 'question_local',
+      activityId: 'activity_local',
+      revision: 1,
+      display: {
+        prompt: 'Choose one.',
+        options: [{ id: 'option_a', label: 'A' }],
+        freeText: { allowed: false, required: false },
+      },
+      selectionMode: 'single',
+      answerCapability: {
+        scope: 'ask-question.answer',
+        ticketRef: 'ticket_reference',
+        boundRevision: 1,
+        expiresAt: '2026-08-18T00:00:10.000Z',
+      },
+      redaction: {
+        applied: true,
+        policyVersion: 1,
+        contentAvailability: 'available',
+        redactedFields: [],
+      },
+      requiresReadOnlyHint: true,
+    } as const;
+    expect(isAskQuestionPresentedEvent(base)).toBe(true);
+    expect(
+      isAskQuestionPresentedEvent({
+        ...base,
+        redaction: { ...base.redaction, contentAvailability: 'unavailable' },
+      }),
+    ).toBe(false);
   });
 });
 

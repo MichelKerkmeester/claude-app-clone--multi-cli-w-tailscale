@@ -7,8 +7,11 @@ export const PROTOCOL_VERSION = 1 as const;
 export { enrollmentProof, sessionProof } from './auth.js';
 export {
   approvalActionDigest,
+  askQuestionAnswerDigest,
+  canonicalizeAskQuestionAnswer,
   canonicalizeApprovalAction,
   canonicalizeJson,
+  normalizeAskQuestionAnswer,
   sha256,
 } from './approval.js';
 
@@ -16,6 +19,11 @@ export {
   ATTACHMENT_CANCELLATION_REASONS,
   ATTACHMENT_PART_STATUSES,
   ATTACHMENT_SUBMISSION_STATUSES,
+  ASK_QUESTION_CONTENT_AVAILABILITIES,
+  ASK_QUESTION_REDACTED_FIELDS,
+  ASK_QUESTION_RESULT_REASONS,
+  ASK_QUESTION_SELECTION_MODES,
+  ASK_QUESTION_TRANSCRIPT_STATUSES,
   DEFAULT_MEDIA_POLICY,
   MODEL_AVAILABILITIES,
   MODEL_AVAILABILITY_REASON_CODES,
@@ -49,6 +57,21 @@ export {
 } from './types.js';
 
 export {
+  isAskQuestionAnswer,
+  isAskQuestionAnswerCapability,
+  isAskQuestionAnswerRequest,
+  isAskQuestionAnswerResult,
+  isAskQuestionAnswerTicketRequest,
+  isAskQuestionAnswerTicketResponse,
+  isAskQuestionDisplay,
+  isAskQuestionDisplayDto,
+  isAskQuestionDisplayReadRequest,
+  isAskQuestionFreeText,
+  isAskQuestionLifecycleEvent,
+  isAskQuestionOption,
+  isAskQuestionPresentedEvent,
+  isAskQuestionRedaction,
+  isAskQuestionTranscriptMeta,
   isAttachmentCancellation,
   isAttachmentCancellationDto,
   isAttachmentManifestItem,
@@ -151,6 +174,26 @@ export {
 } from './guards.js';
 
 export type {
+  AskQuestionAnswer,
+  AskQuestionAnswerCapability,
+  AskQuestionAnswerRequest,
+  AskQuestionAnswerResult,
+  AskQuestionAnswerTicketRequest,
+  AskQuestionAnswerTicketResponse,
+  AskQuestionContentAvailability,
+  AskQuestionDisplay,
+  AskQuestionDisplayDto,
+  AskQuestionDisplayReadRequest,
+  AskQuestionFreeText,
+  AskQuestionLifecycleEvent,
+  AskQuestionOption,
+  AskQuestionPresentedEvent,
+  AskQuestionRedactedField,
+  AskQuestionRedaction,
+  AskQuestionResultReason,
+  AskQuestionSelectionMode,
+  AskQuestionTranscriptMeta,
+  AskQuestionTranscriptStatus,
   AcceptEditsGrantDto,
   AbortCommand,
   ApprovalAction,

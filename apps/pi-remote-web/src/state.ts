@@ -258,7 +258,14 @@ export function transcriptReducer(
         error: null,
       };
     case 'page':
-      if (state.sessionId !== action.sessionId || state.epoch !== null) return state;
+      // A cache hydrate may omit volatile blocks while retaining the relay cursor. The
+      // authoritative page must still replace that history projection before sync resumes.
+      if (
+        state.sessionId !== action.sessionId ||
+        state.source === 'relay' ||
+        state.awaitingSnapshot
+      )
+        return state;
       return {
         ...state,
         blocks: normalizeBlocks(action.blocks, 'relay'),
@@ -487,7 +494,9 @@ function annotateDisplayBlock(
 
 function stripDisplayMetadata(value: unknown): unknown {
   if (!isRecord(value)) return value;
-  const { provenance: _provenance, richEligible: _richEligible, ...protocolValue } = value;
+  const protocolValue = { ...value };
+  delete protocolValue.provenance;
+  delete protocolValue.richEligible;
   return protocolValue;
 }
 

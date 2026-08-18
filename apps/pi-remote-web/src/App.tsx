@@ -6,6 +6,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   isOpaqueId,
   type ApprovalCardDto,
+  type AskQuestionTranscriptMeta,
   type AttentionItemDto,
   type FileDiffBlock,
   type FilePreviewBlock,
@@ -38,6 +39,7 @@ import { ArtifactCard } from './artifacts/ArtifactCard.js';
 import { ArtifactViewerProvider } from './artifacts/ArtifactViewerProvider.js';
 import { useOptionalArtifactViewer } from './artifacts/ArtifactViewerProvider.js';
 import { InboundImageBlockView } from './artifacts/InboundImageBlockView.js';
+import { AskQuestionCard } from './features/ask-question/AskQuestionCard.js';
 import {
   enrollDevice,
   establishSession,
@@ -116,9 +118,14 @@ function dispatchArtifactLifecycleEvent(name: string): void {
 export interface AppProps {
   /** Typed fixture injection keeps production media disabled until host enablement. */
   readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
+  /** Runtime-only principal injection keeps answer digest binding out of persistence. */
+  readonly askQuestionPrincipal?: string | undefined;
 }
 
-export function App({ mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF }: AppProps = {}) {
+export function App({
+  mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF,
+  askQuestionPrincipal,
+}: AppProps = {}) {
   const [device, setDevice] = useState<DeviceIdentity | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [authAttempt, setAuthAttempt] = useState(0);
@@ -386,6 +393,7 @@ export function App({ mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF }: AppProps
           theme={theme}
           onThemeChange={setTheme}
           mediaCapability={mediaCapability}
+          askQuestionPrincipal={askQuestionPrincipal}
         />
       )}
     </div>
@@ -957,6 +965,7 @@ export function Session({
   theme,
   onThemeChange,
   mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF,
+  askQuestionPrincipal,
 }: {
   readonly connection: ConnectionPhase;
   readonly sessionId: string;
@@ -971,6 +980,7 @@ export function Session({
   readonly theme: 'system' | 'light' | 'dark';
   readonly onThemeChange: (theme: 'system' | 'light' | 'dark') => void;
   readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
+  readonly askQuestionPrincipal?: string | undefined;
 }) {
   const cursorRef = useRef<{ epoch: string; seq: number } | null>(null);
   const frameRef = useRef<number | null>(null);
@@ -1371,6 +1381,8 @@ export function Session({
           sessionId={sessionId}
           blocks={transcript.blocks}
           running={status === 'running'}
+          canAnswer={connection === 'live' && !transcript.awaitingSnapshot}
+          askQuestionPrincipal={askQuestionPrincipal}
         />
       </ArtifactViewerProvider>
       <RuntimeStrip
@@ -1488,10 +1500,14 @@ export function TranscriptList({
   sessionId,
   blocks,
   running,
+  canAnswer = true,
+  askQuestionPrincipal,
 }: {
   readonly sessionId?: string;
   readonly blocks: readonly DisplayTranscriptBlock[];
   readonly running: boolean;
+  readonly canAnswer?: boolean;
+  readonly askQuestionPrincipal?: string | undefined;
 }) {
   const artifactSessionId = sessionId ?? '';
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -1601,13 +1617,20 @@ export function TranscriptList({
                         key={block.blockId}
                         block={block}
                         sessionId={artifactSessionId}
+                        canAnswer={canAnswer}
+                        askQuestionPrincipal={askQuestionPrincipal}
                       />
                     ))}
                   </div>
                 ) : item.kind === 'actions' ? (
                   <AssistantActions text={item.text} />
                 ) : (
-                  <NormalizedTranscriptBlockView block={item.block} sessionId={artifactSessionId} />
+                  <NormalizedTranscriptBlockView
+                    block={item.block}
+                    sessionId={artifactSessionId}
+                    canAnswer={canAnswer}
+                    askQuestionPrincipal={askQuestionPrincipal}
+                  />
                 )}
               </div>
             );
@@ -1820,15 +1843,26 @@ function NormalizedActivityGroup({
 function NormalizedTranscriptBlockView({
   block,
   sessionId,
+  canAnswer,
+  askQuestionPrincipal,
 }: {
   readonly block: NormalizedTranscriptBlock;
   readonly sessionId: string;
+  readonly canAnswer: boolean;
+  readonly askQuestionPrincipal?: string | undefined;
 }) {
   if (block.kind === 'fallback' && block.sourceBlock !== null) {
-    return <Block block={block.sourceBlock} sessionId={sessionId} />;
+    return (
+      <Block
+        block={block.sourceBlock}
+        sessionId={sessionId}
+        canAnswer={canAnswer}
+        askQuestionPrincipal={askQuestionPrincipal}
+      />
+    );
   }
   if (block.kind === 'diff' && block.sourceBlock.kind === 'file_diff') {
-    return <Block block={block.sourceBlock} sessionId={sessionId} />;
+    return <Block block={block.sourceBlock} sessionId={sessionId} canAnswer={canAnswer} />;
   }
   return <RichContentRouter block={block} />;
 }
@@ -1923,10 +1957,14 @@ function Block({
   block,
   bare = false,
   sessionId,
+  canAnswer = true,
+  askQuestionPrincipal,
 }: {
   readonly block: DisplayTranscriptBlock;
   readonly bare?: boolean;
   readonly sessionId: string;
+  readonly canAnswer?: boolean;
+  readonly askQuestionPrincipal?: string | undefined;
 }) {
   let content: ReactNode;
   let label: string;
@@ -2018,6 +2056,17 @@ function Block({
       label = block.displayName;
       content = <InboundImageBlockView block={block} sessionId={sessionId} />;
       break;
+    case 'ask-question':
+      label = 'Question';
+      content = (
+        <AskQuestionCard
+          block={block as AskQuestionTranscriptMeta}
+          sessionId={sessionId}
+          canAnswer={canAnswer}
+          principal={askQuestionPrincipal}
+        />
+      );
+      break;
     case 'unknown':
       label = 'Unsupported block';
       content = (
@@ -2036,6 +2085,7 @@ function Block({
     block.kind !== 'file_diff' &&
     block.kind !== 'file_preview' &&
     block.kind !== 'inbound_image' &&
+    block.kind !== 'ask-question' &&
     (bare ? block.kind !== 'text' : block.kind !== 'text' && !collapsible);
   const renderAsDisclosure = collapsible && !bare;
   return (
@@ -2260,6 +2310,7 @@ function blockLabel(block: DisplayTranscriptBlock): string {
     file_preview: 'File preview',
     attachment: 'Photo attachment',
     inbound_image: 'Image from pi',
+    'ask-question': 'Question',
     usage: 'Usage',
     unknown: 'Unsupported',
   };

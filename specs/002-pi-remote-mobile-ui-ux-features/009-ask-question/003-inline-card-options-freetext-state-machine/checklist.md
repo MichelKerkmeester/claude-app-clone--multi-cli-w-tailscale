@@ -1,12 +1,12 @@
 # Checklist — Inline ask-question card, options, free-text, and non-optimistic state machine
 
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0.
-- [ ] `npm run test:web` exits 0.
-- [ ] A true-390px CDP run passes in light and dark themes with one inline card, fully visible options, no route change, and the focused field above the virtual keyboard.
-- [ ] A valid presentation renders exactly once at the correct chronological transcript position with no modal, scrim, or page-level focus trap.
-- [ ] Prompt, descriptions, options, free text, read-only hint, status, and submit action render only from the guarded redacted view model.
-- [ ] Single and multiple selection semantics are correct, required free text validates locally, and free text appears only when allowed.
-- [ ] Selection, blur, and free-text edits send no mutation; explicit submit enters `submitting` and disables all answer controls.
-- [ ] Retryable errors preserve local values, accepted confirmation produces an immutable answered line, terminal lifecycle states block stale submission, and duplicate submits produce one mutation.
-- [ ] Ordinary transcript ordering, `SessionComposer`, read-only cache behavior, content-free push, and existing mutation boundaries remain intact.
+- [x] `npm run typecheck` exits 0. — exit 0 (outside sandbox).
+- [x] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0. — backend 360 passed / 47 files outside the sandbox (unchanged; no backend change this phase).
+- [x] `npm run test:web` exits 0. — 623 passed / 61 files (+10 over 613; card state-machine + no-storage-leak + end-to-end render tests).
+- [x] A true-390px CDP run passes in light and dark themes with one inline card, fully visible options, no route change, and the focused field above the virtual keyboard. — CDP DOM assertions (both themes): exactly one `[data-ask-question-card]` at 390 CSS px, contained (left 8/right 382), no h-overflow, option+free-text+submit controls present, no modal/scrim/route change, `data-theme` correct. (Headless PNG bytes unreliable; DOM assertions authoritative.)
+- [x] A valid presentation renders exactly once at the correct chronological transcript position with no modal, scrim, or page-level focus trap. — new end-to-end `App.test.tsx` case asserts one card at the correct position (after prior blocks, before later) via the real App/state path; CDP `modalOrScrim` = 0. (A real hydrate/epoch bug that dropped the block was found by CDP and fixed in `state.ts`.)
+- [x] Prompt, descriptions, options, free text, read-only hint, status, and submit action render only from the guarded redacted view model. — `AskQuestionCard` renders from `fetchAskQuestionDisplay` (volatile read), never the metadata block; `ask-question-card.test.tsx`.
+- [x] Single and multiple selection semantics are correct, required free text validates locally, and free text appears only when allowed. — card state machine + local validation; `ask-question-card.test.tsx`.
+- [x] Selection, blur, and free-text edits send no mutation; explicit submit enters `submitting` and disables all answer controls. — `useAskQuestionState`/`useAskQuestionMutation`; tests assert no mutation until explicit submit, controls disabled in `submitting`.
+- [x] Retryable errors preserve local values, accepted confirmation produces an immutable answered line, terminal lifecycle states block stale submission, and duplicate submits produce one mutation. — idempotent `clientMutationId` + terminal-state blocking; `ask-question-card.test.tsx`.
+- [x] Ordinary transcript ordering, `SessionComposer`, read-only cache behavior, content-free push, and existing mutation boundaries remain intact. — backend 360 + web 623 green (no regression); `cache.ts` excludes ask-question from persistence; push unchanged (content-free); no relay/protocol change.

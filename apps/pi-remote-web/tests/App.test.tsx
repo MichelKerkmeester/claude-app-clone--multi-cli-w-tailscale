@@ -4,6 +4,8 @@
 
 import type {
   ApprovalCardDto,
+  AskQuestionDisplayDto,
+  AskQuestionTranscriptMeta,
   AttentionItemDto,
   CommandCatalogDto,
   SessionCardDto,
@@ -53,6 +55,7 @@ const relay = vi.hoisted(() => {
     createAcceptEditsGrant: vi.fn(),
     decideApproval: vi.fn(),
     fetchApprovals: vi.fn(),
+    fetchAskQuestionDisplay: vi.fn(),
     fetchCommands: vi.fn(),
     fetchRuntimeModels: vi.fn(),
     fetchRuntimeState: vi.fn(),
@@ -95,6 +98,36 @@ import { EMPTY_TRANSCRIPT, transcriptReducer } from '../src/state.js';
 const occurredAt = '2026-08-13T10:00:00.000Z';
 const sessionId = 'session_web_001';
 
+const askQuestionDisplay: AskQuestionDisplayDto = {
+  type: 'session.ask-question.display',
+  sessionId,
+  questionId: 'question_web_001',
+  activityId: 'activity_web_001',
+  revision: 2,
+  display: {
+    prompt: 'Which verification lane should run next?',
+    options: [
+      { id: 'option_web_tests', label: 'Run focused tests', description: 'Fast local confidence.' },
+    ],
+    freeText: {
+      allowed: true,
+      required: false,
+      placeholder: 'Optional note',
+      maxLength: 120,
+    },
+    minSelections: 1,
+    maxSelections: 1,
+  },
+  selectionMode: 'single',
+  redaction: {
+    applied: true,
+    policyVersion: 1,
+    contentAvailability: 'available',
+    redactedFields: [],
+  },
+  requiresReadOnlyHint: true,
+};
+
 const catalogFixture: CommandCatalogDto = {
   hostEpoch: 'epoch_web_001',
   sessionId,
@@ -129,6 +162,7 @@ beforeEach(() => {
     preferences: null,
   });
   relay.fetchTranscript.mockResolvedValue({ items: [], coversThrough: 0 });
+  relay.fetchAskQuestionDisplay.mockResolvedValue(askQuestionDisplay);
   relay.requestTicket.mockResolvedValue('ticket_app_001');
   relay.submitSlashCommand.mockResolvedValue(
     block({ id: 'block_slash_001', kind: 'text', text: '/plan', role: 'user' }),
@@ -275,6 +309,87 @@ it('renders every projected transcript block kind', () => {
   expect(screen.getByText('projected output')).toBeInTheDocument();
   expect(screen.getByText('Preview not retained')).toBeInTheDocument();
   expect(screen.getByText(/without keeping image content/u)).toBeInTheDocument();
+});
+
+it('renders a hydrated ask-question block once at its transcript position through Session', async () => {
+  const preceding = block({
+    id: 'block_question_before_001',
+    kind: 'text',
+    text: 'Before the question',
+    role: 'user',
+  });
+  const question = block<AskQuestionTranscriptMeta>({
+    id: 'block_question_001',
+    kind: 'ask-question',
+    activityId: askQuestionDisplay.activityId,
+    questionId: askQuestionDisplay.questionId,
+    sessionId,
+    presentedRevision: askQuestionDisplay.revision,
+    status: 'presented',
+  });
+  const following = block({
+    id: 'block_question_after_003',
+    kind: 'text',
+    text: 'After the question',
+    role: 'assistant',
+  });
+  const selected = transcriptReducer(EMPTY_TRANSCRIPT, { type: 'select', sessionId });
+  const hydrated = transcriptReducer(selected, {
+    type: 'hydrate',
+    sessionId,
+    epoch: 'epoch_web_001',
+    coversThrough: 3,
+    blocks: [preceding],
+    savedAt: occurredAt,
+  });
+
+  const projected = transcriptReducer(hydrated, {
+    type: 'page',
+    sessionId,
+    coversThrough: 3,
+    blocks: [preceding, question, following],
+    at: occurredAt,
+  });
+
+  expect(projected.blocks).toHaveLength(3);
+  expect(projected.blocks[1]).toMatchObject({ kind: 'ask-question', id: question.id });
+
+  const { container } = render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={projected}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+      onInbox={vi.fn()}
+      onReview={vi.fn()}
+      theme="system"
+      onThemeChange={vi.fn()}
+      askQuestionPrincipal="operator@example.test"
+    />,
+  );
+
+  await waitFor(() => expect(container.querySelector('[data-ask-question-card]')).toBeTruthy());
+  await waitFor(() =>
+    expect(screen.getByText(askQuestionDisplay.display.prompt)).toBeInTheDocument(),
+  );
+  expect(container.querySelectorAll('[data-ask-question-card]')).toHaveLength(1);
+  const content = container.textContent ?? '';
+  expect(content.indexOf('Before the question')).toBeLessThan(
+    content.indexOf(askQuestionDisplay.display.prompt),
+  );
+  expect(content.indexOf(askQuestionDisplay.display.prompt)).toBeLessThan(
+    content.indexOf('After the question'),
+  );
+  expect(relay.fetchAskQuestionDisplay).toHaveBeenCalledWith(
+    sessionId,
+    question.questionId,
+    question.presentedRevision,
+    expect.any(AbortSignal),
+  );
 });
 
 it('submits the compose box through the relay command path', async () => {

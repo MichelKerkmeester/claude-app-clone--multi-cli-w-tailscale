@@ -12,7 +12,13 @@
 // the real deployment's authority and redaction are untouched.
 
 import type { DeviceIdentity } from './auth.js';
-import { sha256, type AvailableModelDto, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
+import {
+  sha256,
+  type AskQuestionAnswerResult,
+  type AskQuestionDisplayDto,
+  type AvailableModelDto,
+  type FilePreviewBlock,
+} from '@pi-remote/pi-rpc-protocol';
 import type { InboundImageBlock, InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 import type {
   ArtifactReadVariant,
@@ -72,6 +78,20 @@ export const DEMO_INBOUND_MEDIA_FIXTURE = Object.freeze({
 export const DEMO_INBOUND_IMAGE_CARD_FIXTURE = Object.freeze({
   query: '?demo=1&fixture=inline-card&state=inline-ready',
   states: ['processing', 'inline-ready', 'withheld', 'corrupt'] as const,
+});
+
+export const DEMO_ASK_QUESTION_FIXTURE = Object.freeze({
+  query: '?demo=1&fixture=ask-question&state=presented',
+  states: [
+    'presented',
+    'selecting',
+    'submitting',
+    'accepted',
+    'error',
+    'expired',
+    'superseded',
+    'delivery-unknown',
+  ] as const,
 });
 
 let cachedEnabled: boolean | null = null;
@@ -722,6 +742,83 @@ const SESSIONS: readonly DemoSession[] = [
   { id: SESSION_RUNNING, status: 'running', blocks: TRIAGE_BLOCKS },
 ];
 
+type DemoAskQuestionState = (typeof DEMO_ASK_QUESTION_FIXTURE.states)[number];
+
+const DEMO_ASK_QUESTION_DISPLAY: AskQuestionDisplayDto = {
+  type: 'session.ask-question.display',
+  sessionId: SESSION_IDLE,
+  questionId: 'demo-ask-question-001',
+  activityId: 'demo-ask-activity-001',
+  revision: 1,
+  display: {
+    prompt: 'Which release gate should Pi run next?',
+    options: [
+      { id: 'demo-option-tests', label: 'Run the focused tests', description: 'Fast local confidence.' },
+      { id: 'demo-option-review', label: 'Open the review lane', description: 'Inspect the current diff.' },
+      { id: 'demo-option-hold', label: 'Hold for later', description: 'Leave the question pending.' },
+    ],
+    freeText: {
+      allowed: true,
+      required: false,
+      placeholder: 'Add a short note (optional)',
+      maxLength: 280,
+    },
+    minSelections: 1,
+    maxSelections: 2,
+  },
+  selectionMode: 'multiple',
+  redaction: {
+    applied: true,
+    policyVersion: 1,
+    contentAvailability: 'available',
+    redactedFields: [],
+  },
+  requiresReadOnlyHint: true,
+};
+
+let demoAskQuestionTicketCounter = 0;
+const demoAskQuestionTickets = new Set<string>();
+
+function isAskQuestionFixture(): boolean {
+  return fixtureName() === 'ask-question';
+}
+
+function demoAskQuestionState(): DemoAskQuestionState {
+  if (!isAskQuestionFixture()) return 'presented';
+  const requested = new URLSearchParams(window.location.search).get('state');
+  const state =
+    requested !== null && DEMO_ASK_QUESTION_FIXTURE.states.includes(requested as DemoAskQuestionState)
+    ? (requested as DemoAskQuestionState)
+    : 'presented';
+  if (state === 'accepted' || state === 'expired' || state === 'superseded' || state === 'delivery-unknown') {
+    demoAskQuestionTickets.clear();
+  }
+  return state;
+}
+
+function demoAskQuestionStatus(
+  state: DemoAskQuestionState,
+): 'presented' | 'submitting' | 'answered' | 'error' | 'expired' | 'superseded' {
+  if (state === 'accepted') return 'answered';
+  if (state === 'expired') return 'expired';
+  if (state === 'superseded') return 'superseded';
+  if (state === 'delivery-unknown') return 'error';
+  if (state === 'submitting') return 'submitting';
+  return 'presented';
+}
+
+function demoAskQuestionBlock(): Record<string, unknown> {
+  return {
+    ...base('blk-ask-question-001', 8, 1),
+    kind: 'ask-question',
+    activityId: DEMO_ASK_QUESTION_DISPLAY.activityId,
+    questionId: DEMO_ASK_QUESTION_DISPLAY.questionId,
+    sessionId: SESSION_IDLE,
+    presentedRevision: DEMO_ASK_QUESTION_DISPLAY.revision,
+    status: demoAskQuestionStatus(demoAskQuestionState()),
+  };
+}
+
 function fixtureName(): string | null {
   try {
     return new URLSearchParams(window.location.search).get('fixture');
@@ -832,6 +929,9 @@ function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   }
   if (isInboundImageCardFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, demoInboundBlockForState(demoInboundImageState() ?? 'inline-ready')];
+  }
+  if (isAskQuestionFixture() && sessionId === SESSION_IDLE) {
+    return [...session.blocks, demoAskQuestionBlock()];
   }
   if (isTextCodeShareFixture() && sessionId === SESSION_IDLE) {
     return [...session.blocks, ...DEMO_TEXT_CODE_SHARE_BLOCKS];
@@ -1114,6 +1214,62 @@ export function demoPostJson(path: string, body: unknown): unknown {
       };
     case '/api/auth/ticket':
       return { ticket: 'demo-ticket-0001', expiresAt: new Date(Date.now() + 60_000).toISOString() };
+    case '/api/ask-question/display':
+      return request.sessionId === SESSION_IDLE &&
+        request.questionId === DEMO_ASK_QUESTION_DISPLAY.questionId &&
+        request.revision === DEMO_ASK_QUESTION_DISPLAY.revision
+        ? DEMO_ASK_QUESTION_DISPLAY
+        : { error: 'question_not_found' };
+    case '/api/ask-question/ticket': {
+      const state = demoAskQuestionState();
+      const scopeMatches =
+        request.sessionId === SESSION_IDLE &&
+        request.questionId === DEMO_ASK_QUESTION_DISPLAY.questionId &&
+        request.expectedRevision === DEMO_ASK_QUESTION_DISPLAY.revision;
+      if (!scopeMatches) return { error: 'validation-failed' };
+      if (state === 'expired' || state === 'superseded' || state === 'delivery-unknown') {
+        return {
+          error: state === 'superseded' ? 'revision_mismatch' : 'question_withdrawn',
+        };
+      }
+      const ticket = `demo-ask-question-ticket-${(demoAskQuestionTicketCounter += 1)}`;
+      demoAskQuestionTickets.add(ticket);
+      return {
+        ticket,
+        expiresAt: new Date(Date.now() + 10_000).toISOString(),
+      };
+    }
+    case '/api/ask-question/answer': {
+      const state = demoAskQuestionState();
+      const ticket = typeof request.ticket === 'string' ? request.ticket : null;
+      const scopeMatches =
+        request.sessionId === SESSION_IDLE &&
+        request.questionId === DEMO_ASK_QUESTION_DISPLAY.questionId &&
+        request.expectedRevision === DEMO_ASK_QUESTION_DISPLAY.revision;
+      const ticketAccepted = scopeMatches && ticket !== null && demoAskQuestionTickets.delete(ticket);
+      const reason = !ticketAccepted
+        ? ('invalid-ticket' as const)
+        : state === 'delivery-unknown'
+          ? ('delivery-unknown' as const)
+          : state === 'error'
+            ? ('validation-failed' as const)
+            : state === 'expired'
+              ? ('question-withdrawn' as const)
+              : state === 'superseded'
+                ? ('revision-mismatch' as const)
+                : null;
+      const result: AskQuestionAnswerResult = {
+        type: 'session.ask-question.answer-result',
+        sessionId: SESSION_IDLE,
+        questionId: DEMO_ASK_QUESTION_DISPLAY.questionId,
+        revision: DEMO_ASK_QUESTION_DISPLAY.revision,
+        clientMutationId:
+          typeof request.clientMutationId === 'string' ? request.clientMutationId : 'demo-mutation',
+        status: reason === null ? 'accepted' : 'rejected',
+        ...(reason === null ? {} : { reason }),
+      };
+      return result;
+    }
     case '/api/runtime/state':
       return { state: runtimeStateDto(String(request.sessionId ?? SESSION_IDLE)) };
     case '/api/runtime/models': {

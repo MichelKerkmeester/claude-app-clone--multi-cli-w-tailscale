@@ -135,6 +135,7 @@ export function saveCache(sessions: readonly SessionCardDto[], current: Transcri
           epoch: current.epoch,
           coversThrough: current.coversThrough,
           blocks: current.blocks
+            .filter((block) => block.kind !== 'ask-question')
             .filter((block) => block.kind !== 'file_preview')
             .filter((block) => !isAttachmentDisplayBlock(block))
             .filter((block) => !isRichBodyBlock(block))
@@ -181,6 +182,7 @@ function parseCachedTranscript(value: unknown): CachedTranscript | null {
     .filter(
       (block): block is DisplayTranscriptBlock =>
         block !== null &&
+        block.kind !== 'ask-question' &&
         block.kind !== 'file_preview' &&
         !isAttachmentDisplayBlock(block) &&
         !isRichBodyBlock(block),

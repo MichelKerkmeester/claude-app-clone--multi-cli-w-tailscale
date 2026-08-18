@@ -9,6 +9,9 @@ import {
   isAttachmentPartStatusDto,
   isAttachmentPartTicket,
   isAttachmentSetManifest,
+  isAskQuestionAnswerResult,
+  isAskQuestionAnswerTicketResponse,
+  isAskQuestionDisplayDto,
   isCommandCatalogDto,
   isFilePreviewBlock,
   isOpaqueId,
@@ -58,6 +61,13 @@ import {
   type AttachmentPartStatusDto,
   type AttachmentPartTicket,
   type AttachmentSetManifest,
+  type AskQuestionAnswerRequest,
+  type AskQuestionAnswerResult,
+  type AskQuestionAnswerTicketRequest,
+  type AskQuestionAnswerTicketResponse,
+  type AskQuestionDisplayDto,
+  type AskQuestionResultReason,
+  type AskQuestionDisplayReadRequest,
   type SlashSubmitIssueCode,
   type SyncCursor,
   type SyncMessage,
@@ -116,6 +126,18 @@ export class RelayRequestError extends Error {
     this.code = code;
     this.status = status;
     this.retryAfterMs = retryAfterMs;
+  }
+}
+
+export class AskQuestionRelayError extends Error {
+  readonly reason: AskQuestionResultReason;
+  readonly status: number | null;
+
+  constructor(reason: AskQuestionResultReason, status: number | null = null) {
+    super('Ask-question request failed.');
+    this.name = 'AskQuestionRelayError';
+    this.reason = reason;
+    this.status = status;
   }
 }
 
@@ -1066,6 +1088,146 @@ export async function fetchTranscript(
     after = payload.nextSeq;
   }
   throw new Error('Transcript exceeded the bounded page limit.');
+}
+
+export async function fetchAskQuestionDisplay(
+  sessionId: string,
+  questionId: string,
+  revision: number,
+  signal?: AbortSignal,
+): Promise<AskQuestionDisplayDto> {
+  const request: AskQuestionDisplayReadRequest = { sessionId, questionId, revision };
+  let payload: unknown;
+  try {
+    payload = await postJson('/api/ask-question/display', request, signal);
+  } catch (cause: unknown) {
+    throw askQuestionRelayError(cause, 'display');
+  }
+  if (
+    !isAskQuestionDisplayDto(payload) ||
+    payload.sessionId !== sessionId ||
+    payload.questionId !== questionId ||
+    payload.revision !== revision
+  ) {
+    throw new AskQuestionRelayError('host-unavailable');
+  }
+  return payload;
+}
+
+export async function requestAskQuestionAnswerTicket(
+  request: AskQuestionAnswerTicketRequest,
+  signal?: AbortSignal,
+): Promise<AskQuestionAnswerTicketResponse> {
+  let payload: unknown;
+  try {
+    payload = await postJson(
+      '/api/ask-question/ticket',
+      request,
+      signal,
+      [201, 400, 401, 403, 409, 422, 429, 503],
+    );
+  } catch (cause: unknown) {
+    throw askQuestionRelayError(cause, 'ticket');
+  }
+  if (isAskQuestionAnswerTicketResponse(payload)) return payload;
+  throw new AskQuestionRelayError(askQuestionReasonFromPayload(payload));
+}
+
+export async function submitAskQuestionAnswer(
+  request: AskQuestionAnswerRequest,
+  signal?: AbortSignal,
+): Promise<AskQuestionAnswerResult> {
+  let payload: unknown;
+  try {
+    payload = await postJson(
+      '/api/ask-question/answer',
+      request,
+      signal,
+      [202, 400, 401, 403, 409, 422, 429, 503],
+    );
+  } catch (cause: unknown) {
+    throw askQuestionRelayError(cause, 'answer');
+  }
+  if (
+    isAskQuestionAnswerResult(payload) &&
+    payload.sessionId === request.sessionId &&
+    payload.questionId === request.questionId &&
+    payload.revision === request.expectedRevision &&
+    payload.clientMutationId === request.clientMutationId
+  ) {
+    return payload;
+  }
+  throw new AskQuestionRelayError(askQuestionReasonFromPayload(payload));
+}
+
+function askQuestionRelayError(
+  cause: unknown,
+  phase: 'display' | 'ticket' | 'answer',
+): AskQuestionRelayError {
+  if (cause instanceof AskQuestionRelayError) return cause;
+  if (cause instanceof RelayRequestError) {
+    if (cause.status === null) {
+      return new AskQuestionRelayError(phase === 'answer' ? 'delivery-unknown' : 'host-unavailable');
+    }
+    return new AskQuestionRelayError(
+      askQuestionReasonFromServerCode(cause.serverCode, cause.status, phase),
+      cause.status,
+    );
+  }
+  return new AskQuestionRelayError(phase === 'answer' ? 'delivery-unknown' : 'host-unavailable');
+}
+
+function askQuestionReasonFromPayload(value: unknown): AskQuestionResultReason {
+  if (isRecord(value) && typeof value.error === 'string') {
+    return askQuestionReasonFromServerCode(value.error, null, 'ticket');
+  }
+  return 'host-unavailable';
+}
+
+function askQuestionReasonFromServerCode(
+  code: string | null,
+  status: number | null,
+  phase: 'display' | 'ticket' | 'answer',
+): AskQuestionResultReason {
+  switch (code) {
+    case 'invalid-ticket':
+    case 'invalid_ticket':
+      return 'invalid-ticket';
+    case 'revision-mismatch':
+    case 'revision_mismatch':
+      return 'revision-mismatch';
+    case 'question-withdrawn':
+    case 'question_withdrawn':
+    case 'question-not-found':
+    case 'question_not_found':
+      return 'question-withdrawn';
+    case 'question-already-answered':
+    case 'question_already_answered':
+      return 'question-already-answered';
+    case 'plan-mode-blocked':
+    case 'plan_mode_blocked':
+      return 'plan-mode-blocked';
+    case 'redaction-policy-blocked':
+    case 'redaction_policy_blocked':
+      return 'redaction-policy-blocked';
+    case 'validation-failed':
+    case 'invalid_request':
+    case 'invalid_ticket_request':
+    case 'invalid_answer_request':
+    case 'foreground_required':
+      return 'validation-failed';
+    case 'delivery-unknown':
+    case 'delivery_unknown':
+      return 'delivery-unknown';
+    case 'host-unavailable':
+    case 'host_unavailable':
+    case 'ask_question_unavailable':
+    case 'rate_limited':
+      return 'host-unavailable';
+    default:
+      if (status === 404 && phase === 'display') return 'question-withdrawn';
+      return 'host-unavailable';
+  }
 }
 
 function annotateRelayBlock(block: TranscriptBlock): RelayTranscriptBlock {

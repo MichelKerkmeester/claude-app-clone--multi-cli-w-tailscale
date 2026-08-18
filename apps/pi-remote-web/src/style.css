@@ -48,10 +48,10 @@
   --pi-accent-ui: #b85f42; /* AA UI accent         */
   --pi-selection: #f3e4de; /* soft selection       */
 
-  /* @ds edit: tokens — semantic roles, light. */
-  /* The role tokens the app reads. A role whose source is a primitive references it;
-     the remaining roles (lines, success/danger state, focus, shadow, spacing/radius/
-     duration/ease/layout) are the raw scales and stay literal at the semantic layer. */
+  /* @ds edit: tokens — theme remap, light. */
+  /* A theme state is one semantic→primitive remap: a role that has a primitive source
+     references it; the remaining roles (lines, success/danger, focus, shadow, spacing/
+     radius/duration/ease/layout) are the raw scales and stay literal at this layer. */
   --canvas: var(--pi-bone);
   --canvas-subtle: #efeeeb;
   --surface: var(--pi-raised);
@@ -121,13 +121,16 @@
   --pi-selection: #3a2720;  /* dark soft selection  */
   /* --pi-accent-ui has no distinct dark source value; the accent-strong role keeps its fixed literal below. */
 
-  /* @ds edit: tokens — semantic roles, dark. */
+  /* @ds edit: tokens — theme remap, dark. */
+  /* This theme state only remaps the semantic roles onto the dark primitives; roles
+     without a dark primitive source (canvas-subtle, surface-muted, lines, success/
+     danger, focus, shadow) keep their frozen literals. */
   --canvas: var(--pi-bone);
   --canvas-subtle: #1f1e1b;
   --surface: var(--pi-raised);
   --surface-raised: var(--pi-raised);
   --surface-muted: #302e2a;
-  --surface-code: #24221f;
+  --surface-code: var(--pi-bone); /* the deep code surface aliases the dark-page tone */
   --ink: var(--pi-carbon);
   --ink-secondary: var(--pi-carbon);
   --ink-muted: var(--pi-muted);
@@ -171,13 +174,15 @@
     --pi-selection: #3a2720;  /* dark soft selection  */
     /* --pi-accent-ui has no distinct dark source value; the accent-strong role keeps its fixed literal below. */
 
-    /* @ds edit: tokens — semantic roles, system-dark. */
+    /* @ds edit: tokens — theme remap, system-dark. */
+    /* System-follows-OS resolves to the dark palette: this block only remaps the same
+       semantic roles onto the dark primitives; literal roles keep their frozen values. */
     --canvas: var(--pi-bone);
     --canvas-subtle: #1f1e1b;
     --surface: var(--pi-raised);
     --surface-raised: var(--pi-raised);
     --surface-muted: #302e2a;
-    --surface-code: #24221f;
+    --surface-code: var(--pi-bone); /* the deep code surface aliases the dark-page tone */
     --ink: var(--pi-carbon);
     --ink-secondary: var(--pi-carbon);
     --ink-muted: var(--pi-muted);
@@ -4139,8 +4144,8 @@ button[data-pressed]:not([data-disabled]) {
   animation: model-sheet-backdrop-out 220ms ease-in;
 }
 
-/* The same model-sheet tokens, remapped for dark. The per-surface theme re-declaration
-   is the existing theming mechanism and is left untouched. */
+/* @ds edit: tokens — theme remap, dark. This surface block remaps the model-sheet
+   component tokens onto the dark palette; the values are frozen and stay literal. */
 :root[data-theme='dark'] .model-sheet-overlay {
   --model-sheet-raised: #2d2a26;
   --model-sheet-ink: #f8f8f6;
@@ -4151,7 +4156,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 @media (prefers-color-scheme: dark) {
-  /* System-dark remap of the same model-sheet tokens. */
+  /* @ds edit: tokens — theme remap, system-dark. Same model-sheet remap, frozen literals. */
   :root[data-theme='system'] .model-sheet-overlay {
     --model-sheet-raised: #2d2a26;
     --model-sheet-ink: #f8f8f6;
@@ -6416,8 +6421,8 @@ button[data-pressed]:not([data-disabled]) {
   font-family: var(--font-sans);
 }
 
-/* The same slash-panel tokens, remapped for dark. The per-surface theme re-declaration
-   is the existing theming mechanism and is left untouched. */
+/* @ds edit: tokens — theme remap, dark. This surface block remaps the slash-panel
+   component tokens onto the dark palette; the values are frozen and stay literal. */
 :root[data-theme='dark'] .slash-panel {
   --slash-raised: #2d2a26;
   --slash-ink: #f8f8f6;
@@ -6428,7 +6433,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 @media (prefers-color-scheme: dark) {
-  /* System-dark remap of the same slash-panel tokens. */
+  /* @ds edit: tokens — theme remap, system-dark. Same slash-panel remap, frozen literals. */
   :root[data-theme='system'] .slash-panel {
     --slash-raised: #2d2a26;
     --slash-ink: #f8f8f6;

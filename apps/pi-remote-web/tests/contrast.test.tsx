@@ -48,6 +48,7 @@ const LIGHT: readonly Pair[] = [
   { name: 'action-fg on action-bg', fg: '#f8f8f6', bg: '#121212', min: NORMAL_TEXT },
   { name: 'success on success-soft', fg: '#37624a', bg: '#e7eee9', min: NORMAL_TEXT },
   { name: 'danger on danger-soft', fg: '#8d382e', bg: '#f4e7e4', min: NORMAL_TEXT },
+  { name: 'warning on warning-soft', fg: '#8a452f', bg: '#f3e4de', min: NORMAL_TEXT },
   { name: 'control-border on canvas', fg: '#7b7974', bg: '#f8f8f6', min: LARGE_OR_NON_TEXT },
   { name: 'focus ring on canvas', fg: '#121212', bg: '#f8f8f6', min: LARGE_OR_NON_TEXT },
 ];
@@ -59,7 +60,11 @@ const DARK: readonly Pair[] = [
   { name: 'accent-ink (clay text) on canvas', fg: '#f0b19a', bg: '#181715', min: NORMAL_TEXT },
   { name: 'action-fg on action-bg', fg: '#181715', bg: '#f4f1eb', min: NORMAL_TEXT },
   { name: 'success on success-soft', fg: '#8fc4a4', bg: '#203129', min: NORMAL_TEXT },
+  { name: 'danger on danger-soft', fg: '#ee9b91', bg: '#3a2522', min: NORMAL_TEXT },
+  { name: 'warning on warning-soft', fg: '#f0b19a', bg: '#3a2720', min: NORMAL_TEXT },
   { name: 'control-border on canvas', fg: '#807a70', bg: '#181715', min: LARGE_OR_NON_TEXT },
+  { name: 'focus ring on surface', fg: '#f8f8f6', bg: '#2d2a26', min: LARGE_OR_NON_TEXT },
+  { name: 'focus ring on canvas', fg: '#f8f8f6', bg: '#24221f', min: LARGE_OR_NON_TEXT },
 ];
 
 const MODEL_SHEET_LIGHT: readonly Pair[] = [

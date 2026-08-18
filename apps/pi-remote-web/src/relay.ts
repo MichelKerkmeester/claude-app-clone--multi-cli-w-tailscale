@@ -33,6 +33,8 @@ import {
   isPromptSubmitResponse,
   isSlashSubmitIssueResponse,
   isSyncMessage,
+  isTodoProjectionEnvelopeKind,
+  isTodoProjectionEnvelopePayload,
   isTranscriptPageDto,
   isWebSocketTicketResponse,
   DEFAULT_MEDIA_POLICY,
@@ -1587,7 +1589,7 @@ export async function openSyncSocket(
   socket.addEventListener('message', (event) => {
     try {
       const value: unknown = JSON.parse(String(event.data));
-      if (isSyncMessage(value) && value.sessionId === sessionId) {
+      if (isReadOnlySyncMessage(value, sessionId)) {
         noteRelayHeartbeat();
         onMessage(value);
       }
@@ -1596,6 +1598,16 @@ export async function openSyncSocket(
     }
   });
   return socket;
+}
+
+export function isReadOnlySyncMessage(value: unknown, sessionId: string): value is SyncMessage {
+  if (!isSyncMessage(value) || value.sessionId !== sessionId) return false;
+  if (value.kind === 'sync.gap') return true;
+  return value.envelopes.every(
+    (envelope) =>
+      !isTodoProjectionEnvelopeKind(envelope.kind) ||
+      isTodoProjectionEnvelopePayload(envelope.kind, envelope.payload),
+  );
 }
 
 async function postJson(

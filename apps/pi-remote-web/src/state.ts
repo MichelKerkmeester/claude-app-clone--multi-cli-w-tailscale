@@ -21,6 +21,13 @@ import {
   type TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 
+export {
+  EMPTY_TODO_PROJECTION_STATE,
+  todoProjectionReducer,
+  type TodoProjectionAction,
+  type TodoProjectionState,
+} from './todo-state.js';
+
 export function parseRuntimeMediaCapability(value: unknown): RuntimeMediaCapabilityDto | null {
   return isRuntimeMediaCapabilityDto(value) ? value : null;
 }

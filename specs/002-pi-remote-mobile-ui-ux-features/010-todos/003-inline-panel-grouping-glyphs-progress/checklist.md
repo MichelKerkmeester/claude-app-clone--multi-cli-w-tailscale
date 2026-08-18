@@ -1,13 +1,13 @@
 # Checklist — Inline todo panel, grouping, glyphs, and progress
-- [ ] `npm run typecheck` exits 0.
-- [ ] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0.
-- [ ] `npm run test:web` exits 0.
-- [ ] True 390px CDP checks pass in both light and dark themes.
-- [ ] The eight-task fixture renders `3/8` with a visible clay progress hairline.
-- [ ] Four-state fixtures render correct localized headings and counts while preserving host order and optional group subheadings.
-- [ ] Collapsing `ActivityGroup` leaves `TodoProjectionBlock` visible in the DOM and viewport.
-- [ ] Task rows have no checkbox, switch, link, button, drag attribute, or mutation handler.
-- [ ] Disclosure and refresh controls have correct accessible names, keyboard behavior, and 44pt-equivalent targets.
-- [ ] All-done rendering shows only `All done · N/N` for the task body, and unsupported or empty states do not fabricate rows.
-- [ ] Light and dark screenshots use only the frozen typography, parchment, carbon-ink, and clay tokens with no added status colors or floating card treatment.
-- [ ] The true 390px layout has wrapped titles, safe-area padding, no clipped content, no horizontal overflow, and no unsafe control placement.
+- [x] `npm run typecheck` exits 0. — exit 0 (outside sandbox).
+- [x] `npx vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests` exits 0. — backend 379 passed / 48 files outside the sandbox (unchanged — no backend change this phase).
+- [x] `npm run test:web` exits 0. — 651 passed / 61 files (+14; panel/state/end-to-end tests).
+- [x] True 390px CDP checks pass in both light and dark themes. — CDP DOM assertions (both themes): panel renders at 390 CSS px, contained, no h-overflow, no modal/scrim, `localStorage` free of task content, zero exceptions.
+- [x] The eight-task fixture renders `3/8` with a visible clay progress hairline. — CDP: `taskRows` = 8, progress `3/8`; `role="progressbar"` clay hairline in `TodoPanel`.
+- [x] Four-state fixtures render correct localized headings and counts while preserving host order and optional group subheadings. — `TodoPanel` section disclosures with `label`+`count`, host order preserved, optional group `<h4>`; `TodoPanel.test.tsx`/`todo-state.test.ts`.
+- [x] Collapsing `ActivityGroup` leaves `TodoProjectionBlock` visible in the DOM and viewport. — placed as a standalone transcript sibling; `App.test.tsx` end-to-end case + probe (panel present with the transcript).
+- [x] Task rows have no checkbox, switch, link, button, drag attribute, or mutation handler. — `TodoTaskRow` is a plain `<li>` (glyph + title + label); CDP `rowControls` = 0 (both themes); explicit grep = 0.
+- [x] Disclosure and refresh controls have correct accessible names, keyboard behavior, and 44pt-equivalent targets. — react-aria `Disclosure`/`Button` with aria-labels ("Refresh pi todos", section label+count); `style.css` 44px targets.
+- [x] All-done rendering shows only `All done · N/N` for the task body, and unsupported or empty states do not fabricate rows. — `TodoPanel` all-done/empty branches (`No tasks in pi's current plan.`); `TodoPanel.test.tsx`.
+- [x] Light and dark screenshots use only the frozen typography, parchment, carbon-ink, and clay tokens with no added status colors or floating card treatment. — `style.css` token-only; state by glyph shape + label (never color-only); `contrast.test.tsx`; CDP both themes.
+- [x] The true 390px layout has wrapped titles, safe-area padding, no clipped content, no horizontal overflow, and no unsafe control placement. — CDP 390px both themes: `noHOverflow` true, contained; `todo-task-title` wraps (`dir="auto"`).

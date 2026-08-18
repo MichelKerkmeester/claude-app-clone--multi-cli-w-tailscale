@@ -2199,6 +2199,312 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink);
 }
 
+/* The todo projection is a transcript annotation, not an editable task surface. */
+.todo-projection-block {
+  min-inline-size: 0;
+  overflow: visible;
+}
+
+.todo-panel {
+  display: grid;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  scroll-margin-block: var(--space-8);
+}
+
+.todo-panel-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.todo-panel-heading {
+  display: grid;
+  min-inline-size: 0;
+  gap: 0.15rem;
+}
+
+.todo-provenance,
+.todo-read-only-label,
+.todo-progress-count,
+.todo-sync-note,
+.todo-empty-line,
+.todo-all-done {
+  margin: 0;
+}
+
+.todo-provenance {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.todo-read-only-label,
+.todo-sync-note,
+.todo-empty-line,
+.todo-updated-label {
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.todo-progress-count {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.todo-refresh,
+.todo-section-trigger {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.todo-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-control);
+  color: var(--ink-secondary);
+  font-size: 0.78rem;
+}
+
+.todo-refresh svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.todo-refresh[data-hovered],
+.todo-refresh[data-pressed],
+.todo-section-trigger[data-hovered],
+.todo-section-trigger[data-pressed] {
+  background: var(--canvas-subtle);
+}
+
+.todo-refresh[data-focus-visible],
+.todo-section-trigger[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.todo-refresh[data-disabled] {
+  cursor: default;
+  opacity: 0.65;
+}
+
+.todo-progress-hairline {
+  block-size: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line-hairline);
+}
+
+.todo-progress-hairline > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: inline-start;
+}
+
+.todo-panel-body {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--space-2);
+}
+
+.todo-state-section {
+  min-inline-size: 0;
+  border-block-start: 1px solid var(--line);
+}
+
+.todo-state-section > h2,
+.todo-state-section > h3 {
+  margin: 0;
+}
+
+.todo-section-trigger {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  inline-size: 100%;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: start;
+}
+
+.todo-section-chevron {
+  color: var(--ink-muted);
+  font-size: 1rem;
+  transform: rotate(90deg);
+}
+
+.todo-section-trigger[aria-expanded='false'] .todo-section-chevron {
+  transform: none;
+}
+
+.todo-section-count {
+  min-inline-size: 1.5rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.todo-section-panel,
+.todo-group-run {
+  min-inline-size: 0;
+}
+
+.todo-group-run + .todo-group-run {
+  margin-block-start: var(--space-2);
+}
+
+.todo-group-heading {
+  margin: 0;
+  padding: var(--space-1) 0 var(--space-1) 1.75rem;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+}
+
+.todo-task-list {
+  display: grid;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.todo-task-row {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block: var(--space-2);
+  border-block-start: 1px solid var(--line);
+}
+
+.todo-task-list > .todo-task-row:first-child {
+  border-block-start: 0;
+}
+
+.todo-state-glyph {
+  display: inline-grid;
+  inline-size: 1rem;
+  block-size: 1rem;
+  place-items: center;
+  color: var(--ink);
+}
+
+.todo-state-glyph svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.todo-state-glyph-active svg {
+  fill: var(--accent);
+  stroke: var(--ink);
+}
+
+.todo-state-glyph-done svg {
+  stroke-width: 2;
+}
+
+.todo-task-title {
+  min-inline-size: 0;
+  color: var(--ink);
+  font-size: 0.86rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  unicode-bidi: plaintext;
+}
+
+.todo-task-state {
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.todo-all-done {
+  padding-block: var(--space-3);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.todo-updated-label {
+  justify-self: end;
+}
+
+@media (max-width: 24rem) {
+  .todo-panel {
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .todo-panel-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .todo-refresh {
+    grid-column: 1 / -1;
+    inline-size: 100%;
+  }
+
+  .todo-task-row {
+    grid-template-columns: 1.1rem minmax(0, 1fr);
+  }
+
+  .todo-task-state {
+    grid-column: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .todo-panel *,
+  .todo-panel *::before,
+  .todo-panel *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root[data-theme='system'] .ask-question-option-row[aria-pressed='true'] {
     color: var(--ink);
@@ -4957,7 +5263,9 @@ button[data-pressed]:not([data-disabled]) {
   background:
     linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%),
     linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%);
-  background-position: 0 0, 0.375rem 0.375rem;
+  background-position:
+    0 0,
+    0.375rem 0.375rem;
   background-size: 0.75rem 0.75rem;
 }
 

@@ -8,7 +8,10 @@ import type {
   AskQuestionTranscriptMeta,
   AttentionItemDto,
   CommandCatalogDto,
+  Envelope,
   SessionCardDto,
+  SyncSnapshot,
+  TodoProjectionV1,
   TranscriptBlock,
 } from '@pi-remote/pi-rpc-protocol';
 import { readFileSync } from 'node:fs';
@@ -94,7 +97,12 @@ vi.mock('../src/attention.js', () => ({
 
 import { AttentionInbox, Home, Review, Session, TranscriptList } from '../src/App.js';
 import { AskQuestionCard } from '../src/features/ask-question/AskQuestionCard.js';
-import { EMPTY_TRANSCRIPT, transcriptReducer } from '../src/state.js';
+import {
+  EMPTY_TODO_PROJECTION_STATE,
+  EMPTY_TRANSCRIPT,
+  todoProjectionReducer,
+  transcriptReducer,
+} from '../src/state.js';
 
 const occurredAt = '2026-08-13T10:00:00.000Z';
 const sessionId = 'session_web_001';
@@ -419,6 +427,122 @@ it('renders a hydrated ask-question block once at its transcript position throug
     question.presentedRevision,
     expect.any(AbortSignal),
   );
+});
+
+it('renders one todo panel at its sync position through the real Session and state path', async () => {
+  const before = block({
+    id: 'block_todo_before_001',
+    kind: 'text',
+    text: 'Before the todo projection',
+    role: 'user',
+  });
+  const toolCall = block({
+    id: 'block_todo_tool_002',
+    kind: 'tool_call',
+    toolName: 'read',
+    inputSummary: 'read current state',
+  });
+  const toolResult = block({
+    id: 'block_todo_result_005',
+    kind: 'tool_result',
+    toolName: 'read',
+    output: 'current state read',
+    isError: false,
+  });
+  const after = block({
+    id: 'block_todo_after_006',
+    kind: 'text',
+    text: 'After the todo projection',
+    role: 'assistant',
+  });
+  const todoProjection: TodoProjectionV1 = {
+    planId: 'plan_app_todos_001',
+    source: 'pi',
+    revision: 1,
+    updatedAt: occurredAt,
+    tasks: [
+      {
+        id: 'task_app_todos_001',
+        title: 'Render through Session state',
+        state: 'active',
+        group: 'Integration',
+        order: 1,
+        revision: 1,
+        updatedAt: occurredAt,
+      },
+    ],
+  };
+  const transcriptEnvelopes = [before, toolCall, toolResult, after].map((payload) =>
+    syncEnvelope('transcript.block', payload, payload.seq),
+  );
+  const snapshot: SyncSnapshot = {
+    kind: 'sync.snapshot',
+    sessionId,
+    epoch: 'epoch_web_001',
+    coversThrough: 6,
+    envelopes: [...transcriptEnvelopes, syncEnvelope('todo.snapshot.v1', todoProjection, 4)],
+  };
+  const selectedTranscript = transcriptReducer(EMPTY_TRANSCRIPT, { type: 'select', sessionId });
+  const transcript = transcriptReducer(selectedTranscript, {
+    type: 'snapshot',
+    message: snapshot,
+    at: occurredAt,
+  });
+  const selectedTodo = todoProjectionReducer(EMPTY_TODO_PROJECTION_STATE, {
+    type: 'select',
+    sessionId,
+  });
+  const todo = todoProjectionReducer(selectedTodo, { type: 'snapshot', message: snapshot });
+
+  const { container } = render(
+    <Session
+      connection="live"
+      sessionId={sessionId}
+      initialCache={null}
+      transcript={transcript}
+      todoProjection={todo}
+      dispatchConnection={vi.fn()}
+      dispatchTranscript={vi.fn()}
+      dispatchTodoProjection={vi.fn()}
+      status="idle"
+      onBack={vi.fn()}
+      onInbox={vi.fn()}
+      onReview={vi.fn()}
+      theme="system"
+      onThemeChange={vi.fn()}
+    />,
+  );
+
+  expect(container.querySelectorAll('[data-todo-projection-block]')).toHaveLength(1);
+  expect(screen.getByText('Render through Session state')).toBeInTheDocument();
+  const content = container.textContent ?? '';
+  expect(content.indexOf('Before the todo projection')).toBeLessThan(
+    content.indexOf('Render through Session state'),
+  );
+  expect(content.indexOf('Render through Session state')).toBeLessThan(
+    content.indexOf('current state read'),
+  );
+  expect(content.indexOf('Render through Session state')).toBeLessThan(
+    content.indexOf('After the todo projection'),
+  );
+
+  const activityTrigger = screen.getByRole('button', { name: /Worked · 1 tool/u });
+  await userEvent.click(activityTrigger);
+  expect(activityTrigger).toHaveAttribute('aria-expanded', 'true');
+  await userEvent.click(activityTrigger);
+  expect(activityTrigger).toHaveAttribute('aria-expanded', 'false');
+  expect(container.querySelectorAll('[data-todo-projection-block]')).toHaveLength(1);
+  expect(screen.getByText('Render through Session state')).toBeVisible();
+  expect(
+    container
+      .querySelector('.activity-group')
+      ?.contains(container.querySelector('[data-todo-panel]')),
+  ).toBe(false);
+
+  await userEvent.click(screen.getByRole('button', { name: 'Refresh pi todos' }));
+  await waitFor(() => expect(relay.openSyncSocket).toHaveBeenCalledTimes(2));
+  expect(relay.submitPrompt).not.toHaveBeenCalled();
+  expect(relay.submitSlashCommand).not.toHaveBeenCalled();
 });
 
 it('exposes safe ask-question semantics and follows the card-local answer-stop sequence', async () => {
@@ -1241,6 +1365,24 @@ function block<T extends TranscriptBlock>(value: Omit<T, 'revision' | 'seq' | 'o
     seq: Number(value.id.match(/(\d+)$/u)?.[1] ?? 1),
     occurredAt,
   } as T;
+}
+
+function syncEnvelope(kind: string, payload: Envelope['payload'], seq: number): Envelope {
+  return {
+    v: 1,
+    eventId: `event_web_${seq}`,
+    kind,
+    hostId: 'host_web_001',
+    workspaceRef: 'workspace_web_001',
+    sessionId,
+    epoch: 'epoch_web_001',
+    seq,
+    occurredAt,
+    causedBy: null,
+    payload,
+    redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+    replay: { eligible: true, snapshotEligible: true },
+  };
 }
 
 function jsonResponse(value: unknown, status = 200): Response {

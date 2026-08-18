@@ -18,6 +18,7 @@ import {
   type AskQuestionDisplayDto,
   type AvailableModelDto,
   type FilePreviewBlock,
+  type TodoProjectionV1,
 } from '@pi-remote/pi-rpc-protocol';
 import type { InboundImageBlock, InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 import type {
@@ -93,6 +94,86 @@ export const DEMO_ASK_QUESTION_FIXTURE = Object.freeze({
     'delivery-unknown',
   ] as const,
 });
+
+export const DEMO_TODO_FIXTURE = Object.freeze({
+  query: '?demo=1&fixture=todos&state=grouped',
+  states: ['grouped', 'all-done', 'empty', 'unsupported'] as const,
+});
+
+const DEMO_TODO_TASKS: TodoProjectionV1['tasks'] = [
+  {
+    id: 'todo_demo_01',
+    title: 'Map the existing transcript placement',
+    state: 'pending',
+    group: 'Panel',
+    order: 10,
+    revision: 1,
+    updatedAt: '2026-08-18T09:00:00.000Z',
+  },
+  {
+    id: 'todo_demo_02',
+    title: 'Keep long translated task titles wrapped at the mobile edge',
+    state: 'pending',
+    group: 'Panel',
+    order: 20,
+    revision: 1,
+    updatedAt: '2026-08-18T09:01:00.000Z',
+  },
+  {
+    id: 'todo_demo_03',
+    title: 'Wire the read-only projection reducer',
+    state: 'active',
+    group: 'State',
+    order: 30,
+    revision: 2,
+    updatedAt: '2026-08-18T09:02:00.000Z',
+  },
+  {
+    id: 'todo_demo_04',
+    title: 'Verify the existing sync subscription',
+    state: 'active',
+    group: 'State',
+    order: 40,
+    revision: 1,
+    updatedAt: null,
+  },
+  {
+    id: 'todo_demo_05',
+    title: 'Define the host-owned task shape',
+    state: 'done',
+    group: 'Protocol',
+    order: 50,
+    revision: 1,
+    updatedAt: '2026-08-18T08:55:00.000Z',
+  },
+  {
+    id: 'todo_demo_06',
+    title: 'Apply relay redaction',
+    state: 'done',
+    group: 'Protocol',
+    order: 60,
+    revision: 1,
+    updatedAt: '2026-08-18T08:56:00.000Z',
+  },
+  {
+    id: 'todo_demo_07',
+    title: 'Advertise projection capability',
+    state: 'done',
+    group: 'Protocol',
+    order: 70,
+    revision: 1,
+    updatedAt: '2026-08-18T08:57:00.000Z',
+  },
+  {
+    id: 'todo_demo_08',
+    title: 'Await device-level visual verification',
+    state: 'blocked',
+    group: null,
+    order: 80,
+    revision: 1,
+    updatedAt: null,
+  },
+];
 
 let cachedEnabled: boolean | null = null;
 
@@ -827,6 +908,40 @@ function fixtureName(): string | null {
   }
 }
 
+type DemoTodoState = (typeof DEMO_TODO_FIXTURE.states)[number];
+
+function isTodoFixture(): boolean {
+  return fixtureName() === 'todos';
+}
+
+function demoTodoState(): DemoTodoState {
+  try {
+    const requested = new URLSearchParams(window.location.search).get('state');
+    return requested !== null && DEMO_TODO_FIXTURE.states.includes(requested as DemoTodoState)
+      ? (requested as DemoTodoState)
+      : 'grouped';
+  } catch {
+    return 'grouped';
+  }
+}
+
+function demoTodoProjection(): TodoProjectionV1 | null {
+  const state = demoTodoState();
+  if (state === 'unsupported') return null;
+  return {
+    planId: 'plan_demo_todos',
+    source: 'pi',
+    revision: 1,
+    updatedAt: '2026-08-18T09:05:00.000Z',
+    tasks:
+      state === 'empty'
+        ? []
+        : state === 'all-done'
+          ? DEMO_TODO_TASKS.map((task) => ({ ...task, state: 'done' as const }))
+          : DEMO_TODO_TASKS,
+  };
+}
+
 function isArtifactStatesFixture(): boolean {
   return fixtureName() === 'artifact-states';
 }
@@ -1391,14 +1506,36 @@ interface FakeSocketListeners {
  * disturbing the transcript already loaded from the fixture page. */
 export function demoSocket(sessionId: string, onMessage: (message: unknown) => void): WebSocket {
   const listeners: FakeSocketListeners = {};
-  const coversThrough = blocksFor(sessionId).length;
+  const transcriptCoversThrough = blocksFor(sessionId).length;
+  const todoProjection = isTodoFixture() ? demoTodoProjection() : null;
+  const todoSeq = transcriptCoversThrough + 1;
+  const coversThrough = todoProjection === null ? transcriptCoversThrough : todoSeq;
   window.setTimeout(() => {
     onMessage({
       kind: 'sync.delta',
       sessionId,
       epoch: EPOCH,
       coversThrough,
-      envelopes: [],
+      envelopes:
+        todoProjection === null
+          ? []
+          : [
+              {
+                v: 1,
+                eventId: 'event_demo_todos',
+                kind: 'todo.snapshot.v1',
+                hostId: 'host_demo_001',
+                workspaceRef: 'workspace_demo_001',
+                sessionId,
+                epoch: EPOCH,
+                seq: todoSeq,
+                occurredAt: '2026-08-18T09:05:00.000Z',
+                causedBy: null,
+                payload: todoProjection,
+                redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+                replay: { eligible: true, snapshotEligible: true },
+              },
+            ],
     });
   }, 0);
   return {

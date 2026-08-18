@@ -40,6 +40,7 @@ import { ArtifactViewerProvider } from './artifacts/ArtifactViewerProvider.js';
 import { useOptionalArtifactViewer } from './artifacts/ArtifactViewerProvider.js';
 import { InboundImageBlockView } from './artifacts/InboundImageBlockView.js';
 import { AskQuestionCard } from './features/ask-question/AskQuestionCard.js';
+import { TodoProjectionBlock } from './TodoPanel.js';
 import {
   enrollDevice,
   establishSession,
@@ -71,16 +72,20 @@ import {
 } from './relay.js';
 import {
   EMPTY_TRANSCRIPT,
+  EMPTY_TODO_PROJECTION_STATE,
   DEFAULT_MEDIA_CAPABILITY_OFF,
   connectionReducer,
   filePreviewAvailability,
   sessionListReducer,
   transcriptReducer,
+  todoProjectionReducer,
   type ConnectionAction,
   type ConnectionPhase,
   type DisplayTranscriptBlock,
   type SessionListState,
   type TranscriptState,
+  type TodoProjectionAction,
+  type TodoProjectionState,
 } from './state.js';
 import { ModelEffortSheet, type EffortSheetSection } from './ModelEffortSheet.js';
 import { LeavePlanSheet } from './LeavePlanSheet.js';
@@ -110,6 +115,7 @@ import {
 
 const initialCache = loadCache();
 type ThemePreference = 'system' | 'light' | 'dark';
+const ignoreTodoAction: Dispatch<TodoProjectionAction> = () => undefined;
 
 function dispatchArtifactLifecycleEvent(name: string): void {
   window.dispatchEvent(new Event(name));
@@ -148,6 +154,10 @@ export function App({
     error: null,
   });
   const [transcript, dispatchTranscript] = useReducer(transcriptReducer, EMPTY_TRANSCRIPT);
+  const [todoProjection, dispatchTodoProjection] = useReducer(
+    todoProjectionReducer,
+    EMPTY_TODO_PROJECTION_STATE,
+  );
 
   useEffect(() => {
     const root = document.documentElement;
@@ -382,8 +392,10 @@ export function App({
           sessionId={selectedSessionId}
           initialCache={initialCache}
           transcript={transcript}
+          todoProjection={todoProjection}
           dispatchConnection={dispatchConnection}
           dispatchTranscript={dispatchTranscript}
+          dispatchTodoProjection={dispatchTodoProjection}
           status={
             sessions.items.find((session) => session.id === selectedSessionId)?.status ?? 'unknown'
           }
@@ -956,8 +968,10 @@ export function Session({
   sessionId,
   initialCache: cache,
   transcript,
+  todoProjection = EMPTY_TODO_PROJECTION_STATE,
   dispatchConnection,
   dispatchTranscript,
+  dispatchTodoProjection = ignoreTodoAction,
   status,
   onBack,
   onInbox,
@@ -971,8 +985,10 @@ export function Session({
   readonly sessionId: string;
   readonly initialCache: ReadOnlyCache | null;
   readonly transcript: TranscriptState;
+  readonly todoProjection?: TodoProjectionState;
   readonly dispatchConnection: Dispatch<ConnectionAction>;
   readonly dispatchTranscript: Dispatch<Parameters<typeof transcriptReducer>[1]>;
+  readonly dispatchTodoProjection?: Dispatch<TodoProjectionAction>;
   readonly status: SessionCardDto['status'];
   readonly onBack: () => void;
   readonly onInbox: () => void;
@@ -1000,6 +1016,7 @@ export function Session({
   // local state only and never carries command content.
   const [slashSubmitting, setSlashSubmitting] = useState(false);
   const [cacheResumeGeneration, setCacheResumeGeneration] = useState(0);
+  const [todoRefreshGeneration, setTodoRefreshGeneration] = useState(0);
   const planReviewTriggerRef = useRef<HTMLButtonElement>(null);
   const [leavePlanReadyOpen, setLeavePlanReadyOpen] = useState(false);
 
@@ -1093,6 +1110,7 @@ export function Session({
 
   useEffect(() => {
     dispatchTranscript({ type: 'select', sessionId });
+    dispatchTodoProjection({ type: 'select', sessionId });
     const cached = cache?.transcripts.find((item) => item.sessionId === sessionId);
     if (cached !== undefined) {
       dispatchTranscript({
@@ -1150,7 +1168,7 @@ export function Session({
           ) {
             dispatchArtifactLifecycleEvent('pi-remote:transcript-superseded');
             cursorRef.current = null;
-            dispatchTranscript({ type: 'delta', message, at });
+            applySyncMessage(message, at, dispatchTranscript, dispatchTodoProjection);
             socket?.close();
             return;
           }
@@ -1165,7 +1183,12 @@ export function Session({
           if (frameRef.current === null) {
             frameRef.current = window.requestAnimationFrame(() => {
               for (const pending of pendingMessagesRef.current) {
-                applySyncMessage(pending.message, pending.at, dispatchTranscript);
+                applySyncMessage(
+                  pending.message,
+                  pending.at,
+                  dispatchTranscript,
+                  dispatchTodoProjection,
+                );
               }
               pendingMessagesRef.current = [];
               frameRef.current = null;
@@ -1221,9 +1244,11 @@ export function Session({
     cache,
     cacheResumeGeneration,
     dispatchConnection,
+    dispatchTodoProjection,
     dispatchTranscript,
     runtimeControls.refresh,
     sessionId,
+    todoRefreshGeneration,
   ]);
 
   const isStale =
@@ -1383,6 +1408,11 @@ export function Session({
           running={status === 'running'}
           canAnswer={connection === 'live' && !transcript.awaitingSnapshot}
           askQuestionPrincipal={askQuestionPrincipal}
+          todoProjection={todoProjection}
+          onRefreshTodos={() => {
+            dispatchTodoProjection({ type: 'refreshRequested' });
+            setTodoRefreshGeneration((generation) => generation + 1);
+          }}
         />
       </ArtifactViewerProvider>
       <RuntimeStrip
@@ -1502,12 +1532,16 @@ export function TranscriptList({
   running,
   canAnswer = true,
   askQuestionPrincipal,
+  todoProjection = EMPTY_TODO_PROJECTION_STATE,
+  onRefreshTodos,
 }: {
   readonly sessionId?: string;
   readonly blocks: readonly DisplayTranscriptBlock[];
   readonly running: boolean;
   readonly canAnswer?: boolean;
   readonly askQuestionPrincipal?: string | undefined;
+  readonly todoProjection?: TodoProjectionState;
+  readonly onRefreshTodos?: () => void;
 }) {
   const artifactSessionId = sessionId ?? '';
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -1538,8 +1572,13 @@ export function TranscriptList({
     [artifactSessionId, blocks, running],
   );
   const renderItems = useMemo(
-    () => groupNormalizedTranscript(normalizedBlocks, blocks),
-    [blocks, normalizedBlocks],
+    () =>
+      insertTodoProjectionItem(
+        groupNormalizedTranscript(normalizedBlocks, blocks),
+        blocks,
+        todoProjection,
+      ),
+    [blocks, normalizedBlocks, todoProjection],
   );
   const turnStartIds = useMemo(() => {
     // Mark the first block of every turn after the first so a boundary rule can space
@@ -1576,7 +1615,7 @@ export function TranscriptList({
     previousCountRef.current = blocks.length;
   }, [blocks, atLiveEdge]);
 
-  if (blocks.length === 0) {
+  if (blocks.length === 0 && todoProjection.projection === null) {
     return <div className="empty-transcript">No transcript blocks are available yet.</div>;
   }
 
@@ -1594,11 +1633,13 @@ export function TranscriptList({
             const item = renderItems[virtualItem.index];
             if (item === undefined) return null;
             const leadId =
-              item.kind === 'block' || item.kind === 'actions'
-                ? item.kind === 'block'
-                  ? item.block.sourceBlockId
-                  : item.sourceBlockId
-                : item.blocks[0]?.sourceBlockId;
+              item.kind === 'todo'
+                ? undefined
+                : item.kind === 'block' || item.kind === 'actions'
+                  ? item.kind === 'block'
+                    ? item.block.sourceBlockId
+                    : item.sourceBlockId
+                  : item.blocks[0]?.sourceBlockId;
             const isTurnStart = leadId !== undefined && turnStartIds.has(leadId);
             return (
               <div
@@ -1608,7 +1649,12 @@ export function TranscriptList({
                 data-index={virtualItem.index}
                 style={{ transform: `translateY(${virtualItem.start}px)` }}
               >
-                {item.kind === 'activity' ? (
+                {item.kind === 'todo' ? (
+                  <TodoProjectionBlock
+                    state={item.state}
+                    {...(onRefreshTodos === undefined ? {} : { onRefresh: onRefreshTodos })}
+                  />
+                ) : item.kind === 'activity' ? (
                   <NormalizedActivityGroup blocks={item.blocks} />
                 ) : item.kind === 'inbound-stack' ? (
                   <div className="inbound-image-stack">
@@ -1703,6 +1749,7 @@ function CollapsedEvidence({
 }
 
 type RenderItem =
+  | { readonly kind: 'todo'; readonly id: string; readonly state: TodoProjectionState }
   | { readonly kind: 'block'; readonly id: string; readonly block: NormalizedTranscriptBlock }
   | {
       readonly kind: 'activity';
@@ -1802,6 +1849,61 @@ function groupNormalizedTranscript(
   });
   if (unassigned.length > 0) items.push(...groupNormalizedSequence(unassigned));
   return items;
+}
+
+function insertTodoProjectionItem(
+  items: readonly RenderItem[],
+  sourceBlocks: readonly DisplayTranscriptBlock[],
+  state: TodoProjectionState,
+): RenderItem[] {
+  if (state.availability !== 'available' || state.projection === null) return [...items];
+  const todoItem: RenderItem = {
+    kind: 'todo',
+    id: `todo-${state.projection.planId}`,
+    state,
+  };
+  const anchorSeq = state.anchorSeq ?? Number.POSITIVE_INFINITY;
+  const seqById = new Map(sourceBlocks.map((block) => [block.id, block.seq]));
+  const result: RenderItem[] = [];
+  let inserted = false;
+  for (const item of items) {
+    if (item.kind === 'todo') continue;
+    if (item.kind === 'activity') {
+      const before = item.blocks.filter((block) => block.sourceBlock.seq <= anchorSeq);
+      const after = item.blocks.filter((block) => block.sourceBlock.seq > anchorSeq);
+      if (!inserted && before.length > 0 && after.length > 0) {
+        result.push({ ...item, id: `${item.id}-before-todo`, blocks: before });
+        result.push(todoItem);
+        result.push({ ...item, id: `${item.id}-after-todo`, blocks: after });
+        inserted = true;
+        continue;
+      }
+    }
+    if (item.kind === 'inbound-stack') {
+      const before = item.blocks.filter((block) => block.sourceBlock.seq <= anchorSeq);
+      const after = item.blocks.filter((block) => block.sourceBlock.seq > anchorSeq);
+      if (!inserted && before.length > 0 && after.length > 0) {
+        result.push({ ...item, id: `${item.id}-before-todo`, blocks: before });
+        result.push(todoItem);
+        result.push({ ...item, id: `${item.id}-after-todo`, blocks: after });
+        inserted = true;
+        continue;
+      }
+    }
+    const itemSeq =
+      item.kind === 'block'
+        ? item.block.sourceBlock.seq
+        : item.kind === 'actions'
+          ? (seqById.get(item.sourceBlockId) ?? 0)
+          : (item.blocks[0]?.sourceBlock.seq ?? 0);
+    if (!inserted && itemSeq > anchorSeq) {
+      result.push(todoItem);
+      inserted = true;
+    }
+    result.push(item);
+  }
+  if (!inserted) result.push(todoItem);
+  return result;
 }
 
 function normalizedActivitySummary(blocks: readonly NormalizedActivityBlock[]): string {
@@ -2214,16 +2316,20 @@ function applySyncMessage(
   message: SyncMessage,
   at: string,
   dispatch: Dispatch<Parameters<typeof transcriptReducer>[1]>,
+  dispatchTodo: Dispatch<TodoProjectionAction> = ignoreTodoAction,
 ) {
   switch (message.kind) {
     case 'sync.snapshot':
       dispatch({ type: 'snapshot', message, at });
+      dispatchTodo({ type: 'snapshot', message });
       break;
     case 'sync.delta':
       dispatch({ type: 'delta', message, at });
+      dispatchTodo({ type: 'delta', message });
       break;
     case 'sync.gap':
       dispatch({ type: 'gap', message });
+      dispatchTodo({ type: 'gap', message });
       break;
   }
 }

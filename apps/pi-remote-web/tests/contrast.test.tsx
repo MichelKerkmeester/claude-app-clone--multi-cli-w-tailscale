@@ -182,6 +182,16 @@ const ASK_QUESTION_DARK: readonly Pair[] = [
   { name: 'clay error text on dark parchment', fg: '#f0b19a', bg: '#24221f', min: NORMAL_TEXT },
 ];
 
+const TODO_LIGHT: readonly Pair[] = [
+  { name: 'todo carbon on bone', fg: '#24221f', bg: '#f8f8f6', min: NORMAL_TEXT },
+  { name: 'todo muted on bone', fg: '#6c6a65', bg: '#f8f8f6', min: NORMAL_TEXT },
+];
+
+const TODO_DARK: readonly Pair[] = [
+  { name: 'todo text on dark page', fg: '#f8f8f6', bg: '#24221f', min: NORMAL_TEXT },
+  { name: 'todo muted on dark page', fg: '#9f998f', bg: '#24221f', min: NORMAL_TEXT },
+];
+
 describe('frozen effort-sheet palette meets WCAG contrast', () => {
   for (const pair of EFFORT_SHEET_LIGHT) {
     it(`light: ${pair.name} ≥ ${pair.min}:1`, () => {
@@ -233,6 +243,33 @@ describe('ask-question accessibility palette and state contract', () => {
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.ask-question-card-submitting::before[\s\S]*?display: none;/u,
     );
     expect(STYLE).toMatch(/\.ask-question-status[\s\S]*?line-height: 1\.4;/u);
+  });
+});
+
+describe('todo projection accessibility and frozen visual contract', () => {
+  for (const pair of [...TODO_LIGHT, ...TODO_DARK]) {
+    it(`${pair.name} >= ${pair.min}:1`, () => {
+      expect(contrast(pair.fg, pair.bg)).toBeGreaterThanOrEqual(pair.min);
+    });
+  }
+
+  it('uses the clay hairline with redundant text and no floating-card treatment', () => {
+    const panelRule = STYLE.match(/\.todo-panel\s*\{[^}]*\}/u)?.[0] ?? '';
+    expect(panelRule).toContain('background: transparent;');
+    expect(panelRule).not.toContain('box-shadow');
+    expect(STYLE).toMatch(/\.todo-progress-hairline > span[\s\S]*?background: var\(--accent\);/u);
+    expect(STYLE).toMatch(/\.todo-progress-count[\s\S]*?color: var\(--ink\);/u);
+    expect(STYLE).toMatch(/\.todo-task-state[\s\S]*?color: var\(--ink-muted\);/u);
+  });
+
+  it('keeps controls and static rows at least 44px with carbon focus', () => {
+    expect(STYLE).toMatch(
+      /\.todo-refresh,[\s\S]*?\.todo-section-trigger[\s\S]*?min-inline-size: 44px;[\s\S]*?min-block-size: 44px;/u,
+    );
+    expect(STYLE).toMatch(/\.todo-task-row[\s\S]*?min-block-size: 44px;/u);
+    expect(STYLE).toMatch(
+      /\.todo-refresh\[data-focus-visible\],[\s\S]*?outline: 2px solid var\(--focus\);/u,
+    );
   });
 });
 

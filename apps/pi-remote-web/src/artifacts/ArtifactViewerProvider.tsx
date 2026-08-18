@@ -208,6 +208,10 @@ function purgeViewerPixelNodes(): void {
 }
 
 export function ArtifactViewerProvider({ children }: { readonly children: ReactNode }) {
+  // @ds surface: artifact-viewer-provider — the viewer state machine plus privacy lifecycle.
+  // @ds guardrail: do-not-edit — the phase machine, dismissal choreography, generation guards,
+  // timer bookkeeping, focus/scroll restoration, and the privacy-curtain lifecycle below are
+  // behavioural and NOT designer-editable. Styling is edited in the artifact-viewer surface blocks.
   const [phase, setPhase] = useState<ArtifactViewerPhase>('closed');
   const [preview, setPreview] = useState<ArtifactPreview | null>(null);
   const generationRef = useRef(0);
@@ -228,6 +232,9 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     restoreTimerRef.current = null;
   };
 
+  // @ds state: opening · ready-diff · ready-image — the openViewer transition resets timers,
+  // purges stale resource stores, clears the privacy curtain, and marks the reader open.
+  // @ds guardrail: do-not-edit — generation-guarded open choreography and history.push.
   const openViewer = (
     block: ArtifactViewerSource,
     trigger: HTMLButtonElement | null,
@@ -348,6 +355,10 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     setPreview(nextPreview);
   };
 
+  // @ds state: exiting · closed · privacy-covered — close(reason) covers the reader with the
+  // opaque privacy curtain, purges image pixels, clears the resource store, and bumps the
+  // generation before any exit timer; privacy/security dismissal reasons route to covered.
+  // @ds guardrail: do-not-edit — the dismissal state machine and resource teardown are frozen.
   const close = (reason: ArtifactDismissalReason = 'close') => {
     const current = previewRef.current;
     if (current === null) {
@@ -403,6 +414,9 @@ export function ArtifactViewerProvider({ children }: { readonly children: ReactN
     [history],
   );
 
+  // @ds guardrail: do-not-edit — privacy purge on visibility-hide/pagehide/bfcache and the
+  // event wiring for logout · session-switch · artifact-revoked · transcript-superseded are
+  // security behaviour; they stay frozen and are NOT designer-editable.
   useEffect(() => {
     const closeHiddenViewer = () => {
       if (document.visibilityState === 'hidden') {

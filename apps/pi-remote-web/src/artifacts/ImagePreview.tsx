@@ -41,6 +41,10 @@ function messageForState(state: ImagePreviewState): string | null {
 }
 
 export function ImagePreview({ block, bytes, onStateChange }: ImagePreviewProps) {
+  // @ds surface: image-preview — the sanitized image stage with zoom and pan.
+  // @ds state: loading · ready · corrupt · too-large — [data-image-state] drives each.
+  // @ds guardrail: do-not-edit — the object-URL lifecycle, byte/dimension bounds, zoom clamp,
+  //   and pointer pan capture are frozen (the image decode/verify lives in the resource hook).
   const [state, setState] = useState<ImagePreviewState>('loading');
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [zoom, setZoom] = useState(IMAGE_PREVIEW_MIN_ZOOM);

@@ -59,6 +59,11 @@ export function CodePreview({
   revision = 1,
   followTail = false,
 }: CodePreviewProps) {
+  // @ds surface: code-preview — the highlighted code well, gutter, and live-edge follow.
+  // @ds state: highlight (plain → pending → highlighted) via [data-highlight-status]; follow-tail
+  //   live-edge via [data-live-edge] and the Jump to latest control.
+  // @ds guardrail: do-not-edit — the highlight worker (useHighlightedCode) and the scroll/follow
+  //   live-edge logic are frozen; tokens render as inert <span> text only.
   const safeLanguage = normalizeHighlightLanguage(language);
   const highlighted = useHighlightedCode({
     source: text,

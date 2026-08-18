@@ -11,6 +11,9 @@ export interface ArtifactCardProps {
 }
 
 export function ArtifactCard({ block }: ArtifactCardProps) {
+  // @ds surface: artifact-card — the in-transcript read-only card that opens the diff viewer.
+  // @ds slot: glyph | body (meta · summary · peek) | open — the card chrome regions.
+  // @ds guardrail: do-not-edit — react-aria Button + onPress opening the viewer are frozen.
   const buttonRef = useRef<HTMLButtonElement>(null);
   const viewer = useOptionalArtifactViewer();
   const patchLines = block.patch.split('\n');
@@ -36,6 +39,7 @@ export function ArtifactCard({ block }: ArtifactCardProps) {
           <span>Read-only</span>
         </span>
         <span className="artifact-card-summary">{block.summary}</span>
+        {/* @ds slot: peek — the clipped 6-line diff preview (mayReorder content only). */}
         <span className="artifact-card-peek" aria-label="Diff preview">
           {peekLines.map((line, index) => (
             <span className="artifact-card-peek-line" key={`${index}-${line.slice(0, 12)}`}>

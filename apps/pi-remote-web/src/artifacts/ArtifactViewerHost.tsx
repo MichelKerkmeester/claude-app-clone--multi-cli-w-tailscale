@@ -220,6 +220,9 @@ interface SecureImagePreviewProps {
   readonly onStateChange: (status: ArtifactResourceStatus) => void;
 }
 
+// @ds guardrail: do-not-edit — SecureImagePreview renders only the verified object URL handed in
+// by the resource hook (decode/verify/re-encode live there). The pan/zoom pointer + keyboard
+// surface is react-aria-free and frozen; do not change its behaviour or a11y.
 function SecureImagePreview({
   objectUrl,
   alt,
@@ -462,6 +465,11 @@ function renderInMemoryDocument(
 }
 
 export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHostProps) {
+  // @ds surface: artifact-viewer — the modal reader chrome: header, status, controls, preview body.
+  // @ds slot: header | status | controls | body — the chrome regions styled in the matching
+  //   @ds surface: artifact-viewer style.css block.
+  // @ds guardrail: do-not-edit — the hooks below are the digest-verified, race-safe,
+  //   no-fetch-on-open exact-tuple reader; do not rework their wiring.
   useVisualViewportAnchor();
   const hasPreview = preview !== null;
   const dialogRef = useRef<HTMLElement>(null);
@@ -500,6 +508,9 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     variant: 'thumbnail',
     requireImageDecode: true,
   });
+  // @ds guardrail: do-not-edit — useArtifactResource is the digest-verified, race-safe,
+  // no-fetch-on-open exact-tuple read. requireImageDecode sanitizes the image (PNG decode/
+  // re-encode metadata-strip) before any object URL is created. Keep behaviour unchanged.
   const resource = useArtifactResource(sessionId, resourceBlock, {
     enabled: resourceEnabled,
     variant: 'full',
@@ -593,6 +604,8 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
 
   if (preview === null || phase === 'closed') return null;
 
+  // @ds state: edge-back · voiceover-scrub — swipe-from-edge and focus-scrub dismissal reasons.
+  // @ds guardrail: do-not-edit — gesture thresholds and the pointer/touch wiring are frozen.
   const startEdgeBack = (x: number, y: number) => {
     if (x <= EDGE_BACK_START) edgeStartRef.current = { x, y };
   };
@@ -731,6 +744,8 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
       : inbound !== null || descriptor === null
         ? (legacyDiff?.patch ?? null)
         : resource.buffer;
+  // @ds guardrail: do-not-edit — Copy writes the exact displayed buffer; Share is policy-gated
+  // by artifact-share (canShareDisplayedArtifact / shareDisplayedArtifact). Wiring is unchanged.
   const shareInput: DisplayedArtifactShareInput = {
     displayName: title,
     renderer: inMemory?.renderer ?? descriptor?.renderer ?? 'diff',
@@ -850,6 +865,11 @@ export function ArtifactViewerHost({ phase, preview, onClose }: ArtifactViewerHo
     });
   };
 
+  // @ds state: the viewer phase (closed · opening · ready-diff · ready-image · viewer-ready ·
+  //   full-fetching · stalled · offline-* · stale · revoked · privacy-covered · exiting ·
+  //   aborted) drives [data-artifact-state] on the overlay and the preview body below.
+  // @ds guardrail: do-not-edit — react-aria ModalOverlay/Modal/Dialog wiring, focus trap,
+  //   isDismissable/onOpenChange, edge-back handlers, and aria attributes are frozen.
   return (
     <ModalOverlay
       isOpen

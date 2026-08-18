@@ -16,6 +16,9 @@ export function ArtifactHeader({
   kindLabel = 'Redacted artifact',
   revision = null,
 }: ArtifactHeaderProps) {
+  // @ds surface: artifact-header — the viewer heading + close chrome.
+  // @ds slot: heading-group (kicker · title · revision) | close — the header regions.
+  // @ds guardrail: do-not-edit — react-aria Heading/Button and the aria-label wiring are frozen.
   return (
     <header className="artifact-viewer-header">
       <div className="artifact-viewer-heading-group">

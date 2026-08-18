@@ -6,6 +6,8 @@ export interface DiffPreviewProps extends Pick<FileDiffBlock, 'patch'> {
 }
 
 export function DiffPreview({ patch, wrap = false, findTerm = '' }: DiffPreviewProps) {
+  // @ds surface: diff-preview — the unified-diff read well.
+  // @ds state: add · remove · context · find-match — per-line classes drive the tint.
   const lines = patch.split('\n');
   return (
     <pre

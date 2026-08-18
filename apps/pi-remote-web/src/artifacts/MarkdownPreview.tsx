@@ -206,6 +206,10 @@ export function MarkdownPreview({
   ariaLabel = 'Markdown preview',
   findTerm = '',
 }: MarkdownPreviewProps) {
+  // @ds surface: markdown-preview — the bounded safe-Markdown renderer well.
+  // @ds state: ready · empty · whitespace — empty/whitespace swap the read content.
+  // @ds guardrail: do-not-edit — parseMarkdown is a bounded allowlist parser (no raw HTML;
+  //   links/images render as inert spans); rendering is unchanged.
   if (text.length === 0) return <p className="artifact-empty-preview">This preview is empty.</p>;
   if (text.trim().length === 0) {
     return <p className="artifact-empty-preview">This preview contains whitespace only.</p>;

@@ -45,6 +45,8 @@ export function getPdfPreviewRuntimeMetrics(): {
 }
 
 function loadPdfJs(): Promise<PdfJsModule> {
+  // @ds guardrail: do-not-edit — the pinned PDF.js module loads one bounded worker; the worker
+  //   config (annotations/XFA disabled, bounded pages/canvases) is frozen. Do not re-point.
   if (pdfJsPromise === null) {
     pdfJsPromise = import('pdfjs-dist').then((module) => {
       module.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
@@ -397,6 +399,11 @@ export function PdfPreview({
   };
 
   const message = stateMessage(state);
+  // @ds surface: pdf-preview — the controlled PDF.js reader (bounded pages/canvases).
+  // @ds state: loading · ready · corrupt · too-large · withheld — [data-pdf-state] each.
+  // @ds guardrail: do-not-edit — the worker is configured with annotations/XFA disabled and
+  //   bounded pages/canvases; the text layer renders only when the relay attested safety
+  //   (textLayerSafe) and is otherwise withheld. Wiring is frozen.
   return (
     <section className="pdf-preview" aria-label="Sanitized PDF preview" data-pdf-state={state}>
       <div className="pdf-preview-controls" role="group" aria-label="PDF controls">

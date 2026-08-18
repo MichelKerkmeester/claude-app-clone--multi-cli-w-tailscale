@@ -47,6 +47,9 @@ export function PreviewControls({
   onDetails,
   detailsOpen = false,
 }: PreviewControlsProps) {
+  // @ds surface: preview-controls — the per-kind toolbar (find · wrap · zoom · pan · copy · share).
+  // @ds state: kind (diff · text · markdown · code · image) decides which controls render.
+  // @ds guardrail: do-not-edit — the toolbar role=group and each aria-label/aria-pressed are frozen.
   return (
     <div className="artifact-preview-controls" role="group" aria-label="Preview controls">
       <span>{KIND_LABELS[kind]}</span>

@@ -48,6 +48,10 @@ export function TextPreview({
   wrap = false,
   findTerm = '',
 }: TextPreviewProps) {
+  // @ds surface: text-preview — the plain-text read well.
+  // @ds state: ready · empty · whitespace — the empty/whitespace copy swaps the read content.
+  // @ds guardrail: do-not-edit — chunked rendering keeps the buffer bounded; find highlighting
+  //   renders inert <mark> text only.
   if (text.length === 0) {
     return <p className="artifact-empty-preview">This preview is empty.</p>;
   }

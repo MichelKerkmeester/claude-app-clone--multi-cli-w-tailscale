@@ -83,6 +83,9 @@
   --danger: #8d382e;
   --danger-soft: #f4e7e4;
   --focus: #121212;
+/* @ds edit: tokens — the --diff-add / --diff-remove component tokens drive the add/remove tints
+   consumed by .artifact-diff-add and .artifact-diff-remove (dark and system-dark remap the same names). */
+
   --diff-add: #e4eee7;
   --diff-remove: #f3e5e2;
   --shadow-raised: 0 4px 20px rgb(0 0 0 / 4%);
@@ -3195,6 +3198,10 @@ button[data-pressed]:not([data-disabled]) {
   box-shadow: 0 0 0 5px var(--accent);
 }
 
+/* @ds surface: code-syntax-tokens — the fixed syntax-highlight palette. */
+/* @ds guardrail: do-not-edit — these token colours are theme-invariant and must stay
+   fixed; the .tsx highlighter and the dark override reuse this exact palette. */
+
 .artifact-code-token.is-keyword,
 .artifact-code-token.is-boolean,
 .artifact-code-token.is-tag,
@@ -3217,10 +3224,17 @@ button[data-pressed]:not([data-disabled]) {
   color: #f0b19a;
 }
 
+/* @ds slot: source-well — the code viewer positions gutter + source; code owns its pan. */
+
 .artifact-code-viewer {
   position: relative;
   min-inline-size: 0;
 }
+
+/* @ds surface: code-preview — the highlighted code well with gutter and live-edge follow. */
+/* @ds edit: layout — capped viewport height; wide lines scroll inside (no page overflow). */
+/* @ds state: highlight (plain · pending · highlighted) via [data-highlight-status]; follow-tail
+   is the live-edge scroll. */
 
 .artifact-code-preview {
   max-block-size: min(70dvh, 42rem);
@@ -3228,6 +3242,8 @@ button[data-pressed]:not([data-disabled]) {
   overscroll-behavior-block: contain;
   scrollbar-gutter: stable;
 }
+
+/* @ds slot: jump-latest — sticky "jump to newest output" pill; 44px target floor. */
 
 .artifact-jump-latest {
   position: sticky;
@@ -3250,15 +3266,21 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink-inverse);
 }
 
+/* @ds edit: layout — viewer full-frame safe-area gutters (bottom/left/right). */
+
 .artifact-viewer-modal {
   padding-block-end: max(var(--space-4), env(safe-area-inset-bottom, 0px));
   padding-inline: max(var(--space-3), env(safe-area-inset-left, 0px))
     max(var(--space-3), env(safe-area-inset-right, 0px));
 }
 
+/* @ds edit: layout — content capped to the visual viewport, minus the safe areas. */
+
 .artifact-viewer-content {
   max-block-size: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
+
+/* @ds guardrail: do-not-edit — code, diff, and fenced markdown stay selectable (bounded reading surface). */
 
 .artifact-markdown-code,
 .artifact-code-preview,
@@ -3306,6 +3328,8 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds edit: layout — short-landscape reflow: cards compact their vertical rhythm. */
+/* @ds edit: layout — short-landscape reflow: cards compact their vertical rhythm. */
+
 @media (orientation: landscape) and (max-height: 30rem) {
   .artifact-viewer-modal {
     max-block-size: 100dvh;
@@ -3322,6 +3346,9 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds guardrail: do-not-edit — reduced-motion: card actions and panning previews
    collapse their transition/scroll motion. */
+/* @ds guardrail: do-not-edit — reduced-motion: card actions and panning previews collapse
+   their transition/scroll motion. */
+
 @media (prefers-reduced-motion: reduce) {
   .rich-block-action,
   .artifact-control-button,
@@ -3702,10 +3729,19 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* Artifact reader contract: the viewer is a bounded reading surface, while code owns its pan. */
+/* @ds surface: artifact-viewer — the modal reader chrome in its authored light surface. */
+/* @ds state: viewer phase (closed · opening · ready-diff · exiting) and dismissal reason
+   (close · escape · history · edge-back · voiceover-scrub) drive the chrome rendered here. */
+/* @ds guardrail: do-not-edit — the light reading surface's background and ink are frozen. */
+
 .artifact-viewer-modal {
   background: #ffffff;
   color: #24221f;
 }
+
+/* @ds slot: chrome — dialog, header, heading, body, and preview region share a zero minimum
+   inline size so no rule overflows the frame.
+   @ds edit: layout — shared zero inline floor for the viewer frame. */
 
 .artifact-viewer-dialog,
 .artifact-viewer-header,
@@ -3715,13 +3751,19 @@ button[data-pressed]:not([data-disabled]) {
   min-inline-size: 0;
 }
 
+/* @ds slot: header — the viewer heading row (wraps at narrow widths). */
+
 .artifact-viewer-header {
   flex-wrap: wrap;
 }
 
+/* @ds slot: heading-group — kicker · title · revision cluster. */
+
 .artifact-viewer-heading-group {
   flex: 1 1 12rem;
 }
+
+/* @ds slot: revision — mono revision chip. */
 
 .artifact-viewer-revision {
   max-inline-size: 100%;
@@ -3730,6 +3772,9 @@ button[data-pressed]:not([data-disabled]) {
   font-family: var(--font-mono);
   font-size: 0.68rem;
 }
+
+/* @ds state: terminal-alert — the assertive (role=alert) announcement region. */
+/* @ds guardrail: do-not-edit — visually-hidden live region; never display. */
 
 .artifact-viewer-terminal-alert {
   position: absolute;
@@ -3742,10 +3787,15 @@ button[data-pressed]:not([data-disabled]) {
   border: 0;
 }
 
+/* @ds slot: body — scroll column; horizontal overflow hidden so previews pan inside. */
+
 .artifact-viewer-content {
   overflow-x: hidden;
   overscroll-behavior: contain;
 }
+
+/* @ds surface: preview-controls — the per-kind toolbar (find · wrap · zoom · pan · copy · share). */
+/* @ds state: preview kind (diff · text · markdown · code · image · pdf) decides which controls render. */
 
 .artifact-preview-controls {
   max-inline-size: 100%;
@@ -3755,6 +3805,9 @@ button[data-pressed]:not([data-disabled]) {
   color: #6c6a65;
   scrollbar-width: thin;
 }
+
+/* @ds guardrail: do-not-edit — >=44px interactive targets (WCAG); unit chrome shared by the
+   toolbar labels, controls, and the stale-action. */
 
 .artifact-preview-controls span,
 .artifact-control-button,
@@ -3769,17 +3822,23 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.25;
 }
 
+/* @ds slot: control-label — a static toolbar label chip. */
+
 .artifact-preview-controls span {
   display: inline-flex;
   align-items: center;
   padding: 0.5rem 0.7rem;
 }
 
+/* @ds slot: action — a toolbar button / stale-action base chrome. */
+
 .artifact-control-button,
 .artifact-stale-action {
   padding-inline: 0.75rem;
   cursor: pointer;
 }
+
+/* @ds state: hover · pressed — react-aria [aria-pressed='true'] and pointer feedback. */
 
 .artifact-control-button:hover,
 .artifact-control-button[aria-pressed='true'],
@@ -3788,12 +3847,18 @@ button[data-pressed]:not([data-disabled]) {
   background: #f3e4de;
 }
 
+/* @ds state: focus-visible — toolbar ring, light. */
+/* @ds guardrail: do-not-edit — never colour-only focus. */
+
 .artifact-control-button:focus-visible,
 .artifact-stale-action:focus-visible,
 .artifact-find-control input:focus-visible {
   outline: 3px solid #24221f;
   outline-offset: 2px;
 }
+
+/* @ds surface: find — the in-preview search control. */
+/* @ds slot: find-control — search input field chrome. */
 
 .artifact-find-control {
   display: inline-flex;
@@ -3811,6 +3876,8 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 650;
 }
 
+/* @ds slot: find-input — the text entry field (transparent over the field chrome). */
+
 .artifact-find-control input {
   min-inline-size: 0;
   inline-size: 100%;
@@ -3822,21 +3889,33 @@ button[data-pressed]:not([data-disabled]) {
   font: inherit;
 }
 
+/* @ds state: selection — text selection tint inside the reading surface. */
+/* @ds guardrail: do-not-edit — the reading surface keeps selection; never un-selectable. */
+
 .artifact-viewer-content ::selection,
 .artifact-viewer-content ::-moz-selection {
   background: #f3e4de;
   color: #24221f;
 }
 
+/* @ds state: find-match — the active search match readback. */
+
 .artifact-find-match {
   background: #f3e4de;
   color: #24221f;
 }
 
+/* @ds slot: body — the preview stage; bidi-stable read surface. */
+/* @ds guardrail: do-not-edit — unicode-bidi: plaintext keeps preview text stable. */
+
 .artifact-preview-region {
   max-inline-size: 100%;
   unicode-bidi: plaintext;
 }
+
+/* @ds surface: text-preview · markdown-preview — the two read wells share this reading base. */
+/* @ds state: ready · empty · whitespace — empty/whitespace swap the read content. */
+/* @ds guardrail: do-not-edit — both wells are bounded reading surfaces; do not un-border. */
 
 .artifact-text-preview,
 .artifact-markdown-preview {
@@ -3852,6 +3931,8 @@ button[data-pressed]:not([data-disabled]) {
   unicode-bidi: plaintext;
 }
 
+/* @ds slot: text-well — plain-text read-out (mono wrap handled by .is-wrapped). */
+
 .artifact-text-preview {
   margin: 0;
   padding: 1rem;
@@ -3862,14 +3943,20 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: normal;
 }
 
+/* @ds state: wrapped — user toggled wrap; text breaks anywhere. */
+
 .artifact-text-preview.is-wrapped {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
+/* @ds slot: text-chunk — an inline preserved chunk of the read content. */
+
 .artifact-text-chunk {
   display: inline;
 }
+
+/* @ds slot: markdown-prose — rendered markdown read-out. */
 
 .artifact-markdown-preview {
   padding: 0.25rem 0.1rem;
@@ -3890,12 +3977,16 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds slot: quote — blockquote accent rule + muted ink. */
+
 .artifact-markdown-preview blockquote {
   margin-inline: 0;
   padding-inline-start: 1rem;
   border-inline-start: 3px solid #d97757;
   color: #6c6a65;
 }
+
+/* @ds slot: link — markdown links; dotted underline affordance (targets are protocol-scrubbed). */
 
 .artifact-markdown-preview a,
 .artifact-markdown-link {
@@ -3904,10 +3995,18 @@ button[data-pressed]:not([data-disabled]) {
   text-decoration-style: dotted;
 }
 
+/* @ds slot: markdown-image — italic placeholder for non-rendering images. */
+/* @ds guardrail: do-not-edit — images render only via the verified object URL; this is the
+   safe fallback presentation. */
+
 .artifact-markdown-image {
   color: #6c6a65;
   font-style: italic;
 }
+
+/* @ds surface: code-well · diff-well — the darkened mono reading surfaces. */
+/* @ds guardrail: do-not-edit — fixed light-on-dark reading base shared by code, diff, and
+   fenced markdown; never restyle the seam. */
 
 .artifact-markdown-code,
 .artifact-code-preview,
@@ -3915,6 +4014,8 @@ button[data-pressed]:not([data-disabled]) {
   background: #24221f;
   color: #f8f8f6;
 }
+
+/* @ds slot: fenced-code — fenced markdown code block. */
 
 .artifact-markdown-code {
   max-inline-size: 100%;
@@ -3927,6 +4028,9 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.6;
   white-space: pre;
 }
+
+/* @ds surface: code-preview — highlighted code well with gutter. */
+/* @ds guardrail: do-not-edit — fixed ltr, isolate bidi, and in-box panning must stay. */
 
 .artifact-code-preview {
   display: grid;
@@ -3943,6 +4047,8 @@ button[data-pressed]:not([data-disabled]) {
   unicode-bidi: isolate;
 }
 
+/* @ds slot: gutter — line-number rail. */
+
 .artifact-code-gutter {
   display: grid;
   align-content: start;
@@ -3958,6 +4064,8 @@ button[data-pressed]:not([data-disabled]) {
   min-block-size: 1.65em;
 }
 
+/* @ds slot: source — the pre body; kept selectable. */
+
 .artifact-code-source {
   min-inline-size: max-content;
   margin: 0;
@@ -3968,11 +4076,17 @@ button[data-pressed]:not([data-disabled]) {
   user-select: text;
 }
 
+/* @ds state: wrapped — code wrap toggles source wrapping. */
+
 .artifact-code-preview.is-wrapped .artifact-code-source {
   min-inline-size: 0;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
+
+/* @ds surface: code-syntax-tokens — the fixed highlight palette (keyword · string · number ·
+   comment) repeated for this well.
+   @ds guardrail: do-not-edit — theme-invariant token colours must stay fixed. */
 
 .artifact-code-token.is-keyword {
   color: #f0b19a;
@@ -3986,6 +4100,9 @@ button[data-pressed]:not([data-disabled]) {
 .artifact-code-token.is-comment {
   color: #9f998f;
 }
+
+/* @ds surface: diff-preview — the unified-diff read well. */
+/* @ds guardrail: do-not-edit — fixed ltr, isolate bidi, selectable, in-box panning. */
 
 .artifact-diff-preview {
   max-inline-size: 100%;
@@ -4002,20 +4119,30 @@ button[data-pressed]:not([data-disabled]) {
   unicode-bidi: isolate;
 }
 
+/* @ds state: wrapped — diff wrap toggles line wrapping. */
+
 .artifact-diff-preview.is-wrapped {
   white-space: pre-wrap;
 }
+
+/* @ds slot: line — one diff row. */
 
 .artifact-diff-line {
   min-block-size: 1.65em;
   padding-inline: 1rem;
 }
 
+/* @ds state: add · remove · find-match — per-line tint. */
+/* @ds guardrail: do-not-edit — theme-invariant light literal; stays fixed. */
+
 .artifact-diff-add,
 .artifact-diff-remove,
 .artifact-diff-line.is-find-match {
   background: #f3e4de;
 }
+
+/* @ds surface: loading-preview — the skeleton shimmer before content arrives. */
+/* @ds state: loading — content still resolving. */
 
 .artifact-loading-preview {
   display: grid;
@@ -4027,6 +4154,8 @@ button[data-pressed]:not([data-disabled]) {
   border-radius: 0.5rem;
 }
 
+/* @ds slot: skeleton-row — one placeholder bar. */
+
 .artifact-loading-preview span {
   display: block;
   block-size: 0.8rem;
@@ -4035,6 +4164,8 @@ button[data-pressed]:not([data-disabled]) {
   opacity: 0.45;
 }
 
+/* @ds slot: skeleton-row — partial-width placeholder row. */
+
 .artifact-loading-preview span:nth-child(2) {
   inline-size: 80%;
 }
@@ -4042,6 +4173,10 @@ button[data-pressed]:not([data-disabled]) {
 .artifact-loading-preview span:nth-child(3) {
   inline-size: 60%;
 }
+
+/* @ds surface: unsupported-preview · empty-preview — quiet read notices. */
+/* @ds state: unsupported · withheld · denied · missing · corrupt · too-large · empty · whitespace —
+   the caller picks the message; the presence chrome is this. */
 
 .artifact-unsupported-preview,
 .artifact-empty-preview {
@@ -4056,9 +4191,13 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.55;
 }
 
+/* @ds slot: message — the read-notice paragraph. */
+
 .artifact-unsupported-preview p {
   margin: 0.5rem 0 0;
 }
+
+/* @ds edit: layout — narrow reflow of the viewer header and controls at <=30rem. */
 
 @media (max-width: 30rem) {
   .artifact-viewer-header {
@@ -4083,6 +4222,10 @@ button[data-pressed]:not([data-disabled]) {
     min-inline-size: 0;
   }
 }
+
+/* @ds surface: artifact-viewer — dark override of the reader surfaces. */
+/* @ds state: dark — remaps the reading surfaces and controls to the dark palette.
+   @ds guardrail: do-not-edit — dark reading surfaces stay fully opaque and legible. */
 
 :root[data-theme='dark'] .artifact-viewer-modal,
 :root[data-theme='dark'] .artifact-text-preview,
@@ -4144,6 +4287,7 @@ button[data-pressed]:not([data-disabled]) {
   color: #f0b19a;
 }
 
+/* @ds end surface: artifact-viewer */
 /* @ds slot: primary-action — the single circular morphing disc (send/steer/stop/sending). */
 .composer-primary {
   display: grid;
@@ -5988,6 +6132,10 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds surface: file-preview-card — read-only preview card reusing the artifact-card
    surface; states come from data-preview-state (ready · withheld · missing · denied · unsupported). */
+/* @ds surface: artifact-card — the in-transcript read-only card that opens the diff viewer. */
+/* @ds slot: glyph | body (meta · summary · peek) | open — the card chrome regions. */
+/* @ds guardrail: do-not-edit — react-aria Button + onPress opening the viewer are frozen. */
+
 .artifact-card {
   display: grid;
   min-inline-size: 0;
@@ -6005,19 +6153,27 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: hover — react-aria data-hovered accent tint. */
+
 .artifact-card[data-hovered] {
   border-color: var(--accent-strong);
   background: var(--accent-soft);
 }
 
+/* @ds state: pressed — react-aria data-pressed; no press-scale. */
+
 .artifact-card[data-pressed] {
   transform: none;
 }
+
+/* @ds state: focus-visible — canonical card focus ring (never colour-only). */
 
 .artifact-card[data-focus-visible] {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
+
+/* @ds slot: glyph — the artifact-type glyph chip. */
 
 .artifact-card-glyph {
   display: grid;
@@ -6028,6 +6184,8 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--accent-soft);
   color: var(--accent-ink);
 }
+
+/* @ds slot: glyph-icon · close-icon — shared 1.35rem stroke geometry. */
 
 .artifact-card-glyph svg,
 .artifact-viewer-close svg {
@@ -6040,11 +6198,15 @@ button[data-pressed]:not([data-disabled]) {
   stroke-width: 1.8;
 }
 
+/* @ds slot: body — meta · summary · peek column. */
+
 .artifact-card-body {
   display: grid;
   min-inline-size: 0;
   gap: var(--space-2);
 }
+
+/* @ds slot: meta — uppercase fact chips. */
 
 .artifact-card-meta {
   display: flex;
@@ -6057,11 +6219,15 @@ button[data-pressed]:not([data-disabled]) {
   text-transform: uppercase;
 }
 
+/* @ds slot: meta-sep — the '/' separator between fact chips. */
+
 .artifact-card-meta span + span::before {
   margin-inline-end: var(--space-2);
   content: '/';
   color: var(--line-strong);
 }
+
+/* @ds slot: summary — the artifact's display-name read-out. */
 
 .artifact-card-summary {
   overflow-wrap: anywhere;
@@ -6070,6 +6236,9 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1.05rem;
   line-height: 1.35;
 }
+
+/* @ds slot: peek — the clipped 6-line diff preview (mayReorder content only). */
+/* @ds guardrail: do-not-edit — peek is clipped and bidi-stable; never expand in the card. */
 
 .artifact-card-peek {
   display: block;
@@ -6088,12 +6257,16 @@ button[data-pressed]:not([data-disabled]) {
   white-space: pre;
 }
 
+/* @ds slot: peek-line — one clipped, ellipsized peek row. */
+
 .artifact-card-peek-line {
   display: block;
   min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* @ds slot: open — the trailing "Open" handoff affordance. */
 
 .artifact-card-open {
   min-block-size: 2.75rem;
@@ -6103,6 +6276,13 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* @ds surface: artifact-viewer — full-frame modal chrome: overlay, modal, dialog, header, status,
+   controls, and preview body; the region blocks that render the viewer states. */
+/* @ds edit: layout — fixed overlay + z-index 110, above every mode surface. */
+/* @ds state: viewer phase (closed · opening · ready-diff · ready-image · exiting) and dismissal
+   reason (close · escape · history · edge-back · voiceover-scrub) drive the chrome rendered here. */
+/* @ds guardrail: do-not-edit — the overlay scrim never lets the transcript bleed through. */
 
 .artifact-viewer-overlay {
   position: fixed;
@@ -6117,6 +6297,9 @@ button[data-pressed]:not([data-disabled]) {
   background: color-mix(in srgb, var(--ink) 58%, transparent);
 }
 
+/* @ds slot: modal — the frame card.
+   @ds edit: layout — frame width, max block-size, and the author palette. */
+
 .artifact-viewer-modal {
   inline-size: min(100%, 48rem);
   max-inline-size: 100%;
@@ -6125,6 +6308,9 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface-raised);
   color: var(--ink);
 }
+
+/* @ds slot: dialog — grid rows (header · status · body) with safe-area gutters.
+   @ds edit: layout — full-frame padding with safe-area insets; rows auto · auto · 1fr. */
 
 .artifact-viewer-dialog {
   display: grid;
@@ -6139,6 +6325,8 @@ button[data-pressed]:not([data-disabled]) {
   outline: none;
 }
 
+/* @ds slot: header — the heading + close chrome. */
+
 .artifact-viewer-header {
   display: flex;
   min-inline-size: 0;
@@ -6149,11 +6337,15 @@ button[data-pressed]:not([data-disabled]) {
   border-block-end: 1px solid var(--line);
 }
 
+/* @ds slot: heading-group — kicker · title · revision cluster. */
+
 .artifact-viewer-heading-group {
   display: grid;
   min-inline-size: 0;
   gap: var(--space-2);
 }
+
+/* @ds slot: kicker — the artifact-kind eyebrow. */
 
 .artifact-viewer-kicker {
   color: var(--accent-ink);
@@ -6162,6 +6354,8 @@ button[data-pressed]:not([data-disabled]) {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+/* @ds slot: title — display-serif artifact title. */
 
 .artifact-viewer-title {
   max-inline-size: 100%;
@@ -6178,6 +6372,9 @@ button[data-pressed]:not([data-disabled]) {
   outline: 2px solid var(--focus);
   outline-offset: 4px;
 }
+
+/* @ds slot: close — the dismiss button (44px round).
+   @ds guardrail: do-not-edit — the close control's 44px target is WCAG-frozen. */
 
 .artifact-viewer-close {
   display: grid;
@@ -6202,6 +6399,14 @@ button[data-pressed]:not([data-disabled]) {
   outline-offset: 3px;
 }
 
+/* @ds surface: artifact-status — the polite status + assertive terminal-alert live regions. */
+/* @ds slot: status — the phase/status readout line. */
+/* @ds state: ArtifactResourceStatus — one exact state per value (idle · loading · stalled · ready ·
+   empty · whitespace · offline · stale · denied · expired · missing · revoked · conflict · corrupt ·
+   too-large · rate-limited · relay-error · aborted · closed) plus the opening/exiting viewer phases —
+   the .tsx renders each as this status line. */
+/* @ds guardrail: do-not-edit — role=status/aria-live=polite and the assertive region are frozen. */
+
 .artifact-viewer-status {
   min-block-size: 2.75rem;
   padding-block: var(--space-3);
@@ -6209,6 +6414,8 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.78rem;
   line-height: 1.4;
 }
+
+/* @ds slot: body — scroll column; previews pan inside (no page overflow). */
 
 .artifact-viewer-content {
   display: grid;
@@ -6221,6 +6428,8 @@ button[data-pressed]:not([data-disabled]) {
   padding-block-end: var(--space-4);
 }
 
+/* @ds slot: summary — the viewer's descriptor prose (capped to a reading measure). */
+
 .artifact-viewer-summary {
   max-inline-size: 66ch;
   margin: 0;
@@ -6230,6 +6439,10 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1.05rem;
   line-height: 1.55;
 }
+
+/* @ds surface: preview-controls — the per-kind toolbar (find · wrap · zoom · pan · copy · share). */
+/* @ds state: preview kind (diff · text · markdown · code · image · pdf) decides which controls render. */
+/* @ds guardrail: do-not-edit — the toolbar role=group and each aria-pressed are frozen. */
 
 .artifact-preview-controls {
   display: flex;
@@ -6243,12 +6456,18 @@ button[data-pressed]:not([data-disabled]) {
   text-transform: uppercase;
 }
 
+/* @ds slot: kind-label — a static per-kind toolbar label chip. */
+
 .artifact-preview-controls span {
   min-block-size: 2rem;
   padding: 0.5rem 0.7rem;
   border: 1px solid var(--line);
   border-radius: 999px;
 }
+
+/* @ds surface: diff-preview — the unified-diff read well. */
+/* @ds state: add · remove · context · find-match — per-line classes drive the tint. */
+/* @ds guardrail: do-not-edit — fixed reading well; selectable and pan-scoped. */
 
 .artifact-diff-preview {
   min-inline-size: 0;
@@ -6266,19 +6485,30 @@ button[data-pressed]:not([data-disabled]) {
   white-space: pre;
 }
 
+/* @ds slot: line — one diff row. */
+
 .artifact-diff-line {
   display: block;
   min-block-size: 1.65em;
   padding-inline: var(--space-4);
 }
 
+/* @ds slot: add-line — added lines tinted by the --diff-add component token.
+   @ds edit: tokens — retint added diff lines via --diff-add. */
+
 .artifact-diff-add {
   background: color-mix(in oklch, var(--diff-add) 90%, transparent);
 }
 
+/* @ds slot: remove-line — removed lines tinted by the --diff-remove component token.
+   @ds edit: tokens — retint removed diff lines via --diff-remove. */
+
 .artifact-diff-remove {
   background: color-mix(in oklch, var(--diff-remove) 90%, transparent);
 }
+
+/* @ds surface: image-preview · pdf-preview — the media preview stage and its page rail.
+   @ds state: preview kind (image · pdf) — which media reader hosts the region. */
 
 .image-preview,
 .pdf-preview {
@@ -6287,6 +6517,8 @@ button[data-pressed]:not([data-disabled]) {
   gap: var(--space-3);
 }
 
+/* @ds slot: media-controls — image/pdf toolbar chrome (zoom · pan · page). */
+
 .image-preview-controls,
 .pdf-preview-controls {
   display: flex;
@@ -6294,6 +6526,10 @@ button[data-pressed]:not([data-disabled]) {
   gap: var(--space-2);
   align-items: center;
 }
+
+/* @ds surface: image-preview — the sanitized image stage with zoom and pan. */
+/* @ds state: Image (loading · ready · corrupt · too-large) — [data-image-state] drives each. */
+/* @ds guardrail: do-not-edit — the object-URL lifecycle and zoom clamp are frozen. */
 
 .image-preview-stage {
   display: grid;
@@ -6306,6 +6542,9 @@ button[data-pressed]:not([data-disabled]) {
   touch-action: none;
 }
 
+/* @ds slot: image — the decoded image (non-draggable).
+   @ds guardrail: do-not-edit — user-select/drag disabled so the layer is handoff-only. */
+
 .image-preview-image {
   display: block;
   max-inline-size: 100%;
@@ -6315,6 +6554,8 @@ button[data-pressed]:not([data-disabled]) {
   transform-origin: center;
   transition: transform 120ms var(--ease-out, ease);
 }
+
+/* @ds slot: message — a quiet secondary read line. */
 
 .artifact-preview-message {
   margin: 0;
@@ -6328,6 +6569,10 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink-secondary);
   font-variant-numeric: tabular-nums;
 }
+
+/* @ds surface: pdf-preview — the controlled PDF.js reader (bounded pages/canvases). */
+/* @ds state: Pdf (loading · ready · corrupt · too-large · withheld) — [data-pdf-state] each. */
+/* @ds guardrail: do-not-edit — the worker (annotations/XFA disabled) and pan containment are frozen. */
 
 .pdf-preview-scroll {
   display: grid;
@@ -6349,6 +6594,8 @@ button[data-pressed]:not([data-disabled]) {
   place-items: start center;
 }
 
+/* @ds slot: page-card — one rendered page card. */
+
 .pdf-preview-canvas-wrap {
   position: relative;
   max-inline-size: 100%;
@@ -6361,6 +6608,9 @@ button[data-pressed]:not([data-disabled]) {
   max-inline-size: 100%;
   block-size: auto;
 }
+
+/* @ds slot: text-layer — selectable text overlay atop the rasterised page. */
+/* @ds guardrail: do-not-edit — the PDF text layer is the sanitized selectable surface; frozen. */
 
 .pdf-text-layer {
   position: absolute;
@@ -6383,11 +6633,15 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink);
 }
 
+/* @ds edit: layout — dvh fallback caps the modal to the visual-viewport height. */
+
 @supports not (height: 100dvh) {
   .artifact-viewer-modal {
     max-block-size: var(--visual-viewport-height, 100vh);
   }
 }
+
+/* @ds edit: layout — narrow card reflow at <=24rem: two-column glyph/body, hidden Open, gutters. */
 
 @media (max-width: 24rem) {
   .artifact-card {
@@ -6414,6 +6668,9 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds edit: motion — reduced-motion collapses card + viewer entry/exit animation. */
+/* @ds guardrail: do-not-edit — reduced-motion must never re-enable transform motion. */
+
 @media (prefers-reduced-motion: reduce) {
   .artifact-card,
   .artifact-viewer-overlay,
@@ -6425,6 +6682,7 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds end surface: artifact-card · artifact-viewer */
 /* @ds state: usage — input/output/cost grid. */
 .usage-grid {
   display: grid;
@@ -7323,6 +7581,11 @@ select:focus-visible,
 
 /* The artifact viewer owns a privacy boundary, so its cover and image stage
    stay fully opaque even when the underlying transcript is still mounted. */
+/* @ds surface: artifact-viewer — the reader owns a privacy boundary; the cover and image stage
+   stay fully opaque even while the underlying transcript is still mounted. */
+/* @ds edit: layout — full-frame 100svh/dvh overlay; overflow clipped and self-contained. */
+/* @ds guardrail: do-not-edit — the opaque scrim is the privacy cover; never transparent. */
+
 .artifact-viewer-overlay {
   inline-size: 100%;
   block-size: 100svh;
@@ -7334,6 +7597,9 @@ select:focus-visible,
   background: #24221f;
 }
 
+/* @ds slot: modal — the frame card (full frame height, overflow closed).
+   @ds edit: layout — frame sizing; max 48rem wide, 100dvh tall. */
+
 .artifact-viewer-modal {
   inline-size: min(100%, 48rem);
   max-inline-size: 100%;
@@ -7342,6 +7608,9 @@ select:focus-visible,
   max-block-size: 100dvh;
   overflow: hidden;
 }
+
+/* @ds slot: dialog — full-frame scroll column with safe-area gutters.
+   @ds edit: layout — all-padding safe-area gutters; overflow contained. */
 
 .artifact-viewer-dialog {
   min-inline-size: 0;
@@ -7355,6 +7624,8 @@ select:focus-visible,
   overscroll-behavior: contain;
 }
 
+/* @ds slot: header — title rail + close (grid: title 1fr, close auto). */
+
 .artifact-viewer-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -7363,6 +7634,8 @@ select:focus-visible,
   gap: var(--space-3);
 }
 
+/* @ds slot: heading-group · title · revision — wrap-safe text cluster. */
+
 .artifact-viewer-heading-group,
 .artifact-viewer-title,
 .artifact-viewer-revision {
@@ -7370,10 +7643,18 @@ select:focus-visible,
   overflow-wrap: anywhere;
 }
 
+/* @ds slot: revision — mono revision, LTR-isolated for stable readback.
+   @ds guardrail: do-not-edit — direction/unicode-bidi isolate keeps revision text stable. */
+
+/* @ds slot: revision — mono revision, LTR-isolated for stable readback.
+   @ds guardrail: do-not-edit — direction/unicode-bidi isolate keeps revision text stable. */
+
 .artifact-viewer-revision {
   direction: ltr;
   unicode-bidi: isolate;
 }
+
+/* @ds slot: body — preview scroll region; contained overscroll. */
 
 .artifact-viewer-content {
   min-inline-size: 0;
@@ -7381,6 +7662,10 @@ select:focus-visible,
   overscroll-behavior: contain;
   overflow: auto;
 }
+
+/* @ds surface: image-preview — the stage is a bounded pan surface (image states live here). */
+/* @ds edit: layout — stage min/max height within the visual viewport. */
+/* @ds guardrail: do-not-edit — touch-action none keeps pan gesture-contained. */
 
 .image-preview-stage {
   min-block-size: min(60svh, 32rem);
@@ -7392,10 +7677,15 @@ select:focus-visible,
   background: #24221f;
 }
 
+/* @ds slot: image — non-draggable decoder output.
+   @ds guardrail: do-not-edit — user-select/drag disabled; layer is handoff-only. */
+
 .image-preview-image {
   user-select: none;
   -webkit-user-drag: none;
 }
+
+/* @ds guardrail: do-not-edit — >=44px WCAG target floor for every viewer control. */
 
 .artifact-control-button,
 .artifact-viewer-close,
@@ -7404,6 +7694,10 @@ select:focus-visible,
   min-inline-size: 44px;
   min-block-size: 44px;
 }
+
+/* @ds slot: privacy-curtain — opaque cover shown on dismissal while content unmounts. */
+/* @ds state: privacy-covered — the curtain is fully opaque and pointer-blocking. */
+/* @ds guardrail: do-not-edit — z-index 10000 opaque cover; the privacy invariant. */
 
 .artifact-viewer-privacy-curtain {
   position: fixed;
@@ -7417,15 +7711,23 @@ select:focus-visible,
   pointer-events: all;
 }
 
+/* @ds state: viewer-open — while the reader is open the composer recedes (blur + inert). */
+/* @ds guardrail: do-not-edit — presentation of the viewer-open state; keep the blur/inert pair. */
+
 html[data-artifact-viewer-open='true'] .composer-region {
   filter: blur(0.5rem);
   pointer-events: none;
   user-select: none;
 }
 
+/* @ds state: privacy-covered — the dialog is hidden under the opaque curtain. */
+/* @ds guardrail: do-not-edit — content must never be visible during the privacy cover. */
+
 .artifact-viewer-overlay[data-privacy-covered='true'] .artifact-viewer-dialog {
   visibility: hidden;
 }
+
+/* @ds edit: layout — narrow header reflow: title rail + fixed 44px close column. */
 
 @media (max-width: 30rem) {
   .artifact-viewer-header {
@@ -7443,6 +7745,9 @@ html[data-artifact-viewer-open='true'] .composer-region {
   }
 }
 
+/* @ds state: high-contrast — forced-colors yields to CanvasText so links/controls stay legible. */
+/* @ds guardrail: do-not-edit — explicit high-contrast re-render is frozen. */
+
 @media (prefers-contrast: more) {
   .artifact-viewer-dialog,
   .artifact-viewer-dialog button,
@@ -7457,6 +7762,9 @@ html[data-artifact-viewer-open='true'] .composer-region {
   }
 }
 
+/* @ds edit: motion — reduced-motion: viewer overlay entry/exit animation dropped. */
+/* @ds guardrail: do-not-edit — reduced-motion must never re-enable the entrance animation. */
+
 @media (prefers-reduced-motion: reduce) {
   .artifact-viewer-overlay,
   .artifact-viewer-modal,
@@ -7465,5 +7773,6 @@ html[data-artifact-viewer-open='true'] .composer-region {
   .image-preview-image {
     animation: none !important;
     transition: none !important;
+/* @ds end surface: artifact-viewer */
   }
 }

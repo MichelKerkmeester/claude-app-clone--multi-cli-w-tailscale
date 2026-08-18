@@ -16,6 +16,11 @@ function statusMessage(
   status: ArtifactResourceStatus | null | undefined,
   subject: string,
 ): string {
+  // @ds state: ArtifactResourceStatus — one exact copy line per status (idle · loading ·
+  //   stalled · ready · empty · whitespace · offline · stale · denied · expired · missing ·
+  //   revoked · conflict · corrupt · too-large · rate-limited · relay-error · aborted · closed)
+  //   plus the opening/exiting phases. @ds guardrail: do-not-edit — this is the a11y status
+  //   vocabulary; the messages are the exact announced copy.
   if (phase === 'opening') return `Opening ${subject}.`;
   if (phase === 'exiting') return `Closing ${subject}.`;
   if (status === undefined || status === null) return `${subject} ready.`;
@@ -70,6 +75,9 @@ export function ArtifactStatus({
 }: ArtifactStatusProps) {
   const message = announcement ?? statusMessage(phase, status, subject);
   const [announcedMessage, setAnnouncedMessage] = useState(message);
+  // @ds surface: artifact-status — the polite status + assertive terminal-alert live regions.
+  // @ds guardrail: do-not-edit — role=status/aria-live=polite and role=alert/aria-live=assertive
+  //   with aria-atomic are the announcement contract; do not change.
   useEffect(() => {
     const timer = window.setTimeout(() => setAnnouncedMessage(message), 0);
     return () => window.clearTimeout(timer);

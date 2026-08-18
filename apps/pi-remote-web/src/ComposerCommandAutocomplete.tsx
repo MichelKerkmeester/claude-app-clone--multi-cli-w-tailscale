@@ -85,6 +85,10 @@ const CLOSED: SlashPanelDerivation = {
   message: null,
 };
 
+/** The explicit open-state machine and its fail-closed actions are frozen: no state
+ *  can ever enable submission; insertion is the only action, and it exists only in
+ *  row-bearing states with usable authority. Restyle only the presentation it selects.
+ *  @ds guardrail: state-machine — catalog/lifecycle explicit-state derivation. */
 /**
  * The one state machine for the inline surface. Every catalog/lifecycle
  * combination maps to exactly one explicit state with fail-closed actions:
@@ -232,6 +236,9 @@ export function ComposerCommandAutocomplete({
   onAnnounce,
 }: ComposerCommandAutocompleteProps) {
   const { viewportHeightPx, anchorTopPx } = useVisualViewportAnchor(anchorRef);
+  // The popover anchors to the composer tray; this visual-viewport input drives only
+  // the panel's max height and is frozen wiring.
+  // @ds guardrail: anchor — visual-viewport anchor for the popover max height.
 
   const showRows =
     open && derivation.panelState !== null && ROW_BEARING_STATES.has(derivation.panelState);
@@ -240,9 +247,13 @@ export function ComposerCommandAutocomplete({
     : prompt.startsWith('/')
       ? 'drafted'
       : 'closed';
+  // The leading-slash trigger predicate and this closed/drafted/panel-state mapping are
+  // frozen; restyling never changes which surface state renders.
+  // @ds guardrail: trigger-predicate — leading-slash open condition and state mapping.
 
   // Keep the active row visible: virtual focus must follow arrows without
   // scrolling the page.
+  // @ds guardrail: virtual-focus — keep the active row in view on arrow nav.
   useEffect(() => {
     if (!open || activeName === null) return undefined;
     const frame = requestAnimationFrame(() => {
@@ -257,6 +268,7 @@ export function ComposerCommandAutocomplete({
   // State transitions announce through the composer's single atomic status
   // region; row-bearing states announce their result count after the
   // debounce so typing does not interrupt the screen reader.
+  // @ds guardrail: announcement — atomic status-region wiring and debounce.
   useEffect(() => {
     if (!open || derivation.panelState === null) return undefined;
     if (derivation.message !== null) {
@@ -287,6 +299,10 @@ export function ComposerCommandAutocomplete({
     derivation.panelState !== 'session.running';
 
   return (
+    // The popover lifecycle, outside-press dismissal, and aria/role wiring are frozen;
+    // this surface only restyles the presentation the state machine selects.
+    // @ds surface: slash-autocomplete
+    // @ds guardrail: react-aria wiring — popover lifecycle, aria/role, virtual focus.
     <div className="slash-surface" data-state={surfaceState}>
       {open && derivation.panelOpen && (
         <Popover
@@ -309,11 +325,13 @@ export function ComposerCommandAutocomplete({
             style={maxHeight === undefined ? undefined : { maxBlockSize: maxHeight }}
           >
             {derivation.message !== null && (
+              // @ds slot: header — the panel's status / error / empty-catalog copy line.
               <div className={hasError ? 'slash-status is-error' : 'slash-status'}>
                 {derivation.message}
               </div>
             )}
             {showRows && (
+              // @ds slot: option-list — the scrollable listbox of command rows.
               <div
                 role="listbox"
                 id={SLASH_LISTBOX_ID}
@@ -332,6 +350,7 @@ export function ComposerCommandAutocomplete({
               </div>
             )}
             {derivation.panelState === 'loading.initial' && (
+              // @ds state: loading.initial — bounded skeleton rows.
               <div className="slash-skeletons" aria-hidden="true">
                 <div className="slash-skeleton" />
                 <div className="slash-skeleton" />
@@ -339,6 +358,7 @@ export function ComposerCommandAutocomplete({
               </div>
             )}
             <div className="slash-footer">
+              {/* @ds slot: footer-hint — the running hint and retry affordance. */}
               {runningNote && (
                 <span className="slash-running-note">
                   Pi is running — insertion stays local, nothing is sent.

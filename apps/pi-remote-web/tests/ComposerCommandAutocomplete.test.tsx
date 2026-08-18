@@ -605,15 +605,15 @@ describe('applied panel styling stays inside the frozen system', () => {
     for (const token of ['#ffffff', '#24221f', '#6c6a65', '#8a452f', '#b85f42', '#f3e4de']) {
       expect(css).toContain(token);
     }
-    expect(css).toContain('--slash-raised: #ffffff');
+    expect(css).toContain('--slash-raised: var(--surface)');
   });
 
   it('uses only the frozen dark tokens on the raised panel', () => {
-    expect(css).toContain('--slash-raised: #2d2a26');
-    expect(css).toContain('--slash-ink: #f8f8f6');
-    expect(css).toContain('--slash-muted: #9f998f');
-    expect(css).toContain('--slash-selection: #3a2720');
-    expect(css).toContain('--slash-accent: #f0b19a');
+    expect(css).toContain('--slash-raised: var(--surface)');
+    expect(css).toContain('--slash-ink: var(--ink)');
+    expect(css).toContain('--slash-muted: var(--ink-muted)');
+    expect(css).toContain('--slash-selection: var(--accent-soft)');
+    expect(css).toContain('--slash-accent: var(--accent-ink)');
   });
 
   it('bounds the panel against the visual viewport with 12px screen margins and no horizontal overflow', () => {

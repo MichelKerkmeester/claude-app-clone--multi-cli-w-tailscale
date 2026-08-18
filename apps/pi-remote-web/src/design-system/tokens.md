@@ -154,13 +154,19 @@ value.
 | `--model-sheet-ui-accent` | `--accent-strong` / `--accent-ink` | `#b85f42` | `#f0b19a` |
 | `--model-sheet-selection` | `--accent-soft`             | `#f3e4de` | `#3a2720` |
 
-### Slash panel (`--slash-*`, surface `slash-panel`)
+### Slash panel (`--slash-*`, surface `slash-autocomplete`)
 
-| Token               | Light     | Dark      |
-| ------------------- | --------- | --------- |
-| `--slash-raised`    | `#ffffff` | `#2d2a26` |
-| `--slash-ink`       | `#24221f` | `#f8f8f6` |
-| `--slash-muted`     | `#6c6a65` | `#9f998f` |
-| `--slash-accent`    | `#8a452f` | `#f0b19a` |
-| `--slash-ui-accent` | `#b85f42` | `#f0b19a` |
-| `--slash-selection` | `#f3e4de` | `#3a2720` |
+The autocomplete card and the command palette share this surface. A component token is an alias to
+the semantic role in its row; the theme block decides which semantic value each role resolves to, so
+the resolved-to role is per theme. The `ui-accent` role diverges between themes: light uses
+`--accent-strong` (the AA UI accent), dark uses `--accent-ink` (because `--accent-strong` carries no
+dark override). Light and dark columns record the resolved value.
+
+| Token               | Resolved to                        | Light     | Dark      |
+| ------------------- | ---------------------------------- | --------- | --------- |
+| `--slash-raised`    | `--surface`                        | `#ffffff` | `#2d2a26` |
+| `--slash-ink`       | `--ink`                            | `#24221f` | `#f8f8f6` |
+| `--slash-muted`     | `--ink-muted`                      | `#6c6a65` | `#9f998f` |
+| `--slash-accent`    | `--accent-ink`                     | `#8a452f` | `#f0b19a` |
+| `--slash-ui-accent` | `--accent-strong` / `--accent-ink` | `#b85f42` | `#f0b19a` |
+| `--slash-selection` | `--accent-soft`                    | `#f3e4de` | `#3a2720` |

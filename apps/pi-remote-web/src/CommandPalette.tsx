@@ -29,12 +29,19 @@ export function CommandPalette({
   readonly isDisabled?: boolean;
 }) {
   const [query, setQuery] = useState('');
+  // Filtering is deterministic and owned by the frozen ranker; the palette renders
+  // exactly the ranked snapshot.
+  // @ds guardrail: ranker — deterministic host-command ranking.
   const ranked = useMemo(
     () => rankHostCommands(catalog.commands, query),
     [catalog.commands, query],
   );
 
   return (
+    // The render only restyles; the ranking-awarded collection, bindings, and the
+    // fail-closed selection path below are frozen.
+    // @ds surface: slash-autocomplete
+    // @ds guardrail: react-aria wiring — ComboBox select/focus lifecycle and aria/role.
     <ComboBox
       aria-label="Insert a command"
       className="command-palette"
@@ -49,7 +56,9 @@ export function CommandPalette({
         if (key === null) return;
         const name = String(key);
         // Bindings only exist inside the current scoped snapshot; anything
-        // else fails closed without touching the draft.
+        // else fails closed without touching the draft. This selection path
+        // only ever requests an insertion draft — it never submits.
+        // @ds guardrail: fail-closed — selection is a local insertion draft only.
         const binding = bindingFor(catalog.snapshot, name);
         if (binding === null) return;
         onInsert(name, binding);
@@ -62,8 +71,13 @@ export function CommandPalette({
       />
       <Button aria-label="Show commands">/</Button>
       <Popover>
-        <ListBox renderEmptyState={() => <span className="command-empty">No commands</span>}>
+        <ListBox renderEmptyState={() => (
+          // @ds state: ready.emptyCatalog — no ranked commands; fail-closed empty copy.
+          <span className="command-empty">No commands</span>
+        )}>
           {(item: RankedHostCommand) => (
+            // @ds slot: label — the command name and its description line.
+            // @ds state: disabled-with-reason — a row rendered but not selectable.
             <ListBoxItem
               key={item.name}
               id={item.name}

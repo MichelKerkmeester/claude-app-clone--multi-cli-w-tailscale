@@ -20,7 +20,10 @@ export function optionId(name: string): string {
   return `slash-option-${name}`;
 }
 
-/** Display-only escape: canonical names never contain these, but visible text is a security surface. */
+/** Display-only escape: canonical names never contain these, but visible text is
+ *  a security surface. The replacement is display-only; insertion always uses the
+ *  canonical DTO string unchanged.
+ *  @ds guardrail: escaping — unsafe/bidi-override characters are display-replaced. */
 const UNSAFE_NAME_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g;
 
 export function escapeUnsafeName(name: string): string {
@@ -74,6 +77,9 @@ export function CommandOption({ command, active, onInsert, onDisabledPress }: Co
       return;
     }
     pressOriginRef.current = null;
+    // A completed row press is only ever an insertion request for an enabled row
+    // (or a disclosed-reason announcement for a disabled one); it never submits.
+    // @ds guardrail: fail-closed — press requests insertion, never submission.
     if (enabled) {
       onInsert(name);
     } else if (disabledReason !== null) {
@@ -86,6 +92,10 @@ export function CommandOption({ command, active, onInsert, onDisabledPress }: Co
     command.matchRanges.some((range) => range.start <= index && index < range.end);
 
   return (
+    // This row only restyles; its role, aria wiring, and virtual-focus hook are frozen.
+    // @ds surface: slash-autocomplete
+    // @ds guardrail: react-aria wiring — option role, aria-selected/aria-disabled,
+    //                data-focused virtual focus, and the focus-preserving press path.
     <div
       role="option"
       id={optionId(name)}
@@ -98,6 +108,7 @@ export function CommandOption({ command, active, onInsert, onDisabledPress }: Co
       onPointerMove={onPointerMove}
       onClick={onClick}
     >
+      {/* @ds slot: label — the command name, match emphasis, and argument hint. */}
       <span className="slash-name-line">
         <bdi dir="ltr" translate="no" className="slash-name">
           {'/'}
@@ -124,10 +135,12 @@ export function CommandOption({ command, active, onInsert, onDisabledPress }: Co
           </span>
         )
       ) : (
+        // @ds state: disabled-with-reason — a disabled row surfaces its disclosed reason.
         <span className="slash-disabled-reason" dir="auto">
           {disabledReason !== null ? disabledReason : 'Unavailable: not disclosed'}
         </span>
       )}
+      {/* @ds slot: binding — the authoritative source binding and confirmation hint. */}
       <span className="slash-meta">
         <span className="slash-source">{sourceLabel(source)}</span>
         {requiresConfirmation && <span className="slash-confirm">Asks first</span>}

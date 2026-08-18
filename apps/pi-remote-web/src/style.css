@@ -6591,21 +6591,26 @@ button[data-pressed]:not([data-disabled]) {
    for 80ms, and the global reduced-motion rule above zeroes that too.
    The card is an overlay, so it displaces nothing. Tokens are the frozen
    panel palette, scoped the same way the model sheet scopes its own. */
+/* @ds state: closed · drafted — surface-level open conditions. The state
+   attribute drives which presentation the surface renders. */
 .slash-surface {
   display: contents;
 }
 
-/* @ds surface: slash-panel — the inline slash autocomplete card. */
+/* @ds surface: slash-autocomplete — the inline autocomplete card and the
+   command palette share this surface name. */
 .slash-panel {
-  /* @ds edit: tokens — per-component palette. A component token is a thin alias that
-     resolves to a semantic role; these stay literal because re-pointing must be
-     pixel-identical in every theme first. Retint this surface here instead of :root. */
-  --slash-raised: #ffffff;
-  --slash-ink: #24221f;
-  --slash-muted: #6c6a65;
-  --slash-accent: #8a452f;
-  --slash-ui-accent: #b85f42;
-  --slash-selection: #f3e4de;
+  /* @ds edit: tokens — component tokens. Each is a thin alias to a semantic role,
+     so this surface retints by editing the role it points at (primitive → semantic
+     → component). Edit them here instead of on :root. */
+  --slash-raised: var(--surface);
+  --slash-ink: var(--ink);
+  --slash-muted: var(--ink-muted);
+  --slash-accent: var(--accent-ink);
+  --slash-ui-accent: var(--accent-strong);
+  --slash-selection: var(--accent-soft);
+  /* @ds edit: layout — popover anchoring, stacking, and max size. Keeps the
+     visual-viewport anchor input and screen-margin bounds exact. */
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -6623,31 +6628,39 @@ button[data-pressed]:not([data-disabled]) {
   font-family: var(--font-sans);
 }
 
-/* @ds edit: tokens — theme remap, dark. This surface block remaps the slash-panel
-   component tokens onto the dark palette; the values are frozen and stay literal. */
+/* @ds edit: tokens — theme remap, dark. The same component tokens resolve to their
+   dark semantic roles here. The ui-accent points at --accent-ink, not --accent-strong,
+   because --accent-strong carries no dark override and would not match the dark
+   UI accent. */
 :root[data-theme='dark'] .slash-panel {
-  --slash-raised: #2d2a26;
-  --slash-ink: #f8f8f6;
-  --slash-muted: #9f998f;
-  --slash-accent: #f0b19a;
-  --slash-ui-accent: #f0b19a;
-  --slash-selection: #3a2720;
+  --slash-raised: var(--surface);
+  --slash-ink: var(--ink);
+  --slash-muted: var(--ink-muted);
+  --slash-accent: var(--accent-ink);
+  --slash-ui-accent: var(--accent-ink);
+  --slash-selection: var(--accent-soft);
 }
 
 @media (prefers-color-scheme: dark) {
-  /* @ds edit: tokens — theme remap, system-dark. Same slash-panel remap, frozen literals. */
+  /* @ds edit: tokens — theme remap, system-dark. Dark semantic roles again, driven
+     by the OS-dark signal; ui-accent resolves to --accent-ink for the same reason
+     as the explicit dark block. */
   :root[data-theme='system'] .slash-panel {
-    --slash-raised: #2d2a26;
-    --slash-ink: #f8f8f6;
-    --slash-muted: #9f998f;
-    --slash-accent: #f0b19a;
-    --slash-ui-accent: #f0b19a;
-    --slash-selection: #3a2720;
+    --slash-raised: var(--surface);
+    --slash-ink: var(--ink);
+    --slash-muted: var(--ink-muted);
+    --slash-accent: var(--accent-ink);
+    --slash-ui-accent: var(--accent-ink);
+    --slash-selection: var(--accent-soft);
   }
 }
 
-/* @ds end surface: slash-panel */
+/* @ds end surface: slash-autocomplete */
 
+/* @ds slot: header — the panel's status / error / empty-catalog copy line. */
+/* @ds state: loading.initial · ready.emptyCatalog · ready.noMatches ·
+   ready.staleOffline · session.running — copy-led panel states; the loading
+   and empty/no-match guards render header copy before any rows. */
 .slash-status {
   padding: 8px 12px;
   color: var(--slash-muted);
@@ -6655,11 +6668,19 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.4;
 }
 
+/* @ds state: error.noSnapshot · error.hostUnavailable · error.forbidden ·
+   error.incompatible — fail-closed error copy, accent-tinted. */
 .slash-status.is-error {
   color: var(--slash-accent);
   font-weight: 600;
 }
 
+/* @ds state: committing — transient post-insertion panel frame: no rows and no
+   copy, closed by the composer on the next commit resolution. */
+
+/* @ds slot: option-list — the scrollable listbox of command rows. */
+/* @ds state: ready.unfiltered · ready.filtered · refreshing.current ·
+   ready.staleOffline · session.running — the row-bearing panel states. */
 .slash-list {
   flex: 0 1 auto;
   min-block-size: 0;
@@ -6671,6 +6692,8 @@ button[data-pressed]:not([data-disabled]) {
   scrollbar-color: var(--line-strong) transparent;
 }
 
+/* @ds slot: label — the option row and its name/match/argument-hint lines. */
+/* @ds state: enabled — an insertable row; default row presentation. */
 .slash-option {
   display: grid;
   gap: 2px;
@@ -6686,6 +6709,8 @@ button[data-pressed]:not([data-disabled]) {
   transition: background-color 80ms linear;
 }
 
+/* @ds state: active — the virtual-focus row (aria-activedescendant). Not
+   colour-only: it keeps its ink rail plus outline. */
 .slash-option[data-focused] {
   background: var(--slash-selection);
   border-inline-start-color: var(--slash-ink);
@@ -6693,6 +6718,7 @@ button[data-pressed]:not([data-disabled]) {
   outline-offset: -2px;
 }
 
+/* @ds state: disabled-with-reason — a row that only offers its disclosed reason. */
 .slash-option[aria-disabled='true'] {
   cursor: default;
 }
@@ -6728,6 +6754,8 @@ button[data-pressed]:not([data-disabled]) {
   font-variant-numeric: tabular-nums;
 }
 
+/* @ds slot: label · disabled-reason — the row's secondary line: a description
+   on enabled rows, the disclosed reason on disabled rows. */
 .slash-desc,
 .slash-disabled-reason {
   overflow-wrap: anywhere;
@@ -6737,6 +6765,7 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--slash-muted);
 }
 
+/* @ds slot: binding — the authoritative source binding and confirmation hint. */
 .slash-meta {
   display: flex;
   flex-wrap: wrap;
@@ -6751,6 +6780,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 650;
 }
 
+/* @ds state: loading.initial — bounded skeleton rows before the first snapshot. */
 .slash-skeletons {
   display: grid;
   gap: 4px;
@@ -6763,6 +6793,7 @@ button[data-pressed]:not([data-disabled]) {
   background: color-mix(in srgb, var(--slash-ink) 7%, transparent);
 }
 
+/* @ds slot: footer-hint — the footer with the running hint and retry affordance. */
 .slash-footer {
   display: flex;
   align-items: center;
@@ -6794,6 +6825,7 @@ button[data-pressed]:not([data-disabled]) {
     color 80ms linear;
 }
 
+/* @ds state: retry-hovered — the revalidate affordance's hover wash. */
 .slash-retry[data-hovered] {
   background: color-mix(in srgb, var(--slash-selection) 60%, var(--slash-raised));
 }
@@ -6826,6 +6858,7 @@ body:has(.slash-panel) .scroll-to-latest {
   margin-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
 }
 
+/* @ds edit: layout — installed-PWA popover bounds clear the device insets. */
 .slash-panel {
   inline-size: var(
     --trigger-width,

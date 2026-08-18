@@ -7,6 +7,11 @@
 // the caller, which then decides whether a request is safe (Build →
 // Plan) or needs the leave confirmation (Plan → Build).
 
+// @ds surface: plan-mode-menu — the exact two-row Build / Plan picker.
+// @ds guardrail: do-not-edit — react-aria Menu/MenuItem/Popover wiring (id, onAction,
+// isDisabled, Text slots); rows are read-only, focus movement never mutates, and only an
+// activated row reports a choice to the caller. Not designer-editable.
+
 import { Menu, MenuItem, Popover, Text } from 'react-aria-components';
 
 import type { ConfirmedMode } from './runtime.js';
@@ -21,6 +26,7 @@ export interface PlanModeMenuProps {
   readonly onSelect: (target: 'build' | 'plan') => void;
 }
 
+// @ds state: build · plan rows — labels + descriptions are bounded local copy.
 const BUILD_DESCRIPTION = 'Pi may request write-capable tools; approvals still apply.';
 const PLAN_DESCRIPTION = 'Read-only exploration and planning.';
 
@@ -31,7 +37,7 @@ export function PlanModeMenu({
   onSelect,
 }: PlanModeMenuProps) {
   return (
-    <Popover className="plan-mode-popover">
+    <Popover className="plan-mode-popover">{/* @ds slot: popover — floating placement chrome. */}
       <Menu
         aria-label="Agent mode"
         className="plan-mode-menu"
@@ -39,6 +45,7 @@ export function PlanModeMenu({
           if (key === 'build' || key === 'plan') onSelect(key);
         }}
       >
+        {/* @ds state: row build — immediately requestable when safe. */}
         <MenuItem
           id="build"
           className="plan-mode-row"
@@ -48,6 +55,7 @@ export function PlanModeMenu({
           <Text slot="description">{BUILD_DESCRIPTION}</Text>
           {confirmedMode === 'build' && <CheckGlyph />}
         </MenuItem>
+        {/* @ds state: row plan — read-only target; only activation reports. */}
         <MenuItem
           id="plan"
           className="plan-mode-row"
@@ -59,12 +67,14 @@ export function PlanModeMenu({
         </MenuItem>
       </Menu>
       {rowsDisabled && rowsDisabledReason !== null && (
+        /* @ds slot: note — bounded reason when a row cannot be chosen. */
         <p className="plan-mode-menu-note">{rowsDisabledReason}</p>
       )}
     </Popover>
   );
 }
 
+/* @ds slot: check-glyph — the ✓ on the confirmed row; strokes inherit currentColor. */
 function CheckGlyph() {
   return (
     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">

@@ -7,11 +7,17 @@
 // the settled presentation so each transition announces exactly once,
 // and the regions are inert text nodes — they never move focus.
 
+// @ds surface: runtime-mode-announcer — dual polite/alert live regions for mode transitions.
+// @ds guardrail: do-not-edit — the announce-once settle-key effect (primedRef/announcedKeyRef)
+// and the ALERT_KINDS routing; the regions are inert text nodes that never move focus. Not
+// designer-editable.
+
 import { useEffect, useRef, useState } from 'react';
 
 import { planModePresentation, type ModePresentationKind } from './PlanModeButton.js';
 import type { RuntimeUiState } from './runtime.js';
 
+// @ds state: alert — conflicts · permission loss · delivery uncertainty route to the alert region.
 const ALERT_KINDS: ReadonlySet<ModePresentationKind> = new Set([
   'stale',
   'forbidden',
@@ -80,9 +86,13 @@ export function RuntimeModeAnnouncer({ runtime, connection }: RuntimeModeAnnounc
 
   return (
     <>
+      {/* @ds state: polite — settled transitions (build · plan · executing).
+          @ds guardrail: do-not-edit — role="status" + aria-live="polite" + aria-atomic region. */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {polite}
       </div>
+      {/* @ds state: alert — conflicts · permission loss · delivery uncertainty.
+          @ds guardrail: do-not-edit — role="alert" region. */}
       <div className="sr-only" role="alert">
         {alert}
       </div>

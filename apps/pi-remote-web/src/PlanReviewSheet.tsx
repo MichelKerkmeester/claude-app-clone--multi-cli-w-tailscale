@@ -8,6 +8,11 @@ import type {
 
 import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 
+// @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path.
+// @ds guardrail: do-not-edit — ModalOverlay/Modal/Dialog react-aria wiring, safe-focus restore,
+// back-button (popstate) containment, focusin dismissal, and the touch/pointer swipe-dismiss
+// gesture are not designer-editable.
+
 export interface PlanReviewSheetProps {
   readonly isOpen: boolean;
   readonly onOpenChange: (open: boolean) => void;
@@ -31,6 +36,8 @@ export function PlanReviewSheet({
   onExecuteReviewedPlan,
   triggerRef,
 }: PlanReviewSheetProps) {
+  // @ds guardrail: do-not-edit — the open effect (safe-action focus, back-button state + popstate,
+  // focusin containment) and swipe refs below are not designer-editable.
   const safeActionRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const swipeStartRef = useRef<{ readonly x: number; readonly y: number } | null>(null);
@@ -71,6 +78,8 @@ export function PlanReviewSheet({
     };
   }, [isOpen]);
 
+  // @ds state: swipe-dismiss — dragging the grabber/backdrop past the threshold closes the sheet.
+  // @ds guardrail: do-not-edit — the pointer/touch gesture handlers below are not designer-editable.
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'mouse') return;
     swipeStartRef.current = { x: event.clientX, y: event.clientY };
@@ -108,7 +117,10 @@ export function PlanReviewSheet({
       }}
       className="plan-review-overlay"
     >
+      {/* @ds slot: overlay — fixed scrim + centring. */}
       <Modal className="plan-review-modal">
+        {/* @ds slot: modal — bottom-docked sheet + entry.
+            @ds guardrail: do-not-edit — Modal/Dialog react-aria wiring + swipe handlers. */}
         <Dialog
           ref={sheetRef}
           aria-label="Review plan"
@@ -118,7 +130,9 @@ export function PlanReviewSheet({
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
         >
+          {/* @ds slot: grabber — swipe-dismiss handle. */}
           <div className="plan-review-grabber" aria-hidden="true" />
+          {/* @ds slot: header — title + revision. */}
           <div className="plan-review-header">
             <div>
               <p className="surface-kicker">Plan review</p>
@@ -126,10 +140,12 @@ export function PlanReviewSheet({
                 {artifact.title}
               </Heading>
             </div>
+            {/* @ds slot: revision — mono pill. */}
             <span className="plan-review-revision" dir="ltr">
               Revision {artifact.planRevision}
             </span>
           </div>
+          {/* @ds slot: content — summary + details. */}
           <div className="plan-review-content">
             <p className="plan-review-summary" dir="auto">
               {artifact.summary}
@@ -153,7 +169,10 @@ export function PlanReviewSheet({
               </div>
             </dl>
           </div>
+          {/* @ds slot: actions — keep · revise · leave · execute rail. */}
           <div className="plan-review-actions">
+            {/* @ds state: keep-planning — the non-mutating safety action.
+                @ds guardrail: do-not-edit — react-aria Button wiring (ref, onPress). */}
             <Button
               ref={safeActionRef}
               type="button"
@@ -162,12 +181,17 @@ export function PlanReviewSheet({
             >
               Keep planning
             </Button>
+            {/* @ds state: revise — leaves the modal for the composer. */}
             <Button type="button" className="plan-review-revise" onPress={onRevisePlan}>
               Revise plan
             </Button>
+            {/* @ds state: leave-without-running — no-op on the plan. */}
             <Button type="button" className="plan-review-leave" onPress={onLeaveWithoutRunning}>
               Leave without running
             </Button>
+            {/* @ds state: execute CTA — the atomic execute path.
+                @ds state: executing — disabled while the execution lease is in flight.
+                @ds guardrail: do-not-edit — react-aria Button wiring (isDisabled, onPress). */}
             <Button
               type="button"
               className="plan-review-execute"

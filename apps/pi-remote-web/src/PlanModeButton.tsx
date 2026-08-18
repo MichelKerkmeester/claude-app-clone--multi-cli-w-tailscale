@@ -9,6 +9,11 @@
 // the two-row menu moves focus only, and only a row activation (or the
 // guarded keyboard path) can lead to a mode request.
 
+// @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger.
+// @ds guardrail: do-not-edit — the fail-closed presentation (planModePresentation) reads
+// modeAuthority and emits bounded local copy only; only the host-confirmed mode can label
+// the control Build or Plan. Not designer-editable.
+
 import { useEffect } from 'react';
 import { Button, MenuTrigger } from 'react-aria-components';
 import type { RefObject } from 'react';
@@ -17,6 +22,7 @@ import { PlanModeMenu } from './PlanModeMenu.js';
 import { modeAuthority, type RuntimeUiState } from './runtime.js';
 import { runtimeIssueMessage } from './runtime-issues.js';
 
+// @ds state: chart — the ModePresentationKind set; each kind maps to an is-<kind> class seam.
 export type ModePresentationKind =
   | 'checking'
   | 'build'
@@ -64,6 +70,8 @@ function confirmedLabelFor(confirmedMode: string): string {
  * session connection. Every branch is bounded local copy; the host-confirmed
  * mode is the only data that can ever label the control as Build or Plan.
  */
+// @ds guardrail: do-not-edit — default-deny, fail-closed derivation; every value is bounded
+// local copy and no mode is guessed beyond what the host confirmed. Not designer-editable.
 export function planModePresentation(
   runtime: RuntimeUiState,
   connection: string,
@@ -258,6 +266,8 @@ export function PlanModeButton({
   const presentation = planModePresentation(runtime, connection);
   const authority = modeAuthority(runtime);
 
+  // @ds guardrail: do-not-edit — the aria-keyshortcuts effect and the MenuTrigger/Button
+  // react-aria wiring (isDisabled, aria-label, onOpenChange, ref) are not designer-editable.
   // The ARIA keyboard-shortcuts hint is not in this react-aria release's
   // filtered prop list, so it is attached imperatively and survives
   // re-renders (React never removes attributes it did not set).
@@ -265,6 +275,9 @@ export function PlanModeButton({
     buttonRef.current?.setAttribute('aria-keyshortcuts', 'Shift+Tab Meta+Shift+M');
   }, [buttonRef]);
 
+  // @ds state: host presentation kind — the is-${kind} class drives the css seam.
+  // @ds guardrail: do-not-edit — MenuTrigger/Button react-aria wiring; opening the menu moves
+  // focus only and never reports a mode.
   return (
     <MenuTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
       <Button
@@ -274,9 +287,13 @@ export function PlanModeButton({
         aria-label={presentation.accessibleName}
         isDisabled={presentation.disabled}
       >
+        {/* @ds slot: glyph — presentation glyph per kind. */}
         <ModeGlyph kind={presentation.kind} />
+        {/* @ds slot: label — bounded visible label. */}
         <span className="plan-mode-label">{presentation.label}</span>
       </Button>
+      {/* @ds guardrail: do-not-edit — onSelect routes only an activated row: Plan is an
+          immediate request, Build opens the leave confirmation rather than mutating. */}
       <PlanModeMenu
         confirmedMode={authority.confirmedMode}
         rowsDisabled={presentation.rowsDisabledReason !== null}
@@ -290,6 +307,7 @@ export function PlanModeButton({
   );
 }
 
+/* @ds slot: glyph — per-kind presentation glyph; strokes inherit currentColor. */
 function ModeGlyph({ kind }: { readonly kind: ModePresentationKind }) {
   switch (kind) {
     case 'plan':

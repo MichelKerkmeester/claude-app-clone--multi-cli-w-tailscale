@@ -1502,6 +1502,13 @@ button[data-pressed]:not([data-disabled]) {
 /* ── Persistent Plan mode control (immediately after "+") ────────────
    One 44px tab stop with a host-confirmed label. Plan is conveyed
    redundantly (lock glyph + words), never by clay alone. */
+/* @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. */
+/* @ds state: chart — the ModePresentationKind set. The default chrome carries
+   checking · build · running · stale · offline · forbidden · unsupported ·
+   extension-error · delivery-unknown · unavailable; plan / executing / applying
+   have dedicated states below. Disabling is driven by the fail-closed
+   presentation kind, never by this class. */
+/* @ds state: default */
 .plan-mode-button {
   display: inline-flex;
   min-inline-size: 44px;
@@ -1524,49 +1531,60 @@ button[data-pressed]:not([data-disabled]) {
     border-color var(--duration-fast, 120ms) var(--ease-out, ease);
 }
 
+/* @ds state: hover · pressed */
 .plan-mode-button[data-hovered],
 .plan-mode-button[data-pressed] {
   background: var(--surface-muted);
 }
 
+/* @ds state: focus-visible */
 .plan-mode-button[data-focus-visible] {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 
+/* @ds state: disabled */
 .plan-mode-button[data-disabled] {
   cursor: default;
   opacity: 0.85;
 }
 
+/* @ds state: plan — host-confirmed Plan; lock glyph + words, never clay alone. */
 .plan-mode-button.is-plan {
   border-color: var(--line-strong);
   background: var(--accent-soft);
   color: var(--accent-ink);
 }
 
+/* @ds state: plan · hover · pressed */
 .plan-mode-button.is-plan[data-hovered],
 .plan-mode-button.is-plan[data-pressed] {
   background: var(--accent-soft);
 }
 
+/* @ds state: executing — plan execution in progress; rows stay disabled. */
 .plan-mode-button.is-executing {
   border-color: var(--line-strong);
   color: var(--ink);
 }
 
+/* @ds state: applying — a mode change is in flight. */
 .plan-mode-button.is-applying .plan-mode-label {
   color: var(--ink-muted);
 }
 
+/* @ds slot: label — bounded, ellipsis-capped visible label. */
 .plan-mode-label {
   max-inline-size: 11rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* @ds end surface: plan-mode-button */
 
 /* The two-row mode menu: focus movement only, activation alone reports. */
+/* @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. */
+/* @ds slot: popover — floating placement chrome + raised elevation. */
 .plan-mode-popover {
   min-inline-size: min(88vw, 18rem);
   padding: var(--space-1);
@@ -1577,6 +1595,7 @@ button[data-pressed]:not([data-disabled]) {
   outline: none;
 }
 
+/* @ds slot: menu — list column for the two rows. */
 .plan-mode-menu {
   display: grid;
   gap: 2px;
@@ -1584,6 +1603,7 @@ button[data-pressed]:not([data-disabled]) {
   outline: none;
 }
 
+/* @ds slot: row — a Build or Plan choice; selection gating is authority-driven. */
 .plan-mode-row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -1600,21 +1620,25 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: row · focused — move-only, never a selection. */
 .plan-mode-row[data-focused] {
   background: var(--surface-muted);
   outline: none;
 }
 
+/* @ds state: row · focus-visible */
 .plan-mode-row[data-focus-visible] {
   outline: 2px solid var(--focus);
   outline-offset: -2px;
 }
 
+/* @ds state: row · disabled — selection unsafe (executing) or already current. */
 .plan-mode-row[data-disabled] {
   cursor: default;
   opacity: 0.55;
 }
 
+/* @ds slot: row-description — bounded local copy under the row label. */
 .plan-mode-row .react-aria-Text[slot='description'] {
   grid-column: 1;
   color: var(--ink-muted);
@@ -1623,6 +1647,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.35;
 }
 
+/* @ds state: row · selected — the ✓ on the confirmed mode's row. */
 .plan-mode-row > svg {
   grid-column: 2;
   grid-row: 1;
@@ -1630,12 +1655,14 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--accent-ink);
 }
 
+/* @ds slot: note — bounded reason when a row cannot be chosen. */
 .plan-mode-menu-note {
   margin: var(--space-2) var(--space-3) var(--space-1);
   color: var(--ink-muted);
   font-size: 0.78rem;
   line-height: 1.35;
 }
+/* @ds end surface: plan-mode-menu */
 
 /* Dashed Plan outline: host-confirmed only; execution is solid. */
 .composer-tray.is-plan-mode {
@@ -1681,6 +1708,9 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* ── Leave plan mode confirmation sheet ────────────────────────────── */
+/* @ds surface: leave-plan-sheet — confirmation before Plan → Build expands host authority. */
+/* @ds slot: overlay — fixed scrim + bottom-sheet placement.
+   @ds edit: layout — z-index 60 keeps it above the mode surfaces and below the review sheet. */
 .leave-plan-overlay {
   position: fixed;
   z-index: 60;
@@ -1691,16 +1721,21 @@ button[data-pressed]:not([data-disabled]) {
   background: rgb(0 0 0 / 35%);
 }
 
+/* @ds slot: sheet — constraint + raised sheet + entry. */
 .leave-plan-sheet {
-  width: 100%;
+  inline-size: 100%;
   max-inline-size: 34rem;
   padding: max(var(--space-4), env(safe-area-inset-bottom));
-  border-radius: 1.25rem 1.25rem 0 0;
+  border-start-start-radius: 1.25rem;
+  border-start-end-radius: 1.25rem;
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
   background: var(--surface-raised);
   box-shadow: var(--shadow-raised);
   transition: transform 180ms var(--ease-out, ease);
 }
 
+/* @ds slot: dialog — content column + focus seam. */
 .leave-plan-dialog {
   display: grid;
   gap: var(--space-3);
@@ -1708,6 +1743,7 @@ button[data-pressed]:not([data-disabled]) {
   outline: none;
 }
 
+/* @ds slot: title */
 .leave-plan-title {
   margin: 0;
   color: var(--ink);
@@ -1717,6 +1753,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.3;
 }
 
+/* @ds slot: body — explanatory copy. */
 .leave-plan-body {
   margin: 0;
   color: var(--ink-secondary);
@@ -1724,6 +1761,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.45;
 }
 
+/* @ds slot: actions — the two-choice rail. */
 .leave-plan-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1731,6 +1769,7 @@ button[data-pressed]:not([data-disabled]) {
   margin-block-start: var(--space-2);
 }
 
+/* @ds state: stay · switch — shared button chrome on the two-choice rail. */
 .leave-plan-stay,
 .leave-plan-switch {
   min-block-size: 44px;
@@ -1741,25 +1780,32 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: stay — the safe, authority-preserving action. */
 .leave-plan-stay {
   border: 1px solid var(--line-strong);
   background: transparent;
   color: var(--ink);
 }
 
+/* @ds state: switch — the only authority-expanding path; copy varies by the
+   mode / plan-ready variant. */
 .leave-plan-switch {
   border: 0;
   background: var(--action-bg);
   color: var(--action-fg);
 }
 
+/* @ds state: focus-visible */
 .leave-plan-stay[data-focus-visible],
 .leave-plan-switch[data-focus-visible] {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
+/* @ds end surface: leave-plan-sheet */
 
 /* ── Live plan review ───────────────────────────────────────────────── */
+/* @ds surface: plan-ready-card — live validated plan summary + review entry. */
+/* @ds state: reviewable — renders only when the artifact is live, newest and valid. */
 .plan-ready-card {
   display: grid;
   gap: var(--space-4);
@@ -1771,6 +1817,7 @@ button[data-pressed]:not([data-disabled]) {
   box-shadow: var(--shadow-raised);
 }
 
+/* @ds slot: header — title + check mark; shared with plan-review-sheet. */
 .plan-ready-header,
 .plan-review-header {
   display: flex;
@@ -1779,14 +1826,16 @@ button[data-pressed]:not([data-disabled]) {
   gap: var(--space-4);
 }
 
+/* @ds slot: kicker — shared section eyebrow pair; shared with plan-review-sheet. */
 .plan-ready-header .surface-kicker,
 .plan-review-header .surface-kicker {
   margin-bottom: var(--space-2);
 }
 
+/* @ds slot: title — display serif cap; shared with plan-review-sheet. */
 .plan-ready-title,
 .plan-review-title {
-  max-width: 30ch;
+  max-inline-size: 30ch;
   margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
@@ -1796,6 +1845,7 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds slot: mark — the ✓ confirmation badge; never clay-only. */
 .plan-ready-mark {
   display: grid;
   min-inline-size: 2.25rem;
@@ -1808,6 +1858,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 700;
 }
 
+/* @ds slot: summary — plain prose; shared with plan-review-sheet. */
 .plan-ready-summary,
 .plan-review-summary {
   margin: 0;
@@ -1818,6 +1869,7 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds slot: meta — revision / steps / published grid; shared with plan-review-sheet. */
 .plan-ready-meta,
 .plan-review-details {
   display: grid;
@@ -1826,6 +1878,7 @@ button[data-pressed]:not([data-disabled]) {
   margin: 0;
 }
 
+/* @ds slot: meta-cell — one fact; shared with plan-review-sheet. */
 .plan-ready-meta > div,
 .plan-review-details > div {
   display: grid;
@@ -1833,6 +1886,7 @@ button[data-pressed]:not([data-disabled]) {
   min-width: 0;
 }
 
+/* @ds slot: meta-label — dt; shared with plan-review-sheet. */
 .plan-ready-meta dt,
 .plan-review-details dt {
   color: var(--ink-muted);
@@ -1842,6 +1896,7 @@ button[data-pressed]:not([data-disabled]) {
   text-transform: uppercase;
 }
 
+/* @ds slot: meta-value — dd; shared with plan-review-sheet. */
 .plan-ready-meta dd,
 .plan-review-details dd {
   margin: 0;
@@ -1851,6 +1906,7 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
+/* @ds state: review CTA — shared pill chrome for the ready card and review sheet. */
 .plan-ready-review,
 .plan-review-safe,
 .plan-review-revise,
@@ -1864,6 +1920,7 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: review CTA active — card entry into the review sheet. */
 .plan-ready-review {
   justify-self: start;
   border: 1px solid var(--line-strong);
@@ -1871,11 +1928,18 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink);
 }
 
+/* @ds state: waiting-for-live-confirmation — review CTA disabled until the
+   host binds the plan. */
 .plan-ready-review[data-disabled] {
   cursor: wait;
   opacity: 0.55;
 }
 
+/* @ds end surface: plan-ready-card */
+
+/* @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. */
+/* @ds slot: overlay — fixed scrim + centring.
+   @ds edit: layout — z-index 100 keeps it above every mode surface. */
 .plan-review-overlay {
   position: fixed;
   z-index: 100;
@@ -1886,6 +1950,7 @@ button[data-pressed]:not([data-disabled]) {
   background: color-mix(in srgb, var(--ink) 58%, transparent);
 }
 
+/* @ds slot: modal — bottom-docked sheet + entry motion. */
 .plan-review-modal {
   inline-size: min(100%, 44rem);
   max-block-size: 100dvh;
@@ -1896,6 +1961,7 @@ button[data-pressed]:not([data-disabled]) {
   animation: plan-review-in 180ms ease-out;
 }
 
+/* @ds slot: dialog — scroll column + safe-area gutters. */
 .plan-review-dialog {
   display: grid;
   min-block-size: 100%;
@@ -1907,6 +1973,7 @@ button[data-pressed]:not([data-disabled]) {
   outline: none;
 }
 
+/* @ds slot: grabber — swipe-dismiss handle. */
 .plan-review-grabber {
   inline-size: 2.25rem;
   block-size: 0.25rem;
@@ -1916,6 +1983,7 @@ button[data-pressed]:not([data-disabled]) {
   opacity: 0.7;
 }
 
+/* @ds slot: revision — mono pill. */
 .plan-review-revision {
   flex: 0 0 auto;
   padding: 0.35rem 0.55rem;
@@ -1927,6 +1995,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 650;
 }
 
+/* @ds slot: content — summary + details. */
 .plan-review-content {
   display: grid;
   gap: var(--space-6);
@@ -1935,12 +2004,14 @@ button[data-pressed]:not([data-disabled]) {
   border-block-end: 1px solid var(--line);
 }
 
+/* @ds slot: actions — keep · revise · leave · execute rail. */
 .plan-review-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
 }
 
+/* @ds state: non-executing actions — keep · revise · leave. */
 .plan-review-safe,
 .plan-review-revise,
 .plan-review-leave {
@@ -1949,17 +2020,20 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink);
 }
 
+/* @ds state: execute CTA — the atomic execute path. */
 .plan-review-execute {
   border: 0;
   background: var(--action-bg);
   color: var(--action-fg);
 }
 
+/* @ds state: executing — execute CTA disabled while the execution lease is in flight. */
 .plan-review-execute[data-disabled] {
   cursor: wait;
   opacity: 0.55;
 }
 
+/* @ds state: hover — non-executing actions. */
 .plan-ready-review[data-hovered],
 .plan-review-safe[data-hovered],
 .plan-review-revise[data-hovered],
@@ -1967,10 +2041,14 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface-muted);
 }
 
+/* @ds state: hover — execute CTA. */
 .plan-review-execute[data-hovered] {
   opacity: 0.82;
 }
 
+/* @ds end surface: plan-review-sheet */
+
+/* @ds edit: motion — review-sheet entry. */
 @keyframes plan-review-in {
   from {
     opacity: 0;
@@ -1982,6 +2060,7 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds edit: layout — narrow reflow of the ready card and review sheet. */
 @media (max-width: 24rem) {
   .plan-ready-card {
     padding: var(--space-4);
@@ -1998,6 +2077,7 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds edit: motion — reduced-motion: review-sheet entry disabled. */
 @media (prefers-reduced-motion: reduce) {
   .plan-review-modal {
     animation: none;
@@ -6969,6 +7049,7 @@ body,
   margin-inline-end: max(0px, env(safe-area-inset-right, 0px));
 }
 
+/* @ds edit: layout — safe-area gutters for the leave sheet. */
 .leave-plan-sheet {
   padding-block-start: max(var(--space-4), env(safe-area-inset-top, 0px));
   padding-block-end: max(var(--space-4), env(safe-area-inset-bottom, 0px));
@@ -6976,11 +7057,13 @@ body,
   padding-inline-end: max(var(--space-4), env(safe-area-inset-right, 0px));
 }
 
+/* @ds edit: layout — viewport-height cap for the review sheet. */
 .plan-review-modal {
   max-block-size: 100svh;
   max-block-size: 100dvh;
 }
 
+/* @ds edit: layout — safe-area gutters for the review sheet. */
 .plan-review-dialog {
   padding-block-start: max(var(--space-6), env(safe-area-inset-top, 0px));
   padding-block-end: max(var(--space-6), env(safe-area-inset-bottom, 0px));
@@ -6988,6 +7071,7 @@ body,
   padding-inline-end: max(var(--space-6), env(safe-area-inset-right, 0px));
 }
 
+/* @ds edit: layout — wrap handling for the card/sheet headers. */
 .plan-ready-header,
 .plan-review-header {
   min-inline-size: 0;
@@ -6999,6 +7083,7 @@ body,
   min-inline-size: 0;
 }
 
+/* @ds edit: layout — bidi + wrap for the card/sheet text. */
 .plan-ready-title,
 .plan-review-title,
 .plan-ready-summary,
@@ -7007,6 +7092,7 @@ body,
   unicode-bidi: plaintext;
 }
 
+/* @ds edit: layout — bidi isolation for the mono revision and ltr meta values. */
 .plan-review-revision,
 .plan-ready-meta dd[dir='ltr'],
 .plan-review-details dd[dir='ltr'] {
@@ -7031,6 +7117,7 @@ select:focus-visible,
   outline-offset: 3px;
 }
 
+/* @ds edit: layout — ≥44px interactive targets (WCAG); the mode button shares the composer bar group. */
 .composer-plus,
 .composer-primary,
 .plan-mode-button,
@@ -7045,6 +7132,7 @@ select:focus-visible,
   block-size: 44px;
 }
 
+/* @ds slot: label — lets the button label shrink; see plan-mode-button. */
 .plan-mode-label {
   min-inline-size: 0;
 }
@@ -7070,6 +7158,7 @@ select:focus-visible,
   color: var(--accent-ink);
 }
 
+/* @ds edit: layout — narrow reflow of the composer bar + ready/review card + sheets. */
 @media (max-width: 27rem) {
   .composer-bar {
     display: grid;

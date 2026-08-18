@@ -3,6 +3,9 @@ import type { RefObject } from 'react';
 
 import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 
+// @ds surface: plan-ready-card — live validated plan summary + review entry.
+// @ds guardrail: do-not-edit — isReviewablePlanArtifact gates rendering on live + newest + valid,
+// and canReview disables the review CTA until the host binds the plan. Not designer-editable.
 const PLAN_TITLE_DISPLAY_CAP = 160;
 
 export interface PlanReadyCardProps {
@@ -17,6 +20,7 @@ export interface PlanReadyCardProps {
   readonly reviewButtonRef?: RefObject<HTMLButtonElement | null>;
 }
 
+// @ds guardrail: do-not-edit — the reviewability gate (live · newest · valid) — not designer-editable.
 export function isReviewablePlanArtifact(
   artifact: PlanArtifactDto | null | undefined,
   isLive: boolean,
@@ -44,20 +48,26 @@ export function PlanReadyCard({
   const title = artifact.title.slice(0, PLAN_TITLE_DISPLAY_CAP);
   return (
     <article className="plan-ready-card" aria-labelledby="plan-ready-title" data-plan-ready="true">
+      {/* @ds state: live · newest · valid — renders only for a reviewable artifact. */}
+      {/* @ds slot: header — title + check mark. */}
       <div className="plan-ready-header">
         <div>
           <p className="surface-kicker">Plan ready</p>
+          {/* @ds slot: title */}
           <Heading id="plan-ready-title" level={2} className="plan-ready-title">
             {title}
           </Heading>
         </div>
+        {/* @ds slot: mark — the ✓ confirmation badge. */}
         <span className="plan-ready-mark" aria-hidden="true">
           ✓
         </span>
       </div>
+      {/* @ds slot: summary */}
       <p className="plan-ready-summary" dir="auto">
         {artifact.summary}
       </p>
+      {/* @ds slot: meta — revision / steps / published grid. */}
       <dl className="plan-ready-meta">
         <div>
           <dt>Revision</dt>
@@ -74,6 +84,8 @@ export function PlanReadyCard({
           </dd>
         </div>
       </dl>
+      {/* @ds state: review CTA — canReview → 'Review plan' (waiting-for-live-confirmation below).
+          @ds guardrail: do-not-edit — react-aria Button wiring (ref, isDisabled, onPress). */}
       <Button
         ref={reviewButtonRef}
         className="plan-ready-review"
@@ -83,6 +95,7 @@ export function PlanReadyCard({
       >
         {canReview ? 'Review plan' : 'Waiting for live confirmation'}
       </Button>
+      {/* @ds state: waiting-for-live-confirmation — the disabled CTA until the host binds the plan. */}
     </article>
   );
 }

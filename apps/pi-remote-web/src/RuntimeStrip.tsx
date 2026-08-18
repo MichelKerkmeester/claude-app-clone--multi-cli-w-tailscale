@@ -45,6 +45,7 @@ export function RuntimeStrip({
   // @ds surface: runtime-strip — host-backed readout + controls strip.
   return (
     <div className="runtime-strip" role="group" aria-label="Runtime controls">
+      {/* @ds slot: model-readout — confirmed model readout. */}
       <span className="runtime-readout runtime-model-readout">
         <span className="runtime-readout-label">Model</span>
         <span className="runtime-readout-value">{modelLabel}</span>
@@ -69,6 +70,8 @@ export function RuntimeStrip({
 
       {/* @ds surface: build-plan-toggle — Build / Plan segmented toggle. */}
       {/* @ds guardrail: react-aria ToggleButtonGroup wiring (selection + onChange + aria) — not designer-editable. */}
+      {/* @ds state: build · plan — selection is disabled while the authority is not ready; the
+          label never precedes host confirmation (non-optimistic). */}
       <ToggleButtonGroup
         className="runtime-control runtime-mode"
         aria-label="Build or Plan"
@@ -88,6 +91,9 @@ export function RuntimeStrip({
         </ToggleButton>
       </ToggleButtonGroup>
 
+      {/* @ds slot: status — applied runtime status hint. */}
+      {/* @ds state: checking · applying · stale · error — the runtime status hint. */}
+      {/* @ds guardrail: do-not-edit — role="status" + aria-live="polite" live region. */}
       <span className="runtime-status" role="status" aria-live="polite">
         {statusHint(runtime.status, runtime.pending !== null)}
       </span>

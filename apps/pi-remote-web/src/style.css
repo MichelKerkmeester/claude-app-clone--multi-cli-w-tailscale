@@ -272,6 +272,8 @@ button[data-pressed]:not([data-disabled]) {
   border: 0;
 }
 
+/* @ds surface: app-shell — the fixed-width app frame wrapping every routed surface. */
+/* @ds edit: layout — frame width + centring; safe gutters are token-driven. */
 .app-shell {
   width: min(100%, var(--content-width));
   min-height: 100dvh;
@@ -280,6 +282,9 @@ button[data-pressed]:not([data-disabled]) {
   background: color-mix(in oklch, var(--canvas) 94%, transparent);
 }
 
+/* @ds end surface: app-shell */
+/* @ds surface: topbar — global chrome header for the non-session surfaces. */
+/* @ds edit: layout — sticky-bar geometry + safe top gutter. */
 .topbar {
   position: sticky;
   z-index: 20;
@@ -295,6 +300,7 @@ button[data-pressed]:not([data-disabled]) {
   backdrop-filter: blur(12px);
 }
 
+/* @ds slot: wordmark — Pi Remote wordmark block. */
 .wordmark {
   display: flex;
   min-width: 2.75rem;
@@ -343,12 +349,14 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 550;
 }
 
+/* @ds slot: nav — Inbox · Review actions; theme-toggle and status slots are shared surfaces below. */
 .topbar-actions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
+/* @ds end surface: topbar */
 /* @ds surface: chrome-button — shared quiet transparent chrome button (nav/back/theme). */
 .nav-button,
 .theme-option,
@@ -378,6 +386,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds end surface: chrome-button */
 
+/* @ds slot: theme-toggle — segmented theme control (shared theme-switcher surface below). */
 /* @ds surface: theme-switcher — segmented theme selector (ToggleButton group). */
 .theme-control {
   display: flex;
@@ -401,6 +410,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 /* @ds end surface: theme-switcher */
 
+/* @ds slot: status — connection-phase readout in the topbar. */
 /* @ds surface: status-pill — connection-phase status. */
 .status-pill {
   display: flex;
@@ -443,6 +453,8 @@ button[data-pressed]:not([data-disabled]) {
 }
 /* @ds end surface: status-pill */
 
+/* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
+/* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
 .home-view,
 .session-view,
 .review-view,
@@ -450,6 +462,7 @@ button[data-pressed]:not([data-disabled]) {
   padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
 }
 
+/* @ds slot: kicker — shared section eyebrow across surfaces. */
 .surface-kicker {
   margin: 0 0 var(--space-3);
   color: var(--accent-ink);
@@ -459,6 +472,8 @@ button[data-pressed]:not([data-disabled]) {
   text-transform: uppercase;
 }
 
+/* @ds surface: home-view — hero, session roster, device footer, push settings. */
+/* @ds state: loading · empty · error · stale — via shared empty-state, inline-alert and freshness surfaces. */
 .hero {
   position: relative;
   display: grid;
@@ -498,6 +513,7 @@ button[data-pressed]:not([data-disabled]) {
   text-wrap: pretty;
 }
 
+/* @ds slot: orbit — decorative relay graphic. */
 .relay-orbit {
   position: absolute;
   right: -5rem;
@@ -561,6 +577,7 @@ button[data-pressed]:not([data-disabled]) {
   left: 14%;
 }
 
+/* @ds slot: sessions — recent-sessions section. */
 .session-section {
   padding-top: var(--space-8);
   border-top: 1px solid var(--line-strong);
@@ -623,6 +640,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 /* @ds end surface: freshness */
 
+/* @ds slot: session-grid — the session card roster. */
 .session-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
@@ -651,8 +669,8 @@ button[data-pressed]:not([data-disabled]) {
 .session-card::after {
   position: absolute;
   top: 0;
-  right: 0;
-  left: 0;
+  /* symmetric right:0/left:0 → logical inline span (equivalent in any locale). */
+  inset-inline: 0;
   height: 2px;
   background: var(--accent);
   content: '';
@@ -729,6 +747,7 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--line-strong);
 }
 
+/* @ds slot: open-arrow — session-card affordance. */
 .open-arrow {
   position: absolute;
   right: var(--space-4);
@@ -745,6 +764,7 @@ button[data-pressed]:not([data-disabled]) {
   opacity: 1;
 }
 
+/* @ds slot: device — device-key footer (logout · revoke). */
 .device-footer {
   display: flex;
   align-items: center;
@@ -781,6 +801,8 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--danger-soft);
 }
 
+/* @ds surface: push-settings — device notification preferences. */
+/* @ds state: loading · disabled · off · on — support check, relay-off, enable CTA, preference grid. */
 .push-settings {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -826,6 +848,7 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--danger);
 }
 
+/* @ds slot: preferences — per-class alert switches. */
 .preference-grid {
   display: flex;
   flex-wrap: wrap;
@@ -872,6 +895,11 @@ button[data-pressed]:not([data-disabled]) {
   transform: translateX(0.95rem);
 }
 
+/* @ds end surface: push-settings */
+/* @ds end surface: home-view */
+/* @ds surface: enrollment-view — first-run device binding. */
+/* @ds edit: layout — full-frame centring + safe gutters. */
+/* @ds state: idle · busy · error · authenticating — binding lifecycle. */
 .enrollment-view {
   display: grid;
   min-height: calc(100dvh - 4.25rem);
@@ -887,6 +915,7 @@ button[data-pressed]:not([data-disabled]) {
   box-shadow: var(--shadow-raised);
 }
 
+/* @ds slot: symbol — the π mark. */
 .surface-symbol {
   display: grid;
   width: 3rem;
@@ -933,6 +962,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.55;
 }
 
+/* @ds slot: actions — scan + enroll controls. */
 .enrollment-actions {
   display: flex;
   align-items: center;
@@ -983,6 +1013,9 @@ button[data-pressed]:not([data-disabled]) {
   clip: rect(0 0 0 0);
 }
 
+/* @ds end surface: enrollment-view */
+/* @ds surface: review-view, inbox-view — routed list surfaces sharing the back-bar. */
+/* @ds slot: toolbar — back-bar (back · count). */
 .session-toolbar {
   margin-bottom: clamp(2rem, 7vw, 4rem);
 }
@@ -1001,12 +1034,16 @@ button[data-pressed]:not([data-disabled]) {
 }
 /* @ds end surface: back-button */
 
+/* @ds slot: count — pending/awaiting badge. */
 .review-count {
   color: var(--warning);
   font-size: 0.72rem;
   font-weight: 700;
 }
 
+/* @ds surface: review-heading — review surface intro (states below via approval-card / inline-alert). */
+/* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
+/* @ds slot: heading — surface title + description. */
 .review-heading,
 .inbox-heading {
   max-width: 58rem;
@@ -1028,6 +1065,9 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.65;
 }
 
+/* @ds state: info — grant-banner (active accept-edits lease). */
+/* @ds state: error — inline-alert (surface error). */
+/* @ds state: stale — barrier-note (reconciliation / checking). */
 .grant-banner,
 .inline-alert,
 .barrier-note {
@@ -4035,6 +4075,8 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.72rem;
 }
 
+/* @ds surface: session-header — in-session quiet header (back · model · overflow). */
+/* @ds edit: layout — grid geometry + safe top gutter. */
 /* ── Session header (in-session): back · centered model · overflow ─────── */
 .session-header {
   position: sticky;
@@ -4050,6 +4092,7 @@ button[data-pressed]:not([data-disabled]) {
   backdrop-filter: blur(12px);
 }
 
+/* @ds slot: icon — back and overflow icon buttons. */
 .session-header-icon {
   display: grid;
   place-items: center;
@@ -4076,6 +4119,7 @@ button[data-pressed]:not([data-disabled]) {
   outline-offset: 2px;
 }
 
+/* @ds slot: model — host-confirmed model/effort readout trigger. */
 .session-model-trigger {
   display: inline-flex;
   min-inline-size: 44px;
@@ -4105,6 +4149,7 @@ button[data-pressed]:not([data-disabled]) {
   opacity: 0.6;
 }
 
+/* @ds slot: model-name — confirmed model label. */
 .session-model-name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4126,12 +4171,14 @@ button[data-pressed]:not([data-disabled]) {
   outline-offset: 2px;
 }
 
+/* @ds slot: separator — between model and effort. */
 .session-header-sep {
   color: var(--ink-muted);
   font-size: 0.85rem;
   font-weight: 400;
 }
 
+/* @ds slot: effort-name — confirmed effort label. */
 .session-effort-name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4141,6 +4188,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 560;
 }
 
+/* @ds slot: plan-badge — plan-mode status chip. */
 .session-plan-badge {
   flex: 0 0 auto;
   padding-block: 0.2rem;
@@ -4153,6 +4201,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 700;
 }
 
+/* @ds end surface: session-header */
 /* @ds surface: model-sheet — the model picker + effort sheet overlay. */
 /* The model catalog is host-authored, so the sheet contains and wraps every value. */
 .model-sheet-overlay {
@@ -5032,6 +5081,8 @@ button[data-pressed]:not([data-disabled]) {
   }
 }
 
+/* @ds surface: session-view — in-session composition root (header · statusline · transcript · composer). */
+/* @ds state: active · stale — reconnecting readout; error via inline-alert. */
 .session-statusline {
   display: flex;
   align-items: center;
@@ -5042,10 +5093,12 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.75rem;
 }
 
+/* @ds slot: label — session status text. */
 .session-status-label {
   font-weight: 600;
 }
 
+/* @ds slot: dot — session-agent status glyph. */
 .agent-dot {
   display: inline-grid;
   place-items: center;
@@ -5054,11 +5107,14 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--ink-muted);
 }
 
+/* @ds state: running */
 .agent-dot.agent-running {
   color: var(--accent);
 }
 
 /* Popover sheets + every react-aria dropdown (Select / ComboBox / Dialog). */
+/* @ds end surface: session-view */
+/* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
 .session-sheet-popover,
 .composer-tools-popover {
   border: 1px solid var(--line);
@@ -5118,11 +5174,13 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds slot: nav — Inbox · Review overflow items. */
 .overflow-nav {
   display: grid;
   gap: var(--space-1);
 }
 
+/* @ds slot: nav-item */
 .overflow-item {
   display: flex;
   min-height: 2.5rem;
@@ -5137,10 +5195,12 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
+/* @ds state: hover */
 .overflow-item[data-hovered] {
   background: var(--surface-muted);
 }
 
+/* @ds end surface: session-sheet */
 /* Timeline rail line removed (§6). */
 .transcript-frame::before {
   content: none;
@@ -6771,12 +6831,14 @@ body,
   min-block-size: 100dvh;
 }
 
+/* @ds edit: layout — safe top inline gutters for the chrome headers. */
 .topbar,
 .session-header {
   padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
   padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
 }
 
+/* @ds edit: layout — safe inline gutters for the routed surfaces. */
 .home-view,
 .session-view,
 .review-view,

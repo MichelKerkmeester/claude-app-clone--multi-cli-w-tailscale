@@ -128,6 +128,8 @@ export interface AppProps {
   readonly askQuestionPrincipal?: string | undefined;
 }
 
+// @ds surface: app-shell — root frame + composition of every routed surface.
+// @ds guardrail: auth / connection / push / routing effects and state (App) — not designer-editable.
 export function App({
   mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF,
   askQuestionPrincipal,
@@ -318,6 +320,8 @@ export function App({
 
   return (
     <div className="app-shell">
+      {/* @ds surface: app-shell — every route renders inside this frame. */}
+      {/* @ds guardrail: route switch (enrollment / review / inbox / home / session) below — not designer-editable. */}
       {!inSession && (
         <Header
           connection={connection.phase}
@@ -412,6 +416,8 @@ export function App({
   );
 }
 
+// @ds surface: enrollment-view — first-run device binding. States: idle · busy · error · authenticating.
+// @ds guardrail: enrollment/auth wiring (enrollDevice · establishSession · scanQrImage · submit · onChange) — not designer-editable.
 function Enrollment({
   phase,
   onEnrolled,
@@ -565,6 +571,8 @@ function ThemeControl({
   );
 }
 
+// @ds surface: review-view — exact-action review list. States: empty · pending · expired · submitted · error.
+// @ds guardrail: approval decisioning + grant tracking — not designer-editable.
 export function Review({
   sessions,
   onBack,
@@ -642,6 +650,7 @@ export function Review({
         </div>
       )}
       {error !== null && <div className="inline-alert">{error}</div>}
+      {/* @ds guardrail: sr-only live region announces decision state — not designer-editable. */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {pendingId === null ? '' : 'Decision submitted. Verifying at host.'}
       </div>
@@ -685,6 +694,7 @@ export function Review({
                 </div>
                 {approval.status === 'pending' && !expired ? (
                   <div className="approval-actions">
+                    {/* @ds guardrail: deny / approve / grant onPress decisioning — not designer-editable. */}
                     <Button
                       className="deny-button"
                       isDisabled={submitted}
@@ -735,6 +745,8 @@ export function Review({
   );
 }
 
+// @ds surface: home-view — hero, session roster, device footer, push settings. States: loading · empty · error · stale.
+// @ds guardrail: staleness derivation + select/revoke/logout handlers — not designer-editable.
 export function Home({
   sessions,
   connection,
@@ -790,6 +802,7 @@ export function Home({
                 key={session.id}
                 onPress={() => onSelect(session.id)}
               >
+                {/* @ds guardrail: session open onPress → onSelect route — not designer-editable. */}
                 <span className={`session-state state-${session.status}`}>
                   <SessionStateIcon status={session.status} />
                   {sessionStatusLabel(session.status)}
@@ -812,6 +825,7 @@ export function Home({
           {device === null ? 'Device key active' : `Host ${compactId(device.hostFingerprint)}`}
         </span>
         <div>
+          {/* @ds guardrail: device logout / revoke onPress handlers — not designer-editable. */}
           <Button onPress={onLogout}>Log out</Button>
           <Button onPress={onRevoke}>Revoke this device</Button>
         </div>
@@ -821,6 +835,8 @@ export function Home({
   );
 }
 
+// @ds surface: inbox-view — attention signals. States: empty · error.
+// @ds guardrail: inbox fetch + open handlers — not designer-editable.
 export function AttentionInbox({
   onBack,
   onOpen,
@@ -900,6 +916,8 @@ export function AttentionInbox({
   );
 }
 
+// @ds surface: push-settings — device notification preferences. States: loading · disabled · off · on.
+// @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — not designer-editable.
 function PushSettings() {
   const [config, setConfig] = useState<PushConfig | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -934,6 +952,7 @@ function PushSettings() {
               .catch((cause: unknown) => setError(messageFrom(cause)));
           }}
         >
+          {/* @ds guardrail: push subscribe onPress handler — not designer-editable. */}
           Enable notifications
         </Button>
       ) : (
@@ -948,6 +967,7 @@ function PushSettings() {
                   setPreferences({ ...config.preferences!, [attentionClass]: selected })
                 }
               >
+                {/* @ds guardrail: preference Switch onChange → updatePushPreferences — not designer-editable. */}
                 <span className="switch-track" aria-hidden="true">
                   <span />
                 </span>
@@ -955,6 +975,7 @@ function PushSettings() {
               </Switch>
             ))}
           </div>
+          {/* @ds guardrail: push unsubscribe onPress handler — not designer-editable. */}
           <Button
             className="push-disable"
             onPress={() => {
@@ -971,6 +992,8 @@ function PushSettings() {
   );
 }
 
+// @ds surface: session-view — in-session composition root (header · statusline · transcript · composer).
+// @ds guardrail: connection / transcript / sync / composer logic — not designer-editable.
 export function Session({
   connection,
   sessionId,

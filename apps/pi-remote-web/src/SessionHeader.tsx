@@ -53,14 +53,19 @@ export function SessionHeader({
   const modelProvider = state?.model?.provider ?? 'unknown provider';
   const effortText = effortTriggerText(state?.thinkingLevel, state?.availableThinkingLevels ?? []);
 
+  // @ds surface: session-header — quiet in-session header. Slots: back · model · overflow.
   return (
     <>
       <header className="session-header">
+        {/* @ds slot: back — back-to-sessions control. */}
+        {/* @ds guardrail: react-aria Button (onPress / aria-label) — not designer-editable. */}
         <Button className="session-header-icon" aria-label="Back to sessions" onPress={onBack}>
           <ChevronLeftGlyph />
         </Button>
 
+        {/* @ds slot: model — host-confirmed model / effort readout trigger. */}
         <div className="session-runtime-controls">
+          {/* @ds guardrail: react-aria Button + aria-* (expanded/controls/haspopup); 44px target — not designer-editable. */}
           <Button
             ref={modelTriggerRef}
             className="session-model-trigger"
@@ -89,6 +94,8 @@ export function SessionHeader({
             <ChevronDownGlyph />
           </Button>
 
+          {/* @ds slot: plan-badge — plan-mode status chip. */}
+          {/* @ds guardrail: role="status" readout — not designer-editable. */}
           {state?.mode === 'plan' && (
             <span
               className="session-plan-badge"
@@ -100,6 +107,8 @@ export function SessionHeader({
           )}
         </div>
 
+        {/* @ds slot: overflow — nav + theme popover trigger. */}
+        {/* @ds guardrail: react-aria DialogTrigger / Popover / Dialog wiring — not designer-editable. */}
         <DialogTrigger>
           <Button className="session-header-icon" aria-label="More: navigation and theme">
             <OverflowGlyph />
@@ -108,6 +117,8 @@ export function SessionHeader({
             <Dialog aria-label="Navigation and theme" className="session-sheet">
               <section className="tools-group">
                 <span className="tools-label">Go to</span>
+                {/* @ds slot: nav — Inbox · Review. */}
+                {/* @ds guardrail: react-aria onPress nav routing — not designer-editable. */}
                 <div className="overflow-nav">
                   <Button className="overflow-item" onPress={onInbox}>
                     Inbox
@@ -119,6 +130,8 @@ export function SessionHeader({
               </section>
               <section className="tools-group">
                 <span className="tools-label">Theme</span>
+                {/* @ds slot: theme-toggle — segmented light / dark / auto. */}
+                {/* @ds guardrail: react-aria ToggleButton group (onChange / aria-label) — not designer-editable. */}
                 <div className="theme-control" role="group" aria-label="Color theme">
                   {(['system', 'light', 'dark'] as const).map((option) => (
                     <ToggleButton

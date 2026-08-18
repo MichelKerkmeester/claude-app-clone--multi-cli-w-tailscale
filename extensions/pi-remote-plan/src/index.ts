@@ -1,5 +1,4 @@
 import {
-  PLAN_ARTIFACT_KEY,
   PlanArtifactAdapter,
   type PlanArtifact,
   type PlanArtifactPublication,
@@ -107,11 +106,13 @@ export const MUTATION_CAPABLE_BUILTINS = ['edit', 'write', 'fetch', 'apply_patch
 /** Non-bash built-ins that are read-only by construction. */
 export const READ_ONLY_BUILTIN_TOOLS = ['read', 'grep', 'find', 'ls'] as const;
 
-/**
- * Extension/MCP tools the host has explicitly classified read-only. Empty until
- * a capability registry exists; until then every unknown tool stays denied.
- */
-const READ_ONLY_EXTENSION_TOOLS: ReadonlySet<string> = new Set();
+/** The relay's exact artifact read lane is safe to expose in Plan mode. */
+export const PLAN_READ_ONLY_EXTENSION_TOOLS = ['artifact:read'] as const;
+
+/** Publication remains host-authoritative and is never a Plan-mode read lane. */
+export const HOST_AUTHORITATIVE_MEDIA_TOOLS = ['artifact:publish'] as const;
+
+const READ_ONLY_EXTENSION_TOOLS: ReadonlySet<string> = new Set(PLAN_READ_ONLY_EXTENSION_TOOLS);
 
 export interface PlanHost {
   acceptPlan(draft: PlanDraft, ctx: ExtensionContext): PlanArtifact;
@@ -138,6 +139,10 @@ export function isPlanReadOnlyTool(
 ): boolean {
   if ((READ_ONLY_BUILTIN_TOOLS as readonly string[]).includes(toolName)) return true;
   return readOnlyExtensionTools.has(toolName);
+}
+
+export function isHostAuthoritativeMediaTool(toolName: string): boolean {
+  return (HOST_AUTHORITATIVE_MEDIA_TOOLS as readonly string[]).includes(toolName);
 }
 
 export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
@@ -343,6 +348,10 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
         return { block: true, reason: 'Plan mode allows only read-only bash.' };
       }
       return undefined;
+    }
+
+    if (isHostAuthoritativeMediaTool(event.toolName)) {
+      return { block: true, reason: 'Plan mode is read-only.' };
     }
 
     // Default-deny: only explicitly read-only tools pass; every unclassified

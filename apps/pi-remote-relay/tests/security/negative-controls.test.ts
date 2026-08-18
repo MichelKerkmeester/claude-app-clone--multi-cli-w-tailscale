@@ -2,8 +2,11 @@
 // MODULE: Consolidated Fail-Closed Negative Controls
 // ───────────────────────────────────────────────────────────────────
 
-import { generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { createHash, generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
+import { mkdtempSync, readFileSync, rmSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { deflateSync } from 'node:zlib';
 
 import {
   DEFAULT_MEDIA_POLICY,
@@ -23,7 +26,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { ApprovalService } from '../../src/approval/approval-service.js';
 import { verifyFinalGate } from '../../src/approval/final-gate.js';
-import { AuthService } from '../../src/auth/auth-service.js';
+import { AuthService, type ArtifactPublishTicketBinding } from '../../src/auth/auth-service.js';
+import {
+  authorizeAction,
+  isHostAuthoritativeAction,
+  isPhoneGrantableAction,
+} from '../../src/auth/policy.js';
 import type {
   AttachmentOwner,
   AttachmentStatusDto,
@@ -34,17 +42,29 @@ import {
 } from '../../src/attachments/pi-image-bridge.js';
 import { CommandService } from '../../src/commands/command-service.js';
 import { MutationPolicy } from '../../src/policy/mutation-policy.js';
-import { PromptRevisionCoordinator } from '../../src/prompt/prompt-revision-coordinator.js';
 import { serializePushHint } from '../../src/push/push-service.js';
 import { SyncHub } from '../../src/replay/sync.js';
 import type { RpcSupervisor } from '../../src/rpc/supervisor.js';
 import { RelayStore } from '../../src/store/relay-store.js';
+import { sanitizeInboundImage } from '../../src/store/artifact-sanitizer.js';
 import { projectCommandCatalog } from '../../src/store/redaction.js';
+import { publishApprovedImage } from '../../../../extensions/pi-remote-inbound-media/src/index.js';
 
 const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
 const NOW = Date.parse('2026-01-01T00:00:00.000Z');
 const IDENTITY = { hostId: 'host_local', workspaceRef: 'workspace_default' } as const;
+const INBOUND_BINDING: ArtifactPublishTicketBinding = {
+  hostExtension: 'host_extension_security',
+  sessionId: 'session_security',
+  runId: 'run_security',
+  turnId: 'turn_security',
+  blockId: 'block_security',
+  submissionId: 'submission_security',
+  expectedTranscriptRevision: 0,
+  declaredByteLength: 128,
+  declaredMediaFamily: 'screenshot',
+};
 const READ_ONLY_SERVER_SOURCE = readFileSync(
   new URL('../../src/http/server.ts', import.meta.url),
   'utf8',
@@ -104,6 +124,128 @@ describe('consolidated fail-closed negative controls', () => {
     expect(auth.revokeSession(session.token)).toBe(true);
     expect(auth.authenticate(session.token, ORIGIN, PRINCIPAL, 'sessions:list')).toBeNull();
     expect(auth.consumeTicket(revokedTicket.ticket, ORIGIN, PRINCIPAL)).toBeNull();
+  });
+
+  it('keeps publication host-authoritative across origin, principal, device, revision, replay, and expiry checks', () => {
+    let now = NOW;
+    const auth = new AuthService({
+      origin: ORIGIN,
+      hostId: IDENTITY.hostId,
+      now: () => now,
+    });
+    const issued = auth.issueArtifactPublishTicketForExtension(
+      PRINCIPAL,
+      INBOUND_BINDING.hostExtension,
+      INBOUND_BINDING.sessionId,
+      INBOUND_BINDING,
+    );
+
+    expect(
+      auth.consumeArtifactPublishTicket(issued.ticket, {
+        origin: ORIGIN,
+        principal: PRINCIPAL,
+        hostExtension: 'device_other',
+        expectedBinding: INBOUND_BINDING,
+      }),
+    ).toBeNull();
+    expect(
+      auth.consumeArtifactPublishTicket(issued.ticket, {
+        origin: ORIGIN,
+        principal: 'spoofed@example.test',
+        hostExtension: INBOUND_BINDING.hostExtension,
+        expectedBinding: INBOUND_BINDING,
+      }),
+    ).toBeNull();
+    expect(
+      auth.consumeArtifactPublishTicket(issued.ticket, {
+        origin: 'https://wrong.example.test',
+        principal: PRINCIPAL,
+        hostExtension: INBOUND_BINDING.hostExtension,
+        expectedBinding: INBOUND_BINDING,
+      }),
+    ).toBeNull();
+    const stale = auth.issueArtifactPublishTicketForExtension(
+      PRINCIPAL,
+      INBOUND_BINDING.hostExtension,
+      INBOUND_BINDING.sessionId,
+      INBOUND_BINDING,
+    );
+    expect(
+      auth.consumeArtifactPublishTicket(stale.ticket, {
+        origin: 'extension',
+        principal: PRINCIPAL,
+        hostExtension: INBOUND_BINDING.hostExtension,
+        expectedBinding: { ...INBOUND_BINDING, expectedTranscriptRevision: 1 },
+      }),
+    ).toBeNull();
+
+    expect(
+      auth.consumeArtifactPublishTicket(stale.ticket, {
+        origin: 'extension',
+        principal: PRINCIPAL,
+        hostExtension: INBOUND_BINDING.hostExtension,
+        expectedBinding: INBOUND_BINDING,
+      }),
+    ).toBeNull();
+
+    const exact = auth.issueArtifactPublishTicketForExtension(
+      PRINCIPAL,
+      INBOUND_BINDING.hostExtension,
+      INBOUND_BINDING.sessionId,
+      INBOUND_BINDING,
+    );
+    const consumed = auth.consumeArtifactPublishTicket(exact.ticket, {
+      origin: 'extension',
+      principal: PRINCIPAL,
+      hostExtension: INBOUND_BINDING.hostExtension,
+      expectedBinding: INBOUND_BINDING,
+    });
+    expect(consumed).toMatchObject({ binding: INBOUND_BINDING, extensionOnly: true });
+    expect(
+      auth.consumeArtifactPublishTicket(exact.ticket, {
+        origin: 'extension',
+        principal: PRINCIPAL,
+        hostExtension: INBOUND_BINDING.hostExtension,
+        expectedBinding: INBOUND_BINDING,
+      }),
+    ).toBeNull();
+
+    const expired = auth.issueArtifactPublishTicketForExtension(
+      PRINCIPAL,
+      INBOUND_BINDING.hostExtension,
+      INBOUND_BINDING.sessionId,
+      INBOUND_BINDING,
+    );
+    now += 90_001;
+    expect(
+      auth.consumeArtifactPublishTicket(expired.ticket, {
+        origin: 'extension',
+        principal: PRINCIPAL,
+        hostExtension: INBOUND_BINDING.hostExtension,
+        expectedBinding: INBOUND_BINDING,
+      }),
+    ).toBeNull();
+
+    expect(isHostAuthoritativeAction('artifact:publish')).toBe(true);
+    expect(isPhoneGrantableAction('artifact:publish')).toBe(false);
+    expect(isPhoneGrantableAction('artifact:read')).toBe(false);
+    expect(authorizeAction('artifact:publish')).toBe(true);
+  });
+
+  it('clears mutation authority on emergency disable and leaves no fallback family', () => {
+    const policy = new MutationPolicy();
+    const reasons: string[] = [];
+    policy.onDisable((reason) => reasons.push(reason));
+    policy.enableFamily('filesystem');
+    policy.setEnabled(true);
+    expect(policy.isAllowed('edit')).toBe(true);
+
+    policy.setEnabled(false);
+
+    expect(policy.status()).toEqual({ enabled: false, family: null });
+    expect(policy.isAllowed('edit')).toBe(false);
+    expect(policy.isAllowed('bash')).toBe(false);
+    expect(reasons).toContain('kill-switch');
   });
 
   it('binds runtime tickets to one exact model command and consumes substitutions', () => {
@@ -449,6 +591,58 @@ describe('consolidated fail-closed negative controls', () => {
     }
   });
 
+  it('rejects path and symlink injection, polyglot bytes, scanner timeout, and forced byte flips', async () => {
+    const publish = vi.fn();
+    for (const output of [
+      { source: 'extension', mediaClass: 'raster', capabilityHandle: 'opaque_security_handle_001', path: '/private/image.png' },
+      { source: 'extension', mediaClass: 'raster', capabilityHandle: 'opaque_security_handle_001', symlink: '/private/image.png' },
+    ]) {
+      await expect(publishApprovedImage(output, { publish })).rejects.toThrow();
+    }
+    expect(publish).not.toHaveBeenCalled();
+
+    const source = securityPngFixture();
+    const clearScanner = { scan: () => ({ status: 'clear' as const, matches: [] }) };
+    const polyglot = Buffer.concat([source, Buffer.from('<script>opaque</script>', 'utf8')]);
+    const polyglotResult = await sanitizeInboundImage(polyglot, {
+      declaredByteLength: polyglot.byteLength,
+      scanner: clearScanner,
+    });
+    expect(polyglotResult.status).toBe('withheld');
+
+    const originalDigest = createHash('sha256').update(source).digest('hex');
+    const flipped = Buffer.from(source);
+    flipped[flipped.byteLength - 1] = (flipped[flipped.byteLength - 1] ?? 0) ^ 1;
+    const flippedResult = await sanitizeInboundImage(flipped, {
+      declaredByteLength: flipped.byteLength,
+      expectedDigest: originalDigest,
+      scanner: clearScanner,
+    });
+    expect(flippedResult).toEqual({ status: 'withheld', reason: 'policy' });
+
+    const timeoutResult = await sanitizeInboundImage(source, {
+      declaredByteLength: source.byteLength,
+      deadlineMs: 1,
+      scanner: { scan: () => new Promise<never>(() => undefined) },
+    });
+    expect(timeoutResult).toEqual({ status: 'withheld', reason: 'redaction-unavailable' });
+
+    const root = mkdtempSync(join(tmpdir(), 'pi-remote-negative-'));
+    const link = `${root}-link`;
+    symlinkSync(root, link, 'dir');
+    try {
+      const symlinkResult = await sanitizeInboundImage(source, {
+        declaredByteLength: source.byteLength,
+        quarantineRoot: link,
+        scanner: clearScanner,
+      });
+      expect(symlinkResult).toEqual({ status: 'withheld', reason: 'policy' });
+    } finally {
+      rmSync(link, { force: true });
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   it('keeps normalized bytes inside the Pi request and out of durable outbound surfaces', async () => {
     const pixelCanary = 'PIXEL_CANARY_SECURITY';
     const owner: AttachmentOwner = {
@@ -702,6 +896,50 @@ async function currentBinding(service: CommandService): Promise<CommandBindingDt
     sessionRevision: fresh.sessionRevision,
     catalogRevision: fresh.catalogRevision,
   };
+}
+
+function securityPngFixture(width = 2, height = 2): Buffer {
+  const raw = Buffer.alloc((width * 4 + 1) * height);
+  for (let y = 0; y < height; y += 1) {
+    raw[y * (width * 4 + 1)] = 0;
+    for (let x = 0; x < width; x += 1) {
+      const offset = y * (width * 4 + 1) + 1 + x * 4;
+      raw[offset] = 210;
+      raw[offset + 1] = 170;
+      raw[offset + 2] = 140;
+      raw[offset + 3] = 255;
+    }
+  }
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
+  header[8] = 8;
+  header[9] = 6;
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    securityPngChunk('IHDR', header),
+    securityPngChunk('IDAT', deflateSync(raw)),
+    securityPngChunk('IEND', Buffer.alloc(0)),
+  ]);
+}
+
+function securityPngChunk(type: string, data: Buffer): Buffer {
+  const typeBytes = Buffer.from(type, 'ascii');
+  const chunk = Buffer.alloc(12 + data.byteLength);
+  chunk.writeUInt32BE(data.byteLength, 0);
+  typeBytes.copy(chunk, 4);
+  data.copy(chunk, 8);
+  chunk.writeUInt32BE(securityCrc32(Buffer.concat([typeBytes, data])), 8 + data.byteLength);
+  return chunk;
+}
+
+function securityCrc32(bytes: Uint8Array): number {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
 }
 
 function securityRuntimeSnapshot() {

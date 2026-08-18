@@ -4,6 +4,10 @@ import { readdirSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
+import {
+  createInboundMediaHostAdapter,
+  publishApprovedImage,
+} from '../../../extensions/pi-remote-inbound-media/src/index.js';
 import { RelayStore, type InboundPublishInput } from '../src/store/relay-store.js';
 import { SyncHub } from '../src/replay/sync.js';
 
@@ -73,6 +77,168 @@ function baseInput(body: Buffer, overrides: Partial<InboundPublishInput> = {}): 
 }
 
 describe('inbound media publication', () => {
+  it('runs a deterministic pre-stdout host seam through processing, exact read, revocation, and expiry', async () => {
+    const relay = new RelayStore();
+    const sync = new SyncHub(relay);
+    const body = pngFixture();
+    const publishedKinds: string[] = [];
+    let seamHandler: ((output: unknown) => void) | undefined;
+    let publication: ReturnType<RelayStore['publishInboundImage']> | undefined;
+    const adapter = createInboundMediaHostAdapter({
+      interception: {
+        available: true,
+        subscribe: (handler) => {
+          seamHandler = handler;
+          return () => {
+            seamHandler = undefined;
+          };
+        },
+      },
+      runtimeSnapshot: { media: { enabled: true, imageIn: true } },
+      onApprovedImage: (output) => {
+        publication = publishApprovedImage(output, {
+          publish: (payload) =>
+            relay.publishInboundImage(
+              baseInput(Buffer.from(payload.bytes ?? body), {
+                source: payload.source,
+                mediaClass: payload.mediaClass,
+                publish: (candidate) => {
+                  publishedKinds.push(candidate.kind);
+                  return sync.publish(candidate);
+                },
+              }),
+            ),
+        });
+      },
+    });
+
+    try {
+      adapter.start();
+      seamHandler?.({
+        source: 'extension',
+        mediaClass: 'screenshot',
+        capabilityHandle: 'opaque_host_fixture_handle_001',
+        bytes: body,
+      });
+      if (publication === undefined) throw new Error('expected host publication');
+      const result = await publication;
+      expect(adapter.capability).toEqual({ enabled: true, imageIn: true });
+      expect(publishedKinds).toEqual(['transcript.block', 'transcript.block']);
+      expect(result.status).toBe('ready');
+      if (result.status !== 'ready') throw new Error('expected ready publication');
+
+      const identity = {
+        sessionId: result.artifact.sessionId,
+        artifactId: result.artifact.artifactId,
+        revision: result.artifact.revision,
+      } as const;
+      const exactRead = relay.artifactStore.readInboundVariant({ ...identity, variant: 'full' });
+      expect(exactRead.status).toBe('ready');
+      if (exactRead.status !== 'ready') throw new Error('expected exact read');
+      expect(exactRead.byteLength).toBeGreaterThan(0);
+
+      expect(relay.artifactStore.revokeInboundArtifact(identity)).toBe(true);
+      expect(relay.artifactStore.readInboundVariant({ ...identity, variant: 'full' })).toEqual({
+        status: 'revoked',
+      });
+
+      const expiresAt = new Date(Date.now() + 1_000).toISOString();
+      const expiring = relay.artifactStore.putInboundArtifact({
+        sessionId: 'session_inbound_expiry_001',
+        blockId: 'block_inbound_expiry_001',
+        blockRevision: 1,
+        ownerPrincipal: 'principal_inbound_001',
+        ownerDeviceId: 'device_inbound_001',
+        mediaClass: 'screenshot',
+        source: 'extension',
+        full: {
+          mediaType: exactRead.mediaType,
+          width: exactRead.metadata.width,
+          height: exactRead.metadata.height,
+          bytes: exactRead.bytes,
+        },
+        thumbnail: {
+          mediaType: exactRead.mediaType,
+          width: exactRead.metadata.width,
+          height: exactRead.metadata.height,
+          bytes: exactRead.bytes,
+        },
+        expiresAt,
+      });
+      expect(
+        relay.artifactStore.readInboundVariant(
+          { sessionId: expiring.sessionId, artifactId: expiring.artifactId, revision: expiring.revision, variant: 'full' },
+          Date.parse(expiresAt) + 1,
+        ),
+      ).toEqual({ status: 'expired' });
+    } finally {
+      adapter.stop();
+      relay.close();
+    }
+  });
+
+  it('routes the same host seam to withheld when scanner processing is unavailable', async () => {
+    const relay = new RelayStore();
+    const body = pngFixture();
+    const publishedKinds: string[] = [];
+    let seamHandler: ((output: unknown) => void) | undefined;
+    let publication: ReturnType<RelayStore['publishInboundImage']> | undefined;
+    const adapter = createInboundMediaHostAdapter({
+      interception: {
+        available: true,
+        subscribe: (handler) => {
+          seamHandler = handler;
+          return () => {
+            seamHandler = undefined;
+          };
+        },
+      },
+      runtimeSnapshot: { media: { enabled: true, imageIn: true } },
+      onApprovedImage: (output) => {
+        publication = publishApprovedImage(output, {
+          publish: (payload) => {
+            const input = baseInput(Buffer.from(payload.bytes ?? body), {
+              source: payload.source,
+              mediaClass: payload.mediaClass,
+              publish: (candidate) => {
+                publishedKinds.push(candidate.kind);
+                return relay.appendEnvelope(candidate).envelope;
+              },
+            });
+            const { scanner: unavailableScanner, ...withoutScanner } = input;
+            void unavailableScanner;
+            return relay.publishInboundImage(withoutScanner);
+          },
+        });
+      },
+    });
+
+    try {
+      adapter.start();
+      seamHandler?.({
+        source: 'extension',
+        mediaClass: 'screenshot',
+        capabilityHandle: 'opaque_host_withheld_handle_001',
+        bytes: body,
+      });
+      if (publication === undefined) throw new Error('expected host publication');
+      const result = await publication;
+      expect(publishedKinds).toEqual(['transcript.block', 'transcript.block']);
+      expect(result.status).toBe('withheld');
+      expect(
+        relay.getTranscriptPage({
+          hostId: 'host_inbound_001',
+          workspaceRef: 'workspace_inbound_001',
+          sessionId: 'session_inbound_001',
+        }).items,
+      ).toMatchObject([{ availability: 'withheld' }]);
+      expect(readdirSync(relay.artifactStore.quarantineRoot)).toEqual([]);
+    } finally {
+      adapter.stop();
+      relay.close();
+    }
+  });
+
   it('commits processing then one ready revision and stores only retrievable derivatives', async () => {
     const relay = new RelayStore();
     const sync = new SyncHub(relay);

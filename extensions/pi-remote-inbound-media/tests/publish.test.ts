@@ -60,6 +60,22 @@ describe('inbound media publisher boundary', () => {
     expect(onApprovedImage).not.toHaveBeenCalled();
   });
 
+  it('fails closed when the seam exists but the runtime snapshot does not grant image input', () => {
+    const subscribe = vi.fn();
+    const onApprovedImage = vi.fn();
+    const adapter = createInboundMediaHostAdapter({
+      interception: { available: true, subscribe },
+      runtimeSnapshot: { media: { enabled: true, imageIn: false } },
+      onApprovedImage,
+    });
+
+    adapter.start();
+
+    expect(adapter.capability).toBeUndefined();
+    expect(subscribe).not.toHaveBeenCalled();
+    expect(onApprovedImage).not.toHaveBeenCalled();
+  });
+
   it('retains the strict approved output shape', () => {
     const output: ApprovedImageOutput = {
       source: 'assistant_output',

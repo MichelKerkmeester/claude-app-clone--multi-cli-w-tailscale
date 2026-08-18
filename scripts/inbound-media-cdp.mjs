@@ -78,7 +78,7 @@ async function waitForHttp(url) {
     }
     await sleep(100);
   }
-  throw new Error(`Timed out waiting for ${url}`);
+  throw new Error('Timed out waiting for the demo server.');
 }
 
 async function launchChrome(chromePath, userDataDir) {
@@ -108,7 +108,7 @@ async function launchChrome(chromePath, userDataDir) {
     if (match?.[1] !== undefined) return { browser, browserWebSocket: match[1] };
     await sleep(100);
   }
-  throw new Error(`Chrome did not expose CDP: ${output.join('')}`);
+  throw new Error('Chrome did not expose CDP.');
 }
 
 class CdpClient {
@@ -133,7 +133,7 @@ class CdpClient {
       const request = this.pending.get(payload.id);
       if (request === undefined) return;
       this.pending.delete(payload.id);
-      if (payload.error !== undefined) request.reject(new Error(JSON.stringify(payload.error)));
+      if (payload.error !== undefined) request.reject(new Error('CDP request failed.'));
       else request.resolve(payload.result);
     });
   }
@@ -158,7 +158,7 @@ async function evaluate(client, expression) {
     returnByValue: true,
   });
   if (result.exceptionDetails !== undefined) {
-    throw new Error(`Page evaluation failed: ${JSON.stringify(result.exceptionDetails)}`);
+    throw new Error('Page evaluation failed.');
   }
   return result.result?.value;
 }
@@ -169,10 +169,7 @@ async function waitForPage(client, expression) {
     if (await evaluate(client, expression)) return;
     await sleep(100);
   }
-  const body = String((await evaluate(client, 'document.body?.innerText ?? ""')).slice(0, 500));
-  throw new Error(
-    `Timed out waiting for page condition: ${expression}; body=${JSON.stringify(body)}`,
-  );
+  throw new Error('Timed out waiting for a page condition.');
 }
 
 async function waitForUnsupportedRow(client) {
@@ -218,6 +215,9 @@ async function waitForProcessExit(process) {
 }
 
 async function exercise(client, theme, fixture, requestedState, outputPath, viewportWidth) {
+  if (fixture === 'end-to-end') {
+    return exerciseEndToEnd(client, theme, outputPath, viewportWidth);
+  }
   const demoFixture = fixture === 'viewer-ready' ? 'inline-card' : fixture;
   await client.send('Emulation.setDeviceMetricsOverride', {
     width: viewportWidth,
@@ -300,7 +300,7 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
     state.disclosures < 1 ||
     state.enablingControls.length !== 0
   ) {
-    throw new Error(`Transcript boundary fixture failed: ${JSON.stringify(state)}`);
+    throw new Error('Transcript boundary fixture failed.');
   }
   if (fixture === 'inbound-media') {
     if (
@@ -309,7 +309,7 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
       !state.unsupportedText.includes('cannot be displayed') ||
       state.imageElements !== 0
     ) {
-      throw new Error(`Disabled inbound-media fixture failed: ${JSON.stringify(state)}`);
+      throw new Error('Disabled inbound-media fixture failed.');
     }
   } else if (fixture === 'viewer-ready') {
     if (
@@ -318,7 +318,7 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
       state.viewerForbiddenControls.length !== 0 ||
       state.viewerState === 'privacy-covered'
     ) {
-      throw new Error(`Viewer-ready fixture failed: ${JSON.stringify(state)}`);
+      throw new Error('Viewer-ready fixture failed.');
     }
   } else {
     const expectedCopy = {
@@ -334,7 +334,7 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
       !cardButtonShapeValid ||
       (expectedCopy !== undefined && !state.cardText.includes(expectedCopy))
     ) {
-      throw new Error(`Inline image card fixture failed: ${JSON.stringify(state)}`);
+      throw new Error('Inline image card fixture failed.');
     }
   }
 
@@ -347,6 +347,109 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
   return { ...state, expectedState: requestedState };
 }
 
+async function exerciseEndToEnd(client, theme, outputPath, viewportWidth) {
+  await client.send('Emulation.setDeviceMetricsOverride', {
+    width: viewportWidth,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+  });
+  const states = ['processing', 'inline-ready', 'withheld', 'expired', 'revoked'];
+  for (const requestedState of states) {
+    await navigateDemo(client, theme, requestedState);
+    await waitForInboundCard(client);
+    await waitForPage(
+      client,
+      `document.querySelector('[data-inbound-image-card="true"]')?.getAttribute('data-image-state') === ${JSON.stringify(requestedState)}`,
+    );
+    const card = await evaluate(
+      client,
+      `(() => {
+        const root = document.documentElement;
+        const scroll = document.querySelector('.transcript-scroll');
+        const imageCard = document.querySelector('[data-inbound-image-card="true"]');
+        return {
+          viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
+          theme: root.dataset.theme,
+          clientWidth: root.clientWidth,
+          scrollWidth: root.scrollWidth,
+          transcript: scroll !== null,
+          activity: document.querySelectorAll('.activity-group').length,
+          disclosures: document.querySelectorAll('.evidence-trigger').length,
+          state: imageCard?.getAttribute('data-image-state'),
+          cardPixels: imageCard?.querySelectorAll('img, canvas, video, audio').length ?? 0,
+          enablingControls: [...document.querySelectorAll('button, [role="button"]')]
+            .map((node) => node.textContent ?? '')
+            .filter((text) => /enable.*inbound|inbound.*enable|capture image|publish image|share inbound image/i.test(text)),
+        };
+      })()`,
+    );
+    if (
+      card.viewportWidth !== viewportWidth ||
+      card.clientWidth !== viewportWidth ||
+      card.scrollWidth > card.clientWidth ||
+      card.theme !== theme ||
+      !card.transcript ||
+      card.activity < 1 ||
+      card.disclosures < 1 ||
+      card.state !== requestedState ||
+      card.enablingControls.length !== 0
+    ) {
+      throw new Error('End-to-end card boundary fixture failed.');
+    }
+    if (requestedState !== 'processing' && requestedState !== 'inline-ready' && card.cardPixels !== 0) {
+      throw new Error('Terminal inbound-media state exposed pixels.');
+    }
+
+    if (requestedState === 'inline-ready') {
+      await evaluate(
+        client,
+        `document.querySelector('[data-inbound-image-card="true"] button, [data-inbound-image-card="true"] [role="button"]')?.click()`,
+      );
+      await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") !== null');
+      await evaluate(client, "window.dispatchEvent(new Event('pi-remote:privacy-cover'))");
+      await waitForPage(
+        client,
+        `document.documentElement.dataset.artifactViewerPrivacy === 'covered' && document.querySelector('#artifact-viewer-privacy-curtain') !== null`,
+      );
+      const privacy = await evaluate(
+        client,
+        `(() => ({
+          covered: document.documentElement.dataset.artifactViewerPrivacy === 'covered',
+          curtain: document.querySelector('#artifact-viewer-privacy-curtain') !== null,
+          viewerCovered: document.querySelector('.artifact-viewer-overlay')?.getAttribute('data-privacy-covered') === 'true',
+          imageSources: [...document.querySelectorAll('.artifact-viewer-dialog img, [data-verified-image="true"]')]
+            .some((image) => image.hasAttribute('src') || image.hasAttribute('srcset')),
+        }))()`,
+      );
+      if (privacy.imageSources || !privacy.covered || !privacy.curtain || !privacy.viewerCovered) {
+        throw new Error('Privacy cover did not purge the viewer.');
+      }
+    }
+  }
+
+  const screenshot = await client.send('Page.captureScreenshot', {
+    format: 'png',
+    fromSurface: true,
+  });
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, Buffer.from(screenshot.data, 'base64'));
+  return { viewportWidth, stateCount: states.length };
+}
+
+async function navigateDemo(client, theme, state) {
+  await client.send('Page.navigate', {
+    url: `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=inline-card&state=${encodeURIComponent(state)}`,
+  });
+  await waitForPage(client, 'document.readyState === "complete"');
+  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await evaluate(
+    client,
+    `localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
+  );
+  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const fixture = options.fixture ?? 'inbound-media';
@@ -355,7 +458,12 @@ async function main() {
   const output =
     options.screenshot ?? join(tmpdir(), `pi-remote-inbound-${fixture}-${theme}.png`);
   const viewportWidth = Number(options['viewport-width'] ?? '390');
-  if (fixture !== 'inbound-media' && fixture !== 'inline-card' && fixture !== 'viewer-ready') {
+  if (
+    fixture !== 'inbound-media' &&
+    fixture !== 'inline-card' &&
+    fixture !== 'viewer-ready' &&
+    fixture !== 'end-to-end'
+  ) {
     throw new Error(`Unsupported fixture: ${fixture}`);
   }
   if (
@@ -378,9 +486,7 @@ async function main() {
   }
   const chromePath = findChrome();
   if (chromePath === null) {
-    console.error(
-      'CDP capture operator-required: no supported headless Chrome executable was found.',
-    );
+    console.error('CDP capture unavailable: no supported headless Chrome executable was found.');
     process.exitCode = 2;
     return;
   }
@@ -406,9 +512,7 @@ async function main() {
     await cdp.send('Page.enable');
     await cdp.send('Runtime.enable');
     const capture = await exercise(cdp, theme, fixture, state, outputPath, viewportWidth);
-    console.log(
-      `CDP passed: ${theme} ${fixture}${state === null ? '' : `/${state}`}, ${capture.viewportWidth} CSS-pixel width, transcript/card boundaries preserved, screenshot ${outputPath}`,
-    );
+    console.log(`CDP passed: ${theme} ${fixture}, ${capture.viewportWidth} CSS-pixel width.`);
   } finally {
     cdp?.close();
     if (browserProcess !== null) {
@@ -420,7 +524,7 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(`CDP failed: ${error instanceof Error ? error.message : String(error)}`);
+main().catch(() => {
+  console.error('CDP verification failed.');
   process.exitCode = 1;
 });

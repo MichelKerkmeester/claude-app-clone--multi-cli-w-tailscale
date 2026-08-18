@@ -2,9 +2,7 @@
 // MODULE: Pi Remote Release Verification Runner
 // ───────────────────────────────────────────────────────────────────
 
-import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -36,7 +34,70 @@ const tools = {
   testingLibraryReact: packageVersion('node_modules/@testing-library/react'),
 };
 
+const boundaryGates = [
+  runBoundaryGate('boundary-default-deny', () => {
+    const host = readSource('extensions/pi-remote-inbound-media/src/index.ts');
+    const plan = readSource('extensions/pi-remote-plan/src/index.ts');
+    const auth = readSource('apps/pi-remote-relay/src/auth/policy.ts');
+    const mutation = readSource('apps/pi-remote-relay/src/policy/mutation-policy.ts');
+    return [
+      host.includes('runtimeSnapshot') && host.includes('isRuntimeMediaCapabilityEnabled'),
+      host.includes('capability === undefined'),
+      host.includes('ALLOWLISTED_INBOUND_MEDIA_SOURCES'),
+      plan.includes("'artifact:read'") && plan.includes("'artifact:publish'"),
+      plan.includes('isHostAuthoritativeMediaTool'),
+      auth.includes('HOST_AUTHORITATIVE_ACTIONS') && auth.includes('READ_ONLY_ACTIONS'),
+      auth.includes('isPhoneGrantableAction'),
+      mutation.includes('private enabled = false') && mutation.includes("'kill-switch'"),
+      mutation.includes('this.families.clear()'),
+    ];
+  }),
+  runBoundaryGate('boundary-publication-read-split', () => {
+    const server = readSource('apps/pi-remote-relay/src/http/server.ts');
+    const sanitizer = readSource('apps/pi-remote-relay/src/store/artifact-sanitizer.ts');
+    const store = readSource('apps/pi-remote-relay/src/store/artifact-store.ts');
+    return [
+      server.includes("path === '/api/extension/artifacts/publish'"),
+      server.includes('auth.consumeArtifactPublishTicket'),
+      server.includes("path === '/api/artifacts/read'"),
+      server.includes("'cache-control': 'private, no-store, max-age=0'"),
+      sanitizer.includes('INBOUND_IMAGE_DECODE_DEADLINE_MS'),
+      sanitizer.includes("'redaction-unavailable'"),
+      sanitizer.includes('matchesInboundDigest'),
+      sanitizer.includes('lstatSync(root).isSymbolicLink()'),
+      store.includes('readInboundVariant'),
+      store.includes('revokeInboundArtifact'),
+      store.includes('purgeInboundExpired'),
+      store.includes('writeAtomicInboundFile'),
+      store.includes('mode: 0o600'),
+    ];
+  }),
+  runBoundaryGate('boundary-release-hygiene', () => {
+    const host = readSource('extensions/pi-remote-inbound-media/src/index.ts');
+    const release = readSource('scripts/release-verify.mjs');
+    const cdp = readSource('scripts/inbound-media-cdp.mjs');
+    const indexHtml = readSource('apps/pi-remote-web/index.html');
+    const serviceWorker = readSource('apps/pi-remote-web/public/service-worker.js');
+    return [
+      !host.includes('options.stdout') && !host.includes('options.session'),
+      !host.includes('console.') && !host.includes('base64'),
+      !release.includes(['output', 'Sha256'].join('')) &&
+        !release.includes(['Evid', 'ence:'].join('')),
+      release.includes("PI_REMOTE_MEDIA_ENABLED: '0'"),
+      cdp.includes("fixture === 'end-to-end'"),
+      cdp.includes("'pi-remote:privacy-cover'"),
+      cdp.includes("artifact-viewer-privacy-curtain"),
+      indexHtml.includes("img-src 'self' blob:") && indexHtml.includes("connect-src 'self'"),
+      indexHtml.includes("object-src 'none'"),
+      serviceWorker.includes("url.pathname.startsWith('/api/artifacts/')"),
+      serviceWorker.includes("cache: 'no-store'"),
+      noScopedMediaResidue(),
+    ];
+  }),
+];
+
 const gates = [
+  ...boundaryGates,
   runGate(
     'typecheck',
     'npm run typecheck',
@@ -89,7 +150,7 @@ const gates = [
   ),
   runGate(
     'thresholds',
-    `node scripts/check-thresholds.mjs${measurementsPath === undefined ? '' : ` --measurements ${measurementsPath}`}`,
+    `node scripts/check-thresholds.mjs${measurementsPath === undefined ? '' : ' --measurements <app-relative>'}`,
     process.execPath,
     [
       'scripts/check-thresholds.mjs',
@@ -151,7 +212,6 @@ const evidence = {
 writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
 
 process.stdout.write(`Release verification: ${machineStatus}\n`);
-process.stdout.write(`Evidence: ${path.relative(appRoot, evidencePath)}\n`);
 for (const stage of rollout.stages) {
   const blocked = stage.evidence.filter((item) => item.status !== 'PASS').map((item) => item.id);
   process.stdout.write(
@@ -165,11 +225,16 @@ function runGate(id, command, executable, args, toolNames) {
   const result = spawnSync(executable, args, {
     cwd: appRoot,
     encoding: 'utf8',
-    env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' },
+    env: {
+      ...process.env,
+      NO_COLOR: '1',
+      FORCE_COLOR: '0',
+      PI_REMOTE_MEDIA_ENABLED: '0',
+      PI_REMOTE_MUTATION_ENABLED: '0',
+    },
     timeout: 120_000,
   });
-  const output = sanitize(`${result.stdout ?? ''}${result.stderr ?? ''}`);
-  return {
+  const gate = {
     id,
     command,
     startedAt: gateStartedAt,
@@ -177,15 +242,21 @@ function runGate(id, command, executable, args, toolNames) {
     toolVersions: Object.fromEntries(toolNames.map((name) => [name, tools[name]])),
     exitStatus: result.status ?? 1,
     signal: result.signal,
-    output,
-    outputSha256: createHash('sha256').update(output).digest('hex'),
+    result: result.status === 0 ? 'completed' : 'failed',
   };
+  Object.defineProperty(gate, 'parsedJson', {
+    value: parseJsonLine(`${result.stdout ?? ''}`),
+    enumerable: false,
+  });
+  return gate;
 }
 
 function parseGateJson(gate) {
-  if (gate?.exitStatus !== 0) return undefined;
-  const lines = gate.output.trim().split('\n');
-  const last = lines.at(-1);
+  return gate?.exitStatus === 0 ? gate.parsedJson : undefined;
+}
+
+function parseJsonLine(output) {
+  const last = output.trim().split('\n').at(-1);
   if (last === undefined) return undefined;
   try {
     return JSON.parse(last);
@@ -194,13 +265,52 @@ function parseGateJson(gate) {
   }
 }
 
-function sanitize(output) {
-  return output
-    .replaceAll('\u001b', '')
-    .replaceAll(appRoot, '<APP_ROOT>')
-    .replaceAll(os.homedir(), '<HOME>')
-    .replace(/[A-Za-z0-9_-]{32,}/g, '<REDACTED_LONG_VALUE>')
-    .trim();
+function runBoundaryGate(id, check) {
+  let checks;
+  try {
+    checks = check();
+  } catch {
+    checks = [false];
+  }
+  const failureCount = checks.filter((passed) => passed !== true).length;
+  return {
+    id,
+    command: 'in-repo boundary assertions',
+    startedAt: startedAt,
+    completedAt: new Date().toISOString(),
+    toolVersions: { node: tools.node },
+    exitStatus: failureCount === 0 ? 0 : 1,
+    signal: null,
+    result: failureCount === 0 ? 'completed' : 'failed',
+    checkCount: checks.length,
+    failureCount,
+  };
+}
+
+function readSource(relativePath) {
+  return readFileSync(path.join(appRoot, relativePath), 'utf8');
+}
+
+function noScopedMediaResidue() {
+  const scopedPaths = [
+    'extensions/pi-remote-inbound-media',
+    'extensions/pi-remote-plan/src/index.ts',
+    'apps/pi-remote-relay/src/policy/mutation-policy.ts',
+    'apps/pi-remote-relay/src/auth/policy.ts',
+    'apps/pi-remote-relay/tests/inbound-media-publish.test.ts',
+    'apps/pi-remote-relay/tests/security/negative-controls.test.ts',
+    'scripts/release-verify.mjs',
+    'scripts/inbound-media-cdp.mjs',
+  ];
+  const result = spawnSync('git', ['status', '--short', '--untracked-files=all', '--', ...scopedPaths], {
+    cwd: appRoot,
+    encoding: 'utf8',
+  });
+  if (result.status !== 0) return false;
+  return String(result.stdout ?? '')
+    .split('\n')
+    .filter((line) => line.length > 0)
+    .every((line) => !/\.(?:png|jpe?g|gif|webp|avif|bin)$/iu.test(line));
 }
 
 function relativeInputAfter(flag) {

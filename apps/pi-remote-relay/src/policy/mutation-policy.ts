@@ -25,9 +25,15 @@ export class MutationPolicy {
   }
 
   public setEnabled(enabled: boolean): void {
-    if (this.enabled === enabled) return;
-    this.enabled = enabled;
-    if (!enabled) this.emitDisabled('kill-switch');
+    if (!enabled) {
+      const wasActive = this.enabled || this.families.size > 0;
+      this.enabled = false;
+      this.families.clear();
+      if (wasActive) this.emitDisabled('kill-switch');
+      return;
+    }
+    if (this.enabled) return;
+    this.enabled = true;
   }
 
   public enableFamily(family: MutationFamily): void {

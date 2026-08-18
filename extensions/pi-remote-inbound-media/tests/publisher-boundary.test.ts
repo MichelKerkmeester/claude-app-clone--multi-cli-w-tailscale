@@ -30,7 +30,33 @@ describe('inbound media host boundary', () => {
     expect(session.write).not.toHaveBeenCalled();
   });
 
-  it('forwards only the opaque seam handle after interception is available', () => {
+  it('keeps the capability off when the runtime snapshot is absent or disabled', () => {
+    const subscribe = vi.fn();
+    const onApprovedImage = vi.fn();
+    const adapter = createInboundMediaHostAdapter({
+      interception: { available: true, subscribe },
+      onApprovedImage,
+    });
+
+    adapter.start();
+
+    expect(adapter.capability).toBeUndefined();
+    expect(adapter.interceptionAvailable).toBe(true);
+    expect(subscribe).not.toHaveBeenCalled();
+    expect(onApprovedImage).not.toHaveBeenCalled();
+
+    const disabled = createInboundMediaHostAdapter({
+      interception: { available: true, subscribe },
+      runtimeSnapshot: { media: { enabled: false, imageIn: true } },
+      onApprovedImage,
+    });
+    disabled.start();
+
+    expect(disabled.capability).toBeUndefined();
+    expect(subscribe).not.toHaveBeenCalled();
+  });
+
+  it('forwards only the opaque seam handle after the runtime snapshot enables image input', () => {
     let published: ((output: unknown) => void) | undefined;
     const unsubscribe = vi.fn();
     const subscribe = vi.fn((handler: (output: unknown) => void) => {
@@ -42,6 +68,7 @@ describe('inbound media host boundary', () => {
     const session = { write: vi.fn() };
     const adapter = createInboundMediaHostAdapter({
       interception: { available: true, subscribe },
+      runtimeSnapshot: { media: { enabled: true, imageIn: true } },
       onApprovedImage,
       stdout,
       session,

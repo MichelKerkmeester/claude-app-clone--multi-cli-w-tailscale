@@ -32,9 +32,17 @@ export interface InboundMediaTransportSpy {
 
 export interface InboundMediaAdapterOptions {
   readonly interception?: PreStdoutInterceptionSeam;
+  readonly runtimeSnapshot?: InboundMediaRuntimeSnapshot | null;
   readonly onApprovedImage?: (output: ApprovedImageOutput) => void;
   readonly stdout?: InboundMediaTransportSpy;
   readonly session?: InboundMediaTransportSpy;
+}
+
+export interface InboundMediaRuntimeSnapshot {
+  readonly media?: {
+    readonly enabled: boolean;
+    readonly imageIn: boolean;
+  };
 }
 
 export interface InboundMediaCapability {
@@ -51,6 +59,7 @@ export interface InboundMediaHostAdapter {
 
 export interface PiInboundMediaExtensionContext {
   readonly preStdoutInterception?: PreStdoutInterceptionSeam;
+  readonly runtimeSnapshot?: InboundMediaRuntimeSnapshot | null;
 }
 
 const INBOUND_MEDIA_CAPABILITY: InboundMediaCapability = Object.freeze({
@@ -58,11 +67,12 @@ const INBOUND_MEDIA_CAPABILITY: InboundMediaCapability = Object.freeze({
   imageIn: true,
 });
 
-const INBOUND_MEDIA_SOURCES = new Set<InboundMediaSource>([
+export const ALLOWLISTED_INBOUND_MEDIA_SOURCES = [
   'tool_result',
   'assistant_output',
   'extension',
-]);
+] as const satisfies readonly InboundMediaSource[];
+const INBOUND_MEDIA_SOURCES = new Set<InboundMediaSource>(ALLOWLISTED_INBOUND_MEDIA_SOURCES);
 const INBOUND_MEDIA_CLASSES = new Set<InboundMediaClass>(['screenshot', 'raster', 'generated']);
 
 /**
@@ -74,11 +84,14 @@ export function createInboundMediaHostAdapter(
 ): InboundMediaHostAdapter {
   const interception = options.interception;
   const interceptionAvailable = interception?.available === true;
-  const capability = interceptionAvailable ? INBOUND_MEDIA_CAPABILITY : undefined;
+  const capability =
+    interceptionAvailable && isRuntimeMediaCapabilityEnabled(options.runtimeSnapshot)
+      ? INBOUND_MEDIA_CAPABILITY
+      : undefined;
   let unsubscribe: (() => void) | undefined;
 
   const start = (): void => {
-    if (!interceptionAvailable || unsubscribe !== undefined || interception === undefined) return;
+    if (capability === undefined || unsubscribe !== undefined || interception === undefined) return;
     unsubscribe = interception.subscribe((output) => {
       if (isApprovedImageOutput(output)) options.onApprovedImage?.(output);
     });
@@ -101,6 +114,7 @@ export function installPiRemoteInboundMedia(
   const adapter = createInboundMediaHostAdapter({
     ...options,
     ...(interception === undefined ? {} : { interception }),
+    ...(pi.runtimeSnapshot === undefined ? {} : { runtimeSnapshot: pi.runtimeSnapshot }),
   });
   adapter.start();
   return adapter;
@@ -126,6 +140,16 @@ export default function piRemoteInboundMedia(
   return installPiRemoteInboundMedia(pi);
 }
 
+export function isAllowlistedInboundMediaSource(value: unknown): value is InboundMediaSource {
+  return typeof value === 'string' && INBOUND_MEDIA_SOURCES.has(value as InboundMediaSource);
+}
+
+function isRuntimeMediaCapabilityEnabled(
+  snapshot: InboundMediaRuntimeSnapshot | null | undefined,
+): boolean {
+  return snapshot?.media?.enabled === true && snapshot.media.imageIn === true;
+}
+
 function isApprovedImageOutput(value: unknown): value is ApprovedImageOutput {
   if (!isRecord(value) || !hasOnlyKeys(value, ['source', 'mediaClass', 'capabilityHandle'], ['bytes'])) {
     return false;
@@ -138,7 +162,7 @@ function isApprovedImageOutput(value: unknown): value is ApprovedImageOutput {
   }
   return (
     typeof value.source === 'string' &&
-    INBOUND_MEDIA_SOURCES.has(value.source as InboundMediaSource) &&
+    isAllowlistedInboundMediaSource(value.source) &&
     typeof value.mediaClass === 'string' &&
     INBOUND_MEDIA_CLASSES.has(value.mediaClass as InboundMediaClass) &&
     isOpaqueCapabilityHandle(value.capabilityHandle)

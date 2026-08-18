@@ -35,12 +35,16 @@ export const ATTACHMENT_ACTIONS = [
 ] as const;
 export type AttachmentAction = (typeof ATTACHMENT_ACTIONS)[number];
 
+export const READ_ONLY_ACTIONS = ['artifact:read'] as const;
+export const HOST_AUTHORITATIVE_ACTIONS = ['artifact:publish'] as const;
+export type HostAuthoritativeAction = (typeof HOST_AUTHORITATIVE_ACTIONS)[number];
+
 const AUTHORIZED_ACTIONS = new Set<string>([
   'health:read',
   'sessions:list',
   'transcript:read',
-  'artifact:read',
-  'artifact:publish',
+  ...READ_ONLY_ACTIONS,
+  ...HOST_AUTHORITATIVE_ACTIONS,
   'sync:read',
   'ticket:create',
   'session:revoke',
@@ -63,7 +67,7 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   ...ATTACHMENT_ACTIONS,
 ]);
 
-/** Media stays unavailable unless the host operator explicitly enables it. */
+/** Media stays unavailable by default and is enabled only by the runtime capability. */
 export function isMediaFeatureEnabled(
   value: string | undefined = process.env.PI_REMOTE_MEDIA_ENABLED,
 ): value is '1' {
@@ -72,6 +76,20 @@ export function isMediaFeatureEnabled(
 
 export function isAttachmentAction(action: string): action is AttachmentAction {
   return (ATTACHMENT_ACTIONS as readonly string[]).includes(action);
+}
+
+export function isHostAuthoritativeAction(action: string): action is HostAuthoritativeAction {
+  return (HOST_AUTHORITATIVE_ACTIONS as readonly string[]).includes(action);
+}
+
+export function isPhoneGrantableAction(
+  action: string,
+): action is Exclude<AuthorizedAction, HostAuthoritativeAction | 'artifact:read'> {
+  return (
+    authorizeAction(action) &&
+    !isHostAuthoritativeAction(action) &&
+    !(READ_ONLY_ACTIONS as readonly string[]).includes(action)
+  );
 }
 
 /** Keep unknown and tool-mutation actions denied unless explicitly authorized. */

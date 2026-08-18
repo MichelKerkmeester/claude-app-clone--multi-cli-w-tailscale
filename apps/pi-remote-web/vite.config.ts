@@ -2,6 +2,7 @@
 // MODULE: Pi Remote Web Vite Configuration
 // ───────────────────────────────────────────────────────────────────
 
+import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -38,4 +39,15 @@ export default defineConfig({
   worker: { format: 'es' },
   server: { proxy: relayProxy },
   preview: { proxy: relayProxy, allowedHosts: previewAllowedHosts() },
+  // The catalog is a separate, isolated Vite entry (catalog.html + its own React
+  // root). Both the operator app and the catalog must build; the app entry still
+  // maps to the existing index.html.
+  build: {
+    rollupOptions: {
+      input: {
+        app: fileURLToPath(new URL('./index.html', import.meta.url)),
+        catalog: fileURLToPath(new URL('./catalog.html', import.meta.url)),
+      },
+    },
+  },
 });

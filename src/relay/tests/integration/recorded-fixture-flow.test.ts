@@ -17,7 +17,7 @@ import { RpcSupervisor } from '../../src/rpc/supervisor.js';
 import { SessionCatalog } from '../../src/sessions/catalog.js';
 import { RelayStore } from '../../src/store/relay-store.js';
 import { TranscriptProjector } from '../../src/store/transcript-projector.js';
-import { EMPTY_TRANSCRIPT, transcriptReducer } from '../../../pi-remote-web/src/state.js';
+import { EMPTY_TRANSCRIPT, transcriptReducer } from '../../../mobile-app/src/state.js';
 
 const IDENTITY = {
   hostId: 'host_local',

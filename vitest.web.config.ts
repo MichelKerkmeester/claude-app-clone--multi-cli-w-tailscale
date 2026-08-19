@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    include: ['apps/pi-remote-web/tests/**/*.test.tsx'],
-    setupFiles: ['apps/pi-remote-web/tests/setup.ts'],
+    include: ['src/mobile-app/tests/**/*.test.tsx'],
+    setupFiles: ['src/mobile-app/tests/setup.ts'],
   },
 });

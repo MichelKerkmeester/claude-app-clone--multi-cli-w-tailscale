@@ -35,7 +35,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['apps/pi-remote-web/**/*.{ts,tsx}'],
+    files: ['src/mobile-app/**/*.{ts,tsx}'],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -52,7 +52,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['apps/pi-remote-web/public/service-worker.js'],
+    files: ['src/mobile-app/public/service-worker.js'],
     languageOptions: {
       globals: {
         ...globals.serviceworker,

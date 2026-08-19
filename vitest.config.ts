@@ -18,6 +18,6 @@ const RUNTIME_SYMLINKS = [
 
 export default defineConfig({
   test: {
-    exclude: [...configDefaults.exclude, 'apps/pi-remote-web/tests/**', ...RUNTIME_SYMLINKS],
+    exclude: [...configDefaults.exclude, 'src/mobile-app/tests/**', ...RUNTIME_SYMLINKS],
   },
 });

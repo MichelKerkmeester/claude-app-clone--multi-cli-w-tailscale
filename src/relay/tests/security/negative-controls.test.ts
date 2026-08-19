@@ -76,14 +76,14 @@ const READ_ONLY_SERVER_SOURCE = readFileSync(
   'utf8',
 );
 const READ_ONLY_RICH_SOURCES = [
-  '../../../pi-remote-web/src/rich-content/CodeCard.tsx',
-  '../../../pi-remote-web/src/rich-content/CommandOutputCard.tsx',
-  '../../../pi-remote-web/src/rich-content/F6ViewerAdapter.tsx',
-  '../../../pi-remote-web/src/rich-content/SafeMarkdown.tsx',
-  '../../../pi-remote-web/src/rich-content/highlight.worker.ts',
-  '../../../pi-remote-web/src/rich-content/useHighlightedCode.ts',
-  '../../../pi-remote-web/src/artifacts/ArtifactViewerProvider.tsx',
-  '../../../pi-remote-web/src/artifacts/CodePreview.tsx',
+  '../../../mobile-app/src/rich-content/CodeCard.tsx',
+  '../../../mobile-app/src/rich-content/CommandOutputCard.tsx',
+  '../../../mobile-app/src/rich-content/F6ViewerAdapter.tsx',
+  '../../../mobile-app/src/rich-content/SafeMarkdown.tsx',
+  '../../../mobile-app/src/rich-content/highlight.worker.ts',
+  '../../../mobile-app/src/rich-content/useHighlightedCode.ts',
+  '../../../mobile-app/src/artifacts/ArtifactViewerProvider.tsx',
+  '../../../mobile-app/src/artifacts/CodePreview.tsx',
 ].map((path) => readFileSync(new URL(path, import.meta.url), 'utf8'));
 
 // This suite keeps the fail-closed boundary visible in one machine-checkable module.

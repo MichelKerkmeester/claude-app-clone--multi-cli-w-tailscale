@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { runRollbackDrill } from '../apps/pi-remote-relay/src/release/rollback-drill.js';
+import { runRollbackDrill } from '../src/relay/src/release/rollback-drill.js';
 
 describe('executable rollback drill', () => {
   it('executes restore and down-migration without losing sessions or uncertainty', () => {

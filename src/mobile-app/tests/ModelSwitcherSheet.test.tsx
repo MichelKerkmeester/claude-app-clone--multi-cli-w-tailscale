@@ -264,7 +264,7 @@ describe('ModelEffortSheet (model section)', () => {
       expect(element.scrollWidth).toBeLessThanOrEqual(element.clientWidth);
     }
 
-    const css = readFileSync('apps/pi-remote-web/src/style.css', 'utf8');
+    const css = readFileSync('src/mobile-app/src/style.css', 'utf8');
     expect(css).toMatch(/\.model-sheet-row-id[\s\S]*?unicode-bidi: isolate;/u);
     expect(css).toMatch(
       /max-block-size: calc\(var\(--visual-viewport-height, 100dvh\) \* 0\.75\);/u,
@@ -529,7 +529,7 @@ describe('ModelEffortSheet (model section)', () => {
       ),
     );
     expect(screen.getByLabelText('Plan mode')).toHaveTextContent('Plan');
-    const css = readFileSync('apps/pi-remote-web/src/style.css', 'utf8');
+    const css = readFileSync('src/mobile-app/src/style.css', 'utf8');
     expect(css).toMatch(/\.session-model-name[\s\S]*?animation: model-header-accepted 150ms/u);
   });
 });

@@ -5,7 +5,7 @@
   "type": "module",
   "workspaces": [
     "packages/*",
-    "apps/*",
+    "src/*",
     "extensions/*"
   ],
   "scripts": {
@@ -15,7 +15,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "npm run typecheck -w @pi-remote/pi-rpc-protocol && npm run typecheck -w @pi-remote/relay && npm run typecheck -w @pi-remote/web && npm run typecheck -w @pi-remote/approval-extension && npm run typecheck -w @pi-remote/plan-extension",
-    "test": "vitest run packages/pi-rpc-protocol/tests apps/pi-remote-relay/tests extensions/pi-remote-approval/tests extensions/pi-remote-plan/tests tests",
+    "test": "vitest run packages/pi-rpc-protocol/tests src/relay/tests extensions/pi-remote-approval/tests extensions/pi-remote-plan/tests tests",
     "test:web": "vitest run --config vitest.web.config.ts",
     "rollback:drill": "npm run build -w @pi-remote/relay && node scripts/rollback-drill.mjs",
     "verify:runtime-boundary": "npm run build -w @pi-remote/relay && node scripts/verify-full-access-runtime.mjs",

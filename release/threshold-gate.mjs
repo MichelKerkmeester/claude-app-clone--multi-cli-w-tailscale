@@ -99,7 +99,7 @@ export function evaluateThresholds(config, measurements) {
 }
 
 export async function collectMachineMeasurements(appRoot) {
-  const webDist = path.join(appRoot, 'apps/pi-remote-web/dist');
+  const webDist = path.join(appRoot, 'src/mobile-app/dist');
   const bundleFiles = listFiles(webDist).filter((file) => /\.(?:css|html|js)$/.test(file));
   if (bundleFiles.length === 0) throw new Error('Web build output is missing.');
   const bundleGzipBytes = bundleFiles.reduce(
@@ -111,7 +111,7 @@ export async function collectMachineMeasurements(appRoot) {
   const tempRoot = mkdtempSync(path.join(releaseRoot, '.tmp-threshold-'));
   const databasePath = path.join(tempRoot, 'threshold.db');
   try {
-    const { RelayStore } = await import('../apps/pi-remote-relay/dist/store/relay-store.js');
+    const { RelayStore } = await import('../src/relay/dist/store/relay-store.js');
     const identity = {
       hostId: 'host_release',
       workspaceRef: 'workspace_release',

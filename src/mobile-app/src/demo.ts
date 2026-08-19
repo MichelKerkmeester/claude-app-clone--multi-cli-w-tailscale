@@ -309,7 +309,7 @@ const TRIAGE_BLOCKS = [
     ...base('blk-103', 3, 1),
     kind: 'tool_call',
     toolName: 'read',
-    inputSummary: 'apps/pi-remote-web/src/App.tsx:958-1020',
+    inputSummary: 'src/mobile-app/src/App.tsx:958-1020',
   },
 ];
 

@@ -31,7 +31,7 @@ _memory:
 |-------|-------|
 | **Level** | 2 |
 | **Layer** | L3 — chrome parallel; composer + LeavePlanSheet serial, **K=1** |
-| **Writer** | cli-devin (Gemini 3.7 Flash High) → Claude verifies |
+| **Writer** | cli-devin (GLM-5.2 High) → Claude verifies |
 | **Barrier** | chrome renders + focus/a11y regression tests pass |
 <!-- /ANCHOR:metadata -->
 
@@ -41,7 +41,7 @@ _memory:
 ## 2. PROBLEM & PURPOSE
 
 Chrome is broad but independent (parallel-safe). The composer and LeavePlanSheet are the opposite —
-narrow but focus-critical: they hand-roll focus, IME, and slash handling, where a Flash-tier model is
+narrow but focus-critical: they hand-roll focus, IME, and slash handling, where any generator is
 most likely to break a11y parity. They are done **serially, single-focus**, with regression tests
 that assert the exact focus/`activeElement` behavior.
 <!-- /ANCHOR:problem -->
@@ -95,7 +95,7 @@ that assert the exact focus/`activeElement` behavior.
 - **R2 LeavePlanSheet focus:** Bits `Dialog` default auto-focus differs from the React hand-roll →
   explicit focus + assertion.
 - **R3 Composer IME/slash:** highest-parity risk → K=1, pure `deriveSlashTrigger`, non-focus-stealing
-  autocomplete, escalate to a deeper Devin model for this unit if Flash stalls (flag to user first).
+  autocomplete, escalate to a stronger model (`glm-5-2-max`/`grok-4-6-high`) for this unit if it stalls (paid — flag to user first).
 - Depends on L2 (feature dirs) and L1 primitives.
 <!-- /ANCHOR:risks -->
 

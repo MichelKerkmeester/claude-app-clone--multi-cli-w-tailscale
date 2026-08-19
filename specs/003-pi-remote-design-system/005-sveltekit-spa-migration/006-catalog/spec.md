@@ -31,7 +31,7 @@ _memory:
 |-------|-------|
 | **Level** | 2 |
 | **Layer** | L6 — stories in parallel per surface (with the verification migration) |
-| **Writer** | cli-devin (Gemini 3.7 Flash High) → Claude verifies |
+| **Writer** | cli-devin (GLM-5.2 High) → Claude verifies |
 | **Barrier** | catalog smoke (light + dark) — every component-backed surface renders |
 <!-- /ANCHOR:metadata -->
 

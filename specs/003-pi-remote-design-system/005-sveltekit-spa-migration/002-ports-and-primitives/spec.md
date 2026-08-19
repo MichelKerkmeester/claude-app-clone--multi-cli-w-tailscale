@@ -31,7 +31,7 @@ _memory:
 |-------|-------|
 | **Level** | 2 |
 | **Layer** | L1 — K parallel cli-devin, disjoint files |
-| **Writer** | cli-devin (Gemini 3.7 Flash High) → Claude verifies |
+| **Writer** | cli-devin (GLM-5.2 High) → Claude verifies |
 | **Barrier** | `svelte-check` clean + primitive smoke stories render |
 <!-- /ANCHOR:metadata -->
 

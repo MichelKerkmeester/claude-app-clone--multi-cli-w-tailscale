@@ -15,7 +15,7 @@ importance_tier: "important"
 ## 1. Execution model — who writes what
 
 **Claude orchestrates and independently verifies; an external CLI model writes all app code.** The
-executor is **Gemini 3.7 Flash High via `cli-devin`** (model id `gemini-3-7-flash-high`).
+executor is **GLM-5.2 High via `cli-devin`** (model id `glm-5-2`).
 
 - **Claude authors / runs:** all spec-folder docs (this parent + the eight children + the amendment);
   the folder move + root-config edits + every `npm install` (infra, not app code); the shared
@@ -23,7 +23,7 @@ executor is **Gemini 3.7 Flash High via `cli-devin`** (model id `gemini-3-7-flas
   test:web / CDP / token-identity, outside any sandbox); all git; and — because it is the
   conventions authority — child **008** (the `sk-code-mobile-cli` skill refactor), optionally with
   markdown-agent fan-out.
-- **cli-devin (Gemini 3.7 Flash High) writes:** all app code under `src/mobile-app/` — the SvelteKit
+- **cli-devin (GLM-5.2 High) writes:** all app code under `src/mobile-app/` — the SvelteKit
   scaffold, `.svelte` components, scoped `<style>` blocks, `app.css`, Storybook stories, and the
   rewritten tests.
 
@@ -33,7 +33,7 @@ Grounded in the tooling: `fanout-run.cjs` is **analysis-only** (`deep-review` / 
 code-gen mode). So generation and verification use different engines:
 
 1. **Generation — cli-devin, parallel background dispatch.** Up to **K parallel `devin -p`**
-   (K=3), each `--model gemini-3-7-flash-high --permission-mode accept-edits`, `AI_SESSION_CHILD=1`,
+   (K=3), each `--model glm-5-2 --permission-mode accept-edits`, `AI_SESSION_CHILD=1`,
    stdin `</dev/null`, **PID captured**, per-unit log file, **PID-scoped kill** (never blanket
    `pkill`). Within one dispatch, Devin may further fan out via native `run_subagent`.
 2. **Verification — deep-review fan-out (`fanout-run.cjs`).** Between layers and at cutover, a
@@ -102,22 +102,25 @@ L7  deep-review fan-out → cutover              [fanout-run.cjs]         ──
 - **Load `sk-code`** → the `sk-code-mobile-cli` surface (frozen `--pi-*` tokens, the `@ds` grammar,
   the verification method) + **`sk-design-md-generator`** with a `DESIGN_DISPATCH_MANIFEST` pinning
   the frozen ink-on-parchment tokens (design-preserving — build against measured tokens, never
-  re-design). Prompt-craft follows `sk-prompt/sk-prompt-models` for `gemini-3-7-flash-high`.
+  re-design). Prompt-craft follows `sk-prompt/sk-prompt-models` for `glm-5-2`.
 - The exact React source file(s) to port + the runes mapping + the react-aria→Bits/Melt mapping for
   this unit.
 - **Verification demand-back:** the child returns its `svelte-check` result + which surface blocks it
   moved; **Claude re-verifies independently outside the sandbox** (diff review + typecheck +
   token-identity on touched surfaces) before the barrier.
 
-**Concurrency K=3** (tunable): Flash is fast, but **Claude's independent verification is the
-throughput bottleneck**, so 3 in flight keeps verification honest. **K=1** for the focus-sensitive
-units (composer, LeavePlanSheet) and the shell integration.
+**Concurrency K=3** (tunable): GLM-5.2 High is a capable, free generator, but **Claude's independent
+verification is the throughput bottleneck**, so 3 in flight keeps verification honest. **K=1** for the
+focus-sensitive units (composer, LeavePlanSheet) and the shell integration.
 
-**Model-fit backstop:** Gemini 3.7 Flash High is fast but a Flash tier; the reasoning-heavy units
-(runes port, react-aria→Bits/Melt a11y parity, CSS `:global()` scoping fixups) are where it may
-stall. Mitigation: Claude's per-dispatch verification is the backstop, and a stalled reasoning-heavy
-unit escalates to a deeper Devin model (e.g. `grok-4-6-high`) **for that unit, flagged to the user
-first** — per the cli-devin model-selection guidance.
+**Model-fit backstop:** GLM-5.2 High (`glm-5-2`) is a high-thinking general-generation model and free
+— a good fit for the bounded per-directory units. Two limits to respect: its **200K context** (vs a
+1M-context tier) keeps units bounded (already the strategy — one directory each, never the whole
+tree), and any model can still slip on the reasoning-heavy units (runes port, react-aria→Bits/Melt
+a11y parity, CSS `:global()` scoping fixups). Mitigation: Claude's per-dispatch verification is the
+backstop, and a stalled unit escalates to a stronger model (`glm-5-2-max` or `grok-4-6-high`) **for
+that unit — flagged to the user first, since those are paid tiers** — per the cli-devin
+model-selection guidance.
 
 ## 6. Verification — the nine objective cutover gates (all must pass)
 

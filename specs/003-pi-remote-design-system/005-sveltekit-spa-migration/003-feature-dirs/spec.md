@@ -31,7 +31,7 @@ _memory:
 |-------|-------|
 | **Level** | 2 |
 | **Layer** | L2 — 4 parallel cli-devin, one dispatch per directory |
-| **Writer** | cli-devin (Gemini 3.7 Flash High) → Claude verifies |
+| **Writer** | cli-devin (GLM-5.2 High) → Claude verifies |
 | **Barrier** | each dir renders in the catalog + typecheck |
 <!-- /ANCHOR:metadata -->
 

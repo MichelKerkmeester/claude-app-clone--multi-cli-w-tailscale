@@ -27,7 +27,7 @@ _memory:
       - "Setup → SvelteKit 5 SPA/CSR (most future-proof)"
       - "Migration → big-bang branch rewrite"
       - "Move scope → apps/* only → /src/*"
-      - "Executor → Gemini 3.7 Flash High via cli-devin"
+      - "Executor → GLM-5.2 High via cli-devin"
       - "Concurrency K=3, disjoint-directory isolation, seven phase children"
 ---
 
@@ -52,7 +52,7 @@ _memory:
 - **Independence:** `001`–`007` run under barriers — each closes with a hard gate before the next
   opens; `008` is dispatched by timing (draft, then finalize), not by position in the sequence.
 - **Execution model:** Claude orchestrates and independently verifies; an external CLI model
-  (Gemini 3.7 Flash High via `cli-devin`) writes all app code under `src/mobile-app/`. Claude owns
+  (GLM-5.2 High via `cli-devin`) writes all app code under `src/mobile-app/`. Claude owns
   the folder move, all shared/config/`npm install` work, and every git action.
 
 ## 2. PROBLEM & PURPOSE

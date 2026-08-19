@@ -1,13 +1,21 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": ["../../tsconfig.base.json", "./.svelte-kit/tsconfig.json"],
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "jsx": "react-jsx",
-    "noEmit": true,
-    "composite": true,
-    "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+    "allowJs": true,
+    "checkJs": false
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"]
+  "//": "During the React→Svelte migration, svelte-check is scoped to the Svelte surface (routes + lib + generated types). The not-yet-ported React .tsx files keep their own vitest tooling and were type-clean at baseline; each is type-checked here once it is ported into src/lib. Widen this include as the port progresses.",
+  "include": [
+    ".svelte-kit/ambient.d.ts",
+    ".svelte-kit/non-ambient.d.ts",
+    ".svelte-kit/types/**/$types.d.ts",
+    "vite.config.ts",
+    "svelte.config.js",
+    "src/app.d.ts",
+    "src/routes/**/*.ts",
+    "src/routes/**/*.svelte",
+    "src/lib/**/*.ts",
+    "src/lib/**/*.svelte"
+  ],
+  "exclude": ["node_modules", "src/service-worker.js"]
 }

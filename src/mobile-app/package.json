@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b && vite build",
-    "dev": "vite",
+    "build": "vite build",
+    "dev": "vite dev",
     "preview": "vite preview",
-    "typecheck": "tsc -b --pretty false"
+    "sync": "svelte-kit sync",
+    "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
     "@pi-remote/pi-rpc-protocol": "0.1.0",

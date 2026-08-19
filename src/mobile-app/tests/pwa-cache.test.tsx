@@ -14,9 +14,9 @@ import { EMPTY_TRANSCRIPT } from '../src/state.js';
 import { PlanReadyCard } from '../src/PlanReadyCard.js';
 import { PlanReviewSheet } from '../src/PlanReviewSheet.js';
 
-const SERVICE_WORKER = readFileSync('src/mobile-app/public/service-worker.js', 'utf8');
+const SERVICE_WORKER = readFileSync('src/mobile-app/static/service-worker.js', 'utf8');
 const MANIFEST = JSON.parse(
-  readFileSync('src/mobile-app/public/manifest.webmanifest', 'utf8'),
+  readFileSync('src/mobile-app/static/manifest.webmanifest', 'utf8'),
 ) as {
   readonly display: string;
   readonly orientation: string;

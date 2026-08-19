@@ -1,10 +1,9 @@
 // ───────────────────────────────────────────────────────────────────
-// MODULE: Pi Remote Web Vite Configuration
+// MODULE: Pi Remote Web Vite Configuration (SvelteKit SPA)
 // ───────────────────────────────────────────────────────────────────
 
-import { fileURLToPath } from 'node:url';
+import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 const relayProxy = {
@@ -34,20 +33,9 @@ function previewAllowedHosts(): string[] {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [tailwindcss(), sveltekit()],
   optimizeDeps: { exclude: ['pdfjs-dist'] },
   worker: { format: 'es' },
   server: { proxy: relayProxy },
   preview: { proxy: relayProxy, allowedHosts: previewAllowedHosts() },
-  // The catalog is a separate, isolated Vite entry (catalog.html + its own React
-  // root). Both the operator app and the catalog must build; the app entry still
-  // maps to the existing index.html.
-  build: {
-    rollupOptions: {
-      input: {
-        app: fileURLToPath(new URL('./index.html', import.meta.url)),
-        catalog: fileURLToPath(new URL('./catalog.html', import.meta.url)),
-      },
-    },
-  },
 });

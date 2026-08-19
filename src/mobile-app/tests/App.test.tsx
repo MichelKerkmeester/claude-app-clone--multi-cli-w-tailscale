@@ -248,7 +248,7 @@ it('opts the installed PWA viewport into safe-area coverage', () => {
 
 it('keeps fonts, manifest, service worker, and push notifications content-free', () => {
   const fontAssets = JSON.parse(
-    readFileSync('src/mobile-app/public/fonts/font-assets.json', 'utf8'),
+    readFileSync('src/mobile-app/static/fonts/font-assets.json', 'utf8'),
   ) as { readonly fonts: readonly { readonly family: string; readonly role: string }[] };
   expect(fontAssets.fonts).toEqual([
     expect.objectContaining({ family: 'Source Serif 4', role: 'display' }),
@@ -256,13 +256,13 @@ it('keeps fonts, manifest, service worker, and push notifications content-free',
   ]);
   expect(fontAssets.fonts).toHaveLength(2);
 
-  const manifest = readFileSync('src/mobile-app/public/manifest.webmanifest', 'utf8');
+  const manifest = readFileSync('src/mobile-app/static/manifest.webmanifest', 'utf8');
   expect(manifest).toContain('content-free attention hints');
   for (const forbidden of ['question-content-canary', 'answer-content-canary', 'ticket_', 'digest']) {
     expect(manifest).not.toContain(forbidden);
   }
 
-  const serviceWorker = readFileSync('src/mobile-app/public/service-worker.js', 'utf8');
+  const serviceWorker = readFileSync('src/mobile-app/static/service-worker.js', 'utf8');
   expect(serviceWorker).toContain("const CACHE_NAME = 'pi-remote-shell-v5';");
   expect(serviceWorker).toContain("if (request.mode === 'navigate')");
   expect(serviceWorker).toContain("cache.put('/index.html', copy)");

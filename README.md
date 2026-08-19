@@ -51,7 +51,7 @@ sh deploy/setup-tailscale-serve.sh
 
 Expected result: the relay runs on `127.0.0.1:4310`, the PWA preview on `127.0.0.1:4173`, and Serve exposes only the `/`, `/api` and `/health` HTTPS routes to the tailnet. The relay prints one short-lived enrollment payload at startup.
 
-Prepare `deploy/serve.env` first as described in [Install And Onboarding](docs/install-and-onboarding.md). That guide also covers the operator checks the repository cannot run itself.
+Prepare `deploy/serve.env` first as described in [Install And Onboarding](.opencode/skills/sk-code/sk-code-mobile-cli/references/app-guide/install-and-onboarding.md). That guide also covers the operator checks the repository cannot run itself.
 
 ---
 
@@ -167,7 +167,7 @@ Result: `npm run release:verify` writes a timestamped evidence file under `relea
 
 **Q: Can I use Pi Remote without Tailscale?**
 
-A: No. The relay binds to loopback only and Tailscale Serve is the supported ingress. See [Security](docs/security.md).
+A: No. The relay binds to loopback only and Tailscale Serve is the supported ingress. See [Security](.opencode/skills/sk-code/sk-code-mobile-cli/references/app-guide/security.md).
 
 **Q: Does Pi Remote store my prompts or file contents?**
 
@@ -187,15 +187,13 @@ A: The cleanup trap removes the Serve routes and stops both loopback processes. 
 
 ### Related Documents
 
-| Document                                                 | Purpose                                                            |
-| -------------------------------------------------------- | ------------------------------------------------------------------ |
-| [Install And Onboarding](docs/install-and-onboarding.md) | Prerequisites, build, Serve deployment, enrollment and PWA install |
-| [Architecture](ARCHITECTURE.md)                          | Relay, protocol, ledger, synchronization, PWA and extension        |
-| [Security](docs/security.md)                             | Ingress, authentication, approval, containment and redaction       |
-| [Operations](docs/operations.md)                         | Migrations, retention, devices, revocation and push lifecycle      |
-| [Incident Playbooks](docs/incident-playbooks.md)         | Recovery for mutation, lease, device, sync and push failures       |
-| [Rollback](docs/rollback.md)                             | Rollback controls, restore limits and smoke checks                 |
-| [Platform Support](docs/platform-support.md)             | PWA installation, offline behavior and notification limits         |
-| [Release Verification](docs/release-verification.md)     | Machine gates, thresholds and staged readiness                     |
-| [Deploy README](deploy/README.md)                        | Serve deployment mechanics                                         |
-| [Containment README](deploy/containment/README.md)       | macOS sandbox profile verification                                 |
+The Pi Remote app documentation — install & onboarding, security, operations, incident playbooks,
+rollback, platform support, release verification, the feature catalog, quality baselines, and design
+reference — now lives in the **sk-code skill** as the single source of truth for the Pi Remote app:
+[`.opencode/skills/sk-code/sk-code-mobile-cli/references/app-guide/`](.opencode/skills/sk-code/sk-code-mobile-cli/references/app-guide/).
+
+| Document                                           | Purpose                                                     |
+| -------------------------------------------------- | ----------------------------------------------------------- |
+| [Architecture](ARCHITECTURE.md)                    | Relay, protocol, ledger, synchronization, PWA and extension |
+| [Deploy README](deploy/README.md)                  | Serve deployment mechanics                                  |
+| [Containment README](deploy/containment/README.md) | macOS sandbox profile verification                          |

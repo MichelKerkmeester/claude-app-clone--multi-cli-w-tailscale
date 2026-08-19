@@ -1,0 +1,29 @@
+{
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/004-chrome-and-composer",
+  "description": "Rewrite the shared chrome (SessionHeader, RuntimeStrip, TodoPanel, plan components, ModelEffortSheet) in parallel, then the composer (SessionComposer",
+  "keywords": [
+    "rewrite",
+    "shared",
+    "chrome",
+    "sessionheader",
+    "runtimestrip",
+    "todopanel",
+    "plan",
+    "components",
+    "modeleffortsheet",
+    "parallel",
+    "composer",
+    "sessioncomposer"
+  ],
+  "lastUpdated": "2026-08-19T17:18:17.256Z",
+  "specId": "004",
+  "folderSlug": "chrome-and-composer",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-pi-remote-design-system",
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "2"
+}

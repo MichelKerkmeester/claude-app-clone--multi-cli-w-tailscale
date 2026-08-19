@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/005-views-and-shell",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/005-views-and-shell",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "extract app.tsx views svelte session socket virtualizer",
+      "sveltekit layout routes goto pi remote"
+    ],
+    "key_topics": [
+      "extract",
+      "app",
+      "tsx",
+      "views",
+      "svelte",
+      "session",
+      "socket",
+      "virtualizer",
+      "sveltekit",
+      "layout",
+      "routes",
+      "goto"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Extract App",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "The Session",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "goto",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "live",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Extract App.tsx's six view functions into Svelte views — Enrollment/Home/Review/Inbox in parallel, Session alone (it owns the socket + virtualizer, swapping @tanstack/react-virtual→svelte-virtual) — then the +layout shell (both context providers, theme, SW registration) and the 3-URL routing via goto/afterNavigate. This is where the branch first runs end-to-end.",
+    "created_at": "2026-08-19T17:24:03.678Z",
+    "last_save_at": "2026-08-19T17:24:03.678Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:e20205024afa8bba9db25a2cdaf24eb5c7fb1c7d1124e835acd30a803ebef016",
+    "source_doc_hashes": {
+      "spec.md": "e67b49e3538280fcea1aa185feea1487e31004bbca447cb58517b20a31d95f25"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

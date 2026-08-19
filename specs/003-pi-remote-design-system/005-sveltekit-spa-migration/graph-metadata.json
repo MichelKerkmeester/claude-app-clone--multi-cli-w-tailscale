@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system",
+  "children_ids": [
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold",
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs",
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/004-chrome-and-composer",
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/005-views-and-shell",
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/006-catalog",
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [
+      "app-mobile-cli/003-pi-remote-design-system/001-architecture-conventions-tokens"
+    ],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "sveltekit spa migration",
+      "react to svelte 5 rewrite pi remote",
+      "apps to src move mobile app",
+      "phase 5 sveltekit spa migration"
+    ],
+    "key_topics": [
+      "sveltekit",
+      "spa",
+      "migration",
+      "react",
+      "svelte",
+      "rewrite",
+      "remote",
+      "apps",
+      "src",
+      "move",
+      "mobile",
+      "app"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Flash High",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement The Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Re",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Tailscale Serve",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "The Pi Remote mobile web app is hard to author as a designer",
+    "created_at": "2026-08-19T17:23:39.714Z",
+    "last_save_at": "2026-08-19T17:23:39.714Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:0e628ea1fadedfcbdb9705764586c5c51c82eb3facfee79741f79da9ef996957",
+    "source_doc_hashes": {
+      "spec.md": "2849388c0d4a633d28ccbad5c2539a0051160f09c8acd8e483f81fe776320e0a"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

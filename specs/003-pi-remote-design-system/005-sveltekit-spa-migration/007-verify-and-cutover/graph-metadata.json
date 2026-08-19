@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "css corpus token identity gate cutover svelte",
+      "test rewrite testing-library svelte cdp repoint"
+    ],
+    "key_topics": [
+      "css",
+      "corpus",
+      "token",
+      "identity",
+      "gate",
+      "cutover",
+      "svelte",
+      "test",
+      "rewrite",
+      "testing-library",
+      "cdp",
+      "repoint"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Migration",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Build the CSS-corpus builder, commit the token-identity resolver gate (0 diffs across 3 themes = the pixel-identity proof), rewrite the 75 tests to @testing-library/svelte, repoint CDP at the built preview, run a deep-review fan-out against the frozen contracts, then cut over: all nine objective gates green + validate.sh --strict, and close the spec amendment.",
+    "created_at": "2026-08-19T17:24:04.291Z",
+    "last_save_at": "2026-08-19T17:24:04.291Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:3abcc19d8a217b243379ec408975f537076dc02f8ca8e9b3468ed554bc115639",
+    "source_doc_hashes": {
+      "spec.md": "3b20d0b5caa7b73bb7955a5ec14ec6bf138d6a184749f890ed32b97a2286d869"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "move apps to src pi remote",
+      "sveltekit scaffold app.css foundation"
+    ],
+    "key_topics": [
+      "move",
+      "apps",
+      "src",
+      "remote",
+      "sveltekit",
+      "scaffold",
+      "app",
+      "css",
+      "foundation",
+      "relocate",
+      "pi-remote-web",
+      "mobile-app"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Folder Move",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "The React",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Tailscale Serve",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "app.css",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the SPA",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Relocate apps/pi-remote-web→src/mobile-app and apps/pi-remote-relay→src/relay (folder-rename only, @pi-remote/* names kept), fix the finite set of filesystem-path refs, npm install; then stand up the SvelteKit 5 SPA skeleton at src/mobile-app with app.css foundation. The React suite stays the correctness oracle through the move; an empty Svelte page renders after scaffold.",
+    "created_at": "2026-08-19T17:24:02.340Z",
+    "last_save_at": "2026-08-19T17:24:02.340Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:3791dfcc04a1f1a95594d5f8e5a9cea34094bf15f0ead1db97fa19fee907c3a3",
+    "source_doc_hashes": {
+      "spec.md": "5bc77a963535c32d5a2d503940c7e3b1c374f4bff57d6d4ec77be116c0a7c793"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

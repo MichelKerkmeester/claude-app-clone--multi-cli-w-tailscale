@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "refactor sk-code-mobile-cli skill svelte conventions",
+      "sk-code surface svelte smart routing markers"
+    ],
+    "key_topics": [
+      "refactor",
+      "sk-code-mobile-cli",
+      "skill",
+      "svelte",
+      "conventions",
+      "sk-code",
+      "surface",
+      "smart",
+      "routing",
+      "markers",
+      "completely",
+      "teaches"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "No React",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Completely refactor the sk-code-mobile-cli surface skill so it teaches the SvelteKit 5 / Svelte 5 stack instead of React — SMART ROUTING + surface-detection markers, the @ds grammar's .svelte seam form, the per-component scoped <style> model, the Bits UI / Melt UI mapping, runes verification, and setup/standards. It is the conventions authority every cli-devin dispatch loads, so it drafts before the first code dispatch and finalizes at cutover. The skill lives in the Public monorepo (symlinked); it lands via an isolated Public worktree.",
+    "created_at": "2026-08-19T17:24:04.580Z",
+    "last_save_at": "2026-08-19T17:24:04.580Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:e5654b04a1734c626d20946e9a666e7a496391202b2f1d515afdf95ab1aea3bd",
+    "source_doc_hashes": {
+      "spec.md": "480afb8ef12fc9a0f6754b9a051ac8c8a1de72b899112898cd3add04ec41d35b"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

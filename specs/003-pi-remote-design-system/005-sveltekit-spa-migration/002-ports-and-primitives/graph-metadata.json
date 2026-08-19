@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
+  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
+  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "port relay.ts state.ts verbatim svelte",
+      "bits ui primitives button sheet menu pi remote"
+    ],
+    "key_topics": [
+      "port",
+      "relay",
+      "state",
+      "verbatim",
+      "svelte",
+      "bits",
+      "primitives",
+      "button",
+      "sheet",
+      "menu",
+      "remote",
+      "framework-agnostic"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Flash High",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA (barrier gate)",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Port the framework-agnostic TypeScript (relay.ts, state.ts, cache.ts, auth.ts, effort.ts, pure halves of runtime.ts/commands.ts, workers) verbatim, and build the shared a11y primitives — Button plus thin Bits UI wrappers Sheet/Menu/ToggleGroup/RadioGroup/Switch/Collapsible — that every later component composes. K parallel, disjoint files.",
+    "created_at": "2026-08-19T17:24:02.664Z",
+    "last_save_at": "2026-08-19T17:24:02.664Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:ac3713e76eee43eb755d25f19d1569eabed4d92ae3431c598c28019c3e2b6669",
+    "source_doc_hashes": {
+      "spec.md": "146d712a64709149864fd590486cdd485936e3b8c2ab6b215f1fc6ed1bc190ff"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

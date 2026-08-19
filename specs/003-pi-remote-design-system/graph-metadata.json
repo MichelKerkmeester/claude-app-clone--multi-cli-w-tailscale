@@ -11,7 +11,8 @@
     "app-mobile-cli/003-pi-remote-design-system/001-architecture-conventions-tokens",
     "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library",
     "app-mobile-cli/003-pi-remote-design-system/003-refine-audit-designer-editability",
-    "app-mobile-cli/003-pi-remote-design-system/004-sk-code-mobile-cli-mode"
+    "app-mobile-cli/003-pi-remote-design-system/004-sk-code-mobile-cli-mode",
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration"
   ],
   "manual": {
     "depends_on": [],
@@ -98,7 +99,7 @@
     "source_doc_hashes": {
       "spec.md": "804f28cacb338af4e054d8005bee5d598c43f056fd705d0fe6f34f8e8c8a453a"
     },
-    "last_active_child_id": "app-mobile-cli/003-pi-remote-design-system/002-implement-migrate-component-library",
-    "last_active_at": null
+    "last_active_child_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+    "last_active_at": "2026-08-19T00:00:00.000Z"
   }
 }

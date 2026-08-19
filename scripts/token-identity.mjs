@@ -19,6 +19,20 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 
+// Read a CSS source. A .svelte file contributes only its <style> block bodies (the scoped CSS the
+// migration moves each surface's rules into); anything else is read as raw CSS. This lets the diff
+// gate assemble the post-migration corpus straight from the component tree:
+//   diff <baseline.json> src/mobile-app/src/app.css src/mobile-app/src/**/*.svelte
+function readCssInput(file) {
+  const text = readFileSync(file, 'utf8');
+  if (!file.endsWith('.svelte')) return text;
+  const bodies = [];
+  const styleRe = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
+  let m;
+  while ((m = styleRe.exec(text)) !== null) bodies.push(m[1]);
+  return bodies.join('\n');
+}
+
 // ---- The three theme states, keyed by the root selector that carries their token remap. ----
 // light  = the base :root block.
 // dark   = :root base then :root[data-theme='dark'] overrides.
@@ -202,7 +216,7 @@ function resolveTheme(rawMap) {
 // -------------------------------------------------------------------------------------------------
 
 function resolveAll(cssFiles) {
-  const css = cssFiles.map((f) => readFileSync(f, 'utf8')).join('\n');
+  const css = cssFiles.map((f) => readCssInput(f)).join('\n');
   const rules = parseRules(css);
   const raw = buildRawMaps(rules);
   const out = {};

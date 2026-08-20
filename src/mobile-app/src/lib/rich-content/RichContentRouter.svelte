@@ -141,3 +141,20 @@
     <p class="block-copy quiet-copy">This redacted “{block.originalKind}” block cannot be displayed by this client.</p>
   </RichBlockFrame>
 {/if}
+
+<!-- @ds surface: rich-prose-block — the plain-prose / safe-Markdown read-out block. Decomposed from
+     style.css; the selectors it was grouped with (safe-markdown*, rich-block-frame, artifact-viewer*)
+     stay with their own components. Values unchanged; the bidi-plaintext guardrail is preserved. -->
+<style>
+  /* @ds slot: prose — bidirectional-safe plain-text read-out; capped to reading width. */
+  /* @ds guardrail: do-not-edit — unicode-bidi: plaintext keeps directional text stable and
+     un-clickable-into; do not weaken. */
+  .rich-prose-block {
+    min-inline-size: 0;
+    max-inline-size: var(--reading-width);
+    direction: auto;
+    text-align: start;
+    unicode-bidi: plaintext;
+    margin-block: var(--space-3);
+  }
+</style>

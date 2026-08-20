@@ -18,7 +18,6 @@
 
 <script lang="ts">
   import { focusVisible, focused } from '../primitives/interactions.js';
-  import Menu from '../primitives/Menu.svelte';
   import MenuContent from '../primitives/MenuContent.svelte';
   import MenuItem from '../primitives/MenuItem.svelte';
 
@@ -57,9 +56,8 @@
 <!-- @ds guardrail: do-not-edit — react-aria Menu/MenuItem/Popover wiring (id, onAction,
      isDisabled, Text slots); rows are read-only, focus movement never mutates, and only an
      activated row reports a choice to the caller. Not designer-editable. -->
-<Menu>
-  <!-- @ds slot: popover — floating placement chrome. -->
-  <MenuContent class="plan-mode-popover" aria-label="Agent mode">
+<!-- @ds slot: popover — floating placement chrome. -->
+<MenuContent class="plan-mode-popover" aria-label="Agent mode">
     <div class="plan-mode-menu">
       <!-- @ds state: row build — immediately requestable when safe. -->
       <MenuItem
@@ -116,8 +114,7 @@
       <!-- @ds slot: note — bounded reason when a row cannot be chosen. -->
       <p class="plan-mode-menu-note">{rowsDisabledReason}</p>
     {/if}
-  </MenuContent>
-</Menu>
+</MenuContent>
 
 <!-- @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. Decomposed from style.css;
      plan-mode-popover / plan-mode-row are child primitives (MenuContent / MenuItem) so they move

@@ -861,3 +861,96 @@
     </div>
   </div>
 {/if}
+
+<!-- @ds surface: artifact-viewer body — the preview region, loading skeleton, and stale-revision
+     action owned by the viewer host. Decomposed from style.css; single-component. The shared dialog
+     chrome (overlay/modal/dialog/content/summary, header, close) is shared with AttachmentPreviewDialog
+     and stays in the global sheet (→ app.css at cutover). The stale action ships native
+     :hover/:focus-visible; dark re-inks use :global(:root[data-theme='dark']). Literal hex preserved.
+     Values unchanged. -->
+<style>
+  /* @ds slot: preview-region — the bounded body that hosts the active preview. */
+  .artifact-preview-region {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    unicode-bidi: plaintext;
+  }
+
+  /* @ds slot: loading-preview — the three-bar skeleton shown while a preview resolves. */
+  .artifact-loading-preview {
+    display: grid;
+    gap: 0.7rem;
+    min-block-size: 8rem;
+    align-content: center;
+    padding: 1rem;
+    border: 1px solid #6c6a65;
+    border-radius: 0.5rem;
+  }
+
+  .artifact-loading-preview span {
+    display: block;
+    block-size: 0.8rem;
+    border-radius: 0.25rem;
+    background: #d97757;
+    opacity: 0.45;
+  }
+
+  .artifact-loading-preview span:nth-child(2) {
+    inline-size: 80%;
+  }
+
+  .artifact-loading-preview span:nth-child(3) {
+    inline-size: 60%;
+  }
+
+  /* @ds slot: stale-action — the "View latest" control for a stale exact revision; native pseudo-states. */
+  .artifact-stale-action {
+    min-block-size: 44px;
+    min-inline-size: 44px;
+    border: 1px solid #6c6a65;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    color: #24221f;
+    font-size: 0.74rem;
+    font-weight: 650;
+    line-height: 1.25;
+    padding-inline: 0.75rem;
+    cursor: pointer;
+  }
+
+  /* @ds state: hover — stale action under pointer hover. */
+  .artifact-stale-action:hover {
+    border-color: #b85f42;
+    background: #f3e4de;
+  }
+
+  /* @ds guardrail: focus-visible — the AA focus ring on the stale action. */
+  .artifact-stale-action:focus-visible {
+    outline: 3px solid #24221f;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px var(--accent);
+  }
+
+  /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
+  :global(:root[data-theme='dark']) .artifact-stale-action {
+    background: #2d2a26;
+    color: #f8f8f6;
+  }
+
+  :global(:root[data-theme='dark']) .artifact-stale-action:hover {
+    background: #3a2720;
+    color: #f8f8f6;
+  }
+
+  :global(:root[data-theme='dark']) .artifact-stale-action:focus-visible {
+    outline-color: #f8f8f6;
+  }
+
+  /* @ds guardrail: do-not-edit — reduced-motion bounds the stale-action transition. */
+  @media (prefers-reduced-motion: reduce) {
+    .artifact-stale-action {
+      transition-duration: 100ms;
+      scroll-behavior: auto;
+    }
+  }
+</style>

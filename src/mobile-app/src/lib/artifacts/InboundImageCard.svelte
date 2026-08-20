@@ -77,6 +77,7 @@
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
   import { getOptionalArtifactViewer } from './ArtifactViewerProvider.svelte';
+  import { hover, press, focusVisible } from '../primitives/interactions.js';
   import ImagePlaceholder from './ImagePlaceholder.svelte';
   import ImageStatus from './ImageStatus.svelte';
   import VerifiedImage from './VerifiedImage.svelte';
@@ -195,6 +196,9 @@
       class="inbound-image-card-button"
       aria-label={cardAccessibleName(block)}
       aria-haspopup="dialog"
+      use:hover
+      use:press
+      use:focusVisible
       onclick={handlePress}
       onpointerdown={handlePointerDown}
       onpointermove={handlePointerMove}

@@ -9,6 +9,8 @@
 </script>
 
 <script lang="ts">
+  import { hover, focusVisible } from '../primitives/interactions.js';
+
   let {
     headingRef = $bindable(null),
     onClose,
@@ -39,6 +41,8 @@
     type="button"
     class="artifact-viewer-close"
     aria-label={`Close ${title.toLocaleLowerCase()} viewer`}
+    use:hover
+    use:focusVisible
     onclick={onClose}
   >
     <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">

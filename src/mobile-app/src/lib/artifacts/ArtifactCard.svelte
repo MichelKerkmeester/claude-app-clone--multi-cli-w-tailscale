@@ -10,6 +10,7 @@
 
 <script lang="ts">
   import { getOptionalArtifactViewer } from './ArtifactViewerProvider.svelte';
+  import { hover, press, focusVisible } from '../primitives/interactions.js';
 
   let { block }: ArtifactCardProps = $props();
 
@@ -29,6 +30,9 @@
   type="button"
   class="artifact-card"
   aria-label={`Open file diff: ${block.summary}`}
+  use:hover
+  use:press
+  use:focusVisible
   onclick={() => viewer?.openDiff(block, buttonRef)}
 >
   <span class="artifact-card-glyph" aria-hidden="true">

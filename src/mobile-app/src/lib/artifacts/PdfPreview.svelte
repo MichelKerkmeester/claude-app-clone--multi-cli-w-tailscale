@@ -199,3 +199,50 @@
   {#if pdfState === 'loading'}<p class="artifact-preview-message" role="status">Loading controlled PDF pages.</p>{/if}
   <div bind:this={scrollEl} class="pdf-preview-scroll" onscroll={onScroll} data-pdf-rendered-pages={visiblePages.length}>{#if pdfState === 'ready' && pdfDocument !== null}{@const readyDocument = pdfDocument}{#each visiblePages as pageNumber (`${block.revision}-${pageNumber}-${scale}`)}<PdfPage pdfDocument={readyDocument} pageNumber={pageNumber} scale={scale} textLayerSafe={block.textLayerSafe === true} findTerm={findTerm} onStateChange={onPageState} />{/each}{/if}</div>
 </section>
+
+<!-- @ds surface: pdf-preview — the controlled PDF.js reader shell: controls, page indicator, and the
+     page scroll column (individual pages are the PdfPage child). Decomposed from style.css; all
+     single-component and static. .pdf-preview-controls was grouped with the different
+     .image-preview-controls (ImagePreview) — only the pdf slice moves here. The shared .pdf-page /
+     .pdf-preview-shared and the .artifact-control-button / .artifact-find-control on the toolbar stay
+     global (→ app.css at cutover). Literal hex preserved. Values unchanged. -->
+<style>
+  /* @ds slot: pdf-preview — the reader shell. */
+  .pdf-preview {
+    display: grid;
+    min-inline-size: 0;
+    gap: var(--space-3);
+  }
+
+  /* @ds slot: pdf-controls — the PDF toolbar row. */
+  .pdf-preview-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  /* @ds slot: page-indicator — the "Page N of M" read-out. */
+  .pdf-page-indicator {
+    min-block-size: 2.75rem;
+    padding-inline: var(--space-2);
+    color: var(--ink-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* @ds slot: page-scroll — the bounded, contained page scroll column. */
+  /* @ds guardrail: do-not-edit — bounded reading well; overscroll contained so panning never chains. */
+  .pdf-preview-scroll {
+    display: grid;
+    min-block-size: 12rem;
+    max-block-size: min(70vh, 48rem);
+    min-inline-size: 0;
+    gap: var(--space-3);
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: #24221f;
+  }
+</style>

@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createInboundMediaHostAdapter,
   publishApprovedImage,
-} from '../../../extensions/pi-remote-inbound-media/src/index.js';
+} from '../../extensions/pi-remote-inbound-media/src/index.js';
 import { RelayStore, type InboundPublishInput } from '../src/store/relay-store.js';
 import { SyncHub } from '../src/replay/sync.js';
 

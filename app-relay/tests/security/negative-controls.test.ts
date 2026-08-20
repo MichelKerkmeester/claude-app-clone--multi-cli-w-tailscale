@@ -54,7 +54,7 @@ import {
   applyTodoProjectionDelta,
   projectTodoSnapshot,
 } from '../../src/store/todo-projector.js';
-import { publishApprovedImage } from '../../../../extensions/pi-remote-inbound-media/src/index.js';
+import { publishApprovedImage } from '../../../extensions/pi-remote-inbound-media/src/index.js';
 
 const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
@@ -76,14 +76,14 @@ const READ_ONLY_SERVER_SOURCE = readFileSync(
   'utf8',
 );
 const READ_ONLY_RICH_SOURCES = [
-  '../../../mobile-app/src/rich-content/CodeCard.tsx',
-  '../../../mobile-app/src/rich-content/CommandOutputCard.tsx',
-  '../../../mobile-app/src/rich-content/F6ViewerAdapter.tsx',
-  '../../../mobile-app/src/rich-content/SafeMarkdown.tsx',
-  '../../../mobile-app/src/rich-content/highlight.worker.ts',
-  '../../../mobile-app/src/rich-content/useHighlightedCode.ts',
-  '../../../mobile-app/src/artifacts/ArtifactViewerProvider.tsx',
-  '../../../mobile-app/src/artifacts/CodePreview.tsx',
+  '../../../app-mobile/src/rich-content/CodeCard.tsx',
+  '../../../app-mobile/src/rich-content/CommandOutputCard.tsx',
+  '../../../app-mobile/src/rich-content/F6ViewerAdapter.tsx',
+  '../../../app-mobile/src/rich-content/SafeMarkdown.tsx',
+  '../../../app-mobile/src/rich-content/highlight.worker.ts',
+  '../../../app-mobile/src/rich-content/useHighlightedCode.ts',
+  '../../../app-mobile/src/artifacts/ArtifactViewerProvider.tsx',
+  '../../../app-mobile/src/artifacts/CodePreview.tsx',
 ].map((path) => readFileSync(new URL(path, import.meta.url), 'utf8'));
 
 // This suite keeps the fail-closed boundary visible in one machine-checkable module.

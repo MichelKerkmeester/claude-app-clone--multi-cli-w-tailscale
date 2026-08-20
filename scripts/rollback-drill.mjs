@@ -4,7 +4,7 @@
 
 import { fileURLToPath } from 'node:url';
 
-import { runRollbackDrill } from '../src/relay/dist/release/rollback-drill.js';
+import { runRollbackDrill } from '../app-relay/dist/release/rollback-drill.js';
 
 const releaseRoot = fileURLToPath(new URL('../release/', import.meta.url));
 

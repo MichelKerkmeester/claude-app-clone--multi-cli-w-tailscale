@@ -38,8 +38,8 @@ const boundaryGates = [
   runBoundaryGate('boundary-default-deny', () => {
     const host = readSource('extensions/pi-remote-inbound-media/src/index.ts');
     const plan = readSource('extensions/pi-remote-plan/src/index.ts');
-    const auth = readSource('src/relay/src/auth/policy.ts');
-    const mutation = readSource('src/relay/src/policy/mutation-policy.ts');
+    const auth = readSource('app-relay/src/auth/policy.ts');
+    const mutation = readSource('app-relay/src/policy/mutation-policy.ts');
     return [
       host.includes('runtimeSnapshot') && host.includes('isRuntimeMediaCapabilityEnabled'),
       host.includes('capability === undefined'),
@@ -53,9 +53,9 @@ const boundaryGates = [
     ];
   }),
   runBoundaryGate('boundary-publication-read-split', () => {
-    const server = readSource('src/relay/src/http/server.ts');
-    const sanitizer = readSource('src/relay/src/store/artifact-sanitizer.ts');
-    const store = readSource('src/relay/src/store/artifact-store.ts');
+    const server = readSource('app-relay/src/http/server.ts');
+    const sanitizer = readSource('app-relay/src/store/artifact-sanitizer.ts');
+    const store = readSource('app-relay/src/store/artifact-store.ts');
     return [
       server.includes("path === '/api/extension/artifacts/publish'"),
       server.includes('auth.consumeArtifactPublishTicket'),
@@ -76,8 +76,8 @@ const boundaryGates = [
     const host = readSource('extensions/pi-remote-inbound-media/src/index.ts');
     const release = readSource('scripts/release-verify.mjs');
     const cdp = readSource('scripts/inbound-media-cdp.mjs');
-    const indexHtml = readSource('src/mobile-app/index.html');
-    const serviceWorker = readSource('src/mobile-app/public/service-worker.js');
+    const indexHtml = readSource('app-mobile/index.html');
+    const serviceWorker = readSource('app-mobile/public/service-worker.js');
     return [
       !host.includes('options.stdout') && !host.includes('options.session'),
       !host.includes('console.') && !host.includes('base64'),
@@ -295,10 +295,10 @@ function noScopedMediaResidue() {
   const scopedPaths = [
     'extensions/pi-remote-inbound-media',
     'extensions/pi-remote-plan/src/index.ts',
-    'src/relay/src/policy/mutation-policy.ts',
-    'src/relay/src/auth/policy.ts',
-    'src/relay/tests/inbound-media-publish.test.ts',
-    'src/relay/tests/security/negative-controls.test.ts',
+    'app-relay/src/policy/mutation-policy.ts',
+    'app-relay/src/auth/policy.ts',
+    'app-relay/tests/inbound-media-publish.test.ts',
+    'app-relay/tests/security/negative-controls.test.ts',
     'scripts/release-verify.mjs',
     'scripts/inbound-media-cdp.mjs',
   ];

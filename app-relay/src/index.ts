@@ -419,7 +419,7 @@ export function mutationPiArguments(
   const familyTools =
     family === 'filesystem' ? ['edit', 'write'] : family === 'process' ? ['bash'] : ['fetch'];
   const extensionPath = new URL(
-    '../../../extensions/pi-remote-approval/dist/index.js',
+    '../../extensions/pi-remote-approval/dist/index.js',
     import.meta.url,
   );
   return [

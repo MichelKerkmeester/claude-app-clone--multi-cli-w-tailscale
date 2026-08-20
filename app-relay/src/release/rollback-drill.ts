@@ -191,7 +191,7 @@ function action(suffix: string): Omit<ApprovalAction, 'policyVersion'> {
 }
 
 function defaultReleaseRoot(): string {
-  return fileURLToPath(new URL('../../../../release/', import.meta.url));
+  return fileURLToPath(new URL('../../../release/', import.meta.url));
 }
 
 function hashFile(filePath: string): string {

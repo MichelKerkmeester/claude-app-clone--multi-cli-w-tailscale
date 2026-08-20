@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    include: ['src/mobile-app/tests/**/*.test.tsx'],
-    setupFiles: ['src/mobile-app/tests/setup.ts'],
+    include: ['app-mobile/tests/**/*.test.tsx'],
+    setupFiles: ['app-mobile/tests/setup.ts'],
   },
 });

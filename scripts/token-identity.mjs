@@ -22,7 +22,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 // Read a CSS source. A .svelte file contributes only its <style> block bodies (the scoped CSS the
 // migration moves each surface's rules into); anything else is read as raw CSS. This lets the diff
 // gate assemble the post-migration corpus straight from the component tree:
-//   diff <baseline.json> src/mobile-app/src/app.css src/mobile-app/src/**/*.svelte
+//   diff <baseline.json> app-mobile/src/app.css app-mobile/src/**/*.svelte
 function readCssInput(file) {
   const text = readFileSync(file, 'utf8');
   if (!file.endsWith('.svelte')) return text;

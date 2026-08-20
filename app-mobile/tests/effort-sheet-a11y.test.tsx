@@ -318,7 +318,7 @@ describe('state fixtures and non-color indicators', () => {
     expect(pendingRow).toHaveTextContent('Applying');
     expect(pendingRow).not.toHaveAttribute('data-selected');
 
-    const css = readFileSync('src/mobile-app/src/style.css', 'utf8');
+    const css = readFileSync('app-mobile/src/style.css', 'utf8');
     expect(css).toMatch(
       /\.effort-radio-row\[data-selected\] \{[\s\S]*?border-color: var\(--model-sheet-ui-accent\);/u,
     );
@@ -364,7 +364,7 @@ describe('state fixtures and non-color indicators', () => {
   });
 
   it('applies the frozen light and dark tokens to the sheet surface', () => {
-    const css = readFileSync('src/mobile-app/src/style.css', 'utf8');
+    const css = readFileSync('app-mobile/src/style.css', 'utf8');
     expect(css).toMatch(
       /\.model-sheet-overlay \{[\s\S]*?--model-sheet-raised: var\(--surface\);[\s\S]*?--model-sheet-ink: var\(--ink\);[\s\S]*?--model-sheet-ui-accent: var\(--accent-strong\);/u,
     );
@@ -426,7 +426,7 @@ describe('reflow, touch targets, and logical layout', () => {
   });
 
   it('uses logical properties and mirrors section arrows under RTL', () => {
-    const css = readFileSync('src/mobile-app/src/style.css', 'utf8');
+    const css = readFileSync('app-mobile/src/style.css', 'utf8');
     expect(css).toMatch(
       /\.effort-radio-row \{[\s\S]*?padding-inline: var\(--space-3\);/u,
     );
@@ -447,7 +447,7 @@ describe('reflow, touch targets, and logical layout', () => {
   });
 
   it('keeps browser text inflation enabled and scrolls internally at large text', () => {
-    const css = readFileSync('src/mobile-app/src/style.css', 'utf8');
+    const css = readFileSync('app-mobile/src/style.css', 'utf8');
     expect(css).not.toMatch(/text-size-adjust:\s*none/gu);
     expect(css).toMatch(/\.model-sheet-search input \{[\s\S]*?font-size: 1rem;/u);
     expect(css).toMatch(/\.effort-radio-row-label \{[\s\S]*?overflow-wrap: anywhere;/u);
@@ -462,7 +462,7 @@ describe('reflow, touch targets, and logical layout', () => {
 
 describe('reduced motion removes transforms, springs, stagger, and spinners', () => {
   it('strips sheet and effort animations while keeping the fixed tokens', () => {
-    const css = readFileSync('src/mobile-app/src/style.css', 'utf8');
+    const css = readFileSync('app-mobile/src/style.css', 'utf8');
     const pulseStart = css.indexOf('@keyframes model-sheet-pulse');
     const blockStart = css.lastIndexOf(
       '@media (prefers-reduced-motion: reduce) {',

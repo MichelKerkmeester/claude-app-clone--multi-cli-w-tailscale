@@ -23,7 +23,7 @@ import {
   createAskQuestionAnswerAdapter,
   createFinalBoundaryHandler,
   createRelayLeaseAuthorizer,
-} from '../../../extensions/pi-remote-approval/src/index.js';
+} from '../../extensions/pi-remote-approval/src/index.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ApprovalService } from '../src/approval/approval-service.js';

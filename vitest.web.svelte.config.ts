@@ -15,7 +15,7 @@ export default defineConfig({
   plugins: [svelte({ hot: false }), svelteTesting()],
   test: {
     environment: 'jsdom',
-    include: ['src/mobile-app/tests/**/*.svelte.test.ts'],
-    setupFiles: ['src/mobile-app/tests/setup.ts'],
+    include: ['app-mobile/tests/**/*.svelte.test.ts'],
+    setupFiles: ['app-mobile/tests/setup.ts'],
   },
 });

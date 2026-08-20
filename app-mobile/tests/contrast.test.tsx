@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const STYLE = readFileSync('src/mobile-app/src/style.css', 'utf8');
+const STYLE = readFileSync('app-mobile/src/style.css', 'utf8');
 
 // The exact Claude semantic values applied in style.css. This computes the real WCAG
 // 2.x contrast ratio for each meaningful foreground/background pair so the "meets WCAG

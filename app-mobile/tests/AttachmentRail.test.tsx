@@ -87,10 +87,10 @@ describe('AttachmentRail', () => {
       });
       expect(element.scrollWidth).toBeLessThanOrEqual(element.clientWidth);
     }
-    expect(readFileSync('src/mobile-app/src/style.css', 'utf8')).toMatch(
+    expect(readFileSync('app-mobile/src/style.css', 'utf8')).toMatch(
       /\.attachment-rail\s*\{[\s\S]*?max-inline-size: 100%;[\s\S]*?overflow-x: auto;/u,
     );
-    expect(readFileSync('src/mobile-app/src/style.css', 'utf8')).toMatch(
+    expect(readFileSync('app-mobile/src/style.css', 'utf8')).toMatch(
       /@media \(max-width: 20rem\)[\s\S]*?\.attachment-preview-dialog/u,
     );
   });

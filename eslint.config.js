@@ -35,7 +35,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/mobile-app/**/*.{ts,tsx}'],
+    files: ['app-mobile/**/*.{ts,tsx}'],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -52,7 +52,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/mobile-app/public/service-worker.js'],
+    files: ['app-mobile/public/service-worker.js'],
     languageOptions: {
       globals: {
         ...globals.serviceworker,

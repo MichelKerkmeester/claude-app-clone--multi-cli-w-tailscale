@@ -17,7 +17,7 @@
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-import { fullAccessPiArguments } from '../src/relay/dist/index.js';
+import { fullAccessPiArguments } from '../app-relay/dist/index.js';
 
 const REQUEST_TIMEOUT_MS = numberFromEnv('PI_REMOTE_VERIFY_TIMEOUT_MS', 20_000);
 const PLAN_SMOKE = process.argv.includes('--no-plan-smoke') ? false : true;

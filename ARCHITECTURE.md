@@ -49,7 +49,7 @@ The relay persists only redacted envelopes before it broadcasts anything, and mu
 - apps/pi-remote-relay/src/approval/final-gate.ts (`verifyFinalGate`)
 - apps/pi-remote-relay/src/http/server.ts (`startReadOnlyServer`, `handleExtensionAuthority`)
 - extensions/pi-remote-approval/src/index.ts (`createFinalBoundaryHandler`, `createRelayLeaseAuthorizer`)
-- apps/pi-remote-web/src/state.ts (`transcriptReducer`), apps/pi-remote-web/src/relay.ts, apps/pi-remote-web/src/cache.ts
+- apps/pi-remote-web/src/state.ts (`transcriptReducer`), apps/pi-remote-web/app-relay.ts, apps/pi-remote-web/src/cache.ts
 - deploy/containment/pi-remote.sb
 - docs/security.md, docs/release-verification.md, docs/setup.md
 

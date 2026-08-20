@@ -599,7 +599,7 @@ describe('CommandOption: safe text-only rows', () => {
 });
 
 describe('applied panel styling stays inside the frozen system', () => {
-  const css = readFileSync('src/mobile-app/src/style.css', 'utf8');
+  const css = readFileSync('app-mobile/src/style.css', 'utf8');
 
   it('uses only the frozen light tokens', () => {
     for (const token of ['#ffffff', '#24221f', '#6c6a65', '#8a452f', '#b85f42', '#f3e4de']) {

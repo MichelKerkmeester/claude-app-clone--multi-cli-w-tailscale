@@ -130,7 +130,7 @@ describe('quarantine normalization round trips', () => {
 });
 
 async function fixture(relativePath: string): Promise<Uint8Array> {
-  return new Uint8Array(await readFile(new URL(`../../../${relativePath}`, import.meta.url)));
+  return new Uint8Array(await readFile(new URL(`../../${relativePath}`, import.meta.url)));
 }
 
 function base64(value: string): Uint8Array {

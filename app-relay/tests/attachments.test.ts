@@ -381,7 +381,7 @@ async function fixturePng(): Promise<Uint8Array> {
   return new Uint8Array(
     await readFile(
       new URL(
-        '../../../docs/design-reference/mobile-chat-apps/screens/00-current-pi-remote.png',
+        '../../docs/design-reference/mobile-chat-apps/screens/00-current-pi-remote.png',
         import.meta.url,
       ),
     ),

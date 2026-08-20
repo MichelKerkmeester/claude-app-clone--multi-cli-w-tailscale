@@ -15,6 +15,8 @@
 </script>
 
 <script lang="ts">
+  import { hover, press, focusVisible } from '../primitives/interactions.js';
+
   let { item, previewUrl, onOpen, onRemove, position, total }: AttachmentTileProps = $props();
 
   let previewFailed = $state(false);
@@ -41,6 +43,9 @@
     aria-label={`Preview ${item.label}`}
     aria-posinset={position}
     aria-setsize={total}
+    use:hover
+    use:press
+    use:focusVisible
     onclick={() => onOpen(item.id, previewButtonRef)}
   >
     {#if unavailable}
@@ -61,6 +66,9 @@
     class="attachment-tile-remove"
     aria-label={`Remove ${item.label}`}
     data-hit-target="44"
+    use:hover
+    use:press
+    use:focusVisible
     onclick={() => onRemove(item.id)}
   >
     <span aria-hidden="true">×</span>
@@ -69,8 +77,10 @@
 </div>
 
 <!-- @ds surface: attachment-tile — the draft photo tile; preview button, remove control, sr-only status.
-     Decomposed from style.css; react-aria [data-hovered]/[data-pressed]/[data-focus-visible] rewritten
-     to the native :hover/:active/:focus-visible the native buttons emit. Values unchanged. -->
+     Decomposed from style.css; the react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states
+     are preserved by the use:hover/use:press/use:focusVisible actions (touch-aware — plain :hover would
+     stick after a tap on this mobile surface). Runtime-attr rules use :global([data-*]) so Svelte keeps
+     the action-set attribute selectors scoped to this component. Values unchanged. -->
 <style>
   .attachment-tile {
     position: relative;
@@ -103,12 +113,12 @@
     object-fit: cover;
   }
 
-  .attachment-tile-preview:hover,
-  .attachment-tile-preview:active {
+  .attachment-tile-preview:global([data-hovered]),
+  .attachment-tile-preview:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
-  .attachment-tile-preview:focus-visible {
+  .attachment-tile-preview:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 3px;
   }
@@ -161,12 +171,12 @@
     line-height: 1;
   }
 
-  .attachment-tile-remove:hover,
-  .attachment-tile-remove:active {
+  .attachment-tile-remove:global([data-hovered]),
+  .attachment-tile-remove:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
-  .attachment-tile-remove:focus-visible {
+  .attachment-tile-remove:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }

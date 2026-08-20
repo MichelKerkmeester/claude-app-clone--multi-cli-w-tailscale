@@ -5,6 +5,7 @@
 
 <script lang="ts">
   import { useVisualViewportAnchor } from '../useVisualViewportAnchor.svelte.js';
+  import { hover, press, focusVisible } from '../primitives/interactions.js';
   import { getAttachmentDraft } from './AttachmentDraftProvider.svelte';
 
   const draft = getAttachmentDraft();
@@ -114,6 +115,8 @@
             type="button"
             class="artifact-viewer-close"
             aria-label="Close preview"
+            use:hover
+            use:focusVisible
             onclick={() => draft.closePreview()}
           >
             <span aria-hidden="true">×</span>
@@ -122,7 +125,14 @@
         <div class="artifact-viewer-content attachment-preview-content">
           <p class="artifact-viewer-summary">Local-only preview. No copy has been sent.</p>
           <div class="attachment-preview-actions" role="group" aria-label="Photo actions">
-            <button type="button" class="attachment-preview-remove" onclick={remove}>Remove {item.label}</button>
+            <button
+              type="button"
+              class="attachment-preview-remove"
+              use:hover
+              use:press
+              use:focusVisible
+              onclick={remove}
+            >Remove {item.label}</button>
           </div>
           <div class="attachment-preview-canvas">
             {#if unavailable}
@@ -146,8 +156,10 @@
 
 <!-- @ds surface: attachment-preview-dialog — local-photo preview; reuses the artifact-viewer modal
      chrome (those .artifact-viewer-* rules stay in style.css until that surface is decomposed).
-     react-aria [data-hovered]/[data-pressed]/[data-focus-visible] on the remove control rewritten
-     to native :hover/:active/:focus-visible. Values unchanged. -->
+     The react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states on the remove control are
+     preserved by the use:hover/use:press/use:focusVisible actions (touch-aware; plain :hover would stick
+     after a tap); the reused close control carries use:hover/use:focusVisible for the same reason. The
+     scoped remove-control attr rules use :global([data-*]) so Svelte keeps them. Values unchanged. -->
 <style>
   .attachment-preview-content {
     align-content: stretch;
@@ -170,12 +182,12 @@
     cursor: pointer;
   }
 
-  .attachment-preview-remove:hover,
-  .attachment-preview-remove:active {
+  .attachment-preview-remove:global([data-hovered]),
+  .attachment-preview-remove:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
-  .attachment-preview-remove:focus-visible {
+  .attachment-preview-remove:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }

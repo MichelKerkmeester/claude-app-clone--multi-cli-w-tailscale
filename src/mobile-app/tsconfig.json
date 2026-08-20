@@ -2,7 +2,9 @@
   "extends": ["../../tsconfig.base.json", "./.svelte-kit/tsconfig.json"],
   "compilerOptions": {
     "allowJs": true,
-    "checkJs": false
+    "checkJs": false,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   },
   "//": "During the React→Svelte migration, svelte-check is scoped to the Svelte surface (routes + lib + generated types). The not-yet-ported React .tsx files keep their own vitest tooling and were type-clean at baseline; each is type-checked here once it is ported into src/lib. Widen this include as the port progresses.",
   "include": [

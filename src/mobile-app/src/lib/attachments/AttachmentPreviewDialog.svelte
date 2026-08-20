@@ -143,3 +143,93 @@
     </div>
   </div>
 {/if}
+
+<!-- @ds surface: attachment-preview-dialog — local-photo preview; reuses the artifact-viewer modal
+     chrome (those .artifact-viewer-* rules stay in style.css until that surface is decomposed).
+     react-aria [data-hovered]/[data-pressed]/[data-focus-visible] on the remove control rewritten
+     to native :hover/:active/:focus-visible. Values unchanged. -->
+<style>
+  .attachment-preview-content {
+    align-content: stretch;
+  }
+
+  .attachment-preview-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .attachment-preview-remove {
+    min-block-size: 44px;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--control-border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .attachment-preview-remove:hover,
+  .attachment-preview-remove:active {
+    background: var(--accent-soft);
+  }
+
+  .attachment-preview-remove:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .attachment-preview-canvas {
+    display: grid;
+    min-inline-size: 0;
+    min-block-size: min(60dvh, 38rem);
+    place-items: center;
+    overflow: hidden;
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--canvas);
+  }
+
+  .attachment-preview-image {
+    display: block;
+    max-inline-size: 100%;
+    max-block-size: min(58dvh, 36rem);
+    object-fit: contain;
+  }
+
+  .attachment-preview-unavailable {
+    max-inline-size: 28ch;
+    margin: 0;
+    color: var(--ink-muted);
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  @media (max-width: 40rem) {
+    .attachment-preview-canvas {
+      min-block-size: min(52dvh, 28rem);
+    }
+  }
+
+  @media (max-width: 20rem) {
+    .attachment-preview-dialog {
+      padding-inline: max(var(--space-3), env(safe-area-inset-left))
+        max(var(--space-3), env(safe-area-inset-right));
+    }
+
+    .attachment-preview-canvas {
+      min-block-size: 12rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .attachment-preview-remove,
+    .attachment-preview-image {
+      transition: none;
+    }
+  }
+</style>

@@ -39,3 +39,27 @@
     {/each}
   </ol>
 {/if}
+
+<!-- @ds surface: attachment-rail — the horizontal draft-photo rail; the tiles are child components. -->
+<style>
+  .attachment-rail {
+    display: flex;
+    min-inline-size: 0;
+    min-block-size: 72px;
+    gap: 8px;
+    max-inline-size: 100%;
+    margin: 0;
+    padding-block: 4px;
+    padding-inline: 0 2rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+
+  .attachment-rail-item {
+    position: relative;
+    flex: 0 0 64px;
+    min-inline-size: 64px;
+    list-style: none;
+  }
+</style>

@@ -38,3 +38,28 @@
     </div>
   </fieldset>
 {/if}
+
+<!-- @ds surface: ask-question option-list — the choice fieldset + stacked rows (rows are a child component). Decomposed from style.css; values unchanged. -->
+<style>
+  /* @ds slot: options — the choice fieldset. */
+  .ask-question-options {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .ask-question-options legend {
+    margin-block-end: var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    font-weight: 650;
+  }
+
+  /* @ds slot: option-list — the stacked option rows. */
+  .ask-question-option-list {
+    display: grid;
+    min-inline-size: 0;
+    gap: var(--space-2);
+  }
+</style>

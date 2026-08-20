@@ -50,3 +50,27 @@
     </svg>
   </button>
 </header>
+
+<!-- @ds surface: artifact-viewer-revision — the exact-revision line in the viewer header. Decomposed
+     from style.css; single-component (only ArtifactHeader renders it). The rest of the header chrome
+     (artifact-viewer-header/heading-group/kicker/title/close) is shared with AttachmentPreviewDialog
+     and stays in the global sheet (→ app.css at cutover). Dark re-ink via :global(:root[data-theme]).
+     Literal hex preserved. Values unchanged. -->
+<style>
+  /* @ds slot: revision — the exact-revision provenance line (LTR-isolated). */
+  .artifact-viewer-revision {
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+    color: #6c6a65;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    min-inline-size: 0;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  /* @ds state: dark — dark-theme re-ink (foreign ancestor via :global). */
+  :global(:root[data-theme='dark']) .artifact-viewer-revision {
+    color: #9f998f;
+  }
+</style>

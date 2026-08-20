@@ -201,3 +201,62 @@
     {/if}
   </div>
 {/if}
+
+<!-- @ds surface: inbound-image-status — the inbound-image lifecycle status line + action buttons.
+     Decomposed from style.css; native :hover/:focus-visible/:disabled preserved (the shipped button
+     uses native pseudo-classes, not react-aria state attributes). Values unchanged. -->
+<style>
+  /* @ds slot: status — the lifecycle status read-out (loading · ready · corrupt · revoked · …). */
+  .inbound-image-status {
+    display: grid;
+    min-block-size: 1.333rem;
+    gap: var(--space-2);
+    color: var(--ink-muted);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    line-height: 1.333;
+  }
+
+  /* @ds slot: status-copy — the human-readable state description. */
+  .inbound-image-status-copy {
+    overflow-wrap: anywhere;
+  }
+
+  /* @ds slot: status-actions — the action button row (retry · reveal · …). */
+  .inbound-image-status-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  /* @ds slot: status-action — one lifecycle action; ≥44px target. */
+  .inbound-image-status-action {
+    min-block-size: 44px;
+    min-inline-size: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--control-border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--accent-ink);
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  /* @ds state: hover — the action under pointer hover. */
+  .inbound-image-status-action:hover:not(:disabled) {
+    background: var(--accent-soft);
+  }
+
+  /* @ds guardrail: focus-visible — the AA focus ring on a status action. */
+  .inbound-image-status-action:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* @ds state: disabled — the action fails-closed to reduced emphasis. */
+  .inbound-image-status-action:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+</style>

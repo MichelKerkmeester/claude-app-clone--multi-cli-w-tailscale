@@ -155,28 +155,21 @@
     margin-block-start: var(--space-4);
   }
 
-  /* @ds edit: layout — narrow reflow of the card at <=20rem: padding,
-     header/actions stacking, and full-width actions grid. */
-  @media (max-width: 20rem) {
+  /* @ds edit: layout — narrow reflow of the card at <=27rem: padding, header
+     stacking, and left-aligned status. */
+  @media (max-width: 27rem) {
     .rich-block-frame {
       padding: var(--space-3);
     }
 
-    .rich-block-header,
-    .rich-block-actions {
-      align-items: stretch;
+    .rich-block-header {
+      display: block;
     }
 
-    .rich-block-actions {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  /* @ds edit: layout — short-landscape reflow: the card compacts vertical rhythm. */
-  @media (orientation: landscape) and (max-height: 30rem) {
-    .rich-block-frame {
-      margin-block: var(--space-2);
+    .rich-block-status {
+      justify-content: flex-start;
+      margin-block-start: var(--space-2);
+      text-align: start;
     }
   }
 </style>

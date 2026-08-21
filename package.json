@@ -19,6 +19,7 @@
     "test": "vitest run packages/pi-rpc-protocol/tests app-relay/tests extensions/pi-remote-approval/tests extensions/pi-remote-plan/tests tests",
     "test:web": "vitest run --config vitest.web.config.ts",
     "test:web:svelte": "vitest run --config vitest.web.svelte.config.ts",
+    "test:web:logic": "vitest run --config vitest.web.logic.config.ts",
     "rollback:drill": "npm run build -w @pi-remote/relay && node scripts/rollback-drill.mjs",
     "verify:runtime-boundary": "npm run build -w @pi-remote/relay && node scripts/verify-full-access-runtime.mjs",
     "release:thresholds": "node scripts/check-thresholds.mjs",

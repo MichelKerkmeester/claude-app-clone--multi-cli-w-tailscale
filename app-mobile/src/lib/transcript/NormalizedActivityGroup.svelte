@@ -63,7 +63,7 @@
 <!-- @ds surface: activity-group — grouped bare evidence surface. Decomposed from style.css;
      activity-group/activity-stack are owned solely by this component so they move with it (scoped).
      evidence-trigger/chevron/summary are shared with CollapsedEvidence and stay :global there
-     (CollapsedEvidence.svelte's <style>); they are not redefined here to avoid duplicate global CSS.
+     (CollapsedEvidence.svelte's scoped style block); they are not redefined here to avoid duplicate global CSS.
      Values unchanged. -->
 <style>
   /* @ds surface: activity-group — grouped bare evidence blocks in one quiet disclosure. */

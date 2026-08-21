@@ -648,10 +648,12 @@ describe('dismissal and exclusivity', () => {
   // popover primitive's focus-trap redirect and its interact-outside dismissal, neither
   // of which jsdom runs: a programmatic focus is trapped back onto the first focusable
   // inside the popover (which opens the tools' own command list), and an outside click
-  // never dismisses the popover. The exclusivity logic itself is covered by the
-  // panel-open derivation and the surrounding tests; the live focus/dismiss behavior is
-  // verified in a real browser via the structural gate. Re-enable if the popover
-  // primitive gains jsdom-faithful focus handling.
+  // never dismisses the popover. Coverage caveat: the reactive suppression guard this
+  // exercises (opening the tools browser hides the inline panel even with an active
+  // trigger) has no other unit coverage — it is not extracted into a pure, separately
+  // tested function the way the slash-panel state machine is. Its live focus/dismiss
+  // behavior is verified in a real browser via the structural gate. Re-enable if the
+  // popover primitive gains jsdom-faithful focus handling.
   it.skip('the inline panel and the + browser are mutually exclusive in both directions', async () => {
     const user = userEvent.setup();
     renderComposer();

@@ -55,8 +55,38 @@ function stripComments(css) {
   return css.replace(/\/\*[\s\S]*?\*\//g, '');
 }
 
+// Svelte's :global(X) is a compile-time scoping directive: the emitted selector is X unchanged, so
+// for token resolution (custom-property cascade keyed by selector) it must be unwrapped to its inner
+// selector. Without this, a decomposed override like `:global(:root[data-theme='dark']) .slash-panel`
+// fails to match the baseline's `:root[data-theme='dark'] .slash-panel` context key — it lands at a
+// separate key (spurious ADDED) and never overrides the base value (spurious CHANGED). Balanced-paren
+// walk so inner selectors that themselves carry parens (e.g. :not(...)) survive intact.
+function unwrapGlobal(sel) {
+  let out = '';
+  let i = 0;
+  while (i < sel.length) {
+    const g = sel.indexOf(':global(', i);
+    if (g === -1) {
+      out += sel.slice(i);
+      break;
+    }
+    out += sel.slice(i, g);
+    let depth = 1;
+    let j = g + 8; // first char inside the '('
+    while (j < sel.length && depth > 0) {
+      if (sel[j] === '(') depth++;
+      else if (sel[j] === ')') depth--;
+      if (depth === 0) break;
+      j++;
+    }
+    out += sel.slice(g + 8, j); // inner selector, wrapper removed
+    i = j + 1; // skip the matching ')'
+  }
+  return out;
+}
+
 function normalizeSelector(sel) {
-  return sel.replace(/\s+/g, ' ').replace(/"/g, "'").trim();
+  return unwrapGlobal(sel).replace(/\s+/g, ' ').replace(/"/g, "'").trim();
 }
 
 // Returns [{ selector, media, decls: [{prop, value}] }, ...] for rules that declare >=1 custom prop.

@@ -1,9 +1,19 @@
 <script lang="ts">
-  // Placeholder home route. The Enrollment / Home / Session views replace this as App.tsx's view
-  // functions are ported (child 005-views-and-shell). It exists so the SvelteKit scaffold builds
-  // and serves a page before any component work begins.
+  // Home route — the session roster. State + actions come from the shell via
+  // context; this page only wires them into the ported Home view.
+  import { getAppState, getAppActions } from '../lib/app-state.svelte.js';
+  import Home from '../lib/views/Home.svelte';
+
+  const app = getAppState();
+  const actions = getAppActions();
 </script>
 
-<main>
-  <p>Pi Remote — SvelteKit scaffold.</p>
-</main>
+<Home
+  sessions={app.sessions}
+  connection={app.connection.phase}
+  cache={app.initialCache}
+  device={app.device}
+  onSelect={actions.navigate}
+  onRevoke={actions.onRevoke}
+  onLogout={actions.onLogout}
+/>

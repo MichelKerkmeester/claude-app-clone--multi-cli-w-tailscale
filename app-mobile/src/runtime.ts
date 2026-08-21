@@ -645,7 +645,7 @@ export interface RuntimeControls {
 // The mutation lane fails closed outside settled ready authority. Streaming is
 // deliberately absent: the host-gated model switch stays legal while streaming,
 // and the streaming capability check below blocks everything else.
-const BLOCKED_MUTATION_PHASES: ReadonlySet<RuntimePhase> = new Set([
+export const BLOCKED_MUTATION_PHASES: ReadonlySet<RuntimePhase> = new Set([
   'checking',
   'pending',
   'stale',
@@ -658,8 +658,8 @@ const BLOCKED_MUTATION_PHASES: ReadonlySet<RuntimePhase> = new Set([
   'inconsistent-state',
 ]);
 
-const HYDRATE_TIMEOUT_MS = 8_000;
-const MUTATION_DEADLINE_MS = 10_000;
+export const HYDRATE_TIMEOUT_MS = 8_000;
+export const MUTATION_DEADLINE_MS = 10_000;
 
 /** Host-authoritative runtime controls for one session. */
 export function useRuntime(sessionId: string): RuntimeControls {
@@ -995,7 +995,7 @@ interface RuntimeHydration {
   readonly planBinding: RuntimePlanBinding | null;
 }
 
-async function hydrateSnapshot(sessionId: string, signal: AbortSignal): Promise<RuntimeHydration> {
+export async function hydrateSnapshot(sessionId: string, signal: AbortSignal): Promise<RuntimeHydration> {
   const reconcileTransport = snapshotTransport();
   const snapshot =
     reconcileTransport !== null
@@ -1066,7 +1066,7 @@ function planBindingTransport():
   }
 }
 
-function planExecutionTransport():
+export function planExecutionTransport():
   | ((
       sessionId: string,
       expectedRuntimeRevision: number,
@@ -1117,7 +1117,7 @@ interface RelayIssueShape {
  * The shape is validated rather than the class so every transport normalizes
  * identically; retry metadata stays clamped to the bounded window.
  */
-function runtimeIssueFrom(error: unknown): RelayIssueShape | null {
+export function runtimeIssueFrom(error: unknown): RelayIssueShape | null {
   if (typeof error !== 'object' || error === null) return null;
   const candidate = error as { readonly issueCode?: unknown; readonly retryAfterMs?: unknown };
   if (typeof candidate.issueCode !== 'string') return null;

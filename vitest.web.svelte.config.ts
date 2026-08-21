@@ -17,6 +17,14 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['app-mobile/tests/**/*.svelte.test.ts'],
     setupFiles: ['app-mobile/tests/setup.ts'],
+    // bits-ui menus/dialogs drive a floating-ui + presence/animation layer whose
+    // work is scheduled on rAF/microtasks. When many of these heavy component
+    // files render in parallel, CPU saturation stalls that async work past
+    // user-event's implicit waits, so a keyboard interaction can observe the menu
+    // mid-transition (rows briefly out of the a11y tree) and miss the activation.
+    // The components are correct — the flake is purely jsdom-under-load — so run
+    // these files serially for deterministic results; the suite is small.
+    fileParallelism: false,
     server: {
       // bits-ui ships raw *.svelte inside node_modules; vitest externalizes
       // node_modules by default, so Node rejects the .svelte extension and any

@@ -13,7 +13,7 @@
   // data-theme token blocks, resets) plus the not-yet-decomposed component
   // rules. It shrinks toward the pure foundation as surfaces move to scoped
   // <style> blocks.
-  import '../style.css';
+  import '../app.css';
 
   import {
     createAppState,

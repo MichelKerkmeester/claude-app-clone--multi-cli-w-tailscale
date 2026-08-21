@@ -205,6 +205,11 @@ async function exerciseDefaultSurface(client, theme, outputPath, viewportWidth) 
   // and the client opts in with ?demo=1 (persisted in localStorage). Enable it
   // so the default surface has a deterministic, enrolled session list.
   await navigate(client, `${DEV_URL}/?demo=1`);
+  // The ?demo=1 opt-in is persisted to localStorage lazily, on the app's first isDemoMode() call
+  // (in the auth bootstrap). SvelteKit mounts after readyState 'complete', so wait for the opt-in
+  // to land before navigating away to '/' — otherwise the bare-'/' load reads no opt-in, demo mode
+  // stays off, and the app sits on the enrollment gate instead of the demo Home surface.
+  await waitForPage(client, `localStorage.getItem('pi-remote.demo') === '1'`);
   await evaluate(
     client,
     `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)});`,

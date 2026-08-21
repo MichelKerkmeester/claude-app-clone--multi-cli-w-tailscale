@@ -150,7 +150,12 @@
     app.authAttempt;
     let stopped = false;
     if (!navigator.onLine) return;
-    app.dispatchConnection({ type: 'authenticating' });
+    // This effect must mirror React's [authAttempt] deps. dispatchConnection READS `connection`
+    // to reduce it, so tracking this call makes `connection` a dependency — and the async
+    // 'connecting' dispatch below then re-invalidates the effect, whose cleanup flips `stopped`
+    // and cancels the in-flight establishSession, so authReady never sticks. untrack keeps the
+    // only real dependency `authAttempt`.
+    untrack(() => app.dispatchConnection({ type: 'authenticating' }));
     void establishSession()
       .then((identity) => {
         if (stopped) return;
@@ -189,7 +194,11 @@
     if (!app.authReady) return;
     const currentSessionId = selectedSessionId;
     const controller = new AbortController();
-    app.dispatchSessions({ type: 'loading' });
+    // Mirror React's [authReady, selectedSessionId] deps. dispatchSessions READS `sessions` to
+    // reduce it, so tracking this call makes `sessions` a dependency — and the async 'loaded'
+    // dispatch then re-invalidates the effect, which re-aborts and re-fetches in a loop, leaving
+    // the roster oscillating loading↔loaded and never settling. untrack keeps the real deps only.
+    untrack(() => app.dispatchSessions({ type: 'loading' }));
     void fetchSessions(controller.signal)
       .then((items) => {
         const at = new Date().toISOString();

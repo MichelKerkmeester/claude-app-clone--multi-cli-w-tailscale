@@ -13,9 +13,12 @@
 import { browser } from '$app/environment';
 import { getContext, setContext } from 'svelte';
 
+import type { RuntimeMediaCapabilityDto } from '@pi-remote/pi-rpc-protocol';
+
 import type { DeviceIdentity } from '../auth.js';
 import { loadCache, type ReadOnlyCache } from '../cache.js';
 import {
+  DEFAULT_MEDIA_CAPABILITY_OFF,
   EMPTY_TRANSCRIPT,
   EMPTY_TODO_PROJECTION_STATE,
   connectionReducer,
@@ -30,8 +33,18 @@ import {
 import { readThemePreference, type ThemePreference } from './views/view-helpers.js';
 
 const APP_STATE_KEY = Symbol('pi-remote:app-state');
+const APP_ACTIONS_KEY = Symbol('pi-remote:app-actions');
 
-export function createAppState() {
+/** Fixture-injection config, mirroring React's `AppProps`; both default to off/none. */
+export interface AppConfig {
+  readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
+  readonly askQuestionPrincipal?: string | undefined;
+}
+
+export function createAppState({
+  mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF,
+  askQuestionPrincipal,
+}: AppConfig = {}) {
   // The persisted roster/transcript snapshot seeds the first paint; storage
   // is browser-only, so guard it for any non-browser module evaluation.
   const initialCache: ReadOnlyCache | null = browser ? loadCache() : null;
@@ -78,6 +91,8 @@ export function createAppState() {
 
   return {
     initialCache,
+    mediaCapability,
+    askQuestionPrincipal,
     get connection() {
       return connection;
     },
@@ -148,4 +163,24 @@ export function setAppState(state: AppState): AppState {
 
 export function getAppState(): AppState {
   return getContext(APP_STATE_KEY) as AppState;
+}
+
+// Shell actions that combine routing (`goto`) and async auth with state
+// mutation. Implemented in `+layout.svelte` (which holds the SvelteKit
+// navigation + effect context) and consumed by the route pages.
+export interface AppActions {
+  navigate(sessionId: string | null): void;
+  openReview(): void;
+  openInbox(): void;
+  onRevoke(): void;
+  onLogout(): void;
+}
+
+export function setAppActions(actions: AppActions): AppActions {
+  setContext(APP_ACTIONS_KEY, actions);
+  return actions;
+}
+
+export function getAppActions(): AppActions {
+  return getContext(APP_ACTIONS_KEY) as AppActions;
 }

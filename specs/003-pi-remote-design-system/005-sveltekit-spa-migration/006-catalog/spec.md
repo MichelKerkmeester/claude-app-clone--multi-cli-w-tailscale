@@ -9,12 +9,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/006-catalog"
-    last_updated_at: "2026-08-19T00:00:00Z"
+    last_updated_at: "2026-08-21T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Spec authored (L6 child)"
-    next_safe_action: "Parallel story dispatches per surface after L5 barrier"
+    recent_action: "Catalog complete: 48 story files / 202 stories, render-verified (404 frames, 0 throws, light+dark). Surfaces are prop-driven (not the originally-planned mock-context decorator); only the ArtifactViewer and AttachmentDraft providers are wrapped. rich-content, transcript, artifacts, views, chrome, AttachmentTile committed + pushed; five batches Sonnet-verified faithful (transcript's one provenance divergence caught + fixed). Security-bounded surfaces (enrollment, push-settings, plan-mode, ask-question), the pdf/image byte-readers, and the a11y primitives stay registry-only / exercised in-situ, documented."
+    next_safe_action: "L7 007-verify-and-cutover — the irreversible cutover (delete React entry, strip app.css) needs explicit user authorization."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

@@ -130,7 +130,6 @@ function selectorCovered(media, rawSel) {
   return coveredKey.get(`${media}||${normSelector(rawSel)}`) === true;
 }
 let removedRules = 0;
-let trimmedRules = 0;
 let keptRules = 0;
 const removedSelectors = [];
 
@@ -139,19 +138,15 @@ root.walkRules((rule) => {
   const ruleDecls = [];
   rule.walkDecls((d) => ruleDecls.push([d.prop.toLowerCase(), declValue(d)]));
   if (ruleDecls.length === 0) { keptRules += 1; return; } // keep empty/structural rules untouched
-  const kept = [];
-  const dropped = [];
-  for (const rawSel of rule.selectors) {
-    if (selectorCovered(media, rawSel)) dropped.push(rawSel);
-    else kept.push(rawSel);
-  }
-  if (kept.length === 0) {
+  // A rule is removed only when EVERY selector in it is covered by the scoped corpus. A grouped
+  // rule with even one uncovered member is kept WHOLE — never split — so app.css preserves the
+  // original grouped-selector text (source-shape faithfulness; keeping an extra covered selector
+  // alongside its scoped copy is harmless duplication of an identical value).
+  const allCovered = rule.selectors.every((rawSel) => selectorCovered(media, rawSel));
+  if (allCovered) {
     removedRules += 1;
-    removedSelectors.push(...dropped.map((s) => `${normSelector(s)}${media ? '  @[' + media + ']' : ''}`));
+    removedSelectors.push(...rule.selectors.map((s) => `${normSelector(s)}${media ? '  @[' + media + ']' : ''}`));
     rule.remove();
-  } else if (dropped.length > 0) {
-    trimmedRules += 1;
-    rule.selectors = kept;
   } else {
     keptRules += 1;
   }
@@ -169,7 +164,7 @@ const out = root.toString();
 const origLines = readFileSync(STYLE, 'utf8').split('\n').length;
 const outLines = out.split('\n').length;
 console.log(`scoped corpus: ${componentsWithStyle}/${fileCount} components with <style>, ${scoped.size} (selector,media) keys`);
-console.log(`style.css rules — removed(all-selectors-covered): ${removedRules}, trimmed(some-selectors-covered): ${trimmedRules}, kept: ${keptRules}`);
+console.log(`style.css rules — removed(all-selectors-covered): ${removedRules}, kept(any-uncovered): ${keptRules}`);
 console.log(`app.css: ${origLines} → ${outLines} lines`);
 if (DRY) {
   console.log('\n--- first 40 removed selectors ---');

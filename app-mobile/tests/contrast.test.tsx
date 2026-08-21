@@ -3,9 +3,13 @@
 // ───────────────────────────────────────────────────────────────────
 
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
 
-const STYLE = readFileSync('app-mobile/src/style.css', 'utf8');
+import { readCssCorpus } from './support/css-corpus';
+
+// The applied-palette rules now live across app.css + each component's scoped <style> rather than one
+// style.css, so assert against the assembled corpus — that keeps this gate working once style.css is
+// retired at cutover, with the same rule text and values.
+const STYLE = readCssCorpus();
 
 // The exact Claude semantic values applied in style.css. This computes the real WCAG
 // 2.x contrast ratio for each meaningful foreground/background pair so the "meets WCAG
@@ -231,7 +235,7 @@ describe('ask-question accessibility palette and state contract', () => {
       /\.ask-question-option-row\[aria-pressed='true'\][\s\S]*?background: var\(--surface-code\);[\s\S]*?color: var\(--ink-inverse\);/u,
     );
     expect(STYLE).toMatch(
-      /\.ask-question-option-row:focus-visible,[\s\S]*?outline: 3px solid var\(--accent-ink\);[\s\S]*?box-shadow: 0 0 0 1px var\(--surface-raised\);/u,
+      /\.ask-question-option-row:focus-visible[\s\S]*?outline: 3px solid var\(--accent-ink\);[\s\S]*?box-shadow: 0 0 0 1px var\(--surface-raised\);/u,
     );
     expect(STYLE).toMatch(/\.ask-question-card[\s\S]*?max-inline-size: 100%;/u);
     expect(STYLE).toMatch(/\.ask-question-free-text textarea[\s\S]*?scroll-margin-block:/u);
@@ -312,7 +316,7 @@ describe('plan-mode hardening style contract', () => {
     expect(STYLE).toMatch(
       /\.composer-plus,[\s\S]*?\.composer-primary,[\s\S]*?min-inline-size: 44px;[\s\S]*?min-block-size: 44px;/u,
     );
-    expect(STYLE).toMatch(/\.plan-ready-review,[\s\S]*?min-block-size: 44px;/u);
+    expect(STYLE).toMatch(/\.plan-ready-review[^}]*?min-block-size: 44px;/u);
   });
 
   it('uses carbon-contrast boundaries and never raw clay as a plan focus ring', () => {

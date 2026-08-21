@@ -14,6 +14,8 @@
 // cast are preserved verbatim. Session consumes nothing back — all
 // effects flow through the dispatch* reducers.
 
+import { untrack } from 'svelte';
+
 import type { SyncCursor, SyncMessage } from '@pi-remote/pi-rpc-protocol';
 
 import { fetchTranscript, noteRelayHeartbeat, openSyncSocket } from '../relay.js';
@@ -104,18 +106,25 @@ export function useSyncSocket(deps: {
     const { dispatchConnection, dispatchTranscript, dispatchTodoProjection, runtimeControls } =
       deps;
 
-    dispatchTranscript({ type: 'select', sessionId });
-    dispatchTodoProjection({ type: 'select', sessionId });
+    // dispatch* reduce their $state (read + write). The header comment intends only the four deps
+    // above to be reactive, but tracking these sync dispatch calls leaks transcript/todo state in
+    // as deps, so the effect re-runs on its own writes → effect_update_depth_exceeded. untrack them.
+    untrack(() => {
+      dispatchTranscript({ type: 'select', sessionId });
+      dispatchTodoProjection({ type: 'select', sessionId });
+    });
     const cached = cache?.transcripts.find((item) => item.sessionId === sessionId);
     if (cached !== undefined) {
-      dispatchTranscript({
-        type: 'hydrate',
-        sessionId,
-        epoch: cached.epoch,
-        coversThrough: cached.coversThrough,
-        blocks: cached.blocks,
-        savedAt: cached.savedAt,
-      });
+      untrack(() =>
+        dispatchTranscript({
+          type: 'hydrate',
+          sessionId,
+          epoch: cached.epoch,
+          coversThrough: cached.coversThrough,
+          blocks: cached.blocks,
+          savedAt: cached.savedAt,
+        }),
+      );
       cursor = cached.epoch === null ? null : { epoch: cached.epoch, seq: cached.coversThrough };
     } else {
       cursor = null;
@@ -224,7 +233,10 @@ export function useSyncSocket(deps: {
           retryTimer = window.setTimeout(connect, Math.min(1_000 * 2 ** retryCount, 15_000));
         });
     };
-    connect();
+    // connect() synchronously dispatchConnection({connecting}) — untrack so the effect does not
+    // take `connection` as a dep and re-fire on the status it just wrote (async retries via
+    // setTimeout already run outside tracking).
+    untrack(() => connect());
 
     return () => {
       stopped = true;

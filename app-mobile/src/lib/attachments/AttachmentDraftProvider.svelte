@@ -133,24 +133,32 @@
   $effect(() => {
     if (previousSession !== sessionId) {
       previousSession = sessionId;
-      clearStoredDraft();
+      // clearStoredDraft dispatches (reduces draftState); untrack so this effect depends only on
+      // sessionId (React's dep) and does not re-trigger on the draftState it just wrote.
+      untrack(() => clearStoredDraft());
     }
   });
 
   $effect(() => {
     const modelChanged = previousModelCanViewPhotos !== modelCanViewPhotos;
     previousModelCanViewPhotos = modelCanViewPhotos;
-
-    if (!mediaAvailable) {
-      clearForCapabilityLoss(null, 'idle');
-      dispatch({ type: 'configure', capabilityAvailable: false, modelCanViewPhotos });
-      return;
-    }
-    if (modelChanged && !modelCanViewPhotos && untrack(() => draftState.items.length) > 0) {
-      clearForCapabilityLoss(modelBlockedMessage(), 'model-blocked');
-    }
-    dispatch({ type: 'configure', capabilityAvailable: true, modelCanViewPhotos });
-    if (modelChanged && modelCanViewPhotos) dispatch({ type: 'validate' });
+    // React deps here were [modelCanViewPhotos, mediaAvailable]. Every dispatch() reduces
+    // draftState (reads AND writes it), so tracking these calls makes the effect depend on
+    // draftState and re-run on its own write → effect_update_depth_exceeded (the Session view
+    // crashed). Read the two real deps in tracked scope, then untrack the state mutations.
+    const available = mediaAvailable;
+    untrack(() => {
+      if (!available) {
+        clearForCapabilityLoss(null, 'idle');
+        dispatch({ type: 'configure', capabilityAvailable: false, modelCanViewPhotos });
+        return;
+      }
+      if (modelChanged && !modelCanViewPhotos && draftState.items.length > 0) {
+        clearForCapabilityLoss(modelBlockedMessage(), 'model-blocked');
+      }
+      dispatch({ type: 'configure', capabilityAvailable: true, modelCanViewPhotos });
+      if (modelChanged && modelCanViewPhotos) dispatch({ type: 'validate' });
+    });
   });
 
   $effect(() => {

@@ -8,6 +8,8 @@
 // overwrite the current snapshot with a different session's rows. The
 // snapshot is intentionally never persisted to any browser storage.
 
+import { untrack } from 'svelte';
+
 import type { CommandCatalogDto } from '@pi-remote/pi-rpc-protocol';
 
 import {
@@ -157,7 +159,9 @@ export function useHostCommandCatalog(
     getSessionId();
     requestIdRef += 1;
     controllerRef?.abort();
-    dispatch({ type: 'session-changed' });
+    // dispatch reduces the catalog state (reads + writes it); untrack so this effect depends only
+    // on the session id and does not re-run on the state it just cleared → no self-invalidation.
+    untrack(() => dispatch({ type: 'session-changed' }));
   });
 
   $effect(() => {

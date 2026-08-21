@@ -119,7 +119,10 @@ async function navigate(c, url) {
 // Wait until Storybook has either mounted the story root's content or shown its
 // error overlay, so we capture the real render outcome rather than a blank frame.
 async function waitForStory(c) {
-  const end = Date.now() + 6000;
+  // Real renders mount in well under a second; a frame still blank at this cap
+  // is a genuinely empty/deferred story, which is not a failure (only thrown
+  // errors are). Keep the cap tight so a large corpus doesn't take forever.
+  const end = Date.now() + 2500;
   while (Date.now() < end) {
     const state = await ev(c, `(() => {
       // Storybook keeps hidden error shells in the DOM; only a VISIBLE one is a

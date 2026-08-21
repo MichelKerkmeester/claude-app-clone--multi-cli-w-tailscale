@@ -17,5 +17,13 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['app-mobile/tests/**/*.svelte.test.ts'],
     setupFiles: ['app-mobile/tests/setup.ts'],
+    server: {
+      // bits-ui ships raw *.svelte inside node_modules; vitest externalizes
+      // node_modules by default, so Node rejects the .svelte extension and any
+      // bits-ui-backed component (Dialog/DropdownMenu/RadioGroup/...) fails to
+      // mount. Inlining bits-ui (and its @internationalized deps) routes those
+      // files through vite-plugin-svelte so the components render under jsdom.
+      deps: { inline: [/bits-ui/, /runed/, /svelte-toolbelt/, /@internationalized/] },
+    },
   },
 });

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/runtime.js';
-import type PlanModeButtonComponent from '../src/lib/chrome/PlanModeButton.svelte';
+import PlanModeButton from '../src/lib/chrome/PlanModeButton.svelte';
 import { planModePresentation } from '../src/lib/chrome/planModePresentation.js';
 
 const HOST_STATE: RuntimeStateDto = {
@@ -52,20 +52,11 @@ function failedWith(
   };
 }
 
-// PlanModeButton renders bits-ui's DropdownMenu, which ships raw *.svelte inside
-// node_modules. The frozen svelte vitest config externalizes node_modules, so in
-// this environment the component cannot be mounted (Node rejects the .svelte
-// extension). Loading it dynamically means the pure presentation derivation below
-// still runs; the DOM block activates only where the harness can import it.
-let PlanModeButton: typeof PlanModeButtonComponent | null = null;
-let domLoadError: string | null = null;
-try {
-  const mod = await import('../src/lib/chrome/PlanModeButton.svelte');
-  PlanModeButton = mod.default;
-} catch (error) {
-  domLoadError = error instanceof Error ? error.message : String(error);
-}
-
+// The menu is a controlled bits-ui root: its open value lives in the parent
+// (isOpen) and flows back through onOpenChange, exactly as the React oracle's
+// own Harness. Recording the requested flag and only applying it via a fresh
+// re-render AFTER the click settles reproduces that ownership without an open
+// menu stealing focus mid-press.
 function renderButton(
   runtime: RuntimeUiState,
   connection = 'live',
@@ -76,22 +67,39 @@ function renderButton(
 ) {
   const onSelectPlan = vi.fn(overrides.onSelectPlan ?? (() => undefined));
   const onSelectBuild = vi.fn(overrides.onSelectBuild ?? (() => undefined));
-  render(PlanModeButton!, {
+  let lastOpenFlag = false;
+  const onOpenChange = vi.fn((open: boolean) => {
+    lastOpenFlag = open;
+  });
+  const view = render(PlanModeButton, {
     props: {
       runtime,
       connection,
       isOpen: false,
-      onOpenChange: () => undefined,
+      onOpenChange,
       onSelectPlan,
       onSelectBuild,
       buttonRef: null,
     },
   });
-  return { onSelectPlan, onSelectBuild };
+  return {
+    onSelectPlan,
+    onSelectBuild,
+    onOpenChange,
+    openMenu: async () => {
+      await view.rerender({ isOpen: lastOpenFlag });
+    },
+    ...view,
+  };
 }
 
 afterEach(() => {
   cleanup();
+  // Opening the menu makes bits-ui's body scroll-lock set pointer-events:
+  // none on document.body; it restores that only on a deferred timer that can
+  // outlive this test and then poison the next render's clicks. Clear it here
+  // so each test starts from a clean pointer-events state.
+  document.body.removeAttribute('style');
   vi.restoreAllMocks();
 });
 
@@ -233,105 +241,76 @@ describe('planModePresentation derivation', () => {
 });
 
 describe('PlanModeButton DOM behavior', () => {
-  it.runIf(PlanModeButton !== null)(
-    'renders one accessible button with the consequence name and shortcut hints',
-    () => {
-      renderButton(readyWith(HOST_STATE));
-      const button = screen.getByRole('button', { name: /Agent mode: Build/ });
-      expect(button).toHaveAttribute('aria-keyshortcuts', 'Shift+Tab Meta+Shift+M');
-      expect(button).toHaveAttribute('aria-haspopup');
-      expect(button).toBeEnabled();
-      expect(within(button).getByText('Build')).toBeInTheDocument();
-    },
-  );
+  it('renders one accessible button with the consequence name and shortcut hints', () => {
+    renderButton(readyWith(HOST_STATE));
+    const button = screen.getByRole('button', { name: /Agent mode: Build/ });
+    expect(button).toHaveAttribute('aria-keyshortcuts', 'Shift+Tab Meta+Shift+M');
+    expect(button).toHaveAttribute('aria-haspopup');
+    expect(button).toBeEnabled();
+    expect(within(button).getByText('Build')).toBeInTheDocument();
+  });
 
-  it.runIf(PlanModeButton !== null)(
-    'shows Plan · read-only as the visible label when host-confirmed',
-    () => {
-      renderButton(readyWith({ ...HOST_STATE, mode: 'plan' }));
-      const button = screen.getByRole('button', { name: /Agent mode: Plan, read-only/ });
-      expect(within(button).getByText('Plan · read-only')).toBeInTheDocument();
-    },
-  );
+  it('shows Plan · read-only as the visible label when host-confirmed', () => {
+    renderButton(readyWith({ ...HOST_STATE, mode: 'plan' }));
+    const button = screen.getByRole('button', { name: /Agent mode: Plan, read-only/ });
+    expect(within(button).getByText('Plan · read-only')).toBeInTheDocument();
+  });
 
-  it.runIf(PlanModeButton !== null)(
-    'shows Checking mode… and is disabled before authority is ready',
-    () => {
-      renderButton(INITIAL_RUNTIME_STATE);
-      const button = screen.getByRole('button', { name: /Checking mode/ });
-      expect(button).toBeDisabled();
-      expect(within(button).getByText('Checking mode…')).toBeInTheDocument();
-    },
-  );
+  it('shows Checking mode… and is disabled before authority is ready', () => {
+    renderButton(INITIAL_RUNTIME_STATE);
+    const button = screen.getByRole('button', { name: /Checking mode/ });
+    expect(button).toBeDisabled();
+    expect(within(button).getByText('Checking mode…')).toBeInTheDocument();
+  });
 
-  it.runIf(PlanModeButton !== null)(
-    'is one tab stop: a single button with the menu as a popup',
-    () => {
-      renderButton(readyWith(HOST_STATE));
-      expect(screen.getAllByRole('button', { name: /Agent mode/ })).toHaveLength(1);
-      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-    },
-  );
+  it('is one tab stop: a single button with the menu as a popup', () => {
+    renderButton(readyWith(HOST_STATE));
+    expect(screen.getAllByRole('button', { name: /Agent mode/ })).toHaveLength(1);
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
 
-  it.runIf(PlanModeButton !== null)(
-    'opening the menu moves focus only and causes zero mutations',
-    async () => {
-      const user = userEvent.setup();
-      const { onSelectPlan, onSelectBuild } = renderButton(readyWith(HOST_STATE));
-      await user.click(screen.getByRole('button', { name: /Agent mode: Build/ }));
-      const menu = await screen.findByRole('menu', { name: /Agent mode/ });
-      expect(within(menu).getAllByRole('menuitem')).toHaveLength(2);
-      expect(onSelectPlan).not.toHaveBeenCalled();
-      expect(onSelectBuild).not.toHaveBeenCalled();
-    },
-  );
+  it('opening the menu moves focus only and causes zero mutations', async () => {
+    const user = userEvent.setup();
+    const { onSelectPlan, onSelectBuild, openMenu } = renderButton(readyWith(HOST_STATE));
+    await user.click(screen.getByRole('button', { name: /Agent mode: Build/ }));
+    await openMenu();
+    const menu = await screen.findByRole('menu', { name: /Agent mode/ });
+    expect(within(menu).getAllByRole('menuitem')).toHaveLength(2);
+    expect(onSelectPlan).not.toHaveBeenCalled();
+    expect(onSelectBuild).not.toHaveBeenCalled();
+  });
 
-  it.runIf(PlanModeButton !== null)(
-    'does not open the menu from a disabled button',
-    async () => {
-      const user = userEvent.setup();
-      renderButton(INITIAL_RUNTIME_STATE);
-      await user.click(screen.getByRole('button', { name: /Checking mode/ }));
-      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-    },
-  );
+  it('does not open the menu from a disabled button', async () => {
+    const user = userEvent.setup();
+    renderButton(INITIAL_RUNTIME_STATE);
+    await user.click(screen.getByRole('button', { name: /Checking mode/ }));
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
 
-  it.runIf(PlanModeButton !== null)(
-    'marks the confirmed row and leaves the other row enabled',
-    async () => {
-      const user = userEvent.setup();
-      const { onSelectBuild } = renderButton(readyWith({ ...HOST_STATE, mode: 'plan' }));
-      await user.click(screen.getByRole('button', { name: /Agent mode: Plan/ }));
-      const menu = await screen.findByRole('menu', { name: /Agent mode/ });
-      const [buildRow, planRow] = within(menu).getAllByRole('menuitem');
-      expect(planRow).toHaveAttribute('aria-disabled', 'true');
-      expect(buildRow).not.toHaveAttribute('aria-disabled', 'true');
-      await user.click(buildRow);
-      await waitFor(() => expect(onSelectBuild).toHaveBeenCalledTimes(1));
-    },
-  );
+  it('marks the confirmed row and leaves the other row enabled', async () => {
+    const user = userEvent.setup();
+    const { onSelectBuild, openMenu } = renderButton(readyWith({ ...HOST_STATE, mode: 'plan' }));
+    await user.click(screen.getByRole('button', { name: /Agent mode: Plan/ }));
+    await openMenu();
+    const menu = await screen.findByRole('menu', { name: /Agent mode/ });
+    const [buildRow, planRow] = within(menu).getAllByRole('menuitem');
+    expect(planRow).toHaveAttribute('aria-disabled', 'true');
+    expect(buildRow).not.toHaveAttribute('aria-disabled', 'true');
+    await user.click(buildRow);
+    await waitFor(() => expect(onSelectBuild).toHaveBeenCalledTimes(1));
+  });
 
-  it.runIf(PlanModeButton !== null)(
-    'shows the disabled reason when selection is unsafe (executing)',
-    async () => {
-      const user = userEvent.setup();
-      renderButton(readyWith({ ...HOST_STATE, mode: 'executing-plan' }));
-      await user.click(screen.getByRole('button', { name: /Agent mode: Executing plan/ }));
-      const menu = await screen.findByRole('menu', { name: /Agent mode/ });
-      for (const row of within(menu).getAllByRole('menuitem')) {
-        expect(row).toHaveAttribute('aria-disabled', 'true');
-      }
-      expect(await screen.findByText('Plan execution is in progress.')).toBeInTheDocument();
-    },
-  );
-
-  it.runIf(PlanModeButton === null)(
-    'cannot render the DOM in this environment (bits-ui .svelte externalized)',
-    () => {
-      expect(PlanModeButton).toBeNull();
-      expect(domLoadError).toMatch(/\.svelte/u);
-    },
-  );
+  it('shows the disabled reason when selection is unsafe (executing)', async () => {
+    const user = userEvent.setup();
+    const { openMenu } = renderButton(readyWith({ ...HOST_STATE, mode: 'executing-plan' }));
+    await user.click(screen.getByRole('button', { name: /Agent mode: Executing plan/ }));
+    await openMenu();
+    const menu = await screen.findByRole('menu', { name: /Agent mode/ });
+    for (const row of within(menu).getAllByRole('menuitem')) {
+      expect(row).toHaveAttribute('aria-disabled', 'true');
+    }
+    expect(await screen.findByText('Plan execution is in progress.')).toBeInTheDocument();
+  });
 
   it('never leaks raw host or issue text into the accessible name', () => {
     const presentations = [

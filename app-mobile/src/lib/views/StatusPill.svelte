@@ -23,7 +23,7 @@
 <!-- @ds surface: status-pill — connection-phase status. -->
 <span class={`status-pill status-${phase}`} role="status">
   <!-- @ds guardrail: role="status" live announce + phase label — not designer-editable. -->
-  <i />
+  <i></i>
   {labels[phase]}
 </span>
 

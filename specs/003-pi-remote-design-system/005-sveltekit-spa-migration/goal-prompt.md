@@ -1,62 +1,32 @@
-# SvelteKit SPA Migration — Goal Prompt
+# SvelteKit SPA Migration — Goal
 
-> Condensed continuation prompt for the **open** migration work. Full north-star: [`goal.md`](goal.md);
-> product goal: root [`goal.md`](../../../goal.md). Paths are post-restructure.
+Re-home the Pi Remote phone UI onto **Svelte 5 / SvelteKit (SPA/CSR)** — every screen one `.svelte` file (HTML + scoped CSS + typed logic) — preserving **byte-for-byte** the shipped look, a11y, security, PWA. **Re-hosting, not redesign**: build against frozen `--pi-*` tokens; never change a rendered value.
 
-## Goal
-Re-home the Pi Remote phone UI onto **Svelte 5 / SvelteKit (SPA/CSR)** — every screen one `.svelte` file
-(HTML + scoped CSS + typed logic) — preserving **byte-for-byte** the shipped look, a11y, security, and
-PWA behavior. A **re-hosting, not a redesign**: build against the frozen `--pi-*` tokens; never change a
-rendered value.
-
-## Invariants (break one → out of scope, stop + escalate)
-- **Tokens** resolve identically in light / dark / system.
-- **Security:** loopback relay, tailnet-only Serve (Funnel off), foreground authority, redaction,
-  ticketed revision-checked mutations that fail closed, host-enforced plan mode, content-free push; the
-  phone can never enable full-access.
-- **A11y:** roles, focus order + trap, `aria-*`, ≥44px, reduced-motion + forced-colors survive
-  react-aria → Bits/Melt.
-- **Routing:** 3 URLs (`/`, `/session/[id]`, `/attention/[lookupId]`); Review/Inbox overlays;
-  Enrollment an auth branch.
-- **Backend stays green throughout** — the leak detector.
+## Invariants (break one → stop + escalate)
+- **Tokens** resolve identically light/dark/system.
+- **Security:** loopback relay, tailnet-only Serve (Funnel off), foreground authority, redaction, ticketed fail-closed mutations, host-enforced plan mode, content-free push; phone never enables full-access.
+- **A11y:** roles, focus order + trap, `aria-*`, ≥44px, reduced-motion + forced-colors survive react-aria → Bits/Melt.
+- **Routing:** `/`, `/session/[id]`, `/attention/[lookupId]`; Review/Inbox overlays; Enrollment an auth branch.
+- **Backend green throughout** — the leak detector.
 
 ## Current state
-- Moved out of `src/`: web = **`app-mobile/`** (`@pi-remote/web`), relay = **`app-relay/`**
-  (`@pi-remote/relay`); `apps/*` + `src/*` gone.
-- **Done L0–L2:** SvelteKit scaffold + route stubs; verbatim `.ts` ports; 14 Bits-UI primitives; feature
-  dirs `rich-content/ artifacts/ attachments/ features/ask-question/` — 56 `.svelte` files, CSS
-  decomposed into scoped `<style>`.
-- **Still React:** `index.html` loads `/src/main.tsx`; `App.tsx` is the live entry; SvelteKit routes are
-  placeholders — **no cutover yet.**
-- Suites: backend green (one pre-existing `auth.test.ts` timing-flake); `test:web` 670/670.
+- Web = `app-mobile/`, relay = `app-relay/`.
+- **Done L0–L3** (`001`–`004`): scaffold + route stubs; verbatim `.ts` ports; 14 Bits-UI primitives; feature dirs (rich-content/artifacts/attachments/ask-question); chrome + composer.
+- **Done L4+L5 components** (`005`, pushed @ `df6acea`): all views, full transcript layer, **Session**, factories `useRuntime`/`useSyncSocket`/`useHostCommandCatalog` — each verified (svelte-check 0 · decl-equivalence PASS · `style.css` untouched).
+- **Still React:** `App.tsx` shell (auth/connection/push/theme/SW/routing) is live; `index.html` → `/src/main.tsx`; routes are stubs — **no cutover.**
+- Suites: backend green (`auth.test.ts` flake; Public-tooling fails report-only); React `test:web` is the pre-cutover oracle.
 
-## Remaining (barrier per layer; Claude verifies before the next)
-- **L3 / `004-chrome-and-composer`** ← NEXT. Chrome (SessionHeader, RuntimeStrip, TodoPanel,
-  ModelEffortSheet, plan components) parallel; **composer + LeavePlanSheet serial / K=1** (hand-rolled
-  focus/IME/slash). Only `RuntimeModeAnnouncer.svelte` + `planModePresentation.ts` exist.
-- **L4+L5 / `005-views-and-shell`.** Extract `App.tsx` views (Enrollment ‖ Home ‖ Review ‖ Inbox; Session
-  alone — socket + virtualizer), then `+layout.svelte` + `routes/*` + `goto`/`afterNavigate`.
-- **L6 / `006-catalog`.** Storybook 8 + mock-context decorator over `demo.ts`.
-- **L7 / `007-verify-and-cutover`.** CSS-corpus builder, committed token-identity gate, test rewrite
-  (→ svelte-testing-library), CDP repoint to built preview, deep-review fan-out, repoint `index.html`
-  off `main.tsx`, amendment close.
-- **`008-sk-code-svelte-refactor`** (spans run; lands via isolated **Public worktree**). Draft the Svelte
-  conventions into `sk-code-mobile-cli` before the next dispatch; finalize at L7.
+## Remaining — existing scope (barrier per layer; Claude verifies each)
+- **Shell** (rest of `005`) ← **NEXT**. `+layout.svelte` (state.ts-reducer stores; auth/connection/push/theme/SW effects; ArtifactViewer + AttachmentDraft context; routing all views incl. Session), routes + `pushState`→`goto`/`afterNavigate`, SW registration. Dispatch fns **stable** (Session's `useSyncSocket` captures them once).
+- **L6 `006-catalog`.** Storybook 8 + mock-context decorator over `demo.ts`.
+- **L7 `007-verify-and-cutover`.** CSS-corpus builder, token-identity gate (0-diff, 3 themes), test rewrite (→ svelte-testing-library), CDP repoint to built preview, deep-review, repoint `index.html` off `main.tsx`, amendment close.
+- **`008-sk-code-svelte-refactor`** (isolated Public worktree). Svelte conventions into `sk-code-mobile-cli`; finalize at L7.
+
+## Remaining — NEW `009-page-centric-architecture` (AFTER `007` green)
+Reorganize `app-mobile/src` by-type → **page-centric**: one folder per page (session/home/review/attention-inbox/enrollment/push-settings). Single-page components live in their page folder; multi-page ones keep a **canonical `shared/` home** surfaced via **relative navigational symlinks** — a lens, not the import path: imports stay via `$lib` aliases; Vite `preserveSymlinks:false` resolves to the real file so module identity stays single (context survives); no cycles. **README per folder** (what · why · naming). **Aggressive** file+folder rename, imports updated in one pass. Symlinks **script-generated + validated**. New child under `005`; **blocked on `007`**.
 
 ## Execution model
-Claude orchestrates + **independently verifies each layer** outside any sandbox, and owns git, the
-shared/integration files, and every `npm install`.
-App code under `app-mobile/**` is written by external executors — **GLM-5.2 High (`cli-devin`, free)** +
-**Composer 2.5-fast (`cli-cursor`)** — parallel (K=3; K=1 for focus-sensitive units). Per dispatch:
-pre-approved spec folder (skip Gate 3); WRITE = one dir; BANNED = install / config / token / security /
-routing / a11y changes; load `sk-code` (→ `sk-code-mobile-cli`) + `sk-design-md-generator` (frozen-token
-manifest); return `svelte-check` + moved surfaces for Claude to re-verify.
+Claude orchestrates + **verifies each layer**; owns git, shared files, every `npm install`. App code under `app-mobile/**` written by **GLM-5.2 High (`cli-devin`)**: pre-approved spec folder; WRITE = one dir; BANNED = install/config/token/security/routing/a11y; load `sk-code` + `sk-design-md-generator`; return svelte-check + moved surfaces to re-verify.
 
-## Gates (nine, all green to cut over)
-build · typecheck (`svelte-check`) · `npm test` · `test:web` · token-identity 0-diff (3 themes) · contrast
-+ ≥76 guardrail fences · CDP 390px both themes · catalog smoke · `validate.sh … --strict`. Plus 008:
-`package_skill.py --check` clean.
-
-## Docs
-`goal.md` · `amendment.md` (React→SvelteKit reversal) · `implementation-phases.md` (DAG + delegation +
-gates) · children `001–008/`.
+## Gates
+Migration: build · svelte-check · `npm test` · `test:web` · token-identity 0-diff (3 themes) · contrast + ≥76 fences · CDP 390px both themes · catalog smoke · `validate.sh --strict`. `008`: `package_skill.py --check`. `009`: build/typecheck/`test:web` green post-reorg · no broken/cyclic symlinks · README per folder.

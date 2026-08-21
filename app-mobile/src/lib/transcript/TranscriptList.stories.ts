@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import TranscriptList from './TranscriptList.svelte';
-import { parseDisplayBlock, type DisplayTranscriptBlock } from '../../state.js';
+import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptProvenance } from '../../state.js';
 import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '../../demo.js';
 
 // Re-host the frozen rich-content fixtures through the existing parseDisplayBlock
@@ -14,8 +14,13 @@ const BLOCKS: readonly DisplayTranscriptBlock[] = [
   ...DEMO_RICH_CONTENT_BLOCKS,
   ...DEMO_RICH_RELEASE_BLOCKS,
 ]
-  .map((raw) => parseDisplayBlock(raw))
+  .map((raw) => parseDisplayBlock(raw, readFixtureProvenance(raw)))
   .filter((block): block is DisplayTranscriptBlock => block !== null);
+
+function readFixtureProvenance(block: Record<string, unknown>): TranscriptProvenance {
+  const value = block.provenance;
+  return value === 'relay' || value === 'cache' || value === 'optimistic' ? value : 'relay';
+}
 
 const SESSION_ID = 'demo-session-triage';
 

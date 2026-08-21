@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import Block from './Block.svelte';
-import { parseDisplayBlock, type DisplayTranscriptBlock } from '../../state.js';
+import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptProvenance } from '../../state.js';
 import {
   DEMO_RICH_CONTENT_BLOCKS,
   DEMO_RICH_RELEASE_BLOCKS,
@@ -21,8 +21,13 @@ const RAW_BLOCKS: readonly unknown[] = [
 ];
 
 const PARSED: readonly DisplayTranscriptBlock[] = RAW_BLOCKS
-  .map((raw) => parseDisplayBlock(raw))
+  .map((raw) => parseDisplayBlock(raw, readFixtureProvenance(raw)))
   .filter((block): block is DisplayTranscriptBlock => block !== null);
+
+function readFixtureProvenance(block: Record<string, unknown>): TranscriptProvenance {
+  const value = block.provenance;
+  return value === 'relay' || value === 'cache' || value === 'optimistic' ? value : 'relay';
+}
 
 function displayBlockBy(predicate: (block: DisplayTranscriptBlock) => boolean): DisplayTranscriptBlock {
   const block = PARSED.find(predicate);

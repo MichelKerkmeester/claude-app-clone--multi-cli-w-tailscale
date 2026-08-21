@@ -7,7 +7,7 @@ const meta = {
   title: 'Views/StatusPill',
   component: StatusPill,
   tags: ['autodocs'],
-} satisfies Meta<StatusPill>;
+} satisfies Meta<typeof StatusPill>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

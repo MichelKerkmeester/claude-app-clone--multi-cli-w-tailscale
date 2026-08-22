@@ -43,12 +43,12 @@ board + user go-ahead.** Target end structure: **Option B — page-centric** (us
 - [x] C1. Flip `test:web` → the Svelte + logic configs (retire the React config as gate 4). ✅ `06e2a82` (React runner kept as `test:web:react` until C5).
 - [x] C2. Full 9-gate board green. ✅ fresh re-run: build 0 · svelte-check 0 · backend 365/366 (`auth.test.ts` flake) · test:web 528+182 · token-identity 0/0/0 · corpus 4343 + contrast 77/77 · CDP both themes · catalog-smoke 404 frames/0 throws · validate.sh --strict (child+parent) 0.
 - [x] C3. Deep-review fan-out against the frozen contracts. ✅ a11y adversarial verification — 4 read-only verifier groups (ariaHideOutside · menu focus-trap · roles/semantics · virtual focus), ALL-FIXED, 0 defects.
-- [ ] **C4. PAUSE — surface the green board; get fresh user go-ahead for the irreversible deletes.** ← board is green; awaiting go-ahead.
-- [ ] C5. (authorized) repoint `index.html` off `/src/main.tsx`; delete React source (`main.tsx`, all `.tsx`, React dirs `artifacts/attachments/rich-content/features`, `style.css`, React-only `.ts`).
+- [x] **C4. Green board surfaced; user gave explicit go-ahead for the irreversible deletes.** ✅ approved (with CDP screenshots shown).
+- [x] C5. ✅ `be76d77` — deleted the React runtime: root `index.html`, `main.tsx`, all 60 `.tsx`, `style.css`, React feature-dir `.tsx`, 2 orphan hooks, 53 retired `.test.tsx` oracles, and `vitest.web.config.ts` + `test:web:react`. Storybook `preview.ts` → `app.css`; `demo.ts` + `App.svelte.test.ts` repointed off deleted paths. Board green post-delete. (Retired-but-not-deleted: `build-app-css.mjs`, `css-corpus-equivalence.mjs`, `decl-equivalence.mjs` — their `style.css` oracle is gone; safe to drop in a follow-up.)
 
-## WS-C — Page-centric reorg (Claude codemod) — Option B, after the delete
+## WS-C — Page-centric reorg (Claude codemod) — Option B ✅ DONE (`2a811df`)
 
-- [ ] R1. Reorganize surviving Svelte tree: `lib/` → `pages/{home,session,review,inbox,enrollment}/` (each holds its screen's components) + `shared/` (primitives + cross-page chrome). Thin `routes/*/+page.svelte` import their page.
-- [ ] R2. Codemod rewrites every import across `.svelte` / `.ts` / `.stories.ts` / tests / vitest configs / gate scripts (build-app-css, css-corpus, token-identity, CDP walk paths).
-- [ ] R3. Re-verify: build · svelte-check · test:web · token-identity 0/0/0 · CDP · catalog smoke all green from the new layout.
-- [ ] R4. Amendment close + `validate.sh …/005-sveltekit-spa-migration --strict`.
+- [x] R1. ✅ `lib/` dissolved → `pages/{home,chat,review,inbox,enrollment}/` + `shared/{primitives,chrome,data}`. The conversation view `Session.svelte` → `pages/chat/Chat.svelte` (user-named "chat"); `/session/[id]` route + internal session-protocol names unchanged. Data/logic layer → `shared/data/`.
+- [x] R2. ✅ Deterministic codemod: 191 files moved, 480 relative imports rewritten (incl. worker `new URL`, test `vi.mock`/`importActual`, `readFileSync` source paths, 2 cross-boundary `app-relay` tests, `css-corpus.ts` walk root).
+- [x] R3. ✅ Re-verified from the new layout: build 0 · svelte-check 0 · test:web 528+182 · token-identity 0/0/0 (3 themes) · CDP both themes · catalog-smoke 404/0 · backend 366/366 (read-only rich-content security assertion re-verified against the Svelte sources).
+- [x] R4. ✅ `validate.sh …/005-sveltekit-spa-migration --strict` = 0 (child+parent). Amendment close: the react-aria→Bits/Melt, `.tsx`→`.svelte`, single-`style.css`→scoped-`<style>` supersessions are now shipped and verified.

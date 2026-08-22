@@ -4,25 +4,28 @@ Re-home the Pi Remote phone UI onto **Svelte 5 / SvelteKit (SPA/CSR)** — every
 
 ## Invariants
 - **Tokens** resolve identically light/dark/system (token-identity 0-diff).
-- **Security:** loopback relay, tailnet-only Serve (Funnel off), foreground authority, redaction, ticketed fail-closed mutations, host-enforced plan mode, content-free push; phone never enables full-access.
+- **Security:** loopback relay, tailnet-only Serve (Funnel off), foreground authority, redaction, ticketed fail-closed mutations, host plan mode, content-free push; phone never enables full-access.
 - **A11y:** roles, focus order + trap, `aria-*`, ≥44px, reduced-motion + forced-colors survive react-aria → Bits/Melt.
 - **Routing:** `/`, `/session/[id]`, `/attention/[lookupId]`; Review/Inbox overlays; Enrollment an auth branch.
-- **Backend green throughout** — the leak detector.
+- **Backend green throughout** — leak detector.
 
-## Current state — CUTOVER SHIPPED
-- Web = `app-mobile/`, relay = `app-relay/`. **The Svelte app is the only runtime.** React is deleted (`be76d77`): no `index.html`/`main.tsx`, no `.tsx`, no `style.css`, no React vitest config.
-- **`007` COMPLETE.** C1–C5 + WS-C done. The a11y regression (3 P0 + 7 P1 from the react-aria→Bits/Melt swap, audit in `a11y-parity-findings.md`) was fixed + adversarially re-verified (4 verifier groups, 0 defects, C3).
-- **Option B page-centric layout is live** (`2a811df`): `pages/{home,chat,review,inbox,enrollment}/` + `shared/{primitives,chrome,data}`. The conversation view is `pages/chat/Chat.svelte` (was Session); `/session/[id]` route + session-protocol names unchanged. 191 files moved, 480 imports codemod-rewritten.
-- Board green from the new layout: build 0 · svelte-check 0 · backend 366/366 · `test:web` 528+182 · token-identity 0/0/0 (3 themes) · CDP both themes · catalog-smoke 404/0 · validate --strict.
+## Current state — EPIC ONGOING (cutover shipped; 007 being extended; 008 + 009 remain)
+- **Svelte app is the only runtime.** React deleted (`be76d77`): no `index.html`/`main.tsx`, no `.tsx`, no `style.css`, no React vitest config.
+- **`007` core cutover SHIPPED, now being EXTENDED.** C1–C5 + WS-C done; a11y regression (3 P0 + 7 P1) fixed + adversarially re-verified (0 defects, audit `a11y-parity-findings.md`). **Not the finish line.**
+- **Option B page-centric layout live** (`2a811df`): `pages/{home,chat,review,inbox,enrollment}/` + `shared/{primitives,chrome,data}`. Conversation view `pages/chat/Chat.svelte` (was Session); route + protocol names unchanged.
+- Board green — all 9 gates pass.
 
-## Remaining
-- **`008-sk-code-svelte-refactor`** (isolated Public worktree): finalize the Svelte conventions surface now that the proven patterns exist.
-- **`009-storybook-experience`** (spec authored, deferred here): see below.
-- Cleanup (follow-up): drop the 3 retired `style.css`-oracle scripts (`build-app-css`, `css-corpus-equivalence`, `decl-equivalence`).
-- **NEW `009-storybook-experience`** (AFTER `007` + WS-C; spec authored, spec-only): make Storybook **dummy-proof + self-maintaining** — one-command non-tech launch (auto-open + quickstart); install the addon set (a11y ✓, **vitest** test, **themes**, **autodocs**, **designs**; Chromatic = open Q); **story-per-component convention + coverage gate + AI-runnable scaffold** so every component change initializes/updates its story; per-component autodocs + docs; stories co-located in `pages/`/`shared/`; `preview.ts` → `app.css` (not the deleted `style.css`). Gate: build-storybook 0 · catalog-smoke green · coverage gate 0 · addon-vitest green.
+## Remaining (in order)
+1. **`007` EXTENSION — quality/DX pass (NEXT; approach set by a fresh Opus-5 xhigh AI council).** Make the Svelte-only, byte-identical app truly *editable*: (a) **inline comments** — segment every file into labelled comment SECTIONS (sk-code / opencode section style), **enforced + applied everywhere**; consistent `@ds` grammar + durable WHY, no ephemeral labels; (b) **architecture** — refine `pages/`+`shared/` layout, boundaries, `*.svelte.ts` factories; (c) **styling structure** — scoped-`<style>` + `app.css` token layering, easy to find/change a surface's CSS; (d) **editing ease** — a designer opens one file, sees the whole component. HARD: zero rendered-value/a11y/security/routing change (cutover gates prove it). Council also sequences 008/009.
+2. **`008-sk-code-svelte-refactor`** (isolated Public worktree): finalize the Svelte conventions surface (`sk-code`) — encode + lint the 007-ext conventions (incl. comment segmentation) so edits stay on-pattern.
+3. **`009-storybook-experience`** (spec-only, AFTER 007-ext + 008): **dummy-proof + self-maintaining** Storybook — one-command non-tech launch; addons (a11y, vitest, themes, autodocs, designs); story-per-component + coverage gate + AI scaffold.
+4. Cleanup: drop the 3 retired `style.css`-oracle scripts.
+
+## Research input (AFTER council + phase update — feeds the phases)
+**Context-repo deep research:** 5 sibling mobile-chat repos in `specs/context/`. Per repo a fresh Opus-5 xhigh agent scopes research angles (ease-of-use · architecture · UX · logic), then **10 deep-research iterations** mine adoptable patterns. Read-only (protected); findings refine 007-ext/008/009, never override frozen contracts.
 
 ## Execution model
-Claude orchestrates + **verifies each layer**; owns git, barrier/shared files, every `npm install`. App code + tests under `app-mobile/**` written by the executor (a11y = **gpt-5.6-luna**, else **GLM-5.2 / cli-devin**): pre-approved spec folder; WRITE = one dir; BANNED = install/config/token/security/routing/a11y-contract changes; load `sk-code`; return svelte-check for Claude to re-verify. Sonnet subagents verify only.
+Claude orchestrates + **verifies each layer**; owns git, barrier/shared files, every `npm install`. App code + tests under `app-mobile/**` by the executor (a11y = **gpt-5.6-luna**, else **cli-devin**): WRITE = one dir; BANNED = install/config/token/security/routing/a11y changes; return svelte-check for Claude to re-verify.
 
 ## Gates
-build · svelte-check · `npm test` · `test:web` (svelte+logic) · token-identity 0-diff (3 themes) · contrast + ≥76 fences · CDP 390px both themes · catalog smoke · `validate.sh --strict`. `008`: `package_skill.py --check`. `009`: build-storybook · catalog-smoke · story-coverage gate · addon-vitest.
+build · svelte-check · `npm test` · `test:web` · token-identity 0-diff (3 themes) · contrast + ≥76 fences · CDP 390px · catalog smoke · `validate.sh --strict`. `008`: `package_skill.py --check` + comment-section lint. `009`: build-storybook · catalog-smoke · story-coverage · addon-vitest.

@@ -33,6 +33,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { untrack } from 'svelte';
   import { get } from 'svelte/store';
   import { createVirtualizer } from '@tanstack/svelte-virtual';
@@ -45,6 +46,7 @@
   import NormalizedTranscriptBlockView from './NormalizedTranscriptBlockView.svelte';
   import AssistantActions from './AssistantActions.svelte';
 
+  // ─── Props ───────────────────────────────
   let {
     sessionId,
     blocks,
@@ -58,12 +60,14 @@
 
   const artifactSessionId = $derived(sessionId ?? '');
 
+  // ─── Local state ───────────────────────────────
   let scrollEl = $state<HTMLDivElement | null>(null);
   let previousCount = blocks.length;
   let announcement = $state('');
   let atLiveEdge = $state(true);
   let newAway = $state(0);
 
+  // ─── Handlers ───────────────────────────────
   // @ds guardrail: live-edge measurement + scroll handlers (followToBottom, onScroll) — not designer-editable.
   function followToBottom(): void {
     const element = scrollEl;
@@ -80,6 +84,7 @@
     if (nearBottom) newAway = 0;
   }
 
+  // ─── Derived state ───────────────────────────────
   // @ds guardrail: block normalization (normalizeTranscriptBlocks), turn grouping
   //   (groupNormalizedTranscript, groupBlocksIntoTurns) and todo-row insertion — not designer-editable.
   const normalizedBlocks = $derived.by(() =>
@@ -107,6 +112,7 @@
     overscan: 6,
   });
 
+  // ─── Effects ───────────────────────────────
   // Options are captured at creation, so re-apply on change. Untracked + get() (not $virtualizer)
   // so the store emission setOptions triggers cannot re-run this effect — Svelte's safe_not_equal
   // treats object values as always changed, so a tracked $virtualizer read here would loop.

@@ -379,8 +379,10 @@
     ariaLabel?: string;
   }
 
+  // ─── Props ───────────────────────────────
   let { source, class: className = '', ariaLabel = 'Formatted text' }: Props = $props();
 
+  // ─── Derived state ───────────────────────────────
   const ast = $derived(parseSafeMarkdown(source));
   const classes = $derived(`safe-markdown${className.length > 0 ? ` ${className}` : ''}`);
   const controlPresentation = $derived.by(() =>

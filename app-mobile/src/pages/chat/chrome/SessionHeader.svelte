@@ -47,12 +47,14 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { modelEffortTriggerName, effortTriggerText } from '../../../shared/data/effort.js';
   import { modelSwitcherStrings } from '../../../shared/data/model-switcher-strings.js';
   import { Popover } from 'bits-ui';
   import { hideOutside } from '../../../shared/primitives/ariaHideOutside.svelte.js';
   import Button from '../../../shared/primitives/Button.svelte';
 
+  // ─── Props ───────────────────────────────
   let {
     onBack,
     onInbox,
@@ -65,6 +67,7 @@
     modelTriggerRef = $bindable(null),
   }: SessionHeaderProps = $props();
 
+  // ─── Derived state ───────────────────────────────
   const runtime = $derived(runtimeControls.runtime);
   const snapshot = $derived(runtime.state);
   const modelLabel = $derived(snapshot?.model?.label ?? 'Model');
@@ -73,10 +76,12 @@
     effortTriggerText(snapshot?.thinkingLevel, snapshot?.availableThinkingLevels ?? []),
   );
 
+  // ─── Local state ───────────────────────────────
   let overflowOpen = $state(false);
   let overflowContentEl = $state<HTMLElement | null>(null);
   let overflowDialogEl = $state<HTMLElement | null>(null);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     if (overflowContentEl === null) return;
     return hideOutside([overflowContentEl]);

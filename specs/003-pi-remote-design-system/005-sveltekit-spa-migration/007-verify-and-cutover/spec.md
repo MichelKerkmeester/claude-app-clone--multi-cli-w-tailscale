@@ -9,15 +9,15 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
-    last_updated_at: "2026-08-22T00:00:00Z"
+    last_updated_at: "2026-08-22T20:30:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "007-EXT Phase A essentially COMPLETE. XA.1 (4 onboarding docs), XA.2 (per-folder READMEs), XA.3 (tsconfig prune — barrier-VERIFIED: svelte-check 0-err/6-warn identical + build OK, 199cdd4), XA.4 editor config (.editorconfig/.vscode) all DONE. XA.4 dead-file removals VERIFIED-READY (catalog.html/build-app-css/css-corpus-equivalence/decl-equivalence all no-live-import) but HELD (stop-for-yes delete + goal item 4 = last). Research infra SOLVED + validated; launch HELD for user go-ahead."
-    next_safe_action: "Phase A safe autonomous work is exhausted. HELD for user go-ahead: (1) research launch (high-blast); (2) push (many doc/config commits local on main); (3) XA.4 dead-file deletion (verified-ready, stop-for-yes) + prettier install. Phase B (comment segmentation, executor-written, TOP PRIORITY) + Phase C stay executor+research-gated per the user's ordering."
+    recent_action: "007-EXT Phase B pure-additive comment work DONE + pushed (5 executor units, 40 files, all proven comment-only: token-identity 0/0/0 · svelte-check 0-err/6-warn · build 0 · test:web 528+3skip/182). Units: (1) 14 @ds primitive headers d9572a1; (2) 4 @ds route markers aec25e8; (3) 4 @ds surface headers 5109d7a; (4) 4 @ds surface headers 1be559d [→ all 26 marker-less .svelte files headed]; (5) 14 // MODULE: banners on logic .ts/.svelte.ts bf531e3. EXECUTOR SWITCHED: pinned cli-pi/deepseek is billing-dead (opencode-go quota + deepseek balance + openrouter credits; ~15d) → grok/cli-cursor (cursor-grok-4.6-high --auto-review --sandbox enabled), the memory-designated primary; smoke-tested + proven across all 5 units. Research (OGAM, 010-context-repo-research/ogam) iteration 1 clean, no leak, running via NODE_PRESERVE_SYMLINKS=1 opencode /deep:research (cli-codex/gpt-5.6-luna)."
+    next_safe_action: "Resume god-file SECTION-SEGMENTATION (higher risk tier — DELETES/collapses redundant same-surface markers e.g. RuntimeStrip 7→3 + adds dividers, across 1000+ line surface files: ModelEffortSheet 1710, SessionComposer 1006, ArtifactViewerHost 962, TodoPanel 688, etc.). Validate on ONE god-file first; the per-file fence-text diff is the deletion guard. Also: stale style.css comment-ref cleanup (~20 now-false refs, rewording). Scale research to the other 4 context repos. All gated on the two open decisions below."
     blockers:
-      - "Research launch needs a genuine in-the-moment go-ahead (high-blast) — mechanism fully staged + proven"
-      - "Phase B/C are executor-written + research-ordered; not startable autonomously"
-      - "Many doc/config commits unpushed on main (push needs go-ahead); XA.4 deletions verified-ready but stop-for-yes"
-    completion_pct: 80
+      - "OPEN DECISION 1 (header-placement Logic-Sync): grammar reference says .svelte header in <script>, never <style>; shipped surface files (Review/Enrollment/Chat) carry it in markup + <style> and pass gates. Recommend amending the grammar ref to accept BOTH (markup/<style> for surface views, <script> for logic/leaf/primitive) rather than relocate committed headers. Not resolved unilaterally (overturns a council rule)."
+      - "OPEN DECISION 2 (marker-collapse scope): god-file section-seg would DELETE redundant same-surface markers (RuntimeStrip 7→3 per grammar). Confirm collapse-vs-additive-only (dividers only, leave markers) before touching god-files."
+      - "Both decisions gate the surface-file section-seg; the pure-additive header/banner portion of Phase B is complete + shipped."
+    completion_pct: 87
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

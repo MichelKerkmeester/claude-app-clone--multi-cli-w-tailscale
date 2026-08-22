@@ -11,12 +11,11 @@ _memory:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
     last_updated_at: "2026-08-22T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "007-EXT Phase 0 calibration complete — X0.1 census (phase-0-census.md, 3 plan refinements) + X0.2 React-completion (0757d83) + X0.3 grammar reference (comment-grammar-reference.md); X0.4 fence baseline deferred to pre-Phase-B"
-    next_safe_action: "Phase 0 done. Remaining 007-EXT (Phase A docs/READMEs · Phase B comment edits · Phase C codemod) + the 5-repo research program are gated on two user decisions: push unpushed commits, and research launch approach (validate-OGAM-first vs all-5, --auto OK)"
+    recent_action: "007-EXT Phase 0 complete + Phase A partially done. Per-folder READMEs (XA.2) DONE for all app-mobile/src folders (2 commits, docs-only, verified); src/README.md screen map rewritten (XA.1 partial). Research infra SOLVED (NODE_PRESERVE_SYMLINKS=1) + validated end-to-end (dry-run clean, zero side effects) but real launch HELD for genuine user go-ahead (high-blast)."
+    next_safe_action: "Continue Phase A: rewrite the 3 remaining onboarding docs (root README, ARCHITECTURE.md, app-mobile/README.md) + config hygiene (XA.3 tsconfig prune, XA.4 .vscode/.editorconfig/dead-file removal). Phase B (comment segmentation, executor-written) + Phase C + the 5-repo research launch remain gated on user go-ahead."
     blockers:
-      - "Push go-ahead needed for the unpushed commits on main"
-      - "Research launch decision needed (approach + --auto) before firing the deep-research loops; per user ordering, research feeds Phase A/B/C"
-    completion_pct: 72
+      - "Research launch needs a genuine in-the-moment go-ahead (high-blast: multi-hour, --auto, external dispatch) — mechanism is fully staged + proven"
+    completion_pct: 75
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

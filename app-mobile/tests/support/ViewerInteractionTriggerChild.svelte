@@ -5,7 +5,7 @@
   // scroll / Typed-transcript section (React oracle's second and third cases).
   import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import { getArtifactViewer } from '../../src/lib/artifacts/ArtifactViewerProvider.svelte';
+  import { getArtifactViewer } from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
 
   let { block, bare = false }: { block: FileDiffBlock; bare?: boolean } = $props();
 

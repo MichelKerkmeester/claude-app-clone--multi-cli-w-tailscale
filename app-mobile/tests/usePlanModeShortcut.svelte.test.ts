@@ -22,11 +22,11 @@ import {
   INITIAL_RUNTIME_STATE,
   runtimeReducer,
   type RuntimeUiState,
-} from '../src/runtime.js';
+} from '../src/shared/data/runtime.js';
 import {
   createPlanModeShortcut,
   type PlanModeShortcutOptions,
-} from '../src/lib/planModeShortcut.js';
+} from '../src/shared/data/planModeShortcut.js';
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',

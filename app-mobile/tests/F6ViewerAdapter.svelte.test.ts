@@ -14,12 +14,12 @@ import { render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ArtifactViewerContextValue } from '../src/lib/artifacts/types.js';
-import { createInMemoryArtifactDocument } from '../src/lib/rich-content/F6ViewerAdapter.js';
+import type { ArtifactViewerContextValue } from '../src/pages/chat/artifacts/types.js';
+import { createInMemoryArtifactDocument } from '../src/pages/chat/rich-content/F6ViewerAdapter.js';
 import {
   normalizeTranscriptBlocks,
   type NormalizedCodeBlock,
-} from '../src/rich-content/normalizeTranscriptBlocks.js';
+} from '../src/pages/chat/rich-content/normalizeTranscriptBlocks.js';
 
 import F6ViewerHarness from './support/F6ViewerHarness.svelte';
 

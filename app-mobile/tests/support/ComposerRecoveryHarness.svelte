@@ -6,10 +6,10 @@
 </script>
 
 <script lang="ts">
-  import SessionComposer from '../../src/lib/chrome/SessionComposer.svelte';
-  import { getAttachmentDraft } from '../../src/lib/attachments/AttachmentDraftProvider.svelte';
-  import { INITIAL_RUNTIME_STATE, type RuntimeControls } from '../../src/runtime.js';
-  import type { HostCommandCatalogState } from '../../src/commands.js';
+  import SessionComposer from '../../src/pages/chat/chrome/SessionComposer.svelte';
+  import { getAttachmentDraft } from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
+  import { INITIAL_RUNTIME_STATE, type RuntimeControls } from '../../src/shared/data/runtime.js';
+  import type { HostCommandCatalogState } from '../../src/shared/data/commands.js';
   import { vi } from 'vitest';
 
   let { sessionId, initialPrompt }: ComposerRecoveryHarnessProps = $props();

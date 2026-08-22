@@ -10,8 +10,8 @@
 import type { TextBlock } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { ScopedCommandSnapshot, SelectedCommandBinding } from '../src/commands.js';
-import { submitSlashDraft } from '../src/submitSlashDraft.js';
+import type { ScopedCommandSnapshot, SelectedCommandBinding } from '../src/shared/data/commands.js';
+import { submitSlashDraft } from '../src/shared/data/submitSlashDraft.js';
 
 const SESSION = 'session_transport';
 const EPOCH = 'epoch_transport';

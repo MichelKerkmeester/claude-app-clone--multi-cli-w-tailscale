@@ -6,12 +6,12 @@
   // snapshot fields into the DOM for the test to read. Reload/Close buttons
   // expose the snapshot's reload()/close() actions, and rerender({ block })
   // drives the block-prop change path the React hook.rerender exercised.
-  import { useArtifactResource, type ArtifactResourceSnapshot } from '../../src/lib/artifacts/useArtifactResource.svelte.js';
+  import { useArtifactResource, type ArtifactResourceSnapshot } from '../../src/pages/chat/artifacts/useArtifactResource.svelte.js';
   import type {
     ArtifactResource,
     ArtifactResourceBlock,
     ArtifactReadVariant,
-  } from '../../relay.js';
+  } from '../../src/shared/data/relay.js';
 
   let {
     sessionId,

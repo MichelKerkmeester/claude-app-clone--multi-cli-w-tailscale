@@ -4,8 +4,8 @@
   // so the ported test can scan every [data-image-state] card in one render.
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import InboundImageCard from '../../src/lib/artifacts/InboundImageCard.svelte';
-  import { INBOUND_IMAGE_LIFECYCLE_STATES } from '../../src/lib/artifacts/ImageStatus.svelte';
+  import InboundImageCard from '../../src/pages/chat/artifacts/InboundImageCard.svelte';
+  import { INBOUND_IMAGE_LIFECYCLE_STATES } from '../../src/pages/chat/artifacts/ImageStatus.svelte';
 
   let {
     block,

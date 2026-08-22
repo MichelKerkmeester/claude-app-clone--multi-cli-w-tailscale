@@ -3,10 +3,10 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/svelt
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import TodoPanel from '../src/lib/chrome/TodoPanel.svelte';
-import TodoProjectionBlock from '../src/lib/transcript/TodoProjectionBlock.svelte';
-import { DEMO_TODO_FIXTURE } from '../src/demo.js';
-import type { TodoProjectionState } from '../src/todo-state.js';
+import TodoPanel from '../src/pages/chat/chrome/TodoPanel.svelte';
+import TodoProjectionBlock from '../src/pages/chat/transcript/TodoProjectionBlock.svelte';
+import { DEMO_TODO_FIXTURE } from '../src/shared/data/demo.js';
+import type { TodoProjectionState } from '../src/shared/data/todo-state.js';
 
 const updatedAt = '2026-08-18T10:00:00.000Z';
 

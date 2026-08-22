@@ -14,11 +14,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sha256, type InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
-import type { ArtifactResource } from '../src/relay.js';
+import type { ArtifactResource } from '../src/shared/data/relay.js';
 
 import {
   clearArtifactResourceStore,
-} from '../src/lib/artifacts/useArtifactResource.svelte.js';
+} from '../src/pages/chat/artifacts/useArtifactResource.svelte.js';
 
 import ArtifactResourceProbe from './support/ArtifactResourceProbe.svelte';
 

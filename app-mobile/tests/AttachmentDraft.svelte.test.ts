@@ -15,7 +15,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   attachmentDraftReducer,
   EMPTY_ATTACHMENT_DRAFT,
-} from '../src/attachments/attachment-state.js';
+} from '../src/pages/chat/attachments/attachment-state.js';
 import AttachmentDraftTestSurface from './support/AttachmentDraftTestSurface.svelte';
 
 afterEach(() => {

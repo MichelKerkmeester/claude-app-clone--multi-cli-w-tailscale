@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { HIGHLIGHT_LANGUAGES, tokenizeSource } from '../src/rich-content/highlight.worker.js';
+import { HIGHLIGHT_LANGUAGES, tokenizeSource } from '../src/pages/chat/rich-content/highlight.worker.js';
 
 describe('highlight worker tokenizer', () => {
   it('keeps the allowlist fixed and returns tokens that reconstruct source', () => {

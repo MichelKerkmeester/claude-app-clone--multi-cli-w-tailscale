@@ -40,10 +40,10 @@ import ComposerCommandAutocomplete, {
   hasRows,
   type SlashPanelDerivation,
   type SlashPanelOpenState,
-} from '../src/lib/chrome/ComposerCommandAutocomplete.svelte';
-import CommandOption, { escapeUnsafeName, optionId } from '../src/lib/chrome/CommandOption.svelte';
-import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/commands.js';
-import type { RankedHostCommand } from '../src/rankHostCommands.js';
+} from '../src/pages/chat/chrome/ComposerCommandAutocomplete.svelte';
+import CommandOption, { escapeUnsafeName, optionId } from '../src/pages/chat/chrome/CommandOption.svelte';
+import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/data/commands.js';
+import type { RankedHostCommand } from '../src/shared/data/rankHostCommands.js';
 import VisualViewportAnchorProbe from './support/VisualViewportAnchorProbe.svelte';
 
 afterEach(() => {
@@ -647,8 +647,8 @@ describe('applied panel styling stays inside the frozen system', () => {
   // matched rule text and values are unchanged.
   const css = [
     readFileSync('app-mobile/src/app.css', 'utf8'),
-    readFileSync('app-mobile/src/lib/chrome/ComposerCommandAutocomplete.svelte', 'utf8'),
-    readFileSync('app-mobile/src/lib/chrome/CommandOption.svelte', 'utf8'),
+    readFileSync('app-mobile/src/pages/chat/chrome/ComposerCommandAutocomplete.svelte', 'utf8'),
+    readFileSync('app-mobile/src/pages/chat/chrome/CommandOption.svelte', 'utf8'),
   ].join('\n');
 
   it('uses only the frozen light tokens', () => {

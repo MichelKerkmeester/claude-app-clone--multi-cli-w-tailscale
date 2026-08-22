@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
-import MarkdownPreview, { parseMarkdown } from '../src/lib/artifacts/MarkdownPreview.svelte';
+import MarkdownPreview, { parseMarkdown } from '../src/pages/chat/artifacts/MarkdownPreview.svelte';
 
 describe('MarkdownPreview', () => {
   it('renders a bounded safe AST without raw HTML, navigation, images, or frames', () => {

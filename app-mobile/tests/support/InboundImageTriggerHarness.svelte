@@ -3,7 +3,7 @@
   // Mirrors the React OpenInboundImage + <ArtifactViewerProvider> wrapper.
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import ArtifactViewerProvider from '../../src/lib/artifacts/ArtifactViewerProvider.svelte';
+  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
   import InboundImageTriggerChild from './InboundImageTriggerChild.svelte';
 
   let {

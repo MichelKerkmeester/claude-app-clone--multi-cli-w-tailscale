@@ -9,8 +9,8 @@ import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import SessionHeader from '../src/lib/chrome/SessionHeader.svelte';
-import { INITIAL_RUNTIME_STATE, type RuntimeControls, type RuntimeUiState } from '../src/runtime.js';
+import SessionHeader from '../src/pages/chat/chrome/SessionHeader.svelte';
+import { INITIAL_RUNTIME_STATE, type RuntimeControls, type RuntimeUiState } from '../src/shared/data/runtime.js';
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',

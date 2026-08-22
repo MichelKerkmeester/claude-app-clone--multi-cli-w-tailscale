@@ -16,8 +16,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
-import type { HostCommandCatalogState, ScopedCommandSnapshot, SelectedCommandBinding } from '../src/commands.js';
-import { INITIAL_RUNTIME_STATE } from '../src/runtime.js';
+import type { HostCommandCatalogState, ScopedCommandSnapshot, SelectedCommandBinding } from '../src/shared/data/commands.js';
+import { INITIAL_RUNTIME_STATE } from '../src/shared/data/runtime.js';
 import SessionComposerSurface from './support/SessionComposerSurface.svelte';
 
 beforeEach(() => {

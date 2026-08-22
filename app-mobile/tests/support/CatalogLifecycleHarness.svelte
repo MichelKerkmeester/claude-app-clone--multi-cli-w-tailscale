@@ -6,9 +6,9 @@
   // HostCommandCatalogState to the test via onControls on every state change.
   // rerender({ sessionId, connection }) drives the prop-change path the
   // React hook.rerender exercised.
-  import { useHostCommandCatalog } from '../../src/lib/hostCommandCatalog.svelte.js';
-  import type { HostCommandCatalogState } from '../../src/commands.js';
-  import type { ConnectionPhase } from '../../src/state.js';
+  import { useHostCommandCatalog } from '../../src/shared/data/hostCommandCatalog.svelte.js';
+  import type { HostCommandCatalogState } from '../../src/shared/data/commands.js';
+  import type { ConnectionPhase } from '../../src/shared/data/state.js';
 
   let {
     sessionId = 'session_a',

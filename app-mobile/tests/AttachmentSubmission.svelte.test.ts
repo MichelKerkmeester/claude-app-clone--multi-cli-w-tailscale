@@ -38,7 +38,7 @@ const client = vi.hoisted(() => {
   };
 });
 
-vi.mock('../src/attachments/attachment-client.js', () => client);
+vi.mock('../src/pages/chat/attachments/attachment-client.js', () => client);
 
 afterEach(() => {
   cleanup();
@@ -77,8 +77,8 @@ describe('explicit attachment submission', () => {
 
   it('submits a HEIC item without a preview URL through a converted JPEG', async () => {
     const actualClient = await vi.importActual<
-      typeof import('../src/attachments/attachment-client.js')
-    >('../src/attachments/attachment-client.js');
+      typeof import('../src/pages/chat/attachments/attachment-client.js')
+    >('../src/pages/chat/attachments/attachment-client.js');
     const file = photo('camera.heic', 'image/heic');
     const convertedBytes = new Blob(['converted jpeg bytes'], { type: 'image/jpeg' });
     const close = vi.fn();

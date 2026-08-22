@@ -23,7 +23,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import LeavePlanSheet from '../src/lib/chrome/LeavePlanSheet.svelte';
+import LeavePlanSheet from '../src/pages/chat/chrome/LeavePlanSheet.svelte';
 
 afterEach(() => {
   cleanup();

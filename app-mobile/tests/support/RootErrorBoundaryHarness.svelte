@@ -1,5 +1,5 @@
 <script lang="ts">
-  import RootErrorBoundary from '../../src/lib/RootErrorBoundary.svelte';
+  import RootErrorBoundary from '../../src/shared/chrome/RootErrorBoundary.svelte';
   import ThrowingChild from './ThrowingChild.svelte';
 
   let { throwError = false }: { throwError?: boolean } = $props();

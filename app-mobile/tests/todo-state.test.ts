@@ -8,8 +8,8 @@ import type {
 } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
 
-import { buildTodoDisplayModel } from '../src/todo-model.js';
-import { EMPTY_TODO_PROJECTION_STATE, todoProjectionReducer } from '../src/todo-state.js';
+import { buildTodoDisplayModel } from '../src/shared/data/todo-model.js';
+import { EMPTY_TODO_PROJECTION_STATE, todoProjectionReducer } from '../src/shared/data/todo-state.js';
 
 const sessionId = 'session_todos_001';
 const epoch = 'epoch_todos_001';

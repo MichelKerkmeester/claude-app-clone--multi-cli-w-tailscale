@@ -19,7 +19,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '../src/runtime.js';
+import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '../src/shared/data/runtime.js';
 import EffortSheetAdvanceHarness, {
   type EffortSheetAdvanceHarnessApi,
 } from './support/EffortSheetAdvanceHarness.svelte';
@@ -46,10 +46,10 @@ const HOST_STATE: RuntimeStateDto = {
 // (reduced-motion overrides, text-size-adjust) live in app.css. Each assertion
 // is repointed to its owning source with the same rule text/values.
 const SHEET_CSS = normalizeSvelteCss(
-  readFileSync('app-mobile/src/lib/chrome/ModelEffortSheet.svelte', 'utf8'),
+  readFileSync('app-mobile/src/pages/chat/chrome/ModelEffortSheet.svelte', 'utf8'),
 );
 const EFFORT_CSS = normalizeSvelteCss(
-  readFileSync('app-mobile/src/lib/chrome/EffortRadioGroup.svelte', 'utf8'),
+  readFileSync('app-mobile/src/pages/chat/chrome/EffortRadioGroup.svelte', 'utf8'),
 );
 const APP_CSS = readFileSync('app-mobile/src/app.css', 'utf8');
 

@@ -15,7 +15,7 @@ import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sha256, type FileDiffBlock, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 
-import type { ArtifactViewerContextValue } from '../src/lib/artifacts/types.js';
+import type { ArtifactViewerContextValue } from '../src/pages/chat/artifacts/types.js';
 
 import ArtifactViewerCardsHarness from './support/ArtifactViewerCardsHarness.svelte';
 import ArtifactPreviewTriggerHarness from './support/ArtifactPreviewTriggerHarness.svelte';

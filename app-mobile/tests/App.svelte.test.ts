@@ -104,24 +104,24 @@ vi.mock('@tanstack/svelte-virtual', () => {
   };
 });
 
-vi.mock('../src/relay.js', () => relay);
-vi.mock('../src/attention.js', () => ({
+vi.mock('../src/shared/data/relay.js', () => relay);
+vi.mock('../src/shared/data/attention.js', () => ({
   ...attention,
   setPushForeground: vi.fn(),
 }));
 
-import Home from '../src/lib/views/Home.svelte';
-import Review from '../src/lib/views/Review.svelte';
-import Session from '../src/lib/views/Session.svelte';
-import AttentionInbox from '../src/lib/views/AttentionInbox.svelte';
-import TranscriptList from '../src/lib/transcript/TranscriptList.svelte';
-import AskQuestionCard from '../src/lib/features/ask-question/AskQuestionCard.svelte';
+import Home from '../src/pages/home/Home.svelte';
+import Review from '../src/pages/review/Review.svelte';
+import Session from '../src/pages/chat/Chat.svelte';
+import AttentionInbox from '../src/pages/inbox/AttentionInbox.svelte';
+import TranscriptList from '../src/pages/chat/transcript/TranscriptList.svelte';
+import AskQuestionCard from '../src/pages/chat/features/ask-question/AskQuestionCard.svelte';
 import {
   EMPTY_TODO_PROJECTION_STATE,
   EMPTY_TRANSCRIPT,
   todoProjectionReducer,
   transcriptReducer,
-} from '../src/state.js';
+} from '../src/shared/data/state.js';
 
 const occurredAt = '2026-08-13T10:00:00.000Z';
 const sessionId = 'session_web_001';
@@ -773,7 +773,7 @@ it('submits the compose box through the relay command path', async () => {
     )
     .mockResolvedValueOnce(jsonResponse({ accepted: true, block: accepted }, 202));
   vi.stubGlobal('fetch', fetchMock);
-  const actualRelay = await vi.importActual<typeof import('../src/relay.js')>('../src/relay.js');
+  const actualRelay = await vi.importActual<typeof import('../src/shared/data/relay.js')>('../src/shared/data/relay.js');
   relay.submitPrompt.mockImplementation(actualRelay.submitPrompt);
   const dispatchTranscript = vi.fn();
 

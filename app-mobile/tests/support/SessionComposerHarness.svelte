@@ -4,8 +4,8 @@
   // so getAttachmentDraft() resolves, mirroring the React oracle's Harness +
   // DraftTestControls (the "select local photos" button + controlled prompt/binding).
   import type { RuntimeMediaCapabilityDto } from '@pi-remote/pi-rpc-protocol';
-  import type { HostCommandCatalogState, SelectedCommandBinding } from '../../src/commands.js';
-  import type { RuntimeControls } from '../../src/runtime.js';
+  import type { HostCommandCatalogState, SelectedCommandBinding } from '../../src/shared/data/commands.js';
+  import type { RuntimeControls } from '../../src/shared/data/runtime.js';
 
   export interface SessionComposerHarnessProps {
     readonly catalog: HostCommandCatalogState;
@@ -26,9 +26,9 @@
 </script>
 
 <script lang="ts">
-  import SessionComposer from '../../src/lib/chrome/SessionComposer.svelte';
-  import { getAttachmentDraft } from '../../src/lib/attachments/AttachmentDraftProvider.svelte';
-  import { INITIAL_RUNTIME_STATE } from '../../src/runtime.js';
+  import SessionComposer from '../../src/pages/chat/chrome/SessionComposer.svelte';
+  import { getAttachmentDraft } from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
+  import { INITIAL_RUNTIME_STATE } from '../../src/shared/data/runtime.js';
 
   let {
     catalog,

@@ -24,8 +24,7 @@ function scopedStyleBodies(): string[] {
       else if (entry.name.endsWith('.svelte')) files.push(full);
     }
   };
-  walk('app-mobile/src/lib');
-  walk('app-mobile/src/routes');
+  walk('app-mobile/src');
   const bodies: string[] = [];
   for (const file of files) {
     // Strip HTML comments first: a markup comment can literally mention `<style>`, which would make

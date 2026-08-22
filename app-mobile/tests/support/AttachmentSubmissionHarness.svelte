@@ -8,8 +8,8 @@
 </script>
 
 <script lang="ts">
-  import { getAttachmentDraft } from '../../src/lib/attachments/AttachmentDraftProvider.svelte';
-  import { useAttachmentSubmission } from '../../src/lib/attachments/useAttachmentSubmission.svelte.js';
+  import { getAttachmentDraft } from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
+  import { useAttachmentSubmission } from '../../src/pages/chat/attachments/useAttachmentSubmission.svelte.js';
 
   let {
     expectedPromptRevision = 1,

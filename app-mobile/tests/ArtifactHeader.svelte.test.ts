@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
-import ArtifactHeader from '../src/lib/artifacts/ArtifactHeader.svelte';
+import ArtifactHeader from '../src/pages/chat/artifacts/ArtifactHeader.svelte';
 
 // Smoke test: proves the Svelte test harness compiles a runes component,
 // renders it under jsdom, and exposes its accessibility tree to queries.

@@ -12,7 +12,7 @@
     useHighlightedCode,
     type HighlightState,
     type UseHighlightedCodeOptions,
-  } from '../../src/lib/rich-content/useHighlightedCode.svelte.js';
+  } from '../../src/pages/chat/rich-content/useHighlightedCode.svelte.js';
 
   let {
     source,

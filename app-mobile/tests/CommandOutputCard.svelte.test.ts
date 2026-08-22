@@ -4,11 +4,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 import CommandOutputCard, {
   reconcileCommandSnapshot,
-} from '../src/lib/rich-content/CommandOutputCard.svelte';
+} from '../src/pages/chat/rich-content/CommandOutputCard.svelte';
 import {
   normalizeTranscriptBlocks,
   type NormalizedCommandBlock,
-} from '../src/rich-content/normalizeTranscriptBlocks.js';
+} from '../src/pages/chat/rich-content/normalizeTranscriptBlocks.js';
 
 function commandBlock(): NormalizedCommandBlock {
   const blocks = normalizeTranscriptBlocks({

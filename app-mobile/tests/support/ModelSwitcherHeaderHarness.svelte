@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { RuntimeControls } from '../../src/runtime.js';
+  import type { RuntimeControls } from '../../src/shared/data/runtime.js';
 
   export interface ModelSwitcherHeaderHarnessProps {
     readonly controls: RuntimeControls;
@@ -8,8 +8,8 @@
 
 <script lang="ts">
   import { vi } from 'vitest';
-  import SessionHeader from '../../src/lib/chrome/SessionHeader.svelte';
-  import ModelEffortSheet from '../../src/lib/chrome/ModelEffortSheet.svelte';
+  import SessionHeader from '../../src/pages/chat/chrome/SessionHeader.svelte';
+  import ModelEffortSheet from '../../src/pages/chat/chrome/ModelEffortSheet.svelte';
 
   let { controls }: ModelSwitcherHeaderHarnessProps = $props();
 

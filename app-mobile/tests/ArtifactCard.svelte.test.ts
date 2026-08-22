@@ -2,7 +2,7 @@ import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
-import ArtifactCard from '../src/lib/artifacts/ArtifactCard.svelte';
+import ArtifactCard from '../src/pages/chat/artifacts/ArtifactCard.svelte';
 
 const DIFF: FileDiffBlock = {
   id: 'block_file_diff_card',

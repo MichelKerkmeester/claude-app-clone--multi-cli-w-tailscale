@@ -19,7 +19,7 @@ import {
   HIGHLIGHT_MAX_LINES,
   hashCanonicalSource,
   highlightEligibility,
-} from '../src/lib/rich-content/useHighlightedCode.svelte.js';
+} from '../src/pages/chat/rich-content/useHighlightedCode.svelte.js';
 
 import HighlightedCodeProbe from './support/HighlightedCodeProbe.svelte';
 

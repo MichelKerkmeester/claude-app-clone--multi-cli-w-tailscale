@@ -3,7 +3,7 @@
   // so getArtifactViewer() resolves. Mirrors the React OpenButtons helper.
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import { getArtifactViewer } from '../../src/lib/artifacts/ArtifactViewerProvider.svelte';
+  import { getArtifactViewer } from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
 
   let {
     first,

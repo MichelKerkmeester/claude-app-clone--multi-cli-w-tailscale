@@ -3,7 +3,7 @@
   // oracle's AttachmentDraftProvider + Harness composition. SessionComposer
   // reads the AttachmentDraft context, so the harness must be its child.
   import type { RuntimeMediaCapabilityDto } from '@pi-remote/pi-rpc-protocol';
-  import type { HostCommandCatalogState, SelectedCommandBinding } from '../../src/commands.js';
+  import type { HostCommandCatalogState, SelectedCommandBinding } from '../../src/shared/data/commands.js';
 
   export interface SessionComposerSurfaceProps {
     readonly catalog: HostCommandCatalogState;
@@ -24,7 +24,7 @@
 </script>
 
 <script lang="ts">
-  import AttachmentDraftProvider from '../../src/lib/attachments/AttachmentDraftProvider.svelte';
+  import AttachmentDraftProvider from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
   import SessionComposerHarness from './SessionComposerHarness.svelte';
 
   let {

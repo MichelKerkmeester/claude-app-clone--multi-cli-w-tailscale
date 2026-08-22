@@ -20,20 +20,20 @@
     setAppState,
     setAppActions,
     type AppActions,
-  } from '../lib/app-state.svelte.js';
-  import { establishSession, revokeDevice, logoutDevice, type DeviceIdentity } from '../auth.js';
-  import { fetchSessions } from '../relay.js';
-  import { setPushForeground, unsubscribeFromPush } from '../attention.js';
-  import { saveCache } from '../cache.js';
-  import { messageFrom } from '../lib/views/view-helpers.js';
-  import type { ConnectionAction } from '../state.js';
+  } from '../shared/data/app-state.svelte.js';
+  import { establishSession, revokeDevice, logoutDevice, type DeviceIdentity } from '../shared/data/auth.js';
+  import { fetchSessions } from '../shared/data/relay.js';
+  import { setPushForeground, unsubscribeFromPush } from '../shared/data/attention.js';
+  import { saveCache } from '../shared/data/cache.js';
+  import { messageFrom } from '../shared/data/view-helpers.js';
+  import type { ConnectionAction } from '../shared/data/state.js';
   import type { AttentionResolutionDto } from '@pi-remote/pi-rpc-protocol';
 
-  import RootErrorBoundary from '../lib/RootErrorBoundary.svelte';
-  import Enrollment from '../lib/views/Enrollment.svelte';
-  import Header from '../lib/views/Header.svelte';
-  import Review from '../lib/views/Review.svelte';
-  import AttentionInbox from '../lib/views/AttentionInbox.svelte';
+  import RootErrorBoundary from '../shared/chrome/RootErrorBoundary.svelte';
+  import Enrollment from '../pages/enrollment/Enrollment.svelte';
+  import Header from '../shared/chrome/Header.svelte';
+  import Review from '../pages/review/Review.svelte';
+  import AttentionInbox from '../pages/inbox/AttentionInbox.svelte';
 
   let { children }: { children: Snippet } = $props();
 

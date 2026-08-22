@@ -3,7 +3,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import TodoPanel from '../src/lib/chrome/TodoPanel.svelte';
+import TodoPanel from '../src/pages/chat/chrome/TodoPanel.svelte';
 
 const projection: TodoProjectionV1 = {
   planId: 'heading-test-plan',

@@ -1,8 +1,8 @@
 <script lang="ts">
   // Home route — the session roster. State + actions come from the shell via
   // context; this page only wires them into the ported Home view.
-  import { getAppState, getAppActions } from '../lib/app-state.svelte.js';
-  import Home from '../lib/views/Home.svelte';
+  import { getAppState, getAppActions } from '../shared/data/app-state.svelte.js';
+  import Home from '../pages/home/Home.svelte';
 
   const app = getAppState();
   const actions = getAppActions();

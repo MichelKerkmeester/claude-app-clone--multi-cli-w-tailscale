@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   canShareDisplayedArtifact,
   shareDisplayedArtifact,
-} from '../src/artifacts/artifact-share.js';
+} from '../src/pages/chat/artifacts/artifact-share.js';
 
 afterEach(() => {
   vi.unstubAllGlobals();

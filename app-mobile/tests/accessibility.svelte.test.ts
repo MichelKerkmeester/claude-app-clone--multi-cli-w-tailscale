@@ -7,9 +7,9 @@
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import ArtifactDetails, { type ArtifactDetailsModel } from '../src/lib/artifacts/ArtifactDetails.svelte';
-import ArtifactHeader from '../src/lib/artifacts/ArtifactHeader.svelte';
-import PreviewControls from '../src/lib/artifacts/PreviewControls.svelte';
+import ArtifactDetails, { type ArtifactDetailsModel } from '../src/pages/chat/artifacts/ArtifactDetails.svelte';
+import ArtifactHeader from '../src/pages/chat/artifacts/ArtifactHeader.svelte';
+import PreviewControls from '../src/pages/chat/artifacts/PreviewControls.svelte';
 
 const MODEL: ArtifactDetailsModel = {
   displayName: 'Redacted capture',

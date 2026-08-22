@@ -1,12 +1,12 @@
 import { cleanup, render, screen } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import RuntimeStrip from '../src/lib/chrome/RuntimeStrip.svelte';
+import RuntimeStrip from '../src/pages/chat/chrome/RuntimeStrip.svelte';
 import {
   INITIAL_RUNTIME_STATE,
   type RuntimeControls,
   type RuntimeUiState,
-} from '../src/runtime.js';
+} from '../src/shared/data/runtime.js';
 import type { RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 
 const HOST_STATE: RuntimeStateDto = {

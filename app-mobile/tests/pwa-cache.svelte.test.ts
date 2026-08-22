@@ -9,10 +9,10 @@ import type {
   SessionCardDto,
 } from '@pi-remote/pi-rpc-protocol';
 
-import { loadCache, saveCache } from '../src/cache.js';
-import { EMPTY_TRANSCRIPT } from '../src/state.js';
-import PlanReadyCard from '../src/lib/chrome/PlanReadyCard.svelte';
-import PlanReviewSheet from '../src/lib/chrome/PlanReviewSheet.svelte';
+import { loadCache, saveCache } from '../src/shared/data/cache.js';
+import { EMPTY_TRANSCRIPT } from '../src/shared/data/state.js';
+import PlanReadyCard from '../src/pages/chat/chrome/PlanReadyCard.svelte';
+import PlanReviewSheet from '../src/pages/chat/chrome/PlanReviewSheet.svelte';
 
 const SERVICE_WORKER = readFileSync('app-mobile/static/service-worker.js', 'utf8');
 const MANIFEST = JSON.parse(

@@ -5,7 +5,7 @@ import {
   fenceBlockIdentity,
   normalizeTranscript,
   normalizeTranscriptBlocks,
-} from '../src/rich-content/normalizeTranscriptBlocks.js';
+} from '../src/pages/chat/rich-content/normalizeTranscriptBlocks.js';
 
 const REDACTION = {
   policyVersion: 1,

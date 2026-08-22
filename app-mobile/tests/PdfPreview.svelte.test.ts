@@ -27,7 +27,7 @@ vi.mock('pdfjs-dist', () => {
 import PdfPreview, {
   getPdfPreviewRuntimeMetrics,
   pagesAround,
-} from '../src/lib/artifacts/PdfPreview.svelte';
+} from '../src/pages/chat/artifacts/PdfPreview.svelte';
 
 function block(overrides: Partial<FilePreviewBlock> = {}): FilePreviewBlock {
   return {

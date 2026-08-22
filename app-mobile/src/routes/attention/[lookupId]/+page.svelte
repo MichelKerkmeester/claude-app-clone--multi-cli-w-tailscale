@@ -6,8 +6,8 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  import { getAppState } from '../../../lib/app-state.svelte.js';
-  import { openAttentionHint } from '../../../attention.js';
+  import { getAppState } from '../../../shared/data/app-state.svelte.js';
+  import { openAttentionHint } from '../../../shared/data/attention.js';
 
   const app = getAppState();
   // The [lookupId] route only matches with the param present.

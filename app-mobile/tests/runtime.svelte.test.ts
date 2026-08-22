@@ -30,7 +30,7 @@ import type {
   RuntimeStateDto,
 } from '@pi-remote/pi-rpc-protocol';
 
-import { runtimeIssueMessage } from '../src/runtime-issues.js';
+import { runtimeIssueMessage } from '../src/shared/data/runtime-issues.js';
 import {
   INITIAL_RUNTIME_STATE,
   modeAuthority,
@@ -39,9 +39,9 @@ import {
   type RuntimeControls,
   type RuntimeIssue,
   type RuntimePhase,
-} from '../src/runtime.js';
-import { useRuntime } from '../src/lib/useRuntime.svelte.js';
-import RuntimeStatusRegion from '../src/lib/transcript/RuntimeStatusRegion.svelte';
+} from '../src/shared/data/runtime.js';
+import { useRuntime } from '../src/shared/data/useRuntime.svelte.js';
+import RuntimeStatusRegion from '../src/pages/chat/transcript/RuntimeStatusRegion.svelte';
 
 const relay = vi.hoisted(() => {
   class RuntimeRelayError extends Error {
@@ -66,7 +66,7 @@ const relay = vi.hoisted(() => {
   };
 });
 
-vi.mock('../src/relay.js', () => relay);
+vi.mock('../src/shared/data/relay.js', () => relay);
 
 const CURRENT_MODEL = { provider: 'deepseek', id: 'deepseek-v4-flash', label: 'DeepSeek Flash' };
 const TARGET_MODEL = { provider: 'opencode-go', id: 'qwen3.8-max', label: 'Qwen 3.8 Max' };

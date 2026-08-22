@@ -7,7 +7,7 @@ import {
   modelAvailabilityMessage,
   modelKey,
   organizeModelCatalog,
-} from '../src/model-catalog.js';
+} from '../src/shared/data/model-catalog.js';
 
 const MODELS: readonly AvailableModelDto[] = [
   { provider: 'Zeta', id: 'zeta-standard', label: 'Zeta Standard' },

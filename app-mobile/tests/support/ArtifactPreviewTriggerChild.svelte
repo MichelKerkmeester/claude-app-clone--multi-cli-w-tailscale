@@ -3,7 +3,7 @@
   // so getArtifactViewer() resolves. Mirrors the React PreviewTrigger helper.
   import type { FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import { getArtifactViewer } from '../../src/lib/artifacts/ArtifactViewerProvider.svelte';
+  import { getArtifactViewer } from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
 
   let { block }: { block: FilePreviewBlock } = $props();
 

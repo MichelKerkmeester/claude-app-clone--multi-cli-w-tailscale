@@ -8,14 +8,14 @@ import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import RuntimeStrip from '../src/lib/chrome/RuntimeStrip.svelte';
+import RuntimeStrip from '../src/pages/chat/chrome/RuntimeStrip.svelte';
 import {
   INITIAL_RUNTIME_STATE,
   type RuntimeControls,
   type RuntimePhase,
   type RuntimeStatus,
   type RuntimeUiState,
-} from '../src/runtime.js';
+} from '../src/shared/data/runtime.js';
 import type { RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 
 const HOST_STATE: RuntimeStateDto = {

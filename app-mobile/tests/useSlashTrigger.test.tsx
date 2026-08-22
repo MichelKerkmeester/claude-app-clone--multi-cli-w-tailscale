@@ -12,7 +12,7 @@ import {
   slashDismissalSignature,
   useSlashTrigger,
   type SlashTriggerInput,
-} from '../src/useSlashTrigger.js';
+} from '../src/shared/data/useSlashTrigger.js';
 
 function trigger(overrides: Partial<SlashTriggerInput>): ReturnType<typeof deriveSlashTrigger> {
   return deriveSlashTrigger({

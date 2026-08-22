@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { TextBlock, ToolCallBlock, TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
-import { groupBlocksIntoTurns } from '../src/turns.js';
+import { groupBlocksIntoTurns } from '../src/shared/data/turns.js';
 
 let seq = 0;
 function user(id: string, text = 'hi'): TextBlock {

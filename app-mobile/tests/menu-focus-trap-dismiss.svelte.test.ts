@@ -3,8 +3,8 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/svelt
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/runtime.js';
-import PlanModeButton from '../src/lib/chrome/PlanModeButton.svelte';
+import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/shared/data/runtime.js';
+import PlanModeButton from '../src/pages/chat/chrome/PlanModeButton.svelte';
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',

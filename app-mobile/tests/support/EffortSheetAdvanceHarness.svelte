@@ -7,7 +7,7 @@
   // `runtime` derivation changes — the open-effect (which depends on `isOpen`,
   // `initialSection`, `runtimeControls`) does not re-run, so the announcement
   // effect can observe the pending→settled transition and announce exactly once.
-  import type { RuntimeControls, RuntimeUiState } from '../../src/runtime.js';
+  import type { RuntimeControls, RuntimeUiState } from '../../src/shared/data/runtime.js';
 
   export interface EffortSheetAdvanceHarnessProps {
     readonly initialRuntime: RuntimeUiState;
@@ -31,7 +31,7 @@
 
 <script lang="ts">
   import { vi } from 'vitest';
-  import ModelEffortSheet from '../../src/lib/chrome/ModelEffortSheet.svelte';
+  import ModelEffortSheet from '../../src/pages/chat/chrome/ModelEffortSheet.svelte';
 
   let {
     initialRuntime,

@@ -3,7 +3,7 @@
   // getArtifactViewer() resolves. Mirrors the React OpenDiff helper.
   import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import { getArtifactViewer } from '../../src/lib/artifacts/ArtifactViewerProvider.svelte';
+  import { getArtifactViewer } from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
 
   const DIFF: FileDiffBlock = {
     id: 'block_phase_privacy_lifecycle',

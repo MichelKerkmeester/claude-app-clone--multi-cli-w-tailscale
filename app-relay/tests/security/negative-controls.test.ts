@@ -76,14 +76,14 @@ const READ_ONLY_SERVER_SOURCE = readFileSync(
   'utf8',
 );
 const READ_ONLY_RICH_SOURCES = [
-  '../../../app-mobile/src/rich-content/CodeCard.tsx',
-  '../../../app-mobile/src/rich-content/CommandOutputCard.tsx',
-  '../../../app-mobile/src/rich-content/F6ViewerAdapter.tsx',
-  '../../../app-mobile/src/rich-content/SafeMarkdown.tsx',
-  '../../../app-mobile/src/rich-content/highlight.worker.ts',
-  '../../../app-mobile/src/rich-content/useHighlightedCode.ts',
-  '../../../app-mobile/src/artifacts/ArtifactViewerProvider.tsx',
-  '../../../app-mobile/src/artifacts/CodePreview.tsx',
+  '../../../app-mobile/src/pages/chat/rich-content/CodeCard.svelte',
+  '../../../app-mobile/src/pages/chat/rich-content/CommandOutputCard.svelte',
+  '../../../app-mobile/src/pages/chat/rich-content/F6ViewerAdapter.ts',
+  '../../../app-mobile/src/pages/chat/rich-content/SafeMarkdown.svelte',
+  '../../../app-mobile/src/pages/chat/rich-content/highlight.worker.ts',
+  '../../../app-mobile/src/pages/chat/rich-content/useHighlightedCode.svelte.ts',
+  '../../../app-mobile/src/pages/chat/artifacts/ArtifactViewerProvider.svelte',
+  '../../../app-mobile/src/pages/chat/artifacts/CodePreview.svelte',
 ].map((path) => readFileSync(new URL(path, import.meta.url), 'utf8'));
 
 // This suite keeps the fail-closed boundary visible in one machine-checkable module.

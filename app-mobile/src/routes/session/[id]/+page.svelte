@@ -4,8 +4,8 @@
   // composer all live inside the Session view.
   import { page } from '$app/stores';
 
-  import { getAppState, getAppActions } from '../../../lib/app-state.svelte.js';
-  import Session from '../../../lib/views/Session.svelte';
+  import { getAppState, getAppActions } from '../../../shared/data/app-state.svelte.js';
+  import Session from '../../../pages/chat/Chat.svelte';
 
   const app = getAppState();
   const actions = getAppActions();

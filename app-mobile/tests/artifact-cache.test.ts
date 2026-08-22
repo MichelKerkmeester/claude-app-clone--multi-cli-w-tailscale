@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { loadCache, saveCache, stripArtifactResourceState } from '../src/cache.js';
-import { EMPTY_TRANSCRIPT } from '../src/state.js';
+import { loadCache, saveCache, stripArtifactResourceState } from '../src/shared/data/cache.js';
+import { EMPTY_TRANSCRIPT } from '../src/shared/data/state.js';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
 afterEach(() => {

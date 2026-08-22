@@ -5,7 +5,7 @@ import {
   canShareDisplayedArtifact,
   copyDisplayedArtifact,
   shareDisplayedArtifact,
-} from '../src/artifacts/artifact-share.js';
+} from '../src/pages/chat/artifacts/artifact-share.js';
 
 const BASE_INPUT = {
   displayName: 'safe.txt',

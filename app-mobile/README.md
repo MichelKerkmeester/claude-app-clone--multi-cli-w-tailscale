@@ -1,6 +1,6 @@
 ---
 title: 'Pi Remote Web: Installable PWA Client'
-description: 'Vite plus React 19 PWA that reads redacted Pi sessions from the relay and keeps an offline read-only cache.'
+description: 'Svelte 5 / SvelteKit SPA (client-side only) that reads redacted Pi sessions from the relay and keeps an offline read-only cache.'
 trigger_phrases:
   - 'pi remote web'
   - '@pi-remote/web'
@@ -12,14 +12,15 @@ trigger_phrases:
 
 ## 1. OVERVIEW
 
-`apps/pi-remote-web/` is the `@pi-remote/web` package, a Vite plus React 19 single page app served by the relay. It renders redacted session transcripts, an exact-action review queue, an attention inbox and device enrollment. Normal reads stay read-only. The service worker caches the app shell, and `src/cache.ts` keeps a bounded offline read-only snapshot in localStorage.
+`app-mobile/` is the `@pi-remote/web` package, a **Svelte 5 / SvelteKit SPA** (client-side only) served by the relay. It renders redacted session transcripts, an exact-action review queue, an attention inbox, and device enrollment. Normal reads stay read-only. The service worker caches the app shell, and `src/shared/data/cache.ts` keeps a bounded offline read-only snapshot.
 
 Current state:
 
-- React 19 with `react-aria-components` and `@tanstack/react-virtual`
+- Svelte 5 (runes) with **Bits UI** accessible primitives and `@tanstack/svelte-virtual`
+- SvelteKit in SPA/CSR mode — `adapter-static`, `ssr = false`, `prerender = false`
 - Tailwind CSS 4 through the `@tailwindcss/vite` plugin
-- WebSocket sync with the relay through `src/relay.ts`
-- Service worker registered from `src/main.tsx` only when `import.meta.env.PROD` is true
+- WebSocket sync with the relay through `src/shared/data/relay.ts`
+- Service worker registered from `src/routes/+layout.svelte` (production only)
 - Dev and preview servers proxy `/api` and `/health` to `http://127.0.0.1:4310`
 
 ---
@@ -28,7 +29,7 @@ Current state:
 
 ```text
 ╭──────────────────────────────────────────────────────────────────╮
-│                     apps/pi-remote-web                           │
+│                          app-mobile                              │
 ╰──────────────────────────────────────────────────────────────────╯
 
 ┌──────────────┐      ┌────────────────┐      ┌──────────────────┐
@@ -39,66 +40,74 @@ Current state:
        ▼
 ┌────────────────┐      ┌────────────────┐
 │ src/           │ ───▶ │ localStorage   │
-│ React app      │      │ read-only cache│
+│ Svelte SPA     │      │ read-only cache│
 └────────────────┘      └────────────────┘
 ```
 
-The relay serves the built app, the manifest and the service worker. The dev server proxies the same API to a local relay at port 4310.
+The relay serves the built app, the manifest, and the service worker. The dev server proxies the same API to a local relay at port 4310.
 
 ---
 
 ## 3. DIRECTORY TREE
 
 ```text
-apps/pi-remote-web/
-+-- src/             # App, state reducers, relay client, auth, cache
-+-- public/          # Manifest, service worker, icon
-+-- tests/           # Vitest component suite
-+-- vite.config.ts   # React and Tailwind plugins, relay proxy
-+-- package.json
-`-- README.md
+app-mobile/
+├─ src/
+│  ├─ routes/         # SvelteKit routes (3 URLs + the +layout shell)
+│  ├─ pages/          # one folder per screen (home, chat, review, inbox, enrollment)
+│  ├─ shared/         # primitives (a11y UI), chrome, data (logic layer)
+│  ├─ app.css         # global foundation: tokens, @font-face, theme blocks, resets
+│  └─ app.html        # SPA shell document
+├─ static/            # manifest, service worker, icons (served as-is)
+├─ tests/             # Vitest + @testing-library/svelte component suite
+├─ svelte.config.js   # adapter-static, CSP, SPA fallback
+├─ vite.config.ts     # SvelteKit + Tailwind plugins, relay proxy
+├─ package.json
+└─ README.md
 ```
+
+Each `src/` folder carries its own `README.md` (what/why) and, where it earns one, a `CODE.md` (structure/logic). Start at `src/README.md` for the route→folder→file screen map.
 
 ---
 
 ## 4. KEY FILES
 
-| File             | Responsibility                                                        |
-| ---------------- | --------------------------------------------------------------------- |
-| `src/main.tsx`   | Mounts `App` into `#root`, registers the service worker in production |
-| `src/App.tsx`    | Root component with Enrollment, Home, Session, Review and Inbox views |
-| `vite.config.ts` | Plugin setup and dev relay proxy                                      |
-| `package.json`   | Build, dev, preview and typecheck scripts                             |
+| File | Responsibility |
+|------|----------------|
+| `src/routes/+layout.svelte` | The app shell: context providers, theme, service-worker registration, Review/Inbox overlays |
+| `src/routes/+layout.ts` | `ssr = false; prerender = false` — pure client render |
+| `src/pages/chat/Chat.svelte` | The conversation view (socket, virtualizer, composer); the largest screen |
+| `src/shared/data/` | The logic layer — relay client, auth, reducers, runes stores |
+| `svelte.config.js` · `vite.config.ts` | Adapter/CSP/SPA config; plugin setup + dev relay proxy |
 
 ---
 
 ## 5. ENTRYPOINTS
 
-| Entrypoint        | Type   | Purpose                                    |
-| ----------------- | ------ | ------------------------------------------ |
-| `npm run dev`     | Script | Vite dev server with relay proxy           |
-| `npm run build`   | Script | Typecheck with `tsc -b`, then `vite build` |
-| `npm run preview` | Script | Serve the built app with the relay proxy   |
-| `src/main.tsx`    | Module | First file to read for app bootstrap       |
+| Entrypoint | Type | Purpose |
+|------------|------|---------|
+| `npm run dev` | Script | Vite dev server with relay proxy |
+| `npm run build` | Script | `vite build` (SvelteKit static SPA into `dist/`) |
+| `npm run preview` | Script | Serve the built app with the relay proxy |
+| `src/routes/+layout.svelte` | Module | First file to read for the app shell + bootstrap |
 
 ---
 
 ## 6. VALIDATION
 
-Run from the repository root (`Apps/Pi Mobile`).
+Run from the repository root.
 
 ```bash
 npm run test:web
-npm run typecheck -w @pi-remote/web
+npm run typecheck -w @pi-remote/web   # svelte-check
 npm run build -w @pi-remote/web
 ```
 
-Expected result: the web suite passes, TypeScript reports no errors, and `dist/` contains the built app with the copied `public/` assets.
+Expected result: the web suite passes, `svelte-check` reports no errors, and `dist/` contains the built app with the copied `static/` assets.
 
 ---
 
 ## 7. RELATED
 
-- [`src/` README](../src/README.md)
-- [`public/` README](../public/README.md)
-- [`tests/` README](../tests/README.md)
+- [`src/` README (screen map)](./src/README.md)
+- [`tests/` README](./tests/README.md)

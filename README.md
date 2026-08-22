@@ -89,8 +89,8 @@ Prepare `deploy/serve.env` first as described in [Install And Onboarding](.openc
 ```text
 Pi Mobile/
 +-- packages/pi-rpc-protocol/        # Shared wire contracts and runtime guards
-+-- apps/pi-remote-relay/            # Pi supervision, SQLite ledger, auth, sync, approval, push
-+-- apps/pi-remote-web/              # React PWA, offline cache, review UI, Attention Inbox
++-- app-relay/            # Pi supervision, SQLite ledger, auth, sync, approval, push
++-- app-mobile/                     # Svelte 5 SPA PWA, offline cache, review UI, Attention Inbox
 +-- extensions/pi-remote-approval/   # Pi final-boundary extension
 +-- deploy/                          # Tailscale Serve and macOS containment assets
 +-- docs/                            # Operator documentation and runbooks
@@ -102,8 +102,8 @@ Pi Mobile/
 | Path                            | Purpose                                                                                            |
 | ------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `packages/pi-rpc-protocol`      | Shared TypeScript contract for commands, events, browser DTOs and runtime guards                   |
-| `apps/pi-remote-relay`          | Owns the Pi child, the redacted SQLite ledger, the loopback API, approval leases and push delivery |
-| `apps/pi-remote-web`            | Enrollment, transcript rendering, exact-action review UI and Attention Inbox                       |
+| `app-relay`          | Owns the Pi child, the redacted SQLite ledger, the loopback API, approval leases and push delivery |
+| `app-mobile`            | Enrollment, transcript rendering, exact-action review UI and Attention Inbox                       |
 | `extensions/pi-remote-approval` | Final protected-tool boundary inside the Pi process                                                |
 | `deploy`                        | Serve deployment script, `serve.env.example` and the macOS containment profile                     |
 | `docs`                          | Architecture, security, setup and runbooks                                                         |

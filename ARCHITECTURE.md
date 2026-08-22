@@ -40,16 +40,16 @@ The relay persists only redacted envelopes before it broadcasts anything, and mu
 
 ### Key Sources
 
-- apps/pi-remote-relay/src/index.ts (`runRelay`, `publishPiEvent`, `bindPushNotifications`, `mutationPiArguments`)
+- app-relay/src/index.ts (`runRelay`, `publishPiEvent`, `bindPushNotifications`, `mutationPiArguments`)
 - packages/pi-rpc-protocol/src/types.ts (`Envelope`, `SyncMessage`, `ApprovalAction`, `ApprovalDecisionCommand`)
-- apps/pi-remote-relay/src/store/relay-store.ts (`appendEnvelope`, `createSyncPlan`)
-- apps/pi-remote-relay/src/replay/sync.ts (`SyncHub.publish`, `SyncHub.subscribe`)
-- apps/pi-remote-relay/src/store/redaction.ts (`redactEnvelope`)
-- apps/pi-remote-relay/src/approval/approval-service.ts (`request`, `decide`, `consume`)
-- apps/pi-remote-relay/src/approval/final-gate.ts (`verifyFinalGate`)
-- apps/pi-remote-relay/src/http/server.ts (`startReadOnlyServer`, `handleExtensionAuthority`)
+- app-relay/src/store/relay-store.ts (`appendEnvelope`, `createSyncPlan`)
+- app-relay/src/replay/sync.ts (`SyncHub.publish`, `SyncHub.subscribe`)
+- app-relay/src/store/redaction.ts (`redactEnvelope`)
+- app-relay/src/approval/approval-service.ts (`request`, `decide`, `consume`)
+- app-relay/src/approval/final-gate.ts (`verifyFinalGate`)
+- app-relay/src/http/server.ts (`startReadOnlyServer`, `handleExtensionAuthority`)
 - extensions/pi-remote-approval/src/index.ts (`createFinalBoundaryHandler`, `createRelayLeaseAuthorizer`)
-- apps/pi-remote-web/src/state.ts (`transcriptReducer`), apps/pi-remote-web/app-relay.ts, apps/pi-remote-web/src/cache.ts
+- app-mobile/src/shared/data/state.ts (`transcriptReducer`), app-mobile/src/shared/data/relay.ts, app-mobile/src/shared/data/cache.ts
 - deploy/containment/pi-remote.sb
 - docs/security.md, docs/release-verification.md, docs/setup.md
 
@@ -67,18 +67,18 @@ The relay persists only redacted envelopes before it broadcasts anything, and mu
 
 | Component                 | Location                      | Role                                                                                                                                                   |
 | ------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Loopback relay            | apps/pi-remote-relay          | Owns one Pi RPC child, the SQLite redacted ledger, the loopback API, approval leases, push delivery, and prompt steering                               |
+| Loopback relay            | app-relay          | Owns one Pi RPC child, the SQLite redacted ledger, the loopback API, approval leases, push delivery, and prompt steering                               |
 | Wire protocol package     | packages/pi-rpc-protocol      | Shared TypeScript contract for commands, events, browser DTOs, approval actions, sync messages, and runtime guards                                     |
-| Installable PWA           | apps/pi-remote-web            | Enrollment, opaque session catalog, typed transcript rendering, exact-action review UI, Attention Inbox, push preferences, and a stale read-only cache |
+| Installable PWA           | app-mobile            | Enrollment, opaque session catalog, typed transcript rendering, exact-action review UI, Attention Inbox, push preferences, and a stale read-only cache |
 | Pinned approval extension | extensions/pi-remote-approval | Final protected-tool boundary inside the Pi process, requests and consumes leases over a per-process loopback channel                                  |
 
 ### Runtime Zone Diagram
 
 ```text
-Phone PWA (apps/pi-remote-web)
+Phone PWA (app-mobile)
   | HTTPS / WSS through Tailscale Serve, secret-prefixed path
   v
-Loopback relay (127.0.0.1, apps/pi-remote-relay)
+Loopback relay (127.0.0.1, app-relay)
   | SQLite redacted ledger (WAL, numbered migrations)
   | strict LF-delimited JSONL over stdin and stdout
   v

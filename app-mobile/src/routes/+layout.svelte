@@ -29,6 +29,7 @@
   import type { ConnectionAction } from '../state.js';
   import type { AttentionResolutionDto } from '@pi-remote/pi-rpc-protocol';
 
+  import RootErrorBoundary from '../lib/RootErrorBoundary.svelte';
   import Enrollment from '../lib/views/Enrollment.svelte';
   import Header from '../lib/views/Header.svelte';
   import Review from '../lib/views/Review.svelte';
@@ -243,27 +244,29 @@
   });
 </script>
 
-{#if !app.authReady}
-  <Enrollment phase={app.connection.phase} onEnrolled={handleEnrolled} />
-{:else if app.reviewOpen}
-  <Review
-    sessions={app.sessions.items}
-    onBack={() => (app.reviewOpen = false)}
-    focusId={app.reviewFocusId}
-  />
-{:else if app.inboxOpen}
-  <AttentionInbox onBack={() => (app.inboxOpen = false)} onOpen={handleInboxOpen} />
-{:else}
-  {#if !inSession}
-    <Header
-      connection={app.connection.phase}
-      {onHome}
-      onReview={openReview}
-      onInbox={openInbox}
-      reviewAvailable={app.authReady}
-      theme={app.theme}
-      onThemeChange={(value) => (app.theme = value)}
+<RootErrorBoundary>
+  {#if !app.authReady}
+    <Enrollment phase={app.connection.phase} onEnrolled={handleEnrolled} />
+  {:else if app.reviewOpen}
+    <Review
+      sessions={app.sessions.items}
+      onBack={() => (app.reviewOpen = false)}
+      focusId={app.reviewFocusId}
     />
+  {:else if app.inboxOpen}
+    <AttentionInbox onBack={() => (app.inboxOpen = false)} onOpen={handleInboxOpen} />
+  {:else}
+    {#if !inSession}
+      <Header
+        connection={app.connection.phase}
+        {onHome}
+        onReview={openReview}
+        onInbox={openInbox}
+        reviewAvailable={app.authReady}
+        theme={app.theme}
+        onThemeChange={(value) => (app.theme = value)}
+      />
+    {/if}
+    {@render children()}
   {/if}
-  {@render children()}
-{/if}
+</RootErrorBoundary>

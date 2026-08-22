@@ -10,9 +10,10 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { svelteTesting } from '@testing-library/svelte/vite';
 import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
-  resolve: { alias: { $shared: new URL('./app-mobile/src/shared', import.meta.url).pathname } },
+  resolve: { alias: { $shared: fileURLToPath(new URL('./app-mobile/src/shared', import.meta.url)) } },
   plugins: [svelte({ hot: false }), svelteTesting()],
   test: {
     environment: 'jsdom',

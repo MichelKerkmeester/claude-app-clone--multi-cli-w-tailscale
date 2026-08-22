@@ -12,6 +12,7 @@
 
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
 
 // Four transport/worker tests are intentionally NOT here: highlight.worker,
 // relay-runtime-transport, submitSlashDraft, submitSlashDraftTransport. They
@@ -37,7 +38,7 @@ const LOGIC_TESTS = [
 ];
 
 export default defineConfig({
-  resolve: { alias: { $shared: new URL('./app-mobile/src/shared', import.meta.url).pathname } },
+  resolve: { alias: { $shared: fileURLToPath(new URL('./app-mobile/src/shared', import.meta.url)) } },
   plugins: [svelte({ hot: false })],
   test: {
     environment: 'jsdom',

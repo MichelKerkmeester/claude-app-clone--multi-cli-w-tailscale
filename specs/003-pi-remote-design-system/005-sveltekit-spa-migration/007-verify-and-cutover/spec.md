@@ -9,12 +9,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
-    last_updated_at: "2026-08-19T00:00:00Z"
+    last_updated_at: "2026-08-22T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Spec authored (L7 final child)"
-    next_safe_action: "Build corpus + token-identity gate after L6; deep-review fan-out; cutover"
+    recent_action: "Cutover shipped; 007-EXT (editability/DX pass) scoped from the AI council, decisions resolved"
+    next_safe_action: "Execute 007-EXT Phase 0 — calibrate census + React-completion (delete dead hook halves, drop react deps), full-board barrier"
     blockers: []
-    completion_pct: 0
+    completion_pct: 70
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -67,6 +67,14 @@ runs an adversarial deep-review, and executes the cutover.
 - **008-finalize trigger:** signal child 008 to capture the proven runes/scoping patterns.
 
 **Out of scope:** any token value change; any new feature; the relay/protocol/extensions.
+
+**Extension (007-EXT — post-cutover editability/DX pass; approach = `ai-council-007-ext-synthesis.md`):**
+- **React-completion:** delete the DEAD React-hook halves in `shared/data/runtime.ts` + `commands.ts` (keep the live pure exports), drop `react`/`react-dom`/`react-aria-components` — completes the cutover the deletion left unfinished; **unblocks 009**.
+- **(a) Inline comments (TOP PRIORITY):** a 4-element house grammar + section-segmentation on **EVERY file** (banner weight scaled to size, sk-code/opencode style), enforced via the comment-hygiene hook.
+- **(b) Architecture:** one `$shared` import alias (codemod ~168 deep-relative specifiers); prune dead-React `tsconfig`. No god-file splits / barrels / renames.
+- **(c) Styling structure:** comment-only wayfinding (owner-pointer anchors, `@ds` legend → top of `app.css`, viewer-block index). No CSS rule moved.
+- **(d) Docs & editing ease:** rewrite the 4 stale onboarding docs to Svelte reality; **per-folder CODE README (structure/logic) + FEATURE README (what/why)**; `.vscode`/`.editorconfig`; format-on-save going forward; root `npm run storybook`.
+- **HARD CONSTRAINT:** zero rendered-value / a11y / security / routing change — the 9 gates + a new per-file unchanged-fence-TEXT diff prove it. Executor writes comment/doc/config; Claude diff-inspects comment-only + owns barriers. Full plan: `tasks.md` §007-EXT.
 <!-- /ANCHOR:scope -->
 
 ---
@@ -105,5 +113,5 @@ runs an adversarial deep-review, and executes the cutover.
 <!-- ANCHOR:questions -->
 ## 7. OPEN QUESTIONS
 
-None blocking. Gate 3 pre-resolved by the phase parent.
+None blocking. Gate 3 pre-resolved by the phase parent. 007-EXT decisions resolved 2026-08-22 (React residue → fold into Phase 0/A; comment-section segmentation → every file, scaled to size; research scope → all 5 `specs/context/` repos) — see `handover.md`.
 <!-- /ANCHOR:questions -->

@@ -52,3 +52,38 @@ board + user go-ahead.** Target end structure: **Option B — page-centric** (us
 - [x] R2. ✅ Deterministic codemod: 191 files moved, 480 relative imports rewritten (incl. worker `new URL`, test `vi.mock`/`importActual`, `readFileSync` source paths, 2 cross-boundary `app-relay` tests, `css-corpus.ts` walk root).
 - [x] R3. ✅ Re-verified from the new layout: build 0 · svelte-check 0 · test:web 528+182 · token-identity 0/0/0 (3 themes) · CDP both themes · catalog-smoke 404/0 · backend 366/366 (read-only rich-content security assertion re-verified against the Svelte sources).
 - [x] R4. ✅ `validate.sh …/005-sveltekit-spa-migration --strict` = 0 (child+parent). Amendment close: the react-aria→Bits/Melt, `.tsx`→`.svelte`, single-`style.css`→scoped-`<style>` supersessions are now shipped and verified.
+
+---
+
+## 007-EXT — Editability & DX hardening (comment structure · architecture · styling · docs)
+
+Extends 007 after the cutover: make the byte-identical Svelte app genuinely **editable**, and **complete the React deletion the cutover left unfinished**. Approach = the AI-council synthesis (`ai-council-007-ext-synthesis.md`, Opus-tier/xhigh, 5 lenses → critique): per-dimension, **risk-ascending** phases. **HARD CONSTRAINT — zero rendered-value / a11y / security / routing change**; the 9 gates + a new **per-file unchanged-fence-TEXT diff** prove it (token-identity is comment/whitespace/fence-content blind). Executor writes `app-mobile/**` comment/doc/config edits; **Claude diff-inspects that ONLY comment/whitespace lines changed before trusting any gate** (executors mask by weakening/deleting); Claude owns judgment items + barriers. Resolved decisions baked in below (React fold; comment segmentation every-file-scaled; per-folder READMEs) — see `handover.md`.
+
+### Phase 0 — Calibrate + React-completion (Claude)
+- [ ] X0.1 Re-measure the census (marker-less `.svelte` files, `@ds guardrail` fence inventory, dead `style.css` refs) before staffing — the council's sequencing counts ran 1.5–2.4× off.
+- [ ] X0.2 **React-completion (cutover finish — folded per decision).** Delete the DEAD React-hook halves: `useRuntime` from `shared/data/runtime.ts` (~L666+) and `useHostCommandCatalog` from `shared/data/commands.ts` (~L114+) — KEEP the live pure exports (types, `modeAuthority`, `bindingFor`, `bindingMatchesSnapshot`, `runtimeAnnouncement`, `INITIAL_*`, reducers). Drop `react`, `react-dom`, `react-aria-components` from `app-mobile/package.json`; `npm install`. **Barrier: FULL board** (build · svelte-check · test:web · token-identity 0/0/0 · CDP both themes · catalog-smoke) — proves the pure exports still resolve and nothing rendered moved. **Unblocks 009.**
+- [ ] X0.3 Author the 4-element house comment grammar reference (file-header purpose · WHY-not-what · the existing `@ds` markers · TSDoc on exports only) — the payload 008 encodes. No source change.
+
+### Phase A — Docs, config hygiene, dead-file removal (no source/style bytes)
+- [ ] XA.1 Rewrite the 4 stale React onboarding docs (root `README`, `ARCHITECTURE.md`, `app-mobile/README.md`, `app-mobile/src/README.md`) to Svelte reality — re-derive the ACTUAL surviving module map (no blind React→Svelte find/replace; it fabricates claims). `src/README.md` = the canonical **route→folder→file screen map**; `ARCHITECTURE.md` = high-level.
+- [ ] XA.2 **Per-folder READMEs (user requirement).** Every folder under `app-mobile/src/` gets a **CODE README** (structure/logic of that folder) + a **FEATURE README** (what/why), scaled to folder size (leaf/tiny folders get a minimal one).
+- [ ] XA.3 Prune dead-React `tsconfig` (`jsx`, `jsxImportSource`, `allowJs`, the `src/lib/**` include, the false migration comment). Barrier: svelte-check error-count byte-identical before/after + build.
+- [ ] XA.4 Add `.vscode/{extensions,settings}.json` + `.editorconfig` (2-space); install `prettier-plugin-svelte` for **format-on-save going forward only** (NOT a bulk reflow — byte-identity HARD STOP); add root `npm run storybook` (drop `--no-open`); delete orphaned `catalog.html` (confirm not a Vite input) + the 3 retired oracle scripts (`build-app-css`, `css-corpus-equivalence`, `decl-equivalence`).
+- **Barrier:** build · svelte-check · test:web · format:check.
+
+### Phase B — Comment grammar + wayfinding (comment-only source edits)
+- [ ] XB.1 **Comment-section segmentation — TOP PRIORITY, EVERY file, banner weight SCALED TO SIZE.** Segment every `.svelte` + `.svelte.ts` into labelled comment SECTIONS (sk-code/opencode style): small files a minimal section structure, god-files full banners. Header in the top `<script>`, **NEVER in `<style>`** (scope-hash risk).
+- [ ] XB.2 Tag the ~26 marker-less `.svelte` files (file-header + `@ds primitive:`/`@ds route:` tags); backfill the 6 missing `// MODULE:` banners; add TSDoc to exports under `shared/data`; collapse triplicated `@ds surface:` to once-per-surface-per-file (NOT once-per-file — breaks the 4-surface god-files).
+- [ ] XB.3 Styling wayfinding (comment-only, **NO rule moved/reordered**): owner-pointer anchors at orphaned `app.css` surfaces; relocate the `@ds` legend to the top of `app.css` (pointer replaces the `catalog-registry` copy); index the artifact-viewer blocks; fix stale `.tsx` refs (trace the real producer before rewording; never touch a `.react-aria-*` selector or `data-*` name); fix the misplaced `@ds end surface` + dup blocks.
+- **Barrier:** build · svelte-check · token-identity 0/0/0 · contrast · ≥76 fence COUNT · **per-file unchanged-fence-TEXT diff** · CDP both themes · test:web. NO markup/CSS whitespace reflow.
+
+### Phase C — `$shared` alias + codemod (highest execution risk, severable)
+- [ ] XC.1 Add a single `$shared` alias; wire it IN LOCKSTEP in `svelte.config.js` `kit.alias` + BOTH `vitest.web.*.config.ts` `resolve.alias` + the Storybook builder (test configs use plain `svelte()`, no `sveltekit()` — without this the codemod reds `test:web`). Deterministic codemod over the ~168 deep-relative specifiers (preserve the `.js` extension on `.ts` targets). Drop `$primitives`/`$data` (council: premature).
+- **Barrier: FULL board** incl. CDP both themes + catalog-smoke (a mass specifier rewrite is the one place a rendered value could silently move via wrong resolution). **Severable** — defers cleanly without blocking 0/A/B.
+
+### Enforcement + handoff
+- [ ] XE.1 Extend the existing comment-hygiene PostToolUse hook to reject `@ds` keywords outside the legend + assert the section-segmentation convention. **No new eslint/tsdoc toolchain** (app-mobile has no eslint).
+- [ ] XE.2 **008 handoff:** the 4-element grammar + section convention + `$shared`-imports + CSS ownership-routing = the `sk-code` payload (008 encodes; must NOT re-invent). **009 handoff:** `@ds surface:` header = the story-per-surface coverage key; `@ds primitive:`/`@ds route:` = the story-exempt allowlist.
+
+### Deferred / rejected (council-trimmed — do NOT do in 007-ext)
+No eslint/tsdoc toolchain · no bulk prettier reflow · no god-file splits (redesign, gated post-cutover amendment) · no barrels/renames · no `$primitives`/`$data` aliases · no `@keyframes`-stub deletion · no physical CSS value refactors. Full list + reasons: synthesis "Deferred / rejected".

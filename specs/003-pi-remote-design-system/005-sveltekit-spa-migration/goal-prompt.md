@@ -1,31 +1,31 @@
 # SvelteKit SPA Migration — Goal
 
-Re-home the Pi Remote phone UI onto **Svelte 5 / SvelteKit (SPA/CSR)** — every screen one `.svelte` file (HTML + scoped CSS + typed logic) — preserving **byte-for-byte** the shipped look, a11y, security, PWA. **Re-hosting, not redesign**: build against frozen `--pi-*` tokens; never change a rendered value. Break an invariant → stop + escalate.
+Re-home the Pi Remote phone UI onto **Svelte 5 / SvelteKit (SPA/CSR)** — every screen one `.svelte` file (HTML + scoped CSS + typed logic) — preserving **byte-for-byte** the shipped look, a11y, security, PWA. **Re-hosting, not redesign**: build against frozen `--pi-*` tokens; never change a rendered value.
 
-## Invariants
+## Execution mode — AUTONOMOUS GRAPH-LOOP (do not stall)
+Work **all phases + future phases autonomously**, dependency-ordered like a graph: finish a node → pass its gate → advance to the next unblocked node; run independent nodes in parallel (e.g. context research ‖ the comment pass). **Do NOT hold for per-step go-ahead** — proceed, verify, commit, push. Stop + escalate ONLY on: a broken invariant (Logic-Sync), a red gate that resists bounded repair, or a destructive/irreversible act (mass-delete >100 files, history rewrite, force-push). Research runs in the background and feeds the phases; never block a phase waiting on it.
+
+## Invariants (break one → stop + escalate)
 - **Tokens** resolve identically light/dark/system (token-identity 0-diff).
-- **Security:** loopback relay, tailnet-only Serve (Funnel off), foreground authority, redaction, ticketed fail-closed mutations, host plan mode, content-free push; phone never enables full-access.
+- **Security:** loopback relay, tailnet-only Serve (Funnel off), foreground authority, redaction, ticketed fail-closed mutations, host plan mode, content-free push; phone never full-access.
 - **A11y:** roles, focus order + trap, `aria-*`, ≥44px, reduced-motion + forced-colors survive react-aria → Bits/Melt.
 - **Routing:** `/`, `/session/[id]`, `/attention/[lookupId]`; Review/Inbox overlays; Enrollment an auth branch.
-- **Backend green throughout** — leak detector.
+- **Backend green throughout.**
 
-## Current state — EPIC ONGOING (cutover shipped; 007 being extended; 008 + 009 remain)
-- **Svelte app is the only runtime.** React deleted (`be76d77`): no `index.html`/`main.tsx`, no `.tsx`, no `style.css`, no React vitest config.
-- **`007` core cutover SHIPPED, now being EXTENDED.** C1–C5 + WS-C done; a11y regression (3 P0 + 7 P1) fixed + adversarially re-verified (0 defects, audit `a11y-parity-findings.md`). **Not the finish line.**
-- **Option B page-centric layout live** (`2a811df`): `pages/{home,chat,review,inbox,enrollment}/` + `shared/{primitives,chrome,data}`. Conversation view `pages/chat/Chat.svelte` (was Session); route + protocol names unchanged.
-- Board green — all 9 gates pass.
+## State — EPIC ONGOING
+Svelte is the only runtime (React fully deleted). 007 core cutover + Option B page-centric layout (`pages/{home,chat,review,inbox,enrollment}/` + `shared/{primitives,chrome,data}`) shipped; board green (9 gates). **007-EXT Phase A DONE + verified** (per-folder READMEs, onboarding docs, tsconfig prune, editor config). Now running: Phase B (comments) ‖ context research.
 
-## Remaining (in order)
-1. **`007` EXTENSION — quality/DX pass (NEXT; approach set by a fresh Opus-5 xhigh AI council).** Make the Svelte-only, byte-identical app truly *editable*: (a) **inline comments (TOP PRIORITY)** — segment every file into labelled comment SECTIONS (sk-code / opencode style), **enforced + applied everywhere**; `@ds` grammar + durable WHY, no ephemeral labels; (b) **architecture** — refine `pages/`+`shared/` layout, boundaries, `*.svelte.ts` factories; (c) **styling structure** — scoped-`<style>` + `app.css` token layering, easy to find/change a surface's CSS; (d) **docs & editing ease** — per-folder **code README** (structure/logic) + **feature README** (what/why); a designer opens one file, sees the whole component. HARD: zero rendered-value/a11y/security/routing change (cutover gates prove it). Council also sequences 008/009.
-2. **`008-sk-code-svelte-refactor`** (isolated Public worktree): finalize the Svelte conventions surface (`sk-code`) — encode + lint the 007-ext conventions (incl. comment segmentation) so edits stay on-pattern.
-3. **`009-storybook-experience`** (spec-only, AFTER 007-ext + 008): **dummy-proof + self-maintaining** Storybook — one-command non-tech launch; addons (a11y, vitest, themes, autodocs, designs); story-per-component + coverage gate + AI scaffold.
+## Phases (graph — advance autonomously)
+1. **007-EXT quality/DX pass:** (a) **inline comments TOP PRIORITY** — segment every file into labelled comment SECTIONS (sk-code/opencode style), `@ds` grammar + durable WHY, no ephemeral labels; (b) architecture (`$shared` alias, boundaries, `*.svelte.ts` factories); (c) styling structure (scoped-`<style>` + `app.css` token layering); (d) docs ✅. HARD: zero rendered-value/a11y/security/routing change — the 9 gates + a per-file unchanged-fence-TEXT diff prove it.
+2. **008-sk-code-svelte-refactor:** encode + lint the 007-ext conventions (incl. comment segmentation) in `sk-code` so edits stay on-pattern.
+3. **009-storybook-experience:** dummy-proof + self-maintaining Storybook — one-command launch; a11y/vitest/themes/autodocs addons; story-per-component + coverage gate + AI scaffold.
 4. Cleanup: drop the 3 retired `style.css`-oracle scripts.
 
-## Research input (AFTER council + phase update — feeds the phases)
-**Context-repo deep research:** 5 sibling chat repos in `specs/context/`. Per repo a fresh Opus-5 xhigh agent scopes research angles (ease-of-use · architecture · UX · logic), then **10 deep-research iterations** each. Read-only (protected); findings refine 007-ext/008/009, never override frozen contracts.
+## Research (background ‖ phases; feeds them)
+5 sibling chat repos in `specs/context/` (READ-ONLY, protected). Per repo: fresh Opus-5 xhigh scopes angles (ease-of-use · architecture · UX · logic) → **10 deep-research iterations**. Findings refine 007-ext/008/009, never override frozen contracts. Run via `NODE_PRESERVE_SYMLINKS=1 opencode /deep:research` (luna; GLM fallback).
 
-## Execution model
-Claude orchestrates + **verifies each layer**; owns git, barrier/shared files, `npm install`. Executor writes `app-mobile/**` (a11y = **gpt-5.6-luna**, else **cli-devin**): WRITE = one dir; BANNED = install/config/token/security/routing/a11y changes; Claude re-verifies.
+## Execution
+Claude orchestrates + **verifies each layer**; owns git, barrier/shared files, config, `npm install`. Executor writes `app-mobile/**` source (a11y=gpt-5.6-luna, else cli-pi/cli-devin): WRITE=one dir; BANNED=install/config/token/security/routing/a11y changes; Claude diff-inspects (comment-only) + gates.
 
 ## Gates
-build · svelte-check · `npm test` · `test:web` · token-identity 0-diff (3 themes) · contrast + ≥76 fences · CDP 390px · catalog smoke · `validate.sh --strict`. `008`: `package_skill.py --check` + comment-section lint. `009`: build-storybook · catalog-smoke · story-coverage · addon-vitest.
+build · svelte-check · `npm test` · `test:web` · token-identity 0-diff (3 themes) · contrast + ≥76 fences · CDP 390px · catalog smoke · `validate.sh --strict`.

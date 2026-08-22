@@ -6,9 +6,12 @@
   import ArtifactViewerProvider from '../../src/lib/artifacts/ArtifactViewerProvider.svelte';
   import InboundImageTriggerChild from './InboundImageTriggerChild.svelte';
 
-  let { block }: { block: InboundImageReadyBlock } = $props();
+  let {
+    block,
+    label,
+  }: { block: InboundImageReadyBlock; label?: string } = $props();
 </script>
 
 <ArtifactViewerProvider>
-  <InboundImageTriggerChild {block} />
+  <InboundImageTriggerChild {block} {label} />
 </ArtifactViewerProvider>

@@ -5,7 +5,10 @@
 
   import { getArtifactViewer } from '../../src/lib/artifacts/ArtifactViewerProvider.svelte';
 
-  let { block }: { block: InboundImageReadyBlock } = $props();
+  let {
+    block,
+    label = 'Open screenshot',
+  }: { block: InboundImageReadyBlock; label?: string } = $props();
 
   const viewer = getArtifactViewer();
 </script>
@@ -14,5 +17,5 @@
   type="button"
   onclick={(event) => viewer.openInboundImage(block, event.currentTarget, null)}
 >
-  Open screenshot
+  {label}
 </button>

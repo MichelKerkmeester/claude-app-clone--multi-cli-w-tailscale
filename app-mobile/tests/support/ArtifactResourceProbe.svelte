@@ -6,7 +6,7 @@
   // snapshot fields into the DOM for the test to read. Reload/Close buttons
   // expose the snapshot's reload()/close() actions, and rerender({ block })
   // drives the block-prop change path the React hook.rerender exercised.
-  import { useArtifactResource } from '../../src/lib/artifacts/useArtifactResource.svelte.js';
+  import { useArtifactResource, type ArtifactResourceSnapshot } from '../../src/lib/artifacts/useArtifactResource.svelte.js';
   import type {
     ArtifactResource,
     ArtifactResourceBlock,
@@ -19,6 +19,7 @@
     read,
     variant = 'full',
     requireImageDecode = false,
+    onSnapshot,
   }: {
     sessionId: string;
     block: ArtifactResourceBlock;
@@ -30,6 +31,7 @@
     ) => Promise<ArtifactResource>;
     variant?: ArtifactReadVariant;
     requireImageDecode?: boolean;
+    onSnapshot?: (snapshot: ArtifactResourceSnapshot) => void;
   } = $props();
 
   const resource = useArtifactResource(
@@ -39,6 +41,14 @@
   );
 
   const snapshot = $derived(resource.current);
+
+  // Mirrors the React renderHook `hook.result.current` access: hands the live
+  // snapshot (with real bytes/buffer/objectUrl, not just their DOM projections)
+  // to the test on every state change so artifact-memory can assert on the
+  // verified binary bytes and the text buffer exactly as the React oracle did.
+  $effect(() => {
+    onSnapshot?.(snapshot);
+  });
 </script>
 
 <div data-testid="status">{snapshot.status}</div>

@@ -170,14 +170,14 @@ export function useHostCommandCatalog(
     // Reconnect is the moment authority changes: entering live refreshes the
     // scope, while an already-live mount keeps the single prefetch.
     if (connection === 'live' && previousConnectionRef !== 'live') {
-      void refresh(previousConnectionRef === null ? 'initial' : 'reconnect');
+      untrack(() => void refresh(previousConnectionRef === null ? 'initial' : 'reconnect'));
     }
     previousConnectionRef = connection;
   });
 
   $effect(() => {
     getSessionId();
-    void refresh('initial');
+    untrack(() => void refresh('initial'));
     return () => {
       requestIdRef += 1;
       controllerRef?.abort();

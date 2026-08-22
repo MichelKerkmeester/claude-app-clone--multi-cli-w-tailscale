@@ -22,6 +22,7 @@
 </script>
 
 <script lang="ts">
+  // @ds surface: SecureImagePreview — sanitized image preview with pointer and keyboard zoom and pan.
   let {
     objectUrl,
     alt,

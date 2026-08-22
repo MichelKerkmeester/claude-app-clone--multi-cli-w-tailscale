@@ -13,6 +13,7 @@
 </script>
 
 <script lang="ts">
+  // @ds surface: ArtifactDetails — openable definition list of image-artifact metadata.
   interface Props {
     model: ArtifactDetailsModel;
     open: boolean;

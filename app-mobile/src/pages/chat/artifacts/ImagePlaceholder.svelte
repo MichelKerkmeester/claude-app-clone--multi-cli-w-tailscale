@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds surface: ImagePlaceholder — empty inbound-image well shown while pixels are unavailable.
   interface Props {
     aspectRatio?: number | null;
     state: string;

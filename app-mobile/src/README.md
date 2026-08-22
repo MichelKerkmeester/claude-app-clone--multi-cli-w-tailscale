@@ -1,122 +1,75 @@
 ---
-title: 'Web Source: State, Cache, Relay, Auth and Attention Zones'
-description: 'Zone map for the browser client, from the relay client to the state reducers and the offline cache.'
+title: 'Web source: screen map (routes → pages → shared)'
+description: 'The canonical route→folder→file map for the Svelte SPA: where each screen lives and how the shell, pages, and shared layers fit together.'
 trigger_phrases:
   - 'pi remote web source'
-  - 'web client zones'
+  - 'svelte screen map'
+  - 'where does this screen live'
 ---
 
-# Web Source: State, Cache, Relay, Auth and Attention Zones
+# Web source — screen map
 
----
+`src/` is the browser client for `@pi-remote/web`: a **Svelte 5 / SvelteKit SPA** (client-side only — `ssr = false`, `prerender = false`). Every screen and component is one `.svelte` file (markup + scoped `<style>` + typed `<script>`); all logic lives in `shared/data/`.
 
-## 1. OVERVIEW
+Open a screen by following the route to its page folder to the component file. This document is that map.
 
-`src/` owns the browser client for `@pi-remote/web`. `App.tsx` composes the views, `relay.ts` and `auth.ts` own all fetch and WebSocket traffic, `state.ts` owns the reducers, `cache.ts` owns the offline snapshot, and `attention.ts` owns the attention inbox and push subscriptions.
+## The URL surface (`routes/`)
 
-Current state:
+Only **three URLs** exist; Review and Inbox are overlays, and Enrollment is an auth branch (not a route).
 
-- `state.ts` runs three reducers: connection, session list and transcript
-- `cache.ts` persists a bounded read-only snapshot under the `pi-remote.read-only.v1` key
-- `relay.ts` is the only module that calls `/api` endpoints
-- `auth.ts` stores the device key in IndexedDB under `pi-remote-device-v1`
+| URL | Route file | Renders |
+|-----|-----------|---------|
+| `/` | `routes/+page.svelte` | `pages/home/Home.svelte` (session roster) |
+| `/session/[id]` | `routes/session/[id]/+page.svelte` | `pages/chat/Chat.svelte` (the conversation) |
+| `/attention/[lookupId]` | `routes/attention/[lookupId]/+page.svelte` | resolves the lookup, then redirects to the Review overlay or the target session |
 
----
+- `routes/+layout.svelte` is the **app shell**: it mounts the context providers, theme, and service-worker registration, and hosts the **Review / Inbox overlays** above the routed page.
+- `routes/+layout.ts` pins `ssr = false; prerender = false`.
+- Pages read state + actions from the shell via context (`getAppState` / `getAppActions` from `shared/data/app-state.svelte.ts`); they don't fetch directly.
 
-## 2. ARCHITECTURE
+> The conversation view's file is `pages/chat/Chat.svelte`. The `/session/[id]` route and the internal session-protocol names are unchanged — the route still imports it as `Session`.
+
+## Folder layout
 
 ```text
-╭──────────────────────────────────────────────────────────────────╮
-│                            src/                                  │
-╰──────────────────────────────────────────────────────────────────╯
-
-┌─────────────┐      ┌────────────────┐      ┌────────────────────┐
-│ App.tsx     │ ───▶ │ relay.ts       │ ───▶ │ Relay /api         │
-│ views       │      │ WebSocket sync │      │ /api/sync          │
-└──────┬──────┘      └────────────────┘      └────────────────────┘
-       │
-       ├──▶ auth.ts ───────▶ /api/auth/* (enroll, session, revoke)
-       ├──▶ attention.ts ──▶ /api/attention*, /api/push*
-       │
-       ▼
-┌─────────────┐      ┌────────────────┐
-│ state.ts    │ ◀─── │ cache.ts       │
-│ reducers    │      │ localStorage   │
-└─────────────┘      └────────────────┘
-
-Dependency direction: App.tsx ───▶ relay.ts, auth.ts, attention.ts, state.ts, cache.ts
-state.ts ───▶ pi-rpc-protocol types only
+src/
+├─ routes/            SvelteKit route files (the 3 URLs + the shell layout)
+├─ pages/             one folder per screen
+│  ├─ home/           Home (roster) + EmptyState, Freshness, PushSettings
+│  ├─ chat/           Chat.svelte + its sub-areas:
+│  │  ├─ artifacts/     artifact/image/pdf/code viewers
+│  │  ├─ attachments/   attachment drafts + preview
+│  │  ├─ chrome/        composer, header, runtime strip, plan-mode, palette
+│  │  ├─ features/ask-question/   the ask-question card flow
+│  │  ├─ rich-content/  markdown/rich block rendering
+│  │  └─ transcript/    the transcript list + block rendering
+│  ├─ review/         Review overlay
+│  ├─ inbox/          Attention inbox overlay
+│  └─ enrollment/     device-enrollment auth gate
+├─ shared/
+│  ├─ primitives/     accessible UI primitives (Button + Bits UI wrappers) — see its README
+│  ├─ chrome/         shared chrome bits (Header, StatusPill, ThemeControl, …)
+│  └─ data/           the logic layer (relay, auth, reducers, runes stores) — see its README
+├─ app.css            global foundation: tokens, @font-face, theme blocks, resets
+└─ app.html           the SPA shell document
 ```
 
----
+Each folder carries its own `README.md` (what/why) and, where it earns one, a `CODE.md` (structure/logic).
 
-## 3. KEY FILES
+## Boundaries
 
-| File           | Responsibility                                                                                                                     |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `state.ts`     | `connectionReducer`, `sessionListReducer`, `transcriptReducer`, block normalization and validation                                 |
-| `cache.ts`     | `loadCache`, `saveCache`, 7 day max age, 8 sessions, 500 blocks                                                                    |
-| `relay.ts`     | `fetchSessions`, `submitPrompt`, `fetchApprovals`, `decideApproval`, `createAcceptEditsGrant`, `fetchTranscript`, `openSyncSocket` |
-| `auth.ts`      | `enrollDevice`, `establishSession`, `revokeDevice`, `logoutDevice`, `scanQrImage`                                                  |
-| `attention.ts` | `fetchAttention`, `openAttentionHint`, push config, subscribe and preferences                                                      |
-| `App.tsx`      | Root component, routing between Enrollment, Home, Session, Review and Inbox                                                        |
-| `style.css`    | Tailwind entry and app styles                                                                                                      |
-| `main.tsx`     | Bootstrap and service worker registration                                                                                          |
+- **Screens are thin.** A page renders; it takes state/actions via `$props()` or shell context. Behaviour lives in `shared/data/`.
+- **One socket, one cache, one auth store.** All relay traffic is in `shared/data/relay.ts`; storage in `cache.ts` (read-only snapshot) and `auth.ts` (device key). Don't open sockets or touch storage from a component.
+- **Styling is co-located.** A component's CSS is in its own scoped `<style>`; only genuinely shared/global rules live in `app.css`.
 
----
-
-## 4. BOUNDARIES AND FLOW
-
-| Boundary  | Rule                                                                                            |
-| --------- | ----------------------------------------------------------------------------------------------- |
-| Imports   | Views import from `state.js`, `relay.js`, `auth.js`, `attention.js` and `cache.js`              |
-| Exports   | App views and state functions are exported for the tests folder                                 |
-| Ownership | Relay HTTP and WebSocket traffic lives in `relay.ts`, storage lives in `cache.ts` and `auth.ts` |
-
-Main flow:
-
-```text
-╭──────────────────────────────────────────╮
-│ main.tsx mounts App                      │
-╰──────────────────────────────────────────╯
-                  │
-                  ▼
-┌──────────────────────────────────────────┐
-│ auth.ts establishSession                 │
-└──────────────────────────────────────────┘
-                  │
-                  ▼
-┌──────────────────────────────────────────┐
-│ relay.ts fetchSessions, fetchTranscript  │
-└──────────────────────────────────────────┘
-                  │
-                  ▼
-┌──────────────────────────────────────────┐
-│ state.ts reducers apply snapshot, delta  │
-└──────────────────────────────────────────┘
-                  │
-                  ▼
-┌──────────────────────────────────────────┐
-│ cache.ts saveCache on relay source       │
-└──────────────────────────────────────────┘
-```
-
----
-
-## 5. VALIDATION
-
-Run from the repository root.
+## Validate (from repo root)
 
 ```bash
+npm run build
+npm run typecheck   # svelte-check
 npm run test:web
-npm run typecheck -w @pi-remote/web
 ```
 
-Expected result: the web suite passes and TypeScript reports no errors.
+## Related
 
----
-
-## 6. RELATED
-
-- [`Package README`](../README.md)
-- [`tests/` README](../tests/README.md)
+- [Package README](../README.md) · [`shared/primitives/README.md`](./shared/primitives/README.md) · [`shared/data/README.md`](./shared/data/README.md)

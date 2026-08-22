@@ -1,5 +1,42 @@
 @import 'tailwindcss';
 
+/* ============================================================================
+   app.css — the single GLOBAL stylesheet for the Pi Remote web app.
+   ----------------------------------------------------------------------------
+   It holds two things ONLY, so a designer knows exactly what lives here:
+     1. The design-token cascade — @theme (type / radius / easing) plus the
+        :root primitive -> semantic -> component tokens, re-themed by
+        prefers-color-scheme and [data-theme]. Change a token here and every
+        surface re-inks; the WCAG on-ink/on-surface invariant is frozen.
+     2. SHARED surfaces — CSS used by two or more components (focus-ring,
+        app-shell, topbar, chrome-button, status, routed-frame, overlay, the
+        per-view roots, artifact-viewer, ...). Single-component CSS lives in
+        that component's own scoped <style>, never here.
+
+   @ds MARKER GRAMMAR (the key to the ~650 markers below):
+     @ds surface: <name>        start of a styling surface (pairs with end)
+     @ds end surface: <name>    close of that surface's block
+     @ds slot: <name>           a named sub-part / element within a surface
+     @ds state: <name>          a visual state (hover / pressed / loading / ...)
+     @ds variant: <name>        a structural variant of a surface
+     @ds theme [...]            the shared design-scale block
+     @ds edit: <kind>           DESIGNER-EDITABLE — safe to tune (colour/layout/tokens)
+     @ds guardrail: do-not-edit FROZEN — behavioural / a11y / security; never change
+
+   FILE MAP (source order; names not line numbers, so it never goes stale):
+     @theme + :root ...... design tokens (light) then dark + [data-theme] overrides
+     focus-ring / status . shared a11y focus ring + status/badge conventions
+     app-shell / topbar .. global chrome (header, nav, chrome-button, theme-switcher)
+     routed-frame ........ shared page scaffold (home / session / review / inbox)
+     home / enrollment ... per-view roots that are shared or cross-referenced
+     composer / plan-* ... chat chrome shared surfaces + their overlays
+     ask-question / todos  interactive card surfaces (+ their keyframes)
+     rich-content / code . transcript rich-block, code, and preview surfaces
+     artifact-viewer ..... the full-screen viewer + its preview sub-surfaces
+                           (preview-controls, find, text/code/diff/loading previews)
+     :root (tail) ........ remaining themed token blocks + guardrail @media queries
+   ============================================================================ */
+
 /* Self-hosted fonts keep the interface typography available in an offline-installed PWA. */
 @font-face {
   font-family: 'Source Serif 4';

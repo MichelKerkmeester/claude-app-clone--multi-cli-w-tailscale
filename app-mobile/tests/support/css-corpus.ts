@@ -9,7 +9,7 @@
 
 import { readFileSync, readdirSync } from 'node:fs';
 
-// Unwrap one level of :global(...); Svelte does not nest it in practice. Mirrors decl-equivalence.mjs.
+// Unwrap one level of :global(...); Svelte does not nest it in practice.
 function stripGlobal(css: string): string {
   return css.replace(/:global\(([^()]*)\)/g, '$1');
 }

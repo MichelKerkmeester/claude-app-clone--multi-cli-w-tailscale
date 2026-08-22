@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Durable WHY: the migration's static gates (svelte-check, decl-equivalence, token-identity) all
+// Durable WHY: the migration's static gates (svelte-check, token-identity) all
 // pass on code that CRASHES when actually run — a class of ported React-useEffect -> Svelte-$effect
 // self-invalidation (a synchronous dispatch reduces its own $state, so the effect takes that state
 // as a dep and re-fires on its own write -> effect_update_depth_exceeded). Static analysis cannot

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Ask-Question Answer Mutation
+// ───────────────────────────────────────────────────────────────────
+
 import {
   askQuestionAnswerDigest,
   isAskQuestionAnswer,

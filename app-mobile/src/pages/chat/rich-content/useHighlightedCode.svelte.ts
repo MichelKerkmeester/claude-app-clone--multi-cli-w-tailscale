@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Code Syntax Highlighting
+// ───────────────────────────────────────────────────────────────────
+
 export const HIGHLIGHT_MAX_CHARS = 20_000;
 export const HIGHLIGHT_MAX_LINES = 1_000;
 

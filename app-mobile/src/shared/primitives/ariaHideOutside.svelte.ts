@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Aria Hide-Outside
+// ───────────────────────────────────────────────────────────────────
+
 import { getContext, setContext } from 'svelte';
 
 export const SHEET_CONTEXT = Symbol('sheet-context');

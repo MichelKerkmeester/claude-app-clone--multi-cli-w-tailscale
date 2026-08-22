@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Model Catalog Organization
+// ───────────────────────────────────────────────────────────────────
+
 import type { AvailableModelDto } from '@pi-remote/pi-rpc-protocol';
 
 export interface ModelCatalogGroup {

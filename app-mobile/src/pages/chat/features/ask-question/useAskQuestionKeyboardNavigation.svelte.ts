@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Ask-Question Keyboard Navigation
+// ───────────────────────────────────────────────────────────────────
+
 export interface UseAskQuestionKeyboardNavigationOptions {
   readonly identity: string | null;
   readonly enabled: boolean;

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Viewer History
+// ───────────────────────────────────────────────────────────────────
+
 // Ported from the React artifacts/useArtifactHistory.ts. createArtifactHistory is the pure,
 // framework-agnostic controller (verbatim). useArtifactHistory is the Svelte 5 runes wrapper:
 // a component <script> runs once per instance, so the controller is created once and disposed on

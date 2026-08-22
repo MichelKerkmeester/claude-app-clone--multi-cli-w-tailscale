@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Copy-to-Clipboard Feedback
+// ───────────────────────────────────────────────────────────────────
+
 export const COPY_FAILURE_MESSAGE = 'Copy failed. Touch and hold to select the text.';
 
 export interface CopyFeedback {

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Todo Projection State Reducers
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isTodoProjectionDeltaV1,
   isTodoProjectionV1,

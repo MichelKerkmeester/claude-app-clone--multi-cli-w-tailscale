@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Resource Loading
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isFilePreviewBlock,
   isInboundImageReadyBlock,

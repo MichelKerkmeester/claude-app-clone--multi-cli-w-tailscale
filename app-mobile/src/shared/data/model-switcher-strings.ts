@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Model Switcher Strings
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeControlOutcome } from '@pi-remote/pi-rpc-protocol';
 
 export const modelSwitcherStrings = {

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Ask-Question Form State
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   AskQuestionAnswer,
   AskQuestionAnswerResult,

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Time & Value Formatting
+// ───────────────────────────────────────────────────────────────────
+
 export function formatTime(value: string): string {
   return new Intl.DateTimeFormat(undefined, {
     hour: '2-digit',

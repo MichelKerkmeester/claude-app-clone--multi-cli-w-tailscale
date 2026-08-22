@@ -1,0 +1,29 @@
+{
+  "specFolder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/mobilecli",
+  "description": "Deep-research packet mining specs/context/mobilecli-main (READ-ONLY) for adoptable patterns for the Pi Remote SvelteKit mobile PWA: Attach-v2 reconnection state machine and its handoff fix, wait-state detection reducer, device pairing auth, QR onboarding, filesystem bridge contract, and push event model.",
+  "keywords": [
+    "mobilecli",
+    "pattern",
+    "mining",
+    "pi-remote",
+    "sveltekit",
+    "pwa",
+    "attach-v2",
+    "reconnection",
+    "wait-state",
+    "detection",
+    "pairing",
+    "challenge-response",
+    "qr-onboarding",
+    "filesystem-contract",
+    "push-notifications"
+  ],
+  "trigger_phrases": [
+    "mobilecli pattern mining",
+    "pi remote adoptable patterns research",
+    "attach-v2 reconnection research"
+  ],
+  "importance_tier": "important",
+  "lastUpdated": "2026-08-22T23:45:00.000Z",
+  "specId": "mobilecli"
+}

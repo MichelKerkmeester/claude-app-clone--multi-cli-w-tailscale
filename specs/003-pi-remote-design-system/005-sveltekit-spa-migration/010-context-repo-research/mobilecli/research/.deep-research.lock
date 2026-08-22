@@ -1,0 +1,11 @@
+{
+  "owner_pid": 60142,
+  "started_at_iso": "2026-08-22T22:15:15.080Z",
+  "ttl_ms": 300000,
+  "last_heartbeat_iso": "2026-08-22T22:15:15.080Z",
+  "packet_id": "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/mobilecli",
+  "runtime_kind": "main",
+  "phase": "running",
+  "last_activity_iso": "2026-08-22T22:15:15.080Z",
+  "acquire_nonce": "60142-1787436915081-e66cf545-9006-4ca0-8ec2-18754d5c5fc7"
+}

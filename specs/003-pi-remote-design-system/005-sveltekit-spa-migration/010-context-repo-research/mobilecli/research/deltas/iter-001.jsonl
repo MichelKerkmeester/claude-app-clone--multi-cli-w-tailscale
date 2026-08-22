@@ -1,0 +1,15 @@
+{"type":"iteration","iteration":1,"mode":"research","target_agent":"deep-research","agent_definition_loaded":true,"resolved_route":"Resolved route: mode=research target_agent=deep-research","newInfoRatio":0.82,"status":"insight","focus":"Attach-v2 reconnection architecture: deterministic clear, chunked snapshot replay, AttachReady barrier, live handoff, and bounded scrollback"}
+{"type":"finding","id":"f-iter001-001","severity":"P1","label":"Attach-v2 provides a replaceable clear/replay/ready/live state machine keyed by session and attach identity","iteration":1}
+{"type":"finding","id":"f-iter001-002","severity":"P1","label":"last_seen_seq labels reconnect but the inspected server path still performs full snapshot replay","iteration":1}
+{"type":"finding","id":"f-iter001-003","severity":"P2","label":"The 8 MiB scrollback ring and 48 KiB snapshot chunks are adoptable replay bounds","iteration":1}
+{"type":"finding","id":"f-iter001-004","severity":"P1","label":"Attach registration is deferred until after bootstrap, but last_live_seq and lag recovery semantics need an explicit high-water-mark contract","iteration":1}
+{"type":"finding","id":"f-iter001-005","severity":"P2","label":"PTY and tmux can share one attach state machine while using different canonical snapshot producers","iteration":1}
+{"type":"invariant","id":"inv-iter001-001","label":"Frames from an old attach identity must not mutate the current session view","iteration":1}
+{"type":"invariant","id":"inv-iter001-002","label":"A reconnect must establish a deterministic empty baseline before replay bytes are applied","iteration":1}
+{"type":"invariant","id":"inv-iter001-003","label":"A live handoff must define a sequence high-water mark and gap recovery behavior","iteration":1}
+{"type":"observation","id":"obs-iter001-001","packet":"mobilecli","classification":"real","iteration":1}
+{"type":"observation","id":"obs-iter001-002","packet":"mobilecli","classification":"real","iteration":1}
+{"type":"edge","id":"e-iter001-001","relation":"SUPPORTS","source":"f-iter001-001","target":"inv-iter001-001","iteration":1}
+{"type":"edge","id":"e-iter001-002","relation":"SUPPORTS","source":"f-iter001-001","target":"inv-iter001-002","iteration":1}
+{"type":"edge","id":"e-iter001-003","relation":"SUPPORTS","source":"f-iter001-004","target":"inv-iter001-003","iteration":1}
+{"type":"ruled_out","direction":"incremental reconnect replay from last_seen_seq is already implemented by the inspected server path","reason":"last_seen_seq is used to label reconnect and log the request, while the attach path still collects and replays the current snapshot","iteration":1}

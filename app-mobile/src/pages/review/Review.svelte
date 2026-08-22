@@ -7,19 +7,23 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import type { ApprovalCardDto } from '@pi-remote/pi-rpc-protocol';
   import { loadApprovals, messageFrom, relativeTime, countdown } from '../../shared/data/view-helpers.js';
   import { decideApproval, createAcceptEditsGrant } from '../../shared/data/relay.js';
   import Button from '../../shared/primitives/Button.svelte';
 
+  // ─── Props ───────────────────────────────
   let { sessions, onBack, focusId }: ReviewProps = $props();
 
+  // ─── Local state ───────────────────────────────
   let approvals = $state<readonly ApprovalCardDto[]>([]);
   let pendingId = $state<string | null>(null);
   let grant = $state<{ readonly remainingActions: number; readonly expiresAt: string } | null>(null);
   let error = $state<string | null>(null);
   let now = $state(Date.now());
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     const controller = new AbortController();
     void loadApprovals(sessions, controller.signal)
@@ -49,6 +53,7 @@
     }
   });
 
+  // ─── Handlers ───────────────────────────────
   function decide(approval: ApprovalCardDto, decision: 'approve' | 'deny'): void {
     pendingId = approval.approvalId;
     error = null;
@@ -64,6 +69,7 @@
       });
   }
 
+  // ─── Derived state ───────────────────────────────
   const pending = $derived(approvals.filter((approval) => approval.status === 'pending'));
 </script>
 

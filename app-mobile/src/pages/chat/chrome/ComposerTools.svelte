@@ -31,12 +31,14 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { Popover } from 'bits-ui';
   import { hideOutside } from '../../../shared/primitives/ariaHideOutside.svelte.js';
   import Button from '../../../shared/primitives/Button.svelte';
   import CommandPalette from './CommandPalette.svelte';
   import { ATTACHMENT_ACCEPT } from '../attachments/attachment-state.js';
 
+  // ─── Props ───────────────────────────────
   let {
     runtimeControls,
     catalog,
@@ -48,19 +50,23 @@
     onShiftTabPreferenceChange,
   }: ComposerToolsProps = $props();
 
+  // ─── Derived state ───────────────────────────────
   const runtime = $derived(runtimeControls.runtime);
 
+  // ─── Local state ───────────────────────────────
   // Popover open state; bind:open keeps the local copy in sync while onOpenChange
   // reports every transition to the host (non-optimistic, host-confirmed).
   let open = $state(false);
   let contentEl = $state<HTMLElement | null>(null);
   let toolsDialogEl = $state<HTMLElement | null>(null);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     if (contentEl === null) return;
     return hideOutside([contentEl]);
   });
 
+  // ─── Handlers ───────────────────────────────
   function handleOpenChange(next: boolean): void {
     onOpenChange(next);
   }

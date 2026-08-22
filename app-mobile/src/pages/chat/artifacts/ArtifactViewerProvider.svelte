@@ -144,6 +144,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import ArtifactViewerHost from './ArtifactViewerHost.svelte';
   import {
     clearArtifactFullResourceStore,
@@ -151,12 +152,14 @@
   } from './useArtifactResource.svelte.js';
   import { useArtifactHistory } from './useArtifactHistory.svelte.js';
 
+  // ─── Props ───────────────────────────────
   let { children }: { readonly children: Snippet } = $props();
 
   // @ds surface: artifact-viewer-provider — the viewer state machine plus privacy lifecycle.
   // @ds guardrail: do-not-edit — the phase machine, dismissal choreography, generation guards,
   // timer bookkeeping, focus/scroll restoration, and the privacy-curtain lifecycle below are
   // behavioural and NOT designer-editable. Styling is edited in the artifact-viewer surface blocks.
+  // ─── Local state ───────────────────────────────
   let phase = $state<ArtifactViewerPhase>('closed');
   let preview = $state<ArtifactPreview | null>(null);
   let generationCounter = 0;
@@ -167,6 +170,7 @@
 
   const history = useArtifactHistory(() => close('history'));
 
+  // ─── Handlers ───────────────────────────────
   function clearTimers(): void {
     if (openingTimer !== null) window.clearTimeout(openingTimer);
     if (exitingTimer !== null) window.clearTimeout(exitingTimer);
@@ -333,6 +337,7 @@
     }, 0);
   }
 
+  // ─── Effects ───────────────────────────────
   $effect(() => () => {
     clearTimers();
     purgeViewerPixelNodes();

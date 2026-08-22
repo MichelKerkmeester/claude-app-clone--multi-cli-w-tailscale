@@ -75,6 +75,7 @@
 
   let overflowOpen = $state(false);
   let overflowContentEl = $state<HTMLElement | null>(null);
+  let overflowDialogEl = $state<HTMLElement | null>(null);
 
   $effect(() => {
     if (overflowContentEl === null) return;
@@ -150,7 +151,12 @@
   <Popover.Root bind:open={overflowOpen}>
     <Popover.Trigger>
       {#snippet child({ props })}
-        <Button {...props} class="session-header-icon" aria-label="More: navigation and theme">
+        <Button
+          {...props}
+          aria-haspopup={undefined}
+          class="session-header-icon"
+          aria-label="More: navigation and theme"
+        >
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
             <circle cx="5" cy="12" r="1.7" fill="currentColor" />
             <circle cx="12" cy="12" r="1.7" fill="currentColor" />
@@ -164,8 +170,27 @@
       side="bottom"
       align="end"
       bind:ref={overflowContentEl}
+      onOpenAutoFocus={(event) => {
+        event.preventDefault();
+        overflowDialogEl?.focus();
+      }}
     >
-      <div class="session-sheet" role="dialog" aria-label="Navigation and theme">
+      <button
+        type="button"
+        class="sr-only"
+        tabindex="-1"
+        aria-label="Dismiss"
+        onclick={() => {
+          overflowOpen = false;
+        }}
+      ></button>
+      <div
+        class="session-sheet"
+        role="dialog"
+        aria-label="Navigation and theme"
+        tabindex="-1"
+        bind:this={overflowDialogEl}
+      >
         <section class="tools-group">
           <span class="tools-label">Go to</span>
           <!-- @ds slot: nav — Inbox · Review. -->
@@ -202,6 +227,15 @@
           </div>
         </section>
       </div>
+      <button
+        type="button"
+        class="sr-only"
+        tabindex="-1"
+        aria-label="Dismiss"
+        onclick={() => {
+          overflowOpen = false;
+        }}
+      ></button>
     </Popover.Content>
   </Popover.Root>
 </header>

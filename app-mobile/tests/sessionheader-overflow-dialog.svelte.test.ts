@@ -117,6 +117,9 @@ afterEach(() => {
 describe('SessionHeader overflow dialog', () => {
   it('renders navigation and theme with dialog and toggle-button semantics', async () => {
     renderHeader();
+    expect(
+      screen.getByRole('button', { name: 'More: navigation and theme' }),
+    ).not.toHaveAttribute('aria-haspopup');
     const { dialog, user } = await openOverflow();
 
     expect(dialog).toBeInTheDocument();
@@ -144,6 +147,32 @@ describe('SessionHeader overflow dialog', () => {
     );
 
     await user.click(within(themeGroup).getByRole('button', { name: 'Use dark theme' }));
+  });
+
+  it('focuses the dialog container on open before tabbing into navigation', async () => {
+    renderHeader();
+    const { dialog, user } = await openOverflow();
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    );
+
+    expect(dialog).toHaveFocus();
+    await user.keyboard('{Tab}');
+    expect(within(dialog).getByRole('button', { name: 'Inbox' })).toHaveFocus();
+  });
+
+  it('provides two dismiss buttons that close the dialog', async () => {
+    renderHeader();
+    const { user } = await openOverflow();
+    const dismissButtons = screen.getAllByRole('button', { name: 'Dismiss' });
+
+    expect(dismissButtons).toHaveLength(2);
+    for (const dismissButton of dismissButtons) {
+      expect(dismissButton).toHaveAttribute('tabindex', '-1');
+    }
+
+    await user.click(dismissButtons[0]);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('routes Inbox and Review through ordinary buttons and reports theme changes', async () => {

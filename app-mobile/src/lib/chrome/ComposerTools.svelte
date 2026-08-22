@@ -54,6 +54,7 @@
   // reports every transition to the host (non-optimistic, host-confirmed).
   let open = $state(false);
   let contentEl = $state<HTMLElement | null>(null);
+  let toolsDialogEl = $state<HTMLElement | null>(null);
 
   $effect(() => {
     if (contentEl === null) return;
@@ -124,6 +125,7 @@
     {#snippet child({ props })}
       <Button
         {...props}
+        aria-haspopup={undefined}
         class="composer-plus"
         data-attachment-plus={mediaAvailable ? true : undefined}
         aria-label={mediaAvailable ? 'Add photo, mode, or command' : 'Mode and commands'}
@@ -132,8 +134,32 @@
       </Button>
     {/snippet}
   </Popover.Trigger>
-  <Popover.Content class="composer-tools-popover" side="top" align="start" bind:ref={contentEl}>
-    <div class="composer-tools" role="dialog" aria-label="Session tools">
+  <Popover.Content
+    class="composer-tools-popover"
+    side="top"
+    align="start"
+    bind:ref={contentEl}
+    onOpenAutoFocus={(event) => {
+      event.preventDefault();
+      toolsDialogEl?.focus();
+    }}
+  >
+    <button
+      type="button"
+      class="sr-only"
+      tabindex="-1"
+      aria-label="Dismiss"
+      onclick={() => {
+        open = false;
+      }}
+    ></button>
+    <div
+      class="composer-tools"
+      role="dialog"
+      aria-label="Session tools"
+      tabindex="-1"
+      bind:this={toolsDialogEl}
+    >
       {#if mediaAvailable}
         <section class="tools-group tools-photo-group" aria-labelledby="photo-tools-label">
           <span class="tools-label" id="photo-tools-label">
@@ -212,6 +238,15 @@
         {statusHint(runtime.status, runtime.pending !== null)}
       </span>
     </div>
+    <button
+      type="button"
+      class="sr-only"
+      tabindex="-1"
+      aria-label="Dismiss"
+      onclick={() => {
+        open = false;
+      }}
+    ></button>
   </Popover.Content>
 </Popover.Root>
 

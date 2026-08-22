@@ -19,7 +19,7 @@
 import type { RuntimeModelCatalogDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/runtime.js';
 import PlanModeButton from '../src/lib/chrome/PlanModeButton.svelte';
@@ -90,6 +90,10 @@ function renderMenu(overrides: MenuOverrides = {}) {
     ...view,
   };
 }
+
+beforeEach(() => {
+  document.body.style.cssText = '';
+});
 
 afterEach(() => {
   cleanup();
@@ -163,7 +167,8 @@ describe('PlanModeMenu mutation discipline', () => {
   it('Enter activates the focused row and reports only that target', async () => {
     const user = userEvent.setup();
     const { onSelectPlan, onSelectBuild, openMenu } = renderMenu();
-    await openMenu(user);
+    const menu = await openMenu(user);
+    await waitFor(() => expect(menu).toContainElement(document.activeElement));
     // Build is the confirmed mode, so its row is disabled; arrow movement
     // lands focus on the enabled Plan row, and Enter activates it.
     await user.keyboard('{ArrowDown}');

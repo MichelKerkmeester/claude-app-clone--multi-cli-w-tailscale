@@ -16,16 +16,16 @@ Re-home the Pi Remote phone UI onto **Svelte 5 / SvelteKit (SPA/CSR)** — every
 - Board green — all 9 gates pass.
 
 ## Remaining (in order)
-1. **`007` EXTENSION — quality/DX pass (NEXT; approach set by a fresh Opus-5 xhigh AI council).** Make the Svelte-only, byte-identical app truly *editable*: (a) **inline comments** — segment every file into labelled comment SECTIONS (sk-code / opencode section style), **enforced + applied everywhere**; consistent `@ds` grammar + durable WHY, no ephemeral labels; (b) **architecture** — refine `pages/`+`shared/` layout, boundaries, `*.svelte.ts` factories; (c) **styling structure** — scoped-`<style>` + `app.css` token layering, easy to find/change a surface's CSS; (d) **editing ease** — a designer opens one file, sees the whole component. HARD: zero rendered-value/a11y/security/routing change (cutover gates prove it). Council also sequences 008/009.
+1. **`007` EXTENSION — quality/DX pass (NEXT; approach set by a fresh Opus-5 xhigh AI council).** Make the Svelte-only, byte-identical app truly *editable*: (a) **inline comments (TOP PRIORITY)** — segment every file into labelled comment SECTIONS (sk-code / opencode style), **enforced + applied everywhere**; `@ds` grammar + durable WHY, no ephemeral labels; (b) **architecture** — refine `pages/`+`shared/` layout, boundaries, `*.svelte.ts` factories; (c) **styling structure** — scoped-`<style>` + `app.css` token layering, easy to find/change a surface's CSS; (d) **docs & editing ease** — per-folder **code README** (structure/logic) + **feature README** (what/why); a designer opens one file, sees the whole component. HARD: zero rendered-value/a11y/security/routing change (cutover gates prove it). Council also sequences 008/009.
 2. **`008-sk-code-svelte-refactor`** (isolated Public worktree): finalize the Svelte conventions surface (`sk-code`) — encode + lint the 007-ext conventions (incl. comment segmentation) so edits stay on-pattern.
 3. **`009-storybook-experience`** (spec-only, AFTER 007-ext + 008): **dummy-proof + self-maintaining** Storybook — one-command non-tech launch; addons (a11y, vitest, themes, autodocs, designs); story-per-component + coverage gate + AI scaffold.
 4. Cleanup: drop the 3 retired `style.css`-oracle scripts.
 
 ## Research input (AFTER council + phase update — feeds the phases)
-**Context-repo deep research:** 5 sibling mobile-chat repos in `specs/context/`. Per repo a fresh Opus-5 xhigh agent scopes research angles (ease-of-use · architecture · UX · logic), then **10 deep-research iterations** mine adoptable patterns. Read-only (protected); findings refine 007-ext/008/009, never override frozen contracts.
+**Context-repo deep research:** 5 sibling chat repos in `specs/context/`. Per repo a fresh Opus-5 xhigh agent scopes research angles (ease-of-use · architecture · UX · logic), then **10 deep-research iterations** each. Read-only (protected); findings refine 007-ext/008/009, never override frozen contracts.
 
 ## Execution model
-Claude orchestrates + **verifies each layer**; owns git, barrier/shared files, every `npm install`. App code + tests under `app-mobile/**` by the executor (a11y = **gpt-5.6-luna**, else **cli-devin**): WRITE = one dir; BANNED = install/config/token/security/routing/a11y changes; return svelte-check for Claude to re-verify.
+Claude orchestrates + **verifies each layer**; owns git, barrier/shared files, `npm install`. Executor writes `app-mobile/**` (a11y = **gpt-5.6-luna**, else **cli-devin**): WRITE = one dir; BANNED = install/config/token/security/routing/a11y changes; Claude re-verifies.
 
 ## Gates
 build · svelte-check · `npm test` · `test:web` · token-identity 0-diff (3 themes) · contrast + ≥76 fences · CDP 390px · catalog smoke · `validate.sh --strict`. `008`: `package_skill.py --check` + comment-section lint. `009`: build-storybook · catalog-smoke · story-coverage · addon-vitest.

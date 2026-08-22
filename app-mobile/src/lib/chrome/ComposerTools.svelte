@@ -32,6 +32,7 @@
 
 <script lang="ts">
   import { Popover } from 'bits-ui';
+  import { hideOutside } from '../primitives/ariaHideOutside.svelte.js';
   import Button from '../primitives/Button.svelte';
   import CommandPalette from './CommandPalette.svelte';
   import { ATTACHMENT_ACCEPT } from '../../attachments/attachment-state.js';
@@ -52,6 +53,12 @@
   // Popover open state; bind:open keeps the local copy in sync while onOpenChange
   // reports every transition to the host (non-optimistic, host-confirmed).
   let open = $state(false);
+  let contentEl = $state<HTMLElement | null>(null);
+
+  $effect(() => {
+    if (contentEl === null) return;
+    return hideOutside([contentEl]);
+  });
 
   function handleOpenChange(next: boolean): void {
     onOpenChange(next);
@@ -125,7 +132,7 @@
       </Button>
     {/snippet}
   </Popover.Trigger>
-  <Popover.Content class="composer-tools-popover" side="top" align="start">
+  <Popover.Content class="composer-tools-popover" side="top" align="start" bind:ref={contentEl}>
     <div class="composer-tools" role="dialog" aria-label="Session tools">
       {#if mediaAvailable}
         <section class="tools-group tools-photo-group" aria-labelledby="photo-tools-label">

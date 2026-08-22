@@ -21,6 +21,7 @@
 <script lang="ts">
   import { Combobox } from 'bits-ui';
 
+  import { hideOutside } from '../primitives/ariaHideOutside.svelte.js';
   import { bindingFor } from '../../commands.js';
   import { rankHostCommands } from '../../rankHostCommands.js';
 
@@ -30,6 +31,17 @@
   // Never retains a selection — a local insertion trigger only (selectedKey={null}).
   let selected = $state('');
   let open = $state(false);
+  let contentEl = $state<HTMLElement | null>(null);
+  let inputEl: HTMLInputElement | null = null;
+
+  $effect(() => {
+    if (contentEl === null) return;
+    const targets: Element[] = [contentEl];
+    // The combobox input is the active anchor for the open listbox and remains
+    // in the accessibility tree while its portalled content is visible.
+    if (inputEl !== null) targets.push(inputEl);
+    return hideOutside(targets);
+  });
 
   // Filtering is deterministic and owned by the frozen ranker; the palette renders
   // exactly the ranked snapshot. Bits must not apply its own input filtering.
@@ -78,6 +90,7 @@
     <Combobox.Input>
       {#snippet child({ props })}
         <input
+          bind:this={inputEl}
           {...props}
           aria-label="Insert a command"
           placeholder="/ command"
@@ -95,7 +108,7 @@
     </Combobox.Input>
     <Combobox.Trigger aria-label="Show commands">/</Combobox.Trigger>
     <Combobox.Portal>
-      <Combobox.Content class="react-aria-Popover">
+      <Combobox.Content class="react-aria-Popover" bind:ref={contentEl}>
         <Combobox.Viewport class="react-aria-ListBox">
           {#if ranked.items.length === 0}
             <!-- @ds state: ready.emptyCatalog — no ranked commands; fail-closed empty copy. -->

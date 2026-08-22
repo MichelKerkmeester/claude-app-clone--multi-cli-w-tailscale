@@ -33,21 +33,24 @@
 <!-- @ds surface: theme-switcher — segmented theme selector. react-aria owns selection. -->
 <div class="theme-control" role="group" aria-label="Color theme">
   <!-- @ds guardrail: react-aria ToggleButton wiring (isSelected/onChange/aria-label) — not designer-editable. -->
-  {#each themes as theme (theme)}
-    <button
-      type="button"
-      class="theme-option"
-      aria-pressed={value === theme}
-      data-selected={value === theme ? true : undefined}
-      aria-label={`Use ${theme} theme`}
-      onclick={() => {
-        if (value !== theme) onChange(theme);
-      }}
-      {@attach attachThemeOptionInteractions}
-    >
-      {theme === 'system' ? 'Auto' : theme === 'light' ? 'Light' : 'Dark'}
-    </button>
-  {/each}
+  <!-- Nest the options so the segmented control keeps its fitting width at 390px; the wrapper is presentational. -->
+  <div>
+    {#each themes as theme (theme)}
+      <button
+        type="button"
+        class="theme-option"
+        aria-pressed={value === theme}
+        data-selected={value === theme ? true : undefined}
+        aria-label={`Use ${theme} theme`}
+        onclick={() => {
+          if (value !== theme) onChange(theme);
+        }}
+        {@attach attachThemeOptionInteractions}
+      >
+        {theme === 'system' ? 'Auto' : theme === 'light' ? 'Light' : 'Dark'}
+      </button>
+    {/each}
+  </div>
 </div>
 
 <!-- @ds surface: theme-switcher — segmented theme selector (ToggleButton group). Decomposed from

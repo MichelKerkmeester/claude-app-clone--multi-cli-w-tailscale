@@ -16,7 +16,7 @@ import {
 // ratio for states that render an aspect frame.
 const ASPECT_RATIO = 1;
 
-function placeholderStory(state: InboundImageLifecycleState): StoryObj<typeof meta> {
+function placeholderStory(state: InboundImageLifecycleState): StoryObj<typeof ImagePlaceholder> {
   const definition = imageStatusDefinition(state);
   return {
     args: {
@@ -34,14 +34,14 @@ function requireState(state: InboundImageLifecycleState): InboundImageLifecycleS
   return state;
 }
 
-const meta = {
+const meta: Meta<typeof ImagePlaceholder> = {
   title: 'Artifacts/ImagePlaceholder',
   component: ImagePlaceholder,
   tags: ['autodocs'],
 } satisfies Meta<typeof ImagePlaceholder>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof ImagePlaceholder>;
 
 export const Processing: Story = placeholderStory(requireState('processing'));
 export const Withheld: Story = placeholderStory(requireState('withheld'));

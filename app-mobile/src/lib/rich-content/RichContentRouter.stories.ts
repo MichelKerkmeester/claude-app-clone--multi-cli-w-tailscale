@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
+import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
 import RichContentRouter from './RichContentRouter.svelte';
 import ArtifactViewerProvider from '../artifacts/ArtifactViewerProvider.svelte';
@@ -15,10 +16,15 @@ import {
 // ten states; RichContentRouter dispatches all of them, so one story per state.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
-  blocks: [...DEMO_RICH_CONTENT_BLOCKS, ...DEMO_RICH_RELEASE_BLOCKS],
+  blocks: [
+    ...DEMO_RICH_CONTENT_BLOCKS,
+    ...DEMO_RICH_RELEASE_BLOCKS,
+  ] as unknown as readonly TranscriptBlock[],
 });
 
-function commandByLifecycle(lifecycle: NormalizedCommandBlock['lifecycle']): NormalizedTranscriptBlock {
+function commandByLifecycle(
+  lifecycle: NormalizedCommandBlock['lifecycle'],
+): NormalizedTranscriptBlock {
   const block = NORMALIZED.find(
     (value): value is NormalizedCommandBlock =>
       value.kind === 'command' && value.lifecycle === lifecycle,
@@ -43,7 +49,7 @@ const meta = {
   tags: ['autodocs'],
   // RichContentRouter reads the ArtifactViewer context via getOptionalArtifactViewer;
   // the self-providing ArtifactViewerProvider supplies it as a Storybook decorator.
-  decorators: [() => ArtifactViewerProvider],
+  decorators: [() => ({ Component: ArtifactViewerProvider })],
 } satisfies Meta<typeof RichContentRouter>;
 
 export default meta;

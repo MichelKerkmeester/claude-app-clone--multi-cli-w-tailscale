@@ -27,7 +27,7 @@ const meta = {
   title: 'Artifacts/ArtifactCard',
   component: ArtifactCard,
   tags: ['autodocs'],
-  decorators: [() => ArtifactViewerProvider],
+  decorators: [() => ({ Component: ArtifactViewerProvider })],
 } satisfies Meta<typeof ArtifactCard>;
 
 export default meta;

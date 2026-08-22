@@ -17,14 +17,14 @@ if (SHARE_BLOCK === undefined) {
 const CAN_SHARE = SHARE_BLOCK.shareAllowed;
 void DEMO_DIFF_FIXTURE;
 
-const meta = {
+const meta: Meta<typeof PreviewControls> = {
   title: 'Artifacts/PreviewControls',
   component: PreviewControls,
   tags: ['autodocs'],
 } satisfies Meta<typeof PreviewControls>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof PreviewControls>;
 
 export const Diff: Story = {
   args: {

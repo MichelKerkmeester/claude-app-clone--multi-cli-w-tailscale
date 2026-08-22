@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
+import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
 import AssistantActions from './AssistantActions.svelte';
 import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '../../demo.js';
@@ -13,7 +14,10 @@ import {
 // `turn-actions` state; AssistantActions renders the under-answer Copy / Share row.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
-  blocks: [...DEMO_RICH_CONTENT_BLOCKS, ...DEMO_RICH_RELEASE_BLOCKS],
+  blocks: [
+    ...DEMO_RICH_CONTENT_BLOCKS,
+    ...DEMO_RICH_RELEASE_BLOCKS,
+  ] as unknown as readonly TranscriptBlock[],
 });
 
 const prose = NORMALIZED.find(

@@ -129,7 +129,7 @@ const meta = {
   title: 'Chrome/SessionComposer',
   component: SessionComposer,
   tags: ['autodocs'],
-  decorators: [() => AttachmentDraftProvider],
+  decorators: [() => ({ Component: AttachmentDraftProvider })],
 } satisfies Meta<typeof SessionComposer>;
 
 export default meta;

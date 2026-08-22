@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
+import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
 import CommandOutputCard from './CommandOutputCard.svelte';
 import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '../../demo.js';
@@ -13,7 +14,10 @@ import {
 // the six command lifecycle states; one story per state.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
-  blocks: [...DEMO_RICH_CONTENT_BLOCKS, ...DEMO_RICH_RELEASE_BLOCKS],
+  blocks: [
+    ...DEMO_RICH_CONTENT_BLOCKS,
+    ...DEMO_RICH_RELEASE_BLOCKS,
+  ] as unknown as readonly TranscriptBlock[],
 });
 
 function commandByLifecycle(
@@ -29,14 +33,14 @@ function commandByLifecycle(
   return block;
 }
 
-const meta = {
+const meta: Meta<typeof CommandOutputCard> = {
   title: 'Rich Content/CommandOutputCard',
   component: CommandOutputCard,
   tags: ['autodocs'],
 } satisfies Meta<typeof CommandOutputCard>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof CommandOutputCard>;
 
 export const Running: Story = { args: { block: commandByLifecycle('running') } };
 export const Completed: Story = { args: { block: commandByLifecycle('completed') } };

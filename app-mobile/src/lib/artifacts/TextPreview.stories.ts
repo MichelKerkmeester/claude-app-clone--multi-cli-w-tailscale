@@ -19,14 +19,14 @@ function inlineText(mimeType: 'text/plain' | 'text/markdown'): string {
 const READY_TEXT = inlineText('text/plain');
 const MARKDOWN_TEXT = inlineText('text/markdown');
 
-const meta = {
+const meta: Meta<typeof TextPreview> = {
   title: 'Artifacts/TextPreview',
   component: TextPreview,
   tags: ['autodocs'],
 } satisfies Meta<typeof TextPreview>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof TextPreview>;
 
 export const Ready: Story = { args: { text: READY_TEXT } };
 export const Empty: Story = { args: { text: '' } };

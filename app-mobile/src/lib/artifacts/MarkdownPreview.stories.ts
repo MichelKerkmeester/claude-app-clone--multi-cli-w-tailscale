@@ -8,21 +8,23 @@ import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '../../demo.js';
 // is invented. The bounded safe-Markdown renderer renders the fixture's headings,
 // strong/emphasis, fenced code, and inert link/image spans; the Empty/Whitespace
 // states swap the read content, and FindMatch adds a find term hitting a real line.
-const MARKDOWN_BLOCK = DEMO_TEXT_CODE_SHARE_BLOCKS.find((block) => block.mimeType === 'text/markdown');
+const MARKDOWN_BLOCK = DEMO_TEXT_CODE_SHARE_BLOCKS.find(
+  (block) => block.mimeType === 'text/markdown',
+);
 if (MARKDOWN_BLOCK === undefined || MARKDOWN_BLOCK.content.kind !== 'inline-text') {
   throw new Error('No inline-text markdown fixture found in DEMO_TEXT_CODE_SHARE_BLOCKS.');
 }
 const MARKDOWN_TEXT = MARKDOWN_BLOCK.content.text;
 const FIND_TERM = 'sanitized';
 
-const meta = {
+const meta: Meta<typeof MarkdownPreview> = {
   title: 'Artifacts/MarkdownPreview',
   component: MarkdownPreview,
   tags: ['autodocs'],
 } satisfies Meta<typeof MarkdownPreview>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof MarkdownPreview>;
 
 export const Ready: Story = { args: { text: MARKDOWN_TEXT } };
 export const Empty: Story = { args: { text: '' } };

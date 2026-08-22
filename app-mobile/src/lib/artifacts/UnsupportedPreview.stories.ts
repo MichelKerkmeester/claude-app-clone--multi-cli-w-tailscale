@@ -14,14 +14,14 @@ if (UNSUPPORTED_BLOCK === undefined) {
   throw new Error('No unsupported fixture found in DEMO_ARTIFACT_BLOCKS.');
 }
 
-const meta = {
+const meta: Meta<typeof UnsupportedPreview> = {
   title: 'Artifacts/UnsupportedPreview',
   component: UnsupportedPreview,
   tags: ['autodocs'],
 } satisfies Meta<typeof UnsupportedPreview>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof UnsupportedPreview>;
 
 export const Default: Story = { args: { renderer: UNSUPPORTED_BLOCK.renderer } };
 export const WithDisplayName: Story = { args: { renderer: UNSUPPORTED_BLOCK.displayName } };

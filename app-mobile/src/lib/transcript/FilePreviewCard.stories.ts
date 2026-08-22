@@ -17,14 +17,16 @@ const meta = {
   title: 'Transcript/FilePreviewCard',
   component: FilePreviewCard,
   tags: ['autodocs'],
-  decorators: [() => ArtifactViewerProvider],
+  decorators: [() => ({ Component: ArtifactViewerProvider })],
 } satisfies Meta<typeof FilePreviewCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Ready: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[0], sessionId: SESSION_ID } };
-export const Withheld: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[1], sessionId: SESSION_ID } };
-export const Missing: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[2], sessionId: SESSION_ID } };
-export const Denied: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[3], sessionId: SESSION_ID } };
-export const Unsupported: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[4], sessionId: SESSION_ID } };
+export const Ready: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[0]!, sessionId: SESSION_ID } };
+export const Withheld: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[1]!, sessionId: SESSION_ID } };
+export const Missing: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[2]!, sessionId: SESSION_ID } };
+export const Denied: Story = { args: { block: DEMO_ARTIFACT_BLOCKS[3]!, sessionId: SESSION_ID } };
+export const Unsupported: Story = {
+  args: { block: DEMO_ARTIFACT_BLOCKS[4]!, sessionId: SESSION_ID },
+};

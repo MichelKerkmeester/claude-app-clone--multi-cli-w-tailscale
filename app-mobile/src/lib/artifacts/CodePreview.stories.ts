@@ -15,14 +15,14 @@ if (CODE_BLOCK === undefined || CODE_BLOCK.content.kind !== 'inline-text') {
 const CODE_TEXT = CODE_BLOCK.content.text;
 const CODE_LANGUAGE = CODE_BLOCK.language ?? 'typescript';
 
-const meta = {
+const meta: Meta<typeof CodePreview> = {
   title: 'Artifacts/CodePreview',
   component: CodePreview,
   tags: ['autodocs'],
 } satisfies Meta<typeof CodePreview>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof CodePreview>;
 
 export const Highlight: Story = {
   args: { text: CODE_TEXT, language: CODE_LANGUAGE, ariaLabel: 'Code preview' },

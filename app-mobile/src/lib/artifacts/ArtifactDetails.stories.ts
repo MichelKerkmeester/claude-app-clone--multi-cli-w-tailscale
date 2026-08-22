@@ -31,14 +31,14 @@ const MODEL: ArtifactDetailsModel = Object.freeze({
   redaction: IMAGE_BLOCK.redaction === 'withheld' ? 'not-needed' : 'applied',
 });
 
-const meta = {
+const meta: Meta<typeof ArtifactDetails> = {
   title: 'Artifacts/ArtifactDetails',
   component: ArtifactDetails,
   tags: ['autodocs'],
 } satisfies Meta<typeof ArtifactDetails>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof ArtifactDetails>;
 
 export const Open: Story = { args: { model: MODEL, open: true } };
 export const Closed: Story = { args: { model: MODEL, open: false } };

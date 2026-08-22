@@ -11,14 +11,14 @@ import { DEMO_DIFF_FIXTURE } from '../../demo.js';
 // Wrapped enables the soft-wrap modifier.
 const FIND_TERM = 'expiresAt';
 
-const meta = {
+const meta: Meta<typeof DiffPreview> = {
   title: 'Artifacts/DiffPreview',
   component: DiffPreview,
   tags: ['autodocs'],
 } satisfies Meta<typeof DiffPreview>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof DiffPreview>;
 
 export const Add: Story = { args: { patch: DEMO_DIFF_FIXTURE.patch } };
 export const Remove: Story = { args: { patch: DEMO_DIFF_FIXTURE.patch } };

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
+import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { createRawSnippet } from 'svelte';
 
 import CollapsedEvidence from './CollapsedEvidence.svelte';
@@ -17,10 +18,15 @@ import {
 // or global CSS is added.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
-  blocks: [...DEMO_RICH_CONTENT_BLOCKS, ...DEMO_RICH_RELEASE_BLOCKS],
+  blocks: [
+    ...DEMO_RICH_CONTENT_BLOCKS,
+    ...DEMO_RICH_RELEASE_BLOCKS,
+  ] as unknown as readonly TranscriptBlock[],
 });
 
-function commandByLifecycle(lifecycle: NormalizedCommandBlock['lifecycle']): NormalizedCommandBlock {
+function commandByLifecycle(
+  lifecycle: NormalizedCommandBlock['lifecycle'],
+): NormalizedCommandBlock {
   const block = NORMALIZED.find(
     (value): value is NormalizedCommandBlock =>
       value.kind === 'command' && value.lifecycle === lifecycle,
@@ -34,10 +40,7 @@ function commandByLifecycle(lifecycle: NormalizedCommandBlock['lifecycle']): Nor
 const COMPLETED = commandByLifecycle('completed');
 
 function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // Mirror Block.svelte's tool_call / tool_result rendering (`<pre>{block.inputSummary}</pre>`
@@ -48,7 +51,10 @@ function evidenceSnippet(content: string) {
   }));
 }
 
-const toolName = COMPLETED.sourceBlock.toolName ?? 'bash';
+const toolName =
+  COMPLETED.sourceBlock.kind === 'tool_call' || COMPLETED.sourceBlock.kind === 'tool_result'
+    ? COMPLETED.sourceBlock.toolName
+    : 'bash';
 
 const meta = {
   title: 'Transcript/CollapsedEvidence',

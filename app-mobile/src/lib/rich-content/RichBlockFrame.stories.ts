@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
+import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { createRawSnippet } from 'svelte';
 
 import RichBlockFrame from './RichBlockFrame.svelte';
@@ -16,10 +17,15 @@ import {
 // canonical text so no wrapper .svelte file is needed.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
-  blocks: [...DEMO_RICH_CONTENT_BLOCKS, ...DEMO_RICH_RELEASE_BLOCKS],
+  blocks: [
+    ...DEMO_RICH_CONTENT_BLOCKS,
+    ...DEMO_RICH_RELEASE_BLOCKS,
+  ] as unknown as readonly TranscriptBlock[],
 });
 
-function firstCommandByLifecycle(lifecycle: NormalizedCommandBlock['lifecycle']): NormalizedCommandBlock {
+function firstCommandByLifecycle(
+  lifecycle: NormalizedCommandBlock['lifecycle'],
+): NormalizedCommandBlock {
   const block = NORMALIZED.find(
     (value): value is NormalizedCommandBlock =>
       value.kind === 'command' && value.lifecycle === lifecycle,
@@ -31,9 +37,7 @@ function firstCommandByLifecycle(lifecycle: NormalizedCommandBlock['lifecycle'])
 }
 
 function firstProse(): NormalizedProseBlock {
-  const block = NORMALIZED.find(
-    (value): value is NormalizedProseBlock => value.kind === 'prose',
-  );
+  const block = NORMALIZED.find((value): value is NormalizedProseBlock => value.kind === 'prose');
   if (block === undefined) {
     throw new Error('No prose block found in the rich-content fixtures.');
   }
@@ -41,10 +45,7 @@ function firstProse(): NormalizedProseBlock {
 }
 
 function escapeHtml(value: string): string {
-  return value
-    .replace(/&/gu, '&amp;')
-    .replace(/</gu, '&lt;')
-    .replace(/>/gu, '&gt;');
+  return value.replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
 }
 
 function preSnippet(text: string) {
@@ -62,14 +63,14 @@ function paragraphSnippet(text: string) {
 const runningCommand = firstCommandByLifecycle('running');
 const proseBlock = firstProse();
 
-const meta = {
+const meta: Meta<typeof RichBlockFrame> = {
   title: 'Rich Content/RichBlockFrame',
   component: RichBlockFrame,
   tags: ['autodocs'],
 } satisfies Meta<typeof RichBlockFrame>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof RichBlockFrame>;
 
 export const WithRedaction: Story = {
   args: {

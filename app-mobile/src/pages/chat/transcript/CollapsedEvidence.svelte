@@ -54,7 +54,7 @@
   {@render children()}
 </Collapsible>
 
-<!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. Decomposed from style.css;
+<!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. Decomposed into this scoped block;
      evidence-trigger is a Collapsible.Trigger primitive so its class and react-aria/runtime data-attributes use
      :global so Svelte scoping cannot drop them. evidence-chevron/evidence-summary are shared with
      NormalizedActivityGroup and stay global here. Values unchanged. -->

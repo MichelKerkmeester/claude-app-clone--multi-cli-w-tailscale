@@ -161,7 +161,7 @@
 {/if}
 
 <!-- @ds surface: attachment-preview-dialog — local-photo preview; reuses the artifact-viewer modal
-     chrome (those .artifact-viewer-* rules stay in style.css until that surface is decomposed).
+     chrome (those .artifact-viewer-* rules stay in app.css).
      The react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states on the remove control are
      preserved by the use:hover/use:press/use:focusVisible actions (touch-aware; plain :hover would stick
      after a tap); the reused close control carries use:hover/use:focusVisible for the same reason. The

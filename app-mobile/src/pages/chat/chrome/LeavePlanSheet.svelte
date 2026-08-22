@@ -163,7 +163,7 @@
   </SheetContent>
 </Sheet>
 
-<!-- @ds surface: leave-plan-sheet — confirmation before Plan → Build expands host authority. Decomposed from style.css;
+<!-- @ds surface: leave-plan-sheet — confirmation before Plan → Build expands host authority. Decomposed into this scoped block;
      leave-plan owned rules move with it. Grouped prefers-reduced-motion / prefers-contrast /
      forced-colors siblings stay global (shared with plan-mode-button, session-card, and other
      chrome). Child-primitive classes and react-aria/runtime data-attributes use :global so

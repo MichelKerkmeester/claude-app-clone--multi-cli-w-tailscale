@@ -86,8 +86,8 @@
   </div>
 {/if}
 
-<!-- @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. Decomposed from
-     style.css; turn-actions / turn-action and their hover/focus-visible states are owned solely
+<!-- @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. Decomposed into this scoped block;
+     turn-actions / turn-action and their hover/focus-visible states are owned solely
      by this component so they move with it. Native div/button elements stay scoped. Values
      unchanged. -->
 <style>

@@ -159,7 +159,7 @@
   {/each}
 </RadioGroup>
 
-<!-- @ds slot: effort-group — the controlled list of effort radio rows. Decomposed from style.css;
+<!-- @ds slot: effort-group — the controlled list of effort radio rows. Decomposed into this scoped block;
      effort-radio-group / effort-radio-row and their states are owned solely by this component so they
      move with it. Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->

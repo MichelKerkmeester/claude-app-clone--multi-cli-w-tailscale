@@ -181,7 +181,7 @@
   </section>
 </main>
 
-<!-- @ds surface: review-view — exact-action review list. Decomposed from style.css; approval-card and its
+<!-- @ds surface: review-view — exact-action review list. Decomposed into this scoped block; approval-card and its
      descendants, approval-actions, and the result-* state variants are owned solely by this component so
      they move with it. The .back-button solo extension and the .approval-actions button / .deny-button /
      .grant-button child-primitive selectors use :global so Svelte scoping cannot drop them. The shared
@@ -191,7 +191,7 @@
      .review-count (shared with the Inbox view), .approval-list (shared with .attention-list), the
      .approval-card prefers-contrast/forced-colors border groups, the .approval-actions button ink-override
      group (shared with composer/enrollment/push), and .inline-alert / .surface-kicker / .empty-state /
-     .empty-glyph / .sr-only are shared by 2+ components and stay global in style.css. Values unchanged. -->
+     .empty-glyph / .sr-only are shared by 2+ components and stay global in app.css. Values unchanged. -->
 <style>
   /* @ds surface: back-button — quiet back arrow, built on the shared chrome-button base. */
   :global(.back-button) {

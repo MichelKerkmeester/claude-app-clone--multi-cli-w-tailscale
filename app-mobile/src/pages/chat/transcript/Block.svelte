@@ -181,7 +181,7 @@
 </article>
 
 <!-- @ds surface: transcript-block — one message block; each kind is a state seam below.
-     Decomposed from style.css; the block-owned article/header/copy-grid/plan-list/usage/
+     Decomposed into this scoped block; the block-owned article/header/copy-grid/plan-list/usage/
      redacted-attachment selectors move scoped here. block-copy, quiet-copy, and the solo
      block-role-* rules stay global (shared with RichContentRouter and InboundImageBlockView).
      Values unchanged. -->

@@ -41,7 +41,7 @@
 {/if}
 
 <!-- @ds slot: projection-block — mount wrapper for the read-only todo projection inside a transcript.
-     Decomposed from style.css; .todo-projection-block is owned solely by this component so it moves
+     Decomposed into this scoped block; .todo-projection-block is owned solely by this component so it moves
      with it. Values unchanged. -->
 <style>
   /* The todo projection is a transcript annotation, not an editable task surface. */

@@ -62,7 +62,7 @@
   >{#each chunkText(text) as chunk, index (index)}<span class="artifact-text-chunk" data-text-chunk={index}>{#each findParts(chunk, findTerm) as part}{#if part.mark}<mark class="artifact-find-match">{part.text}</mark>{:else}{part.text}{/if}{/each}</span>{/each}</div>
 {/if}
 
-<!-- @ds surface: artifact-text-preview — the plain-text read well. Decomposed from style.css; the base
+<!-- @ds surface: artifact-text-preview — the plain-text read well. Decomposed into this scoped block; the base
      merges the shared well-guardrail group with the text-well layout into one faithful rule. is-wrapped
      is a local soft-wrap modifier; the dark re-ink uses :global(:root[data-theme='dark']). The shared
      .artifact-empty-preview (empty/whitespace notice) and .artifact-find-match (find <mark>) stay global

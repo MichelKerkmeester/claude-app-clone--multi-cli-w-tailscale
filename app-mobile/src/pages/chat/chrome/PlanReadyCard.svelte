@@ -118,7 +118,7 @@
   </article>
 {/if}
 
-<!-- @ds surface: plan-ready-card — live validated plan summary + review entry. Decomposed from style.css;
+<!-- @ds surface: plan-ready-card — live validated plan summary + review entry. Decomposed into this scoped block;
      plan-ready-card / plan-ready-mark and this card's owned members of shared ready/review pairs move
      with it. Grouped plan-review-* siblings stay global (plan-review-sheet). Child-primitive classes
      and react-aria/runtime data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->

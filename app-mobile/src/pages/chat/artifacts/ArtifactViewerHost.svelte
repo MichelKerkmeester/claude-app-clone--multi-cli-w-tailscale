@@ -208,7 +208,7 @@
 
   // @ds surface: artifact-viewer — the modal reader chrome: header, status, controls, preview body.
   // @ds slot: header | status | controls | body — the chrome regions styled in the matching
-  //   @ds surface: artifact-viewer style.css block.
+  //   @ds surface: artifact-viewer scoped block.
   // @ds guardrail: do-not-edit — the hooks below are the digest-verified, race-safe,
   //   no-fetch-on-open exact-tuple reader; do not rework their wiring.
   useVisualViewportAnchor();
@@ -869,7 +869,7 @@
 {/if}
 
 <!-- @ds surface: artifact-viewer body — the preview region, loading skeleton, and stale-revision
-     action owned by the viewer host. Decomposed from style.css; single-component. The shared dialog
+     action owned by the viewer host. Decomposed into this scoped block; single-component. The shared dialog
      chrome (overlay/modal/dialog/content/summary, header, close) is shared with AttachmentPreviewDialog
      and stays in the global sheet (→ app.css at cutover). The stale action ships native
      :hover/:focus-visible; dark re-inks use :global(:root[data-theme='dark']). Literal hex preserved.

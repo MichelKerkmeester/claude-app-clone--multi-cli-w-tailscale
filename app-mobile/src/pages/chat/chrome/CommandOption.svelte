@@ -156,7 +156,7 @@
   </span>
 </div>
 
-<!-- @ds surface: slash-autocomplete — one text-only listbox option. Decomposed from style.css;
+<!-- @ds surface: slash-autocomplete — one text-only listbox option. Decomposed into this scoped block;
      slash-option / name / match / hint / desc / meta and their states are owned solely by this
      component so they move with it. Values unchanged. -->
 <style>

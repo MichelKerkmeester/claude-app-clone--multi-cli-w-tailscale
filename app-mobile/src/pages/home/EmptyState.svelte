@@ -20,5 +20,5 @@
 
 <!-- @ds surface: empty-state — empty/unavailable list state. .empty-state and .empty-glyph are
      SHARED: the same classes are rendered inline by the Review and Inbox views (App.tsx), not only
-     by this component. They are therefore left GLOBAL in style.css (unchanged) and resolve there;
+     by this component. They are therefore left GLOBAL in app.css (unchanged) and resolve there;
      this component intentionally carries no scoped rules for them. -->

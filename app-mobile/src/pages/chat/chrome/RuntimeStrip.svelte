@@ -142,7 +142,7 @@
   </span>
 </div>
 
-<!-- @ds surface: runtime-strip — host-backed readout + controls strip. Decomposed from style.css;
+<!-- @ds surface: runtime-strip — host-backed readout + controls strip. Decomposed into this scoped block;
      effort-trigger and build-plan-toggle are owned solely by this component so they move with it.
      Child-primitive classes and react-aria/runtime data-attributes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->

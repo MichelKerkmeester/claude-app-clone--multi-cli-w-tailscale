@@ -27,12 +27,12 @@
   {labels[phase]}
 </span>
 
-<!-- @ds surface: status-pill — connection-phase status. Decomposed from style.css; status-pill,
+<!-- @ds surface: status-pill — connection-phase status. Decomposed into this scoped block; status-pill,
      status-pill i and status-live are owned solely by this component so they move with it. The
      pulsing group (.status-authenticating/connecting/reconnecting i joined with .state-running /
      .agent-running .state-icon) and the error group (.status-error joined with .state-interrupted)
      are shared with the session-state surface, and the @media (max-width: 52rem) .status-pill rule
-     is grouped with .wordmark-copy — those grouped selectors stay GLOBAL in style.css (unchanged)
+     is grouped with .wordmark-copy — those grouped selectors stay GLOBAL in app.css (unchanged)
      so their byte-for-byte structure is preserved. Values unchanged. -->
 <style>
   /* @ds surface: status-pill — connection-phase status. */

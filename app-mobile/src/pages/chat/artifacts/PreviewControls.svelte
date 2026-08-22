@@ -101,8 +101,8 @@
   {/if}
 </div>
 
-<!-- @ds surface: artifact-preview-controls — the preview toolbar (chips + pan controls). Decomposed
-     from style.css; single-component. The chip <span>s and pan <button>s are literal template elements
+<!-- @ds surface: artifact-preview-controls — the preview toolbar (chips + pan controls). Decomposed into this scoped block;
+     single-component. The chip <span>s and pan <button>s are literal template elements
      (plain scoped). The buttons themselves carry the shared .artifact-control-button class, which stays
      global (→ app.css at cutover). Dark re-ink via :global(:root[data-theme]). Literal hex preserved.
      Values unchanged. -->

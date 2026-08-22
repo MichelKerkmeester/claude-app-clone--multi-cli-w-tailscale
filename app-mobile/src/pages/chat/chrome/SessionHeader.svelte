@@ -240,7 +240,7 @@
   </Popover.Root>
 </header>
 
-<!-- @ds surface: session-header — quiet in-session header. Decomposed from style.css;
+<!-- @ds surface: session-header — quiet in-session header. Decomposed into this scoped block;
      overflow-nav / overflow-item are owned solely by this component so they move with it.
      Child-primitive classes and react-aria/runtime data-attributes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->

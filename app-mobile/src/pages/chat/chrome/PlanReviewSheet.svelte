@@ -260,7 +260,7 @@
   </Sheet>
 {/if}
 
-<!-- @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. Decomposed from style.css;
+<!-- @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. Decomposed into this scoped block;
      plan-review-sheet owned rules and this sheet's owned members of shared ready/review pairs move with it.
      Grouped plan-ready-* siblings stay global (plan-ready-card). The system-wide
      prefers-reduced-motion group that includes .plan-review-modal stays global (shared with

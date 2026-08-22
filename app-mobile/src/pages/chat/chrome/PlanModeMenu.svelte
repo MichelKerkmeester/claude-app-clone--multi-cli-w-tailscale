@@ -116,7 +116,7 @@
     {/if}
 </MenuContent>
 
-<!-- @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. Decomposed from style.css;
+<!-- @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. Decomposed into this scoped block;
      plan-mode-popover / plan-mode-row are child primitives (MenuContent / MenuItem) so they move
      with this surface. Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->

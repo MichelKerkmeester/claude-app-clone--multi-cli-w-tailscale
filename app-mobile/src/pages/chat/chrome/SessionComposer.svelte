@@ -779,12 +779,12 @@
   </svg>
 {/snippet}
 
-<!-- @ds surface: composer — the input island. Decomposed from style.css; the composer-region /
+<!-- @ds surface: composer — the input island. Decomposed into this scoped block; the composer-region /
      composer-disclaimer / composer-input / composer-bar / composer-left / composer-right /
      attachment-draft-message owned rules move with it. Child-primitive classes
      (composer-tray / composer-primary / composer-later / composer-spinner) and the shared 44px
      target / prefers-contrast / forced-colors / reduced-motion / clay-override / safe-area
-     groups stay GLOBAL in style.css (they are shared grouped selectors — moving them into scope
+     groups stay GLOBAL in app.css (they are shared grouped selectors — moving them into scope
      would reverse the cascade against those global overrides). Values unchanged. -->
 <style>
   /* @ds state: promptError — inline-alert rendered above the tray (shared error surface). */

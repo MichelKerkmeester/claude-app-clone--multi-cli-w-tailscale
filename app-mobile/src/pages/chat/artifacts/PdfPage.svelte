@@ -127,7 +127,7 @@
 </article>
 
 <!-- @ds surface: pdf-preview-page — one rendered PDF page: canvas + selectable text overlay.
-     Decomposed from style.css; single-component. The text layer is Svelte-rendered (literal spans),
+     Decomposed into this scoped block; single-component. The text layer is Svelte-rendered (literal spans),
      the canvas is a literal element, so the descendant selectors scope plainly. The shared .pdf-page /
      .pdf-preview-shared classes stay global (→ app.css at cutover). Values unchanged. -->
 <style>

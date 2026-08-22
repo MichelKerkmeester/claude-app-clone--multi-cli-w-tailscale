@@ -215,7 +215,7 @@
 </article>
 
 <!-- @ds surface: inbound-image-card — the in-transcript inbound-image card, its open button, identity
-     header, and the lifecycle-state re-inking of the well/placeholder. Decomposed from style.css. The
+     header, and the lifecycle-state re-inking of the well/placeholder. Decomposed into this scoped block. The
      react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states are preserved via the wired
      use:hover/use:press/use:focusVisible actions and scoped as :global([data-*]). The card owns the
      [data-image-state] state; the well and placeholder-pattern it re-inks are rendered by child

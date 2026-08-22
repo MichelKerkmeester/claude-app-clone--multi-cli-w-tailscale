@@ -261,11 +261,11 @@
 {/if}
 
 <!-- @ds surface: transcript-list — the virtualized typed-transcript list and its live-edge controls.
-     Decomposed from style.css; transcript-frame/scroll/virtual, virtual-row (+turn-start),
+     Decomposed into this scoped block; transcript-frame/scroll/virtual, virtual-row (+turn-start),
      streaming-marker/glyph/label, scroll-to-latest (+hover), scroll-badge, and inbound-image-stack
      are owned solely by this component so they move with it (scoped). .sr-only is a shared a11y
      util and .empty-state,.empty-transcript is a shared empty-state group, so both stay global in
-     style.css. The body:has(.slash-panel) .scroll-to-latest override is body-rooted and couples to
+     app.css. The body:has(.slash-panel) .scroll-to-latest override is body-rooted and couples to
      the slash-panel surface, so it is wrapped in :global. Values unchanged. -->
 <style>
   /* @ds slot: frame — transcript region wrapper (positioning only). */

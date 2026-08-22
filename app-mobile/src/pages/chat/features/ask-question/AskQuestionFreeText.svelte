@@ -22,7 +22,7 @@
     <label for={fieldId}>
       {viewModel.display.freeText.required ? 'Your response' : 'Additional context'}
     </label>
-    <!-- @ds slot: textarea — the response input; invalid (error) state handled in style.css. -->
+    <!-- @ds slot: textarea — the response input; invalid (error) state handled in CSS. -->
     <textarea
       id={fieldId}
       value={value}
@@ -41,8 +41,8 @@
   </div>
 {/if}
 
-<!-- @ds surface: ask-question free-text — the response textarea + optional character count. Decomposed
-     from style.css; native aria-invalid/:focus-visible/:disabled preserved. Values unchanged. -->
+<!-- @ds surface: ask-question free-text — the response textarea + optional character count. Decomposed into this scoped block;
+     native aria-invalid/:focus-visible/:disabled preserved. Values unchanged. -->
 <style>
   /* @ds slot: free-text — the response textarea + optional character count. */
   .ask-question-free-text {

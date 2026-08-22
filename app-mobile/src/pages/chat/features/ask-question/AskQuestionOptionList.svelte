@@ -39,7 +39,7 @@
   </fieldset>
 {/if}
 
-<!-- @ds surface: ask-question option-list — the choice fieldset + stacked rows (rows are a child component). Decomposed from style.css; values unchanged. -->
+<!-- @ds surface: ask-question option-list — the choice fieldset + stacked rows (rows are a child component). Decomposed into this scoped block; values unchanged. -->
 <style>
   /* @ds slot: options — the choice fieldset. */
   .ask-question-options {

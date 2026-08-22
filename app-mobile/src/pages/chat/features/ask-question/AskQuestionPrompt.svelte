@@ -17,7 +17,7 @@
   <h2>{viewModel.display.prompt}</h2>
 </div>
 
-<!-- @ds surface: ask-question prompt — eyebrow + display headline. Decomposed from style.css; values unchanged. -->
+<!-- @ds surface: ask-question prompt — eyebrow + display headline. Decomposed into this scoped block; values unchanged. -->
 <style>
   /* @ds slot: prompt — the question eyebrow + display headline. */
   .ask-question-prompt {

@@ -91,7 +91,7 @@
   {/if}
 </section>
 
-<!-- @ds surface: push-settings — device notification preferences. Decomposed from style.css;
+<!-- @ds surface: push-settings — device notification preferences. Decomposed into this scoped block;
      push-settings / preference-grid / switch-track and their switch state rules are owned solely
      by this component so they move with it. The hand-rolled switch renders the original
      [role='switch'] + [data-selected] + .switch-track structure the frozen CSS targets, so the
@@ -99,7 +99,7 @@
      class. Button primitive outputs (.push-settings > button / .push-disable) use :global so Svelte
      scoping cannot drop the child-component element. .surface-kicker (shared by review/home/inbox/
      plan surfaces) and .inline-alert (shared by the composer) are shared by 2+ components and stay
-     global in style.css. The .push-settings h2 / .push-settings p solo occurrences are extracted
+     global in app.css. The .push-settings h2 / .push-settings p solo occurrences are extracted
      from the shared .section-heading groups; the shared groups stay global. Values unchanged. -->
 <style>
   /* @ds surface: push-settings — device notification preferences. */
@@ -125,8 +125,8 @@
   }
 
   /* .push-settings h2 / .push-settings p — solo occurrences extracted from the shared
-     .section-heading h2, .push-settings h2 / .section-heading p, .push-settings p groups
-     (style.css lines 621/629); the shared groups stay global. */
+     .section-heading h2, .push-settings h2 / .section-heading p, .push-settings p groups;
+     the shared groups stay global. */
   .push-settings h2 {
     margin: 0;
     font-size: clamp(1.4rem, 3vw, 2rem);
@@ -143,7 +143,7 @@
   }
 
   /* Button primitive outputs (subscribe / disable) — :global so Svelte scoping cannot
-     drop the child-component element. The shared grouped hover override (style.css line 7647)
+     drop the child-component element. The shared grouped hover override
      stays global. */
   :global(.push-settings > button),
   :global(.push-disable) {
@@ -218,7 +218,7 @@
   }
 
   /* [role='switch']:focus-visible — solo occurrence extracted from the shared focus-visible
-     group (style.css line 7606); the shared group stays global. A native <button> supplies
+     group; the shared group stays global. A native <button> supplies
      the :focus-visible the CSS keys on (no [data-hovered] on the switch). */
   :global([role='switch']:focus-visible) {
     outline: 3px solid var(--focus);
@@ -240,7 +240,7 @@
   }
 
   /* @ds state: motion — reduced-motion switch knob zeroing. Solo occurrence extracted from
-     the shared reduced-motion group (style.css line 7713); the shared group stays global. */
+     the shared reduced-motion group; the shared group stays global. */
   @media (prefers-reduced-motion: reduce) {
     :global([role='switch'][data-selected]) .switch-track > span {
       transform: none !important;

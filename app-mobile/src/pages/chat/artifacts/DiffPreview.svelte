@@ -16,7 +16,7 @@
 <pre class={`artifact-diff-preview${wrap ? ' is-wrapped' : ''}`} aria-label="Redacted file diff" dir="ltr" data-display-buffer="true">{#each lines as line, index (index)}<span class={`${line.startsWith('+') ? 'artifact-diff-line artifact-diff-add' : line.startsWith('-') ? 'artifact-diff-line artifact-diff-remove' : 'artifact-diff-line artifact-diff-context'}${findTerm.length > 0 && line.toLocaleLowerCase().includes(findTerm.toLocaleLowerCase()) ? ' is-find-match' : ''}`}>{line}{index < lines.length - 1 ? '\n' : ''}</span>{/each}</pre>
 
 <!-- @ds surface: artifact-diff-preview — the unified-diff read well + per-line add/remove/find tints.
-     Decomposed from style.css; the .artifact-diff-preview base merges the shared well-guardrail group
+     Decomposed into this scoped block; the .artifact-diff-preview base merges the shared well-guardrail group
      (overflow/overscroll/user-select) with the diff-specific layout into one faithful rule. The add/
      remove tints read --diff-add/--diff-remove tokens (system-dark remaps the token); the explicit
      :root[data-theme='dark'] literal overrides use :global(:root[data-theme='dark']). is-wrapped /

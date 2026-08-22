@@ -96,10 +96,10 @@
   </section>
 </main>
 
-<!-- @ds surface: inbox-view — attention signals. Decomposed from style.css; inbox-heading,
+<!-- @ds surface: inbox-view — attention signals. Decomposed into this scoped block; inbox-heading,
      attention-list and attention-icon are owned solely by this component so they move with it.
      .inbox-heading h1 carries the full merged declaration set from the shared hero/review/inbox/
-     enrollment h1 group (style.css 516-526) plus the review/inbox h1 override group (1075-1079);
+     enrollment h1 group plus the review/inbox h1 override group;
      the .enrollment-card h1 half of the first group is owned by Enrollment.svelte and is not
      reproduced here. .attention-card and its .attention-{needs_input,finished,error} state
      variants live on the Button primitive, so the original top-level selectors are reproduced with
@@ -108,7 +108,7 @@
      .attention-card inside the prefers-contrast / forced-colors shared groups (7455, 7483),
      .session-toolbar / .back-button / .review-count (shared with Review), .inline-alert (composer),
      .surface-kicker (many), and .empty-state / .empty-glyph (Review/Home) are shared by 2+
-     components and stay global in style.css. Values unchanged. -->
+     components and stay global in app.css. Values unchanged. -->
 <style>
   /* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
   /* @ds slot: heading — surface title + description. */

@@ -15,8 +15,8 @@
   <p>{message ?? `${renderer} previews are not available in this reader.`}</p>
 </div>
 
-<!-- @ds surface: artifact-unsupported-preview — the unavailable/unsupported read notice. Decomposed
-     from style.css; the base + dark rules were grouped with the shared .artifact-empty-preview (and
+<!-- @ds surface: artifact-unsupported-preview — the unavailable/unsupported read notice. Decomposed into this scoped block;
+     the base + dark rules were grouped with the shared .artifact-empty-preview (and
      other viewer chrome), which stay global. The dark re-ink uses the :global(:root[data-theme='dark'])
      foreign ancestor. Literal hex values preserved byte-for-byte. -->
 <style>
@@ -37,7 +37,7 @@
     margin: 0.5rem 0 0;
   }
 
-  /* @ds state: dark — dark-theme re-ink (a shared group in style.css; only the unsupported slice here). */
+  /* @ds state: dark — dark-theme re-ink (a shared group in app.css; only the unsupported slice here). */
   :global(:root[data-theme='dark']) .artifact-unsupported-preview {
     background: #2d2a26;
     color: #f8f8f6;

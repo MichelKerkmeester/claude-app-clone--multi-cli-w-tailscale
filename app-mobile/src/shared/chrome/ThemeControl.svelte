@@ -53,10 +53,10 @@
   </div>
 </div>
 
-<!-- @ds surface: theme-switcher — segmented theme selector (ToggleButton group). Decomposed from
-     style.css; theme-control is owned solely by this component so it moves with it. .theme-option is
+<!-- @ds surface: theme-switcher — segmented theme selector (ToggleButton group). Decomposed into this scoped block;
+     theme-control is owned solely by this component so it moves with it. .theme-option is
      on the ToggleGroupItem primitive so it uses :global. The grouped .nav-button, .theme-option,
-     .back-button base + hover rules stay GLOBAL in style.css (unchanged) so their byte-for-byte
+     .back-button base + hover rules stay GLOBAL in app.css (unchanged) so their byte-for-byte
      structure is preserved. Values unchanged. -->
 <style>
   /* @ds slot: theme-toggle — segmented theme control (shared theme-switcher surface below). */

@@ -126,7 +126,7 @@
 </div>
 
 <!-- @ds surface: artifact-code-preview — the highlighted code well, gutter, tokens, and jump-to-latest.
-     Decomposed from style.css. Token classes are built by concatenation ('artifact-code-token is-' +
+     Decomposed into this scoped block. Token classes are built by concatenation ('artifact-code-token is-' +
      kind), so the .is-* suffix is not a static literal — the compounds use :global(.is-*) to stay
      un-pruned (faithful). is-wrapped is a literal in a ternary so it stays plain-scoped. Dark re-inks
      use :global(:root[data-theme='dark']). .artifact-jump-latest ships native :hover/:focus-visible

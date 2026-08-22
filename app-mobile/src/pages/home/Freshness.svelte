@@ -17,7 +17,7 @@
   <time datetime={at ?? undefined}>{at === null ? 'Not synced' : relativeTime(at)}</time>
 </div>
 
-<!-- @ds surface: freshness — sync staleness readout. Decomposed from style.css; freshness,
+<!-- @ds surface: freshness — sync staleness readout. Decomposed into this scoped block; freshness,
      freshness time and freshness.is-stale are owned solely by this component so they move with it.
      The @media (max-width: 39rem) .section-heading .freshness variant has an external ancestor
      (.section-heading, rendered by section headings, not this component), so the ancestor is

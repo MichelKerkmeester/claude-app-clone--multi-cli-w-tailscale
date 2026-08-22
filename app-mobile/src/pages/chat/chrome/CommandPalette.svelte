@@ -144,7 +144,7 @@
   </div>
 </Combobox.Root>
 
-<!-- @ds surface: slash-autocomplete — the command palette. Decomposed from style.css;
+<!-- @ds surface: slash-autocomplete — the command palette. Decomposed into this scoped block;
      command-palette / command-empty / command-name / command-desc have no owned
      declarations in the original stylesheet (they inherit the shared overlay
      primitives). Shared .react-aria-Popover / .react-aria-ListBox /
@@ -156,6 +156,6 @@
      command palette share this surface name. */
   /* `.command-palette`, `.command-empty`, `.command-name`, and `.command-desc`
      carry structure only; the original stylesheet has no owned declarations
-     for them. Shared overlay primitives stay in style.css:
+     for them. Shared overlay primitives stay in app.css:
      .react-aria-Popover, .react-aria-ListBox, .react-aria-ListBoxItem. */
 </style>

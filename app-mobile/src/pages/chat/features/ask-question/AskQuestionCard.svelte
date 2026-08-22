@@ -39,7 +39,7 @@
   // @ds guardrail: one-use ticketed, revision-bound, FAIL-CLOSED mutation path. The ticket,
   //   revision binding, non-optimistic submit, and keyboard/a11y wiring live in the hooks
   //   (useAskQuestionState / useAskQuestionMutation / useAskQuestionKeyboardNavigation) and are
-  //   NOT designer-editable. Only style.css @ds surface: ask-question is editable.
+  //   NOT designer-editable. Only the @ds surface: ask-question CSS is editable.
   let viewModel = $state<AskQuestionViewModel | null>(null);
   let cardEl = $state<HTMLElement | null>(null);
 
@@ -244,7 +244,7 @@
 {/if}
 
 <!-- @ds surface: ask-question-card — the question card frame: submit progress bar (+ its keyframes),
-     loading state, form column, validation alert, and answered line. Decomposed from style.css; the
+     loading state, form column, validation alert, and answered line. Decomposed into this scoped block; the
      @keyframes moves with the card so Svelte scopes both together. Values unchanged. -->
 <style>
   /* @ds surface: ask-question-card — the one-use interactive question card frame. */

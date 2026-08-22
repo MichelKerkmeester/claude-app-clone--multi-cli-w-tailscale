@@ -142,8 +142,8 @@
   </RichBlockFrame>
 {/if}
 
-<!-- @ds surface: rich-prose-block — the plain-prose / safe-Markdown read-out block. Decomposed from
-     style.css; the selectors it was grouped with (safe-markdown*, rich-block-frame, artifact-viewer*)
+<!-- @ds surface: rich-prose-block — the plain-prose / safe-Markdown read-out block. Decomposed into this scoped block;
+     the selectors it was grouped with (safe-markdown*, rich-block-frame, artifact-viewer*)
      stay with their own components. Values unchanged; the bidi-plaintext guardrail is preserved. -->
 <style>
   /* @ds slot: prose — bidirectional-safe plain-text read-out; capped to reading width. */

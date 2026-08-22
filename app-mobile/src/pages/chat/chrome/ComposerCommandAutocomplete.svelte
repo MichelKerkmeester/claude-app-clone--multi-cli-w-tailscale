@@ -408,7 +408,7 @@
   {/if}
 </div>
 
-<!-- @ds surface: slash-autocomplete — the inline autocomplete card. Decomposed from style.css;
+<!-- @ds surface: slash-autocomplete — the inline autocomplete card. Decomposed into this scoped block;
      slash-surface / panel / list / status / skeleton / footer / retry are owned solely by this
      component so they move with it. Child-primitive retry classes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->

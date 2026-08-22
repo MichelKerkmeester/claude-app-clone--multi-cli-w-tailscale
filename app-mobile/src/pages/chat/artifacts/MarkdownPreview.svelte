@@ -155,8 +155,8 @@
   <article class="artifact-markdown-preview" aria-label={ariaLabel} dir="auto" data-display-buffer="true" data-find-term={findTerm || undefined}>{#each blocks as block, index (index)}{#if block.kind === 'heading'}<svelte:element this={`h${block.level}`}>{@render inline(parseInline(block.text))}</svelte:element>{:else if block.kind === 'paragraph'}<p>{@render inline(parseInline(block.lines.join('\n')))}</p>{:else if block.kind === 'quote'}<blockquote>{@render inline(parseInline(block.lines.join('\n')))}</blockquote>{:else if block.kind === 'list'}<svelte:element this={block.ordered ? 'ol' : 'ul'}>{#each block.items as item, itemIndex (itemIndex)}<li>{@render inline(parseInline(item))}</li>{/each}</svelte:element>{:else if block.kind === 'code'}<pre class="artifact-markdown-code"><code>{block.text}</code></pre>{:else if block.kind === 'rule'}<hr />{/if}{/each}</article>
 {/if}
 
-<!-- @ds surface: artifact-markdown-preview — the bounded safe-Markdown render well. Decomposed from
-     style.css. The markdown blocks render via svelte:element / renderer constructs, so the descendant
+<!-- @ds surface: artifact-markdown-preview — the bounded safe-Markdown render well. Decomposed into this scoped block.
+     The markdown blocks render via svelte:element / renderer constructs, so the descendant
      tag rules use :global(tag) (faithful — same reach; prune-proof). Links render as inert spans, so the
      defensive .artifact-markdown-preview a rule is kept via :global(a). Dark re-inks use
      :global(:root[data-theme='dark']). The shared .artifact-empty-preview stays global. Literal hex

@@ -100,7 +100,7 @@
   <PushSettings />
 </main>
 
-<!-- @ds surface: home-view — hero, session roster, device footer, push settings. Decomposed from style.css;
+<!-- @ds surface: home-view — hero, session roster, device footer, push settings. Decomposed into this scoped block;
      hero / hero-copy-block / hero-copy / relay-orbit(+::before/::after) / orbit-core / orbit-node(+one/two/three)
      / session-section / section-heading(solo) / session-grid / session-state / session-meta(+i) / open-arrow
      / device-footer(+>div) are owned solely by this component so they move with it. .session-card and
@@ -113,7 +113,7 @@
      session-toolbar / push-settings), the .state-running / .state-idle / .state-interrupted color rules and
      the .state-running .state-icon / .agent-running .state-icon pulsing group (shared with the agent-row
      surface, already left global by SessionStateIcon.svelte), and the shared prefers-contrast /
-     forced-colors / reduced-motion .session-card groups stay GLOBAL in style.css (unchanged). The
+     forced-colors / reduced-motion .session-card groups stay GLOBAL in app.css (unchanged). The
      @media .section-heading .freshness variant lives in Freshness.svelte. The orbit is static (no
      @keyframes). Values unchanged. -->
 <style>

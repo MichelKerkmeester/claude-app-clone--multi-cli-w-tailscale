@@ -1053,7 +1053,7 @@
   {/if}
 {/snippet}
 
-<!-- @ds surface: model-effort-sheet — the model picker + effort sheet overlay. Decomposed from style.css;
+<!-- @ds surface: model-effort-sheet — the model picker + effort sheet overlay. Decomposed into this scoped block;
      model-effort-sheet owned rules and this sheet's owned members of mixed pairs move with it.
      Shared overlay/modal chrome (.react-aria-Popover, system-wide prefers-reduced-motion grouping
      .model-sheet-modal with plan-review-modal / session-card) stays global. Effort radio-group

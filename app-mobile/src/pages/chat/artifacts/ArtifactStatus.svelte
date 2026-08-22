@@ -97,7 +97,7 @@
 {/if}
 
 <!-- @ds surface: artifact-status — the polite status + assertive terminal-alert live regions.
-     Decomposed from style.css; both are single-component. terminal-alert is the visually-hidden
+     Decomposed into this scoped block; both are single-component. terminal-alert is the visually-hidden
      (sr-only) pattern. Values unchanged. -->
 <style>
   /* @ds slot: status — the polite status live region. */

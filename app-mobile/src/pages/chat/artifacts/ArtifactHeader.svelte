@@ -51,8 +51,8 @@
   </button>
 </header>
 
-<!-- @ds surface: artifact-viewer-revision — the exact-revision line in the viewer header. Decomposed
-     from style.css; single-component (only ArtifactHeader renders it). The rest of the header chrome
+<!-- @ds surface: artifact-viewer-revision — the exact-revision line in the viewer header. Decomposed into this scoped block;
+     single-component (only ArtifactHeader renders it). The rest of the header chrome
      (artifact-viewer-header/heading-group/kicker/title/close) is shared with AttachmentPreviewDialog
      and stays in the global sheet (→ app.css at cutover). Dark re-ink via :global(:root[data-theme]).
      Literal hex preserved. Values unchanged. -->

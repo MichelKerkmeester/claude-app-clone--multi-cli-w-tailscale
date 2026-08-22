@@ -150,7 +150,7 @@
   {/if}
 </section>
 
-<!-- @ds surface: image-preview-controls — the image zoom toolbar. Decomposed from style.css;
+<!-- @ds surface: image-preview-controls — the image zoom toolbar. Decomposed into this scoped block;
      single-component (ImagePreview). The image display classes (image-preview / image-preview-image /
      image-preview-stage) are shared with SecureImagePreview and stay global (→ app.css at cutover); the
      toolbar buttons carry the shared .artifact-control-button, also global. Values unchanged. -->

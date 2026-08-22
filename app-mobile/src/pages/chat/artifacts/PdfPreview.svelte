@@ -201,7 +201,7 @@
 </section>
 
 <!-- @ds surface: pdf-preview — the controlled PDF.js reader shell: controls, page indicator, and the
-     page scroll column (individual pages are the PdfPage child). Decomposed from style.css; all
+     page scroll column (individual pages are the PdfPage child). Decomposed into this scoped block; all
      single-component and static. .pdf-preview-controls was grouped with the different
      .image-preview-controls (ImagePreview) — only the pdf slice moves here. The shared .pdf-page /
      .pdf-preview-shared and the .artifact-control-button / .artifact-find-control on the toolbar stay

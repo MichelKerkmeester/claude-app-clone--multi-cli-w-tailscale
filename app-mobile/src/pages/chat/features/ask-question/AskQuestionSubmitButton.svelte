@@ -11,7 +11,7 @@
 <!-- @ds slot: submit — the form's guarded one-use submit button; disabled binding preserved. -->
 <button type="submit" class="ask-question-submit" {disabled}>Submit answer</button>
 
-<!-- @ds surface: ask-question submit — the guarded one-use submit button. Decomposed from style.css;
+<!-- @ds surface: ask-question submit — the guarded one-use submit button. Decomposed into this scoped block;
      native :focus-visible/:disabled preserved (the shared ring/disabled groups split to this control). Values unchanged. -->
 <style>
   /* @ds slot: submit — the guarded one-use submit button; disabled binding preserved. */

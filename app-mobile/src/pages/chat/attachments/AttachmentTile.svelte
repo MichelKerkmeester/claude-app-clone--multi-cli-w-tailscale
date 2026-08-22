@@ -77,7 +77,7 @@
 </div>
 
 <!-- @ds surface: attachment-tile — the draft photo tile; preview button, remove control, sr-only status.
-     Decomposed from style.css; the react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states
+     Decomposed into this scoped block; the react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states
      are preserved by the use:hover/use:press/use:focusVisible actions (touch-aware — plain :hover would
      stick after a tap on this mobile surface). Runtime-attr rules use :global([data-*]) so Svelte keeps
      the action-set attribute selectors scoped to this component. Values unchanged. -->

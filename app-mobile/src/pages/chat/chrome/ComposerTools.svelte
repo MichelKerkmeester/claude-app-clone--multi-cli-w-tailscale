@@ -250,13 +250,13 @@
   </Popover.Content>
 </Popover.Root>
 
-<!-- @ds surface: composer-tools — the "+" tools popover. Decomposed from style.css;
+<!-- @ds surface: composer-tools — the "+" tools popover. Decomposed into this scoped block;
      composer-tools / tools-checkbox / tools-photo-actions / tools-action / tools-disclosure /
      tools-divider / tools-status / composer-plus are owned solely by this component so they
      move with it. Shared .tools-group / .tools-label (also used by SessionHeader) and the
      shared grouped selectors .session-sheet-popover, .composer-tools-popover and the
      .composer-plus members of the prefers-contrast / forced-colors / 44px-target groups stay
-     GLOBAL in style.css. Child-primitive classes and react-aria/runtime data-attributes use
+     GLOBAL in app.css. Child-primitive classes and react-aria/runtime data-attributes use
      :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>
   /* @ds slot: tools-trigger — the "+" popover trigger. */

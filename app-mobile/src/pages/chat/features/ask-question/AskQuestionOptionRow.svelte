@@ -39,7 +39,7 @@
   </span>
 </button>
 
-<!-- @ds surface: ask-question option-row — one answer option. Decomposed from style.css; native
+<!-- @ds surface: ask-question option-row — one answer option. Decomposed into this scoped block; native
      :hover/:focus-visible/:disabled and the aria-pressed selected state preserved; the dark-theme
      selected re-ink uses :global(:root[data-theme='dark']). Values unchanged. -->
 <style>

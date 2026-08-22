@@ -203,7 +203,7 @@
 {/if}
 
 <!-- @ds surface: inbound-image-status — the inbound-image lifecycle status line + action buttons.
-     Decomposed from style.css; native :hover/:focus-visible/:disabled preserved (the shipped button
+     Decomposed into this scoped block; native :hover/:focus-visible/:disabled preserved (the shipped button
      uses native pseudo-classes, not react-aria state attributes). Values unchanged. -->
 <style>
   /* @ds slot: status — the lifecycle status read-out (loading · ready · corrupt · revoked · …). */

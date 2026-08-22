@@ -31,7 +31,7 @@
 
 <header class="topbar">
   <!-- @ds surface: chrome-button — wordmark + nav react-aria Buttons. -->
-  <!-- @ds guardrail: react-aria Button wiring (press + aria-label) — presentation only in style.css. -->
+  <!-- @ds guardrail: react-aria Button wiring (press + aria-label) — presentation only in CSS. -->
   <Button class="wordmark" onclick={onHome} aria-label="Pi Remote home">
     <span class="pi-mark" aria-hidden="true">
       π
@@ -59,12 +59,12 @@
   </div>
 </header>
 
-<!-- @ds surface: topbar — global chrome header for the non-session surfaces. Decomposed from style.css;
+<!-- @ds surface: topbar — global chrome header for the non-session surfaces. Decomposed into this scoped block;
      topbar, pi-mark, wordmark-copy and topbar-actions are owned solely by this component so they move
      with it. .wordmark and .nav-button are on the Button primitive so they use :global. The grouped
      .nav-button, .theme-option, .back-button base + hover rules, the grouped .wordmark-copy, .status-pill
      @media (max-width: 52rem) rule, and the grouped .topbar, .session-header safe-gutter rule stay GLOBAL
-     in style.css (unchanged) so their byte-for-byte structure is preserved. Values unchanged. -->
+     in app.css (unchanged) so their byte-for-byte structure is preserved. Values unchanged. -->
 <style>
   /* @ds surface: topbar — global chrome header for the non-session surfaces. */
   /* @ds edit: layout — sticky-bar geometry + safe top gutter. */

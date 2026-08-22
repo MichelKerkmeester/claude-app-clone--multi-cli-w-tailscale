@@ -513,7 +513,7 @@
 </main>
 
 <!-- @ds surface: session-view — in-session composition root (header · statusline · transcript · composer).
-     Decomposed from style.css; session-statusline / session-status-label / agent-dot and the
+     Decomposed into this scoped block; session-statusline / session-status-label / agent-dot and the
      agent-dot.agent-running variant are owned solely by this component (rendered directly) so they
      move with it. session-view stays global (shared grouped routed-frame selector with home/review/inbox);
      inline-alert / barrier-note stay global (shared by 2+ surfaces: enrollment/review/inbox/push/composer);

@@ -53,10 +53,10 @@
   <span class="artifact-card-open" aria-hidden="true">Open</span>
 </button>
 
-<!-- @ds surface: artifact-card — the read-only in-transcript diff card. Decomposed from style.css;
+<!-- @ds surface: artifact-card — the read-only in-transcript diff card. Decomposed into this scoped block;
      the react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states are preserved by the
      use:hover/use:press/use:focusVisible actions and scoped as :global([data-*]). The glyph icon
-     geometry is shared with the viewer close icon, whose copy stays in style.css. Values unchanged. -->
+     geometry is shared with the viewer close icon, whose copy stays in app.css. Values unchanged. -->
 <style>
   /* @ds slot: card — the read-only artifact card button; glyph · body · open grid. */
   .artifact-card {
@@ -104,7 +104,7 @@
     color: var(--accent-ink);
   }
 
-  /* @ds slot: glyph-icon — 1.35rem stroke geometry (the viewer close icon reuses this in style.css). */
+  /* @ds slot: glyph-icon — 1.35rem stroke geometry (the viewer close icon reuses this in app.css). */
   .artifact-card-glyph svg {
     inline-size: 1.35rem;
     block-size: 1.35rem;

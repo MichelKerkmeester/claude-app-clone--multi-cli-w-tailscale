@@ -25,7 +25,7 @@
   <span>{message}</span>
 </div>
 
-<!-- @ds surface: ask-question status — the live form-state line + phase glyph. Decomposed from style.css;
+<!-- @ds surface: ask-question status — the live form-state line + phase glyph. Decomposed into this scoped block;
      the sent tint is driven by the card's answered-immutable state via :global(...) ancestor. Values unchanged. -->
 <style>
   /* @ds slot: status — the live form-state line. */

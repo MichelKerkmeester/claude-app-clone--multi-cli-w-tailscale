@@ -86,11 +86,11 @@
   </section>
 </main>
 
-<!-- @ds surface: enrollment-view — first-run device binding. Decomposed from style.css;
+<!-- @ds surface: enrollment-view — first-run device binding. Decomposed into this scoped block;
      enrollment-view / enrollment-card / surface-symbol / scan-button / enrollment-actions are owned
      solely by this component so they move with it. The .enrollment-actions button child-primitive
-     selectors and their shared grouped/state overrides (composer/approval/push at lines 7641/7648)
-     stay global in style.css — the shared overrides change the effective background/color, so moving
+     selectors and their shared grouped/state overrides (composer/approval/push)
+     stay global in app.css — the shared overrides change the effective background/color, so moving
      only the enrollment-specific button rules would diverge from the original cascade. .surface-kicker
      (shared by review/home/inbox/plan surfaces), .barrier-note (shared by the session surface), and
      .inline-alert (shared by the composer) are shared by 2+ components and stay global. Values unchanged. -->
@@ -175,7 +175,7 @@
     margin-top: var(--space-4);
   }
 
-  /* .enrollment-actions button, .scan-button base (style.css line 996) — split: the button
+  /* .enrollment-actions button, .scan-button base — split: the button
      child-primitive part stays global (see header comment); the scan-button own-element part
      moves here scoped. */
   .scan-button {

@@ -190,7 +190,7 @@
     {:else}
       {#each model.sections as section (`${projection.planId}-${section.state}`)}
         <!-- @ds slot: section — one state's task rows in a collapsible Disclosure; section state read from
-             `data-todo-state` (pending · active/in-progress · done) in style.css. -->
+             `data-todo-state` (pending · active/in-progress · done). -->
         <Collapsible
           class="todo-state-section"
           data-todo-state={section.state}
@@ -268,7 +268,7 @@
   {/if}
 </section>
 
-<!-- @ds surface: todos — the read-only todo projection panel (pi's plan). Decomposed from style.css;
+<!-- @ds surface: todos — the read-only todo projection panel (pi's plan). Decomposed into this scoped block;
      refresh/section-trigger are child primitives (Button / Collapsible.Trigger) so their classes and
      react-aria/runtime data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>

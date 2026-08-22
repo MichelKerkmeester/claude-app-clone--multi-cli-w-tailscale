@@ -180,7 +180,7 @@
   </svg>
 {/snippet}
 
-<!-- @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. Decomposed from style.css;
+<!-- @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. Decomposed into this scoped block;
      plan-mode-button / plan-mode-label are owned solely by this component so they move with it.
      Child-primitive classes and react-aria/runtime data-attributes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->

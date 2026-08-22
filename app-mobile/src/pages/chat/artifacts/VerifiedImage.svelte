@@ -165,8 +165,8 @@
   {/if}
 </div>
 
-<!-- @ds surface: inbound-image-thumbnail — the decoded inbound image inside the well. Decomposed from
-     style.css; the well itself (.inbound-image-well) is shared with ImagePlaceholder and stays global.
+<!-- @ds surface: inbound-image-thumbnail — the decoded inbound image inside the well. Decomposed into this scoped block;
+     the well itself (.inbound-image-well) is shared with ImagePlaceholder and stays global.
      Values unchanged. -->
 <style>
   /* @ds slot: thumbnail — the contained, non-interactive decoded image. */

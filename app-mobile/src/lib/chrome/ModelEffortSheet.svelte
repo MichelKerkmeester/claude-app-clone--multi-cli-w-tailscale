@@ -76,6 +76,7 @@
 
 <script lang="ts">
   import type { AvailableModelDto, RuntimeControlResponse } from '@pi-remote/pi-rpc-protocol';
+  import { untrack } from 'svelte';
   import { effortConfirmedMessage } from '../../effort.js';
   import {
     displayModelText as displayModel,
@@ -137,6 +138,8 @@
   let searchEl = $state<HTMLInputElement | null>(null);
   let dialogEl = $state<HTMLElement | null>(null);
   let modalEl = $state<HTMLElement | null>(null);
+  let activeSearchIndex = $state<number | null>(null);
+  const MODEL_LISTBOX_ID = 'model-sheet-listbox';
 
   let dragRef: {
     readonly pointerId: number;
@@ -161,6 +164,16 @@
   const catalog = $derived(
     organizeCatalog(visibleModels, groupingCurrent, deferredQuery.length > 0),
   );
+  const searchOptions = $derived.by(() =>
+    showSearch && !isCommitting
+      ? catalog.groups.flatMap((group) => group.models.filter(isModelAvailable))
+      : [],
+  );
+  const activeSearchOptionKey = $derived.by(() => {
+    if (activeSearchIndex === null) return null;
+    const option = searchOptions[activeSearchIndex];
+    return option === undefined ? null : modelKey(option);
+  });
   const draft = $derived(
     draftKey === null
       ? null
@@ -206,6 +219,7 @@
     terminalBlocked = false;
     mutationMessage = '';
     announcement = '';
+    activeSearchIndex = null;
     prevEffortPending = null;
     dragOffset = 0;
     isDragging = false;
@@ -235,8 +249,36 @@
   });
 
   $effect(() => {
+    const searchIsVisible = isOpen && section === 'model' && showSearch;
+    const optionCount = searchOptions.length;
+    untrack(() => {
+      if (!searchIsVisible || optionCount === 0) {
+        activeSearchIndex = null;
+      } else if (activeSearchIndex !== null && activeSearchIndex >= optionCount) {
+        activeSearchIndex = optionCount - 1;
+      }
+    });
+  });
+
+  // Virtual focus keeps the active search option visible without moving DOM focus
+  // away from the input, which preserves the mobile keyboard interaction.
+  $effect(() => {
+    const activeKey = activeSearchOptionKey;
+    if (!isOpen || section !== 'model' || !showSearch || activeKey === null) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(activeKey)?.scrollIntoView({ block: 'nearest' });
+    });
+    return () => cancelAnimationFrame(frame);
+  });
+
+  $effect(() => {
     if (!isOpen || section !== 'model' || runtime.catalogPhase !== 'ready') return;
+    const focusSearch = showSearch;
     const focusTimer = window.setTimeout(() => {
+      if (focusSearch) {
+        searchEl?.focus({ preventScroll: true });
+        return;
+      }
       dialogEl
         ?.querySelector<HTMLElement>('.model-sheet-row[aria-current="true"]:not([data-disabled])')
         ?.focus({ preventScroll: true });
@@ -399,6 +441,7 @@
       event.preventDefault();
       event.stopPropagation();
       query = '';
+      activeSearchIndex = null;
       searchEl?.focus();
     } else if (event.key === 'Escape' && !isCommitting) {
       event.preventDefault();
@@ -482,7 +525,36 @@
     mutationMessage = '';
   };
 
+  function onSearchKeyDown(event: KeyboardEvent): void {
+    const key = event.key;
+    if (
+      key !== 'ArrowDown' &&
+      key !== 'ArrowUp' &&
+      key !== 'Home' &&
+      key !== 'End' &&
+      key !== 'Enter'
+    )
+      return;
+    if (searchOptions.length === 0) return;
+    if (key === 'Enter') {
+      if (activeSearchOptionKey === null) return;
+      event.preventDefault();
+      document.getElementById(activeSearchOptionKey)?.click();
+      searchEl?.focus({ preventScroll: true });
+      return;
+    }
+    event.preventDefault();
+    const index = activeSearchIndex;
+    let next = 0;
+    if (key === 'ArrowDown') next = index === null ? 0 : Math.min(index + 1, searchOptions.length - 1);
+    else if (key === 'ArrowUp') next = index === null ? searchOptions.length - 1 : Math.max(index - 1, 0);
+    else if (key === 'Home') next = 0;
+    else next = searchOptions.length - 1;
+    activeSearchIndex = next;
+  }
+
   function onListKeyDown(event: KeyboardEvent): void {
+    if (showSearch) return;
     const key = event.key;
     if (
       key !== 'ArrowDown' &&
@@ -671,17 +743,41 @@
                     id="model-sheet-search-input"
                     bind:this={searchEl}
                     bind:value={query}
+                    aria-autocomplete="list"
+                    aria-controls={MODEL_LISTBOX_ID}
+                    aria-activedescendant={activeSearchOptionKey ?? undefined}
                     autocapitalize="none"
                     autocorrect="off"
                     spellcheck="false"
                     enterkeyhint="search"
                     placeholder={strings.searchPlaceholder}
+                    oninput={(event) => {
+                      const inputType = (event as unknown as InputEvent).inputType;
+                      if (
+                        inputType === 'insertText' ||
+                        inputType === 'insertCompositionText' ||
+                        inputType === 'insertFromComposition'
+                      ) {
+                        activeSearchIndex = searchOptions.length > 0 ? 0 : null;
+                      } else if (
+                        inputType &&
+                        (inputType.includes('insert') ||
+                          inputType.includes('delete') ||
+                          inputType.includes('history'))
+                      ) {
+                        activeSearchIndex = null;
+                      }
+                    }}
+                    onkeydown={onSearchKeyDown}
                   />
                   <Button
                     class="model-sheet-search-clear"
                     aria-label={strings.clearSearch}
                     style="min-block-size: 44px"
-                    onclick={() => (query = '')}
+                    onclick={() => {
+                      query = '';
+                      activeSearchIndex = null;
+                    }}
                   >
                     {strings.clearSearchVisible}
                   </Button>
@@ -819,10 +915,11 @@
     <!-- @ds slot: model-list — catalog rows on the model-open section. -->
     <div
       role="listbox"
+      id={MODEL_LISTBOX_ID}
       aria-label={strings.availableModels}
       class="model-sheet-list"
       style="overflow-x: hidden; overscroll-behavior-y: contain"
-      tabindex="0"
+      tabindex={showSearch ? -1 : 0}
       onkeydown={onListKeyDown}
     >
       {#if catalog.retiredCurrent !== null}
@@ -875,8 +972,9 @@
     aria-label={accessibleName}
     class="model-sheet-row"
     style="min-block-size: 64px"
-    tabindex={isCurrent && !rowDisabled ? 0 : -1}
+    tabindex={showSearch ? -1 : isCurrent && !rowDisabled ? 0 : -1}
     aria-selected={isDraft}
+    data-focused={showSearch && activeSearchOptionKey === key ? true : undefined}
     aria-current={isCurrent ? 'true' : undefined}
     aria-busy={isApplying ? 'true' : undefined}
     aria-disabled={rowDisabled ? 'true' : undefined}

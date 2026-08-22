@@ -2,11 +2,9 @@
   "extends": ["../tsconfig.base.json", "./.svelte-kit/tsconfig.json"],
   "compilerOptions": {
     "allowJs": true,
-    "checkJs": false,
-    "jsx": "react-jsx",
-    "jsxImportSource": "react"
+    "checkJs": false
   },
-  "//": "During the React→Svelte migration, svelte-check is scoped to the Svelte surface (routes + lib + generated types). The not-yet-ported React .tsx files keep their own vitest tooling and were type-clean at baseline; each is type-checked here once it is ported into src/lib. Widen this include as the port progresses.",
+  "//": "svelte-check discovers and type-checks every .svelte/.ts itself; this include is for tsc/editor scoping. allowJs keeps svelte.config.js (a .js file) in the program. The React→Svelte migration is complete — there are no .tsx files, so no jsx compiler options are needed.",
   "include": [
     ".svelte-kit/ambient.d.ts",
     ".svelte-kit/non-ambient.d.ts",
@@ -16,8 +14,10 @@
     "src/app.d.ts",
     "src/routes/**/*.ts",
     "src/routes/**/*.svelte",
-    "src/lib/**/*.ts",
-    "src/lib/**/*.svelte"
+    "src/pages/**/*.ts",
+    "src/pages/**/*.svelte",
+    "src/shared/**/*.ts",
+    "src/shared/**/*.svelte"
   ],
   "exclude": ["node_modules", "src/service-worker.js"]
 }

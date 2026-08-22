@@ -42,14 +42,17 @@
 </script>
 
 <script lang="ts">
+  // ─── Props ───────────────────────────────
   let { block, bytes, onStateChange }: ImagePreviewProps = $props();
 
+  // ─── Local state ───────────────────────────────
   let imageState = $state<ImagePreviewState>('loading');
   let objectUrl = $state<string | null>(null);
   let zoom = $state(IMAGE_PREVIEW_MIN_ZOOM);
   let pan = $state({ x: 0, y: 0 });
   let panStart: { x: number; y: number; panX: number; panY: number } | null = null;
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     void block.digest;
     let active = true;
@@ -95,6 +98,7 @@
     onStateChange?.(imageState);
   });
 
+  // ─── Handlers ───────────────────────────────
   function updatePan(event: PointerEvent): void {
     const start = panStart;
     if (start === null || zoom <= IMAGE_PREVIEW_MIN_ZOOM) return;
@@ -114,6 +118,7 @@
     if (bounded === IMAGE_PREVIEW_MIN_ZOOM) pan = { x: 0, y: 0 };
   }
 
+  // ─── Derived state ───────────────────────────────
   const message = $derived(messageForState(imageState));
 </script>
 

@@ -43,6 +43,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import RichBlockFrame from './RichBlockFrame.svelte';
   import { useCopyFeedback } from './useCopyFeedback.svelte.js';
   import { hover } from '../../../shared/primitives/interactions.js';
@@ -52,6 +53,7 @@
     onOpen?: (trigger?: HTMLButtonElement | null) => void;
   }
 
+  // ─── Props ───────────────────────────────
   let { block, onOpen }: Props = $props();
 
   const OUTPUT_PREVIEW_LINES = 8;
@@ -59,6 +61,7 @@
   const feedback = useCopyFeedback();
 
   let previousSnapshot: CommandSnapshot | null = null;
+  // ─── Derived state ───────────────────────────────
   const snapshot = $derived.by(() => {
     const next = reconcileCommandSnapshot(previousSnapshot, block);
     previousSnapshot = next;
@@ -86,8 +89,10 @@
       showingLastTrustworthySnapshot ? 'Last trustworthy snapshot' : null,
     ].filter((label): label is string => label !== null),
   );
+  // ─── Local state ───────────────────────────────
   let openButton = $state<HTMLButtonElement | null>(null);
 
+  // ─── Handlers ───────────────────────────────
   function lifecycleText(value: NormalizedCommandBlock['lifecycle']): string {
     switch (value) {
       case 'queued':

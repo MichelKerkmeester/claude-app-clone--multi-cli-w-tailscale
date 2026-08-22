@@ -48,6 +48,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { demoInboundArtifactResource, isDemoMode } from '../../../shared/data/demo.js';
   import { useArtifactResource } from './useArtifactResource.svelte.js';
 
@@ -61,6 +62,7 @@
     onStateChange,
   }: VerifiedImageProps = $props();
 
+  // ─── Local state ───────────────────────────────
   // svelte-ignore state_referenced_locally
   let nearViewport = $state(forceLoad || typeof IntersectionObserver === 'undefined');
   let imageFailed = $state(false);
@@ -78,6 +80,7 @@
     }),
   );
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     void block.id;
     void block.revision;
@@ -125,6 +128,7 @@
     if (next !== null) onStateChange(next);
   });
 
+  // ─── Derived state ───────────────────────────────
   const showPixels = $derived(
     !imageFailed &&
       resource.current.status === 'ready' &&

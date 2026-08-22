@@ -14,6 +14,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import Button from '../../../shared/primitives/Button.svelte';
   import Sheet from '../../../shared/primitives/Sheet.svelte';
   import SheetContent from '../../../shared/primitives/SheetContent.svelte';
@@ -29,14 +30,17 @@
     triggerRef = $bindable(null),
   }: LeavePlanSheetProps = $props();
 
+  // ─── Derived state ───────────────────────────────
   const isPlanReady = $derived(variant === 'plan-ready' || planReady);
 
   // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
   // copy is restored to the host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
+  // ─── Local state ───────────────────────────────
   let sheetOpen = $state(false);
   let stayEl = $state<HTMLButtonElement | null>(null);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     sheetOpen = hostOpen;
   });
@@ -53,6 +57,7 @@
     restoreTriggerFocus();
   };
 
+  // ─── Handlers ───────────────────────────────
   function onSheetOpenChange(next: boolean): void {
     if (!next) close();
     else onOpenChange(true);

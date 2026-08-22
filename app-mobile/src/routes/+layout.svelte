@@ -6,6 +6,7 @@
   // `App` component; the selected session id now comes from the SvelteKit route
   // rather than a hand-rolled history listener, so the router owns the URL.
 
+  // ─── Imports ───────────────────────────────
   import { onMount, untrack, type Snippet } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
@@ -36,10 +37,12 @@
   import Review from '../pages/review/Review.svelte';
   import AttentionInbox from '../pages/inbox/AttentionInbox.svelte';
 
+  // ─── Props ───────────────────────────────
   let { children }: { children: Snippet } = $props();
 
   const app = setAppState(createAppState());
 
+  // ─── Derived state ───────────────────────────────
   // The selected session lives in the URL: `/session/<id>` → that id, anything
   // else → none. This replaces React's selectedSessionId useState + popstate.
   const selectedSessionId = $derived($page.params.id ?? null);
@@ -49,6 +52,7 @@
     app.authReady && !app.reviewOpen && !app.inboxOpen && selectedSessionId !== null,
   );
 
+  // ─── Handlers ───────────────────────────────
   function dispatchArtifactLifecycleEvent(name: string): void {
     window.dispatchEvent(new Event(name));
   }
@@ -57,6 +61,7 @@
   // announces once so artifact viewers can tear down. Seeded with the mount
   // value so it never fires on first paint.
   let previousSessionId = untrack(() => selectedSessionId);
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     const next = selectedSessionId;
     if (next !== previousSessionId) {

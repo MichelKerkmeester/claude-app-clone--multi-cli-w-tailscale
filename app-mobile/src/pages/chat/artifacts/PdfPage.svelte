@@ -1,4 +1,5 @@
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist';
 
   import {
@@ -20,12 +21,15 @@
     onStateChange: (state: PdfPreviewState) => void;
   }
 
+  // ─── Props ───────────────────────────────
   let { pdfDocument, pageNumber, scale, textLayerSafe, findTerm, onStateChange }: Props = $props();
 
+  // ─── Local state ───────────────────────────────
   let canvasEl = $state<HTMLCanvasElement | null>(null);
   let viewportSize = $state({ width: 0, height: 0 });
   let spans = $state<readonly TextSpan[]>([]);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     // Svelte tracks only synchronous reads; the real reads happen in the async .then() below, so read every
     // React dependency synchronously here to match the original [document, findTerm, onStateChange,

@@ -17,6 +17,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { modeAuthority } from '../../../shared/data/runtime.js';
   import { planModePresentation } from './planModePresentation.js';
   import { focusVisible, hover, press } from '../../../shared/primitives/interactions.js';
@@ -34,18 +35,22 @@
     buttonRef = $bindable(null),
   }: PlanModeButtonProps = $props();
 
+  // ─── Derived state ───────────────────────────────
   const presentation = $derived(planModePresentation(runtime, connection));
   const authority = $derived(modeAuthority(runtime));
 
   // Host-confirmed open only; Bits Menu writes the next open flag, so a local
   // copy is restored to the host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
+  // ─── Local state ───────────────────────────────
   let menuOpen = $state(false);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     menuOpen = hostOpen;
   });
 
+  // ─── Handlers ───────────────────────────────
   function onMenuOpenChange(next: boolean): void {
     onOpenChange(next);
     menuOpen = hostOpen;

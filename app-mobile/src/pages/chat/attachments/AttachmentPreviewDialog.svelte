@@ -4,15 +4,18 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { useVisualViewportAnchor } from '../../../shared/data/useVisualViewportAnchor.svelte.js';
   import { hideOutside } from '../../../shared/primitives/ariaHideOutside.svelte.js';
   import { hover, press, focusVisible } from '../../../shared/primitives/interactions.js';
   import { getAttachmentDraft } from './AttachmentDraftProvider.svelte';
 
   const draft = getAttachmentDraft();
+  // ─── Derived state ───────────────────────────────
   const item = $derived(
     draft.state.items.find((candidate) => candidate.id === draft.state.previewId) ?? null,
   );
+  // ─── Local state ───────────────────────────────
   let dialogEl = $state<HTMLElement | null>(null);
   let headingEl = $state<HTMLHeadingElement | null>(null);
   let previewFailed = $state(false);
@@ -20,6 +23,7 @@
 
   useVisualViewportAnchor(() => dialogEl);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     if (item === null || dialogEl === null) return;
     return hideOutside([dialogEl]);
@@ -39,6 +43,7 @@
     item !== null && (item.preview === 'unavailable' || previewUrl === null || previewFailed),
   );
 
+  // ─── Handlers ───────────────────────────────
   // @ds guardrail: do-not-edit — the removal focus handoff moves focus to the adjacent tile
   // (or the add-photo control) after the previewed item is removed and the dialog closes.
   function remove(): void {

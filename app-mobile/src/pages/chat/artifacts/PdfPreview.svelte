@@ -14,6 +14,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import type { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist';
 
   import PdfPage from './PdfPage.svelte';
@@ -31,8 +32,10 @@
     type PdfPreviewState,
   } from './pdf-preview-shared.js';
 
+  // ─── Props ───────────────────────────────
   let { block, bytes, findTerm = '', onFindTermChange, onStateChange }: PdfPreviewProps = $props();
 
+  // ─── Local state ───────────────────────────────
   let pdfState = $state<PdfPreviewState>('loading');
   let pdfDocument = $state<PDFDocumentProxy | null>(null);
   let pageCount = $state(0);
@@ -43,6 +46,7 @@
   let pageWidth = $state(0);
   let scrollEl = $state<HTMLDivElement | null>(null);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     void block.digest;
     let active = true;
@@ -143,6 +147,7 @@
     return () => observer.disconnect();
   });
 
+  // ─── Derived state ───────────────────────────────
   const scale = $derived(
     !fitWidth || containerWidth <= 0 || pageWidth <= 0
       ? clampZoom(zoom)
@@ -151,6 +156,7 @@
 
   const visiblePages = $derived(pdfDocument === null ? [] : pagesAround(currentPage, pageCount));
 
+  // ─── Handlers ───────────────────────────────
   function onPageState(nextState: PdfPreviewState): void {
     if (nextState !== 'ready') pdfState = nextState;
   }

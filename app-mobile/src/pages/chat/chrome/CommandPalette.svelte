@@ -19,14 +19,17 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { Combobox } from 'bits-ui';
 
   import { hideOutside } from '../../../shared/primitives/ariaHideOutside.svelte.js';
   import { bindingFor } from '../../../shared/data/commands.js';
   import { rankHostCommands } from '../../../shared/data/rankHostCommands.js';
 
+  // ─── Props ───────────────────────────────
   let { catalog, onInsert, isDisabled = false }: CommandPaletteProps = $props();
 
+  // ─── Local state ───────────────────────────────
   let query = $state('');
   // Never retains a selection — a local insertion trigger only (selectedKey={null}).
   let selected = $state('');
@@ -34,6 +37,7 @@
   let contentEl = $state<HTMLElement | null>(null);
   let inputEl: HTMLInputElement | null = null;
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     if (contentEl === null) return;
     const targets: Element[] = [contentEl];
@@ -43,11 +47,13 @@
     return hideOutside(targets);
   });
 
+  // ─── Derived state ───────────────────────────────
   // Filtering is deterministic and owned by the frozen ranker; the palette renders
   // exactly the ranked snapshot. Bits must not apply its own input filtering.
   // @ds guardrail: ranker — deterministic host-command ranking.
   const ranked = $derived.by(() => rankHostCommands(catalog.commands, query));
 
+  // ─── Handlers ───────────────────────────────
   function onQueryInput(event: Event): void {
     const target = event.currentTarget;
     if (target instanceof HTMLInputElement) query = target.value;

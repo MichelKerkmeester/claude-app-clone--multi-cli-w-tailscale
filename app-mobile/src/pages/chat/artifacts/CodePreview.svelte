@@ -24,6 +24,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import {
     normalizeHighlightLanguage,
     useHighlightedCode,
@@ -51,6 +52,7 @@
     followTail = false,
   }: Props = $props();
 
+  // ─── Derived state ───────────────────────────────
   const safeLanguage = $derived(normalizeHighlightLanguage(language));
   const highlighted = useHighlightedCode(() => ({
     source: text,
@@ -63,10 +65,12 @@
   const tokens = $derived(highlighted.current.tokens);
   const lines = $derived(text.split('\n'));
 
+  // ─── Local state ───────────────────────────────
   let scrollEl = $state<HTMLDivElement | null>(null);
   let atLiveEdgeRef = true;
   let atLiveEdge = $state(true);
 
+  // ─── Handlers ───────────────────────────────
   function updateLiveEdge(): void {
     const scroll = scrollEl;
     if (scroll === null) return;
@@ -83,6 +87,7 @@
     atLiveEdge = true;
   }
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     void followTail;
     void revision;

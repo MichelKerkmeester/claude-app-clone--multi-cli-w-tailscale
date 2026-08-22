@@ -51,8 +51,10 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { commandGraphemes } from '../../../shared/data/rankHostCommands.js';
 
+  // ─── Props ───────────────────────────────
   let { command, active, onInsert, onDisabledPress }: CommandOptionProps = $props();
 
   /** A pointer drag farther than this cancels activation (no accidental tap-drag inserts). */
@@ -101,6 +103,7 @@
     }
   };
 
+  // ─── Derived state ───────────────────────────────
   const graphemes = $derived(commandGraphemes(escapeUnsafeName(command.name)));
   const matched = (index: number) =>
     command.matchRanges.some((range) => range.start <= index && index < range.end);

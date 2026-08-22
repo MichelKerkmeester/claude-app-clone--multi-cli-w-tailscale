@@ -20,6 +20,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import {
     applyingEffortMessage,
     effortRowAccessibleName,
@@ -42,16 +43,20 @@
     onSelect,
   }: EffortRadioGroupProps = $props();
 
+  // ─── Derived state ───────────────────────────────
   // Host-confirmed selection only; Bits RadioGroup writes the clicked value, so a
   // local copy is restored to the host-confirmed level after every change
   // (non-optimistic, never an empty selection flash while a request is in flight).
   const hostValue = $derived(confirmed ?? '');
+  // ─── Local state ───────────────────────────────
   let effortValue = $state('');
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     effortValue = hostValue;
   });
 
+  // ─── Handlers ───────────────────────────────
   function onEffortChange(next: string): void {
     // @ds guardrail: do-not-edit — a row selection here is the only request path,
     // never a commit; the read-only guard keeps a stale event from firing.

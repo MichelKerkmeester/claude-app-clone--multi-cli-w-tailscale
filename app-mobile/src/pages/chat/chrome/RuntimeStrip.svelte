@@ -28,6 +28,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { effortTriggerName, effortTriggerText } from '../../../shared/data/effort.js';
   import Button from '../../../shared/primitives/Button.svelte';
   import ToggleGroup from '../../../shared/primitives/ToggleGroup.svelte';
@@ -40,6 +41,7 @@
     effortTriggerRef = $bindable(null),
   }: RuntimeStripProps = $props();
 
+  // ─── Derived state ───────────────────────────────
   const runtime = $derived(controls.runtime);
   const snapshot = $derived(runtime.state);
   const disabled = $derived(runtime.status !== 'ready' || snapshot === null);
@@ -50,14 +52,17 @@
   const planActive = $derived(snapshot?.mode === 'plan' || snapshot?.mode === 'executing-plan');
   const hostMode = $derived(snapshot === null ? '' : planActive ? 'plan' : 'build');
 
+  // ─── Local state ───────────────────────────────
   // Host-confirmed selection only; Bits UI single-type allows emptying, so a local
   // copy is restored to hostMode after every change (non-optimistic, no empty).
   let modeValue = $state('');
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     modeValue = hostMode;
   });
 
+  // ─── Handlers ───────────────────────────────
   function onModeChange(next: string): void {
     if (next === 'build' || next === 'plan') void controls.setMode(next);
     modeValue = hostMode;

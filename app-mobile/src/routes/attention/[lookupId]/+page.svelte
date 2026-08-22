@@ -1,4 +1,5 @@
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   // @ds route: /attention/[lookupId] — attention deep-link resolver (no view of its own; resolves then redirects).
   // Attention deep-link resolver — renders no view of its own. It shows the
   // inbox overlay while it resolves the hint (gated on auth so a cold load waits
@@ -11,9 +12,11 @@
   import { openAttentionHint } from '../../../shared/data/attention.js';
 
   const app = getAppState();
+  // ─── Derived state ───────────────────────────────
   // The [lookupId] route only matches with the param present.
   const lookupId = $derived($page.params.lookupId!);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     if (!app.authReady) return;
     app.inboxOpen = true;

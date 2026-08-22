@@ -17,21 +17,27 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { focusVisible, focused } from '../../../shared/primitives/interactions.js';
   import MenuContent from '../../../shared/primitives/MenuContent.svelte';
   import MenuItem from '../../../shared/primitives/MenuItem.svelte';
 
+  // ─── Props ───────────────────────────────
   let { confirmedMode, rowsDisabled, rowsDisabledReason, onSelect }: PlanModeMenuProps = $props();
 
+  // ─── Derived state ───────────────────────────────
   // Host-confirmed mode only; Bits MenuItem has no selection to bind, so a local
   // copy is restored to the host value after every activation (non-optimistic).
   const hostMode = $derived(confirmedMode);
+  // ─── Local state ───────────────────────────────
   let localMode = $state<ConfirmedMode>('unknown');
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     localMode = hostMode;
   });
 
+  // ─── Handlers ───────────────────────────────
   function onRowSelect(target: 'build' | 'plan'): void {
     // @ds guardrail: do-not-edit — a row activation here is the only request path,
     // never a commit; the read-only guard keeps a stale event from firing.

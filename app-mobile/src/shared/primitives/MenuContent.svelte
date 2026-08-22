@@ -1,4 +1,5 @@
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   // @ds primitive: MenuContent — Bits UI DropdownMenu.Content portal that hides outside content, traps Tab, and renders a children snippet.
   import { DropdownMenu } from 'bits-ui';
   import { getContext } from 'svelte';
@@ -10,10 +11,13 @@
     children: Snippet;
   }
 
+  // ─── Props ───────────────────────────────
   let { children, ...rest }: Props = $props();
+  // ─── Local state ───────────────────────────────
   let contentEl = $state<HTMLElement | null>(null);
   const dismiss = getContext<(() => void) | undefined>(MENU_DISMISS_KEY);
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     if (contentEl === null) return;
     return hideOutside([contentEl]);

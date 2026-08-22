@@ -8,11 +8,14 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import Collapsible from '../../../shared/primitives/Collapsible.svelte';
   import { hover } from '../../../shared/primitives/interactions.js';
 
+  // ─── Props ───────────────────────────────
   let { summary, children }: CollapsedEvidenceProps = $props();
 
+  // ─── Local state ───────────────────────────────
   // defaultExpanded={false} → Collapsible starts closed (open defaults to false on the primitive).
   let open = $state(false);
 
@@ -21,6 +24,7 @@
   // are set explicitly on the button (data-expanded reactively from `open`, data-hovered via hover).
   let triggerButton = $state<HTMLButtonElement | null>(null);
 
+  // ─── Handlers ───────────────────────────────
   function attachEvidenceTrigger(node: HTMLElement): (() => void) | void {
     const button = node.parentElement;
     if (!(button instanceof HTMLButtonElement)) return;
@@ -34,6 +38,7 @@
     };
   }
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     const button = triggerButton;
     if (button === null) return;

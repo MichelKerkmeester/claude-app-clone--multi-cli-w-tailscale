@@ -8,18 +8,22 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { getOptionalArtifactViewer } from '../artifacts/ArtifactViewerProvider.svelte';
   import { filePreviewAvailability } from '../../../shared/data/state.js';
   import { formatArtifactSize } from '../../../shared/data/format.js';
   import Button from '../../../shared/primitives/Button.svelte';
 
+  // ─── Props ───────────────────────────────
   let { block, sessionId }: FilePreviewCardProps = $props();
 
+  // ─── Local state ───────────────────────────────
   // @ds surface: file-preview-card — read-only preview card; states read from
   //   data-preview-state (ready · withheld · missing · denied · unsupported).
   // @ds guardrail: react-aria Button press, aria-label, and viewer open (onPress) — not designer-editable.
   let buttonEl = $state<HTMLButtonElement | null>(null);
   const viewer = getOptionalArtifactViewer();
+  // ─── Derived state ───────────────────────────────
   const availability = $derived(filePreviewAvailability(block));
   const stateLabel = $derived({
     ready: 'Ready',

@@ -1,4 +1,5 @@
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import type { NormalizedTextArtifactBlock } from './normalizeTranscriptBlocks.js';
   import RichBlockFrame from './RichBlockFrame.svelte';
   import { useCopyFeedback } from './useCopyFeedback.svelte.js';
@@ -9,19 +10,23 @@
     onOpen?: (trigger?: HTMLButtonElement | null) => void;
   }
 
+  // ─── Props ───────────────────────────────
   let { block, onOpen }: Props = $props();
 
   const PREVIEW_LINES = 6;
 
   const feedback = useCopyFeedback();
+  // ─── Derived state ───────────────────────────────
   const lines = $derived(displayLines(block.canonicalSource));
   const preview = $derived(lines.slice(0, PREVIEW_LINES).join('\n'));
   const trustedLabel = $derived(textArtifactLabel(block.label));
   const canOpen = $derived(
     block.settled && block.canonicalSource.length > 0 && onOpen !== undefined,
   );
+  // ─── Local state ───────────────────────────────
   let openButton = $state<HTMLButtonElement | null>(null);
 
+  // ─── Handlers ───────────────────────────────
   function textArtifactLabel(value: NormalizedTextArtifactBlock['label']): string {
     switch (value) {
       case 'prompt':

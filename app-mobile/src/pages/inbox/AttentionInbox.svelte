@@ -9,13 +9,16 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import { onMount } from 'svelte';
   import { fetchAttention } from '../../shared/data/attention.js';
   import { attentionIcon, attentionLabel, messageFrom, relativeTime } from '../../shared/data/view-helpers.js';
   import Button from '../../shared/primitives/Button.svelte';
 
+  // ─── Props ───────────────────────────────
   let { onBack, onOpen }: AttentionInboxProps = $props();
 
+  // ─── Local state ───────────────────────────────
   let items = $state<readonly AttentionItemDto[]>([]);
   let error = $state<string | null>(null);
   let opening = $state<string | null>(null);
@@ -33,6 +36,7 @@
     return () => controller.abort();
   });
 
+  // ─── Handlers ───────────────────────────────
   function openItem(item: AttentionItemDto): void {
     opening = item.lookupId;
     error = null;

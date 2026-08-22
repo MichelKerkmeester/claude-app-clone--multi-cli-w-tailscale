@@ -11,6 +11,7 @@
 
 import type { RuntimeControlResponse, RuntimeOperation } from '@pi-remote/pi-rpc-protocol';
 
+import { untrack } from 'svelte';
 import * as relay from '../relay.js';
 import {
   BLOCKED_MUTATION_PHASES,
@@ -270,7 +271,7 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
 
   $effect(() => {
     getSessionId();
-    void refresh('initial');
+    untrack(() => void refresh('initial'));
     return () => {
       authorityGeneration += 1;
       catalogController?.abort();

@@ -10,4 +10,10 @@
   let { value = $bindable(''), children, ...rest }: Props = $props();
 </script>
 
-<ToggleGroup.Root type="single" bind:value {...rest}>{@render children()}</ToggleGroup.Root>
+{#snippet root({ props }: { props: Record<string, unknown> })}
+  <div {...props} role="radiogroup">
+    {@render children()}
+  </div>
+{/snippet}
+
+<ToggleGroup.Root type="single" bind:value {...rest} child={root} />

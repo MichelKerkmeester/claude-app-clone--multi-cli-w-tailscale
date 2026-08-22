@@ -6,6 +6,25 @@ The App(26) test port exposed one masked a11y regression (sheets lost react-aria
 
 Method: each Svelte primitive/consumer was read against its React (`react-aria-components`) counterpart, and Bits UI's `dist` source was read to confirm whether a behavior is provided by default. No tests were run for the audit; findings are source-confirmed.
 
+## RESOLUTION — all P0 + P1 FIXED and independently re-verified (C3)
+
+Every P0 and P1 finding was remediated (executor-written source, gpt-5.6-luna) and then adversarially re-verified by a 4-group read-only fan-out that each tried to *refute* the fix against the frozen React oracle + Bits UI `dist`. **All 4 groups returned ALL-FIXED, 0 defects.** The objective gates (token-identity/CDP/backend) remain blind to this class; this verifier pass is the a11y acceptance evidence for the board.
+
+| Finding | Fix commit(s) | Verified | Restored behavior (basis) |
+|---|---|---|---|
+| SEED (Sheet ariaHideOutside) | `ff6aeb6` | A | `SheetContent.svelte` hides background on open, restores on close (also serves PlanReview/ModelEffort) |
+| P0-1 (PlanModeMenu Tab-trap + bg) | `6fcd0d5` + `83433b5` | B | `MenuContent.svelte` capture-phase Tab trap preempts bits-ui close-on-Tab **and** `ariaHideOutside` hides background |
+| P0-2 (hand-rolled dialogs) | `888c3b9` | A | ArtifactViewerHost + AttachmentPreviewDialog call `hideOutside([dialogEl])` + Tab-wrap/focusin containment |
+| P1-1 (composer "+" popover) | `83433b5` | A | `ComposerTools.svelte` hides background via the Popover.Content ref, matching react-aria modal popover |
+| P1-2 (slash-command palette) | `83433b5` | A | `CommandPalette.svelte` `hideOutside([content,input])` matches `useComboBox` |
+| P1-3 (model-search virtual focus) | `f8359a6` | D | Focus stays on input; `aria-activedescendant` tracks highlight; no row `.focus()`; Enter reads active-descendant (iOS-VoiceOver-safe) |
+| P1-4 (ToggleGroup radiogroup) | `f2da878` | C | Single-select renders `role="radiogroup"`; children keep `role=radio`/`aria-checked` |
+| P1-5 (Collapsible headings) | `c780925` | C | Shared primitive wraps the trigger in a real `<h3>` → all 3 sites reachable by SR heading nav |
+| P1-6 (header widget pattern) | `b0c28fd` + `263b2a1` | B | SessionHeader overflow re-architected to Popover>Dialog; the menu-wrapping-radiogroup anti-pattern is gone |
+| P1-7 (Dismiss buttons) | `6fcd0d5` + `263b2a1` | B | AT-discoverable `sr-only` Dismiss buttons bracket menu + both popovers; wired to close |
+
+**P2 items below stay deferred** per the user directive (fix Full P0+P1 before cutover); they are amendment candidates, not cutover blockers. The sanctioned parity deviations (ThemeControl toggle-button/`aria-pressed`+`role=group`, `ae6a5dd`) are intentional, not defects.
+
 ## SEED (FIXED) — Sheet family lost `ariaHideOutside`
 - **React:** `LeavePlanSheet.tsx` / `PlanReviewSheet.tsx` / `ModelEffortSheet.tsx` use `ModalOverlay`/`Modal` → auto `ariaHideOutside`.
 - **Svelte gap (was):** `Sheet.svelte` / `SheetContent.svelte` (Bits UI `Dialog.*`) had no background-AT-hiding.

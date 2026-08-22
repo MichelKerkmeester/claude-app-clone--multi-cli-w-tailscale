@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import MarkdownPreview from './MarkdownPreview.svelte';
-import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '../../../shared/data/demo.js';
+import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/data/demo.js';
 
 // Re-host the frozen DEMO_TEXT_CODE_SHARE_BLOCKS markdown fixture so every story
 // `text` arg is sourced from the real inline-text markdown demo block — nothing

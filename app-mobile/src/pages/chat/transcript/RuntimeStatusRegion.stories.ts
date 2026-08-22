@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import RuntimeStatusRegion from './RuntimeStatusRegion.svelte';
-import { INITIAL_RUNTIME_STATE, type RuntimeUiState } from '../../../shared/data/runtime.js';
+import { INITIAL_RUNTIME_STATE, type RuntimeUiState } from '$shared/data/runtime.js';
 
 // Prop-driven stories over the exported INITIAL_RUNTIME_STATE: each story spreads the
 // real initial state and selects a real RuntimePhase so runtimeAnnouncement emits the

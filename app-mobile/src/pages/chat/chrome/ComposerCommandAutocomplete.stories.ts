@@ -8,9 +8,9 @@ import ComposerCommandAutocomplete, {
 import type {
   HostCommandCatalogState,
   ScopedCommandSnapshot,
-} from '../../../shared/data/commands.js';
-import { rankHostCommands, type RankedHostCommand } from '../../../shared/data/rankHostCommands.js';
-import { demoPostJson } from '../../../shared/data/demo.js';
+} from '$shared/data/commands.js';
+import { rankHostCommands, type RankedHostCommand } from '$shared/data/rankHostCommands.js';
+import { demoPostJson } from '$shared/data/demo.js';
 
 // Re-host the demo `/api/commands/list` rows through the real ranker and the
 // panel's exported state-machine derivation so every story's `items` and

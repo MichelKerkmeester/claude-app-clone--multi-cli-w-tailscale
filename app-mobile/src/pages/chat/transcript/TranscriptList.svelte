@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { DisplayTranscriptBlock, TodoProjectionState } from '../../../shared/data/state.js';
+  import type { DisplayTranscriptBlock, TodoProjectionState } from '$shared/data/state.js';
 
   export interface TranscriptListProps {
     readonly sessionId?: string;
@@ -37,9 +37,9 @@
   import { untrack } from 'svelte';
   import { get } from 'svelte/store';
   import { createVirtualizer } from '@tanstack/svelte-virtual';
-  import { EMPTY_TODO_PROJECTION_STATE } from '../../../shared/data/state.js';
+  import { EMPTY_TODO_PROJECTION_STATE } from '$shared/data/state.js';
   import { normalizeTranscriptBlocks } from '../rich-content/normalizeTranscriptBlocks.js';
-  import { groupBlocksIntoTurns } from '../../../shared/data/turns.js';
+  import { groupBlocksIntoTurns } from '$shared/data/turns.js';
   import { groupNormalizedTranscript, insertTodoProjectionItem } from './transcript-helpers.js';
   import TodoProjectionBlock from './TodoProjectionBlock.svelte';
   import NormalizedActivityGroup from './NormalizedActivityGroup.svelte';

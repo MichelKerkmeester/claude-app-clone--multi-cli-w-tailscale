@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
-import { demoPostJson } from '../../shared/data/demo.js';
+import { demoPostJson } from '$shared/data/demo.js';
 import Review from './Review.svelte';
 
 // Re-host the demo session ids through the relay's real /api/sessions shape so

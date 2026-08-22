@@ -19,7 +19,7 @@ import {
   type AttachmentReservationResponse,
   type AttachmentReserveBinding,
   type AttachmentStatusResponse,
-} from '../../../shared/data/relay.js';
+} from '$shared/data/relay.js';
 import type { AttachmentDraftItem } from './attachment-state.js';
 
 const MAX_PARALLEL_UPLOADS = 2;

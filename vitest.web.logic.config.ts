@@ -37,6 +37,7 @@ const LOGIC_TESTS = [
 ];
 
 export default defineConfig({
+  resolve: { alias: { $shared: new URL('./app-mobile/src/shared', import.meta.url).pathname } },
   plugins: [svelte({ hot: false })],
   test: {
     environment: 'jsdom',

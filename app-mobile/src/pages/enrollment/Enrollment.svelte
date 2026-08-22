@@ -1,6 +1,6 @@
 <script module lang="ts">
-  import type { ConnectionPhase } from '../../shared/data/state.js';
-  import type { DeviceIdentity } from '../../shared/data/auth.js';
+  import type { ConnectionPhase } from '$shared/data/state.js';
+  import type { DeviceIdentity } from '$shared/data/auth.js';
 
   export interface EnrollmentProps {
     readonly phase: ConnectionPhase;
@@ -9,9 +9,9 @@
 </script>
 
 <script lang="ts">
-  import { enrollDevice, establishSession, scanQrImage } from '../../shared/data/auth.js';
-  import { messageFrom } from '../../shared/data/view-helpers.js';
-  import Button from '../../shared/primitives/Button.svelte';
+  import { enrollDevice, establishSession, scanQrImage } from '$shared/data/auth.js';
+  import { messageFrom } from '$shared/data/view-helpers.js';
+  import Button from '$shared/primitives/Button.svelte';
 
   let { phase, onEnrolled }: EnrollmentProps = $props();
 

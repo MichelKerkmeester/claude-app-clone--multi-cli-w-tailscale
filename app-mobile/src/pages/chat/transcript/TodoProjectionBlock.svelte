@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { TodoProjectionState } from '../../../shared/data/state.js';
+  import type { TodoProjectionState } from '$shared/data/state.js';
 
   export interface TodoProjectionBlockProps {
     readonly state: TodoProjectionState;

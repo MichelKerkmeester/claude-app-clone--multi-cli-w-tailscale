@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
 import CommandOption from './CommandOption.svelte';
-import { rankHostCommands, type RankedHostCommand } from '../../../shared/data/rankHostCommands.js';
-import { demoPostJson } from '../../../shared/data/demo.js';
+import { rankHostCommands, type RankedHostCommand } from '$shared/data/rankHostCommands.js';
+import { demoPostJson } from '$shared/data/demo.js';
 
 // Re-host the demo `/api/commands/list` rows through the real deterministic
 // ranker so every CommandOption story's `command` is a real RankedHostCommand

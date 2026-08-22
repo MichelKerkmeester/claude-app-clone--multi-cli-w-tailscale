@@ -9,8 +9,8 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import Collapsible from '../../../shared/primitives/Collapsible.svelte';
-  import { hover } from '../../../shared/primitives/interactions.js';
+  import Collapsible from '$shared/primitives/Collapsible.svelte';
+  import { hover } from '$shared/primitives/interactions.js';
 
   // ─── Props ───────────────────────────────
   let { summary, children }: CollapsedEvidenceProps = $props();

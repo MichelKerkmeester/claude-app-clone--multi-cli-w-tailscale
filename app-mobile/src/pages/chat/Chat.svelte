@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { ReadOnlyCache } from '../../shared/data/cache.js';
+  import type { ReadOnlyCache } from '$shared/data/cache.js';
   import {
     transcriptReducer,
     type ConnectionAction,
@@ -7,10 +7,10 @@
     type TranscriptState,
     type TodoProjectionAction,
     type TodoProjectionState,
-  } from '../../shared/data/state.js';
+  } from '$shared/data/state.js';
   import type { RuntimeMediaCapabilityDto, SessionCardDto } from '@pi-remote/pi-rpc-protocol';
-  import type { RuntimeUiState } from '../../shared/data/runtime.js';
-  import type { SlashSubmitFailureCode } from '../../shared/data/submitSlashDraft.js';
+  import type { RuntimeUiState } from '$shared/data/runtime.js';
+  import type { SlashSubmitFailureCode } from '$shared/data/submitSlashDraft.js';
 
   export interface SessionProps {
     readonly connection: ConnectionPhase;
@@ -73,17 +73,17 @@
   // ─── Imports ───────────────────────────────
   import { untrack } from 'svelte';
 
-  import { messageFrom, relativeTime, sessionStatusLabel } from '../../shared/data/view-helpers.js';
-  import { installCacheRevalidation } from '../../shared/data/cache.js';
-  import { abortPrompt, submitPrompt } from '../../shared/data/relay.js';
-  import { submitSlashDraft } from '../../shared/data/submitSlashDraft.js';
-  import { bindingMatchesSnapshot, type SelectedCommandBinding } from '../../shared/data/commands.js';
-  import { bindingAfterDraftChange } from '../../shared/data/insertSlashCommand.js';
-  import { modeAuthority } from '../../shared/data/runtime.js';
-  import { DEFAULT_MEDIA_CAPABILITY_OFF, EMPTY_TODO_PROJECTION_STATE } from '../../shared/data/state.js';
-  import { useRuntime } from '../../shared/data/useRuntime.svelte.js';
-  import { useHostCommandCatalog } from '../../shared/data/hostCommandCatalog.svelte.js';
-  import { useSyncSocket } from '../../shared/data/useSyncSocket.svelte.js';
+  import { messageFrom, relativeTime, sessionStatusLabel } from '$shared/data/view-helpers.js';
+  import { installCacheRevalidation } from '$shared/data/cache.js';
+  import { abortPrompt, submitPrompt } from '$shared/data/relay.js';
+  import { submitSlashDraft } from '$shared/data/submitSlashDraft.js';
+  import { bindingMatchesSnapshot, type SelectedCommandBinding } from '$shared/data/commands.js';
+  import { bindingAfterDraftChange } from '$shared/data/insertSlashCommand.js';
+  import { modeAuthority } from '$shared/data/runtime.js';
+  import { DEFAULT_MEDIA_CAPABILITY_OFF, EMPTY_TODO_PROJECTION_STATE } from '$shared/data/state.js';
+  import { useRuntime } from '$shared/data/useRuntime.svelte.js';
+  import { useHostCommandCatalog } from '$shared/data/hostCommandCatalog.svelte.js';
+  import { useSyncSocket } from '$shared/data/useSyncSocket.svelte.js';
   import type { EffortSheetSection } from './chrome/ModelEffortSheet.svelte';
 
   import RuntimeStatusRegion from './transcript/RuntimeStatusRegion.svelte';
@@ -96,7 +96,7 @@
   import PlanReviewSheet from './chrome/PlanReviewSheet.svelte';
   import LeavePlanSheet from './chrome/LeavePlanSheet.svelte';
   import ModelEffortSheet from './chrome/ModelEffortSheet.svelte';
-  import SessionStateIcon from '../../shared/chrome/SessionStateIcon.svelte';
+  import SessionStateIcon from '$shared/chrome/SessionStateIcon.svelte';
   import ArtifactViewerProvider from './artifacts/ArtifactViewerProvider.svelte';
   import AttachmentDraftProvider from './attachments/AttachmentDraftProvider.svelte';
 

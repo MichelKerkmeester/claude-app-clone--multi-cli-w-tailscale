@@ -8,9 +8,9 @@
     unsubscribeFromPush,
     updatePushPreferences,
     type PushConfig,
-  } from '../../shared/data/attention.js';
-  import { attentionLabel, messageFrom } from '../../shared/data/view-helpers.js';
-  import Button from '../../shared/primitives/Button.svelte';
+  } from '$shared/data/attention.js';
+  import { attentionLabel, messageFrom } from '$shared/data/view-helpers.js';
+  import Button from '$shared/primitives/Button.svelte';
 
   // ─── Local state ───────────────────────────────
   // @ds surface: push-settings — device notification preferences. States: loading · disabled · off · on.

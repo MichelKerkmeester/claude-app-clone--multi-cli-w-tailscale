@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import NormalizedTranscriptBlockView from './NormalizedTranscriptBlockView.svelte';
-import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '../../../shared/data/demo.js';
+import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/data/demo.js';
 import {
   normalizeTranscriptBlocks,
   type NormalizedTranscriptBlock,
@@ -10,7 +10,7 @@ import {
   parseDisplayBlock,
   type DisplayTranscriptBlock,
   type TranscriptProvenance,
-} from '../../../shared/data/state.js';
+} from '$shared/data/state.js';
 
 // Re-host the frozen rich-content fixtures through the existing normalizer so every
 // story `block` arg is a real NormalizedTranscriptBlock sourced from the demo data —

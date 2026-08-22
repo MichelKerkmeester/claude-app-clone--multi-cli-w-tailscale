@@ -25,10 +25,10 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import Button from '../../../shared/primitives/Button.svelte';
-  import Sheet from '../../../shared/primitives/Sheet.svelte';
-  import SheetContent from '../../../shared/primitives/SheetContent.svelte';
-  import SheetTitle from '../../../shared/primitives/SheetTitle.svelte';
+  import Button from '$shared/primitives/Button.svelte';
+  import Sheet from '$shared/primitives/Sheet.svelte';
+  import SheetContent from '$shared/primitives/SheetContent.svelte';
+  import SheetTitle from '$shared/primitives/SheetTitle.svelte';
 
   // ─── Props ───────────────────────────────
   let {

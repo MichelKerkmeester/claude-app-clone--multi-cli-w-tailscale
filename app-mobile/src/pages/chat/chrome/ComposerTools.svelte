@@ -1,6 +1,6 @@
 <script module lang="ts">
-  import type { RuntimeControls } from '../../../shared/data/runtime.js';
-  import type { HostCommandCatalogState, SelectedCommandBinding } from '../../../shared/data/commands.js';
+  import type { RuntimeControls } from '$shared/data/runtime.js';
+  import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/data/commands.js';
 
   export interface ComposerToolsProps {
     readonly runtimeControls: RuntimeControls;
@@ -33,8 +33,8 @@
 <script lang="ts">
   // ─── Imports ───────────────────────────────
   import { Popover } from 'bits-ui';
-  import { hideOutside } from '../../../shared/primitives/ariaHideOutside.svelte.js';
-  import Button from '../../../shared/primitives/Button.svelte';
+  import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
+  import Button from '$shared/primitives/Button.svelte';
   import CommandPalette from './CommandPalette.svelte';
   import { ATTACHMENT_ACCEPT } from '../attachments/attachment-state.js';
 

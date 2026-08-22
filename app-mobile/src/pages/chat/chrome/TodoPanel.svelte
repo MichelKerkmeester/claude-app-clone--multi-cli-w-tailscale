@@ -37,10 +37,10 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import { buildTodoDisplayModel, TODO_STATE_LABELS } from '../../../shared/data/todo-model.js';
-  import Button from '../../../shared/primitives/Button.svelte';
-  import Collapsible from '../../../shared/primitives/Collapsible.svelte';
-  import { focused, focusVisible, hover, press } from '../../../shared/primitives/interactions.js';
+  import { buildTodoDisplayModel, TODO_STATE_LABELS } from '$shared/data/todo-model.js';
+  import Button from '$shared/primitives/Button.svelte';
+  import Collapsible from '$shared/primitives/Collapsible.svelte';
+  import { focused, focusVisible, hover, press } from '$shared/primitives/interactions.js';
 
   // ─── Props ───────────────────────────────
   let {

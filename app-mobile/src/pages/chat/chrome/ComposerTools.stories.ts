@@ -11,13 +11,13 @@ import {
   runtimeReducer,
   type RuntimeControls,
   type RuntimeUiState,
-} from '../../../shared/data/runtime.js';
+} from '$shared/data/runtime.js';
 import type {
   HostCommandCatalogState,
   ScopedCommandSnapshot,
   SelectedCommandBinding,
-} from '../../../shared/data/commands.js';
-import { demoPostJson } from '../../../shared/data/demo.js';
+} from '$shared/data/commands.js';
+import { demoPostJson } from '$shared/data/demo.js';
 
 // Re-host the demo runtime + command fixtures so every ComposerTools story args
 // object is sourced from demo.ts — nothing is invented. The runtime hydrates to

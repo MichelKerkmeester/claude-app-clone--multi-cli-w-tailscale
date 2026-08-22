@@ -14,7 +14,7 @@
 <script lang="ts">
   // ─── Imports ───────────────────────────────
   import { untrack } from 'svelte';
-  import { fetchAskQuestionDisplay } from '../../../../shared/data/relay.js';
+  import { fetchAskQuestionDisplay } from '$shared/data/relay.js';
   import {
     releaseAskQuestionEphemeral,
     setAskQuestionDisplay,

@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import { relativeTime } from '../../shared/data/view-helpers.js';
+  import { relativeTime } from '$shared/data/view-helpers.js';
 
   let { stale, at }: FreshnessProps = $props();
 </script>

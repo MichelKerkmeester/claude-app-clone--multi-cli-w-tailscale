@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { DisplayTranscriptBlock } from '../../../shared/data/state.js';
+  import type { DisplayTranscriptBlock } from '$shared/data/state.js';
   import type { AskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
 
   export interface BlockProps {
@@ -16,7 +16,7 @@
   import ArtifactCard from '../artifacts/ArtifactCard.svelte';
   import InboundImageBlockView from '../artifacts/InboundImageBlockView.svelte';
   import AskQuestionCard from '../features/ask-question/AskQuestionCard.svelte';
-  import { formatNumber, formatCost, formatTime } from '../../../shared/data/format.js';
+  import { formatNumber, formatCost, formatTime } from '$shared/data/format.js';
   import CollapsedEvidence from './CollapsedEvidence.svelte';
   import FilePreviewCard from './FilePreviewCard.svelte';
 

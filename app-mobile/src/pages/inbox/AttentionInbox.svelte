@@ -1,6 +1,6 @@
 <script module lang="ts">
   import type { AttentionItemDto } from '@pi-remote/pi-rpc-protocol';
-  import { openAttentionHint } from '../../shared/data/attention.js';
+  import { openAttentionHint } from '$shared/data/attention.js';
 
   export interface AttentionInboxProps {
     readonly onBack: () => void;
@@ -11,9 +11,9 @@
 <script lang="ts">
   // ─── Imports ───────────────────────────────
   import { onMount } from 'svelte';
-  import { fetchAttention } from '../../shared/data/attention.js';
-  import { attentionIcon, attentionLabel, messageFrom, relativeTime } from '../../shared/data/view-helpers.js';
-  import Button from '../../shared/primitives/Button.svelte';
+  import { fetchAttention } from '$shared/data/attention.js';
+  import { attentionIcon, attentionLabel, messageFrom, relativeTime } from '$shared/data/view-helpers.js';
+  import Button from '$shared/primitives/Button.svelte';
 
   // ─── Props ───────────────────────────────
   let { onBack, onOpen }: AttentionInboxProps = $props();

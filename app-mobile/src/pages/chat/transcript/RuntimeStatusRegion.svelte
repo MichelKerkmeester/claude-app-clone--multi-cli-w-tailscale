@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import { runtimeAnnouncement, type RuntimeUiState } from '../../../shared/data/runtime.js';
+  import { runtimeAnnouncement, type RuntimeUiState } from '$shared/data/runtime.js';
 
   /**
    * The one document-level polite atomic runtime status region. Confirmations

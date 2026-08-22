@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
-import type { SessionListState, ConnectionPhase } from '../../shared/data/state.js';
-import { demoPostJson, DEMO_IDENTITY } from '../../shared/data/demo.js';
+import type { SessionListState, ConnectionPhase } from '$shared/data/state.js';
+import { demoPostJson, DEMO_IDENTITY } from '$shared/data/demo.js';
 import Home from './Home.svelte';
 
 // Re-host the demo session roster through the relay's real /api/sessions shape

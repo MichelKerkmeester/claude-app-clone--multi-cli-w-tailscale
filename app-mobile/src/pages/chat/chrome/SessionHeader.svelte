@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { RuntimeControls } from '../../../shared/data/runtime.js';
+  import type { RuntimeControls } from '$shared/data/runtime.js';
 
   export type ThemePreference = 'system' | 'light' | 'dark';
 
@@ -48,11 +48,11 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import { modelEffortTriggerName, effortTriggerText } from '../../../shared/data/effort.js';
-  import { modelSwitcherStrings } from '../../../shared/data/model-switcher-strings.js';
+  import { modelEffortTriggerName, effortTriggerText } from '$shared/data/effort.js';
+  import { modelSwitcherStrings } from '$shared/data/model-switcher-strings.js';
   import { Popover } from 'bits-ui';
-  import { hideOutside } from '../../../shared/primitives/ariaHideOutside.svelte.js';
-  import Button from '../../../shared/primitives/Button.svelte';
+  import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
+  import Button from '$shared/primitives/Button.svelte';
 
   // ─── Props ───────────────────────────────
   let {

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import TodoProjectionBlock from './TodoProjectionBlock.svelte';
-import { EMPTY_TODO_PROJECTION_STATE, type TodoProjectionState } from '../../../shared/data/state.js';
+import { EMPTY_TODO_PROJECTION_STATE, type TodoProjectionState } from '$shared/data/state.js';
 
 // The `todos` surface is registry-only because the demo projection is not exported
 // for a typed preview (see registry.ts). DEMO_TODO_FIXTURE declares the grouped /

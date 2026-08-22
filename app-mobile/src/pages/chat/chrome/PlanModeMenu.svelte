@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { ConfirmedMode } from '../../../shared/data/runtime.js';
+  import type { ConfirmedMode } from '$shared/data/runtime.js';
 
   export interface PlanModeMenuProps {
     readonly confirmedMode: ConfirmedMode;
@@ -18,9 +18,9 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import { focusVisible, focused } from '../../../shared/primitives/interactions.js';
-  import MenuContent from '../../../shared/primitives/MenuContent.svelte';
-  import MenuItem from '../../../shared/primitives/MenuItem.svelte';
+  import { focusVisible, focused } from '$shared/primitives/interactions.js';
+  import MenuContent from '$shared/primitives/MenuContent.svelte';
+  import MenuItem from '$shared/primitives/MenuItem.svelte';
 
   // ─── Props ───────────────────────────────
   let { confirmedMode, rowsDisabled, rowsDisabledReason, onSelect }: PlanModeMenuProps = $props();

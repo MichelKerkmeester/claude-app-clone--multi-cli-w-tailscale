@@ -5,6 +5,8 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
   preprocess: vitePreprocess(),
   kit: {
+    // $shared → src/shared: a single flat alias replacing deep ../../../shared/ chains.
+    alias: { $shared: 'src/shared' },
     // SPA / CSR: a single static fallback, no server. Tailscale Serve (not the relay) serves
     // this build, and adapter-static keeps the dist/ output that the release gate and vite
     // preview already expect — so the backend needs zero serving changes.

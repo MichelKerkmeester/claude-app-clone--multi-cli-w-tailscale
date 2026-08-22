@@ -18,8 +18,8 @@ import {
   type ArtifactReadVariant,
   type ArtifactResource,
   type ArtifactResourceBlock,
-} from '../../../shared/data/relay.js';
-import { demoInboundArtifactResource, isDemoMode } from '../../../shared/data/demo.js';
+} from '$shared/data/relay.js';
+import { demoInboundArtifactResource, isDemoMode } from '$shared/data/demo.js';
 
 export const ARTIFACT_RESOURCE_STALL_MS = 15_000;
 export const MAX_ARTIFACT_RESOURCE_BYTES = 50 * 1024 * 1024;

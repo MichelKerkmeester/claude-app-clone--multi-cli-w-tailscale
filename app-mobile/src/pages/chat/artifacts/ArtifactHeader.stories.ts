@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import ArtifactHeader from './ArtifactHeader.svelte';
-import { DEMO_DIFF_FIXTURE, DEMO_ARTIFACT_BLOCKS } from '../../../shared/data/demo.js';
+import { DEMO_DIFF_FIXTURE, DEMO_ARTIFACT_BLOCKS } from '$shared/data/demo.js';
 
 // Re-host the frozen demo fixtures so every story arg is sourced from real demo
 // data — nothing is invented. The title comes from DEMO_DIFF_FIXTURE.summary and

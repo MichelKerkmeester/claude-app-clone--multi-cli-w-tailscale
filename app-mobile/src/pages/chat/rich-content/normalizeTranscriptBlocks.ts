@@ -14,7 +14,7 @@ import {
   type TranscriptTerminalCheckpoint,
 } from '@pi-remote/pi-rpc-protocol';
 
-import type { DisplayTranscriptBlock, TranscriptProvenance } from '../../../shared/data/state.js';
+import type { DisplayTranscriptBlock, TranscriptProvenance } from '$shared/data/state.js';
 
 export type RichContentSource = TranscriptProvenance;
 

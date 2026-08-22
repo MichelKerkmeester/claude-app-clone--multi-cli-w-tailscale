@@ -12,6 +12,7 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: { alias: { $shared: new URL('./app-mobile/src/shared', import.meta.url).pathname } },
   plugins: [svelte({ hot: false }), svelteTesting()],
   test: {
     environment: 'jsdom',

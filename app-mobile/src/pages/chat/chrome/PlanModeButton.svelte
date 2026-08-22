@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { RuntimeUiState } from '../../../shared/data/runtime.js';
+  import type { RuntimeUiState } from '$shared/data/runtime.js';
 
   export interface PlanModeButtonProps {
     readonly runtime: RuntimeUiState;
@@ -18,11 +18,11 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import { modeAuthority } from '../../../shared/data/runtime.js';
+  import { modeAuthority } from '$shared/data/runtime.js';
   import { planModePresentation } from './planModePresentation.js';
-  import { focusVisible, hover, press } from '../../../shared/primitives/interactions.js';
-  import Menu from '../../../shared/primitives/Menu.svelte';
-  import MenuTrigger from '../../../shared/primitives/MenuTrigger.svelte';
+  import { focusVisible, hover, press } from '$shared/primitives/interactions.js';
+  import Menu from '$shared/primitives/Menu.svelte';
+  import MenuTrigger from '$shared/primitives/MenuTrigger.svelte';
   import PlanModeMenu from './PlanModeMenu.svelte';
 
   let {

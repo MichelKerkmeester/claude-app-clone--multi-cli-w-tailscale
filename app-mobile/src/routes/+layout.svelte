@@ -22,18 +22,18 @@
     setAppState,
     setAppActions,
     type AppActions,
-  } from '../shared/data/app-state.svelte.js';
-  import { establishSession, revokeDevice, logoutDevice, type DeviceIdentity } from '../shared/data/auth.js';
-  import { fetchSessions } from '../shared/data/relay.js';
-  import { setPushForeground, unsubscribeFromPush } from '../shared/data/attention.js';
-  import { saveCache } from '../shared/data/cache.js';
-  import { messageFrom } from '../shared/data/view-helpers.js';
-  import type { ConnectionAction } from '../shared/data/state.js';
+  } from '$shared/data/app-state.svelte.js';
+  import { establishSession, revokeDevice, logoutDevice, type DeviceIdentity } from '$shared/data/auth.js';
+  import { fetchSessions } from '$shared/data/relay.js';
+  import { setPushForeground, unsubscribeFromPush } from '$shared/data/attention.js';
+  import { saveCache } from '$shared/data/cache.js';
+  import { messageFrom } from '$shared/data/view-helpers.js';
+  import type { ConnectionAction } from '$shared/data/state.js';
   import type { AttentionResolutionDto } from '@pi-remote/pi-rpc-protocol';
 
-  import RootErrorBoundary from '../shared/chrome/RootErrorBoundary.svelte';
+  import RootErrorBoundary from '$shared/chrome/RootErrorBoundary.svelte';
   import Enrollment from '../pages/enrollment/Enrollment.svelte';
-  import Header from '../shared/chrome/Header.svelte';
+  import Header from '$shared/chrome/Header.svelte';
   import Review from '../pages/review/Review.svelte';
   import AttentionInbox from '../pages/inbox/AttentionInbox.svelte';
 

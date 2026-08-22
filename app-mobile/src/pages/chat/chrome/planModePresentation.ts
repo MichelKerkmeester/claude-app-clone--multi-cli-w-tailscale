@@ -3,8 +3,8 @@
 // (the derivation is pure; the React file keeps its own copy until cutover) so the
 // SvelteKit bundle carries no React. Every branch is bounded local copy and no mode
 // is guessed beyond what the host confirmed.
-import { modeAuthority, type RuntimeUiState } from '../../../shared/data/runtime.js';
-import { runtimeIssueMessage } from '../../../shared/data/runtime-issues.js';
+import { modeAuthority, type RuntimeUiState } from '$shared/data/runtime.js';
+import { runtimeIssueMessage } from '$shared/data/runtime-issues.js';
 
 // @ds state: chart — the ModePresentationKind set; each kind maps to an is-<kind> class seam.
 export type ModePresentationKind =

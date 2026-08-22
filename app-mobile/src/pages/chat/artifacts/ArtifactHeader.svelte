@@ -9,7 +9,7 @@
 </script>
 
 <script lang="ts">
-  import { hover, focusVisible } from '../../../shared/primitives/interactions.js';
+  import { hover, focusVisible } from '$shared/primitives/interactions.js';
 
   let {
     headingRef = $bindable(null),

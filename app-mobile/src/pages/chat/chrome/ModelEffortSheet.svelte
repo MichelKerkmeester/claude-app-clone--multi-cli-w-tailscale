@@ -1,7 +1,7 @@
 <script module lang="ts">
-  import { applyingEffortMessage, effortStrings } from '../../../shared/data/effort.js';
-  import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '../../../shared/data/runtime.js';
-  import { runtimeIssueMessage } from '../../../shared/data/runtime-issues.js';
+  import { applyingEffortMessage, effortStrings } from '$shared/data/effort.js';
+  import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '$shared/data/runtime.js';
+  import { runtimeIssueMessage } from '$shared/data/runtime-issues.js';
 
   export const SEARCH_THRESHOLD = 8;
   export const SWIPE_DISMISS_RATIO = 0.3;
@@ -78,7 +78,7 @@
   // ─── Imports ───────────────────────────────
   import type { AvailableModelDto, RuntimeControlResponse } from '@pi-remote/pi-rpc-protocol';
   import { untrack } from 'svelte';
-  import { effortConfirmedMessage } from '../../../shared/data/effort.js';
+  import { effortConfirmedMessage } from '$shared/data/effort.js';
   import {
     displayModelText as displayModel,
     filterAndRankModels,
@@ -88,7 +88,7 @@
     modelCapabilities,
     modelKey,
     organizeModelCatalog as organizeCatalog,
-  } from '../../../shared/data/model-catalog.js';
+  } from '$shared/data/model-catalog.js';
   import {
     modelCountMessage,
     modelRowName,
@@ -97,13 +97,13 @@
     modelSwitchedMessage,
     noModelMatchMessage,
     runtimeOutcomeMessage,
-  } from '../../../shared/data/model-switcher-strings.js';
-  import { focusVisible, focused, hover, press } from '../../../shared/primitives/interactions.js';
-  import Button from '../../../shared/primitives/Button.svelte';
-  import Sheet from '../../../shared/primitives/Sheet.svelte';
-  import SheetClose from '../../../shared/primitives/SheetClose.svelte';
-  import SheetContent from '../../../shared/primitives/SheetContent.svelte';
-  import SheetTitle from '../../../shared/primitives/SheetTitle.svelte';
+  } from '$shared/data/model-switcher-strings.js';
+  import { focusVisible, focused, hover, press } from '$shared/primitives/interactions.js';
+  import Button from '$shared/primitives/Button.svelte';
+  import Sheet from '$shared/primitives/Sheet.svelte';
+  import SheetClose from '$shared/primitives/SheetClose.svelte';
+  import SheetContent from '$shared/primitives/SheetContent.svelte';
+  import SheetTitle from '$shared/primitives/SheetTitle.svelte';
   import EffortRadioGroup from './EffortRadioGroup.svelte';
 
   // ─── Props ───────────────────────────────

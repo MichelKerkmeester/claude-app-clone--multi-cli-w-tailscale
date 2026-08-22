@@ -15,7 +15,7 @@
 </script>
 
 <script lang="ts">
-  import { hover, press, focusVisible } from '../../../shared/primitives/interactions.js';
+  import { hover, press, focusVisible } from '$shared/primitives/interactions.js';
 
   let { item, previewUrl, onOpen, onRemove, position, total }: AttachmentTileProps = $props();
 

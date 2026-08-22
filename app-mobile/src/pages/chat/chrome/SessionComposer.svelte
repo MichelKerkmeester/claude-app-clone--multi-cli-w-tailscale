@@ -15,8 +15,8 @@
   // action route between local Insert (panel open) and native multiline/send
   // (panel closed), and no panel interaction can ever reach submission.
 
-  import type { RuntimeControls } from '../../../shared/data/runtime.js';
-  import type { HostCommandCatalogState, SelectedCommandBinding } from '../../../shared/data/commands.js';
+  import type { RuntimeControls } from '$shared/data/runtime.js';
+  import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/data/commands.js';
   import type { RuntimeMediaCapabilityDto } from '@pi-remote/pi-rpc-protocol';
 
   export interface SessionComposerProps {
@@ -76,14 +76,14 @@
   import { getAttachmentDraft } from '../attachments/AttachmentDraftProvider.svelte';
   import { capabilityAllowsPhotos } from '../attachments/attachment-state.js';
   import { useAttachmentSubmission } from '../attachments/useAttachmentSubmission.svelte.js';
-  import { rankHostCommands } from '../../../shared/data/rankHostCommands.js';
-  import { bindingFor } from '../../../shared/data/commands.js';
-  import { insertSlashCommand } from '../../../shared/data/insertSlashCommand.js';
-  import { deriveSlashTrigger, slashDismissalSignature } from '../../../shared/data/useSlashTrigger.js';
-  import { modeAuthority } from '../../../shared/data/runtime.js';
-  import { readComposerShiftTabPreference, writeComposerShiftTabPreference } from '../../../shared/data/state.js';
-  import { createPlanModeShortcut } from '../../../shared/data/planModeShortcut.js';
-  import Button from '../../../shared/primitives/Button.svelte';
+  import { rankHostCommands } from '$shared/data/rankHostCommands.js';
+  import { bindingFor } from '$shared/data/commands.js';
+  import { insertSlashCommand } from '$shared/data/insertSlashCommand.js';
+  import { deriveSlashTrigger, slashDismissalSignature } from '$shared/data/useSlashTrigger.js';
+  import { modeAuthority } from '$shared/data/runtime.js';
+  import { readComposerShiftTabPreference, writeComposerShiftTabPreference } from '$shared/data/state.js';
+  import { createPlanModeShortcut } from '$shared/data/planModeShortcut.js';
+  import Button from '$shared/primitives/Button.svelte';
 
   // ─── Props ───────────────────────────────
   let {

@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { DisplayTranscriptBlock } from '../../../shared/data/state.js';
+  import type { DisplayTranscriptBlock } from '$shared/data/state.js';
   import type {
     NormalizedCodeBlock,
     NormalizedCommandBlock,

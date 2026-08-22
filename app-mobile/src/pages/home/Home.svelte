@@ -1,7 +1,7 @@
 <script module lang="ts">
-  import type { SessionListState, ConnectionPhase } from '../../shared/data/state.js';
-  import type { ReadOnlyCache } from '../../shared/data/cache.js';
-  import type { DeviceIdentity } from '../../shared/data/auth.js';
+  import type { SessionListState, ConnectionPhase } from '$shared/data/state.js';
+  import type { ReadOnlyCache } from '$shared/data/cache.js';
+  import type { DeviceIdentity } from '$shared/data/auth.js';
 
   export interface HomeProps {
     readonly sessions: SessionListState;
@@ -16,11 +16,11 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import { sessionStatusLabel, compactId, relativeTime } from '../../shared/data/view-helpers.js';
-  import Button from '../../shared/primitives/Button.svelte';
+  import { sessionStatusLabel, compactId, relativeTime } from '$shared/data/view-helpers.js';
+  import Button from '$shared/primitives/Button.svelte';
   import Freshness from './Freshness.svelte';
   import EmptyState from './EmptyState.svelte';
-  import SessionStateIcon from '../../shared/chrome/SessionStateIcon.svelte';
+  import SessionStateIcon from '$shared/chrome/SessionStateIcon.svelte';
   import PushSettings from './PushSettings.svelte';
 
   // ─── Props ───────────────────────────────

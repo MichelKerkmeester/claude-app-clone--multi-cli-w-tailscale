@@ -183,8 +183,8 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import { useVisualViewportAnchor } from '../../../shared/data/useVisualViewportAnchor.svelte.js';
-  import { hideOutside } from '../../../shared/primitives/ariaHideOutside.svelte.js';
+  import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
+  import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
   import {
     canCopyDisplayedArtifact,
     canShareDisplayedArtifact,

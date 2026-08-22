@@ -12,8 +12,8 @@
   // touches the host execution path. The panel is an overlay, so opening and
   // closing displace nothing.
 
-  import type { HostCommandCatalogState, HostCommandCatalogStatus } from '../../../shared/data/commands.js';
-  import type { RankedHostCommand } from '../../../shared/data/rankHostCommands.js';
+  import type { HostCommandCatalogState, HostCommandCatalogStatus } from '$shared/data/commands.js';
+  import type { RankedHostCommand } from '$shared/data/rankHostCommands.js';
 
   /** The listbox the composer's aria-controls references while rows exist. */
   export const SLASH_LISTBOX_ID = 'slash-command-list';
@@ -218,8 +218,8 @@
 
 <script lang="ts">
   // ─── Imports ───────────────────────────────
-  import { useVisualViewportAnchor } from '../../../shared/data/useVisualViewportAnchor.svelte.js';
-  import Button from '../../../shared/primitives/Button.svelte';
+  import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
+  import Button from '$shared/primitives/Button.svelte';
   import CommandOption from './CommandOption.svelte';
 
   // ─── Props ───────────────────────────────

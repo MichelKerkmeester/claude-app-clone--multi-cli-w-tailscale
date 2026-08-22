@@ -3,7 +3,7 @@
   import type { NormalizedTextArtifactBlock } from './normalizeTranscriptBlocks.js';
   import RichBlockFrame from './RichBlockFrame.svelte';
   import { useCopyFeedback } from './useCopyFeedback.svelte.js';
-  import { hover } from '../../../shared/primitives/interactions.js';
+  import { hover } from '$shared/primitives/interactions.js';
 
   interface Props {
     block: NormalizedTextArtifactBlock;

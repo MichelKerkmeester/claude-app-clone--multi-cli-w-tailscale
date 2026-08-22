@@ -5,12 +5,12 @@ import {
   parseDisplayBlock,
   type DisplayTranscriptBlock,
   type TranscriptProvenance,
-} from '../../../shared/data/state.js';
+} from '$shared/data/state.js';
 import {
   DEMO_RICH_CONTENT_BLOCKS,
   DEMO_RICH_RELEASE_BLOCKS,
   DEMO_ARTIFACT_BLOCKS,
-} from '../../../shared/data/demo.js';
+} from '$shared/data/demo.js';
 
 // Re-host the frozen demo fixtures through the existing parseDisplayBlock parser so
 // every story `block` arg is a real DisplayTranscriptBlock sourced from the demo

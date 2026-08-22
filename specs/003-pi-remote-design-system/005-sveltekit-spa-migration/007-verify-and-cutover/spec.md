@@ -11,11 +11,12 @@ _memory:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
     last_updated_at: "2026-08-22T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "007-EXT Phase 0 complete + Phase A partially done. Per-folder READMEs (XA.2) DONE for all app-mobile/src folders (2 commits, docs-only, verified); src/README.md screen map rewritten (XA.1 partial). Research infra SOLVED (NODE_PRESERVE_SYMLINKS=1) + validated end-to-end (dry-run clean, zero side effects) but real launch HELD for genuine user go-ahead (high-blast)."
-    next_safe_action: "Continue Phase A: rewrite the 3 remaining onboarding docs (root README, ARCHITECTURE.md, app-mobile/README.md) + config hygiene (XA.3 tsconfig prune, XA.4 .vscode/.editorconfig/dead-file removal). Phase B (comment segmentation, executor-written) + Phase C + the 5-repo research launch remain gated on user go-ahead."
+    recent_action: "007-EXT Phase A DOCS dimension COMPLETE. XA.1 (all 4 onboarding docs corrected React→Svelte: src screen map, app-mobile/README rewrite, root README + ARCHITECTURE surgical path fixes) DONE (2d2b37c, 25f30e6). XA.2 (per-folder READMEs) DONE. XA.3 tsconfig ANALYZED — surfaced a council-claim correction (allowJs is load-bearing, NOT dead). Research infra SOLVED + validated; launch HELD for genuine user go-ahead."
+    next_safe_action: "Phase A config hygiene remains: XA.3 tsconfig prune (jsx/jsxImportSource only; KEEP allowJs; needs build+svelte-check barrier) + XA.4 (.vscode/.editorconfig, root storybook script, verified dead-file removal). Phase B (comment segmentation, executor-written, TOP PRIORITY) + Phase C + the 5-repo research launch remain gated on user go-ahead (research feeds the phases)."
     blockers:
       - "Research launch needs a genuine in-the-moment go-ahead (high-blast: multi-hour, --auto, external dispatch) — mechanism is fully staged + proven"
-    completion_pct: 75
+      - "XA.3/XA.4 config hygiene needs the build+svelte-check barrier (config changes + dead-file removals); better done as a verified batch"
+    completion_pct: 78
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

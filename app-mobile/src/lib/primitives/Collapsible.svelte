@@ -12,6 +12,8 @@
 </script>
 
 <Collapsible.Root bind:open {...rest}>
-	<Collapsible.Trigger>{@render trigger()}</Collapsible.Trigger>
+	<h3>
+		<Collapsible.Trigger>{@render trigger()}</Collapsible.Trigger>
+	</h3>
 	<Collapsible.Content>{@render children()}</Collapsible.Content>
 </Collapsible.Root>

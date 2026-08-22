@@ -9,8 +9,6 @@
 
 <script lang="ts">
   import { focusVisible, focused, hover } from '../primitives/interactions.js';
-  import ToggleGroup from '../primitives/ToggleGroup.svelte';
-  import ToggleGroupItem from '../primitives/ToggleGroupItem.svelte';
 
   let {
     value,
@@ -18,19 +16,6 @@
   }: ThemeControlProps = $props();
 
   const themes = ['system', 'light', 'dark'] as const;
-
-  // Host-confirmed selection only; Bits ToggleGroup single-type allows emptying, so a
-  // local copy is restored to the host value after every change (non-optimistic, no empty).
-  let themeValue = $state('');
-
-  $effect(() => {
-    themeValue = value;
-  });
-
-  function onThemeChange(next: string): void {
-    if (next === 'system' || next === 'light' || next === 'dark') onChange(next);
-    themeValue = value;
-  }
 
   function attachThemeOptionInteractions(node: Element): () => void {
     const el = node as HTMLElement;
@@ -48,19 +33,21 @@
 <!-- @ds surface: theme-switcher — segmented theme selector. react-aria owns selection. -->
 <div class="theme-control" role="group" aria-label="Color theme">
   <!-- @ds guardrail: react-aria ToggleButton wiring (isSelected/onChange/aria-label) — not designer-editable. -->
-  <ToggleGroup bind:value={themeValue} onValueChange={onThemeChange}>
-    {#each themes as theme (theme)}
-      <ToggleGroupItem
-        value={theme}
-        class="theme-option"
-        aria-label={`Use ${theme} theme`}
-        data-selected={themeValue === theme ? true : undefined}
-        {@attach attachThemeOptionInteractions}
-      >
-        {theme === 'system' ? 'Auto' : theme === 'light' ? 'Light' : 'Dark'}
-      </ToggleGroupItem>
-    {/each}
-  </ToggleGroup>
+  {#each themes as theme (theme)}
+    <button
+      type="button"
+      class="theme-option"
+      aria-pressed={value === theme}
+      data-selected={value === theme ? true : undefined}
+      aria-label={`Use ${theme} theme`}
+      onclick={() => {
+        if (value !== theme) onChange(theme);
+      }}
+      {@attach attachThemeOptionInteractions}
+    >
+      {theme === 'system' ? 'Auto' : theme === 'light' ? 'Light' : 'Dark'}
+    </button>
+  {/each}
 </div>
 
 <!-- @ds surface: theme-switcher — segmented theme selector (ToggleButton group). Decomposed from

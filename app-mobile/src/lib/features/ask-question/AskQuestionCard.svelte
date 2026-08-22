@@ -12,6 +12,7 @@
 </script>
 
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { fetchAskQuestionDisplay } from '../../../relay.js';
   import {
     releaseAskQuestionEphemeral,
@@ -134,7 +135,8 @@
   });
 
   $effect(() => {
-    stateApi.applyTranscriptStatus(block.status);
+    const status = block.status;
+    untrack(() => stateApi.applyTranscriptStatus(status));
   });
 
   $effect(() => {

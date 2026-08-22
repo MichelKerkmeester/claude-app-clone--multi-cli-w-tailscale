@@ -11,10 +11,12 @@ _memory:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
     last_updated_at: "2026-08-22T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Cutover shipped; 007-EXT (editability/DX pass) scoped from the AI council, decisions resolved"
-    next_safe_action: "Execute 007-EXT Phase 0 — calibrate census + React-completion (delete dead hook halves, drop react deps), full-board barrier"
-    blockers: []
-    completion_pct: 70
+    recent_action: "007-EXT Phase 0 calibration complete — X0.1 census (phase-0-census.md, 3 plan refinements) + X0.2 React-completion (0757d83) + X0.3 grammar reference (comment-grammar-reference.md); X0.4 fence baseline deferred to pre-Phase-B"
+    next_safe_action: "Phase 0 done. Remaining 007-EXT (Phase A docs/READMEs · Phase B comment edits · Phase C codemod) + the 5-repo research program are gated on two user decisions: push unpushed commits, and research launch approach (validate-OGAM-first vs all-5, --auto OK)"
+    blockers:
+      - "Push go-ahead needed for the unpushed commits on main"
+      - "Research launch decision needed (approach + --auto) before firing the deep-research loops; per user ordering, research feeds Phase A/B/C"
+    completion_pct: 72
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

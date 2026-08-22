@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds primitive: SheetClose — Bits UI Dialog.Close re-export that renders a children snippet.
   import { Dialog } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

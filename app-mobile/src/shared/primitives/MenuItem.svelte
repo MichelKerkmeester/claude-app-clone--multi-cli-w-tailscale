@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds primitive: MenuItem — Bits UI DropdownMenu.Item re-export that renders a children snippet.
   import { DropdownMenu } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds primitive: SheetTitle — Bits UI Dialog.Title re-export that renders a children snippet.
   import { Dialog } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

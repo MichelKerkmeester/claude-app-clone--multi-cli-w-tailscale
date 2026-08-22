@@ -1,4 +1,5 @@
 <script lang="ts">
+	// @ds primitive: Collapsible — Bits UI Collapsible.Root wrapper that renders a trigger snippet and collapsible content.
 	import { Collapsible } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 

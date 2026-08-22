@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds primitive: MenuContent — Bits UI DropdownMenu.Content portal that hides outside content, traps Tab, and renders a children snippet.
   import { DropdownMenu } from 'bits-ui';
   import { getContext } from 'svelte';
   import { hideOutside } from './ariaHideOutside.svelte.js';

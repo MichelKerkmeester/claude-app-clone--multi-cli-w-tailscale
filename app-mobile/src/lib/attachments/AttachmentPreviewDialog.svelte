@@ -5,6 +5,7 @@
 
 <script lang="ts">
   import { useVisualViewportAnchor } from '../useVisualViewportAnchor.svelte.js';
+  import { hideOutside } from '../primitives/ariaHideOutside.svelte.js';
   import { hover, press, focusVisible } from '../primitives/interactions.js';
   import { getAttachmentDraft } from './AttachmentDraftProvider.svelte';
 
@@ -18,6 +19,11 @@
   let wasOpen = false;
 
   useVisualViewportAnchor(() => dialogEl);
+
+  $effect(() => {
+    if (item === null || dialogEl === null) return;
+    return hideOutside([dialogEl]);
+  });
 
   $effect(() => {
     const isOpen = item !== null;

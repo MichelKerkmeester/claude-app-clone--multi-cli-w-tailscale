@@ -183,6 +183,7 @@
 
 <script lang="ts">
   import { useVisualViewportAnchor } from '../useVisualViewportAnchor.svelte.js';
+  import { hideOutside } from '../primitives/ariaHideOutside.svelte.js';
   import {
     canCopyDisplayedArtifact,
     canShareDisplayedArtifact,
@@ -223,6 +224,11 @@
   let imageZoom = $state(IMAGE_MIN_ZOOM);
   let imagePan = $state<ImagePan>({ x: 0, y: 0 });
   let detailsOpen = $state(false);
+
+  $effect(() => {
+    if (preview === null || phase === 'closed' || dialogEl === null) return;
+    return hideOutside([dialogEl]);
+  });
 
   const setWrap = (value: boolean): void => {
     wrap = value;

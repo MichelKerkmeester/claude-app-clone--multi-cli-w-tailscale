@@ -1,0 +1,7 @@
+{
+  "// note": "Points .svelte files at the Svelte extension's own formatter. Format-on-save is intentionally OFF: a full-file reformat on save would reflow markup/CSS and break the byte-identity guarantee the migration relies on — format explicitly, per file, when you mean to. Indentation, trailing-whitespace, and final-newline rules live in .editorconfig (which correctly leaves markdown hard breaks alone).",
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+  "editor.formatOnSave": false
+}

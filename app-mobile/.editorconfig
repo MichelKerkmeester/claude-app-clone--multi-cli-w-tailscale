@@ -1,0 +1,18 @@
+# Editor defaults for @pi-remote/web. Scoped to app-mobile (root = true stops the
+# search here, so this never affects the relay/backend siblings). Verified 2026-08-22:
+# 194 of 196 source files already indent with 2 spaces — this makes that the standard
+# so new edits stay consistent, and the two tab-indented primitives converge when next
+# touched (a passive default, not a bulk reflow — reflowing would break byte-identity).
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Markdown uses trailing double-space for hard line breaks — don't strip it.
+[*.md]
+trim_trailing_whitespace = false

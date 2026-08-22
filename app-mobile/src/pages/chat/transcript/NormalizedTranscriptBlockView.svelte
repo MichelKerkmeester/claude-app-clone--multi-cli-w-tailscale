@@ -10,6 +10,7 @@
 </script>
 
 <script lang="ts">
+  // @ds surface: NormalizedTranscriptBlockView — renders a normalized transcript block via Block or RichContentRouter.
   import Block from './Block.svelte';
   import RichContentRouter from '../rich-content/RichContentRouter.svelte';
 

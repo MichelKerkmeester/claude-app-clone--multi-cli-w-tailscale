@@ -81,6 +81,7 @@
 </script>
 
 <script lang="ts">
+  // @ds surface: AttachmentDraftProvider — context provider for the chat attachment draft (selection, previews, capability gating).
   let {
     children,
     sessionId = null,

@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds surface: RedactionBadge — badge that labels redacted sensitive fields by category.
   import type { RedactionMetadata } from '@pi-remote/pi-rpc-protocol';
 
   interface Props {

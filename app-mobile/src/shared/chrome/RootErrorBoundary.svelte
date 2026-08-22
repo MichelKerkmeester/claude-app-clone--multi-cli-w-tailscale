@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds surface: RootErrorBoundary — top-level error boundary that catches render failures and offers reload or reset recovery.
   import type { Snippet } from 'svelte';
 
   let { children }: { children: Snippet } = $props();

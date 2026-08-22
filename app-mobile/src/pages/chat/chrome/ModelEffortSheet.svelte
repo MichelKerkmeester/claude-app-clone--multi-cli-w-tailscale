@@ -75,6 +75,7 @@
 </script>
 
 <script lang="ts">
+  // ─── Imports ───────────────────────────────
   import type { AvailableModelDto, RuntimeControlResponse } from '@pi-remote/pi-rpc-protocol';
   import { untrack } from 'svelte';
   import { effortConfirmedMessage } from '../../../shared/data/effort.js';
@@ -105,6 +106,7 @@
   import SheetTitle from '../../../shared/primitives/SheetTitle.svelte';
   import EffortRadioGroup from './EffortRadioGroup.svelte';
 
+  // ─── Props ───────────────────────────────
   let {
     isOpen,
     onOpenChange,
@@ -124,6 +126,7 @@
     sheetOpen = hostOpen;
   });
 
+  // ─── Local state ───────────────────────────────
   let section = $state<EffortSheetSection>('model');
   let query = $state('');
   const deferredQuery = $derived(query);
@@ -151,6 +154,7 @@
   // region so a settled outcome is announced exactly once per transition.
   let prevEffortPending: string | null = null;
 
+  // ─── Derived state ───────────────────────────────
   const current = $derived(runtime.state?.model ?? null);
   const currentKey = $derived(current === null ? null : modelKey(current));
   const confirmedEffort = $derived(runtime.state?.thinkingLevel ?? null);
@@ -211,6 +215,7 @@
   const effortStatus = $derived(effortSectionStatus(runtime, levels));
   const showReconcile = $derived(RECONCILE_PHASES.has(runtime.phase ?? 'checking'));
 
+  // ─── Effects ───────────────────────────────
   $effect(() => {
     if (!isOpen) return;
     section = initialSection;
@@ -332,6 +337,7 @@
     }
   });
 
+  // ─── Handlers ───────────────────────────────
   const restoreTriggerFocus = () => {
     window.setTimeout(() => triggerRef?.focus({ preventScroll: true }), 0);
   };
@@ -588,6 +594,7 @@
     rows[next]?.focus({ preventScroll: true });
   }
 
+  // ─── Helpers ───────────────────────────────
   function attachRowInteractions(node: Element): () => void {
     const el = node as HTMLElement;
     const hoverAction = hover(el);

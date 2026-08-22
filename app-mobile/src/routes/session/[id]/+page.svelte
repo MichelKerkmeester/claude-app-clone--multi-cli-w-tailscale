@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds route: /session/[id] — one live session.
   // Session route — one live session. The id is the route param; all shared
   // state and dispatches come from the shell context. The socket, runtime, and
   // composer all live inside the Session view.

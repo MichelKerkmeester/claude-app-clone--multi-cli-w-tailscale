@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds route: +layout — app shell: owns cross-route state and the connection/auth/theme/push lifecycle.
   // The app shell: it owns the cross-route state (via the app-state store),
   // runs the connection/auth/theme/push lifecycle, and renders the auth gate
   // and the Review/Inbox overlays above the routed page. Ported from React's

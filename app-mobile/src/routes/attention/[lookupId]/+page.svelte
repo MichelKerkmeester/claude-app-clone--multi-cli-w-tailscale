@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ds route: /attention/[lookupId] — attention deep-link resolver (no view of its own; resolves then redirects).
   // Attention deep-link resolver — renders no view of its own. It shows the
   // inbox overlay while it resolves the hint (gated on auth so a cold load waits
   // for enrollment), then redirects to the Review overlay or the target session

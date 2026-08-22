@@ -26,7 +26,7 @@ import type {
   ArtifactResource,
   ArtifactResourceBlock,
 } from './relay.js';
-import type { InboundImageLifecycleState } from './artifacts/ImageStatus.js';
+import type { InboundImageLifecycleState } from './lib/artifacts/ImageStatus.svelte';
 
 // Opaque ids must match the protocol guard pattern ^[A-Za-z0-9][A-Za-z0-9_-]{2,127}$.
 const SESSION_IDLE = 'demo-session-refactor';

@@ -281,7 +281,7 @@ it('lists sessions on Home', async () => {
 });
 
 it('opts the installed PWA viewport into safe-area coverage', () => {
-  const html = readFileSync('app-mobile/index.html', 'utf8');
+  const html = readFileSync('app-mobile/src/app.html', 'utf8');
   expect(html).toMatch(
     /<meta name="viewport" content="width=device-width, initial-scale=1\.0, viewport-fit=cover" \/>/u,
   );

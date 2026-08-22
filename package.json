@@ -20,7 +20,6 @@
     "test:web": "npm run test:web:svelte && npm run test:web:logic",
     "test:web:svelte": "vitest run --config vitest.web.svelte.config.ts",
     "test:web:logic": "vitest run --config vitest.web.logic.config.ts",
-    "test:web:react": "vitest run --config vitest.web.config.ts",
     "test:web:runtime": "node scripts/runtime-smoke-cdp.mjs",
     "rollback:drill": "npm run build -w @pi-remote/relay && node scripts/rollback-drill.mjs",
     "verify:runtime-boundary": "npm run build -w @pi-remote/relay && node scripts/verify-full-access-runtime.mjs",

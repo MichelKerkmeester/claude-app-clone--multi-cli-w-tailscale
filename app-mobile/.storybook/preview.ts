@@ -1,8 +1,9 @@
 import type { Preview } from '@storybook/sveltekit';
 
-// The frozen global stylesheet (foundation + component rules) so surfaces render
-// against the real --pi-* tokens, exactly as the app serves them.
-import '../src/style.css';
+// The global foundation stylesheet the app serves (imported once by +layout), so
+// surfaces render against the real --pi-* tokens; component rules live in each
+// component's scoped <style> and travel with the story.
+import '../src/app.css';
 
 const preview: Preview = {
   parameters: {

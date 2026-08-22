@@ -1,0 +1,36 @@
+{"type":"iteration","iteration":7,"mode":"research","target_agent":"deep-research","agent_definition_loaded":true,"resolved_route":"Resolved route: mode=research target_agent=deep-research","newInfoRatio":0.92,"status":"insight","focus":"Long-session context budget and hardened LLM I/O: compaction ledger, persisted summary/cutoff, anti-instruction summarizer, typed tool outcomes, streamed-retry fencing, per-turn interruption, and shared step ceiling."}
+{"type":"finding","id":"f-iter007-budget-ledger","severity":"P1","label":"Compaction reserves explicit system, summary, recent, generation, and native-overhead budget portions","iteration":7}
+{"type":"finding","id":"f-iter007-persisted-cutoff","severity":"P1","label":"Compaction persists summary plus cutoff and rebuilds context from summary and recent messages","iteration":7}
+{"type":"finding","id":"f-iter007-injection-aware-summary","severity":"P1","label":"Summarizer prompt treats transcript instructions as data and input is capped","iteration":7}
+{"type":"finding","id":"f-iter007-service-observable","severity":"P1","label":"Compaction busy state is service-owned observable state with finally-based cleanup","iteration":7}
+{"type":"finding","id":"f-iter007-typed-tool-seam","severity":"P1","label":"All tool outcomes pass through one typed defensive seam with bounded model-facing content","iteration":7}
+{"type":"finding","id":"f-iter007-stream-retry-fence","severity":"P1","label":"Retry without tools is allowed only when the failed attempt emitted no stream output","iteration":7}
+{"type":"finding","id":"f-iter007-per-turn-stop","severity":"P1","label":"Per-turn interruption and one shared step ceiling prevent zombie generations and runaway tool loops","iteration":7}
+{"type":"invariant","id":"inv-iter007-untrusted-transcript","label":"Transcript text is summarized as untrusted data; embedded instructions are not followed","iteration":7}
+{"type":"invariant","id":"inv-iter007-no-duplicate-retry","label":"A retry that would duplicate already-streamed output is forbidden","iteration":7}
+{"type":"invariant","id":"inv-iter007-finally-clear-compaction","label":"Compaction observable state returns to idle in a finally path","iteration":7}
+{"type":"observation","id":"obs-iter007-tool-taxonomy-split","packet":"007","classification":"real","iteration":7}
+{"type":"observation","id":"obs-iter007-sync-package-absent","packet":"007","classification":"unconfirmed","iteration":7}
+{"type":"node","id":"q-iter007-context-io","kind":"QUESTION","label":"Long-session context budget and hardened LLM I/O"}
+{"type":"node","id":"f-iter007-budget-ledger","kind":"FINDING","label":"Explicit compaction budget ledger"}
+{"type":"node","id":"f-iter007-persisted-cutoff","kind":"FINDING","label":"Persisted summary and cutoff"}
+{"type":"node","id":"f-iter007-injection-aware-summary","kind":"FINDING","label":"Injection-aware summarizer"}
+{"type":"node","id":"f-iter007-service-observable","kind":"FINDING","label":"Service-owned compaction observable"}
+{"type":"node","id":"f-iter007-typed-tool-seam","kind":"FINDING","label":"Typed defensive tool seam"}
+{"type":"node","id":"f-iter007-stream-retry-fence","kind":"FINDING","label":"Stream-safe retry fence"}
+{"type":"node","id":"f-iter007-per-turn-stop","kind":"FINDING","label":"Per-turn interruption and step ceiling"}
+{"type":"node","id":"s-iter007-context-tool-sources","kind":"SOURCE","label":"OGAM context compaction and generation tool loop sources"}
+{"type":"edge","id":"e-iter007-budget-answers","source":"f-iter007-budget-ledger","target":"q-iter007-context-io","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter007-cutoff-answers","source":"f-iter007-persisted-cutoff","target":"q-iter007-context-io","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter007-injection-answers","source":"f-iter007-injection-aware-summary","target":"q-iter007-context-io","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter007-observable-answers","source":"f-iter007-service-observable","target":"q-iter007-context-io","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter007-typed-answers","source":"f-iter007-typed-tool-seam","target":"q-iter007-context-io","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter007-retry-answers","source":"f-iter007-stream-retry-fence","target":"q-iter007-context-io","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter007-stop-answers","source":"f-iter007-per-turn-stop","target":"q-iter007-context-io","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter007-source-budget","source":"s-iter007-context-tool-sources","target":"f-iter007-budget-ledger","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter007-source-cutoff","source":"s-iter007-context-tool-sources","target":"f-iter007-persisted-cutoff","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter007-source-injection","source":"s-iter007-context-tool-sources","target":"f-iter007-injection-aware-summary","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter007-source-observable","source":"s-iter007-context-tool-sources","target":"f-iter007-service-observable","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter007-source-typed","source":"s-iter007-context-tool-sources","target":"f-iter007-typed-tool-seam","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter007-source-retry","source":"s-iter007-context-tool-sources","target":"f-iter007-stream-retry-fence","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter007-source-stop","source":"s-iter007-context-tool-sources","target":"f-iter007-per-turn-stop","relation":"SUPPORTS"}

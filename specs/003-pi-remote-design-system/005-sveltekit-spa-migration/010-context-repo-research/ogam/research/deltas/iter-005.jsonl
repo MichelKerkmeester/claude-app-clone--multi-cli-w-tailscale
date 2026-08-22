@@ -1,0 +1,39 @@
+{"type":"iteration","iteration":5,"mode":"research","target_agent":"deep-research","agent_definition_loaded":true,"resolved_route":"Resolved route: mode=research target_agent=deep-research","newInfoRatio":0.9,"status":"insight","focus":"Unconfirmed sync-package implementation; transcript rendering, composer/keyboard ergonomics, failure affordances, and context-budget compaction."}
+{"type":"finding","id":"f-iter005-row-memo","severity":"P1","label":"Keep finalized transcript item references stable and memoize rows so per-token stream updates do not re-render history.","iteration":5}
+{"type":"finding","id":"f-iter005-first-class-surfaces","severity":"P1","label":"Render reasoning, tool calls, and tool results as independent collapsible transcript surfaces with chunk-safe delimiter parsing.","iteration":5}
+{"type":"finding","id":"f-iter005-stable-accordion","severity":"P1","label":"Store accordion expansion by stable turn/tool identity and use a stable toggle across streaming remounts.","iteration":5}
+{"type":"finding","id":"f-iter005-scroll-gate","severity":"P1","label":"Gate autoscroll on near-bottom state and expose a haptic jump-to-bottom affordance when the reader scrolls away.","iteration":5}
+{"type":"finding","id":"f-iter005-composer-state","severity":"P1","label":"Use explicit send/stop/voice action precedence, retain focus after send, and defer keyboard popover measurement until layout settles.","iteration":5}
+{"type":"finding","id":"f-iter005-actionable-failure","severity":"P1","label":"Distinguish unsupported capability, repairable local state, and retryable failure; show only actions that are valid for the deployment.","iteration":5}
+{"type":"finding","id":"f-iter005-context-budget","severity":"P1","label":"Separate summary, recent-history, and generation budgets; persist summary plus cutoff and fall back to trim-only.","iteration":5}
+{"type":"finding","id":"f-iter005-safe-compaction","severity":"P1","label":"Escape transcript role prefixes, instruct the summarizer not to follow transcript instructions, cap I/O, and fence retries with turn cancellation.","iteration":5}
+{"type":"invariant","id":"inv-iter005-stream-row-isolation","label":"A token update must invalidate only the active streaming row, not the finalized transcript history.","iteration":5}
+{"type":"invariant","id":"inv-iter005-compaction-cutoff","label":"A compacted conversation must persist a deterministic summary cutoff and reconstruct the same reduced context after reload.","iteration":5}
+{"type":"observation","id":"obs-iter005-sync-package-gap","packet":"ogam","classification":"real","label":"The sibling package implementing sync leases, sequence windows, and expiry is absent from the snapshot; wire semantics are UNKNOWN.","iteration":5}
+{"type":"node","id":"q-iter005-ux-budget","kind":"QUESTION","label":"Transcript, composer, and context-budget ergonomics"}
+{"type":"node","id":"f-iter005-row-memo","kind":"FINDING","label":"Memoized transcript rows isolate streaming churn"}
+{"type":"node","id":"f-iter005-first-class-surfaces","kind":"FINDING","label":"Reasoning and tool rows are collapsible first-class surfaces"}
+{"type":"node","id":"f-iter005-stable-accordion","kind":"FINDING","label":"Accordion state survives streaming remounts"}
+{"type":"node","id":"f-iter005-scroll-gate","kind":"FINDING","label":"Autoscroll is gated by reader position"}
+{"type":"node","id":"f-iter005-composer-state","kind":"FINDING","label":"Composer uses explicit send stop voice precedence"}
+{"type":"node","id":"f-iter005-actionable-failure","kind":"FINDING","label":"Failure surfaces distinguish repair from unsupported capability"}
+{"type":"node","id":"f-iter005-context-budget","kind":"FINDING","label":"Compaction persists summary and cutoff under explicit budgets"}
+{"type":"node","id":"f-iter005-safe-compaction","kind":"FINDING","label":"Summarization is injection-aware and cancellation-fenced"}
+{"type":"node","id":"s-iter005-ogam-ux-context","kind":"SOURCE","label":"OGAM transcript, ChatScreen, ChatInput, and compaction sources"}
+{"type":"edge","id":"e-iter005-row-answers","source":"f-iter005-row-memo","target":"q-iter005-ux-budget","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter005-surfaces-answers","source":"f-iter005-first-class-surfaces","target":"q-iter005-ux-budget","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter005-accordion-answers","source":"f-iter005-stable-accordion","target":"q-iter005-ux-budget","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter005-scroll-answers","source":"f-iter005-scroll-gate","target":"q-iter005-ux-budget","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter005-composer-answers","source":"f-iter005-composer-state","target":"q-iter005-ux-budget","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter005-failure-answers","source":"f-iter005-actionable-failure","target":"q-iter005-ux-budget","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter005-budget-answers","source":"f-iter005-context-budget","target":"q-iter005-ux-budget","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter005-safe-answers","source":"f-iter005-safe-compaction","target":"q-iter005-ux-budget","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter005-source-row","source":"s-iter005-ogam-ux-context","target":"f-iter005-row-memo","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter005-source-surfaces","source":"s-iter005-ogam-ux-context","target":"f-iter005-first-class-surfaces","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter005-source-accordion","source":"s-iter005-ogam-ux-context","target":"f-iter005-stable-accordion","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter005-source-scroll","source":"s-iter005-ogam-ux-context","target":"f-iter005-scroll-gate","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter005-source-composer","source":"s-iter005-ogam-ux-context","target":"f-iter005-composer-state","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter005-source-failure","source":"s-iter005-ogam-ux-context","target":"f-iter005-actionable-failure","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter005-source-budget","source":"s-iter005-ogam-ux-context","target":"f-iter005-context-budget","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter005-source-safe","source":"s-iter005-ogam-ux-context","target":"f-iter005-safe-compaction","relation":"SUPPORTS"}
+{"type":"ruled_out","direction":"Infer sync lease duration, sequence-window acceptance, or expiry behavior from the receiver UI/store contract","reason":"The shared sync sibling package is absent; only projection and import contracts are available in the snapshot.","iteration":5}

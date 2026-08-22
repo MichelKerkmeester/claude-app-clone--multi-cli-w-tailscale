@@ -1,0 +1,21 @@
+{"type":"iteration","iteration":8,"mode":"research","target_agent":"deep-research","agent_definition_loaded":true,"resolved_route":"Resolved route: mode=research target_agent=deep-research","newInfoRatio":0.58,"status":"insight","focus":"Verification and evidence-depth sweep: context compaction and LLM I/O, tool-loop defensive seams, and service-versus-store ownership."}
+{"type":"finding","id":"f-iter008-compaction-depth","severity":"P1","label":"Bounded persisted compaction is corroborated by implementation and unit tests; summarization escapes transcript instructions and caps input/output.","iteration":8}
+{"type":"finding","id":"f-iter008-tool-depth","severity":"P1","label":"Typed tool outcomes, safe execution, streamed-retry fencing, per-turn interruption, and step limits are separate tested seams.","iteration":8}
+{"type":"finding","id":"f-iter008-ownership-precision","severity":"P1","label":"Services own imperative generation state and resources; stores remain UI and durable projections rather than literal read-only objects.","iteration":8}
+{"type":"invariant","id":"inv-iter008-no-duplicate-retry","label":"Never retry a tool-enabled request after streamed output has reached the same consumer.","iteration":8}
+{"type":"invariant","id":"inv-iter008-service-authority","label":"Imperative cancellation, routing, resource cleanup, and lifecycle coordination have one service owner.","iteration":8}
+{"type":"observation","id":"obs-iter008-sync-gap","packet":"ogam","classification":"unconfirmed","iteration":8}
+{"type":"ruled_out","direction":"re-research absent shared sync package","reason":"The shared package is not present in the snapshot; guidance explicitly excludes spending this iteration on it.","iteration":8}
+{"type":"node","id":"q-iter008-verification","kind":"QUESTION","label":"Verification and evidence depth for load-bearing OGAM seams"}
+{"type":"node","id":"f-iter008-compaction","kind":"FINDING","label":"Bounded persisted and injection-aware compaction"}
+{"type":"node","id":"f-iter008-tool-loop","kind":"FINDING","label":"Typed defensive tool loop with retry and interruption fences"}
+{"type":"node","id":"f-iter008-ownership","kind":"FINDING","label":"Service authority with UI and durable store projections"}
+{"type":"node","id":"s-iter008-compaction","kind":"SOURCE","label":"Context compaction implementation and tests"}
+{"type":"node","id":"s-iter008-tools","kind":"SOURCE","label":"Tool result, generation loop, and tool-loop tests"}
+{"type":"node","id":"s-iter008-services","kind":"SOURCE","label":"Architecture rules and generation services"}
+{"type":"edge","id":"e-iter008-compaction-answers","source":"f-iter008-compaction","target":"q-iter008-verification","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter008-tool-answers","source":"f-iter008-tool-loop","target":"q-iter008-verification","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter008-ownership-answers","source":"f-iter008-ownership","target":"q-iter008-verification","relation":"ANSWERS"}
+{"type":"edge","id":"e-iter008-compaction-source","source":"s-iter008-compaction","target":"f-iter008-compaction","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter008-tools-source","source":"s-iter008-tools","target":"f-iter008-tool-loop","relation":"SUPPORTS"}
+{"type":"edge","id":"e-iter008-services-source","source":"s-iter008-services","target":"f-iter008-ownership","relation":"SUPPORTS"}

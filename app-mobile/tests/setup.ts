@@ -14,6 +14,12 @@ class TestResizeObserver implements ResizeObserver {
 
 globalThis.ResizeObserver = TestResizeObserver;
 
+// jsdom does not implement scrollIntoView. bits-ui's Combobox/Select highlights the
+// first candidate on input and scrolls it into view, which throws under jsdom and
+// breaks the input handler. A no-op keeps keyboard/filter interactions working; nothing
+// asserts on scroll behavior.
+Element.prototype.scrollIntoView = function scrollIntoView(): void {};
+
 const values = new Map<string, string>();
 Object.defineProperty(globalThis, 'localStorage', {
   configurable: true,

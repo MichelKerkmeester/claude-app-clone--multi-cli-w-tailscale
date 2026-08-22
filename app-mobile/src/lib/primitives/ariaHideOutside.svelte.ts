@@ -1,0 +1,132 @@
+import { getContext, setContext } from 'svelte';
+
+export const SHEET_CONTEXT = Symbol('sheet-context');
+
+export interface SheetContext {
+  readonly isOpen: () => boolean;
+}
+
+interface HideSession {
+  readonly targets: readonly Element[];
+}
+
+const activeSessions: HideSession[] = [];
+const changedAttributes = new Map<Element, string | null>();
+let observer: MutationObserver | null = null;
+let observedBody: HTMLBodyElement | null = null;
+
+export function hideOutside(targets: Element[]): () => void {
+  if (typeof document === 'undefined' || document.body === null) return () => {};
+
+  const session: HideSession = { targets: [...targets] };
+  activeSessions.push(session);
+  if (activeSessions.length === 1) {
+    observedBody = document.body;
+    if (typeof MutationObserver !== 'undefined') {
+      observer = new MutationObserver(() => applyVisibility());
+      observer.observe(observedBody, { childList: true, subtree: true });
+    }
+  }
+
+  applyVisibility();
+
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    const index = activeSessions.indexOf(session);
+    if (index !== -1) activeSessions.splice(index, 1);
+
+    if (activeSessions.length === 0) {
+      observer?.disconnect();
+      observer = null;
+      restoreChangedAttributes();
+      changedAttributes.clear();
+      observedBody = null;
+      return;
+    }
+
+    applyVisibility();
+  };
+}
+
+export function setSheetContext(isOpen: () => boolean): void {
+  setContext<SheetContext>(SHEET_CONTEXT, { isOpen });
+}
+
+export function getSheetContext(): SheetContext | undefined {
+  return getContext<SheetContext | undefined>(SHEET_CONTEXT);
+}
+
+function applyVisibility(): void {
+  const body = observedBody ?? (typeof document === 'undefined' ? null : document.body);
+  if (body === null || activeSessions.length === 0) return;
+
+  const elements = collectElements(body);
+  const exempt = new Set<Element>();
+
+  for (const session of activeSessions) {
+    for (const target of session.targets) addExemptSubtreeAndAncestors(target, body, exempt);
+  }
+
+  for (const element of elements) {
+    if (isLiveRegion(element)) addExemptSubtreeAndAncestors(element, body, exempt);
+  }
+
+  for (const element of elements) {
+    if (exempt.has(element)) restoreOwnedAttribute(element);
+    else hideElement(element);
+  }
+}
+
+function collectElements(body: HTMLBodyElement): Element[] {
+  const elements: Element[] = [];
+  const walker = document.createTreeWalker(body, NodeFilter.SHOW_ELEMENT);
+  while (walker.nextNode()) elements.push(walker.currentNode as Element);
+  return elements;
+}
+
+function addExemptSubtreeAndAncestors(
+  element: Element,
+  body: HTMLBodyElement,
+  exempt: Set<Element>,
+): void {
+  exempt.add(element);
+  for (const descendant of element.querySelectorAll('*')) exempt.add(descendant);
+
+  let ancestor = element.parentElement;
+  while (ancestor !== null && ancestor !== body) {
+    exempt.add(ancestor);
+    ancestor = ancestor.parentElement;
+  }
+}
+
+function isLiveRegion(element: Element): boolean {
+  const live = element.getAttribute('aria-live');
+  if (live !== null && live.toLowerCase() !== 'off') return true;
+
+  const role = element.getAttribute('role')?.toLowerCase();
+  return role === 'alert' || role === 'log' || role === 'marquee' || role === 'status' || role === 'timer';
+}
+
+function hideElement(element: Element): void {
+  if (element.getAttribute('aria-hidden')?.toLowerCase() === 'true') return;
+  if (!changedAttributes.has(element)) {
+    changedAttributes.set(element, element.getAttribute('aria-hidden'));
+  }
+  element.setAttribute('aria-hidden', 'true');
+}
+
+function restoreOwnedAttribute(element: Element): void {
+  if (!changedAttributes.has(element)) return;
+  const previous = changedAttributes.get(element);
+  if (previous === null) element.removeAttribute('aria-hidden');
+  else element.setAttribute('aria-hidden', previous);
+}
+
+function restoreChangedAttributes(): void {
+  for (const [element, previous] of changedAttributes) {
+    if (previous === null) element.removeAttribute('aria-hidden');
+    else element.setAttribute('aria-hidden', previous);
+  }
+}

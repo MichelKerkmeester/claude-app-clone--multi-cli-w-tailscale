@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "full storybook integration dummy proof",
+      "storybook addons autodocs auto-maintained stories",
+      "non technical user boot up storybook"
+    ],
+    "key_topics": [
+      "full",
+      "storybook",
+      "integration",
+      "dummy",
+      "proof",
+      "addons",
+      "autodocs",
+      "auto-maintained",
+      "stories",
+      "non",
+      "technical",
+      "user"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Full Storybook Experience",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Elevate Storybook",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "North Star",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Elevate Storybook from a developer-only render catalog (Phase 006) into a first-class, dummy-proof, self-maintaining component surface: one-command launch a non-technical user can run, the relevant addons installed (a11y, test, themes, autodocs, designs), per-component autodocs, a co-located story-per-component convention enforced by a coverage gate, an AI-runnable story scaffold so every component change initializes/updates its story, and a documented folder architecture that follows the post-cutover pages/ + shared/ layout. Blocked on 007 cutover + WS-C reorg; drafts now, executes after.",
+    "created_at": "2026-08-22T15:25:21.892Z",
+    "last_save_at": "2026-08-22T15:25:21.892Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:8fc54eda3487191939c79557369617a04c2c9546d199b2f0c69feb8970f7b654",
+    "source_doc_hashes": {
+      "spec.md": "b9d7c7e9128d755ae29dbe3dbeb3759f50af4ffb0e537de985c0f07b3e176a8d"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

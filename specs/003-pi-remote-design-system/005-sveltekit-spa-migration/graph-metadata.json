@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
-  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
-  "parent_id": "app-mobile-cli/003-pi-remote-design-system",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "parent_id": "003-pi-remote-design-system",
   "children_ids": [
     "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold",
     "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
@@ -11,12 +11,25 @@
     "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/005-views-and-shell",
     "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/006-catalog",
     "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
-    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
+    "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/004-chrome-and-composer",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/005-views-and-shell",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/006-catalog",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience"
   ],
   "manual": {
     "depends_on": [],
     "supersedes": [
-      "app-mobile-cli/003-pi-remote-design-system/001-architecture-conventions-tokens"
+      {
+        "packet_id": "app-mobile-cli/003-pi-remote-design-system/001-architecture-conventions-tokens",
+        "reason": "Imported from legacy graph-metadata.json",
+        "source": "legacy"
+      }
     ],
     "related_to": []
   },
@@ -60,12 +73,6 @@
         "source": "derived"
       },
       {
-        "name": "GLM-5.2 High",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
         "name": "Problem Statement The Pi Remote",
         "kind": "proper_noun",
         "path": "spec.md",
@@ -88,21 +95,27 @@
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "The Pi Remote mobile web app is hard to author as a designer",
     "created_at": "2026-08-19T17:23:39.714Z",
-    "last_save_at": "2026-08-19T17:23:39.714Z",
+    "last_save_at": "2026-08-22T15:25:36.847Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:0e628ea1fadedfcbdb9705764586c5c51c82eb3facfee79741f79da9ef996957",
+    "source_fingerprint": "sha256:173a6578d8877fd9612a300bf4fb7b7cd539c44c2a2e0333bce1809b569ab924",
     "source_doc_hashes": {
-      "spec.md": "2849388c0d4a633d28ccbad5c2539a0051160f09c8acd8e483f81fe776320e0a"
+      "spec.md": "fb596d1c926171b271e2d66a0acd732adeca1582cac64f1012d907d48aee99e9"
     },
-    "last_active_child_id": null,
+    "last_active_child_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
     "last_active_at": null
   }
 }

@@ -65,6 +65,9 @@ describe('viewer history and focus ownership', () => {
   it('uses one history child, restores transcript scroll, and returns focus to the trigger', async () => {
     const historyBack = vi.spyOn(window.history, 'back').mockImplementation(() => undefined);
     render(InboundImageOpenButtonsHarness, { props: { first: FIRST, second: SECOND } });
+    // Capture both trigger refs before opening — the open viewer aria-hides the background, so a later role query can't resolve them.
+    const openFirst = screen.getByRole('button', { name: 'Open first' });
+    const openSecond = screen.getByRole('button', { name: 'Open second' });
     const scroll = document.querySelector<HTMLElement>('.transcript-scroll');
     expect(scroll).not.toBeNull();
     if (scroll === null) return;
@@ -72,14 +75,14 @@ describe('viewer history and focus ownership', () => {
     scroll.scrollLeft = 18;
     const before = window.history.length;
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Open first' }));
+    await fireEvent.click(openFirst);
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Screenshot' })).toBeVisible());
     expect(window.history.length).toBe(before + 1);
     expect(JSON.stringify(window.history.state)).not.toContain(FIRST.id);
 
     // The second open replaces the preview without pushing a second history
     // child (preview is already non-null, so history.open is a no-op).
-    await fireEvent.click(screen.getByRole('button', { name: 'Open second', hidden: true }));
+    await fireEvent.click(openSecond);
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'Image from pi' })).toBeVisible(),
     );

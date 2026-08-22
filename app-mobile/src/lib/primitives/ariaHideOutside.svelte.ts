@@ -13,7 +13,7 @@ interface HideSession {
 const activeSessions: HideSession[] = [];
 const changedAttributes = new Map<Element, string | null>();
 let observer: MutationObserver | null = null;
-let observedBody: HTMLBodyElement | null = null;
+let observedBody: HTMLElement | null = null;
 
 export function hideOutside(targets: Element[]): () => void {
   if (typeof document === 'undefined' || document.body === null) return () => {};
@@ -21,10 +21,11 @@ export function hideOutside(targets: Element[]): () => void {
   const session: HideSession = { targets: [...targets] };
   activeSessions.push(session);
   if (activeSessions.length === 1) {
-    observedBody = document.body;
+    const body = document.body;
+    observedBody = body;
     if (typeof MutationObserver !== 'undefined') {
       observer = new MutationObserver(() => applyVisibility());
-      observer.observe(observedBody, { childList: true, subtree: true });
+      observer.observe(body, { childList: true, subtree: true });
     }
   }
 
@@ -79,7 +80,7 @@ function applyVisibility(): void {
   }
 }
 
-function collectElements(body: HTMLBodyElement): Element[] {
+function collectElements(body: HTMLElement): Element[] {
   const elements: Element[] = [];
   const walker = document.createTreeWalker(body, NodeFilter.SHOW_ELEMENT);
   while (walker.nextNode()) elements.push(walker.currentNode as Element);
@@ -88,7 +89,7 @@ function collectElements(body: HTMLBodyElement): Element[] {
 
 function addExemptSubtreeAndAncestors(
   element: Element,
-  body: HTMLBodyElement,
+  body: HTMLElement,
   exempt: Set<Element>,
 ): void {
   exempt.add(element);
@@ -120,6 +121,7 @@ function hideElement(element: Element): void {
 function restoreOwnedAttribute(element: Element): void {
   if (!changedAttributes.has(element)) return;
   const previous = changedAttributes.get(element);
+  if (previous === undefined) return;
   if (previous === null) element.removeAttribute('aria-hidden');
   else element.setAttribute('aria-hidden', previous);
 }

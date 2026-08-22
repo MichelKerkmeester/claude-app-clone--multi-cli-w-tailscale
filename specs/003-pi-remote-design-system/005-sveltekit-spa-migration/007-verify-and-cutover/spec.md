@@ -11,12 +11,13 @@ _memory:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
     last_updated_at: "2026-08-22T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "007-EXT Phase A DOCS dimension COMPLETE. XA.1 (all 4 onboarding docs corrected React→Svelte: src screen map, app-mobile/README rewrite, root README + ARCHITECTURE surgical path fixes) DONE (2d2b37c, 25f30e6). XA.2 (per-folder READMEs) DONE. XA.3 tsconfig ANALYZED — surfaced a council-claim correction (allowJs is load-bearing, NOT dead). Research infra SOLVED + validated; launch HELD for genuine user go-ahead."
-    next_safe_action: "Phase A config hygiene remains: XA.3 tsconfig prune (jsx/jsxImportSource only; KEEP allowJs; needs build+svelte-check barrier) + XA.4 (.vscode/.editorconfig, root storybook script, verified dead-file removal). Phase B (comment segmentation, executor-written, TOP PRIORITY) + Phase C + the 5-repo research launch remain gated on user go-ahead (research feeds the phases)."
+    recent_action: "007-EXT Phase A essentially COMPLETE. XA.1 (4 onboarding docs), XA.2 (per-folder READMEs), XA.3 (tsconfig prune — barrier-VERIFIED: svelte-check 0-err/6-warn identical + build OK, 199cdd4), XA.4 editor config (.editorconfig/.vscode) all DONE. XA.4 dead-file removals VERIFIED-READY (catalog.html/build-app-css/css-corpus-equivalence/decl-equivalence all no-live-import) but HELD (stop-for-yes delete + goal item 4 = last). Research infra SOLVED + validated; launch HELD for user go-ahead."
+    next_safe_action: "Phase A safe autonomous work is exhausted. HELD for user go-ahead: (1) research launch (high-blast); (2) push (many doc/config commits local on main); (3) XA.4 dead-file deletion (verified-ready, stop-for-yes) + prettier install. Phase B (comment segmentation, executor-written, TOP PRIORITY) + Phase C stay executor+research-gated per the user's ordering."
     blockers:
-      - "Research launch needs a genuine in-the-moment go-ahead (high-blast: multi-hour, --auto, external dispatch) — mechanism is fully staged + proven"
-      - "XA.3/XA.4 config hygiene needs the build+svelte-check barrier (config changes + dead-file removals); better done as a verified batch"
-    completion_pct: 78
+      - "Research launch needs a genuine in-the-moment go-ahead (high-blast) — mechanism fully staged + proven"
+      - "Phase B/C are executor-written + research-ordered; not startable autonomously"
+      - "Many doc/config commits unpushed on main (push needs go-ahead); XA.4 deletions verified-ready but stop-for-yes"
+    completion_pct: 80
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

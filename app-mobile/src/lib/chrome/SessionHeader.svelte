@@ -24,11 +24,7 @@
     return option === 'system' ? 'Auto' : option === 'light' ? 'Light' : 'Dark';
   }
 
-  function isThemePreference(value: string): value is ThemePreference {
-    return value === 'system' || value === 'light' || value === 'dark';
-  }
-
-  // Bits Menu/ToggleGroup do not emit react-aria data-hovered / data-focus-visible;
+  // Plain theme buttons do not emit react-aria data-hovered / data-focus-visible;
   // pointer + focus-visible hooks match the Button primitive's interaction actions.
   function onChromePointerEnter(event: PointerEvent): void {
     if (event.pointerType === 'touch') return;
@@ -53,13 +49,9 @@
 <script lang="ts">
   import { modelEffortTriggerName, effortTriggerText } from '../../effort.js';
   import { modelSwitcherStrings } from '../../model-switcher-strings.js';
+  import { Popover } from 'bits-ui';
+  import { hideOutside } from '../primitives/ariaHideOutside.svelte.js';
   import Button from '../primitives/Button.svelte';
-  import Menu from '../primitives/Menu.svelte';
-  import MenuContent from '../primitives/MenuContent.svelte';
-  import MenuItem from '../primitives/MenuItem.svelte';
-  import MenuTrigger from '../primitives/MenuTrigger.svelte';
-  import ToggleGroup from '../primitives/ToggleGroup.svelte';
-  import ToggleGroupItem from '../primitives/ToggleGroupItem.svelte';
 
   let {
     onBack,
@@ -81,18 +73,13 @@
     effortTriggerText(snapshot?.thinkingLevel, snapshot?.availableThinkingLevels ?? []),
   );
 
-  // Host-confirmed theme only; Bits UI single-type allows emptying, so a local
-  // copy is restored to the host value after every change (non-optimistic, no empty).
-  let themeValue = $state('');
+  let overflowOpen = $state(false);
+  let overflowContentEl = $state<HTMLElement | null>(null);
 
   $effect(() => {
-    themeValue = theme;
+    if (overflowContentEl === null) return;
+    return hideOutside([overflowContentEl]);
   });
-
-  function onThemeValueChange(next: string): void {
-    if (isThemePreference(next)) onThemeChange(next);
-    themeValue = theme;
-  }
 </script>
 
 <!-- @ds surface: session-header — quiet in-session header. Slots: back · model · overflow. -->
@@ -160,81 +147,63 @@
 
   <!-- @ds slot: overflow — nav + theme popover trigger. -->
   <!-- @ds guardrail: react-aria DialogTrigger / Popover / Dialog wiring — not designer-editable. -->
-  <Menu>
-    <MenuTrigger
-      class="session-header-icon"
-      aria-label="More: navigation and theme"
-      onpointerenter={onChromePointerEnter}
-      onpointerleave={onChromePointerLeave}
-      onpointercancel={onChromePointerLeave}
-      onfocus={onChromeFocus}
-      onblur={onChromeBlur}
-    >
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
-        <circle cx="5" cy="12" r="1.7" fill="currentColor" />
-        <circle cx="12" cy="12" r="1.7" fill="currentColor" />
-        <circle cx="19" cy="12" r="1.7" fill="currentColor" />
-      </svg>
-    </MenuTrigger>
-    <MenuContent
-      class="session-sheet-popover session-sheet"
+  <Popover.Root bind:open={overflowOpen}>
+    <Popover.Trigger>
+      {#snippet child({ props })}
+        <Button {...props} class="session-header-icon" aria-label="More: navigation and theme">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+            <circle cx="5" cy="12" r="1.7" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.7" fill="currentColor" />
+            <circle cx="19" cy="12" r="1.7" fill="currentColor" />
+          </svg>
+        </Button>
+      {/snippet}
+    </Popover.Trigger>
+    <Popover.Content
+      class="session-sheet-popover"
       side="bottom"
       align="end"
-      aria-label="Navigation and theme"
+      bind:ref={overflowContentEl}
     >
-      <section class="tools-group">
-        <span class="tools-label">Go to</span>
-        <!-- @ds slot: nav — Inbox · Review. -->
-        <!-- @ds guardrail: react-aria onPress nav routing — not designer-editable. -->
-        <div class="overflow-nav">
-          <MenuItem
-            class="overflow-item"
-            onSelect={onInbox}
-            onpointerenter={onChromePointerEnter}
-            onpointerleave={onChromePointerLeave}
-            onpointercancel={onChromePointerLeave}
-          >
-            Inbox
-          </MenuItem>
-          <MenuItem
-            class="overflow-item"
-            onSelect={onReview}
-            onpointerenter={onChromePointerEnter}
-            onpointerleave={onChromePointerLeave}
-            onpointercancel={onChromePointerLeave}
-          >
-            Review
-          </MenuItem>
-        </div>
-      </section>
-      <section class="tools-group">
-        <span class="tools-label">Theme</span>
-        <!-- @ds slot: theme-toggle — segmented light / dark / auto. -->
-        <!-- @ds guardrail: react-aria ToggleButton group (onChange / aria-label) — not designer-editable. -->
-        <ToggleGroup
-          class="theme-control"
-          aria-label="Color theme"
-          bind:value={themeValue}
-          onValueChange={onThemeValueChange}
-        >
-          {#each THEME_OPTIONS as option (option)}
-            <ToggleGroupItem
-              id={option}
-              value={option}
-              class="theme-option"
-              aria-label={`Use ${option} theme`}
-              data-selected={themeValue === option ? true : undefined}
-              onpointerenter={onChromePointerEnter}
-              onpointerleave={onChromePointerLeave}
-              onpointercancel={onChromePointerLeave}
-            >
-              {themeOptionLabel(option)}
-            </ToggleGroupItem>
-          {/each}
-        </ToggleGroup>
-      </section>
-    </MenuContent>
-  </Menu>
+      <div class="session-sheet" role="dialog" aria-label="Navigation and theme">
+        <section class="tools-group">
+          <span class="tools-label">Go to</span>
+          <!-- @ds slot: nav — Inbox · Review. -->
+          <!-- @ds guardrail: react-aria onPress nav routing — not designer-editable. -->
+          <div class="overflow-nav">
+            <Button class="overflow-item" onclick={onInbox}>Inbox</Button>
+            <Button class="overflow-item" onclick={onReview}>Review</Button>
+          </div>
+        </section>
+        <section class="tools-group">
+          <span class="tools-label">Theme</span>
+          <!-- @ds slot: theme-toggle — segmented light / dark / auto. -->
+          <!-- @ds guardrail: react-aria ToggleButton group (onChange / aria-label) — not designer-editable. -->
+          <div class="theme-control" role="group" aria-label="Color theme">
+            {#each THEME_OPTIONS as option (option)}
+              <button
+                type="button"
+                class="theme-option"
+                aria-pressed={theme === option}
+                data-selected={theme === option ? true : undefined}
+                aria-label={`Use ${option} theme`}
+                onclick={() => {
+                  if (theme !== option) onThemeChange(option);
+                }}
+                onpointerenter={onChromePointerEnter}
+                onpointerleave={onChromePointerLeave}
+                onpointercancel={onChromePointerLeave}
+                onfocus={onChromeFocus}
+                onblur={onChromeBlur}
+              >
+                {themeOptionLabel(option)}
+              </button>
+            {/each}
+          </div>
+        </section>
+      </div>
+    </Popover.Content>
+  </Popover.Root>
 </header>
 
 <!-- @ds surface: session-header — quiet in-session header. Decomposed from style.css;

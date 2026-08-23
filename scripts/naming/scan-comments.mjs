@@ -77,6 +77,11 @@ function main() {
     lines.forEach((line, index) => {
       const body = commentBody(line);
       if (body === null || body.length === 0) return;
+      // Only the first line of a comment run starts a sentence. Counting every
+      // line counts wrapped prose as a violation, which would send someone to
+      // capitalise the middle of a sentence.
+      const previous = commentBody(lines[index - 1] ?? '');
+      const isContinuation = previous !== null && previous.length > 0;
       if (body.includes('@ds guardrail:')) {
         // Counted separately over the gate's scope; here only its shape matters.
         // A fence whose reason spills onto the next comment line is the shape
@@ -87,6 +92,9 @@ function main() {
       }
       if (body.includes(RULE) || /^[A-Z0-9. ]+$/.test(body)) return;
       if (NOT_A_SENTENCE.test(body)) return;
+      if (isContinuation) return;
+      // Commented-out declarations are code kept for reference, not prose.
+      if (/^(interface|const|let|var|function|import|export|type|declare|class)\b/.test(body)) return;
       if (/^[a-z]/.test(body)) lowercaseStarts += 1;
     });
   }

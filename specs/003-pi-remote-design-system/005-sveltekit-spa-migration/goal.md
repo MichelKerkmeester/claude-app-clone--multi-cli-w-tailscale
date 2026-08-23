@@ -73,13 +73,20 @@ pre-migration snapshot → CHANGED 0 / VANISHED 0 / ADDED 0) · **contrast + ≥
   files, config, and `npm install`. An external executor writes `app-mobile/**` source (one directory
   per dispatch; BANNED from install/config/token/security/routing/a11y changes). Claude diff-inspects
   (comment-only) and runs the gates.
-- **Executor routes (as discovered live in this environment).** Working: **luna** via the opencode
-  `openai` provider (`openai/gpt-5.6-luna[-fast]`); **GLM-5.2** via **cli-devin** (`glm-5-2`, free);
-  **stealth/ox-alpha** via `openrouter` for `cli-pi` story writes (rate-limits intermittently). Walled
-  here: deepseek-direct (402 balance), opencode-go (429 monthly), openrouter-deepseek (402 credit),
-  `zai-coding-plan` GLM (provider not configured in opencode), `cli-pi`/openai-codex (its own auth,
-  had expired). Deep-research needs `SYSTEM_SPEC_GATE_ENFORCE=0 AI_SESSION_CHILD=1` + `NODE_PRESERVE_SYMLINKS=1`
-  and its executor bound with the `=` form (`--executor=cli-devin --model=glm-5-2`).
+- **Executor ladder (try in order; fall through on auth wall, rate limit or empty output).**
+  **Primary: GPT-5.6 Luna, xhigh, fast** — reachable through `cli-codex`, `cli-opencode`
+  (`openai/gpt-5.6-luna-fast`) and `cli-pi`. One model, three CLIs: a refusal on one surface is worth
+  retrying on the next before dropping a tier. **Fallback: Gemini 3.7 Flash, high, via `cli-devin`.**
+  **Final fallback: GLM-5.2, high, via `cli-devin`** (free). Walled here historically:
+  deepseek-direct (402), opencode-go (429 monthly), openrouter-deepseek (402), `zai-coding-plan` GLM
+  (provider unconfigured). Deep-research needs `SYSTEM_SPEC_GATE_ENFORCE=0 AI_SESSION_CHILD=1` +
+  `NODE_PRESERVE_SYMLINKS=1` and its executor bound with the `=` form
+  (`--executor=cli-devin --model=glm-5-2`).
+- **Every dispatch carries a persona.** Compose `{resolved agent persona + task prompt}`, inlining
+  the persona body from `.claude/agents/<name>.md` — `code` for source, `review` for audit,
+  `markdown` for docs. A persona-less leaf runs as a generic assistant and silently drops its
+  tool-scope, verification gates and output contract. Non-interactive `opencode run` needs
+  `</dev/null` or it hangs at 0% CPU, and never a top-level `--agent general`.
 
 ## 6. Research → recommendations → approval (STANDING RULE)
 

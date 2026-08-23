@@ -43,9 +43,20 @@ or a11y change, no deletes outside scope.
 source, the executor repairs it. You own barrier files and verification. Taking over source repair
 blurs that boundary and has caused rework before.
 
-**Model routes that work here:** `openai/gpt-5.6-luna` via opencode for a11y-sensitive work; GLM-5.2
-via `cli-devin` (free) for bulk generation; `cli-pi` with deepseek-v4-flash at xhigh plus a code
-persona for source fixes.
+**Executor ladder — try in order, fall through on auth wall, rate limit or empty output:**
+
+1. **Primary — GPT-5.6 Luna at xhigh, fast variant.** Reachable three ways: `cli-codex`,
+   `cli-opencode` (`--model openai/gpt-5.6-luna-fast`) and `cli-pi`. Pick whichever surface suits the
+   dispatch; they are the same model behind three CLIs, so a refusal on one is worth retrying on the
+   next before dropping a tier.
+2. **Fallback — Gemini 3.7 Flash at high, via `cli-devin`.**
+3. **Final fallback — GLM-5.2 at high, via `cli-devin`** (free tier).
+
+Every dispatch composes `{resolved agent persona + task prompt}` — inline the persona from
+`.claude/agents/<name>.md` (`code` for source, `review` for audit, `markdown` for docs); a
+persona-less leaf silently loses its tool-scope and verification contract. Non-interactive
+`opencode run` needs `</dev/null`, `NODE_PRESERVE_SYMLINKS=1`, `SYSTEM_SPEC_GATE_ENFORCE=0` and
+`AI_SESSION_CHILD=1`, and never a top-level `--agent general`.
 
 ---
 

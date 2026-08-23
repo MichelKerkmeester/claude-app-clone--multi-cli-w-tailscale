@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/019-surface-skill-refresh"
-    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_at: "2026-08-23T22:48:08Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped as the terminal packet; no files changed."
-    next_safe_action: "Wait for 012, 013 and 014, then audit the skill."
-    blockers: ["depends on 012, 013 and 014 landing first"]
-    completion_pct: 0
+    recent_action: "Skill rewritten and gated in its worktree; the merge awaits an operator go-ahead."
+    next_safe_action: "Operator approves the push, then merge and run a dispatch against it."
+    blockers: ["merge into the live skill line needs an operator go-ahead"]
+    completion_pct: 88
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | **Scoped, not started** — blocked on 012, 013 and 014 |
-| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+| Status | **In Progress** — rewritten, committed and gated; the merge is the one thing left |
+| Requirements shipped | REQ-001 … REQ-007, pending the merge |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -36,9 +36,21 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing. The skill has not been edited.
+The surface now teaches the shipped tree. Two commits sit on
+`worktrees/026-019-surface-skill-refresh`: the rewrite at `3e615efedd` and, separately, the
+frontmatter six reference documents had been missing since an earlier reorganisation, at `73c7cbc31b`.
 
-The state this packet inherits:
+| Change | What it now teaches |
+|---|---|
+| Paths | `app-mobile` and `app-relay`; the design-system documents at `feature-catalog/design-system/`; the catalog at `app-mobile/catalog.html`; and that `src/style.css` is gone, replaced by scoped component blocks over a shared `app.css` |
+| Module and comment grammar | the `MODULE:` banner and numbered box-drawing dividers the tree actually uses |
+| Naming | kebab-case, the closed kind-first prefix list, and the `routes/**` exemption with its reason |
+| Shared ownership | the nine shared folders against what makes each one change |
+| Folder documentation | the README and CODE pair per source folder, and which template answers which question |
+| Runes | the self-invalidation doctrine, stated as the failure it prevents |
+| Routing keywords | Svelte, runes and scoped styles in place of `.tsx` and `style.css` |
+
+The state this packet inherited:
 
 | Fact | State |
 |---|---|
@@ -88,15 +100,18 @@ produced work that nothing loads.
 
 | Check | Result |
 |---|---|
-| Audit against the shipped tree | not run |
-| Reference-integrity scan | not built |
-| Divider grammar replaced | not done |
-| Runes doctrine written | not done |
-| Branch merged | no |
-| Dispatch against the merged surface | not run |
-| `validate.sh --strict` via realpath | not run |
+| Audit against the shipped tree | eight stale path claims found and corrected |
+| Reference-integrity scan | `scan-skill-references.mjs` — 18 path claims, 6 filename references, broken 0 |
+| Divider grammar replaced | the `MODULE:` banner and numbered dividers, read back against `turns.ts` |
+| Runes doctrine written | four-step audit stated as the failure it prevents |
+| Skill package validation | `package_skill.py --check --strict` — `Result: PASS` |
+| Skill root metadata | `ci-skill-root-metadata.cjs --fix` — checked=13 passed=13 failed=0 |
+| Commit-message gate | flagged an 82-character subject; amended to 75 |
+| Branch merged | not yet — needs an operator go-ahead |
+| Dispatch against the merged surface | not run; there is nothing merged to load |
+| `validate.sh --strict` via realpath | exit 0 |
 
-No completion claim is made or implied.
+No completion claim is made for the merge or for the dispatch that follows it.
 <!-- /ANCHOR:verification -->
 
 ---

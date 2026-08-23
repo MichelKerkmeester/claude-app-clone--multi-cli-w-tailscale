@@ -136,20 +136,20 @@
         "source": "derived"
       },
       {
-        "name": "evidence",
+        "name": "their",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "TASK NOTATION",
-        "kind": "heading",
+        "name": "composition",
+        "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "PHASE 1: SETUP",
-        "kind": "heading",
+        "name": "T3.5",
+        "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Re-open the sk-code-mobile-cli surface skill once the naming, comment and documentation packets have landed, teach it what actually shipped, and merge the branch that has been stranded since the framework refactor.",
     "created_at": "2026-08-23T10:47:21.393Z",
-    "last_save_at": "2026-08-23T10:47:21.393Z",
+    "last_save_at": "2026-08-23T22:48:43.594Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:4265281d7a42c29f3a0d0105a16fa106e3c6d3fb80da4579b04cc173243137f3",
+    "source_fingerprint": "sha256:d4905e20a2fed09b5e07ee756624cb1daa52a66059a5aa48a9cc5582af9e5df5",
     "source_doc_hashes": {
-      "spec.md": "2f3f40cc61a8ce4fbdff3df70a7d41ffbad2806a8d5abf2cdf03caea8c793eaf",
-      "plan.md": "181c0600e7b47b4b865546da934ccd4f562182adb6e0fbdb8a354482c8a11721",
-      "tasks.md": "050a2347bf5b981c410e6e3da891f967ccffef3840f61724db16ddad325e488f",
-      "checklist.md": "07d4c03b6839c35638537649bba0ff255a607c3533de14353fcbc46861fa3d70",
-      "implementation-summary.md": "a8a316c962afd7ce1cc6ed8ed9e77b9d3df71d5537a612d751968d7136ac5ac5"
+      "spec.md": "0656e343c403d50097dc63832dfe22aa50879bf66ecf47005589fbe7e1903a4f",
+      "plan.md": "d051419063f46d796d30885a4d27cedd203c0363f25eb5a76d66234319ba995b",
+      "tasks.md": "c2982f961aecaa45cb3e1c31f9f4456ea6aa97b44dacf3997ce0baa2cf7f337c",
+      "checklist.md": "bc7756c3b76ff7c522a194a4639441731e56f058d0252e8d3d759f5790e9c5a2",
+      "implementation-summary.md": "2b700f68e4159b1308f2bee03cff2e66328ea0e4f6f0d105596698683a5ea7ef"
     },
     "last_active_child_id": null,
     "last_active_at": null

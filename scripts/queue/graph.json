@@ -146,7 +146,9 @@
     "013",
     "014"
    ],
-   "gate": "conventions surface teaches the shipped tree; stranded branch merged"
+   "gate": "conventions surface teaches the shipped tree; stranded branch merged",
+   "held": true,
+   "heldReason": "The surface is rewritten, committed in its worktree and past every pre-push gate. The merge into the live skill line needs an operator go-ahead, and the dispatch that verifies meaning has nothing to load until it happens."
   },
   {
    "id": "011",

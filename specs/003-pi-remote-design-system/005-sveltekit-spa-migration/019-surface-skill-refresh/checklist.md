@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/019-surface-skill-refresh"
-    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_at: "2026-08-23T22:48:08Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Checklist authored; all items open pending execution."
     next_safe_action: "Wait for the three editability packets to land."
     blockers: []
-    completion_pct: 0
+    completion_pct: 88
 ---
 
 # Verification Checklist: Child 019 — Surface skill refresh
@@ -39,10 +39,10 @@ it.
 <!-- ANCHOR:pre-impl -->
 ## Pre-Implementation
 
-- [ ] **CHK-PRE-01** [P0] 012, 013 and 014 have all landed. [deferred: pending execution — this packet describes their result; writing it earlier means writing it twice]
-- [ ] **CHK-PRE-02** [P0] The audit lists every claim in the skill that no longer holds. [deferred: pending execution — detection, routing, standards, verification, checklists, onboarding]
-- [ ] **CHK-PRE-03** [P0] An isolated worktree is in use. [deferred: pending execution — the shared checkout's index holds another session's staged files]
-- [ ] **CHK-PRE-04** [P1] The branch was allocated, not hand-named. [deferred: pending execution — naming goes through the allocator under a lock]
+- [x] **CHK-PRE-01** [P0] 012, 013 and 014 have all landed. [evidence: 012/003 and 014 closed with their scans at zero; 013 at 95% with `commentedOutCodeLines : 0`]
+- [x] **CHK-PRE-02** [P0] The audit lists every claim in the skill that no longer holds. [evidence: `scan-skill-references.mjs` reported eight stale path claims — `apps/pi-remote-web`, `apps/pi-remote-relay`, the two design-system documents, the catalog and `src/style.css`]
+- [x] **CHK-PRE-03** [P0] An isolated worktree is in use. [evidence: `worktrees/026-019-surface-skill-refresh`; the shared checkout was never staged]
+- [x] **CHK-PRE-04** [P1] The branch was allocated, not hand-named. [evidence: `worktree-naming.sh create` issued the number under a lock]
 <!-- /ANCHOR:pre-impl -->
 
 ---
@@ -50,11 +50,11 @@ it.
 <!-- ANCHOR:code-quality -->
 ## Code Quality
 
-- [ ] **CHK-CQ-01** [P0] No reference to the superseded divider grammar survives. [deferred: pending execution — the specific reason the branch has never merged]
-- [ ] **CHK-CQ-02** [P0] The naming grammar is documented with its enumerated prefix list. [deferred: pending execution — an open list degrades into taste within a few contributions]
-- [ ] **CHK-CQ-03** [P0] The routing exemption is documented **with its reason**. [deferred: pending execution — an unexplained inconsistency invites a fix that changes a URL]
-- [ ] **CHK-CQ-04** [P1] The runes doctrine is expressed as the failure it prevents. [deferred: pending execution — a rule without its failure gets optimised away by the next reader]
-- [ ] **CHK-CQ-05** [P1] The shared workflow documents are untouched. [deferred: pending execution — symlinked into two surfaces that are not Svelte]
+- [x] **CHK-CQ-01** [P0] No reference to the superseded divider grammar survives. [evidence: the module and comment grammar section teaches the `MODULE:` banner and numbered box-drawing dividers the tree uses]
+- [x] **CHK-CQ-02** [P0] The naming grammar is documented with its enumerated prefix list. [evidence: the closed list `sheet-`, `menu-`, `dialog-`, `card-`, `button-`, `toggle-`, `radio-`, `screen-`]
+- [x] **CHK-CQ-03** [P0] The routing exemption is documented **with its reason**. [evidence: SvelteKit reads `+page`, `+layout`, `+error` and `[param]` as routing directives, so renaming one changes the URL contract]
+- [x] **CHK-CQ-04** [P1] The runes doctrine is expressed as the failure it prevents. [evidence: the `Runes effects` section states the effect that cancels its own work, with the two details that cost the most — two of seven were invisible to a search for a literal `dispatch(` call, and one file needed fixing twice]
+- [x] **CHK-CQ-05** [P1] The shared workflow documents are untouched. [evidence: `workflow-implement.md`, `workflow-debug.md` and `workflow-verify.md` do not appear in either commit's diff]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -62,10 +62,10 @@ it.
 <!-- ANCHOR:testing -->
 ## Testing
 
-- [ ] **CHK-TEST-01** [P0] Reference-integrity scan clean. [deferred: pending execution — every path the skill names resolves in the shipped tree]
-- [ ] **CHK-TEST-02** [P0] The skill's own document validation passes. [deferred: pending execution — including the house heading format its validator enforces]
-- [ ] **CHK-TEST-03** [P0] A dispatch loads the merged surface and produces the right shape. [deferred: pending execution — the only check that tests meaning rather than form]
-- [ ] **CHK-TEST-04** [P1] A grep is not accepted as a review. [deferred: pending execution — verbatim absence of old text does not prove the new text is correct]
+- [x] **CHK-TEST-01** [P0] Reference-integrity scan clean. [evidence: `scan-skill-references.mjs` — 18 path claims, 6 filename references, broken 0]
+- [x] **CHK-TEST-02** [P0] The skill's own document validation passes. [evidence: `package_skill.py --check --strict` reports `Result: PASS`; it failed on six reference documents that predate this packet, which were given the five-field block in their own commit]
+- [ ] **CHK-TEST-03** [P0] A dispatch loads the merged surface and produces the right shape. Open with the merge — there is nothing merged to load yet.
+- [x] **CHK-TEST-04** [P1] A grep is not accepted as a review. [evidence: the naming, shared-ownership and runes sections of `SKILL.md` were read in full against the shipped tree, not matched for absence of old strings]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -73,10 +73,10 @@ it.
 <!-- ANCHOR:fix-completeness -->
 ## Fix Completeness
 
-- [ ] **CHK-FIX-01** [P0] The stranded branch is merged. [deferred: pending execution — until it merges, nothing loads either this work or the earlier refactor]
-- [ ] **CHK-FIX-02** [P0] All three editability conventions are taught. [deferred: pending execution — naming, comments, folder documentation]
-- [ ] **CHK-FIX-03** [P1] The version is bumped with a changelog entry. [deferred: pending execution — so a dispatch that loaded the old guidance can tell it moved]
-- [ ] **CHK-FIX-04** [P1] The design-system contracts are carried unchanged. [deferred: pending execution — tokens, guardrail grammar and contrast are framework-agnostic]
+- [ ] **CHK-FIX-01** [P0] The stranded branch is merged. Open: the branch is committed and every pre-push gate passes, but pushing to the live skill line needs the operator's go-ahead, and an approval given for an earlier push does not carry to this one.
+- [x] **CHK-FIX-02** [P0] All three editability conventions are taught. [evidence: naming with its closed prefix list, the comment grammar as applied with `scan-comments.mjs` named as its executable form, and the README and CODE pair per source folder with `scan-folder-docs.mjs`]
+- [x] **CHK-FIX-03** [P1] The version is bumped with a changelog entry. [evidence: 1.1.0.0 to 1.2.0.0 with `changelog/v1.2.0.0.md`]
+- [x] **CHK-FIX-04** [P1] The design-system contracts are carried unchanged. [evidence: the token model, the `@ds` grammar and the contrast rules are untouched in the `SKILL.md` diff; only stale paths inside them were corrected]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -84,10 +84,10 @@ it.
 <!-- ANCHOR:security -->
 ## Security
 
-- [ ] **CHK-SEC-01** [P0] Nothing is staged in the shared checkout. [deferred: pending execution — `git add` there would sweep another session's files into a commit]
-- [ ] **CHK-SEC-02** [P0] The three pre-push gates pass. [deferred: pending execution — commit-message shape, branch naming, metadata manifest regeneration; each has failed a previous attempt]
-- [ ] **CHK-SEC-03** [P1] The security posture the skill teaches still matches reality. [deferred: pending execution — a conventions file that misstates the trust boundary is worse than one that omits it]
-- [ ] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [deferred: pending execution — five read-only research repos live there]
+- [x] **CHK-SEC-01** [P0] Nothing is staged in the shared checkout. [evidence: every `git add` ran inside the worktree; the shared checkout's index was never touched]
+- [x] **CHK-SEC-02** [P0] The three pre-push gates pass. [evidence: the allocator issued the branch name; `ci-skill-root-metadata.cjs --fix` reports checked=13 passed=13 failed=0; the commit-message hook flagged an 82-character subject, which was amended to 75]
+- [x] **CHK-SEC-03** [P1] The security posture the skill teaches still matches reality. [evidence: the loopback relay, tailnet-only serve and foreground-authority statements were checked against `app-relay/src/http/server.ts` and are unchanged]
+- [x] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [evidence: the work happened in another repository entirely; the five research repositories remain untracked and unmodified]
 <!-- /ANCHOR:security -->
 
 ---
@@ -95,9 +95,9 @@ it.
 <!-- ANCHOR:docs -->
 ## Documentation
 
-- [ ] **CHK-DOC-01** [P0] Every convention taught matches what shipped, not what was planned. [deferred: pending execution — the packet exists because those two diverged before]
-- [ ] **CHK-DOC-02** [P1] Reference-document headings follow the house format. [deferred: pending execution — the skill's own validation enforces it]
-- [ ] **CHK-DOC-03** [P2] The changelog entry says what moved, not that something moved. [deferred: pending execution — a reader needs the delta, not the fact of a delta]
+- [x] **CHK-DOC-01** [P0] Every convention taught matches what shipped, not what was planned. [evidence: each convention was read back against the tree — the divider grammar against `turns.ts`, the shared folders against `app-mobile/src/shared/`, the folder documentation against the 29 folders 014 closed]
+- [x] **CHK-DOC-02** [P1] Reference-document headings follow the house format. [evidence: `package_skill.py --check --strict` enforces it and reports `Result: PASS`]
+- [x] **CHK-DOC-03** [P2] The changelog entry says what moved, not that something moved. [evidence: `changelog/v1.2.0.0.md` names each section that changed and what it now teaches]
 <!-- /ANCHOR:docs -->
 
 ---
@@ -105,8 +105,8 @@ it.
 <!-- ANCHOR:file-org -->
 ## File Organization
 
-- [ ] **CHK-ORG-01** [P0] All work lands through the isolated worktree, which is removed afterwards. [deferred: pending execution — the same discipline the earlier refactor used successfully]
-- [ ] **CHK-ORG-02** [P1] The merge is a separate commit from the rewrite. [deferred: pending execution — they revert independently and for different reasons]
+- [ ] **CHK-ORG-01** [P0] All work lands through the isolated worktree, which is removed afterwards. Partly met: all work landed through the worktree, which stays until the merge is approved and can be removed.
+- [x] **CHK-ORG-02** [P1] The merge is a separate commit from the rewrite. [evidence: the rewrite is `3e615efedd` and the reference-document frontmatter is `73c7cbc31b`; the merge, when approved, will be its own]
 <!-- /ANCHOR:file-org -->
 
 ---

@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation"
-    last_updated_at: "2026-08-23T12:00:00Z"
+    last_updated_at: "2026-08-23T21:06:15Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Checklist authored; all items open pending execution."
     next_safe_action: "Approve the reference pair before writing further documents."
     blockers: []
-    completion_pct: 0
+    completion_pct: 88
 ---
 
 # Verification Checklist: Child 014 — Folder documentation
@@ -37,10 +37,10 @@ packet. The sampled read exists for exactly that case.
 <!-- ANCHOR:pre-impl -->
 ## Pre-Implementation
 
-- [ ] **CHK-PRE-01** [P0] 012 has landed. [deferred: pending execution — documentation naming pre-rename files is wrong the day it is written]
-- [ ] **CHK-PRE-02** [P1] 013 has landed. [deferred: pending execution — so comment text and folder documentation agree rather than diverge]
-- [ ] **CHK-PRE-03** [P0] The one-file-versus-two question is answered. [deferred: pending sign-off — recorded as open question 1 in `spec.md`; the split doubles the documents to keep true]
-- [ ] **CHK-PRE-04** [P0] The reference pair is approved. [deferred: pending execution — `pages/chat/transcript` converted first, approved before any other folder starts]
+- [x] **CHK-PRE-01** [P0] 012 has landed. [evidence: 012/003 closed at 100% before the first document was written; the naming scan reports 219 files / 0 offenders]
+- [x] **CHK-PRE-02** [P1] 013 has landed. [evidence: 013 at 95%; the comment-grammar scan reports 0 lowercase starts and 0 commented-out code lines, so comment text and folder documentation describe the same tree]
+- [ ] **CHK-PRE-03** [P0] The one-file-versus-two question is answered. Open: the split was kept because it is what the tree already used and keeping it is the reversible choice, but the operator has not answered.
+- [ ] **CHK-PRE-04** [P0] The reference pair is approved. Open: `pages/chat/transcript` was converted first and reviewed against the templates before any other folder was dispatched — frontmatter was removed at that review — but the reviewer was not the operator.
 <!-- /ANCHOR:pre-impl -->
 
 ---
@@ -48,9 +48,9 @@ packet. The sampled read exists for exactly that case.
 <!-- ANCHOR:code-quality -->
 ## Code Quality
 
-- [ ] **CHK-CQ-01** [P0] No source file was edited. [deferred: pending execution — `git diff --stat` must show documentation paths only]
-- [ ] **CHK-CQ-02** [P1] Documents are written from the reader's side. [deferred: pending execution — what the feature does first, how the code is arranged second; a file listing is not an explanation]
-- [ ] **CHK-CQ-03** [P2] The parent folder documents link to children rather than restating them. [deferred: pending execution — duplicated content is content that will disagree with itself later]
+- [x] **CHK-CQ-01** [P0] No source file was edited. [evidence: the documentation commit stages 59 paths, all `README.md` or `CODE.md`; a separate commit fixes `vitest.config.ts`, deliberately outside this packet and recorded as its own change]
+- [x] **CHK-CQ-02** [P1] Documents are written from the reader's side. [evidence: sampled `pages/review/README.md`, which opens on what Review decides rather than its files, and `shared/fixtures/README.md`, which states the module ships in the browser bundle and is held inert by a build flag plus a query opt-in]
+- [x] **CHK-CQ-03** [P2] The parent folder documents link to children rather than restating them. [evidence: `pages/chat/README.md` carries 25 relative links, one pair per child folder]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -58,9 +58,9 @@ packet. The sampled read exists for exactly that case.
 <!-- ANCHOR:testing -->
 ## Testing
 
-- [ ] **CHK-TEST-01** [P0] Reference-integrity scan clean. [deferred: pending execution — every backticked path and component name must resolve against the filesystem]
-- [ ] **CHK-TEST-02** [P1] The nine program gates are untouched. [deferred: pending execution — this packet changes no source, so gate movement means something leaked out of scope]
-- [ ] **CHK-TEST-03** [P2] The integrity scan is committed, not ad hoc. [deferred: pending execution — it is the only mechanical defence against documentation describing a tree that no longer exists]
+- [x] **CHK-TEST-01** [P0] Reference-integrity scan clean. [evidence: `scan-folder-docs.mjs` reports `brokenReferences: 0` across 29 folders]
+- [x] **CHK-TEST-02** [P1] The nine program gates are untouched. [evidence: build RC 0; typecheck 1123 files / 0 errors; `npm run test:web` 67 files / 539 passed and 16 files / 188 passed; token identity 0 diffs across three themes; catalog smoke 534 frames / 0 throws]
+- [x] **CHK-TEST-03** [P2] The integrity scan is committed, not ad hoc. [evidence: `scripts/naming/scan-folder-docs.mjs` is tracked]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -68,10 +68,10 @@ packet. The sampled read exists for exactly that case.
 <!-- ANCHOR:fix-completeness -->
 ## Fix Completeness
 
-- [ ] **CHK-FIX-01** [P0] Coverage scan returns zero folders lacking either document. [deferred: pending execution — baseline is 16 `README.md` and 7 `CODE.md` across ~23 source folders]
-- [ ] **CHK-FIX-02** [P0] The 13 folders 012 creates under `shared/` are all documented. [deferred: pending execution — all new writing, and the largest single block in the packet]
-- [ ] **CHK-FIX-03** [P1] The four five-line READMEs are genuinely rewritten. [deferred: pending execution — `pages/enrollment`, `pages/inbox`, `pages/review` and their peers are effectively new writing, not edits]
-- [ ] **CHK-FIX-04** [P1] The two undocumented route directories are covered. [deferred: pending execution — they hold source and have no documentation at all today]
+- [x] **CHK-FIX-01** [P0] Coverage scan returns zero folders lacking either document. [evidence: `scripts/naming/scan-folder-docs.mjs` — 29 folders, 29/29 carrying both documents, missingBothDocuments 0, missingFeatureDocument 0, missingCodeDocument 0]
+- [x] **CHK-FIX-02** [P0] The 13 folders 012 creates under `shared/` are all documented. [evidence: catalog, chrome, commands, fixtures, format, state, transport, viewport and the six primitive families each carry a rewritten pair]
+- [x] **CHK-FIX-03** [P1] The four five-line READMEs are genuinely rewritten. [evidence: `pages/inbox` 5 to 110 lines, `pages/review` 5 to 114, `pages/enrollment` 5 to 117, each with a new code map]
+- [x] **CHK-FIX-04** [P1] The two undocumented route directories are covered. [evidence: `routes/attention/[lookupId]` and `routes/session/[id]` each gained both documents, kept short because each folder holds one page file]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -79,9 +79,9 @@ packet. The sampled read exists for exactly that case.
 <!-- ANCHOR:security -->
 ## Security
 
-- [ ] **CHK-SEC-01** [P0] No document leaks a secret, token, host or tailnet detail. [deferred: pending execution — documentation is the easiest place to write down a real address by accident]
-- [ ] **CHK-SEC-02** [P1] The security posture is described accurately where it is described at all. [deferred: pending execution — a document that misstates the trust boundary is worse than one that omits it]
-- [ ] **CHK-SEC-03** [P1] Nothing under `specs/context/**` is touched. [deferred: pending execution — five read-only research repos live there]
+- [x] **CHK-SEC-01** [P0] No document leaks a secret, token, host or tailnet detail. [evidence: a scan across all 59 documents for tailnet names, routable addresses, bearer tokens and key or secret assignments returns nothing; the only addresses written are `127.0.0.1` and `localhost`]
+- [x] **CHK-SEC-02** [P1] The security posture is described accurately where it is described at all. [evidence: `shared/fixtures/README.md` states the demo gate is `VITE_PI_DEMO=1` plus an explicit query opt-in, matching the source]
+- [x] **CHK-SEC-03** [P1] Nothing under `specs/context/**` is touched. [evidence: no commit in this packet names a path under `specs/context`, and the five research repositories remain untracked and unmodified]
 <!-- /ANCHOR:security -->
 
 ---
@@ -89,11 +89,11 @@ packet. The sampled read exists for exactly that case.
 <!-- ANCHOR:docs -->
 ## Documentation
 
-- [ ] **CHK-DOC-01** [P0] Every document conforms to its sk-doc template's section model. [deferred: pending execution — `readme-template.md` for feature docs, `readme-code-template.md` for code docs]
-- [ ] **CHK-DOC-02** [P1] Omitted sections are deliberate. [deferred: pending execution — each template states when a section earns its place; omission is a judgement, not an oversight]
-- [ ] **CHK-DOC-03** [P0] Zero ephemeral artifact pointers. [deferred: pending execution — no spec paths, packet or phase numbers, ADR, requirement, checklist or task ids]
-- [ ] **CHK-DOC-04** [P1] The root README orients in one screen. [deferred: pending execution — it is the first thing a newcomer reads, and a confused orientation is worse than none]
-- [ ] **CHK-DOC-05** [P1] The overlay-versus-route distinction is explained where it applies. [deferred: pending execution — Review and Inbox are overlay state, not URLs, which surprises every newcomer]
+- [x] **CHK-DOC-01** [P0] Every document conforms to its sk-doc template's section model. [evidence: feature documents follow the `readme-template.md` scaffold and code documents the `readme-code-template.md` scaffold, overview through related]
+- [x] **CHK-DOC-02** [P1] Omitted sections are deliberate. [evidence: small folders use the flat-inventory alternative in `readme-code-template.md` rather than a directory tree, and no document carries frontmatter — `readme-template.md` calls for omitting it on human-only documents, and nothing indexes an application tree]
+- [x] **CHK-DOC-03** [P0] Zero ephemeral artifact pointers. [evidence: `grep` across all 59 documents for `specs/003-`, REQ, CHK, ADR and task ids returns 0 matches]
+- [x] **CHK-DOC-04** [P1] The root README orients in one screen. [evidence: the root `README.md` is 61 lines — overview, quick start, tree and a link table to every package and folder pair, duplicating none of them]
+- [x] **CHK-DOC-05** [P1] The overlay-versus-route distinction is explained where it applies. [evidence: `pages/review/README.md` states Review is an overlay rendered by `routes/+layout.svelte`, not a route, and that Chat can open it without changing the URL]
 <!-- /ANCHOR:docs -->
 
 ---
@@ -101,8 +101,8 @@ packet. The sampled read exists for exactly that case.
 <!-- ANCHOR:file-org -->
 ## File Organization
 
-- [ ] **CHK-ORG-01** [P1] Both documents sit in the folder they describe. [deferred: pending execution — colocation is what makes them findable at the moment of need]
-- [ ] **CHK-ORG-02** [P2] Commits are per folder. [deferred: pending execution — a reviewer reads one coherent folder rather than a 46-file blur]
+- [x] **CHK-ORG-01** [P1] Both documents sit in the folder they describe. [evidence: `scan-folder-docs.mjs` resolves `README.md` and `CODE.md` per folder from the folder itself, 29/29]
+- [ ] **CHK-ORG-02** [P2] Commits are per folder. Not met: all 59 documents landed in one commit because five agents wrote disjoint folder sets concurrently and splitting afterwards would have invented a history that did not happen. The reviewer reads a 59-file diff rather than 29 coherent ones.
 <!-- /ANCHOR:file-org -->
 
 ---

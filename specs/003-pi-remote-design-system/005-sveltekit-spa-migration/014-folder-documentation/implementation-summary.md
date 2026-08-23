@@ -1,16 +1,16 @@
 ---
 title: "Child 014 implementation summary — folder documentation on the sk-doc templates"
-description: "Continuity anchor for the folder documentation packet. Nothing is implemented yet: this records the measured inventory, which template answers which question, and why the packet is sequenced last."
+description: "Continuity anchor for the folder documentation packet. Records what shipped across 59 documents, how it was delivered, and the two operator gates that stayed open."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation"
-    last_updated_at: "2026-08-23T12:00:00Z"
+    last_updated_at: "2026-08-23T21:06:15Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Packet scoped from measured documentation inventory; nothing written."
-    next_safe_action: "Wait for 012 and 013, then convert the transcript folder as the reference pair."
-    blockers: ["depends on 012 tree and 013 comments landing first"]
-    completion_pct: 0
+    recent_action: "All 29 source folders documented; coverage and reference scans report zero gaps."
+    next_safe_action: "Operator reads the transcript exemplar and answers the one-file-versus-two question."
+    blockers: []
+    completion_pct: 88
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | **Scoped, not started** — blocked on 012 and 013 |
-| Requirements shipped | none yet; REQ-001 … REQ-006 all open |
+| Status | **In Progress** — every document written and scanned; two operator gates open |
+| Requirements shipped | REQ-001 … REQ-006 |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -36,9 +36,18 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing. No documentation has been written or edited.
+Fifty-nine documents: a `README.md` and a `CODE.md` for every one of the 29 source folders under
+`app-mobile/src/`, plus the repository root README.
 
-The measured inventory the scope was derived from:
+| Result | Value |
+|---|---|
+| Source folders carrying both documents | 29 of 29 |
+| Code maps created where none existed | 11 |
+| Route directories that had no documentation at all | 2, both now covered |
+| Broken references before / after | 3 / 0 |
+| Root README | 61 lines, linking every package and folder pair |
+
+The starting inventory the scope was derived from:
 
 | Measurement | Value |
 |---|---|
@@ -59,11 +68,17 @@ editability pass, which is why they range from one paragraph to a usable orienta
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-One folder converted first as an approved reference pair, then folder by folder.
+`pages/chat/transcript` was converted first, from 22 and 17 lines to 125 and 241, and reviewed
+against both templates before anything else was dispatched. That review removed the YAML frontmatter
+the first draft carried: nothing indexes an application tree, so trigger phrases there are inert, and
+the feature template calls for omitting frontmatter on human-only documents.
 
-The executor writes documents. Claude checks template conformance and reference integrity and owns
-git. Commits are per folder, so a reviewer reads one coherent folder rather than a forty-six-file
-diff.
+The remaining folders were then split into five disjoint sets and written concurrently. Claude checked
+template conformance, reference integrity, hygiene and security by scan, and owned git.
+
+The packet intended per-folder commits so a reviewer would read one coherent folder at a time. That
+did not happen: five agents wrote disjoint sets concurrently, and splitting the result afterwards
+would have invented a history that did not occur. The reviewer reads one 59-file diff instead.
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -91,13 +106,22 @@ only mechanical defence against documentation that describes a tree which no lon
 
 | Check | Result |
 |---|---|
-| Coverage scan | not run |
-| Template conformance | not run |
-| Reference integrity | not run — scan not yet built |
-| Hygiene scan | not run |
-| Nine program gates | not run — expected untouched, since no source changes |
+| Coverage scan | 29 folders — 0 missing either document |
+| Reference integrity | 0 broken references |
+| Hygiene scan | 0 spec paths or REQ, CHK, ADR and task ids across all 59 documents |
+| Security scan | 0 tailnet names, routable addresses, bearer tokens or key assignments |
+| Template conformance | every document on its template's scaffold; no frontmatter |
+| Build | RC 0 |
+| Typecheck | 1123 files, 0 errors |
+| `npm test` | 55 files / 400 tests, RC 0 |
+| `npm run test:web` | 67 files / 539 passed and 16 files / 188 passed, RC 0 |
+| Token identity | 0 changed, 0 vanished, 0 added across light, dark and system |
+| Catalog smoke | 267 stories x 2 themes = 534 frames, 0 throws |
+| Runtime smoke | 4 of 4 surfaces, 0 runtime errors |
+| Design system | 390 CSS-pixel width, no horizontal overflow, both themes |
 
-No completion claim is made or implied.
+The nine gates moved only because a separate commit fixed test discovery, described below. No
+documentation change touched source.
 <!-- /ANCHOR:verification -->
 
 ---
@@ -116,4 +140,16 @@ the barebones files this packet exists to replace, and it would pass every mecha
 **Documentation ages against a moving tree.** Sequencing after 012 and 013 removes the immediate
 version of this problem but not the ongoing one. The integrity scan is the durable part of the answer;
 being committed rather than run once is what makes it durable.
+
+**Two operator gates stayed open.** The one-file-versus-two question was never answered, and the
+exemplar pair was reviewed against the templates rather than by the operator. The split was kept
+because it is what the tree already used, which is the reversible choice, but both remain the
+operator's to settle.
+
+**The root README documented a command that did not work.** Its quick start names `npm test`, which
+reported 629 failed files because the script passes bare positional filters and vitest treats those as
+substring matches on paths, so `tests` reached the read-only research repositories under
+`specs/context`. That is a source change and therefore outside this packet, so it landed as its own
+commit with its own reasoning rather than being folded in here; `npm test` now passes 55 files and 400
+tests. Documenting a command that fails would have been worse than either.
 <!-- /ANCHOR:limitations -->

@@ -86,6 +86,10 @@ function resolveSpecifier(specifier, fromFile, originOf) {
     const absolute = resolve(dirname(join(REPO_ROOT, origin)), specifier);
     return moduleKey(relative(REPO_ROOT, absolute).split('\\').join('/'));
   }
+  // A repository-relative path, as a suite reading component source uses.
+  if (specifier.startsWith('app-mobile/') || specifier.startsWith('app-relay/')) {
+    return moduleKey(specifier);
+  }
   return null;
 }
 
@@ -111,6 +115,11 @@ const URL_SPECIFIER_PATTERN = /(new URL\(\s*)(['"])([^'"]+)\2(\s*,\s*import\.met
 // passing against the real module — the quietest way for a rename to lie.
 const MOCK_SPECIFIER_PATTERN =
   /(vi\.(?:mock|doMock|unmock|importActual|importMock)(?:<[^>]*>)?\(\s*)(['"])([^'"]+)\2/g;
+// Some suites read a component's source as a file rather than importing it, by
+// a path relative to the repository root. Nothing resolves that string until
+// the assertion runs, so a stale one fails late and for a reason that reads
+// like a missing file rather than a missed rename.
+const FILE_PATH_PATTERN = /((?:readFileSync|readFile|existsSync|statSync)\(\s*)(['"])([^'"]+)\2/g;
 
 function rewriteFile(filePath, moveMap, originOf) {
   const original = readFileSync(join(REPO_ROOT, filePath), 'utf8');
@@ -123,9 +132,19 @@ function rewriteFile(filePath, moveMap, originOf) {
     changes += 1;
     return `${lead}${quote}${emitSpecifier(specifier, moved, filePath)}${quote}`;
   };
+  const rewriteFilePath = (match, lead, quote, specifier) => {
+    if (!specifier.startsWith('app-mobile/') && !specifier.startsWith('app-relay/')) return match;
+    const moved = moveMap.get(moduleKey(specifier));
+    if (moved === undefined) return match;
+    // A file path keeps its real extension; there is no .js-for-.ts convention here.
+    const suffix = specifier.slice(moduleKey(specifier).length);
+    changes += 1;
+    return `${lead}${quote}${moved}${suffix}${quote}`;
+  };
   const updated = original
     .replace(SPECIFIER_PATTERN, rewriteImport)
     .replace(MOCK_SPECIFIER_PATTERN, rewriteImport)
+    .replace(FILE_PATH_PATTERN, rewriteFilePath)
     .replace(URL_SPECIFIER_PATTERN, (match, lead, quote, specifier, tail) => {
       const key = resolveSpecifier(specifier, filePath, originOf);
       if (key === null) return match;

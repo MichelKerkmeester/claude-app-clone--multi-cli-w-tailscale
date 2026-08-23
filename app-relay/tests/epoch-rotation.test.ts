@@ -14,6 +14,7 @@ import {
   type AttachmentManifestItem,
   type AttachmentOwner,
   type AttachmentSetManifest,
+  type Envelope,
   type PiRpcCommand,
   type PiRpcEvent,
   type PiRpcResponse,
@@ -36,6 +37,14 @@ const ENDED_EPOCH = 'epoch_ended';
 const CURRENT_EPOCH = 'epoch_current';
 const PRINCIPAL = 'operator@example.test';
 const ORIGIN = 'https://pi-remote.example.test';
+const SEQUENCE_EPOCH_A = 'epoch_sequence_a';
+const SEQUENCE_EPOCH_B = 'epoch_sequence_b';
+const RETAINED_ENDED_EPOCHS = 10;
+const STORE_IDENTITY = {
+  hostId: HOST_ID,
+  workspaceRef: WORKSPACE_REF,
+  sessionId: SESSION_ID,
+} as const;
 
 describe('epoch rotation consumers', () => {
   it('uses the current epoch for prompt and transcript envelopes after a restart', async () => {
@@ -105,6 +114,94 @@ describe('epoch rotation consumers', () => {
       expect(transcriptEnvelope).toBeDefined();
       expect(promptEnvelope?.epoch).toBe(CURRENT_EPOCH);
       expect(promptEnvelope?.epoch).toBe(transcriptEnvelope?.epoch);
+    } finally {
+      store.close();
+    }
+  });
+
+  it('starts a rotated epoch at one and refuses reuse of the retired epoch', () => {
+    const store = new RelayStore();
+    try {
+      for (const sequence of [1, 2, 3]) {
+        expect(store.nextSequence(STORE_IDENTITY, SEQUENCE_EPOCH_A)).toBe(sequence);
+        store.appendEnvelope(makeEpochEnvelope(SEQUENCE_EPOCH_A, sequence));
+      }
+
+      const firstSequenceInB = store.nextSequence(STORE_IDENTITY, SEQUENCE_EPOCH_B);
+      expect(firstSequenceInB).toBe(1);
+      expect(
+        store.appendEnvelope(makeEpochEnvelope(SEQUENCE_EPOCH_B, firstSequenceInB)).inserted,
+      ).toBe(true);
+
+      let reuseError: unknown;
+      try {
+        store.appendEnvelope(makeEpochEnvelope(SEQUENCE_EPOCH_A, 4));
+      } catch (error) {
+        reuseError = error;
+      }
+      expect(reuseError).toBeInstanceOf(Error);
+      expect((reuseError as Error).message).toBe(
+        `Relay rejected reused or stale epoch '${SEQUENCE_EPOCH_A}'.`,
+      );
+    } finally {
+      store.close();
+    }
+  });
+
+  it('collects envelopes beyond the ten newest ended epochs but preserves tombstones', () => {
+    const store = new RelayStore();
+    try {
+      for (let index = 0; index <= RETAINED_ENDED_EPOCHS; index += 1) {
+        const epoch = collectionEpoch(index);
+        store.appendEnvelope(makeEpochEnvelope(epoch, 1, collectionTimestamp(index, 1)));
+        store.appendEnvelope(makeEpochEnvelope(epoch, 2, collectionTimestamp(index, 2)));
+      }
+
+      const beforeCollectionEnvelopeCount = countRows(store, 'envelopes');
+      const beforeCollectionEndedEpochCount = countEndedEpochs(store);
+      expect(beforeCollectionEnvelopeCount).toBe(22);
+      expect(beforeCollectionEndedEpochCount).toBe(RETAINED_ENDED_EPOCHS);
+
+      const oldestCollectedEpoch = collectionEpoch(0);
+      const currentEpochIndex = RETAINED_ENDED_EPOCHS + 1;
+      const currentEpoch = collectionEpoch(currentEpochIndex);
+      store.appendEnvelope(
+        makeEpochEnvelope(currentEpoch, 1, collectionTimestamp(currentEpochIndex, 1)),
+      );
+
+      const afterCollectionEnvelopeCount = countRows(store, 'envelopes');
+      expect(afterCollectionEnvelopeCount).toBe(21);
+      expect(countEndedEpochs(store)).toBe(RETAINED_ENDED_EPOCHS + 1);
+      expect(countRows(store, 'envelopes', oldestCollectedEpoch)).toBe(0);
+      for (let index = 1; index <= RETAINED_ENDED_EPOCHS; index += 1) {
+        expect(countRows(store, 'envelopes', collectionEpoch(index))).toBe(2);
+      }
+      expect(countRows(store, 'envelopes', currentEpoch)).toBe(1);
+      expect(countRows(store, 'stream_epochs', oldestCollectedEpoch)).toBe(1);
+
+      const tombstone = store
+        .databaseHandle()
+        .prepare(
+          `SELECT status FROM stream_epochs
+           WHERE host_id = ? AND workspace_ref = ? AND session_id = ? AND epoch = ?`,
+        )
+        .get(HOST_ID, WORKSPACE_REF, SESSION_ID, oldestCollectedEpoch) as
+        | { readonly status: string }
+        | undefined;
+      expect(tombstone).toEqual({ status: 'ended' });
+
+      let reuseError: unknown;
+      try {
+        store.appendEnvelope(
+          makeEpochEnvelope(oldestCollectedEpoch, 1, collectionTimestamp(currentEpochIndex + 1, 1)),
+        );
+      } catch (error) {
+        reuseError = error;
+      }
+      expect(reuseError).toBeInstanceOf(Error);
+      expect((reuseError as Error).message).toBe(
+        `Relay rejected reused or stale epoch '${oldestCollectedEpoch}'.`,
+      );
     } finally {
       store.close();
     }
@@ -241,4 +338,68 @@ function mockChild(): ChildProcessWithoutNullStreams {
     }),
   });
   return child as unknown as ChildProcessWithoutNullStreams;
+}
+
+function makeEpochEnvelope(
+  epoch: string,
+  seq: number,
+  occurredAt = '2026-01-01T00:00:00.000Z',
+): Envelope {
+  return {
+    v: 1,
+    eventId: `event_${epoch}_${seq}`,
+    kind: 'pi.message_update',
+    hostId: HOST_ID,
+    workspaceRef: WORKSPACE_REF,
+    sessionId: SESSION_ID,
+    epoch,
+    seq,
+    occurredAt,
+    causedBy: null,
+    payload: { value: seq },
+    redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
+    replay: { eligible: true, snapshotEligible: true },
+  };
+}
+
+function collectionEpoch(index: number): string {
+  return `epoch_collection_${String(index).padStart(2, '0')}`;
+}
+
+function collectionTimestamp(index: number, seq: number): string {
+  return `2026-01-${String(index + 1).padStart(2, '0')}T00:00:0${seq}.000Z`;
+}
+
+function countRows(
+  store: RelayStore,
+  table: 'envelopes' | 'stream_epochs',
+  epoch?: string,
+): number {
+  const database = store.databaseHandle();
+  const row =
+    epoch === undefined
+      ? database
+          .prepare(
+            `SELECT COUNT(*) AS count FROM ${table}
+             WHERE host_id = ? AND workspace_ref = ? AND session_id = ?`,
+          )
+          .get(HOST_ID, WORKSPACE_REF, SESSION_ID)
+      : database
+          .prepare(
+            `SELECT COUNT(*) AS count FROM ${table}
+             WHERE host_id = ? AND workspace_ref = ? AND session_id = ? AND epoch = ?`,
+          )
+          .get(HOST_ID, WORKSPACE_REF, SESSION_ID, epoch);
+  return Number((row as { readonly count: number }).count);
+}
+
+function countEndedEpochs(store: RelayStore): number {
+  const row = store
+    .databaseHandle()
+    .prepare(
+      `SELECT COUNT(*) AS count FROM stream_epochs
+       WHERE host_id = ? AND workspace_ref = ? AND session_id = ? AND status = 'ended'`,
+    )
+    .get(HOST_ID, WORKSPACE_REF, SESSION_ID) as { readonly count: number };
+  return Number(row.count);
 }

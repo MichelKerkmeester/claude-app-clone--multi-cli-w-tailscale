@@ -80,6 +80,7 @@ const MAX_HTTP_BODY_BYTES = 16_384;
 const MAX_WS_MESSAGE_BYTES = 65_536;
 const MAX_CONNECTIONS = 32;
 const MAX_CONNECTIONS_PER_DEVICE = 4;
+const DEFAULT_SYNC_HEARTBEAT_INTERVAL_MS = 30_000;
 const MAX_PROMPTS_PER_MINUTE = 20;
 const MAX_ARTIFACT_READS_PER_MINUTE = 60;
 const MAX_ARTIFACT_READ_BYTES = 50 * 1024 * 1024;
@@ -110,6 +111,7 @@ interface ActiveSocket {
   readonly client: WebSocket;
   readonly deviceId: string;
   readonly sessionToken: string;
+  isAlive: boolean;
 }
 
 export interface ReadOnlyServerOptions {
@@ -121,6 +123,8 @@ export interface ReadOnlyServerOptions {
   readonly publicOrigin: string;
   readonly serveSecret: string;
   readonly port?: number;
+  // Keep liveness timing injectable so heartbeat checks stay deterministic.
+  readonly syncHeartbeatIntervalMs?: number;
   readonly auth?: AuthService;
   readonly approvals?: ApprovalService;
   readonly extensionAuthority?: {
@@ -267,6 +271,7 @@ export async function startReadOnlyServer(
       client,
       deviceId: session.deviceId,
       sessionToken: session.token,
+      isAlive: true,
     };
     const expiresIn = Math.max(0, Date.parse(session.expiresAt) - (options.now?.() ?? Date.now()));
     const expiryTimer = setTimeout(() => {
@@ -275,6 +280,9 @@ export async function startReadOnlyServer(
     expiryTimer.unref();
     activeSockets.add(active);
     auth.metrics.connectionsAccepted += 1;
+    client.on('pong', () => {
+      active.isAlive = true;
+    });
     let unsubscribe: (() => void) | null = null;
     let subscribed = false;
     client.on('message', (raw) => {
@@ -307,6 +315,19 @@ export async function startReadOnlyServer(
     client.on('close', release);
     client.on('error', release);
   });
+
+  const heartbeatTimer = setInterval(() => {
+    for (const active of activeSockets) {
+      if (!active.isAlive || active.client.readyState !== WebSocket.OPEN) {
+        active.client.terminate();
+        activeSockets.delete(active);
+        continue;
+      }
+      active.isAlive = false;
+      active.client.ping();
+    }
+  }, options.syncHeartbeatIntervalMs ?? DEFAULT_SYNC_HEARTBEAT_INTERVAL_MS);
+  heartbeatTimer.unref();
 
   const stopRevocationListener = auth.onRevocation((deviceId, sessionToken) => {
     for (const active of activeSockets) {
@@ -344,6 +365,7 @@ export async function startReadOnlyServer(
       return new Set([...activeSockets].map((active) => active.deviceId));
     },
     stop: async () => {
+      clearInterval(heartbeatTimer);
       stopRevocationListener();
       if (options.attachmentReaper !== undefined) {
         await options.attachmentReaper.shutdown();

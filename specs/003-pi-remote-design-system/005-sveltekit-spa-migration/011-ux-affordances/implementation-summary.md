@@ -7,7 +7,7 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances"
     last_updated_at: "2026-08-23T06:20:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "R1 glass scroll-to-latest shipped; board green."
+    recent_action: "REQ-001 glass scroll-to-latest shipped; board green."
     next_safe_action: "Operator confirms the glass on a device (T3.4)."
     completion_pct: 90
 ---
@@ -27,7 +27,7 @@ _memory:
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 1 |
 | Status | In Progress — one operator confirmation outstanding |
-| Requirements shipped | R1 |
+| Requirements shipped | REQ-001 |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -35,7 +35,7 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## What Was Built
 
-**R1 — the scroll-to-latest control now uses the app's glass idiom.**
+**REQ-001 — the scroll-to-latest control now uses the app's glass idiom.**
 
 The affordance itself was already shipped and correct: a circular chevron above the composer,
 revealed once the reader leaves the live edge, carrying an unread-count badge and hiding itself while

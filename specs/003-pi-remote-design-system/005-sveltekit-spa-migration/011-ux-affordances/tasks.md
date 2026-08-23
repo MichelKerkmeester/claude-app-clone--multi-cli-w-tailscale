@@ -7,7 +7,7 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances"
     last_updated_at: "2026-08-23T06:20:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "R1 glass scroll-to-latest shipped; board green."
+    recent_action: "REQ-001 glass scroll-to-latest shipped; board green."
     next_safe_action: "Operator confirms the glass on a device (T3.4)."
     completion_pct: 90
 ---

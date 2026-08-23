@@ -12,7 +12,7 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances"
     last_updated_at: "2026-08-23T06:20:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "R1 glass scroll-to-latest shipped; board green."
+    recent_action: "REQ-001 glass scroll-to-latest shipped; board green."
     next_safe_action: "Operator confirms the glass on a device (T3.4)."
     completion_pct: 90
 ---
@@ -62,7 +62,7 @@ visual change is allowed to land.
 behaviour, and the a11y contracts (roles, focus order, `≥44px` targets, reduced-motion,
 `prefers-contrast`, `forced-colors`). A change that reduces contrast must state how it stays legible.
 
-**Out of scope for R1 specifically:** `followToBottom()`, the live-edge threshold, virtualization and
+**Out of scope for REQ-001 specifically:** `followToBottom()`, the live-edge threshold, virtualization and
 turn grouping — all sit behind a `@ds guardrail: do-not-edit` fence. No new design token is
 introduced; the glass treatment composes existing ones.
 <!-- /ANCHOR:scope -->
@@ -72,7 +72,7 @@ introduced; the glass treatment composes existing ones.
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-### R1 — Glass scroll-to-latest control
+### REQ-001 — Glass scroll-to-latest control
 
 The transcript already ships this affordance
 (`app-mobile/src/pages/chat/transcript/TranscriptList.svelte`): a 2.75rem circular button holding a
@@ -93,6 +93,8 @@ a11y labelling or hit target.
 
 <!-- ANCHOR:success-criteria -->
 ## 5. SUCCESS CRITERIA
+
+All five trace to REQ-001; the packet ships only when every one of them holds.
 
 1. The control reads as translucent over scrolled transcript content, with the content behind it
    blurred rather than merely showing through.

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research",
   "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
@@ -11,25 +11,25 @@
   },
   "derived": {
     "trigger_phrases": [
-      "ux affordance change",
-      "glass scroll to latest button",
-      "post migration visual change"
+      "context repo research",
+      "five repo research sweep",
+      "research recommendations decision"
     ],
     "key_topics": [
-      "affordance",
-      "change",
-      "glass",
-      "scroll",
-      "latest",
-      "button",
-      "post",
-      "migration",
-      "visual",
-      "home",
-      "deliberate",
-      "operator-requested"
+      "context",
+      "repo",
+      "research",
+      "five",
+      "sweep",
+      "recommendations",
+      "decision",
+      "mine",
+      "checked-out",
+      "reference",
+      "codebases",
+      "patterns"
     ],
-    "importance_tier": "normal",
+    "importance_tier": "important",
     "status": "in_progress",
     "key_files": [
       "spec.md",
@@ -63,19 +63,25 @@
         "source": "derived"
       },
       {
-        "name": "In Progress",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "the",
+        "name": "evidence",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "zero",
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
@@ -93,38 +99,38 @@
         "source": "derived"
       },
       {
-        "name": "3. SCOPE",
+        "name": "Done Name",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Three",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Merge",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Open The",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
         "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Done Confirm",
-        "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Done Append",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Done Run",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Deferred Whether",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "The Svelte",
-        "kind": "proper_noun",
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
@@ -135,31 +141,25 @@
         "source": "derived"
       },
       {
-        "name": "Completion Criteria All",
+        "name": "React Native",
         "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "a",
-        "kind": "key_phrase",
+        "name": "Completion Criteria The",
+        "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Phase 1: Setup",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "What Was Built",
+        "name": "What Was Built Five",
         "kind": "proper_noun",
         "path": "implementation-summary.md",
         "source": "derived"
       },
       {
-        "name": "How It Was Delivered",
+        "name": "How It Was Delivered Through",
         "kind": "proper_noun",
         "path": "implementation-summary.md",
         "source": "derived"
@@ -175,11 +175,17 @@
         "kind": "proper_noun",
         "path": "implementation-summary.md",
         "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
-    "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-23T06:31:50.991Z",
+    "causal_summary": "Mine five checked-out reference codebases for patterns that a phone-remote for an AI coding CLI has to get right, and hand the operator a decision-ready recommendation list. Research only: the sweep reads the context repos and writes findings, it never modifies them and never scaffolds anything into the product without approval.",
+    "created_at": "2026-08-23T06:30:13.518Z",
+    "last_save_at": "2026-08-23T06:31:15.287Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -188,12 +194,12 @@
       "tasks.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:f176ad367b65dcb7d320e48c3d272f4e8a7871626300455d96324510bbb8c8b4",
+    "source_fingerprint": "sha256:8260bbe0e0665a0f98ca9b23b12a7c9721674f6d15e1dc6217427d53fe78e3eb",
     "source_doc_hashes": {
-      "spec.md": "3e614453315be110c6a11a5b6afdccf334aa910c309720501561fc69deb1690b",
-      "plan.md": "574a68baf7b1dd8368a4fe5ff950db368c76e753d9552c14d1cdb4214cae88c4",
-      "tasks.md": "b6143e7bde79de080e763775e871d232ecc41e70761a60de12d4fb0f6e90ecfd",
-      "implementation-summary.md": "377d17c41dea767ca56d29ae7717a5deb9288aeac143f233e011eb79b77da68e"
+      "spec.md": "a518a87603bd463047351afd02e8d82ac4479f1b8c3685ace68ad49fb716e532",
+      "plan.md": "f39d8b5a269c2cda6f2a39e84d61c48770816ef37ee2646e2d5851918ff2ca90",
+      "tasks.md": "a3d45d6a9e3a223f5ebb6b94f01d4df2cab6fcbc48fff6270802ba4ed1e814c6",
+      "implementation-summary.md": "a1b8ce4873a246af575ceb2ba3d5611ac04280b7f2233f0f7b5eabeefefc81aa"
     },
     "last_active_child_id": null,
     "last_active_at": null

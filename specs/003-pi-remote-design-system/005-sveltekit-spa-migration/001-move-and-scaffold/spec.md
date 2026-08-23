@@ -8,13 +8,13 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold"
-    last_updated_at: "2026-08-19T00:00:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Spec authored (L0 infra child)"
-    next_safe_action: "Create worktree, then git mv the two app folders and fix path refs"
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold"
+    last_updated_at: "2026-08-23T09:40:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Packet documentation completed retrospectively."
+    next_safe_action: "None; child shipped and superseded by later layers."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -88,19 +88,19 @@ any security-boundary change.
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- R1: The move is a single atomic "restructure only" commit; the React suite is green **before and
+- **REQ-001** — The move is a single atomic "restructure only" commit; the React suite is green **before and
   after** it (no behavior change).
-- R2: Every filesystem-path ref is updated; zero broken references; `@pi-remote/*` imports unchanged.
-- R3: The SvelteKit skeleton builds and serves an empty page; `dist/` output is preserved so
+- **REQ-002** — Every filesystem-path ref is updated; zero broken references; `@pi-remote/*` imports unchanged.
+- **REQ-003** — The SvelteKit skeleton builds and serves an empty page; `dist/` output is preserved so
   `release/threshold-gate.mjs` and `vite preview` keep working.
-- R4: `app.css` is a byte-for-byte move of the foundation region; no value edited.
-- R5: The relay needs **zero** serving changes (Tailscale Serve is the reverse proxy).
+- **REQ-004** — `app.css` is a byte-for-byte move of the foundation region; no value edited.
+- **REQ-005** — The relay needs **zero** serving changes (Tailscale Serve is the reverse proxy).
 <!-- /ANCHOR:requirements -->
 
 ---
 
 <!-- ANCHOR:success-criteria -->
-## 5. SUCCESS CRITERIA (barrier gate)
+## 5. SUCCESS CRITERIA
 
 - `npm run build` · `npm run typecheck` · `npm test` · `npm run test:web` · `node scripts/design-system-cdp.mjs` — all exit 0 after the move (still React).
 - After scaffold: `svelte-check` + `vite build` green with an empty page.

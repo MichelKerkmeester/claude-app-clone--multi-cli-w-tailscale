@@ -1,5 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold",
+  "level": "2",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/001-move-and-scaffold",
   "description": "Relocate apps/pi-remote-web→src/mobile-app and apps/pi-remote-relay→src/relay (folder-rename only, @pi-remote/* names kept), fix the finite set of",
   "keywords": [
     "relocate",
@@ -17,15 +18,13 @@
     "finite",
     "set"
   ],
-  "lastUpdated": "2026-08-19T17:17:01.102Z",
+  "lastUpdated": "2026-08-23T06:47:02.588Z",
   "specId": "001",
   "folderSlug": "move-and-scaffold",
   "parentChain": [
-    "app-mobile-cli",
     "003-pi-remote-design-system",
     "005-sveltekit-spa-migration"
   ],
   "memorySequence": 0,
-  "memoryNameHistory": [],
-  "level": "2"
+  "memoryNameHistory": []
 }

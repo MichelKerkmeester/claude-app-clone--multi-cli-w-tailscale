@@ -8,11 +8,11 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/006-catalog"
-    last_updated_at: "2026-08-21T00:00:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Catalog complete: 48 story files / 202 stories, render-verified (404 frames, 0 throws, light+dark). Surfaces are prop-driven (not the originally-planned mock-context decorator); only the ArtifactViewer and AttachmentDraft providers are wrapped. rich-content, transcript, artifacts, views, chrome, AttachmentTile committed + pushed; five batches Sonnet-verified faithful (transcript's one provenance divergence caught + fixed). Security-bounded surfaces (enrollment, push-settings, plan-mode, ask-question), the pdf/image byte-readers, and the a11y primitives stay registry-only / exercised in-situ, documented."
-    next_safe_action: "L7 007-verify-and-cutover — the irreversible cutover (delete React entry, strip app.css) needs explicit user authorization."
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/006-catalog"
+    last_updated_at: "2026-08-23T10:00:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Packet documentation completed retrospectively."
+    next_safe_action: "None; child shipped, extended by 009."
     blockers: []
     completion_pct: 100
 ---
@@ -69,16 +69,19 @@ value; app-logic changes; installs (Storybook deps were installed in L0).
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- R1: ~60 of 64 surfaces render live (the ≤4 that cannot are documented, not silently dropped).
-- R2: Stories are pure-data seeded from `registry.ts`; no story reaches a live socket.
-- R3: The `data-theme` decorator renders both themes; the a11y addon runs per story.
-- R4: Story dispatches are disjoint (one surface each), parallel-safe.
+- **REQ-001** — ~60 of 64 surfaces render live (the ≤4 that cannot are documented, not silently dropped).
+- **REQ-002** — Stories are pure-data seeded from `registry.ts`; no story reaches a live socket.
+- **REQ-003** — The `data-theme` decorator renders both themes; the a11y addon runs per story.
+- **REQ-004** — Story dispatches are disjoint (one surface each), parallel-safe.
+- **REQ-005** — The gate must prove stories *render*, not merely that they build. `storybook build`
+  only proves they type-check and bundle; a story can build perfectly and draw nothing. The gate
+  therefore drives a real browser and fails on any thrown exception or console error.
 <!-- /ANCHOR:requirements -->
 
 ---
 
 <!-- ANCHOR:success-criteria -->
-## 5. SUCCESS CRITERIA (barrier gate)
+## 5. SUCCESS CRITERIA
 
 - Catalog smoke: every component-backed surface renders in Storybook (light + dark) without throw.
 - The count of live surfaces is reported (target ~60/64); any excluded surface is listed with reason.

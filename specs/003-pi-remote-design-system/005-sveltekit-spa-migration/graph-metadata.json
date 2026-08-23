@@ -156,7 +156,7 @@
         "source": "derived"
       },
       {
-        "name": "a",
+        "name": "and",
         "kind": "key_phrase",
         "path": "handover.md",
         "source": "derived"
@@ -164,17 +164,17 @@
     ],
     "causal_summary": "The Pi Remote mobile web app is hard to author as a designer",
     "created_at": "2026-08-19T17:23:39.714Z",
-    "last_save_at": "2026-08-23T13:59:51.038Z",
+    "last_save_at": "2026-08-23T15:09:22.092Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "handover.md"
     ],
-    "source_fingerprint": "sha256:2578f39f26727a160092fce6b53421c561436bf45e01c09a52ab1c3000b59a69",
+    "source_fingerprint": "sha256:b799c6723daabd5bc40534d10eed6ad6f3d61fa4a5f4259921028b6d704b31b6",
     "source_doc_hashes": {
       "spec.md": "e0e8b7af0da967b131ec6ebf752ca151be49c1f85680ddc0229e1ceba0102edf",
-      "handover.md": "b10d216261054c6c29821752b7e7fb0a71f981d3ddfa5190d57c39f883ad107d"
+      "handover.md": "7f76d55a9d0441a42e5a7b12d43c2a2fb607abefddfc35235542c322cb962f0d"
     },
     "last_active_child_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
     "last_active_at": null

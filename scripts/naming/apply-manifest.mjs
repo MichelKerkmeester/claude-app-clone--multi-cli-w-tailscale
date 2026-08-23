@@ -19,10 +19,21 @@ const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const MANIFEST = join(REPO_ROOT, 'scripts/naming/rename-manifest.json');
 const ALIAS_PREFIX = '$shared/';
 const ALIAS_ROOT = 'app-mobile/src/shared/';
-// Where a specifier could live. Tests and stories import the moved modules too,
-// so a rewrite scoped to src alone leaves the suites pointing at old paths — and
-// the logic suites are .tsx, which an extension list built from src alone omits.
-const SPECIFIER_ROOTS = ['app-mobile/src', 'app-mobile/tests'];
+// Where a specifier could live. Scoping this to the tree being renamed is the
+// mistake it looks like a shortcut for: stories and suites import the moved
+// modules, the logic suites are .tsx, and a relay integration test reaches
+// across workspaces by deep-relative path. Anything that can name a module has
+// to be scanned, or the rename is silently partial.
+const SPECIFIER_ROOTS = [
+  'app-mobile/src',
+  'app-mobile/tests',
+  'app-relay/src',
+  'app-relay/tests',
+  'packages',
+  'extensions',
+  'scripts',
+  'tests',
+];
 const SPECIFIER_EXTENSIONS = ['.svelte', '.ts', '.tsx', '.js', '.mjs'];
 
 function argValue(flag) {

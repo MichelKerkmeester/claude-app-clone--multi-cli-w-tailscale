@@ -1,4 +1,12 @@
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { Action } from 'svelte/action';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. HOVER ACTION
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * react-aria useHover parity. Sets data-hovered only for non-touch pointers, so a
@@ -22,6 +30,10 @@ export const hover: Action<HTMLElement> = (node) => {
     },
   };
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. PRESS ACTION
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * react-aria usePress parity for the data-pressed visual state. Pressed while a
@@ -74,6 +86,10 @@ export const press: Action<HTMLElement> = (node) => {
     },
   };
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 4. FOCUS ACTIONS
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * react-aria useFocusRing parity. Sets data-focus-visible when the element is

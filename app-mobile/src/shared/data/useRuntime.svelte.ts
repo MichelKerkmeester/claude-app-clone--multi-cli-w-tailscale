@@ -9,6 +9,10 @@
 // becomes `runtime = runtimeReducer(runtime, action)` and the retry/reconcile
 // re-entry calls the stable `refresh` closure directly.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeControlResponse, RuntimeOperation } from '@pi-remote/pi-rpc-protocol';
 
 import { untrack } from 'svelte';
@@ -29,6 +33,10 @@ import {
 
 /** Host-authoritative runtime controls for one session. */
 export function useRuntime(getSessionId: () => string): RuntimeControls {
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let runtime = $state<RuntimeUiState>(INITIAL_RUNTIME_STATE);
   let catalogController: AbortController | null = null;
   let mutationController: AbortController | null = null;
@@ -39,6 +47,10 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
   let refreshInFlight = false;
   let refreshQueued: RefreshReason | null = null;
   let retryTimer: number | null = null;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. READ-ONLY HYDRATE
+  // ───────────────────────────────────────────────────────────────────
 
   const refresh = async (reason: RefreshReason = 'manual'): Promise<void> => {
     // Concurrent triggers coalesce: one read-only hydrate at a time, latest
@@ -115,6 +127,10 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
       if (queued !== null) void refresh(queued);
     }
   };
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. MUTATION DISPATCH
+  // ───────────────────────────────────────────────────────────────────
 
   const apply = async (operation: RuntimeOperation): Promise<RuntimeControlResponse | null> => {
     const current = runtime;
@@ -193,12 +209,20 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
     }
   };
 
+  // ───────────────────────────────────────────────────────────────────
+  // 5. CONTROL WRAPPERS
+  // ───────────────────────────────────────────────────────────────────
+
   const setModel = (provider: string, modelId: string): Promise<RuntimeControlResponse | null> =>
     apply({ type: 'set_model', provider, modelId });
   const setThinkingLevel = (level: string): Promise<RuntimeControlResponse | null> =>
     apply({ type: 'set_thinking_level', level });
   const setMode = (mode: 'build' | 'plan'): Promise<RuntimeControlResponse | null> =>
     apply({ type: 'set_mode', mode });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. PLAN REVIEW AND EXECUTION
+  // ───────────────────────────────────────────────────────────────────
 
   const openPlanReview = (): boolean => {
     const current = runtime;
@@ -269,6 +293,10 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
     }
   };
 
+  // ───────────────────────────────────────────────────────────────────
+  // 7. LIFECYCLE
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     getSessionId();
     untrack(() => void refresh('initial'));
@@ -279,6 +307,10 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
       if (retryTimer !== null) window.clearTimeout(retryTimer);
     };
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 8. PUBLIC CONTROLS
+  // ───────────────────────────────────────────────────────────────────
 
   return {
     get runtime() {

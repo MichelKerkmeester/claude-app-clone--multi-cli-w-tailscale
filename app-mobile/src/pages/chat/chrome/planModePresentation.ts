@@ -3,8 +3,17 @@
 // (the derivation is pure; the React file keeps its own copy until cutover) so the
 // SvelteKit bundle carries no React. Every branch is bounded local copy and no mode
 // is guessed beyond what the host confirmed.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { modeAuthority, type RuntimeUiState } from '$shared/data/runtime.js';
 import { runtimeIssueMessage } from '$shared/data/runtime-issues.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 // @ds state: chart — the ModePresentationKind set; each kind maps to an is-<kind> class seam.
 export type ModePresentationKind =
@@ -36,6 +45,10 @@ export interface ModePresentation {
   readonly rowsDisabledReason: string | null;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function confirmedLabelFor(confirmedMode: string): string {
   switch (confirmedMode) {
     case 'build':
@@ -48,6 +61,10 @@ function confirmedLabelFor(confirmedMode: string): string {
       return 'Mode unavailable';
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. FAIL-CLOSED PRESENTATION DERIVATION
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * Derive the full fail-closed presentation from the committed runtime and the

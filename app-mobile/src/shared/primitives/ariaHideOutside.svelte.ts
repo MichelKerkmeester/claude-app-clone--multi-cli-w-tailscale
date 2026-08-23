@@ -2,7 +2,15 @@
 // MODULE: Aria Hide-Outside
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { getContext, setContext } from 'svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONTEXT AND SESSION TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export const SHEET_CONTEXT = Symbol('sheet-context');
 
@@ -14,10 +22,18 @@ interface HideSession {
   readonly targets: readonly Element[];
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. ACTIVE SESSION STATE
+// ───────────────────────────────────────────────────────────────────
+
 const activeSessions: HideSession[] = [];
 const changedAttributes = new Map<Element, string | null>();
 let observer: MutationObserver | null = null;
 let observedBody: HTMLElement | null = null;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. PUBLIC API
+// ───────────────────────────────────────────────────────────────────
 
 export function hideOutside(targets: Element[]): () => void {
   if (typeof document === 'undefined' || document.body === null) return () => {};
@@ -62,6 +78,10 @@ export function setSheetContext(isOpen: () => boolean): void {
 export function getSheetContext(): SheetContext | undefined {
   return getContext<SheetContext | undefined>(SHEET_CONTEXT);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. VISIBILITY ENGINE
+// ───────────────────────────────────────────────────────────────────
 
 function applyVisibility(): void {
   const body = observedBody ?? (typeof document === 'undefined' ? null : document.body);
@@ -113,6 +133,10 @@ function isLiveRegion(element: Element): boolean {
   const role = element.getAttribute('role')?.toLowerCase();
   return role === 'alert' || role === 'log' || role === 'marquee' || role === 'status' || role === 'timer';
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. ARIA-HIDDEN ATTRIBUTE BOOKKEEPING
+// ───────────────────────────────────────────────────────────────────
 
 function hideElement(element: Element): void {
   if (element.getAttribute('aria-hidden')?.toLowerCase() === 'true') return;

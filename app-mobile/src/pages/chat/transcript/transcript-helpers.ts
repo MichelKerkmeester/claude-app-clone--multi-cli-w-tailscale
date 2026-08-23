@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   type NormalizedActivityBlock,
   type NormalizedFallbackBlock,
@@ -5,6 +9,10 @@ import {
 } from '../rich-content/normalizeTranscriptBlocks.js';
 import { type DisplayTranscriptBlock, type TodoProjectionState } from '$shared/data/state.js';
 import { groupBlocksIntoTurns } from '$shared/data/turns.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. RENDER ITEM MODEL
+// ───────────────────────────────────────────────────────────────────
 
 export type RenderItem =
   | { readonly kind: 'todo'; readonly id: string; readonly state: TodoProjectionState }
@@ -25,6 +33,10 @@ export type RenderItem =
       readonly sourceBlockId: string;
       readonly text: string;
     };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SEQUENCE GROUPING
+// ───────────────────────────────────────────────────────────────────
 
 export function groupNormalizedSequence(blocks: readonly NormalizedTranscriptBlock[]): RenderItem[] {
   const items: RenderItem[] = [];
@@ -70,6 +82,10 @@ export function isInboundImageFallback(
   return block.kind === 'fallback' && block.sourceBlock.kind === 'inbound_image';
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. TURN-AWARE GROUPING
+// ───────────────────────────────────────────────────────────────────
+
 export function groupNormalizedTranscript(
   blocks: readonly NormalizedTranscriptBlock[],
   sourceBlocks: readonly DisplayTranscriptBlock[],
@@ -108,6 +124,10 @@ export function groupNormalizedTranscript(
   if (unassigned.length > 0) items.push(...groupNormalizedSequence(unassigned));
   return items;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TODO PROJECTION INSERTION
+// ───────────────────────────────────────────────────────────────────
 
 export function insertTodoProjectionItem(
   items: readonly RenderItem[],
@@ -163,6 +183,10 @@ export function insertTodoProjectionItem(
   if (!inserted) result.push(todoItem);
   return result;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. ACTIVITY SUMMARY LABELS
+// ───────────────────────────────────────────────────────────────────
 
 export function normalizedActivitySummary(blocks: readonly NormalizedActivityBlock[]): string {
   const tools = blocks.filter((block) => block.sourceBlock.kind === 'tool_call').length;

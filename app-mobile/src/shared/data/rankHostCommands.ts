@@ -8,7 +8,15 @@
 // Nothing here performs transport, history, or edit-distance correction: a
 // plausible typo simply matches nothing.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface GraphemeRange {
   /** Grapheme-cluster index into the canonical name, inclusive. */
@@ -30,6 +38,10 @@ export type HostCommandMatchTier =
   | 'description'
   | 'hint';
 
+// ───────────────────────────────────────────────────────────────────
+// 3. TIER CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const TIER_ORDER: readonly HostCommandMatchTier[] = [
   'host-order',
   'exact-name',
@@ -44,6 +56,10 @@ const TIER_ORDER: readonly HostCommandMatchTier[] = [
 ];
 
 const TIER_INDEX = new Map(TIER_ORDER.map((tier, index) => [tier, index]));
+
+// ───────────────────────────────────────────────────────────────────
+// 4. RANKED RESULT TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export interface RankedHostCommand extends CommandDescriptorDto {
   /** The best tier this row matched, or host-order for an empty query. */
@@ -71,6 +87,10 @@ interface MatchCandidate {
   readonly gapPenalty: number;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. NORMALIZATION HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 /** Normalize comparison text: NFC, then diacritic-folded lowercase. */
 export function normalizeCommandText(text: string): string {
   return text
@@ -88,6 +108,10 @@ export function commandGraphemes(text: string): readonly string[] {
   }
   return Array.from(text);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. RANKING PIPELINE
+// ───────────────────────────────────────────────────────────────────
 
 export function rankHostCommands(
   commands: readonly CommandDescriptorDto[],
@@ -160,6 +184,10 @@ function bestMatch(
   }
   return null;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. GRAPHEME MATCHING PRIMITIVES
+// ───────────────────────────────────────────────────────────────────
 
 function fullRange(graphemes: readonly string[]): readonly GraphemeRange[] {
   return graphemes.length === 0 ? [] : [{ start: 0, end: graphemes.length }];
@@ -260,6 +288,10 @@ function indexOfNormalized(haystack: readonly string[], needle: readonly string[
 function containsNormalized(text: string, needle: readonly string[]): boolean {
   return indexOfNormalized(commandGraphemes(normalizeCommandText(text)), needle) !== null;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 8. COMPARISON AND ACTIVE SELECTION
+// ───────────────────────────────────────────────────────────────────
 
 function compareRanked(
   a: RankedHostCommand,

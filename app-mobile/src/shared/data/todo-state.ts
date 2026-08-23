@@ -2,6 +2,10 @@
 // MODULE: Todo Projection State Reducers
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isTodoProjectionDeltaV1,
   isTodoProjectionV1,
@@ -14,6 +18,10 @@ import {
   type TodoProjectionV1,
   type TodoTaskProjectionV1,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. PROJECTION STATE TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export type TodoProjectionAvailability = 'waiting' | 'available' | 'unsupported';
 
@@ -46,6 +54,10 @@ export type TodoProjectionAction =
   | { readonly type: 'refreshRequested' }
   | { readonly type: 'clearAnnouncement' };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. EMPTY STATE
+// ───────────────────────────────────────────────────────────────────
+
 export const EMPTY_TODO_PROJECTION_STATE: TodoProjectionState = {
   sessionId: null,
   epoch: null,
@@ -56,6 +68,10 @@ export const EMPTY_TODO_PROJECTION_STATE: TodoProjectionState = {
   needsRefresh: false,
   announcement: '',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 4. PROJECTION REDUCER
+// ───────────────────────────────────────────────────────────────────
 
 export function todoProjectionReducer(
   state: TodoProjectionState,
@@ -114,6 +130,10 @@ export function todoProjectionReducer(
     }
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. ENVELOPE FOLDING
+// ───────────────────────────────────────────────────────────────────
 
 function foldTodoEnvelopes(
   state: TodoProjectionState,
@@ -215,6 +235,10 @@ function applyDelta(state: TodoProjectionState, delta: TodoProjectionDeltaV1): T
     announcement: deltaAnnouncement(projection, announcedTask),
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. ANNOUNCEMENT HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function snapshotAnnouncement(
   projection: TodoProjectionV1,

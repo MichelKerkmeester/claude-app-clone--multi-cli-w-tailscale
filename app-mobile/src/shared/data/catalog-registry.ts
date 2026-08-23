@@ -21,6 +21,10 @@
 // preview safely here (needs a live host, a socket/relay/provider, or is a
 // documented CSS convention with no shared component).
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type PreviewKind = 'live' | 'registry-only';
 
 export interface CatalogSurface {
@@ -34,6 +38,10 @@ export interface CatalogSurface {
   readonly previewReason?: string;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SHARED PRIMITIVE GUARDRAIL NOTE
+// ───────────────────────────────────────────────────────────────────
+
 /** Shared guardrail note for the accessibility primitives (focus / motion / status). */
 const A11Y_PRIMITIVES = {
   editability:
@@ -42,6 +50,10 @@ const A11Y_PRIMITIVES = {
   previewReason:
     'a shared primitive with no standalone component — it renders inside every live control, never on its own.',
 } as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SURFACE REGISTRY
+// ───────────────────────────────────────────────────────────────────
 
 export const CATALOG_SURFACES: readonly CatalogSurface[] = [
   {
@@ -405,6 +417,10 @@ export const CATALOG_SURFACES: readonly CatalogSurface[] = [
     previewReason: 'depends on the PDF.js runtime + worker bundle; kept out to keep the catalog build lean.',
   },
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// 4. LIVE SURFACES AND LOOKUP
+// ───────────────────────────────────────────────────────────────────
 
 /** The distinct surfaces the catalog renders live, in presentation order. */
 export const LIVE_SURFACE_IDS: readonly string[] = CATALOG_SURFACES.filter(

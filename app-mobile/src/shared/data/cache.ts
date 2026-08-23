@@ -11,6 +11,10 @@
 // and would not survive the redaction boundary in either browser storage
 // or service-worker storage.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isFilePreviewBlock,
   isOpaqueId,
@@ -25,10 +29,18 @@ import {
 
 import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptState } from './state.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CACHE LIMITS
+// ───────────────────────────────────────────────────────────────────
+
 const CACHE_KEY = 'pi-remote.read-only.v1';
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1_000;
 const MAX_SESSIONS = 8;
 const MAX_BLOCKS = 500;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CACHED RECORD TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export interface CachedTranscript {
   readonly sessionId: string;
@@ -56,6 +68,10 @@ export interface ReadOnlyCache {
   readonly savedAt: string;
   readonly transcripts: readonly CachedTranscript[];
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. METADATA-ONLY SANITIZATION
+// ───────────────────────────────────────────────────────────────────
 
 const NON_DURABLE_ARTIFACT_KEYS = new Set([
   'bytes',
@@ -86,6 +102,10 @@ export function stripArtifactResourceState(value: unknown): unknown {
   return result;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. REVALIDATION HOOK
+// ───────────────────────────────────────────────────────────────────
+
 export function installCacheRevalidation(onRestore: () => void): () => void {
   const onPageShow = (event: PageTransitionEvent) => {
     if (event.persisted) onRestore();
@@ -93,6 +113,10 @@ export function installCacheRevalidation(onRestore: () => void): () => void {
   window.addEventListener('pageshow', onPageShow);
   return () => window.removeEventListener('pageshow', onPageShow);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. LOAD AND SAVE
+// ───────────────────────────────────────────────────────────────────
 
 export function loadCache(): ReadOnlyCache | null {
   try {
@@ -167,6 +191,10 @@ export function saveCache(sessions: readonly SessionCardDto[], current: Transcri
     // Storage pressure must not affect the live read-only view.
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. CACHE PARSING
+// ───────────────────────────────────────────────────────────────────
 
 function parseCachedTranscript(value: unknown): CachedTranscript | null {
   if (
@@ -262,6 +290,10 @@ function parseCachedArtifactMetadata(value: unknown): CachedArtifactMetadata | n
     availability: value.availability as FilePreviewAvailability | null,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 8. VALIDATION PREDICATES
+// ───────────────────────────────────────────────────────────────────
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

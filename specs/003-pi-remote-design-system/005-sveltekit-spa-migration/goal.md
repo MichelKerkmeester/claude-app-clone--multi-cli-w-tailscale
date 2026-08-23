@@ -136,25 +136,44 @@ Per the 5 read-only `specs/context/` sibling chat repos: a fresh xhigh pass scop
 ## 8. Current status (live)
 
 - **Core migration (001–007): ✅ done**, React deleted, board green, on GitHub.
-- **007-EXT:** docs/architecture ✅. Comments: **85/109 files sectioned + pushed**; ~24 small leaves
-  unsectioned; **the 1:1 sk-code/opencode style alignment is NEW open work.**
-- **008: committed**, but `svelte-conventions.md` is not at the live skill path — **verify it landed on
-  live Public, not a stranded branch.**
-- **009: ~90%.** Machinery/addons/docs ✅ (R1/R4/R5/R6/R7; R2 ~80%). **R3: 21 of 27 story gaps filled**
-  (verified — catalog-smoke 0 throws — and pushed); the last **6** (Chat, Enrollment,
-  AttachmentPreviewDialog, AttachmentRail, PushSettings, RootErrorBoundary) are in progress.
+- **007-EXT:** docs/architecture ✅. Comments: the divider **style** is now the sk-code-opencode
+  Format A block (full-width rule / numbered ALL-CAPS name / rule), converted across 45 files and
+  213 dividers by codemod, with `@ds` banners hoisted above section 1. **Sectioning coverage is the
+  open half:** a survey found **105 files with zero numbered sections**, the largest being
+  `relay.ts` (1770 lines), `demo.ts` (1556) and `runtime.ts` (845). The biggest modules are landing
+  batch by batch; every batch is proven comment-only by a diff check that fails on any changed line
+  that is not a comment or blank.
+- **008: pushed but STRANDED.** `svelte-conventions.md` lives on `branches/008-sk-code-mobile-cli-svelte`,
+  which is **not** merged into the live `skilled/v4.0.0.0` — so the on-disk skill still teaches React.
+  Deliberately held: the doc records the older compact divider, which the Format A pass supersedes.
+  Update it to the new convention first, then land once.
+- **009: R3 ✅ COMPLETE — story coverage 74/74** renderable components (22 allowlisted, each with a
+  reason). Two defects surfaced that the existing gates could not see: `svelte-check` was red on the
+  story files (now **0 errors / 1123 files**), and a decorator-order bug made two stories render an
+  empty frame *without throwing*, which the CDP smoke gate passes by design. That blind spot is now
+  covered by `story-render.svelte.test.ts`, which drives Storybook's real decorator pipeline and
+  requires the seeded content to appear.
 - **Cleanup: ✅ done.**
-- **Research: 3/5 landed** (ogam, mobilecli, nodeterm — pushed). openclaude-android + remote-for-opencode
-  **not yet landed** — blocked on deep-research invocation issues (provider walls, Gate-3 stall, executor
-  flag binding), not on content. Needs the operator's known-good GLM/cli-devin invocation.
+- **Research: 3/5 landed** (ogam, mobilecli, nodeterm — pushed). The invocation failure is diagnosed:
+  the working command form is **`/deep:research:auto`** (the spaced `<topic> :auto` form is parsed as
+  plain prompt text), and the orchestrator that drove all three landed legs was a plain model with
+  `executor.kind: "native"` — not a forced `--executor=cli-devin`. `stealth/ox-alpha` now returns a
+  server error, so openclaude-android is running on luna.
 - **Git: all work pushed to `origin/main`** (the remote now redirects to `remote-cli-agent-chat`).
+- **Known dirty, not a regression:** `npx eslint app-mobile/src` reports 27 pre-existing code errors
+  (control-regex, case-declaration, unused var). `npm run lint` reports ~36,700 only because its bare
+  glob sweeps the protected `specs/context/` research repos.
 
 ## 9. Open work (next unblocked nodes)
 
-1. **009** — finish the last 6 stories (executor on a working provider), gate, commit; then 009
-   completion docs + `validate.sh --strict`.
-2. **007-EXT comments** — bring the sections to a 1:1 sk-code/opencode match and close the ~24 gaps.
-3. **008** — confirm the skill doc is on live Public.
+1. **007-EXT comments** — section the remaining files from the 105-file survey, largest first, one
+   directory per dispatch. Open judgment call for the operator: Format A is currently applied to
+   *every* file that has sections, including small components where a 3-line divider block sits above
+   a 1-line `PROPS` section. sk-code's own rule scopes numbered dividers to *large* files, so a size
+   threshold is the alternative.
+2. **008** — update `svelte-conventions.md` to the Format A convention, then merge the stranded
+   branch into the live `skilled/v4.0.0.0` (isolated worktree; never stage in the shared checkout).
+3. **009** — completion docs + `validate.sh --strict`.
 4. **Research** — land openclaude-android → remote-for-opencode for 5/5; then **present recommendations
    (per §6) before scaffolding any research-driven phase.**
 

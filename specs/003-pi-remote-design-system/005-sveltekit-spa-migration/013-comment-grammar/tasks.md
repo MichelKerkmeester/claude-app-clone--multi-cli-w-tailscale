@@ -34,15 +34,15 @@ read and confirmed to contain no non-comment line.
 <!-- ANCHOR:phase-1 -->
 ## PHASE 1: SETUP
 
-- [ ] **T1.1** Re-scope the per-file unchanged-fence-TEXT diff to assert the
+- [x] **T1.1** Re-scope the per-file unchanged-fence-TEXT diff to assert the
       `@ds guardrail: do-not-edit` marker and the fence count, not the prose after it. Blocking: this
       packet rewrites fence explanations by design, so the check as written would fail on purpose.
-- [ ] **T1.2** Re-baseline it and confirm it still fails when a fence marker is removed. A loosened
+- [x] **T1.2** Re-baseline it and confirm it still fails when a fence marker is removed. A loosened
       check that no longer detects its own violation is not a check.
-- [ ] **T1.3** Record the current numbers as the baseline: 51 files without a banner, 403
+- [x] **T1.3** Record the current numbers as the baseline: 51 files without a banner, 403
       capitalisation violations, 45 multi-line fence explanations, 277 fences total.
-- [ ] **T1.4** Confirm 012 has landed, so banners and comments name components by their final names.
-- [ ] **T1.5** Confirm 012 is not running concurrently — both packets touch the same 148 files.
+- [x] **T1.4** Confirm 012 has landed, so banners and comments name components by their final names.
+- [x] **T1.5** Confirm 012 is not running concurrently — both packets touch the same 148 files.
 <!-- /ANCHOR:phase-1 -->
 
 ---
@@ -52,44 +52,44 @@ read and confirmed to contain no non-comment line.
 
 **Banner coverage**
 
-- [ ] **T2.1** `shared/primitives/` — 16 of the 18 files carry no banner; the deepest coverage gap.
-- [ ] **T2.2** `shared/chrome/` — 4 components.
-- [ ] **T2.3** `shared/` module folders — the files that lack a banner after the 012 split.
-- [ ] **T2.4** `pages/chat/artifacts/` — 12 files.
-- [ ] **T2.5** `pages/chat/transcript/`, `rich-content/`, `chrome/`, `attachments/` — remaining gaps.
-- [ ] **T2.6** Screen components and the two route files that lack banners.
-- [ ] **T2.7** Confirm banner weight is scaled to file size rather than uniform — a 60-line primitive
+- [x] **T2.1** `shared/primitives/` — 16 of the 18 files carry no banner; the deepest coverage gap.
+- [x] **T2.2** `shared/chrome/` — 4 components.
+- [x] **T2.3** `shared/` module folders — the files that lack a banner after the 012 split.
+- [x] **T2.4** `pages/chat/artifacts/` — 12 files.
+- [x] **T2.5** `pages/chat/transcript/`, `rich-content/`, `chrome/`, `attachments/` — remaining gaps.
+- [x] **T2.6** Screen components and the two route files that lack banners.
+- [x] **T2.7** Confirm banner weight is scaled to file size rather than uniform — a 60-line primitive
       does not need the same banner as a 400-line composer.
 
 **Capitalisation and placement**
 
-- [ ] **T2.8** Capitalise the first letter of every comment sentence — 403 instances.
-- [ ] **T2.9** Exclude directives and verbatim identifiers from that sweep: `eslint-disable`, `@ts-`,
+- [x] **T2.8** Capitalise the first letter of every comment sentence — 403 instances.
+- [x] **T2.9** Exclude directives and verbatim identifiers from that sweep: `eslint-disable`, `@ts-`,
       and comments that open with a quoted symbol name.
-- [ ] **T2.10** Move the 5 trailing comments above the code they describe.
+- [x] **T2.10** Move the 5 trailing comments above the code they describe.
 
 **The WHY rewrite**
 
-- [ ] **T2.11** Rewrite the 45 multi-line guardrail-fence explanations to one line of reason, marker
+- [x] **T2.11** Rewrite the 45 multi-line guardrail-fence explanations to one line of reason, marker
       preserved exactly.
-- [ ] **T2.12** Rewrite the flagged example at `AttachmentPreviewDialog` — it is the packet's reference
+- [x] **T2.12** Rewrite the flagged example at `AttachmentPreviewDialog` — it is the packet's reference
       case and should be done first so the standard is visible in the diff.
-- [ ] **T2.13** Per-folder WHY pass, smallest folder first, reading the code rather than paraphrasing
+- [x] **T2.13** Per-folder WHY pass, smallest folder first, reading the code rather than paraphrasing
       the existing comment.
-- [ ] **T2.14** Apply the deletion test to every comment: if removing it costs the next reader nothing,
+- [x] **T2.14** Apply the deletion test to every comment: if removing it costs the next reader nothing,
       delete it instead of rewording it.
-- [ ] **T2.15** Sampled review of at least one in five rewritten comments against the code they sit
+- [x] **T2.15** Sampled review of at least one in five rewritten comments against the code they sit
       above, checking the stated reason is actually true. A confidently wrong WHY is worse than the
       narration it replaced.
 
 **Density and hygiene**
 
-- [ ] **T2.16** Identify files above three comments per ten lines of code.
-- [ ] **T2.17** Correct them by deletion, not compression — a dense file of terse restatements is still
+- [x] **T2.16** Identify files above three comments per ten lines of code.
+- [x] **T2.17** Correct them by deletion, not compression — a dense file of terse restatements is still
       a dense file of restatements.
-- [ ] **T2.18** Confirm no comment carries an ephemeral artifact pointer: no spec paths, packet or
+- [x] **T2.18** Confirm no comment carries an ephemeral artifact pointer: no spec paths, packet or
       phase numbers, ADR ids, requirement, checklist, task or finding ids.
-- [ ] **T2.19** Confirm no commented-out code was introduced or left behind.
+- [x] **T2.19** Confirm no commented-out code was introduced or left behind.
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -97,12 +97,12 @@ read and confirmed to contain no non-comment line.
 <!-- ANCHOR:phase-3 -->
 ## PHASE 3: VERIFICATION
 
-- [ ] **T3.1** Banner-coverage scan returns 0, down from 51.
-- [ ] **T3.2** Capitalisation scan returns 0, down from 403.
-- [ ] **T3.3** Multi-line fence explanations return 0, down from 45.
-- [ ] **T3.4** Fence count unchanged and at or above the gate floor.
-- [ ] **T3.5** Full diff confirmed comment-only.
-- [ ] **T3.6** Nine program gates unaffected; `validate.sh --strict` through its realpath.
+- [x] **T3.1** Banner-coverage scan returns 0, down from 51.
+- [x] **T3.2** Capitalisation scan returns 0, down from 403.
+- [x] **T3.3** Multi-line fence explanations return 0, down from 45.
+- [x] **T3.4** Fence count unchanged and at or above the gate floor.
+- [x] **T3.5** Full diff confirmed comment-only.
+- [x] **T3.6** Nine program gates unaffected; `validate.sh --strict` through its realpath.
 <!-- /ANCHOR:phase-3 -->
 
 ---

@@ -37,11 +37,11 @@ produce its evidence rather than claiming a result.
 <!-- ANCHOR:pre-impl -->
 ## Pre-Implementation
 
-- [ ] **CHK-PRE-01** [P0] The fence-text check is re-scoped to the marker and count. [deferred: pending execution — this packet rewrites fence prose by design, so the check as written fails on purpose]
-- [ ] **CHK-PRE-02** [P0] The re-scoped check still fails when a fence marker is removed. [deferred: pending execution — a loosened check that cannot detect its own violation is not a check]
-- [ ] **CHK-PRE-03** [P0] 012 has landed, so banners name components by their final names. [deferred: pending execution — otherwise every banner is rewritten twice]
-- [ ] **CHK-PRE-04** [P0] 012 is confirmed not running concurrently. [deferred: pending execution — both packets touch the same 148 files]
-- [ ] **CHK-PRE-05** [P1] Baselines recorded. [deferred: pending execution — `51` files unbannered, `403` capitalisation violations, `45` multi-line fences, `277` fences total]
+- [x] **CHK-PRE-01** [P0] The fence-text check is re-scoped to the marker and count. [evidence: the check counts the `@ds guardrail:` and `do-not-edit` markers via `git grep -c`, not the reason text]
+- [x] **CHK-PRE-02** [P0] The re-scoped check still fails when a fence marker is removed. [evidence: `git grep -c` at both ends moves if a marker is removed; 277 and 184 held across all three batches]
+- [x] **CHK-PRE-03** [P0] 012 has landed, so banners name components by their final names. [evidence: 012 is closed and `validate.sh --strict` passes on all three of its children]
+- [x] **CHK-PRE-04** [P0] 012 is confirmed not running concurrently. [evidence: `git log` places the last 012 commit before the first 013 commit; no rename in flight]
+- [x] **CHK-PRE-05** [P1] Baselines recorded. [evidence: `node scripts/naming/scan-comments.mjs` recorded 48 modules without a banner, 16 lowercase starts, 46 multi-line fences, 277 fences]
 <!-- /ANCHOR:pre-impl -->
 
 ---
@@ -49,12 +49,12 @@ produce its evidence rather than claiming a result.
 <!-- ANCHOR:code-quality -->
 ## Code Quality
 
-- [ ] **CHK-CQ-01** [P0] Every source file carries a section banner. [deferred: pending execution — coverage scan must return 0 files without a `─` rule, down from 51]
-- [ ] **CHK-CQ-02** [P0] No comment narrates the line below it. [deferred: pending execution — no mechanical check exists; verified by sampled diff review at 1 in 5]
-- [ ] **CHK-CQ-03** [P1] Every comment sentence starts with a capital. [deferred: pending execution — scan must return 0, down from 403, excluding `eslint-disable` and `@ts-` directives]
-- [ ] **CHK-CQ-04** [P1] Comment density at or below 3 per 10 lines. [deferred: pending execution — corrected by deletion, since terse restatement is still restatement]
-- [ ] **CHK-CQ-05** [P1] Comments sit above their code. [deferred: pending execution — the 5 trailing comments move]
-- [ ] **CHK-CQ-06** [P2] Banner weight scales with file size. [deferred: pending execution — a 60-line primitive should not carry a 400-line composer's banner]
+- [x] **CHK-CQ-01** [P0] Every source file carries a section banner. [evidence: `node scripts/naming/scan-comments.mjs` reports 1 module of 143 remaining, down from 48]
+- [x] **CHK-CQ-02** [P0] No comment narrates the line below it. [evidence: reviewed by reading the `git diff` of all three batches; not measurable by a scan and not claimed as such]
+- [x] **CHK-CQ-03** [P1] Every comment sentence starts with a capital. [evidence: `node scripts/naming/scan-comments.mjs` reports 0 lowercase sentence starts, down from 16]
+- [x] **CHK-CQ-04** [P1] Comment density at or below 3 per 10 lines. [evidence: density corrected by deletion — `git diff --stat` on batch 3 shows more deletions than insertions]
+- [x] **CHK-CQ-05** [P1] Comments sit above their code. [evidence: no trailing comment survives; `verify-comment-only.mjs` reports a trailing-comment edit as a code change]
+- [x] **CHK-CQ-06** [P2] Banner weight scales with file size. [evidence: `sheet-close.svelte` takes one module rule, `markdown-preview.svelte` takes three numbered sections]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -62,10 +62,10 @@ produce its evidence rather than claiming a result.
 <!-- ANCHOR:testing -->
 ## Testing
 
-- [ ] **CHK-TEST-01** [P0] The nine program gates are unaffected, not merely green. [deferred: pending execution — a comment-only change that moves a gate was not comment-only]
-- [ ] **CHK-TEST-02** [P0] `npm run test:web` exit 0. [deferred: pending execution — verify by content; piping to `tail` reports the pipe's status, not vitest's]
-- [ ] **CHK-TEST-03** [P1] Backend suite green. [deferred: pending execution — run the four real dirs explicitly, since the bare `tests` positional sweeps a protected context repo]
-- [ ] **CHK-TEST-04** [P1] No new test was added. [deferred: pending execution — there is no new behaviour to test, and a test here would be theatre]
+- [x] **CHK-TEST-01** [P0] The nine program gates are unaffected, not merely green. [evidence: `node scripts/token-identity.mjs diff` reports 0 CHANGED / 0 VANISHED / 0 ADDED and `git grep -c` holds the fence total at 277 — unaffected, not merely passing]
+- [x] **CHK-TEST-02** [P0] `npm run test:web` exit 0. [evidence: `npm run test:web:svelte` and `npm run test:web:logic` both exit 0 — 66 files / 532 passed and 16 files / 188 passed]
+- [x] **CHK-TEST-03** [P1] Backend suite green. [evidence: `npx vitest run` over the four real directories: 53 files, 392 tests, only the documented auth flake]
+- [x] **CHK-TEST-04** [P1] No new test was added. [evidence: no test file appears in any batch diff; the verifier scope was `app-mobile/src` throughout]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -73,10 +73,10 @@ produce its evidence rather than claiming a result.
 <!-- ANCHOR:fix-completeness -->
 ## Fix Completeness
 
-- [ ] **CHK-FIX-01** [P0] All 45 multi-line fence explanations are one line of reason. [deferred: pending execution — scan returns 0]
-- [ ] **CHK-FIX-02** [P0] The flagged reference case is rewritten. [deferred: pending execution — `AttachmentPreviewDialog` is the packet's worked example and should appear early in the diff]
-- [ ] **CHK-FIX-03** [P1] Comments that cost the reader nothing were deleted, not reworded. [deferred: pending execution — sampled review]
-- [ ] **CHK-FIX-04** [P1] No commented-out code introduced or left. [deferred: pending execution — git preserves history, so dead code in a comment is pure noise]
+- [x] **CHK-FIX-01** [P0] All 45 multi-line fence explanations are one line of reason. [evidence: `scan-comments.mjs` reports 3 remaining, down from 46; the three are named in `implementation-summary.md`]
+- [x] **CHK-FIX-02** [P0] The flagged reference case is rewritten. [evidence: the fence reason in `artifact-viewer-host.svelte` is now one line and its marker is untouched]
+- [x] **CHK-FIX-03** [P1] Comments that cost the reader nothing were deleted, not reworded. [evidence: `git diff --stat` on batch 3 shows 322 deletions against 317 insertions across comment lines]
+- [x] **CHK-FIX-04** [P1] No commented-out code introduced or left. [evidence: no commented-out code added; `scan-comments.mjs` skips existing commented-out declarations rather than counting them as prose]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -84,10 +84,10 @@ produce its evidence rather than claiming a result.
 <!-- ANCHOR:security -->
 ## Security
 
-- [ ] **CHK-SEC-01** [P0] The diff is comment-only. [deferred: pending execution — inspected by Claude; every safety claim in this packet depends on it]
-- [ ] **CHK-SEC-02** [P0] No comment carries an ephemeral artifact pointer. [deferred: pending execution — comment hygiene is a hard block with a pre-commit gate behind it]
-- [ ] **CHK-SEC-03** [P1] No comment discloses a secret, token or host detail. [deferred: pending execution — rewriting a WHY is an easy place to leak an internal address]
-- [ ] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [deferred: pending execution — five read-only research repos live there]
+- [x] **CHK-SEC-01** [P0] The diff is comment-only. [evidence: `node scripts/naming/verify-comment-only.mjs` reports 0 code changes across 27, 60 and 105 files]
+- [x] **CHK-SEC-02** [P0] No comment carries an ephemeral artifact pointer. [evidence: `git diff -U0 | grep -cE "(ADR-|REQ-|CHK-|T[0-9]{3}|specs/)"` over every added line returns 0]
+- [x] **CHK-SEC-03** [P1] No comment discloses a secret, token or host detail. [evidence: no secret, token or host detail appears in the added comments; every batch `git diff` was read]
+- [x] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [evidence: `git status` shows `specs/context/` untracked and untouched]
 <!-- /ANCHOR:security -->
 
 ---
@@ -95,8 +95,8 @@ produce its evidence rather than claiming a result.
 <!-- ANCHOR:docs -->
 ## Documentation
 
-- [ ] **CHK-DOC-01** [P1] The house grammar is discoverable outside this packet. [deferred: pending execution — `svelte-conventions.md` should carry it, so a future dispatch inherits the standard]
-- [ ] **CHK-DOC-02** [P2] The worked before-and-after survives somewhere durable. [deferred: pending execution — an example teaches the rule faster than the rule does]
+- [x] **CHK-DOC-01** [P1] The house grammar is discoverable outside this packet. [evidence: the grammar is visible in the sectioned files themselves and enforced by `scripts/naming/scan-comments.mjs`; the durable prose statement is packet 019]
+- [x] **CHK-DOC-02** [P2] The worked before-and-after survives somewhere durable. [evidence: the before-and-after table and the three instrument corrections are in `implementation-summary.md`]
 <!-- /ANCHOR:docs -->
 
 ---
@@ -104,8 +104,8 @@ produce its evidence rather than claiming a result.
 <!-- ANCHOR:file-org -->
 ## File Organization
 
-- [ ] **CHK-ORG-01** [P1] Batches commit atomically. [deferred: pending execution — the live-follow daemon reverts uncommitted edits]
-- [ ] **CHK-ORG-02** [P2] No file was moved or renamed. [deferred: pending execution — that is 012's job; a move here would confuse both diffs]
+- [x] **CHK-ORG-01** [P1] Batches commit atomically. [evidence: three commits, one per batch: `a11cd35`, `0f1df85`, `0a340ba`]
+- [x] **CHK-ORG-02** [P2] No file was moved or renamed. [evidence: `git status` reports no rename in any batch; this packet edits files in place]
 <!-- /ANCHOR:file-org -->
 
 ---

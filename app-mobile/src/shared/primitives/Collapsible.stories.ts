@@ -23,11 +23,11 @@ const BODY = paragraphSnippet(
   'This collapsible content stays hidden until the trigger is activated. Use it to keep long or secondary information out of the primary reading flow.',
 );
 
-const meta = {
+const meta: Meta<typeof Collapsible> = {
   title: 'Primitives/Collapsible',
   component: Collapsible,
   tags: ['autodocs'],
-} satisfies Meta<typeof Collapsible>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -12,11 +12,11 @@ function labelSnippet(text: string) {
   }));
 }
 
-const meta = {
+const meta: Meta<typeof Button> = {
   title: 'Primitives/Button',
   component: Button,
   tags: ['autodocs'],
-} satisfies Meta<typeof Button>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;

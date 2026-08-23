@@ -16,12 +16,20 @@ import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/data/demo.js';
 // 160×100 ratio. VerifiedImage is prop-only (no context read), so no decorator;
 // outside demo mode the resource read resolves through the real relay seam, so
 // lifecycle states are pinned with the frozen `lifecycleState` prop.
-function requireImageBytes(): { readonly digest: string; readonly byteLength: number; readonly mediaType: string } {
+function requireImageBytes(): {
+  readonly digest: string;
+  readonly byteLength: number;
+  readonly mediaType: 'image/jpeg' | 'image/png';
+} {
   const ready = DEMO_IMAGE_PDF_BLOCKS.find((block) => block.renderer === 'image');
   if (ready === undefined || ready.byteLength === null) {
     throw new Error('No image fixture found in DEMO_IMAGE_PDF_BLOCKS.');
   }
-  return { digest: ready.digest, byteLength: demoArtifactBytes(ready).byteLength, mediaType: ready.mimeType };
+  const mediaType = ready.mimeType;
+  if (mediaType !== 'image/jpeg' && mediaType !== 'image/png') {
+    throw new Error(`Image fixture has an unsupported mediaType: ${mediaType}`);
+  }
+  return { digest: ready.digest, byteLength: demoArtifactBytes(ready).byteLength, mediaType };
 }
 
 const IMAGE = requireImageBytes();

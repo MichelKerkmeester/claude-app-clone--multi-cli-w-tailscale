@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
+import type { ComponentProps } from 'svelte';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
 import PdfPage from './PdfPage.svelte';
@@ -18,16 +19,16 @@ if (SAFE_BLOCK === undefined) {
 }
 const PDF_BYTES = demoArtifactBytes(SAFE_BLOCK);
 
-const meta = {
+const meta: Meta<typeof PdfPage> = {
   title: 'Artifacts/PdfPage',
   component: PdfPage,
   tags: ['autodocs'],
-} satisfies Meta<typeof PdfPage>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type PdfPageStory = StoryObj<Omit<ComponentProps<typeof PdfPage>, 'pdfDocument'>>;
 
-export const Default: Story = {
+export const Default: PdfPageStory = {
   args: {
     pageNumber: 1,
     scale: 1,

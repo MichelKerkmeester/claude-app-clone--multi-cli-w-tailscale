@@ -32,12 +32,16 @@ homed in a packet. None of the nine has started.
 
 | Packet | Level | State |
 |---|---|---|
-| `011-ux-affordances` | 1 | open — the one packet allowed to change a rendered value; operator-driven |
-| `012-naming-and-structure` | phase parent | scoped; grammar decisions **settled**, three children |
-| `013-comment-grammar` | 2 | scoped; blocked on 012 (same 148 files) |
+| `011-ux-affordances` | 1 | code shipped at 90%; one operator device-confirmation outstanding |
+| `012/001-grammar-and-manifest` | 2 | **shipped** — manifest, applier, scan; primitives and chrome moved |
+| `012/002-shared-tree-split` | 2 | **shipped** — `shared/data/` dissolved into seven folders |
+| `012/003-pages-and-tooling` | 2 | next in the client lane; consumes the manifest and the kind overlay |
+| `013-comment-grammar` | 2 | scoped; blocked on 012 (same source files) |
 | `014-folder-documentation` | 2 | scoped; blocked on 012 and 013 |
-| `015-test-lanes` | 2 | scoped; **executable now** — precondition for everything else |
-| `016-relay-correctness` | phase parent | scoped; **executable now**, three children |
+| `015-test-lanes` | 2 | **shipped** — glob lane, real virtualizer, Svelte lint, reducer coverage |
+| `016/001-projection-integrity` | 2 | projection, framing and retention **shipped**; epoch half held for the operator |
+| `016/002-route-authority` | 2 | in progress — steps 1 and 2 of 5 shipped |
+| `016/003-connection-lifecycle` | 2 | scoped; carries an operator question |
 | `017-ask-question-activation` | 2 | scoped; blocked on 016 |
 | `018-transcript-affordances` | 2 | scoped; blocked on 012, 015, 011 |
 | `019-surface-skill-refresh` | 2 | scoped; last — describes what shipped |
@@ -168,9 +172,17 @@ nineteen hand-placed `untrack()` calls across eleven files. A `$effect` that dis
 ported effect by tracing what its API methods do, not by grepping for a literal `dispatch(`.
 
 **10. Known flakes, not regressions.** `PlanModeMenu.svelte.test.ts` "Enter activates" is ~62% flaky
-at baseline. `auth.test.ts` is timing-flaky (201 vs 403). A bits-ui body-scroll-lock timer can throw
-`document is not defined` after teardown while every test passes. Confirm flake-versus-regression with
-a scoped stash and at least eight runs, never a single run.
+at baseline. `auth.test.ts` is timing-flaky (201 vs 403) — measured at 3/8 and 1/8 across two arms of
+the same change, failing on the identical assertion in both. `integration/pinned-pi-image-probe.test.ts`
+is load-sensitive (`expected true to be false`); it probes the installed Pi binary, and passed 3/3 both
+with and without a change under test. A bits-ui body-scroll-lock timer can throw `document is not
+defined` after teardown while every test passes. Confirm flake-versus-regression with a scoped stash —
+`git stash push -- <paths>`, never `reset --hard` — and at least eight runs, never a single run.
+
+**10b. A backgrounded dispatch outlives its shell wrapper.** `cmd & sleep N` returns when the compound
+command exits, not when the executor does, so a "completed" notification can be false and a log tail is
+not a final report. Poll `pgrep -f "opencode run"` until it clears. **Never reset or revert the working
+tree while a dispatch is live** — doing so silently clobbers its work, including work that was correct.
 
 **11. Comment hygiene is a hard block.** Never put a spec path, ADR id, REQ id, CHK id or task id in a
 code comment. Write the durable WHY instead. A pre-commit gate enforces it.

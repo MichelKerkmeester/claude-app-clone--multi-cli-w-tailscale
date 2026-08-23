@@ -36,10 +36,15 @@ const KIND_PREFIX = {
 // having to already know these five names.
 const SCREENS = {
   'app-mobile/src/pages/chat/Chat': 'screen-chat',
+  'app-mobile/src/pages/chat/chat': 'screen-chat',
   'app-mobile/src/pages/home/Home': 'screen-home',
+  'app-mobile/src/pages/home/home': 'screen-home',
   'app-mobile/src/pages/review/Review': 'screen-review',
+  'app-mobile/src/pages/review/review': 'screen-review',
   'app-mobile/src/pages/inbox/AttentionInbox': 'screen-attention-inbox',
+  'app-mobile/src/pages/inbox/attention-inbox': 'screen-attention-inbox',
   'app-mobile/src/pages/enrollment/Enrollment': 'screen-enrollment',
+  'app-mobile/src/pages/enrollment/enrollment': 'screen-enrollment',
 };
 
 function walk(dir, out = []) {
@@ -51,13 +56,28 @@ function walk(dir, out = []) {
   return out;
 }
 
-/** The kind-first stem for a component name, or null when it is not an instance of a kind. */
+/**
+ * The kind-first stem for a component name, or null when it is not an instance
+ * of a kind. Both spellings are recognised — the original PascalCase and the
+ * kebab-case a partial pass may already have produced — so running this twice
+ * converges instead of leaving half the tree kind-last.
+ */
 function kindFirstStem(stem) {
+  const alreadyKindFirst = Object.values(KIND_PREFIX).some((prefix) =>
+    stem.startsWith(`${prefix}-`),
+  );
+  if (alreadyKindFirst) return null;
+
   for (const kind of KINDS) {
-    if (stem === kind || !stem.endsWith(kind)) continue;
-    const remainder = stem.slice(0, -kind.length);
-    if (remainder.length === 0) continue;
-    return `${KIND_PREFIX[kind]}-${toKebab(remainder)}`;
+    if (stem !== kind && stem.endsWith(kind)) {
+      const remainder = stem.slice(0, -kind.length);
+      if (remainder.length > 0) return `${KIND_PREFIX[kind]}-${toKebab(remainder)}`;
+    }
+    const kebabKind = `-${toKebab(kind)}`;
+    if (stem !== toKebab(kind) && stem.endsWith(kebabKind)) {
+      const remainder = stem.slice(0, -kebabKind.length);
+      if (remainder.length > 0) return `${KIND_PREFIX[kind]}-${remainder}`;
+    }
   }
   return null;
 }

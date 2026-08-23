@@ -186,7 +186,7 @@
     ],
     "causal_summary": "A server heartbeat with an injectable interval so a suspended phone stops locking itself out of its own relay, and a client that classifies a socket close by the recovery it implies rather than backing off from all of them.",
     "created_at": "2026-08-23T10:35:57.997Z",
-    "last_save_at": "2026-08-23T10:36:38.366Z",
+    "last_save_at": "2026-08-23T17:47:41.739Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:db196b089cadf1226b0a8de9e696deb1ac4c38fb6f8fa8aebbf4fffcb7a3addc",
+    "source_fingerprint": "sha256:1fa7a97266e5f8c358392d72168e9e646435b7eedc6d627034fbadf5a16e7684",
     "source_doc_hashes": {
       "spec.md": "f85c2c7aa12c1a236d3d0aa703c197f05bc5d2fd27176d2b949f8c524b077276",
       "plan.md": "fb59e83d522959b28ca47714d774256519013cd1f01316e693fff30fea7ab8a2",
       "tasks.md": "12a91339cfc16d81822060a36268bef3a6aa8b4eb84ff5324815125f3c861bd0",
       "checklist.md": "739b7c1702a1e5cce9a18d463d5705ed5073d62b2646e4cc0e06fa8903ee1c05",
-      "implementation-summary.md": "ee56086723e02b77a5bd0bd23aeddf3a6b2dd0152bb627901c9e485e0ab6a6bd"
+      "implementation-summary.md": "f2837ef05fb23b82cf246eeb169c3284dfb156a11424d06a0acb3907ac903e6c"
     },
     "last_active_child_id": null,
     "last_active_at": null

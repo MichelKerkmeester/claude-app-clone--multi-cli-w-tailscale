@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/017-ask-question-activation"
-    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_at: "2026-08-23T17:48:05Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped from a verified wiring gap; no code changed."
-    next_safe_action: "Trace the host event that should raise a question."
+    recent_action: "Service constructed and both ends wired; round-trip test red before green."
+    next_safe_action: "Nothing outstanding; 018 no longer waits on this node."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,7 +27,7 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | **Scoped, not started** |
+| Status | **Shipped** |
 | Requirements shipped | none yet; REQ-001 … REQ-007 all open |
 <!-- /ANCHOR:metadata -->
 

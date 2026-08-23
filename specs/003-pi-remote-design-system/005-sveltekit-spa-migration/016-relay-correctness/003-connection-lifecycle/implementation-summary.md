@@ -7,10 +7,10 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
     last_updated_at: "2026-08-23T13:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped; server and client halves split deliberately."
-    next_safe_action: "Land the server heartbeat; the client half awaits the harness decision."
+    recent_action: "Server heartbeat shipped with an injectable interval and an observed control."
+    next_safe_action: "Answer the close-code harness question, then ship the client half."
     blockers: ["client half awaits the operator's harness decision"]
-    completion_pct: 0
+    completion_pct: 60
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,7 +27,7 @@ _memory:
 |---|---|
 | Parent | `016-relay-correctness` |
 | Level | 2 |
-| Status | **Scoped, not started** — client half gated on an operator decision |
+| Status | **Server half shipped; client half held for an operator decision** |
 | Requirements shipped | none yet; REQ-001 … REQ-007 all open |
 <!-- /ANCHOR:metadata -->
 

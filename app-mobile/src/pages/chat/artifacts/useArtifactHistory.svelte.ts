@@ -7,6 +7,10 @@
 // a component <script> runs once per instance, so the controller is created once and disposed on
 // destroy via an $effect cleanup — matching the React useRef "create once" + useEffect dispose.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. HISTORY KEY AND CONTROLLER TYPES
+// ───────────────────────────────────────────────────────────────────
+
 const HISTORY_KEY = '__piRemoteArtifactViewer';
 
 interface ArtifactHistoryEntry {
@@ -26,6 +30,10 @@ type HistoryWindow = Pick<
   'addEventListener' | 'removeEventListener' | 'history' | 'location'
 >;
 
+// ───────────────────────────────────────────────────────────────────
+// 2. TOKEN STATE AND HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 let historyToken = 0;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -36,6 +44,10 @@ function createHistoryToken(): string {
   historyToken += 1;
   return `artifact-viewer-${historyToken}`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CREATE ARTIFACT HISTORY
+// ───────────────────────────────────────────────────────────────────
 
 export function createArtifactHistory(
   onBack: () => void,
@@ -110,6 +122,10 @@ export function createArtifactHistory(
     },
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. SVELTE RUNES BINDING
+// ───────────────────────────────────────────────────────────────────
 
 export function useArtifactHistory(onBack: () => void): ArtifactHistoryController {
   const controller = createArtifactHistory(onBack);

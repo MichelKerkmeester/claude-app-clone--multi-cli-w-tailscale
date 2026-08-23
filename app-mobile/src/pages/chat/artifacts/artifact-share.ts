@@ -1,8 +1,16 @@
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   FilePreviewCompleteness,
   FilePreviewRedaction,
   FilePreviewRenderer,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SHARE INPUT AND RESULT TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export interface DisplayedArtifactShareInput {
   readonly displayName: string;
@@ -18,6 +26,10 @@ export interface DisplayedArtifactShareInput {
 export type ArtifactShareResult = 'shared' | 'cancelled' | 'unavailable' | 'failed';
 
 type ShareNavigator = Navigator;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SHARE PAYLOAD HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function shareNavigator(): ShareNavigator | null {
   return typeof navigator === 'undefined' ? null : (navigator as ShareNavigator);
@@ -38,6 +50,10 @@ function shareData(input: DisplayedArtifactShareInput): ShareData {
 function needsDisclosureConfirmation(input: DisplayedArtifactShareInput): boolean {
   return input.redaction === 'applied' || input.completeness === 'excerpt';
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. SHARE AND COPY API
+// ───────────────────────────────────────────────────────────────────
 
 export function canShareDisplayedArtifact(input: DisplayedArtifactShareInput): boolean {
   const currentNavigator = shareNavigator();
@@ -96,6 +112,10 @@ export function shareDisplayedArtifact(
     return Promise.resolve('failed');
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. PAYLOAD AND FILENAME HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function hasShareablePayload(input: DisplayedArtifactShareInput): boolean {
   return (

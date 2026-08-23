@@ -3,11 +3,19 @@
 // erasing the Provider<->Host<->Status back-edge; per-file Svelte modules make that fragile, so
 // the shared types live here). Compile-time only — no runtime behaviour or rendered output changes.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   FileDiffBlock,
   FilePreviewBlock,
   InboundImageReadyBlock,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. VIEWER PHASES AND DISMISSAL REASONS
+// ───────────────────────────────────────────────────────────────────
 
 export type ArtifactViewerPhase =
   | 'closed'
@@ -40,6 +48,10 @@ export type ArtifactDismissalReason =
   | 'revoked'
   | 'transcript-superseded';
 
+// ───────────────────────────────────────────────────────────────────
+// 3. ARTIFACT DOCUMENTS AND SOURCES
+// ───────────────────────────────────────────────────────────────────
+
 export interface InMemoryArtifactDocument {
   readonly kind: 'in-memory';
   readonly id: string;
@@ -57,6 +69,10 @@ export interface InMemoryArtifactDocument {
 
 export type ArtifactViewerSource =
   FileDiffBlock | FilePreviewBlock | InboundImageReadyBlock | InMemoryArtifactDocument;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. PREVIEW AND CONTEXT CONTRACTS
+// ───────────────────────────────────────────────────────────────────
 
 export interface ArtifactPreview {
   readonly source: Readonly<ArtifactViewerSource>;

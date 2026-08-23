@@ -1,8 +1,16 @@
 /// <reference types="vite/client" />
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. PREVIEW BOUNDS AND STATE TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export const PDF_PREVIEW_MAX_BYTES = 50 * 1024 * 1024;
 export const PDF_PREVIEW_MAX_PAGES = 500;
@@ -32,6 +40,10 @@ export interface TextSpan {
   readonly key: string;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. PDF.JS LOADING AND RUNTIME METRICS
+// ───────────────────────────────────────────────────────────────────
+
 let pdfJsPromise: Promise<PdfJsModule> | null = null;
 
 // Live worker/canvas counts back getPdfPreviewRuntimeMetrics (a leak detector). React kept these as two
@@ -57,6 +69,10 @@ export function loadPdfJs(): Promise<PdfJsModule> {
   }
   return pdfJsPromise;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. ZOOM, PAGE AND TEXT HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 export function clampZoom(value: number): number {
   return Math.min(PDF_PREVIEW_MAX_ZOOM, Math.max(PDF_PREVIEW_MIN_ZOOM, value));

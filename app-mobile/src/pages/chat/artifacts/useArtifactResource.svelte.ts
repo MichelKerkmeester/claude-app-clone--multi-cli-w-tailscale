@@ -2,6 +2,10 @@
 // MODULE: Artifact Resource Loading
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isFilePreviewBlock,
   isInboundImageReadyBlock,
@@ -20,6 +24,10 @@ import {
   type ArtifactResourceBlock,
 } from '$shared/data/relay.js';
 import { demoInboundArtifactResource, isDemoMode } from '$shared/data/demo.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. RESOURCE LIMITS AND STATUS CONTRACT
+// ───────────────────────────────────────────────────────────────────
 
 export const ARTIFACT_RESOURCE_STALL_MS = 15_000;
 export const MAX_ARTIFACT_RESOURCE_BYTES = 50 * 1024 * 1024;
@@ -104,6 +112,10 @@ interface StoredArtifactResource {
 
 type LoadedArtifactResource = ArtifactResource & { readonly retained?: boolean };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SHARED STORES AND LIFECYCLE TRIGGERS
+// ───────────────────────────────────────────────────────────────────
+
 const EMPTY_IDENTITY = 'none';
 const thumbnailStore = new Map<string, StoredArtifactResource>();
 const fullStore = new Map<string, StoredArtifactResource>();
@@ -122,6 +134,10 @@ const ARTIFACT_LIFECYCLE_EVENTS = [
   'artifact-revoked',
   'transcript-superseded',
 ] as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. OBJECT URL STORE
+// ───────────────────────────────────────────────────────────────────
 
 function storeFor(variant: ArtifactReadVariant): Map<string, StoredArtifactResource> {
   return variant === 'thumbnail' ? thumbnailStore : fullStore;
@@ -195,6 +211,10 @@ function clearStore(variant: ArtifactReadVariant): void {
   store.clear();
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. IDENTITY AND SNAPSHOTS
+// ───────────────────────────────────────────────────────────────────
+
 function blockIdentity(
   block: ArtifactResourceBlock | null,
   variant: ArtifactReadVariant,
@@ -265,6 +285,10 @@ function snapshotFor(
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 6. BYTE VERIFICATION HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function isAbortError(error: unknown): boolean {
   return (
     typeof error === 'object' &&
@@ -327,6 +351,10 @@ async function requireImageDecode(
   if (signal.aborted) throw new DOMException('The artifact request was aborted.', 'AbortError');
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 7. REQUEST LIFECYCLE AND PURGE
+// ───────────────────────────────────────────────────────────────────
+
 function readVerifiedArtifact(
   sessionId: string,
   block: ArtifactResourceBlock,
@@ -380,6 +408,10 @@ export function clearArtifactFullResourceStore(): void {
 export function clearArtifactResourceStore(): void {
   purgeArtifactResourceStore();
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 8. LOADING AND ERROR MAPPING
+// ───────────────────────────────────────────────────────────────────
 
 function mapReadError(error: unknown): {
   readonly status: ArtifactResourceStatus;
@@ -504,6 +536,10 @@ function releaseRequestResource(request: ActiveRequest): void {
   request.storeKey = null;
   request.storeVariant = null;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 9. USE ARTIFACT RESOURCE HOOK
+// ───────────────────────────────────────────────────────────────────
 
 // Runes port of the React useArtifactResource hook. Consumers pass reactive getter thunks and read
 // the returned `.current`. useState -> $state, useRef refs -> plain closure vars, the two useEffects
@@ -748,6 +784,10 @@ export function useArtifactResource(
     },
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 10. BLOCK TYPE GUARD
+// ───────────────────────────────────────────────────────────────────
 
 export function isArtifactResourceBlock(value: unknown): value is ArtifactResourceBlock {
   return isFilePreviewBlock(value) || isInboundImageReadyBlock(value);

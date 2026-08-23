@@ -20,9 +20,10 @@ const MANIFEST = join(REPO_ROOT, 'scripts/naming/rename-manifest.json');
 const ALIAS_PREFIX = '$shared/';
 const ALIAS_ROOT = 'app-mobile/src/shared/';
 // Where a specifier could live. Tests and stories import the moved modules too,
-// so a rewrite scoped to src alone leaves the suites pointing at old paths.
+// so a rewrite scoped to src alone leaves the suites pointing at old paths — and
+// the logic suites are .tsx, which an extension list built from src alone omits.
 const SPECIFIER_ROOTS = ['app-mobile/src', 'app-mobile/tests'];
-const SPECIFIER_EXTENSIONS = ['.svelte', '.ts', '.js'];
+const SPECIFIER_EXTENSIONS = ['.svelte', '.ts', '.tsx', '.js', '.mjs'];
 
 function argValue(flag) {
   const index = process.argv.indexOf(flag);

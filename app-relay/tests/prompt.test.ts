@@ -17,6 +17,7 @@ import {
   type WebSocketTicketResponse,
 } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { WebSocket } from 'ws';
 
 import { AuthService } from '../src/auth/auth-service.js';
 import type { AttachmentOwner, AttachmentStatusDto } from '../src/attachments/attachment-types.js';
@@ -50,11 +51,14 @@ interface Harness {
 
 interface AuthorizedClient {
   readonly cookie: string;
+  readonly socket: WebSocket | null;
 }
 
 const activeHarnesses: Harness[] = [];
+const activeSockets: WebSocket[] = [];
 
 afterEach(async () => {
+  for (const socket of activeSockets.splice(0)) socket.close();
   await Promise.all(
     activeHarnesses.splice(0).map(async ({ server, store }) => {
       await server.stop();
@@ -64,6 +68,25 @@ afterEach(async () => {
 });
 
 describe('live prompt command transport', () => {
+  it('refuses a background device whether or not the prompt carries an attachment', async () => {
+    const harness = await createHarness();
+    // No sync socket: this is a device that cannot be shown what it just did.
+    const background = await authorize(harness, { foreground: false });
+    const ticket = await issueTicket(harness, background.cookie);
+
+    const plain = await submit(harness, background.cookie, {
+      submissionId: 'prompt_submission_background',
+      message: 'Steer the host from the background.',
+      ticket: ticket.ticket,
+    });
+
+    expect(plain.status).toBe(403);
+    expect(await plain.json()).toEqual({ error: 'foreground_required' });
+    // The gate used to depend on payload shape, so a plain prompt slipped
+    // through while the same prompt carrying an image was refused.
+    expect(harness.send).not.toHaveBeenCalled();
+  });
+
   it('requires authentication, sends one typed Pi command, and persists only a redacted user block', async () => {
     const harness = await createHarness();
     const authorized = await authorize(harness);
@@ -722,7 +745,10 @@ async function createHarness(): Promise<Harness> {
   return harness;
 }
 
-async function authorize(harness: Harness): Promise<AuthorizedClient> {
+async function authorize(
+  harness: Harness,
+  { foreground = true }: { readonly foreground?: boolean } = {},
+): Promise<AuthorizedClient> {
   const keys = deviceKeys();
   const enrollment = harness.server.auth.enrollment.createChallenge();
   const enrolled = await post(harness.ingressUrl, '/api/auth/enroll', {
@@ -748,7 +774,9 @@ async function authorize(harness: Harness): Promise<AuthorizedClient> {
   });
   const cookie = sessionResponse.headers.get('set-cookie')?.split(';')[0];
   if (cookie === undefined) throw new Error('Test session omitted its cookie.');
-  return { cookie };
+  if (!foreground) return { cookie, socket: null };
+  const ticket = await issueTicket(harness, cookie);
+  return { cookie, socket: await connectForeground(harness, ticket.ticket) };
 }
 
 async function issueTicket(harness: Harness, cookie: string): Promise<WebSocketTicketResponse> {
@@ -832,4 +860,31 @@ function post(
     },
     body: options.body === undefined ? null : JSON.stringify(options.body),
   });
+}
+
+/**
+ * Open the live sync socket, which is what makes a device foreground: the
+ * server derives foreground from an open /api/sync connection, and the real
+ * client holds one for the whole session because the transcript streams over
+ * it. A harness that submits without one is a background caller.
+ */
+async function connectForeground(harness: Harness, ticket: string): Promise<WebSocket> {
+  const socket = new WebSocket(
+    `${harness.ingressUrl}/api/sync?ticket=${encodeURIComponent(ticket)}`,
+    { origin: ORIGIN, headers: { 'tailscale-user-login': PRINCIPAL } },
+  );
+  await new Promise<void>((resolve, reject) => {
+    const onError = (error: Error) => {
+      socket.off('open', onOpen);
+      reject(error);
+    };
+    const onOpen = () => {
+      socket.off('error', onError);
+      resolve();
+    };
+    socket.once('error', onError);
+    socket.once('open', onOpen);
+  });
+  activeSockets.push(socket);
+  return socket;
 }

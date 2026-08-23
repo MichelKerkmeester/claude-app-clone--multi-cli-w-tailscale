@@ -185,6 +185,8 @@ export async function startReadOnlyServer(
   const runtimeReconcileLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const planControlLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const planBindingLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
+  const approvalDecisionLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
+  const acceptEditsLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const askQuestionTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
   const askQuestionAnswerLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const activeSockets = new Set<ActiveSocket>();
@@ -211,6 +213,8 @@ export async function startReadOnlyServer(
       runtimeReconcileLimiter,
       planControlLimiter,
       planBindingLimiter,
+      approvalDecisionLimiter,
+      acceptEditsLimiter,
       askQuestionTicketLimiter,
       askQuestionAnswerLimiter,
       isForegroundDevice,
@@ -369,6 +373,8 @@ async function handleHttp(
   runtimeReconcileLimiter: FixedWindowRateLimiter,
   planControlLimiter: FixedWindowRateLimiter,
   planBindingLimiter: FixedWindowRateLimiter,
+  approvalDecisionLimiter: FixedWindowRateLimiter,
+  acceptEditsLimiter: FixedWindowRateLimiter,
   askQuestionTicketLimiter: FixedWindowRateLimiter,
   askQuestionAnswerLimiter: FixedWindowRateLimiter,
   isForegroundDevice: (deviceId: string, token: string) => boolean,
@@ -785,6 +791,15 @@ async function handleHttp(
       sendJson(response, 400, { error: 'invalid_decision' });
       return;
     }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (!approvalDecisionLimiter.consume(session.deviceId).allowed) {
+      auth.metrics.rateLimited += 1;
+      sendJson(response, 429, { error: 'rate_limited' });
+      return;
+    }
     const result = options.approvals.decide(body, session.deviceId, session.principal);
     sendJson(response, result.accepted ? 202 : 409, result);
     return;
@@ -817,7 +832,7 @@ async function handleHttp(
       sendJson(response, 404, { error: 'not_available' });
       return;
     }
-    if (hasAttachments && !isForegroundDevice(session.deviceId, session.token)) {
+    if (!isForegroundDevice(session.deviceId, session.token)) {
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
@@ -1101,6 +1116,15 @@ async function handleHttp(
       typeof body.ttlMs !== 'number'
     ) {
       sendJson(response, 400, { error: 'invalid_grant' });
+      return;
+    }
+    if (!isForegroundDevice(session.deviceId, session.token)) {
+      sendJson(response, 403, { error: 'foreground_required' });
+      return;
+    }
+    if (!acceptEditsLimiter.consume(session.deviceId).allowed) {
+      auth.metrics.rateLimited += 1;
+      sendJson(response, 429, { error: 'rate_limited' });
       return;
     }
     try {

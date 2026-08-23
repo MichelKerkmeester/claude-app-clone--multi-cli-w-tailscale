@@ -64,15 +64,18 @@ here is silent by construction, so an unobserved check proves nothing.
 - [x] **T2.6** Confirm no other caller holds a private copy of a store-owned counter. [evidence: one remains — projectSubmittedAttachments caches across a batch; reported, not fixed here]
 
 **Rotate**
-- [ ] **T2.7** Rotate the stream epoch on the child exit, restart and failed edges. [deferred: held — epoch rotation awaits the operator retention decision]
-- [ ] **T2.8** Respect the store's reused-epoch guard and its first-sequence-is-one requirement. [deferred: held with T2.7]
-- [ ] **T2.9** Confirm the transcript now shows a generation change, as the command catalog, todos and
-      attachments already do. [deferred: held with T2.7]
+- [x] **T2.7** Rotate the stream epoch on the child exit, restart and failed edges. [evidence: `supervisor.onLifecycle` reallocates on exit/restart/failed in `index.ts`, and all four consumers resolve the epoch at use time rather than capturing it at startup]
+- [x] **T2.8** Respect the store's reused-epoch guard and its first-sequence-is-one requirement. [evidence: test `starts a rotated epoch at one and refuses reuse of the retired epoch`, asserting the guard's exact message]
+- [x] **T2.9** Confirm the transcript now shows a generation change, as the command catalog, todos and
+      attachments already do. [evidence: confirmed by reading the consumer, not by a test — the client
+      compares its cursor epoch against each sync message in `use-sync-socket.svelte.ts` and fires
+      `pi-remote:transcript-superseded` on a mismatch, so a rotated epoch surfaces on the next frame]
 
 **Collect and bound**
-- [ ] **T2.10** Add cross-epoch collection for ended epochs behind an explicit retained count. [deferred: held — collection ships with rotation or not at all]
+- [x] **T2.10** Add cross-epoch collection for ended epochs behind an explicit retained count. [evidence: `collectEndedEpochEnvelopes` with `MAX_RETAINED_ENDED_EPOCHS = 10`, the operator's chosen retention; a named constant, not a runtime option]
 - [ ] **T2.11** Verify collection against a copy of a real database before running it against one, and
-      keep the before-and-after row counts. [deferred: held with T2.10]
+      keep the before-and-after row counts. Open: the counts recorded so far come from a
+      test-constructed store, which proves the query but not its behaviour on real accumulated data.
 - [x] **T2.12** Bound the four unbounded attachment-service maps, matching the bound the prompt service
       already applies to its equivalent. [evidence: three ceilings with live-record-skipping eviction, proven by a bound test and its negative control]
 <!-- /ANCHOR:phase-2 -->
@@ -83,10 +86,12 @@ here is silent by construction, so an unobserved check proves nothing.
 ## PHASE 3: VERIFICATION
 - [x] **T3.1** T2.1 fails on the pre-fix commit and passes on the post-fix commit — both observed. [evidence: both observed: fail at 2e71b45, pass at 3052336]
 - [x] **T3.2** A grep for the error-listener registration returns a hit. [evidence: `grep onError app-relay/src/index.ts` returns line 155]
-- [ ] **T3.3** Rotation produces an epoch whose first sequence is one, and the reused-epoch guard still
-      rejects a repeat. [deferred: held with rotation]
-- [ ] **T3.4** Collection reduces ended-epoch rows, with counts recorded. [deferred: held with collection]
-- [x] **T3.5** `npm test` exit 0 against the four real directories. [evidence: 51 files / 384 tests, exit 0]
+- [x] **T3.3** Rotation produces an epoch whose first sequence is one, and the reused-epoch guard still
+      rejects a repeat. [evidence: `app-relay/tests/epoch-rotation.test.ts` allocates three sequences
+      under the first epoch, then asserts the rotated epoch's first allocation is 1, and that reusing
+      the retired epoch raises the store's exact guard message]
+- [x] **T3.4** Collection reduces envelope rows while keeping every epoch row, with counts recorded. [evidence: 11 ended epochs; envelopes 22 to 21 across the triggering publish, the collected epoch left with 0 and each retained ended epoch with 2, the current epoch with 1, and the collected epoch's `stream_epochs` tombstone still present. The task's original wording expected epoch rows to fall; they deliberately do not, because a surviving tombstone is what stops a collected epoch from being reused]
+- [x] **T3.5** `npm test` exit 0 against the four real directories. [evidence: 50 files / 387 tests, exit 0, re-run whole from the final state]
 - [x] **T3.6** `npm run build` exit 0. [evidence: exit 0]
 - [x] **T3.7** `validate.sh --strict` exit 0 through its realpath. [evidence: exit 0 through the script realpath]
 <!-- /ANCHOR:phase-3 -->

@@ -135,6 +135,12 @@
         "source": "derived"
       },
       {
+        "name": "Make Stop",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
         "name": "Completion Criteria All",
         "kind": "proper_noun",
         "path": "tasks.md",
@@ -143,12 +149,6 @@
       {
         "name": "a",
         "kind": "key_phrase",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "Phase 1: Setup",
-        "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
@@ -179,7 +179,7 @@
     ],
     "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
     "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-23T18:54:07.483Z",
+    "last_save_at": "2026-08-23T20:18:34.981Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -188,11 +188,11 @@
       "tasks.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:4396604a105d205d4115b9b97b87cc8719288f668d8e87b046d9a9b6fb79da30",
+    "source_fingerprint": "sha256:cb39351887d1913d930d76a39d34d312a00d155a09598d2d14306c0f176bfb5a",
     "source_doc_hashes": {
       "spec.md": "a101790ecf0497eec9244c79f47e00183c0baf7cc084d68049dc70c1aea9e819",
       "plan.md": "574a68baf7b1dd8368a4fe5ff950db368c76e753d9552c14d1cdb4214cae88c4",
-      "tasks.md": "b6143e7bde79de080e763775e871d232ecc41e70761a60de12d4fb0f6e90ecfd",
+      "tasks.md": "11e62b2deeef7b04d6d3ef77cfe919393151041de74f62aa146091ee5401a627",
       "implementation-summary.md": "11e2948dbbd754574d27decc85a02dcdc05784dd7935e98e2c8ba5475fa105c2"
     },
     "last_active_child_id": null,

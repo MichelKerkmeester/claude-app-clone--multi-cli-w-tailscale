@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances"
     last_updated_at: "2026-08-23T06:20:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "REQ-001 glass scroll-to-latest shipped; board green."
-    next_safe_action: "Operator confirms the glass on a device (T3.4)."
+    recent_action: "Draft-preserving abort shipped in 0c0d309; whole board green."
+    next_safe_action: "Operator confirms the glass and the interrupt on a device."
     completion_pct: 90
 ---
 
@@ -50,6 +50,17 @@ Each task carries its evidence inline, so the ledger is readable without the pla
 - [x] **T2.2** Append the `prefers-contrast: more` opaque fallback with the `--line-strong` carry,
       ordered last so it wins the cascade.
 - [x] **T2.3** Keep the change append-only — no edit to geometry, reveal logic, badge or `aria-label`.
+- [x] **T2.4** Make Stop its own control instead of a state of the primary disc, so a draft never
+      hides the interrupt. `session-composer.svelte` renders it whenever `running &&
+      connection === 'live'`; the former `showStop` derived value is gone.
+- [x] **T2.5** Leave the draft untouched on abort. `stopRun` in `screen-chat.svelte` only calls
+      `abortPrompt()` and never clears `prompt`; the form's old `if (showStop) return` guard was
+      removed, and `sendPrompt` already refuses an empty message so an empty submit stays a no-op.
+- [x] **T2.6** Render the draft action only when there is something to send, so a running turn with
+      an empty composer shows the interrupt alone rather than an enabled steer disc that does
+      nothing. Both controls appear together once text or an attachment is present.
+- [x] **T2.7** Carry the new control through the `prefers-contrast: more` and `forced-colors: active`
+      groups, so the interrupt keeps a visible border where system colours replace the palette.
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -65,6 +76,16 @@ Each task carries its evidence inline, so the ledger is readable without the pla
 - [~] **T3.4** Confirm the glass reads correctly on device. Deferred: the CDP gate can screenshot the
       rendered surface, but "does this look like the Claude app" is an operator judgement, not a
       machine check.
+- [x] **T3.5** Draft preservation proved by test, not by inspection.
+      `app-mobile/tests/SessionComposer.svelte.test.ts` asserts by accessible name that a running
+      turn with an empty draft exposes only "Stop the current turn", that a typed draft exposes both
+      it and "Steer the current turn", and that the typed text is still in the field after Stop.
+- [x] **T3.6** Board re-run whole from the final state — build RC 0; typecheck 1123 files / 0 errors;
+      backend 50 files / 385 tests RC 0; Svelte 67 files / 539 passed / 3 skipped and logic 16 files
+      / 188 passed, RC 0; token identity 0 CHANGED / 0 VANISHED / 0 ADDED across light, dark and
+      system; catalog smoke 267 stories x 2 themes = 534 frames / 0 throws; runtime smoke 4/4
+      surfaces / 0 errors; design-system 390 CSS-pixel width with no horizontal overflow in both
+      themes.
 <!-- /ANCHOR:phase-3 -->
 
 ---

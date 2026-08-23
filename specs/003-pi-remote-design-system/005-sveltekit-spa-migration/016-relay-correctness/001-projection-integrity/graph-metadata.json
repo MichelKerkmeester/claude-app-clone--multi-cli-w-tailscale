@@ -142,19 +142,19 @@
         "source": "derived"
       },
       {
-        "name": "T2.7",
+        "name": "live-record-skipping",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "rotation",
+        "name": "counts",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "T2.10",
+        "name": "evidence",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Make the deliberately-raised-but-unheard error audible, allocate projection sequences from the store that owns them, and rotate the stream epoch on host restart together with the garbage collection that rotation obliges.",
     "created_at": "2026-08-23T10:35:57.408Z",
-    "last_save_at": "2026-08-23T18:54:06.871Z",
+    "last_save_at": "2026-08-23T20:21:01.117Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:4c50722c338c5053779bb8064c3f0b51545af9fd38929e05238de7f9458bd2da",
+    "source_fingerprint": "sha256:2a187e99b8c0f6045619f0c3d90e0ef89656ff1dc818fc28a989c1552bb24533",
     "source_doc_hashes": {
       "spec.md": "9038f979d2b5b866ff08440e75cc1ba626c6c79eb9fc89580110c48973ac0328",
       "plan.md": "10ed71436e3e3979846f601066066bc66b17bbb91accbb031ddf124a7e352aac",
-      "tasks.md": "d0d6a17ebc46a3d9d81c0d0188611934a2c3482736d4a9a5a23a89180246a1e5",
-      "checklist.md": "37fd017a27c7c612705574c8d7cbb03845b75d7fe8a3b9522088f68c0e5d481c",
-      "implementation-summary.md": "062377bed69f3b7d7e181c6bfdae8a533388216d269fd0163bd832d8e8998b40"
+      "tasks.md": "c06234efceae2395ba0cc133e245f6759a26ee5b52ac101b585d9013cd7f9ba6",
+      "checklist.md": "9ed351f3f09bb4a5c79b227d196f84e1b393d8b94b353ddc9a9fd5c874de1626",
+      "implementation-summary.md": "a7a785df1b30d4e456975e6a1160f4e01836164dc26ab34fe1d500f85fe0e0df"
     },
     "last_active_child_id": null,
     "last_active_at": null

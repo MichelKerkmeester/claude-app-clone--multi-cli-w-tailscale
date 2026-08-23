@@ -14,7 +14,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
 import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/commands/commands.js';
-import CommandPalette from '../src/pages/chat/chrome/CommandPalette.svelte';
+import CommandPalette from '../src/pages/chat/chrome/command-palette.svelte';
 
 beforeEach(() => {
   // bits-ui positions Combobox content via floating-ui, which under jsdom

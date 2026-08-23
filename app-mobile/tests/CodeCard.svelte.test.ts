@@ -2,11 +2,11 @@ import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import CodeCard from '../src/pages/chat/rich-content/CodeCard.svelte';
+import CodeCard from '../src/pages/chat/rich-content/code-card.svelte';
 import {
   normalizeTranscriptBlocks,
   type NormalizedCodeBlock,
-} from '../src/pages/chat/rich-content/normalizeTranscriptBlocks.js';
+} from '../src/pages/chat/rich-content/normalize-transcript-blocks.js';
 
 // CodeCard progressive-highlights via a Web Worker, but jsdom has no Worker.
 // A real Worker global lets the highlight life-cycle take its normal dispatch

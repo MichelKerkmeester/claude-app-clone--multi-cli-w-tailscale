@@ -6,7 +6,7 @@
   // drive. The button's onclick calls feedback.copy(unit, source), matching
   // the React Button's onPress handler. The optional unit/source props
   // default to the exact values the React oracle hardcoded.
-  import { useCopyFeedback } from '../../src/pages/chat/rich-content/useCopyFeedback.svelte.js';
+  import { useCopyFeedback } from '../../src/pages/chat/rich-content/use-copy-feedback.svelte.js';
 
   let {
     unit = 'code',

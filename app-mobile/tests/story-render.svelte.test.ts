@@ -17,8 +17,8 @@ import { render, screen, waitFor } from '@testing-library/svelte';
 import { composeStories } from '@storybook/svelte';
 import { describe, it, expect } from 'vitest';
 
-import * as railStories from '../src/pages/chat/attachments/AttachmentRail.stories';
-import * as dialogStories from '../src/pages/chat/attachments/AttachmentPreviewDialog.stories';
+import * as railStories from '../src/pages/chat/attachments/attachment-rail.stories';
+import * as dialogStories from '../src/pages/chat/attachments/attachment-preview-dialog.stories';
 
 // composeStories' Svelte return shape is `{ Component, props }` per story.
 interface ComposedStory {

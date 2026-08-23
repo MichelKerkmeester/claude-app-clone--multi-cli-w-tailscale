@@ -6,9 +6,9 @@
 </script>
 
 <script lang="ts">
-  import { getAttachmentDraft } from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
-  import AttachmentRail from '../../src/pages/chat/attachments/AttachmentRail.svelte';
-  import AttachmentPreviewDialog from '../../src/pages/chat/attachments/AttachmentPreviewDialog.svelte';
+  import { getAttachmentDraft } from '../../src/pages/chat/attachments/attachment-draft-provider.svelte';
+  import AttachmentRail from '../../src/pages/chat/attachments/attachment-rail.svelte';
+  import AttachmentPreviewDialog from '../../src/pages/chat/attachments/attachment-preview-dialog.svelte';
 
   let { mode = 'rail', fileType = 'image/jpeg' }: AttachmentDraftHarnessProps = $props();
 

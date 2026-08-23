@@ -11,7 +11,7 @@
 </script>
 
 <script lang="ts">
-  import AttachmentDraftProvider from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
+  import AttachmentDraftProvider from '../../src/pages/chat/attachments/attachment-draft-provider.svelte';
   import AttachmentSubmissionHarness from './AttachmentSubmissionHarness.svelte';
 
   let {

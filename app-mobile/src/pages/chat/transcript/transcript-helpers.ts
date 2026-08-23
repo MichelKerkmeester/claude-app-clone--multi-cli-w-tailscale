@@ -6,7 +6,7 @@ import {
   type NormalizedActivityBlock,
   type NormalizedFallbackBlock,
   type NormalizedTranscriptBlock,
-} from '../rich-content/normalizeTranscriptBlocks.js';
+} from '../rich-content/normalize-transcript-blocks.js';
 import { type DisplayTranscriptBlock, type TodoProjectionState } from '$shared/state/state.js';
 import { groupBlocksIntoTurns } from '$shared/state/turns.js';
 

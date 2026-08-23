@@ -3,8 +3,8 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/svelt
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import TodoPanel from '../src/pages/chat/chrome/TodoPanel.svelte';
-import TodoProjectionBlock from '../src/pages/chat/transcript/TodoProjectionBlock.svelte';
+import TodoPanel from '../src/pages/chat/chrome/todo-panel.svelte';
+import TodoProjectionBlock from '../src/pages/chat/transcript/todo-projection-block.svelte';
 import { DEMO_TODO_FIXTURE } from '../src/shared/fixtures/demo.js';
 import type { TodoProjectionState } from '../src/shared/state/todo-state.js';
 

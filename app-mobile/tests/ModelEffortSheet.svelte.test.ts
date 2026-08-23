@@ -16,7 +16,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import ModelEffortSheet from '../src/pages/chat/chrome/ModelEffortSheet.svelte';
+import ModelEffortSheet from '../src/pages/chat/chrome/model-effort-sheet.svelte';
 import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '../src/shared/state/runtime.js';
 
 type EffortSheetSection = 'model' | 'effort';

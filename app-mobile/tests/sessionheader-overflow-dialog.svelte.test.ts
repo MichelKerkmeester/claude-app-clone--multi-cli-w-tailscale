@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import SessionHeader, {
   type ThemePreference,
-} from '../src/pages/chat/chrome/SessionHeader.svelte';
+} from '../src/pages/chat/chrome/session-header.svelte';
 import { INITIAL_RUNTIME_STATE, type RuntimeControls, type RuntimeUiState } from '../src/shared/state/runtime.js';
 
 const HOST_STATE: RuntimeStateDto = {

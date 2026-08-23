@@ -87,21 +87,21 @@
   import { useRuntime } from '$shared/state/use-runtime.svelte.js';
   import { useHostCommandCatalog } from '$shared/commands/host-command-catalog.svelte.js';
   import { useSyncSocket } from '$shared/transport/use-sync-socket.svelte.js';
-  import type { EffortSheetSection } from './chrome/ModelEffortSheet.svelte';
+  import type { EffortSheetSection } from './chrome/model-effort-sheet.svelte';
 
-  import RuntimeStatusRegion from './transcript/RuntimeStatusRegion.svelte';
-  import RuntimeModeAnnouncer from './chrome/RuntimeModeAnnouncer.svelte';
-  import SessionHeader from './chrome/SessionHeader.svelte';
-  import RuntimeStrip from './chrome/RuntimeStrip.svelte';
-  import PlanReadyCard from './chrome/PlanReadyCard.svelte';
-  import TranscriptList from './transcript/TranscriptList.svelte';
-  import SessionComposer from './chrome/SessionComposer.svelte';
-  import PlanReviewSheet from './chrome/PlanReviewSheet.svelte';
-  import LeavePlanSheet from './chrome/LeavePlanSheet.svelte';
-  import ModelEffortSheet from './chrome/ModelEffortSheet.svelte';
+  import RuntimeStatusRegion from './transcript/runtime-status-region.svelte';
+  import RuntimeModeAnnouncer from './chrome/runtime-mode-announcer.svelte';
+  import SessionHeader from './chrome/session-header.svelte';
+  import RuntimeStrip from './chrome/runtime-strip.svelte';
+  import PlanReadyCard from './chrome/plan-ready-card.svelte';
+  import TranscriptList from './transcript/transcript-list.svelte';
+  import SessionComposer from './chrome/session-composer.svelte';
+  import PlanReviewSheet from './chrome/plan-review-sheet.svelte';
+  import LeavePlanSheet from './chrome/leave-plan-sheet.svelte';
+  import ModelEffortSheet from './chrome/model-effort-sheet.svelte';
   import SessionStateIcon from '$shared/chrome/session-state-icon.svelte';
   import ArtifactViewerProvider from './artifacts/artifact-viewer-provider.svelte';
-  import AttachmentDraftProvider from './attachments/AttachmentDraftProvider.svelte';
+  import AttachmentDraftProvider from './attachments/attachment-draft-provider.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

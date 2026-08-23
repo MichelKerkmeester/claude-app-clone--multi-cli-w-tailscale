@@ -31,7 +31,7 @@
   import {
     normalizeHighlightLanguage,
     useHighlightedCode,
-  } from '../rich-content/useHighlightedCode.svelte.js';
+  } from '../rich-content/use-highlighted-code.svelte.js';
 
   interface Props {
     text: string;

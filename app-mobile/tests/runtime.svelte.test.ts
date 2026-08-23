@@ -41,7 +41,7 @@ import {
   type RuntimePhase,
 } from '../src/shared/state/runtime.js';
 import { useRuntime } from '../src/shared/state/use-runtime.svelte.js';
-import RuntimeStatusRegion from '../src/pages/chat/transcript/RuntimeStatusRegion.svelte';
+import RuntimeStatusRegion from '../src/pages/chat/transcript/runtime-status-region.svelte';
 
 const relay = vi.hoisted(() => {
   class RuntimeRelayError extends Error {

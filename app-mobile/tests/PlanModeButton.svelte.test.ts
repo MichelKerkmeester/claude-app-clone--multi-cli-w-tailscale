@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/shared/state/runtime.js';
-import PlanModeButton from '../src/pages/chat/chrome/PlanModeButton.svelte';
-import { planModePresentation } from '../src/pages/chat/chrome/planModePresentation.js';
+import PlanModeButton from '../src/pages/chat/chrome/plan-mode-button.svelte';
+import { planModePresentation } from '../src/pages/chat/chrome/plan-mode-presentation.js';
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',

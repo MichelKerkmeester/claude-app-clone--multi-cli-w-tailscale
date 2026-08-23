@@ -6,8 +6,8 @@
 </script>
 
 <script lang="ts">
-  import SessionComposer from '../../src/pages/chat/chrome/SessionComposer.svelte';
-  import { getAttachmentDraft } from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
+  import SessionComposer from '../../src/pages/chat/chrome/session-composer.svelte';
+  import { getAttachmentDraft } from '../../src/pages/chat/attachments/attachment-draft-provider.svelte';
   import { INITIAL_RUNTIME_STATE, type RuntimeControls } from '../../src/shared/state/runtime.js';
   import type { HostCommandCatalogState } from '../../src/shared/commands/commands.js';
   import { vi } from 'vitest';

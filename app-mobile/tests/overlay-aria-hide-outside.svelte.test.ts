@@ -7,8 +7,8 @@ import type { RuntimeModelCatalogDto, RuntimeStateDto } from '@pi-remote/pi-rpc-
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/shared/state/runtime.js';
 import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/commands/commands.js';
-import CommandPalette from '../src/pages/chat/chrome/CommandPalette.svelte';
-import PlanModeButton from '../src/pages/chat/chrome/PlanModeButton.svelte';
+import CommandPalette from '../src/pages/chat/chrome/command-palette.svelte';
+import PlanModeButton from '../src/pages/chat/chrome/plan-mode-button.svelte';
 import SessionComposerHarness from './support/SessionComposerHarness.svelte';
 
 const HOST_STATE: RuntimeStateDto = {

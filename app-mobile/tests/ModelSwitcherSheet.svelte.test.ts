@@ -32,8 +32,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { controlRuntime } from '../src/shared/transport/relay.js';
 import type { RuntimeControls, RuntimeUiState } from '../src/shared/state/runtime.js';
-import ModelEffortSheet from '../src/pages/chat/chrome/ModelEffortSheet.svelte';
-import SessionHeader from '../src/pages/chat/chrome/SessionHeader.svelte';
+import ModelEffortSheet from '../src/pages/chat/chrome/model-effort-sheet.svelte';
+import SessionHeader from '../src/pages/chat/chrome/session-header.svelte';
 import ModelSwitcherHeaderHarness from './support/ModelSwitcherHeaderHarness.svelte';
 
 const CURRENT: AvailableModelDto = {
@@ -63,10 +63,10 @@ const HOST_STATE: RuntimeStateDto = {
 // port, component-owned rules live in scoped <style> blocks. Each assertion is
 // repointed to its owning source with the same rule text/values.
 const SHEET_CSS = normalizeSvelteCss(
-  readFileSync('app-mobile/src/pages/chat/chrome/ModelEffortSheet.svelte', 'utf8'),
+  readFileSync('app-mobile/src/pages/chat/chrome/model-effort-sheet.svelte', 'utf8'),
 );
 const HEADER_CSS = normalizeSvelteCss(
-  readFileSync('app-mobile/src/pages/chat/chrome/SessionHeader.svelte', 'utf8'),
+  readFileSync('app-mobile/src/pages/chat/chrome/session-header.svelte', 'utf8'),
 );
 
 afterEach(() => {

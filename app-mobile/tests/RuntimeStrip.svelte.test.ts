@@ -8,7 +8,7 @@ import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import RuntimeStrip from '../src/pages/chat/chrome/RuntimeStrip.svelte';
+import RuntimeStrip from '../src/pages/chat/chrome/runtime-strip.svelte';
 import {
   INITIAL_RUNTIME_STATE,
   type RuntimeControls,

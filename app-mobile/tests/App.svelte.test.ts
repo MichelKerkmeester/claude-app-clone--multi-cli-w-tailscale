@@ -114,7 +114,7 @@ import Home from '../src/pages/home/Home.svelte';
 import Review from '../src/pages/review/Review.svelte';
 import Session from '../src/pages/chat/Chat.svelte';
 import AttentionInbox from '../src/pages/inbox/AttentionInbox.svelte';
-import TranscriptList from '../src/pages/chat/transcript/TranscriptList.svelte';
+import TranscriptList from '../src/pages/chat/transcript/transcript-list.svelte';
 import AskQuestionCard from '../src/pages/chat/features/ask-question/AskQuestionCard.svelte';
 import {
   EMPTY_TODO_PROJECTION_STATE,

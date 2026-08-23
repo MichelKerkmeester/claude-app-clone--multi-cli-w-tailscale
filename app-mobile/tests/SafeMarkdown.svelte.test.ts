@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
-import SafeMarkdown, { parseSafeMarkdown } from '../src/pages/chat/rich-content/SafeMarkdown.svelte';
+import SafeMarkdown, { parseSafeMarkdown } from '../src/pages/chat/rich-content/safe-markdown.svelte';
 
 describe('SafeMarkdown', () => {
   it('renders an inert plain-text fallback for raw HTML and unsafe destinations', () => {

@@ -5,7 +5,7 @@
 </script>
 
 <script lang="ts">
-  import { getAttachmentDraft } from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
+  import { getAttachmentDraft } from '../../src/pages/chat/attachments/attachment-draft-provider.svelte';
 
   let { files }: AttachmentDraftControlsProps = $props();
 

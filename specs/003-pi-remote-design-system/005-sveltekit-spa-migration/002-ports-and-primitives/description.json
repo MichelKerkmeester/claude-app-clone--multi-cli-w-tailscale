@@ -1,5 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
+  "level": "2",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
   "description": "Port the framework-agnostic TypeScript (relay.ts, state.ts, cache.ts, auth.ts, effort.ts, pure halves of runtime.ts/commands.ts, workers) verbatim,",
   "keywords": [
     "port",
@@ -17,15 +18,13 @@
     "workers",
     "verbatim"
   ],
-  "lastUpdated": "2026-08-19T17:17:27.985Z",
+  "lastUpdated": "2026-08-23T06:50:39.502Z",
   "specId": "002",
   "folderSlug": "ports-and-primitives",
   "parentChain": [
-    "app-mobile-cli",
     "003-pi-remote-design-system",
     "005-sveltekit-spa-migration"
   ],
   "memorySequence": 0,
-  "memoryNameHistory": [],
-  "level": "2"
+  "memoryNameHistory": []
 }

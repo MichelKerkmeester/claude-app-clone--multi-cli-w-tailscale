@@ -8,13 +8,13 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives"
-    last_updated_at: "2026-08-19T00:00:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Spec authored (L1 child)"
-    next_safe_action: "Dispatch K parallel cli-devin units after L0 barrier + 008-draft"
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives"
+    last_updated_at: "2026-08-23T10:00:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Packet documentation completed retrospectively."
+    next_safe_action: "None; child shipped and superseded by later layers."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -72,19 +72,23 @@ component; any token value; `npm install`; config or shared files.
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- R1: Ported `.ts` files are logic-identical to source (import paths only may differ); the pure
+- **REQ-001** — Ported `.ts` files are logic-identical to source (import paths only may differ); the pure
   reducers are byte-for-byte where imports allow.
-- R2: Each primitive exposes the same a11y surface its react-aria counterpart did — asserted by a
+- **REQ-002** — Each primitive exposes the same a11y surface its react-aria counterpart did — asserted by a
   smoke story (role present, focus behaves, `aria-*` correct).
-- R3: The runes-split pattern for `runtime.ts`/`commands.ts` (pure reducer file + `*.svelte.ts`
+- **REQ-003** — The runes-split pattern for `runtime.ts`/`commands.ts` (pure reducer file + `*.svelte.ts`
   factory) is established here as the reference for later children.
-- R4: Disjoint files only — the ports dispatch and each primitive touch no shared file.
+- **REQ-004** — Disjoint files only — the ports dispatch and each primitive touch no shared file.
+- **REQ-005** — The interaction-state contract survives the swap. react-aria supplied `[data-hovered]`,
+  `[data-pressed]` and `[data-focus-visible]` automatically; Bits UI does not, so shared `use:` actions
+  must supply them. Native CSS `:hover` is not an acceptable substitute — it sticks after a tap on
+  touch devices, which is the whole target platform.
 <!-- /ANCHOR:requirements -->
 
 ---
 
 <!-- ANCHOR:success-criteria -->
-## 5. SUCCESS CRITERIA (barrier gate)
+## 5. SUCCESS CRITERIA
 
 - `svelte-check` clean across the new `src/lib/` files.
 - Each primitive renders a smoke story in the catalog (light + dark) without throw.

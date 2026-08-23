@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
-  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
-  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/002-ports-and-primitives",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -29,9 +29,13 @@
       "framework-agnostic"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "tasks.md"
     ],
     "entities": [
       {
@@ -41,9 +45,27 @@
         "source": "derived"
       },
       {
-        "name": "GLM-5.2 High",
-        "kind": "proper_noun",
-        "path": "spec.md",
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -71,23 +93,115 @@
         "source": "derived"
       },
       {
-        "name": "5. SUCCESS CRITERIA (barrier gate)",
+        "name": "5. SUCCESS CRITERIA",
         "kind": "heading",
         "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Copy",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "import-path",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "nothing",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
         "source": "derived"
       }
     ],
     "causal_summary": "Port the framework-agnostic TypeScript (relay.ts, state.ts, cache.ts, auth.ts, effort.ts, pure halves of runtime.ts/commands.ts, workers) verbatim, and build the shared a11y primitives — Button plus thin Bits UI wrappers Sheet/Menu/ToggleGroup/RadioGroup/Switch/Collapsible — that every later component composes. K parallel, disjoint files.",
     "created_at": "2026-08-19T17:24:02.664Z",
-    "last_save_at": "2026-08-19T17:24:02.664Z",
+    "last_save_at": "2026-08-23T06:50:39.881Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:ac3713e76eee43eb755d25f19d1569eabed4d92ae3431c598c28019c3e2b6669",
+    "source_fingerprint": "sha256:63a0a4239a1b59118e74b8e991d25ed7a25b01f372dc8e215952d1da4b1ac1a9",
     "source_doc_hashes": {
-      "spec.md": "146d712a64709149864fd590486cdd485936e3b8c2ab6b215f1fc6ed1bc190ff"
+      "spec.md": "02e649009e3ae051cd3e9aab32b30efa0eb5255230563a281eebc0312ac194f9",
+      "plan.md": "d223f7dadd2c5ebece88fc077b35eb111b9993e2d20dadc710875e70053db284",
+      "tasks.md": "e2fc57bd8ba3dc2f4aa43ec73693d276498abbd26a20ba9cfab3c24585a80b0e",
+      "checklist.md": "4023e080f3654fd89d55d9a9a2ad530efed8eb5a6e9a1ad47f4fc19b5cf7f4f0",
+      "implementation-summary.md": "8866a541aa708f2d9cd23e334f61c1384e3b8f2faab96ecc2c3d2cb9c6d11998"
     },
     "last_active_child_id": null,
     "last_active_at": null

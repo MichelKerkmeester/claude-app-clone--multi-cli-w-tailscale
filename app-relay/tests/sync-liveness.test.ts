@@ -38,6 +38,12 @@ interface Harness {
   readonly ingressUrl: string;
 }
 
+interface AuthorizedClient {
+  readonly cookie: string;
+  readonly deviceId: string;
+  readonly socket: WebSocket | null;
+}
+
 const activeHarnesses: Harness[] = [];
 const activeSockets: WebSocket[] = [];
 
@@ -98,6 +104,40 @@ describe('sync socket liveness', () => {
     // is just a slow disconnect.
     expect(harness.server.foregroundDeviceIds.size).toBe(1);
   });
+
+  it('reclaims four silent sockets so the same device can connect again', async () => {
+    const harness = await createHarness({ syncHeartbeatIntervalMs: 100 });
+    const authorized = await authorize(harness, { foreground: false });
+
+    const sockets = await Promise.all(
+      Array.from({ length: 4 }, async () => {
+        const ticket = await issueTicket(harness, authorized.cookie);
+        const socket = await connectForeground(harness, ticket.ticket);
+        await subscribeAndSilence(socket);
+        return socket;
+      }),
+    );
+
+    expect(sockets).toHaveLength(4);
+    expect(harness.server.foregroundDeviceIds).toEqual(new Set([authorized.deviceId]));
+
+    // This negative control must precede the heartbeat wait while all four
+    // valid sockets still occupy the device allowance.
+    const refusedTicket = await issueTicket(harness, authorized.cookie);
+    const refusal = await rejectedWebSocketResponse(harness, refusedTicket.ticket);
+    // Capacity is a 429; invalid or missing credentials would be a 401.
+    expect(refusal).toEqual({ statusCode: 429, statusMessage: 'Too Many Requests' });
+    expect(refusal.statusCode).not.toBe(401);
+    expect(harness.server.foregroundDeviceIds).toEqual(new Set([authorized.deviceId]));
+
+    await waitFor(() => harness.server.foregroundDeviceIds.size === 0, 3_000);
+    expect(harness.server.foregroundDeviceIds).toEqual(new Set());
+
+    const reclaimedTicket = await issueTicket(harness, authorized.cookie);
+    const reclaimedSocket = await connectForeground(harness, reclaimedTicket.ticket);
+    await subscribe(reclaimedSocket);
+    expect(harness.server.foregroundDeviceIds).toEqual(new Set([authorized.deviceId]));
+  });
 });
 
 async function waitFor(condition: () => boolean, timeoutMs: number): Promise<void> {
@@ -149,7 +189,7 @@ async function createHarness(
 async function authorize(
   harness: Harness,
   { foreground = true }: { readonly foreground?: boolean } = {},
-): Promise<{ readonly cookie: string; readonly socket: WebSocket | null }> {
+): Promise<AuthorizedClient> {
   const keys = deviceKeys();
   const enrollment = harness.server.auth.enrollment.createChallenge();
   const enrolled = await post(harness.ingressUrl, '/api/auth/enroll', {
@@ -172,13 +212,17 @@ async function authorize(
   });
   const cookie = sessionResponse.headers.get('set-cookie')?.split(';')[0];
   if (cookie === undefined) throw new Error('Test session omitted its cookie.');
-  if (!foreground) return { cookie, socket: null };
+  if (!foreground) return { cookie, deviceId, socket: null };
 
+  const ticket = await issueTicket(harness, cookie);
+  return { cookie, deviceId, socket: await connectForeground(harness, ticket.ticket) };
+}
+
+async function issueTicket(harness: Harness, cookie: string): Promise<WebSocketTicketResponse> {
   const ticketResponse = await post(harness.ingressUrl, '/api/auth/ticket', {
     headers: authorizedHeaders(cookie),
   });
-  const ticket = (await ticketResponse.json()) as WebSocketTicketResponse;
-  return { cookie, socket: await connectForeground(harness, ticket.ticket) };
+  return (await ticketResponse.json()) as WebSocketTicketResponse;
 }
 
 /** Foreground is an open sync socket, which is what the real client holds. */
@@ -201,6 +245,45 @@ async function connectForeground(harness: Harness, ticket: string): Promise<WebS
   });
   activeSockets.push(socket);
   return socket;
+}
+
+async function subscribe(socket: WebSocket): Promise<void> {
+  const message = nextMessage(socket);
+  socket.send(JSON.stringify({ type: 'subscribe', sessionId: SESSION_ID }));
+  expect(JSON.parse(await message)).toMatchObject({
+    kind: 'sync.gap',
+    sessionId: SESSION_ID,
+  });
+}
+
+async function subscribeAndSilence(socket: WebSocket): Promise<void> {
+  socket.pong = () => undefined;
+  await subscribe(socket);
+}
+
+function rejectedWebSocketResponse(
+  harness: Harness,
+  ticket: string,
+): Promise<{ readonly statusCode: number; readonly statusMessage: string }> {
+  return new Promise((resolve, reject) => {
+    const url = harness.ingressUrl.replace('http:', 'ws:');
+    const socket = new WebSocket(`${url}/api/sync?ticket=${encodeURIComponent(ticket)}`, {
+      origin: ORIGIN,
+      headers: { 'tailscale-user-login': PRINCIPAL },
+    });
+    socket.once('unexpected-response', (_request, response) => {
+      response.resume();
+      resolve({
+        statusCode: response.statusCode ?? 0,
+        statusMessage: response.statusMessage ?? '',
+      });
+    });
+    socket.once('open', () => {
+      socket.close();
+      reject(new Error('WebSocket unexpectedly opened.'));
+    });
+    socket.once('error', () => undefined);
+  });
 }
 
 function deviceKeys(): { publicKey: DevicePublicKeyJwk; privateKey: KeyObject } {
@@ -244,6 +327,13 @@ function trustedHeaders(origin = ORIGIN): Record<string, string> {
 
 function authorizedHeaders(cookie: string, origin = ORIGIN): Record<string, string> {
   return { ...trustedHeaders(origin), cookie };
+}
+
+function nextMessage(socket: WebSocket): Promise<string> {
+  return new Promise((resolve, reject) => {
+    socket.once('message', (data) => resolve(data.toString()));
+    socket.once('error', reject);
+  });
 }
 
 function post(

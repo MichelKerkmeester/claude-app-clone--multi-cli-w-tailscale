@@ -24,6 +24,15 @@ const RESEARCH_INPUTS = ['specs/context/**'];
 
 export default defineConfig({
   test: {
+    // The pinned-Pi integration probe spawns a real Pi build and snapshots workspace
+    // files, so concurrent test files perturb what it observes. Running the suite in
+    // parallel it failed every time, asserting that image bytes reached stdout; serially
+    // the same assertion holds, so the leak it reported was an artifact of the capture
+    // racing other workers, not a real one. Serializing costs seconds on a suite this
+    // size, and a gate that is confidently wrong is worth less than one that is slower.
+    // This does not make the probe deterministic — it drives a real subprocess and stays
+    // timing-sensitive — it removes the failure that concurrency alone was causing.
+    fileParallelism: false,
     exclude: [
       ...configDefaults.exclude,
       'app-mobile/tests/**',

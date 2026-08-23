@@ -35,8 +35,8 @@
       "spec.md",
       "plan.md",
       "checklist.md",
-      "tasks.md",
-      "implementation-summary.md"
+      "implementation-summary.md",
+      "tasks.md"
     ],
     "entities": [
       {
@@ -58,15 +58,15 @@
         "source": "derived"
       },
       {
-        "name": "tasks.md",
-        "kind": "doc",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "implementation-summary.md",
         "kind": "doc",
         "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Kind-first renames across every feature folder under pages/, then the configs, globs, story ids and coverage allowlist that make the renamed tree testable, plus the minimal conventions correction and the nine-gate barrier.",
     "created_at": "2026-08-23T10:58:31.124Z",
-    "last_save_at": "2026-08-23T12:13:10.109Z",
+    "last_save_at": "2026-08-23T15:28:12.605Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:5c2a605082103b3f0ebf6319f0e8df181513b607e649457c4b35ae55d4f28360",
+    "source_fingerprint": "sha256:9a5779424899433dbc3820f84cc95477078a4b7924cc760ce05836aa2daa0141",
     "source_doc_hashes": {
       "spec.md": "a81ac1dd908ea706f6e1b7411ee40bdb964bcb5de7a846e05c847d38dd4f2fd0",
       "plan.md": "ae4617961862eaefc2effadd78f615b90b5cc3c6b81be0c147c7330985c481a8",
-      "tasks.md": "76700cf11ec0c312779dbb73e8c6046b302d995d3a6f6985d06713e48b32b20b",
-      "checklist.md": "405599b0f9ccc0bc18bb3eb05e6090713c67688cbcceef33d96f5a03eacfb54a",
-      "implementation-summary.md": "9bd23c9c0f2895c933217051b289e48437a178fb4fb54ffa848851af49c9aec1"
+      "tasks.md": "7dc16406971eb152181ce30cb38db779aef17cd196adc7523341e7ded0689cf2",
+      "checklist.md": "83dfc8d3bae4a69936bc690807c4d7e90b2f74a9e72748e9e34fbaac34a792b5",
+      "implementation-summary.md": "1c10c943777e55ee87cf1a935e9cc85c3e31ea52d5729e42c411b4bd61fd9ada"
     },
     "last_active_child_id": null,
     "last_active_at": null

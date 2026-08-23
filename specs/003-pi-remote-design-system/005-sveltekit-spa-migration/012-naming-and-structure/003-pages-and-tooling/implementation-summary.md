@@ -1,22 +1,23 @@
 ---
-title: "Child 003 implementation summary — pages rename and tooling catch-up"
-description: "Continuity anchor. Nothing is implemented yet: this records the per-folder file counts and the one gate that fails silently."
+title: "Child 012/003 implementation summary — pages and tooling"
+description: "The whole source tree is kebab-case and kind-first, the tooling that named the old paths was re-baselined, and three more ways a reference can hide were found and closed."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"
-    last_updated_at: "2026-08-23T14:00:00Z"
+    last_updated_at: "2026-08-23T19:30:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped from the per-folder file inventory; no files moved."
-    next_safe_action: "Wait for children 001 and 002."
-    blockers: ["depends on children 001 and 002"]
-    completion_pct: 0
+    recent_action: "Pages renamed kind-first; scan reports zero offenders across 219 files."
+    next_safe_action: "Land the naming stop-gap in the conventions authority through an isolated worktree."
+    blockers:
+      - "The conventions-authority correction is a cross-repository edit and is not yet landed."
+    completion_pct: 90
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
 <!-- SPECKIT_LEVEL: 2 -->
 
-# Child 003 implementation summary
+# Child 012/003 implementation summary
 
 ---
 
@@ -27,8 +28,9 @@ _memory:
 |---|---|
 | Parent | `012-naming-and-structure` |
 | Level | 2 |
-| Status | **Scoped, not started** — blocked on children 001 and 002 |
-| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+| Status | **In-repository work shipped; the cross-repository correction remains** |
+| Requirements shipped | REQ-001, REQ-002, REQ-003, REQ-004, REQ-007 |
+| Requirements open | REQ-005, REQ-006 — the conventions-authority stop-gap |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -36,21 +38,19 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing has moved. The measured surface this child acts on:
+**Every in-scope path is kebab-case, and the kind comes first.** The completeness scan reports zero
+offenders across 219 files. The five screens carry `screen-`, so a reader searching for one types
+what they would type for any other kind rather than having to already know the five names.
 
-| Folder | Files |
-|---|---|
-| `app-mobile/src/pages/chat/artifacts/` | 24 |
-| `app-mobile/src/pages/chat/chrome/` | 17 |
-| `app-mobile/src/pages/chat/rich-content/` | 12 |
-| `app-mobile/src/pages/chat/features/ask-question/` | 12 |
-| `app-mobile/src/pages/chat/transcript/` | 10 |
-| `app-mobile/src/pages/chat/attachments/` | 9 |
-| Screen components, taking the `screen-` prefix | 5 |
+**Which components take a kind prefix is a rule, not a per-file judgement.** A name ending in one of
+the closed kinds is an instance of that kind; everything else is a feature component whose name
+already is the thing. The rule reads both the PascalCase and the kebab-case spelling and skips
+anything already kind-first, so running it twice converges rather than leaving half the tree
+kind-last.
 
-Tooling still pointing at the pre-rename tree: the three `$shared` alias definitions, the Storybook
-globs, the 009 coverage allowlist, both vitest web configs, the cwd-relative `readFileSync` paths in
-several web tests, and the CSS-corpus builder's glob.
+**The tooling that named the old paths was re-baselined.** Eighteen story-coverage exemptions pointed
+at files that no longer existed — and an exemption that resolves to nothing exempts nothing, so the
+gate would have started demanding stories for components that deliberately have none.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -58,9 +58,20 @@ several web tests, and the CSS-corpus builder's glob.
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-One dispatch per feature folder, largest first, each committed atomically. Then the tooling in one
-pass, then the conventions stop-gap through an isolated Public worktree, then the barrier. The
-executor performs the renames; Claude owns the configs, the cross-repo edit, verification and git.
+Folder by folder, each batch carrying its moves, its generated rewrite and a green typecheck, with
+the wider suites run before each commit.
+
+Three more ways a reference can hide turned up here, on top of the six the previous child found:
+
+| Shape | How it fails |
+|---|---|
+| `readFileSync('app-mobile/src/…/X.svelte')` — a test reading component source by cwd-relative path | Fails late, and reports a missing file rather than a missed rename |
+| A bare path string in an array with no call around it | Nothing resolves it until the line using it runs; a relay security test named seven client components this way |
+| A kind rule that only reads PascalCase | A folder already kebab-cased kind-last is invisible to a second pass |
+
+The last one bit for a reason worth recording: the manifest is a generated file that is also
+committed, so reverting the working tree restored a stale copy of it and a batch landed kind-last.
+The rule is now idempotent, which turned an unwind into a second pass.
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -68,20 +79,16 @@ executor performs the renames; Claude owns the configs, the cross-repo edit, ver
 <!-- ANCHOR:decisions -->
 ## KEY DECISIONS
 
-**Tooling lands once, at the end.** Updating a glob while the tree is still moving means updating it
-twice; leaving it until the tree has settled means one edit against a known final state.
+**A prefix is applied only where the name ends in a closed kind.** That keeps the rule mechanical and
+reviewable; adding a kind is a deliberate edit to one list rather than an emergent guess about what
+counts as a card.
 
-**The coverage allowlist is regenerated, not hand-edited.** After a hundred-file rename, hand-editing
-is transcription, and transcription is where a silent omission enters.
+**The stale-path sweep takes its rename chain from git, not the manifest.** A file that moved twice
+still resolves to where it ended up, and only a literal resolving to a file git actually moved is
+rewritten — which is what makes a search across every code tree safe.
 
-**The conventions edit is a stop-gap, not a refresh.** One section — kebab-case, the closed prefix
-list, the `routes/**` exemption with its reason. The full rewrite is 019's, after every convention has
-shipped. Two documents attempting the same rewrite is two places to disagree.
-
-**Screens take the `screen-` prefix.** Leaving five files bare was the first proposal and was
-overruled on search: a contributor hunting for a screen types the same prefix they would type for any
-other kind. The side effect is that every component in the tree carries a kind, which removes the "is
-this a kind or a screen" judgement entirely.
+**Folder documentation stayed where it was.** `CODE.md` and `README.md` files still describe folders
+by their old component names in prose. Correcting that text is packet 013 and 014's work.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -89,18 +96,19 @@ this a kind or a screen" judgement entirely.
 <!-- ANCHOR:verification -->
 ## VERIFICATION
 
-| Check | Result |
+| Gate | Result |
 |---|---|
-| Completeness scan | not run |
-| `npm run build` / `npm run typecheck` | not run |
-| `npm test` / `npm run test:web` | not run |
-| Token-identity over a confirmed non-empty corpus | not run |
-| Contrast and `@ds guardrail:` fence count | not run |
-| CDP structural gate at 390px, both themes | not run |
-| Catalog smoke, both themes | not run |
-| `validate.sh --strict` via realpath | not run |
-
-No completion claim is made or implied.
+| Completeness scan | PASS — 0 offenders across 219 files, route tree excluded by name and by directory |
+| `npm run build` | PASS — exit 0 |
+| `npm run typecheck` | PASS — exit 0, 1123 files, 0 errors |
+| Backend, four real directories | PASS — 52 files / 390 tests, only the documented auth flake |
+| `npm run test:web` | PASS — exit 0, 66/532 and 16/188, both summaries present |
+| Token identity, three themes | PASS — 0 CHANGED / 0 VANISHED / 0 ADDED, corpus confirmed at 96 components plus `app.css` |
+| Contrast | PASS — 77 pairs at threshold |
+| `@ds guardrail:` fences | PASS — 277 before and after |
+| CDP structural, 390px | PASS — light and dark, no horizontal overflow |
+| Catalog smoke | PASS — 267 stories × 2 themes = 534 frames, 0 throws |
+| Story coverage | PASS — every exemption resolves to a file that exists |
 <!-- /ANCHOR:verification -->
 
 ---
@@ -108,15 +116,14 @@ No completion claim is made or implied.
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-**One gate in this child's barrier can pass for the wrong reason.** The token-identity gate reads a
-CSS corpus assembled by a glob. If the glob is stale the corpus is empty, the diff is zero, and the
-load-bearing proof of the entire naming pass reports success over nothing. Non-emptiness has to be
-confirmed separately; the gate cannot confirm it for itself.
+**The conventions-authority correction has not landed.** It is a cross-repository edit that must go
+through an isolated worktree because the shared checkout holds another session's staged files, and
+until it lands the authority teaches a grammar the tree no longer uses.
 
-**Story identity churn is total**, so the catalog smoke and the coverage gate both re-baseline in the
-same commit. That means a red gate immediately afterwards is ambiguous between a regression and a
-missed re-baseline, and has to be read rather than trusted.
+**Documentation prose still names old paths.** Ten folder documents and several story-file comments
+reference components and folders by names that have changed. Nothing resolves those strings, so
+nothing breaks; packets 013 and 014 own the text.
 
-**The stop-gap has a shelf life.** It is correct only until 019 rewrites the surrounding document, and
-a stop-gap nobody replaces becomes the convention by default.
+**The kind list is closed by decision, not by discovery.** A component that is plainly an instance of
+some kind not on the list keeps its feature name, and nothing flags that.
 <!-- /ANCHOR:limitations -->

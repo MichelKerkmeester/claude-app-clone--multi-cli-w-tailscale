@@ -1,0 +1,24 @@
+{
+  "_comment": "Components intentionally without a co-located *.stories.ts. Every entry needs a reason (no silent exclusion). The story-coverage gate exempts exactly these; everything else renderable must have a story. Keep paths relative to app-mobile/src.",
+  "allow": [
+    { "path": "routes/+layout.svelte", "reason": "SvelteKit route wrapper — the app shell, rendered in-situ only; not an isolated surface." },
+    { "path": "routes/+page.svelte", "reason": "SvelteKit route wrapper (home route) — delegates to the Home page component, which is storied." },
+    { "path": "routes/attention/[lookupId]/+page.svelte", "reason": "SvelteKit route wrapper — deep-link entry, no isolated visual." },
+    { "path": "routes/session/[id]/+page.svelte", "reason": "SvelteKit route wrapper — mounts the Chat page, which is storied." },
+    { "path": "pages/chat/artifacts/ArtifactViewerHost.svelte", "reason": "Full-screen viewer host — driven entirely by ArtifactViewer context; exercised via the artifact cards' stories." },
+    { "path": "pages/chat/artifacts/ArtifactViewerProvider.svelte", "reason": "Context provider — renders no visual of its own; used AS a decorator in other stories." },
+    { "path": "pages/chat/attachments/AttachmentDraftProvider.svelte", "reason": "Context provider — no isolated visual; supplies attachment-draft context to consuming surfaces." },
+    { "path": "shared/primitives/Menu.svelte", "reason": "Compositional Bits primitive — renders nothing without MenuTrigger/MenuContent/MenuItem children; exercised via consuming surfaces (Header, Plan menus)." },
+    { "path": "shared/primitives/MenuTrigger.svelte", "reason": "Compositional sub-part of Menu — no standalone render." },
+    { "path": "shared/primitives/MenuContent.svelte", "reason": "Compositional sub-part of Menu — no standalone render." },
+    { "path": "shared/primitives/MenuItem.svelte", "reason": "Compositional sub-part of Menu — no standalone render." },
+    { "path": "shared/primitives/Sheet.svelte", "reason": "Compositional Bits primitive (Dialog) — needs SheetContent/SheetTitle/SheetClose; exercised via the sheet surfaces (ModelEffortSheet, LeavePlanSheet)." },
+    { "path": "shared/primitives/SheetContent.svelte", "reason": "Compositional sub-part of Sheet — no standalone render." },
+    { "path": "shared/primitives/SheetTitle.svelte", "reason": "Compositional sub-part of Sheet — no standalone render." },
+    { "path": "shared/primitives/SheetClose.svelte", "reason": "Compositional sub-part of Sheet — no standalone render." },
+    { "path": "shared/primitives/RadioGroup.svelte", "reason": "Compositional Bits primitive — needs RadioGroupItem children; exercised via the effort picker surface." },
+    { "path": "shared/primitives/RadioGroupItem.svelte", "reason": "Compositional sub-part of RadioGroup — no standalone render." },
+    { "path": "shared/primitives/ToggleGroup.svelte", "reason": "Compositional Bits primitive — needs ToggleGroupItem children; exercised via the theme/runtime toggles." },
+    { "path": "shared/primitives/ToggleGroupItem.svelte", "reason": "Compositional sub-part of ToggleGroup — no standalone render." }
+  ]
+}

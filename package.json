@@ -12,6 +12,9 @@
   "scripts": {
     "build": "npm run build -w @pi-remote/pi-rpc-protocol && npm run build -w @pi-remote/relay && npm run build -w @pi-remote/web && npm run build -w @pi-remote/approval-extension && npm run build -w @pi-remote/plan-extension",
     "boot": "node scripts/boot.mjs",
+  "storybook": "npm run storybook -w @pi-remote/web",
+  "story:coverage": "node scripts/story-coverage.mjs",
+  "story:new": "node scripts/new-story.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",

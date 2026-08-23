@@ -45,6 +45,9 @@ import {
 } from './attachment-types.js';
 
 const DEFAULT_QUARANTINE_ROOT = join(tmpdir(), 'pi-remote-attachments');
+const MAX_MANAGED_SETS = 256; // Caps retained reservation metadata after its quota is released.
+const MAX_SUBMISSION_RECORDS = 256; // Caps idempotency history after its set is gone.
+const MAX_DELIVERED_SETS = 256; // Caps replay-block markers while their set remains retained.
 
 interface ManagedPart extends AttachmentPartRecord {
   status: 'reserved' | 'uploading' | 'checking' | 'ready' | 'rejected' | 'cancelled' | 'expired';
@@ -215,6 +218,7 @@ export class AttachmentService {
     };
     this.sets.set(setId, set);
     this.submissions.set(submissionKey, { manifestFingerprint: fingerprint, setId });
+    this.pruneCollections();
     return toReservationRecord(set);
   }
 
@@ -449,6 +453,7 @@ export class AttachmentService {
     }
     await this.removeBytes(set);
     this.deliveredSets.add(setId);
+    this.pruneCollections();
   }
 
   public async discardRejected(setId: string): Promise<void> {
@@ -546,6 +551,41 @@ export class AttachmentService {
       normalizedBytes,
       relayBytes: sourceBytes + normalizedBytes,
     };
+  }
+
+  private pruneCollections(): void {
+    this.pruneManagedSets();
+    this.pruneSubmissions();
+    this.pruneDeliveredSets();
+  }
+
+  private pruneManagedSets(): void {
+    while (this.sets.size > MAX_MANAGED_SETS) {
+      const removable = [...this.sets].find(
+        ([, set]) => set.quotaBytes === 0 && set.activeUploads === 0,
+      );
+      if (removable === undefined) return;
+      this.sets.delete(removable[0]);
+      this.deliveredSets.delete(removable[0]);
+    }
+  }
+
+  private pruneSubmissions(): void {
+    while (this.submissions.size > MAX_SUBMISSION_RECORDS) {
+      const removable = [...this.submissions].find(([, submission]) => {
+        return !this.sets.has(submission.setId);
+      });
+      if (removable === undefined) return;
+      this.submissions.delete(removable[0]);
+    }
+  }
+
+  private pruneDeliveredSets(): void {
+    while (this.deliveredSets.size > MAX_DELIVERED_SETS) {
+      const removable = [...this.deliveredSets].find((setId) => !this.sets.has(setId));
+      if (removable === undefined) return;
+      this.deliveredSets.delete(removable);
+    }
   }
 
   public async quarantineEntries(): Promise<readonly string[]> {

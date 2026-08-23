@@ -1,4 +1,8 @@
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: DIFF PREVIEW
+  // ───────────────────────────────────────────────────────────────────
+
   import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
   interface Props extends Pick<FileDiffBlock, 'patch'> {
@@ -23,7 +27,7 @@
      is-find-match are per-element modifiers local to this component. Values unchanged. -->
 <style>
   /* @ds slot: diff-well — the unified-diff read-out. */
-  /* @ds guardrail: do-not-edit — fixed reading well; selectable and pan-scoped; never overflow the page. */
+  /* @ds guardrail: do-not-edit — Fixed reading well; selectable and pan-scoped; never overflow the page. */
   .artifact-diff-preview {
     min-inline-size: 0;
     max-inline-size: 100%;

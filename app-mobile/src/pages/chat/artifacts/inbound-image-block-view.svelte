@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: INBOUND IMAGE BLOCK VIEW
+  // ───────────────────────────────────────────────────────────────────
+
   import type { InboundImageBlock } from '@pi-remote/pi-rpc-protocol';
 
   export interface InboundImageBlockViewProps {

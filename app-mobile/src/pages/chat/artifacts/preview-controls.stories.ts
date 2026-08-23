@@ -1,14 +1,14 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: PREVIEW CONTROLS STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import PreviewControls from './preview-controls.svelte';
 import { DEMO_DIFF_FIXTURE, DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen demo fixtures so every data-bearing story arg is sourced
-// from real demo data — nothing is invented. The find term comes from a real
-// DEMO_DIFF_FIXTURE patch line ('expiresAt'); canCopy/canShare mirror the
-// share-allowed DEMO_TEXT_CODE_SHARE_BLOCKS entry. The `preview-controls` surface
-// renders a different toolbar per kind, so one story per kind. Callbacks are
-// no-ops (the toolbar's aria-pressed/aria-label contract is the frozen seam).
+// Reuse frozen fixtures so each toolbar story exercises real find/share data.
+// The aria contract stays visible while callbacks remain inert.
 const FIND_TERM = 'expiresAt';
 const SHARE_BLOCK = DEMO_TEXT_CODE_SHARE_BLOCKS[0];
 if (SHARE_BLOCK === undefined) {

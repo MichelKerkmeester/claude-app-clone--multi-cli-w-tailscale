@@ -1,4 +1,8 @@
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: IMAGE PLACEHOLDER
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: ImagePlaceholder — empty inbound-image well shown while pixels are unavailable.
   interface Props {
     aspectRatio?: number | null;

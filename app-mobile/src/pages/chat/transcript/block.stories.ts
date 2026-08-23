@@ -12,12 +12,8 @@ import {
   DEMO_ARTIFACT_BLOCKS,
 } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen demo fixtures through the existing parseDisplayBlock parser so
-// every story `block` arg is a real DisplayTranscriptBlock sourced from the demo
-// data — nothing is invented. The `transcript` surface declares the `block-delivery`
-// state; Block renders one card per block kind, so one story per kind present in the
-// fixtures. (The `plan-todo` pending/done checklist has no `plan`-kind fixture and is
-// not storyed — nothing invented.)
+// Reuse frozen fixtures through the real parser so each block-kind story exercises actual display data.
+// The plan-todo shape is omitted rather than fabricated.
 const RAW_BLOCKS: readonly Record<string, unknown>[] = [
   ...DEMO_RICH_CONTENT_BLOCKS,
   ...DEMO_RICH_RELEASE_BLOCKS,

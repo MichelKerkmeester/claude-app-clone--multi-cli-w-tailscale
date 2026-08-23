@@ -26,12 +26,11 @@
   // 3. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // defaultExpanded={false} → Collapsible starts closed (open defaults to false on the primitive).
+  // The primitive's defaultExpanded={false} keeps Collapsible closed until the reader opens it.
   let open = $state(false);
 
-  // Collapsible.Trigger renders the trigger snippet inside a button; the wrapper does not forward
-  // trigger class/aria, and Bits does not emit react-aria's data-expanded/data-hovered, so they
-  // are set explicitly on the button (data-expanded reactively from `open`, data-hovered via hover).
+  // The wrapper does not forward trigger class/aria, and Bits does not emit react-aria's data-expanded/data-hovered.
+  // The button therefore sets both attributes explicitly from its state.
   let triggerButton = $state<HTMLButtonElement | null>(null);
 
   // ───────────────────────────────────────────────────────────────────

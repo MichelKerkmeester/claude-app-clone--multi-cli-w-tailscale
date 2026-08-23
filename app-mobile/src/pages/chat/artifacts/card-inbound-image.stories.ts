@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: INBOUND IMAGE CARD STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -6,19 +10,8 @@ import ArtifactViewerProvider from './artifact-viewer-provider.svelte';
 import type { InboundImageLifecycleState } from './image-status.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Re-host the demo module's private DEMO_INBOUND_MEDIA_READY_BLOCK (in
-// $shared/data/demo.js) as a real InboundImageReadyBlock so every story arg is
-// sourced from the demo data — nothing is invented. Every id, revision, seq,
-// dimension and flag below is copied verbatim from that fixture; the digest,
-// media type and byte length come from the exported image-ready
-// DEMO_IMAGE_PDF_BLOCKS entry (the same DEMO_IMAGE_BYTES the private fixture
-// wraps), and occurredAt uses the deterministic epoch form from
-// ArtifactCard.stories because the fixture derives its timestamp from
-// wall-clock minutes. The card reads the ArtifactViewer context via
-// getOptionalArtifactViewer, so the self-providing ArtifactViewerProvider
-// supplies it as a Storybook decorator (same form as ArtifactCard.stories).
-// Lifecycle states are exercised through the card's frozen `state` fixture prop
-// (the same seam demoInboundImageState uses); onAction is a no-op.
+// Rebuild the private ready-image fixture from exported demo bytes so stories exercise context wiring.
+// Lifecycle states stay tied to real identity and payload data.
 function requireImageBytes(): {
   readonly digest: string;
   readonly byteLength: number;

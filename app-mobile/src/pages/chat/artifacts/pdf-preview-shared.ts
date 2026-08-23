@@ -46,9 +46,8 @@ export interface TextSpan {
 
 let pdfJsPromise: Promise<PdfJsModule> | null = null;
 
-// Live worker/canvas counts back getPdfPreviewRuntimeMetrics (a leak detector). React kept these as two
-// module-level `let`s inside the single PdfPreview.tsx; the Svelte port splits that file into PdfPage.svelte
-// and PdfPreview.svelte, so the counters move here as one shared object both components mutate in place.
+// Shared worker/canvas counts back getPdfPreviewRuntimeMetrics as a leak detector.
+// The Svelte split keeps both counters in one object so PdfPage and PdfPreview mutate the same state.
 export const pdfPreviewMetrics = { liveWorkers: 0, liveCanvases: 0 };
 
 export function getPdfPreviewRuntimeMetrics(): {
@@ -59,8 +58,7 @@ export function getPdfPreviewRuntimeMetrics(): {
 }
 
 export function loadPdfJs(): Promise<PdfJsModule> {
-  // @ds guardrail: do-not-edit — the pinned PDF.js module loads one bounded worker; the worker
-  //   config (annotations/XFA disabled, bounded pages/canvases) is frozen. Do not re-point.
+  // @ds guardrail: do-not-edit — The pinned PDF.js module loads one bounded worker with annotations/XFA disabled and bounded pages/canvases. Do not re-point it.
   if (pdfJsPromise === null) {
     pdfJsPromise = import('pdfjs-dist').then((module) => {
       module.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;

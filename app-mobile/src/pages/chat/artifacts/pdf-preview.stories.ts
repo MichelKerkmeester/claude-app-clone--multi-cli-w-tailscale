@@ -1,14 +1,14 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: PDF PREVIEW STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import PdfPreview from './pdf-preview.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen DEMO_IMAGE_PDF_BLOCKS entries so every story arg is
-// sourced from the demo data — nothing is invented. The ready story loads the
-// fixture's real PDF bytes through the component's own guarded pdf.js wiring;
-// the withheld-availability fixture carries an empty payload, which lands in
-// the bounded 'too-large' state. PdfPreview is prop-only (no context read), so
-// no decorator; the change callbacks are no-ops.
+// Reuse the frozen PDF fixtures so readiness and withholding exercise guarded bytes.
+// Safety attestation stays tied to those fixtures rather than invented payloads.
 const SAFE_BLOCK = DEMO_IMAGE_PDF_BLOCKS.find((block) => block.id === 'blk-pdf-safe');
 if (SAFE_BLOCK === undefined) {
   throw new Error('No safe PDF fixture found in DEMO_IMAGE_PDF_BLOCKS.');

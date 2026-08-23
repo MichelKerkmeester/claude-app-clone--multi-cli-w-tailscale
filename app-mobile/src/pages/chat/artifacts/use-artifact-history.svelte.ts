@@ -2,10 +2,9 @@
 // MODULE: Artifact Viewer History
 // ───────────────────────────────────────────────────────────────────
 
-// Ported from the React artifacts/useArtifactHistory.ts. createArtifactHistory is the pure,
-// framework-agnostic controller (verbatim). useArtifactHistory is the Svelte 5 runes wrapper:
-// a component <script> runs once per instance, so the controller is created once and disposed on
-// destroy via an $effect cleanup — matching the React useRef "create once" + useEffect dispose.
+// The framework-agnostic controller stays separate from the Svelte wrapper.
+// The wrapper creates it once per component and disposes it through effect cleanup.
+// This preserves the React useRef/useEffect lifecycle.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. HISTORY KEY AND CONTROLLER TYPES

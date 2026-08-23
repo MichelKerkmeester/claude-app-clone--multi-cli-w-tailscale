@@ -16,7 +16,7 @@
 
   // @ds surface: artifact-card — the in-transcript read-only card that opens the diff viewer.
   // @ds slot: glyph | body (meta · summary · peek) | open — the card chrome regions.
-  // @ds guardrail: do-not-edit — the button + click opening the viewer are frozen.
+  // @ds guardrail: do-not-edit — The button + click opening the viewer are frozen.
   let buttonRef = $state<HTMLButtonElement | null>(null);
   const viewer = getOptionalArtifactViewer();
   const patchLines = $derived(block.patch.split('\n'));
@@ -151,7 +151,7 @@
   }
 
   /* @ds slot: peek — the clipped 6-line diff preview (mayReorder content only). */
-  /* @ds guardrail: do-not-edit — peek is clipped and bidi-stable; never expand in the card. */
+  /* @ds guardrail: do-not-edit — Peek is clipped and bidi-stable; never expand in the card. */
   .artifact-card-peek {
     display: block;
     min-inline-size: 0;
@@ -204,7 +204,7 @@
     }
   }
 
-  /* @ds guardrail: do-not-edit — reduced-motion must never re-enable transform motion. */
+  /* @ds guardrail: do-not-edit — Reduced motion must never re-enable transform motion. */
   @media (prefers-reduced-motion: reduce) {
     .artifact-card {
       animation: none;

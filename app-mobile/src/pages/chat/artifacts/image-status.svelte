@@ -1,4 +1,12 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: IMAGE STATUS
+  // ───────────────────────────────────────────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. LIFECYCLE STATES
+  // ───────────────────────────────────────────────────────────────────
+
   export const INBOUND_IMAGE_LIFECYCLE_STATES = [
     'processing',
     'deferred',
@@ -43,6 +51,10 @@
     | 'report'
     | 'view-latest'
     | 'reveal';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. STATUS DEFINITIONS
+  // ───────────────────────────────────────────────────────────────────
 
   interface ImageStatusDefinition {
     readonly copy: string | null;
@@ -161,6 +173,10 @@
     reveal: 'Reveal preview',
   };
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. PUBLIC PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   export interface ImageStatusProps {
     readonly state: InboundImageLifecycleState;
     readonly message?: string;
@@ -174,6 +190,10 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 4. RENDER STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let { state, message, onAction, disabledActions = [] }: ImageStatusProps = $props();
 
   const definition = $derived(STATUS_DEFINITIONS[state]);
@@ -248,7 +268,7 @@
     background: var(--accent-soft);
   }
 
-  /* @ds guardrail: focus-visible — the AA focus ring on a status action. */
+  /* @ds guardrail: focus-visible — The AA focus ring on a status action. */
   .inbound-image-status-action:focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;

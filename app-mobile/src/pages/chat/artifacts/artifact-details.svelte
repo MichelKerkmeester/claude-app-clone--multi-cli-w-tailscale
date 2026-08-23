@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ARTIFACT DETAILS
+  // ───────────────────────────────────────────────────────────────────
+
   export interface ArtifactDetailsModel {
     readonly displayName: string;
     readonly mediaType: string;

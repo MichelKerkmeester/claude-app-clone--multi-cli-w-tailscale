@@ -3,10 +3,8 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import RuntimeStatusRegion from './runtime-status-region.svelte';
 import { INITIAL_RUNTIME_STATE, type RuntimeUiState } from '$shared/state/runtime.js';
 
-// Prop-driven stories over the exported INITIAL_RUNTIME_STATE: each story spreads the
-// real initial state and selects a real RuntimePhase so runtimeAnnouncement emits the
-// bounded copy for that phase. RuntimeStatusRegion is the one document-level polite
-// atomic live region (sr-only); the announced text is the frozen a11y contract.
+// Reuse the initial runtime state so each story selects a declared phase.
+// The single polite live region then exposes bounded announcement copy.
 const meta = {
   title: 'Transcript/RuntimeStatusRegion',
   component: RuntimeStatusRegion,

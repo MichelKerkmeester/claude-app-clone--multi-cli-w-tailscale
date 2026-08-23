@@ -1,21 +1,15 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: VERIFIED IMAGE STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
 import VerifiedImage from './verified-image.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Re-host the demo module's private DEMO_INBOUND_MEDIA_READY_BLOCK (in
-// $shared/data/demo.js) as a real InboundImageReadyBlock so every story arg is
-// sourced from the demo data — nothing is invented. Every id, revision, seq,
-// dimension and flag below is copied verbatim from that fixture; the digest,
-// media type and byte length come from the exported image-ready
-// DEMO_IMAGE_PDF_BLOCKS entry (the same DEMO_IMAGE_BYTES the private fixture
-// wraps), and occurredAt uses the deterministic epoch form from
-// ArtifactCard.stories because the fixture derives its timestamp from
-// wall-clock minutes. The aspect ratio is the fixture thumbnail's real
-// 160×100 ratio. VerifiedImage is prop-only (no context read), so no decorator;
-// outside demo mode the resource read resolves through the real relay seam, so
-// lifecycle states are pinned with the frozen `lifecycleState` prop.
+// Rebuild the private ready-image fixture from exported demo bytes so stories exercise verification.
+// Lifecycle pinning and aspect ratio remain tied to the real thumbnail.
 function requireImageBytes(): {
   readonly digest: string;
   readonly byteLength: number;

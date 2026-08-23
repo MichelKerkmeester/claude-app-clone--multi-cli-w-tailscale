@@ -1,4 +1,12 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ARTIFACT STATUS
+  // ───────────────────────────────────────────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. STATUS MESSAGE
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
   import type { ArtifactViewerPhase } from './types.js';
 
@@ -15,11 +23,7 @@
     status: ArtifactResourceStatus | null | undefined,
     subject: string,
   ): string {
-    // @ds state: ArtifactResourceStatus — one exact copy line per status (idle · loading ·
-    //   stalled · ready · empty · whitespace · offline · stale · denied · expired · missing ·
-    //   revoked · conflict · corrupt · too-large · rate-limited · relay-error · aborted · closed)
-    //   plus the opening/exiting phases. @ds guardrail: do-not-edit — this is the a11y status
-    //   vocabulary; the messages are the exact announced copy.
+    // @ds state: ArtifactResourceStatus — One exact copy line covers each resource status plus the opening and exiting phases. @ds guardrail: do-not-edit — This is the a11y status vocabulary; the messages are the exact announced copy.
     if (phase === 'opening') return `Opening ${subject}.`;
     if (phase === 'exiting') return `Closing ${subject}.`;
     if (status === undefined || status === null) return `${subject} ready.`;
@@ -67,6 +71,10 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LIVE REGION STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     phase,
     status,
@@ -89,8 +97,7 @@
 </script>
 
 <!-- @ds surface: artifact-status — the polite status + assertive terminal-alert live regions. -->
-<!-- @ds guardrail: do-not-edit — role=status/aria-live=polite and role=alert/aria-live=assertive
-     with aria-atomic are the announcement contract; do not change. -->
+<!-- @ds guardrail: do-not-edit — The status and alert live regions use fixed roles, live settings, and atomic announcements as the accessibility contract. -->
 <div class="artifact-viewer-status" role="status" aria-live="polite" aria-atomic="true">{announcedMessage}</div>
 {#if terminalMessage !== null}
   <div class="artifact-viewer-terminal-alert" role="alert" aria-live="assertive" aria-atomic="true">{terminalMessage}</div>
@@ -110,7 +117,7 @@
   }
 
   /* @ds slot: terminal-alert — the visually-hidden assertive alert live region. */
-  /* @ds guardrail: do-not-edit — visually hidden but present for assistive tech; the announcement contract. */
+  /* @ds guardrail: do-not-edit — Visually hidden but present for assistive tech; this is the announcement contract. */
   .artifact-viewer-terminal-alert {
     position: absolute;
     width: 1px;

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ARTIFACT STATUS STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import ArtifactStatus from './artifact-status.svelte';
@@ -6,13 +10,8 @@ import type { ArtifactViewerPhase } from './types.js';
 import { catalogSurfaceById } from '$shared/catalog/catalog-registry.js';
 import { DEMO_DIFF_FIXTURE, DEMO_ARTIFACT_STATES_FIXTURE } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen artifact-status vocabulary so every story `status` arg is
-// sourced from real catalog data — nothing is invented. The status values are
-// the `artifact-status` surface's declared states (the frozen a11y vocabulary in
-// registry.ts); DEMO_ARTIFACT_STATES_FIXTURE confirms the demo-activatable subset
-// (ready/withheld/missing/denied/unsupported). The subject comes from
-// DEMO_DIFF_FIXTURE.summary and the phase is the viewer-ready phase the catalog's
-// own ArtifactStatusPreview uses. One story per declared status state.
+// Reuse catalog-declared status values so the a11y vocabulary and demo subset stay tied to the registry.
+// Fixture-only values cannot silently diverge.
 const SURFACE = catalogSurfaceById('artifact-status');
 if (SURFACE === undefined) {
   throw new Error('The artifact-status surface is missing from the catalog registry.');
@@ -22,8 +21,7 @@ const STATUSES = SURFACE.states as readonly ArtifactResourceStatus[];
 const PHASE: ArtifactViewerPhase = 'viewer-ready';
 const SUBJECT = DEMO_DIFF_FIXTURE.summary;
 
-// DEMO_ARTIFACT_STATES_FIXTURE is the demo query selector that activates these
-// status states; touching it keeps the fixture provenance legible.
+// Keep the demo selector referenced so fixture provenance remains visible to the story.
 void DEMO_ARTIFACT_STATES_FIXTURE;
 
 function statusStory(status: ArtifactResourceStatus): StoryObj<typeof meta> {

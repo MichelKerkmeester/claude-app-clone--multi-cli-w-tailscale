@@ -80,7 +80,7 @@
   // 4. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: live-edge measurement + scroll handlers (followToBottom, onScroll) — not designer-editable.
+  // @ds guardrail: live-edge measurement + scroll handlers (followToBottom, onScroll) — Not designer-editable.
   function followToBottom(): void {
     const element = scrollEl;
     if (element !== null) element.scrollTop = element.scrollHeight;
@@ -90,7 +90,7 @@
   function onScroll(): void {
     const element = scrollEl;
     if (element === null) return;
-    // The reader owns the live edge: only follow new blocks when already near the bottom.
+    // The reader owns the live edge, so new blocks follow only when the viewport is near the bottom.
     const nearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 96;
     atLiveEdge = nearBottom;
     if (nearBottom) newAway = 0;
@@ -100,8 +100,7 @@
   // 5. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: block normalization (normalizeTranscriptBlocks), turn grouping
-  //   (groupNormalizedTranscript, groupBlocksIntoTurns) and todo-row insertion — not designer-editable.
+  // @ds guardrail: block normalization (normalizeTranscriptBlocks), turn grouping (groupNormalizedTranscript, groupBlocksIntoTurns) and todo-row insertion — Not designer-editable.
   const normalizedBlocks = $derived.by(() =>
     normalizeTranscriptBlocks({
       sessionId: artifactSessionId || 'unknown-session',
@@ -113,13 +112,13 @@
     insertTodoProjectionItem(groupNormalizedTranscript(normalizedBlocks, blocks), blocks, todoProjection),
   );
   const turnStartIds = $derived.by(() => {
-    // Mark the first block of every turn after the first so a boundary rule can space
-    // consecutive turns; the derivation never mutates or drops a block.
+    // Mark the first block of each turn after the first so a boundary rule can space each turn.
+    // The derivation never mutates or drops a block.
     const turns = groupBlocksIntoTurns(blocks);
     return new Set(turns.slice(1).map((turn) => turn.blocks[0]?.id));
   });
 
-  // @ds guardrail: virtualization — count/estimateSize/measureElement/overscan; rows are measured.
+  // @ds guardrail: virtualization — Count/estimateSize/measureElement/overscan; rows are measured.
   const virtualizer = createVirtualizer<HTMLDivElement, HTMLDivElement>({
     count: renderItems.length,
     getScrollElement: () => scrollEl,
@@ -131,9 +130,8 @@
   // 6. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
-  // Options are captured at creation, so re-apply on change. Untracked + get() (not $virtualizer)
-  // so the store emission setOptions triggers cannot re-run this effect — Svelte's safe_not_equal
-  // treats object values as always changed, so a tracked $virtualizer read here would loop.
+  // Reapply options because the store captures them at creation. Untracked `get()` prevents store emissions from setOptions from retriggering this effect.
+  // Svelte's safe_not_equal treats object values as changed, so tracking `$virtualizer` here would loop.
   $effect(() => {
     const count = renderItems.length;
     const el = scrollEl;
@@ -147,7 +145,7 @@
     });
   });
 
-  // @ds guardrail: live-edge auto-scroll effect + sr-only block-arrival announcements — not designer-editable.
+  // @ds guardrail: live-edge auto-scroll effect + sr-only block-arrival announcements — Not designer-editable.
   $effect(() => {
     if (blocks.length > previousCount) {
       const addedBlocks = blocks.slice(previousCount);
@@ -179,7 +177,7 @@
 {:else}
   <!-- @ds slot: frame — labelled, focussable transcript region. -->
   <section class="transcript-frame" aria-label="Typed transcript" tabindex={-1}>
-    <!-- @ds guardrail: sr-only polite live announcer — not designer-editable. -->
+    <!-- @ds guardrail: sr-only polite live announcer — Not designer-editable. -->
     <div class="sr-only" aria-live="polite" aria-atomic="true">
       {announcement}
     </div>
@@ -199,7 +197,7 @@
                   ? item.kind === 'block' ? item.block.sourceBlockId : item.sourceBlockId
                   : item.blocks[0]?.sourceBlockId}
             {@const isTurnStart = leadId !== undefined && turnStartIds.has(leadId)}
-            <!-- @ds guardrail: virtualized row — measureElement + translateY come from the virtualizer. -->
+            <!-- @ds guardrail: virtualized row — MeasureElement + translateY come from the virtualizer. -->
             <div
               class={isTurnStart ? 'virtual-row turn-start' : 'virtual-row'}
               data-index={virtualItem.index}
@@ -298,7 +296,7 @@
     margin-top: var(--space-6);
   }
 
-  /* Timeline rail line removed (§6). */
+  /* The rail stays absent; turn boundaries provide conversation hierarchy. */
   .transcript-frame::before {
     content: none;
   }
@@ -348,8 +346,7 @@
   /* @ds edit: contrast — the high-contrast reader gives up the glass: translucency lowers the
      chevron's effective contrast against whatever scrolls behind it, so the control returns to
      an opaque surface and carries the stronger border the app's other raised surfaces use. */
-  /* @ds guardrail: do-not-edit — the opaque high-contrast fallback is an accessibility
-     guarantee; never let the translucent surface survive prefers-contrast: more. */
+  /* @ds guardrail: do-not-edit — The opaque high-contrast fallback is an accessibility guarantee; translucent surfaces must not survive prefers-contrast: more. */
   @media (prefers-contrast: more) {
     .scroll-to-latest,
     .scroll-to-latest:hover {
@@ -385,7 +382,7 @@
   }
 
   /* @ds slot: virtual-list — reserves total height; rows are absolutely positioned below. */
-  /* @ds guardrail: virtualization layout — measured rows; do not change row height math. */
+  /* @ds guardrail: virtualization layout — Measured rows; do not change row height math. */
   .transcript-virtual {
     position: relative;
     width: 100%;
@@ -461,7 +458,7 @@
     font-weight: 550;
   }
 
-  /* @ds guardrail: streaming reduced-motion — a11y invariant; do not remove. */
+  /* @ds guardrail: streaming reduced-motion — A11y invariant; do not remove. */
   @media (prefers-reduced-motion: reduce) {
     .streaming-glyph i {
       animation: none;

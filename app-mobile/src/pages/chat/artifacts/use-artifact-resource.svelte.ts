@@ -541,10 +541,8 @@ function releaseRequestResource(request: ActiveRequest): void {
 // 9. USE ARTIFACT RESOURCE HOOK
 // ───────────────────────────────────────────────────────────────────
 
-// Runes port of the React useArtifactResource hook. Consumers pass reactive getter thunks and read
-// the returned `.current`. useState -> $state, useRef refs -> plain closure vars, the two useEffects
-// -> $effect (cleanup runs on re-run + destroy, matching React). The React render-time retry-key reset
-// runs in a keyed $effect. The React effect dep arrays map to the reactive reads inside each $effect.
+// This Svelte runes hook preserves the React lifecycle: getter thunks stay reactive.
+// Refs become closure state, effects clean up on rerun/destroy, and retry keys reset in a keyed effect.
 export function useArtifactResource(
   getSessionId: () => string | null,
   getBlock: () => ArtifactResourceBlock | null,

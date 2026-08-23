@@ -1,18 +1,15 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: SECURE IMAGE PREVIEW STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import SecureImagePreview from './secure-image-preview.svelte';
 import type { ImagePan } from './secure-image-preview.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen DEMO_IMAGE_PDF_BLOCKS image-ready entry so every story arg
-// is sourced from the demo data — nothing is invented. The component's own
-// types demand an object URL string (no demo fixture exports one), so a local
-// blob: URL is created from the fixture's real PNG bytes via the same
-// demoArtifactBytes seam the viewer uses. `alt` reuses the component family's
-// own fallback copy ('Sanitized image preview', as in ImagePreview.svelte) —
-// the fixture block carries no altText of its own. SecureImagePreview is
-// prop-only (no context read), so no decorator; the change callbacks are
-// no-ops.
+// Build the object URL from frozen demo bytes so the story exercises the guarded image path.
+// Callbacks remain inert because the component is prop-only.
 const READY_BLOCK = DEMO_IMAGE_PDF_BLOCKS.find((block) => block.id === 'blk-image-ready');
 if (READY_BLOCK === undefined) {
   throw new Error('No ready image fixture found in DEMO_IMAGE_PDF_BLOCKS.');

@@ -1,4 +1,8 @@
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: UNSUPPORTED PREVIEW
+  // ───────────────────────────────────────────────────────────────────
+
   interface Props {
     renderer?: string;
     message?: string;

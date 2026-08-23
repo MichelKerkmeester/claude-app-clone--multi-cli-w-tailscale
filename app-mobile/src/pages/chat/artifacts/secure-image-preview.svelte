@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: SECURE IMAGE PREVIEW
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
 
   export interface ImagePan {
@@ -22,6 +26,10 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. PROPS AND STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: SecureImagePreview — sanitized image preview with pointer and keyboard zoom and pan.
   let {
     objectUrl,

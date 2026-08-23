@@ -1,7 +1,6 @@
-// Shared artifact-viewer types, hoisted out of the React ArtifactViewerProvider so the Svelte
-// port's Provider / Host / Status chain is acyclic (the React tree relied on type-only imports
-// erasing the Provider<->Host<->Status back-edge; per-file Svelte modules make that fragile, so
-// the shared types live here). Compile-time only — no runtime behaviour or rendered output changes.
+// Shared artifact-viewer types keep the Provider, Host, and Status chain acyclic in the Svelte port.
+// Type-only imports erased the React back-edge, but per-file Svelte modules keep that boundary fragile.
+// Keeping the types here changes no runtime behaviour or rendered output.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS

@@ -1,14 +1,14 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: UNSUPPORTED PREVIEW STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import UnsupportedPreview from './unsupported-preview.svelte';
 import { DEMO_ARTIFACT_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen DEMO_ARTIFACT_BLOCKS unsupported fixture so every story
-// `renderer` arg is sourced from the real demo data — nothing is invented. The
-// `unsupported-preview` surface renders the unavailable notice; Default passes
-// the fixture's renderer ('unsupported') so the component's default message
-// composes, and WithDisplayName passes the fixture's display name so the notice
-// reads "<display name> previews are not available in this reader."
+// Reuse the frozen unsupported fixture so the notice exercises real renderer provenance.
+// Display-name fallback text remains tied to that fixture.
 const UNSUPPORTED_BLOCK = DEMO_ARTIFACT_BLOCKS.find((block) => block.renderer === 'unsupported');
 if (UNSUPPORTED_BLOCK === undefined) {
   throw new Error('No unsupported fixture found in DEMO_ARTIFACT_BLOCKS.');

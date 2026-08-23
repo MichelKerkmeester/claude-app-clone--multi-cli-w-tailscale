@@ -99,8 +99,7 @@
   }: InboundImageCardProps = $props();
 
   // @ds surface: inbound-image-card — the in-transcript inbound-image card and its lifecycle.
-  // @ds guardrail: do-not-edit — the lifecycle state machine, press-cancel gesture guard, and the
-  // viewer open handoff are behavioural; do not change them.
+  // @ds guardrail: do-not-edit — The lifecycle state machine, press-cancel gesture guard, and viewer open handoff are behavioural; do not change them.
   const viewer = getOptionalArtifactViewer();
   const controlled = $derived(fixtureState !== undefined);
 
@@ -371,8 +370,7 @@
     }
   }
 
-  /* @ds guardrail: do-not-edit — reduced-motion bounds the card fade to a short linear step and
-     removes the press-scale; motion is never re-enabled beyond this. */
+  /* @ds guardrail: do-not-edit — Reduced motion bounds the card fade to a short linear step and removes press scaling. */
   @media (prefers-reduced-motion: reduce) {
     .inbound-image-card {
       animation: inbound-image-card-in 100ms linear both !important;

@@ -217,8 +217,7 @@
   // @ds surface: artifact-viewer — the modal reader chrome: header, status, controls, preview body.
   // @ds slot: header | status | controls | body — the chrome regions styled in the matching
   //   @ds surface: artifact-viewer scoped block.
-  // @ds guardrail: do-not-edit — the hooks below are the digest-verified, race-safe,
-  //   no-fetch-on-open exact-tuple reader; do not rework their wiring.
+  // @ds guardrail: do-not-edit — The hooks below are the digest-verified, race-safe, no-fetch-on-open exact-tuple reader wiring; do not rework them.
   useVisualViewportAnchor();
 
   // ───────────────────────────────────────────────────────────────────
@@ -296,9 +295,7 @@
       requireImageDecode: true,
     }),
   );
-  // @ds guardrail: do-not-edit — useArtifactResource is the digest-verified, race-safe,
-  // no-fetch-on-open exact-tuple read. requireImageDecode sanitizes the image (PNG decode/
-  // re-encode metadata-strip) before any object URL is created. Keep behaviour unchanged.
+  // @ds guardrail: do-not-edit — useArtifactResource is the digest-verified, race-safe, no-fetch-on-open exact-tuple read; requireImageDecode sanitizes image bytes before any object URL exists. Keep behaviour unchanged.
   const resource = useArtifactResource(
     () => sessionId,
     () => resourceBlock,
@@ -386,8 +383,7 @@
     return () => window.clearTimeout(timer);
   });
 
-  // @ds guardrail: do-not-edit — VoiceOver focus-scrub past the modal boundary dismisses the
-  // reader; the capture-phase focusin containment check is frozen a11y behaviour.
+  // @ds guardrail: do-not-edit — VoiceOver focus-scrub past the modal boundary dismisses the reader; the capture-phase focusin containment check is frozen a11y behaviour.
   $effect(() => {
     if (phase !== 'ready-diff' && phase !== 'ready-image') return;
     const onFocusIn = (event: FocusEvent) => {
@@ -405,7 +401,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   // @ds state: edge-back · voiceover-scrub — swipe-from-edge and focus-scrub dismissal reasons.
-  // @ds guardrail: do-not-edit — gesture thresholds and the pointer/touch wiring are frozen.
+  // @ds guardrail: do-not-edit — Gesture thresholds and the pointer/touch wiring are frozen.
   function startEdgeBack(x: number, y: number): void {
     if (x <= EDGE_BACK_START) edgeStart = { x, y };
   }
@@ -435,8 +431,7 @@
     if (touch !== undefined) finishEdgeBack(touch.clientX, touch.clientY);
   }
 
-  // @ds guardrail: do-not-edit — Escape always dismisses (isKeyboardDismissDisabled is unset in
-  // the react-aria contract); Tab is contained within the dialog so focus never scrubs out.
+  // @ds guardrail: do-not-edit — Escape always dismisses under the react-aria contract, and Tab stays inside the dialog so focus never scrubs out.
   function onDialogKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       event.stopPropagation();
@@ -468,8 +463,7 @@
     }
   }
 
-  // @ds guardrail: do-not-edit — pressing the underlay dismisses only when the reader is
-  // dismissable (inbound images are not), mirroring the react-aria isDismissable contract.
+  // @ds guardrail: do-not-edit — Underlay presses dismiss only when the reader is dismissable; inbound images mirror the react-aria isDismissable contract.
   function onOverlayPointer(event: MouseEvent): void {
     if (inbound === null && event.target === event.currentTarget) {
       onClose('escape');
@@ -673,8 +667,7 @@
 <!-- @ds state: the viewer phase (closed · opening · ready-diff · ready-image · viewer-ready ·
      full-fetching · stalled · offline-* · stale · revoked · privacy-covered · exiting ·
      aborted) drives [data-artifact-state] on the overlay and the preview body below.
-     @ds guardrail: do-not-edit — the overlay > modal > dialog nesting, focus trap, Escape /
-     underlay dismissal, edge-back handlers, and aria attributes are frozen. -->
+     @ds guardrail: do-not-edit — Overlay nesting, focus trapping, Escape and underlay dismissal, edge-back handlers, and ARIA attributes are frozen. -->
 {#if preview !== null && phase !== 'closed'}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -954,7 +947,7 @@
     background: #f3e4de;
   }
 
-  /* @ds guardrail: focus-visible — the AA focus ring on the stale action. */
+  /* @ds guardrail: focus-visible — The AA focus ring on the stale action. */
   .artifact-stale-action:focus-visible {
     outline: 3px solid #24221f;
     outline-offset: 2px;

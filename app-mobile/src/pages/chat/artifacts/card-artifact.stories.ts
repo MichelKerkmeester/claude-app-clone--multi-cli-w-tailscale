@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ARTIFACT CARD STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -5,14 +9,8 @@ import ArtifactCard from './card-artifact.svelte';
 import ArtifactViewerProvider from './artifact-viewer-provider.svelte';
 import { DEMO_DIFF_FIXTURE } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen DEMO_DIFF_FIXTURE as a real FileDiffBlock so the story
-// `block` arg is sourced from the demo data — nothing is invented. The id,
-// summary and patch come straight from the fixture; the ordering fields use the
-// fixture's real transcript seq (5) with deterministic revision/occurredAt, the
-// same form the catalog's demoDiffBlock() uses. ArtifactCard reads the
-// ArtifactViewer context via getOptionalArtifactViewer, so the self-providing
-// ArtifactViewerProvider supplies it as a Storybook decorator (same form as
-// RichContentRouter.stories and FilePreviewCard.stories).
+// Reuse the frozen diff fixture so the card story exercises real patch provenance.
+// The viewer context seam stays visible without invented transcript metadata.
 const DEMO_DIFF_BLOCK: FileDiffBlock = Object.freeze({
   kind: 'file_diff',
   id: DEMO_DIFF_FIXTURE.blockId,

@@ -4,13 +4,8 @@ import FilePreviewCard from './card-file-preview.svelte';
 import ArtifactViewerProvider from '../artifacts/artifact-viewer-provider.svelte';
 import { DEMO_ARTIFACT_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen DEMO_ARTIFACT_BLOCKS fixtures so every story `block` arg is a
-// real FilePreviewBlock sourced from the demo data — nothing is invented. The
-// `transcript` surface declares the `block-delivery` state; FilePreviewCard renders
-// the read-only preview card across every availability. FilePreviewCard reads the
-// ArtifactViewer context via getOptionalArtifactViewer, so the self-providing
-// ArtifactViewerProvider supplies it as a Storybook decorator (same form as
-// RichContentRouter.stories).
+// Reuse frozen artifact fixtures so availability stories exercise real preview provenance.
+// Context wiring remains visible without invented blocks.
 const SESSION_ID = 'demo-session-triage';
 
 const meta = {

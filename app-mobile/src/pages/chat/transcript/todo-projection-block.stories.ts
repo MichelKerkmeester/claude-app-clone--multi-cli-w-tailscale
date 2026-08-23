@@ -3,14 +3,8 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import TodoProjectionBlock from './todo-projection-block.svelte';
 import { EMPTY_TODO_PROJECTION_STATE, type TodoProjectionState } from '$shared/state/state.js';
 
-// The `todos` surface is registry-only because the demo projection is not exported
-// for a typed preview (see registry.ts). DEMO_TODO_FIXTURE declares the grouped /
-// all-done / empty / unsupported states, but only the projection-null states are
-// constructable from the exported EMPTY_TODO_PROJECTION_STATE without inventing task
-// content — so these stories render the real component's projection-null guard over
-// the exported empty-state fixture. The grouped / all-done states require the
-// unexported DEMO_TODO_TASKS projection and are intentionally omitted (nothing
-// invented).
+// Keep the story on exported projection-null states because unexported task fixtures cannot be represented.
+// This avoids inventing task content.
 const meta = {
   title: 'Transcript/TodoProjectionBlock',
   component: TodoProjectionBlock,

@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ARTIFACT HEADER
+  // ───────────────────────────────────────────────────────────────────
+
   export interface ArtifactHeaderProps {
     headingRef?: HTMLHeadingElement | null;
     readonly onClose: () => void;
@@ -22,7 +26,7 @@
 
 <!-- @ds surface: artifact-header — the viewer heading + close chrome. -->
 <!-- @ds slot: heading-group (kicker · title · revision) | close — the header regions. -->
-<!-- @ds guardrail: do-not-edit — the heading focus target (tabindex=-1) and the close aria-label are frozen. -->
+<!-- @ds guardrail: do-not-edit — The heading focus target (tabindex=-1) and the close aria-label are frozen. -->
 <header class="artifact-viewer-header">
   <div class="artifact-viewer-heading-group">
     <span class="artifact-viewer-kicker">{kindLabel}</span>

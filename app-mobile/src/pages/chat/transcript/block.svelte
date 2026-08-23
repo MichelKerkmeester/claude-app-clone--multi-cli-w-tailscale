@@ -40,8 +40,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   // @ds surface: transcript-block — one message block; each kind is its own state seam below.
-  // @ds guardrail: the kind switch, collapsibility, role and header decisions are presentation
-  //   logic that must stay in lockstep with the block model; not designer-editable.
+  // @ds guardrail: the kind switch, collapsibility, role and header decisions are presentation logic that must stay in lockstep with the block model; not designer-editable.
   // Routine evidence collapses to a recoverable disclosure; high-signal blocks
   // (text, plan, diffs, and tool errors) stay expanded and prominent.
   const blockDisplay = $derived.by(() => {
@@ -56,8 +55,7 @@
         return { label: 'Thinking summary', collapsible: true };
       // @ds state: plan
       // @ds surface: plan-todo — the plan-block ✓/○ checklist surface; item states pending (○) · done (✓).
-      // @ds guardrail: the block.items and each item's `done` flag come from the plan block model;
-      //   done-state derivation and plan-mode gating live there and in the reducer, never editable here.
+      // @ds guardrail: the block.items and each item's `done` flag come from the plan block model; done-state derivation and plan-mode gating live there and in the reducer, never editable here.
       case 'plan':
         return { label: 'Plan / todo', collapsible: false };
       // @ds state: tool_call
@@ -91,10 +89,9 @@
   });
 
   const roleClass = $derived(block.kind === 'text' ? ` block-role-${block.role ?? 'assistant'}` : '');
-  // Text turns imply role by placement + typography (Claude-style), and collapsible evidence
-  // carries its own labelled trigger — so the label/timestamp header only shows for the
-  // promoted, standalone blocks (plan and unsupported). When `bare`, this block is
-  // already inside an Activity disclosure: show its label and render content directly.
+  // Text turns imply role by placement and typography, while collapsible evidence owns its labelled trigger.
+  // The label/timestamp header is reserved for promoted standalone blocks.
+  // When `bare`, the block sits inside an Activity disclosure, so it shows its label directly.
   const showHeader = $derived(
     block.kind !== 'file_diff' &&
       block.kind !== 'file_preview' &&
@@ -117,7 +114,7 @@
     <ul class="plan-list">
       {#each block.items as item, index (`${block.id}-${index}`)}
         <!-- @ds state: pending (○) · done (✓) — the `done` class selects the item state; the -->
-        <!--   inline glyph and text below are rendered by this branch. -->
+        <!--   The inline glyph and text below are rendered by this branch. -->
         <li class={item.done ? 'done' : ''}>
           <span aria-hidden="true">{item.done ? '✓' : '○'}</span>
           {item.text}

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: IMAGE PLACEHOLDER STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import ImagePlaceholder from './image-placeholder.svelte';
@@ -7,13 +11,8 @@ import {
   type InboundImageLifecycleState,
 } from './image-status.svelte';
 
-// Re-host the frozen inbound-image lifecycle vocabulary so every story `state`
-// arg is sourced from the real INBOUND_IMAGE_LIFECYCLE_STATES list — nothing is
-// invented. The `image-preview` surface keeps the byte-reading stage
-// registry-only, so this stories the image-STATE placeholder wells only (no real
-// bytes). noAspect is sourced from each state's frozen STATUS_DEFINITIONS via
-// imageStatusDefinition; the aspect ratio is the demo image fixture's real 1×1
-// ratio for states that render an aspect frame.
+// Reuse the frozen lifecycle vocabulary so placeholder stories cover declared states.
+// Image bytes and aspect-ratio metadata are not fabricated.
 const ASPECT_RATIO = 1;
 
 function placeholderStory(state: InboundImageLifecycleState): StoryObj<typeof ImagePlaceholder> {

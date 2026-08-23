@@ -162,9 +162,7 @@
   let { children }: { readonly children: Snippet } = $props();
 
   // @ds surface: artifact-viewer-provider — the viewer state machine plus privacy lifecycle.
-  // @ds guardrail: do-not-edit — the phase machine, dismissal choreography, generation guards,
-  // timer bookkeeping, focus/scroll restoration, and the privacy-curtain lifecycle below are
-  // behavioural and NOT designer-editable. Styling is edited in the artifact-viewer surface blocks.
+  // @ds guardrail: do-not-edit — The phase machine, dismissal choreography, generation guards, timer bookkeeping, focus/scroll restoration, and privacy-curtain lifecycle are behavioural and NOT designer-editable. Styling belongs in artifact-viewer surface blocks.
 
   // ───────────────────────────────────────────────────────────────────
   // 3. LOCAL STATE
@@ -310,10 +308,8 @@
     preview = nextPreview;
   }
 
-  // @ds state: exiting · closed · privacy-covered — close(reason) covers the reader with the
-  // opaque privacy curtain, purges image pixels, clears the resource store, and bumps the
-  // generation before any exit timer; privacy/security dismissal reasons route to covered.
-  // @ds guardrail: do-not-edit — the dismissal state machine and resource teardown are frozen.
+  // @ds state: exiting · closed · privacy-covered — Closing covers the reader, purges image pixels, clears resources, and bumps generation before exit cleanup. Privacy/security dismissal reasons route through the covered phase.
+  // @ds guardrail: do-not-edit — The dismissal state machine and resource teardown are frozen.
   function close(reason: ArtifactDismissalReason = 'close'): void {
     const current = preview;
     if (current === null) {
@@ -367,9 +363,7 @@
     }
   });
 
-  // @ds guardrail: do-not-edit — privacy purge on visibility-hide/pagehide/bfcache and the
-  // event wiring for logout · session-switch · artifact-revoked · transcript-superseded are
-  // security behaviour; they stay frozen and are NOT designer-editable.
+  // @ds guardrail: do-not-edit — Privacy purge on visibility-hide/pagehide/bfcache and event wiring for logout, session-switch, artifact-revoked, and transcript-superseded are security behaviour; they stay frozen and are NOT designer-editable.
   $effect(() => {
     const closeHiddenViewer = () => {
       if (document.visibilityState === 'hidden') {

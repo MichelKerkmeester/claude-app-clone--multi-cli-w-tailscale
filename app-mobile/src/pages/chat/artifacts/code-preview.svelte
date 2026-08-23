@@ -123,8 +123,7 @@
 <!-- @ds surface: code-preview — the highlighted code well, gutter, and live-edge follow. -->
 <!-- @ds state: highlight (plain → pending → highlighted) via [data-highlight-status]; follow-tail
      live-edge via [data-live-edge] and the Jump to latest control. -->
-<!-- @ds guardrail: do-not-edit — the highlight worker (useHighlightedCode) and the scroll/follow
-     live-edge logic are frozen; tokens render as inert <span> text only. -->
+<!-- @ds guardrail: do-not-edit — The highlight worker and scroll/follow live-edge logic are frozen; tokens render as inert <span> text only. -->
 <div class="artifact-code-viewer" data-live-edge={followTail ? atLiveEdge : undefined}>
   <div
     class={`artifact-code-preview${wrap ? ' is-wrapped' : ''}`}
@@ -160,7 +159,7 @@
   }
 
   /* @ds slot: code-well — the scrollable highlighted code surface. */
-  /* @ds guardrail: do-not-edit — bounded reading well; selectable and pan-scoped; never overflow the page. */
+  /* @ds guardrail: do-not-edit — Bounded reading well; selectable and pan-scoped; never overflow the page. */
   .artifact-code-preview {
     overscroll-behavior: contain;
     overflow-anchor: none;
@@ -259,7 +258,7 @@
     font-size: 0.8125rem;
   }
 
-  /* @ds guardrail: focus-visible — the AA focus ring on jump-to-latest. */
+  /* @ds guardrail: focus-visible — The AA focus ring on jump-to-latest. */
   .artifact-jump-latest:focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
@@ -285,7 +284,7 @@
     color: #f0b19a;
   }
 
-  /* @ds guardrail: do-not-edit — reduced-motion bounds the well + jump-to-latest transitions. */
+  /* @ds guardrail: do-not-edit — Reduced motion bounds the well + jump-to-latest transitions. */
   @media (prefers-reduced-motion: reduce) {
     .artifact-code-preview {
       transition-duration: 100ms;

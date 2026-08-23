@@ -1,13 +1,14 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: CODE PREVIEW STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import CodePreview from './code-preview.svelte';
 import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen DEMO_TEXT_CODE_SHARE_BLOCKS code fixture so every story
-// `text`/`language` arg is sourced from the real inline-text demo block — nothing
-// is invented. The `code-preview` surface declares three states: Highlight (the
-// default highlighted well), Wrapped (soft-wrap modifier), and FollowTail (the
-// live-edge follow frame with its Jump-to-latest control).
+// Reuse the frozen inline-text fixture so highlight, wrap, and live-edge stories exercise real source.
+// Language values stay tied to the fixture rather than invented content.
 const CODE_BLOCK = DEMO_TEXT_CODE_SHARE_BLOCKS.find((block) => block.renderer === 'code');
 if (CODE_BLOCK === undefined || CODE_BLOCK.content.kind !== 'inline-text') {
   throw new Error('No inline-text code fixture found in DEMO_TEXT_CODE_SHARE_BLOCKS.');

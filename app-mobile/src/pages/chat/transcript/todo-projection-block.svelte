@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: TODO PROJECTION BLOCK
+  // ───────────────────────────────────────────────────────────────────
+
   import type { TodoProjectionState } from '$shared/state/state.js';
 
   export interface TodoProjectionBlockProps {

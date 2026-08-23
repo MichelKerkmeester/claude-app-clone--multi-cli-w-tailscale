@@ -12,19 +12,8 @@ import {
   type TranscriptProvenance,
 } from '$shared/state/state.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so every
-// story `block` arg is a real NormalizedTranscriptBlock sourced from the demo data —
-// nothing is invented. The `transcript` surface declares the `block-delivery` state;
-// NormalizedTranscriptBlockView dispatches each normalized kind to Block (fallback /
-// diff) or RichContentRouter, so one story per normalized kind present in the fixtures.
-//
-// The transcript reducer (src/state.ts) runs every relay block through parseDisplayBlock
-// before it reaches the normalizer, converting any unrecognized protocol kind into
-// `{ kind: 'unknown', originalKind }`. Block.svelte handles 'unknown' but not raw
-// protocol kinds like 'unknown_payload', so the fallback story's sourceBlock must be
-// that converted display block. Reuse the same exported converter here, preserving each
-// fixture's existing provenance so only the unknown-kind conversion differs from a raw
-// passthrough.
+// Reuse frozen fixtures through the real parser and normalizer so each story exercises a genuine normalized kind.
+// The fallback preserves the reducer's unknown-kind conversion.
 const DISPLAY_BLOCKS: readonly DisplayTranscriptBlock[] = [
   ...DEMO_RICH_CONTENT_BLOCKS,
   ...DEMO_RICH_RELEASE_BLOCKS,

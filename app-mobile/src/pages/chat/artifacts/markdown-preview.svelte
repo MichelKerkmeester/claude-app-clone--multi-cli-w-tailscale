@@ -1,4 +1,12 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: MARKDOWN PREVIEW
+  // ───────────────────────────────────────────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. MARKDOWN MODEL
+  // ───────────────────────────────────────────────────────────────────
+
   const MAX_MARKDOWN_LINES = 50_000;
 
   type MarkdownInline =
@@ -48,6 +56,10 @@
     if (cursor < source.length) nodes.push(inlineText(source.slice(cursor)));
     return nodes;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. BOUNDED PARSER
+  // ───────────────────────────────────────────────────────────────────
 
   export function parseMarkdown(text: string): readonly MarkdownBlock[] {
     const lines = text.split('\n').slice(0, MAX_MARKDOWN_LINES);
@@ -130,6 +142,10 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 3. PROPS AND DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   interface Props {
     text: string;
     ariaLabel?: string;
@@ -145,8 +161,7 @@
 
 <!-- @ds surface: markdown-preview — the bounded safe-Markdown renderer well. -->
 <!-- @ds state: ready · empty · whitespace — empty/whitespace swap the read content. -->
-<!-- @ds guardrail: do-not-edit — parseMarkdown is a bounded allowlist parser (no raw HTML;
-     links/images render as inert spans); rendering is unchanged. -->
+<!-- @ds guardrail: do-not-edit — parseMarkdown uses a bounded allowlist parser, so raw HTML is excluded and links/images render as inert spans. -->
 {#if text.length === 0}
   <p class="artifact-empty-preview">This preview is empty.</p>
 {:else if text.trim().length === 0}
@@ -163,7 +178,7 @@
      preserved. Values unchanged. -->
 <style>
   /* @ds slot: markdown-well — the bounded safe-Markdown render surface. */
-  /* @ds guardrail: do-not-edit — bounded reading well; selectable; links/images render inert. */
+  /* @ds guardrail: do-not-edit — Bounded reading well; selectable; links/images render inert. */
   .artifact-markdown-preview {
     max-inline-size: 100%;
     max-block-size: 100%;

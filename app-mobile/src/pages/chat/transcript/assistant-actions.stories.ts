@@ -8,10 +8,8 @@ import {
   type NormalizedProseBlock,
 } from '../rich-content/normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so the
-// story `text` arg is the canonicalSource of a real assistant prose block sourced
-// from the demo data — nothing is invented. The `transcript` surface declares the
-// `turn-actions` state; AssistantActions renders the under-answer Copy / Share row.
+// Reuse normalized assistant prose so the action story tests canonical source text.
+// The capability-gated row therefore needs no invented content.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

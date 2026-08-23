@@ -8,11 +8,8 @@ import {
   type NormalizedActivityBlock,
 } from '../rich-content/normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so every
-// story `blocks` arg is a real array of NormalizedActivityBlock sourced from the demo
-// data — nothing is invented. The `transcript` surface declares the
-// `evidence-disclosure` state; NormalizedActivityGroup renders the grouped bare
-// evidence disclosure, so one story over the activity blocks the fixtures yield.
+// Reuse frozen rich-content fixtures through the real normalizer so the disclosure story exercises genuine activity grouping.
+// The grouped content therefore stays tied to actual blocks.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

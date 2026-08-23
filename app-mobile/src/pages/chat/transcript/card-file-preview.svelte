@@ -27,9 +27,8 @@
   // 3. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: file-preview-card — read-only preview card; states read from
-  //   data-preview-state (ready · withheld · missing · denied · unsupported).
-  // @ds guardrail: react-aria Button press, aria-label, and viewer open (onPress) — not designer-editable.
+  // @ds surface: file-preview-card — Read-only preview card; states come from data-preview-state (ready · withheld · missing · denied · unsupported).
+  // @ds guardrail: react-aria Button press, aria-label, and viewer open (onPress) — Not designer-editable.
   let buttonEl = $state<HTMLButtonElement | null>(null);
   const viewer = getOptionalArtifactViewer();
 

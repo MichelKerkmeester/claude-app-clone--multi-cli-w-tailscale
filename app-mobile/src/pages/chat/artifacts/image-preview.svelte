@@ -139,8 +139,7 @@
 
 <!-- @ds surface: image-preview — the sanitized image stage with zoom and pan. -->
 <!-- @ds state: loading · ready · corrupt · too-large — [data-image-state] drives each. -->
-<!-- @ds guardrail: do-not-edit — the object-URL lifecycle, byte/dimension bounds, zoom clamp,
-     and pointer pan capture are frozen (the image decode/verify lives in the resource hook). -->
+<!-- @ds guardrail: do-not-edit — Object-URL lifecycle, byte/dimension bounds, zoom clamping, and pointer-pan capture are frozen; image verification stays in the resource hook. -->
 <section class="image-preview" aria-label="Sanitized image preview" data-image-state={imageState}>
   <div class="image-preview-controls" role="group" aria-label="Image zoom controls">
     <button type="button" class="artifact-control-button" onclick={() => setBoundedZoom(zoom - 1)} disabled={zoom <= IMAGE_PREVIEW_MIN_ZOOM}>Zoom out</button>

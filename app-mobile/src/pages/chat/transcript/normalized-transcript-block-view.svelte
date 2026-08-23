@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: NORMALIZED TRANSCRIPT BLOCK VIEW
+  // ───────────────────────────────────────────────────────────────────
+
   import type { NormalizedTranscriptBlock } from '../rich-content/normalize-transcript-blocks.js';
 
   export interface NormalizedTranscriptBlockViewProps {

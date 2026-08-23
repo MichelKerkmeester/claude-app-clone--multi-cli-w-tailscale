@@ -1,13 +1,14 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: MARKDOWN PREVIEW STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import MarkdownPreview from './markdown-preview.svelte';
 import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen DEMO_TEXT_CODE_SHARE_BLOCKS markdown fixture so every story
-// `text` arg is sourced from the real inline-text markdown demo block — nothing
-// is invented. The bounded safe-Markdown renderer renders the fixture's headings,
-// strong/emphasis, fenced code, and inert link/image spans; the Empty/Whitespace
-// states swap the read content, and FindMatch adds a find term hitting a real line.
+// Reuse the frozen inline-text fixture so the bounded renderer exercises real content.
+// Empty, whitespace, and find states remain explicit input boundaries.
 const MARKDOWN_BLOCK = DEMO_TEXT_CODE_SHARE_BLOCKS.find(
   (block) => block.mimeType === 'text/markdown',
 );

@@ -4,12 +4,8 @@ import TranscriptList from './transcript-list.svelte';
 import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptProvenance } from '$shared/state/state.js';
 import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Re-host the frozen rich-content fixtures through the existing parseDisplayBlock
-// parser so every story `blocks` arg is a real DisplayTranscriptBlock[] sourced from
-// the demo data — nothing is invented. The `transcript` surface declares the
-// `virtualized-list` and `live-edge` states; TranscriptList virtualizes the blocks and
-// shows the streaming marker while running, so one settled and one running story plus
-// the empty-transcript state.
+// Reuse frozen rich-content fixtures through the real parser so virtualized stories exercise genuine blocks.
+// Live-edge behavior stays explicit, as does the empty state.
 const BLOCKS: readonly DisplayTranscriptBlock[] = [
   ...DEMO_RICH_CONTENT_BLOCKS,
   ...DEMO_RICH_RELEASE_BLOCKS,

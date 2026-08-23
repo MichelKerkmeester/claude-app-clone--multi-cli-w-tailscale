@@ -201,9 +201,7 @@
 
 <!-- @ds surface: pdf-preview — the controlled PDF.js reader (bounded pages/canvases). -->
 <!-- @ds state: loading · ready · corrupt · too-large · withheld — [data-pdf-state] each. -->
-<!-- @ds guardrail: do-not-edit — the worker is configured with annotations/XFA disabled and
-     bounded pages/canvases; the text layer renders only when the relay attested safety
-     (textLayerSafe) and is otherwise withheld. Wiring is frozen. -->
+<!-- @ds guardrail: do-not-edit — The worker disables annotations/XFA, pages and canvases stay bounded, and text renders only after relay attestation. -->
 <section class="pdf-preview" aria-label="Sanitized PDF preview" data-pdf-state={pdfState}>
   <div class="pdf-preview-controls" role="group" aria-label="PDF controls">
     <button type="button" class="artifact-control-button" onclick={() => (currentPage = Math.max(1, currentPage - 1))} disabled={currentPage <= 1 || pageCount === 0}>Previous</button>
@@ -255,7 +253,7 @@
   }
 
   /* @ds slot: page-scroll — the bounded, contained page scroll column. */
-  /* @ds guardrail: do-not-edit — bounded reading well; overscroll contained so panning never chains. */
+  /* @ds guardrail: do-not-edit — Bounded reading well; overscroll contained so panning never chains. */
   .pdf-preview-scroll {
     display: grid;
     min-block-size: 12rem;

@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: TEXT PREVIEW
+  // ───────────────────────────────────────────────────────────────────
+
   const TEXT_CHUNK_SIZE = 8_192;
 
   interface FindPart {
@@ -47,8 +51,7 @@
 
 <!-- @ds surface: text-preview — the plain-text read well. -->
 <!-- @ds state: ready · empty · whitespace — the empty/whitespace copy swaps the read content. -->
-<!-- @ds guardrail: do-not-edit — chunked rendering keeps the buffer bounded; find highlighting
-     renders inert <mark> text only. -->
+<!-- @ds guardrail: do-not-edit — Chunked rendering keeps the buffer bounded, while find highlighting renders inert <mark> text only. -->
 {#if text.length === 0}
   <p class="artifact-empty-preview">This preview is empty.</p>
 {:else if text.trim().length === 0}
@@ -69,7 +72,7 @@
      — rendered by multiple previews. Literal hex preserved. Values unchanged. -->
 <style>
   /* @ds slot: text-well — plain-text read-out. */
-  /* @ds guardrail: do-not-edit — bounded reading well; selectable and pan-scoped. */
+  /* @ds guardrail: do-not-edit — Bounded reading well; selectable and pan-scoped. */
   .artifact-text-preview {
     overscroll-behavior: contain;
     overflow-anchor: none;

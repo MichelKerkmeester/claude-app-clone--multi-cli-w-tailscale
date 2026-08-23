@@ -43,9 +43,8 @@
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
-    // Svelte tracks only synchronous reads; the real reads happen in the async .then() below, so read every
-    // React dependency synchronously here to match the original [document, findTerm, onStateChange,
-    // pageNumber, scale, textLayerSafe] re-run set.
+    // Svelte tracks only synchronous reads. The async `.then()` below performs the real reads.
+    // This effect reads every dependency synchronously and matches the original rerun set.
     void pdfDocument;
     void pageNumber;
     void scale;

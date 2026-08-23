@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: IMAGE STATUS STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import ImageStatus, {
@@ -6,13 +10,8 @@ import ImageStatus, {
   type InboundImageLifecycleState,
 } from './image-status.svelte';
 
-// Re-host the frozen inbound-image lifecycle vocabulary so every story `state`
-// arg is sourced from the real INBOUND_IMAGE_LIFECYCLE_STATES list — nothing is
-// invented. The `image-preview` surface keeps the byte-reading stage
-// registry-only, so this stories the image-STATE status wells only (no real
-// bytes). One story per lifecycle state that renders a visible status (copy or
-// actions present); states with neither copy nor actions render nothing and are
-// omitted. onAction is a no-op (the action dispatch is the frozen guarded seam).
+// Reuse the frozen lifecycle vocabulary so stories cover declared visible states.
+// The byte-reading stage stays registry-only and action callbacks remain inert.
 function statusStory(state: InboundImageLifecycleState): StoryObj<typeof meta> {
   return { args: { state, onAction: () => {} } };
 }

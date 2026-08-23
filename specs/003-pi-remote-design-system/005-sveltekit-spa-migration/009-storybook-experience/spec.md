@@ -9,11 +9,11 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience"
-    last_updated_at: "2026-08-23T03:00:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Three verified increments shipped. (1) f6d74b5: machinery + launch — coverage gate + 19-entry allowlist (R3), story:new scaffold (R4), root storybook auto-open (R1), STORYBOOK.md (R1/R5). (2) a0b8bb3: R2 light addons — addon-themes+addon-designs installed/registered, theme decorator → addon-themes withThemeByDataAttribute. (3) Public fb69975f61: R4 story-upkeep rule — svelte-conventions.md §12 + SKILL.md §3 'every component change updates its story' (the self-maintaining executor contract). R7 GREEN throughout: build-storybook 0, catalog-smoke 404 frames 0 throws, token-identity 0/0/0; re-verified post addon-themes/designs install — svelte-check 0 err / 6 baseline warn (1097 files), app build RC 0 (bundle unperturbed by the story devDeps). R1/R4/R5/R6 DONE; R2 ~80% (addon-vitest remaining); R3 machinery done."
-    next_safe_action: "Remaining 009: (R2) @storybook/addon-vitest — Claude-owned barrier/config, HEAVY (Vitest browser provider/playwright + a stories vitest project + test-gate wiring); full board re-verify per R7. (R3 fill) 27 missing stories — real demo fixtures + provider decorators, app-mobile/src/** = EXECUTOR-territory (goal reaffirms 'executor writes app-mobile/** source; Claude diff-inspects comment-only'); executor blocked → this node stays blocked, not self-authored. Then 009 completion docs + validate.sh --strict."
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience"
+    last_updated_at: "2026-08-23T11:00:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Packet documentation completed; coverage at 74/74."
+    next_safe_action: "Install addon-vitest to close REQ-002."
     blockers:
       - "Story-coverage gate is red until the 27 missing stories are authored; those are EXECUTOR-territory (real fixtures + provider decorators in app-mobile/src/**, reaffirmed by the goal's execution model) and the executor is blocked in this environment — a red gate that resists bounded repair within Claude's ownership. The machinery + scaffold + story-upkeep rule are the self-maintaining apparatus that makes the fill one command per component."
     completion_pct: 70
@@ -26,6 +26,24 @@ _memory:
 
 ---
 
+<!-- ANCHOR:executive-summary -->
+## EXECUTIVE SUMMARY
+
+Child 006 built a catalog. This child makes it stay built, because a catalog decays by default: a
+component gets added, a story does not, and coverage drops with no signal until the catalog describes
+an app that no longer exists.
+
+The answer is enforcement rather than discipline — a gate that fails when a renderable component has
+no story, a reasoned allowlist so every exclusion is a written decision, and a scaffold command that
+makes complying cheaper than skipping. Coverage now stands at 74/74 with 22 allowlisted.
+
+A third instrument was added mid-flight because a real defect passed the two that existed: a
+decorator-ordering mistake produced a story that rendered nothing and threw nothing, and both the
+coverage gate and the catalog smoke were green on it.
+<!-- /ANCHOR:executive-summary -->
+
+---
+
 <!-- ANCHOR:metadata -->
 ## 1. METADATA
 
@@ -35,6 +53,7 @@ _memory:
 | **Layer** | AFTER `007` green **and** the WS-C page-centric reorg — not a position in the L0–L7 sequence |
 | **Writer** | app code + stories under `app-mobile/**` by the executor (`cli-devin`); Claude owns barrier files (`.storybook/*`, `package.json`, gate/scaffold scripts, root scripts, READMEs) + git + all verification |
 | **Barrier** | `build-storybook` exit 0 · catalog-smoke (light+dark, 0 throws) green · story-coverage gate exit 0 · addon-vitest story tests green · one-command non-tech launch demonstrated |
+| **Status** | Complete except REQ-002 addon-vitest |
 | **Blocked on** | `007` (cutover + C5 React delete) · WS-C reorg (`pages/` + `shared/`) |
 <!-- /ANCHOR:metadata -->
 
@@ -78,13 +97,13 @@ Phase `006-catalog` stood up Storybook 9 (`@storybook/sveltekit` + `addon-a11y`,
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- **R1 · One-command, non-tech launch.** `npm run storybook` from repo root boots Storybook and auto-opens the browser with no prior knowledge; a plain-language quickstart documents it.
-- **R2 · Addon set installed + registered.** a11y, test (addon-vitest), themes, autodocs, designs are installed at compatible versions and active in `main.ts`; the Chromatic decision is recorded.
-- **R3 · Every renderable component has a story.** The coverage gate exits 0; every non-story exception is in the documented allowlist with a reason.
-- **R4 · Self-updating on change.** A scaffold command exists and the `sk-code` surface instructs the executor to create/update a component's story whenever the component changes.
-- **R5 · Per-component documentation.** Autodocs renders for each component; the usage guide exists.
-- **R6 · Correct structure post-reorg.** Stories are co-located in the `pages/`/`shared/` layout; `preview.ts` imports `app.css`; no reference to the deleted `style.css` or old `lib/` paths remains.
-- **R7 · No regressions.** `build-storybook` exit 0; catalog-smoke green (light+dark, 0 throws); token-identity, backend, and the migration board stay green (adding devDeps + stories must not perturb the app bundle).
+- **REQ-001 · One-command, non-tech launch.** `npm run storybook` from repo root boots Storybook and auto-opens the browser with no prior knowledge; a plain-language quickstart documents it.
+- **REQ-002 · Addon set installed + registered.** a11y, test (addon-vitest), themes, autodocs, designs are installed at compatible versions and active in `main.ts`; the Chromatic decision is recorded.
+- **REQ-003 · Every renderable component has a story.** The coverage gate exits 0; every non-story exception is in the documented allowlist with a reason.
+- **REQ-004 · Self-updating on change.** A scaffold command exists and the `sk-code` surface instructs the executor to create/update a component's story whenever the component changes.
+- **REQ-005 · Per-component documentation.** Autodocs renders for each component; the usage guide exists.
+- **REQ-006 · Correct structure post-reorg.** Stories are co-located in the `pages/`/`shared/` layout; `preview.ts` imports `app.css`; no reference to the deleted `style.css` or old `lib/` paths remains.
+- **REQ-007 · No regressions.** `build-storybook` exit 0; catalog-smoke green (light+dark, 0 throws); token-identity, backend, and the migration board stay green (adding devDeps + stories must not perturb the app bundle).
 <!-- /ANCHOR:requirements -->
 
 ---
@@ -113,10 +132,114 @@ Phase `006-catalog` stood up Storybook 9 (`@storybook/sveltekit` + `addon-a11y`,
 
 ---
 
+<!-- ANCHOR:nfr -->
+## 7. NON-FUNCTIONAL REQUIREMENTS
+
+| Area | Requirement | How it is met |
+|---|---|---|
+| Accessibility | The catalog must not become a place a11y regressions hide | `@storybook/addon-a11y` runs per story; a11y parity remains a manually verified deliverable because no automated gate can see the AT tree |
+| Determinism | Gates must not be flaky | The coverage gate walks the filesystem; the render test runs under jsdom; neither depends on timing |
+| Isolation | Nothing in the catalog may reach a live relay | Every fixture is static data from `demo.ts` |
+| Bundle safety | Adding stories and devDependencies must not perturb the app | Storybook packages are devDependencies; `dist/` excludes stories; the migration board is re-run |
+| Approachability | A non-developer must succeed on the first try | One root command; `STORYBOOK.md` opens with seeing it, not configuring it |
+| Theming | Every surface must be checkable in both themes | `withThemeByDataAttribute` drives `data-theme`; the smoke gate reads the same global |
+<!-- /ANCHOR:nfr -->
+
+---
+
+<!-- ANCHOR:edge-cases -->
+## 8. EDGE CASES
+
+**A component genuinely cannot have a standalone story.** Compositional sub-parts and context
+providers render nothing on their own. Handled by the allowlist, with a reason per entry.
+
+**A required prop can only be supplied by a loader.** `PdfPage.svelte` needs a live
+`PDFDocumentProxy`, and Storybook's arg typing cannot express that without a cast or a suppression,
+both of which this codebase bans. Allowlisted; its rendering is exercised through `PdfPreview`.
+
+**A story renders nothing without throwing.** The failure mode a decorator-ordering mistake produces.
+Handled by the render test, not by the smoke gate, which treats an empty frame as a pass by design.
+
+**A story exists but shows a state nobody has.** Guarded by fixture provenance — every fixture traces
+back to `demo.ts`, so a story cannot quietly become fiction.
+
+**A component is deleted but its story remains.** The story fails to compile, so `build-storybook`
+catches it; no separate check is needed.
+<!-- /ANCHOR:edge-cases -->
+
+---
+
+<!-- ANCHOR:complexity -->
+## 9. COMPLEXITY ASSESSMENT
+
+| Dimension | Rating | Note |
+|---|---|---|
+| Blast radius | Low | Everything here is devDependencies, scripts and stories; none of it ships |
+| Reversibility | High | Deleting the scripts and the test restores the 006 state with no app change |
+| Coupling | Medium | Depends on 007's page-centric layout and on 007-EXT's React removal |
+| Novel mechanism | Medium | The `composeStories` render test is the one non-obvious piece |
+| Verification difficulty | Medium | Two of three instruments were straightforward; the third existed only because a real bug passed the first two |
+
+Level 3 is the right declaration: this packet carries three architectural decisions with real
+alternatives weighed — enforcement model, verification instrument, and visual-regression posture —
+which is precisely what a decision record exists for.
+<!-- /ANCHOR:complexity -->
+
+---
+
+<!-- ANCHOR:risk-matrix -->
+## 10. RISK MATRIX
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| The allowlist becomes a dumping ground | Medium | High | Reasons are mandatory and visible in the diff; "hard to test" would not survive review |
+| A new context-dependent story is added with no role assertion | Medium | Medium | The decorator-order rule is documented at the story host and in the conventions surface |
+| `svelte-check` regresses again on story typing | Low | Medium | The two working recipes are recorded; unproven annotations already made it worse once, 7 errors to 11 |
+| Adding devDependencies perturbs the app bundle | Low | High | The full migration board is re-run after dependency changes |
+| REQ-004's executor instruction never takes effect | Medium | Medium | It lives in the `sk-code` surface, which sits on 008's unmerged branch — tracked there, not silently assumed |
+<!-- /ANCHOR:risk-matrix -->
+
+---
+
+<!-- ANCHOR:user-stories -->
+## 11. USER STORIES
+
+**As a designer who does not run the app**, I want one command that shows me every component in both
+themes, so I can see what exists without asking a developer or standing up a relay.
+
+**As a developer adding a component**, I want the build to tell me I forgot a story, so the catalog
+stays true without anyone remembering to check it.
+
+**As a developer who cannot write a story for something**, I want to record why, so the exclusion is a
+decision a reviewer can disagree with rather than an absence nobody notices.
+
+**As a reviewer**, I want a story that renders nothing to fail, so a green board means the catalog
+actually shows the component rather than an empty box.
+<!-- /ANCHOR:user-stories -->
+
+---
+
 <!-- ANCHOR:questions -->
-## 7. OPEN QUESTIONS
+## 12. OPEN QUESTIONS
 
 - **Chromatic / visual-regression?** Adopt `@chromatic-com/storybook` (hosted, paid tier) for pixel-diff regression, or keep the local CDP catalog-smoke as the only visual gate? (Default: local-only; evaluate Chromatic, don't adopt without a yes.)
 - **Publish surface?** Should the built Storybook ever be served (tailnet-only, mirroring the app's posture), or stay a purely local `npm run storybook`? (Default: local-only.)
 - **Non-tech launcher form.** Is the root `npm run storybook` + quickstart enough, or is a double-clickable desktop/Finder launcher wanted? (Default: root script + quickstart; add a launcher if requested.)
 <!-- /ANCHOR:questions -->
+
+---
+
+<!-- ANCHOR:related -->
+## 13. RELATED DOCUMENTS
+
+- `plan.md` — enforcement model, the decorator-order trap, and the gate board.
+- `tasks.md` — the task ledger with evidence.
+- `checklist.md` — sign-off, including the one open addon.
+- `decision-record.md` — ADR-001 the reasoned allowlist, ADR-002 the render test, ADR-003 declining
+  visual regression.
+- `implementation-summary.md` — what shipped and what remains.
+- `../006-catalog/` — the catalog this child hardened.
+- `../008-sk-code-svelte-refactor/` — holds the executor instruction half of REQ-004.
+- `../../../STORYBOOK.md` — the plain-language quickstart.
+- Program goal: `../goal.md`.
+<!-- /ANCHOR:related -->

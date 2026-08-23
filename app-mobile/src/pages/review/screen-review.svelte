@@ -158,35 +158,39 @@
           {#if approval.status === 'pending' && !expired}
             <div class="approval-actions">
               <!-- @ds guardrail: deny / approve / grant onPress decisioning — Not designer-editable. -->
-              <Button class="deny-button" disabled={submitted} onclick={() => decide(approval, 'deny')}>
-                Deny
-              </Button>
-              <Button disabled={submitted} onclick={() => decide(approval, 'approve')}>
-                {submitted ? 'Submitted, verifying' : 'Approve once'}
-              </Button>
-              {#if ['edit', 'write'].includes(approval.tool)}
-                <Button
-                  class="grant-button"
-                  disabled={submitted}
-                  onclick={() => {
-                    pendingId = approval.approvalId;
-                    void createAcceptEditsGrant(approval, 3)
-                      .then((created) => {
-                        grant = {
-                          remainingActions: created.remainingActions,
-                          expiresAt: created.expiresAt,
-                        };
-                      })
-                      .catch((cause: unknown) => {
-                        error = messageFrom(cause);
-                      })
-                      .finally(() => {
-                        pendingId = null;
-                      });
-                  }}
-                >
-                  Accept next 3 edits
+              <div class="approval-decision-group" role="group" aria-label="Single action approval">
+                <Button class="deny-button" disabled={submitted} onclick={() => decide(approval, 'deny')}>
+                  Deny
                 </Button>
+                <Button disabled={submitted} onclick={() => decide(approval, 'approve')}>
+                  {submitted ? 'Submitted, verifying' : 'Approve once'}
+                </Button>
+              </div>
+              {#if ['edit', 'write'].includes(approval.tool)}
+                <div class="approval-grant-group" role="group" aria-label="Standing approval grant">
+                  <Button
+                    class="grant-button"
+                    disabled={submitted}
+                    onclick={() => {
+                      pendingId = approval.approvalId;
+                      void createAcceptEditsGrant(approval, 3)
+                        .then((created) => {
+                          grant = {
+                            remainingActions: created.remainingActions,
+                            expiresAt: created.expiresAt,
+                          };
+                        })
+                        .catch((cause: unknown) => {
+                          error = messageFrom(cause);
+                        })
+                        .finally(() => {
+                          pendingId = null;
+                        });
+                    }}
+                  >
+                    Accept next 3 edits
+                  </Button>
+                </div>
               {/if}
             </div>
           {:else if approval.status === 'approved'}
@@ -298,9 +302,21 @@
 
   .approval-actions {
     display: grid;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6) var(--space-6);
+  }
+
+  .approval-decision-group {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-3);
-    padding: var(--space-4) var(--space-6) var(--space-6);
+  }
+
+  .approval-grant-group {
+    display: grid;
+    gap: var(--space-3);
+    padding-block-start: var(--space-4);
+    border-block-start: 1px solid var(--line-strong);
   }
 
   :global(.approval-actions button) {
@@ -340,7 +356,6 @@
   }
 
   :global(.approval-actions .grant-button) {
-    grid-column: 1 / -1;
     border: 1px solid var(--line-strong);
     background: var(--surface);
     color: var(--ink);
@@ -374,12 +389,8 @@
       flex-direction: column;
     }
 
-    .approval-actions {
+    .approval-decision-group {
       grid-template-columns: 1fr;
-    }
-
-    :global(.approval-actions .grant-button) {
-      grid-column: auto;
     }
   }
   /* @ds end surface: review-view */

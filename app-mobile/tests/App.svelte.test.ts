@@ -1376,6 +1376,47 @@ it('renders a pending approval and submits approve and deny decisions', async ()
   await waitFor(() => expect(relay.decideApproval).toHaveBeenCalledWith(approval, 'deny'));
 });
 
+it.each([
+  ['edit', true],
+  ['write', true],
+  ['shell', false],
+] as const)('separates the standing grant for %s approvals', async (tool, hasGrant) => {
+  const approval: ApprovalCardDto = {
+    approvalId: `approval_${tool}_001`,
+    sessionId,
+    epoch: 'epoch_web_001',
+    tool,
+    canonicalArguments: '{"path":"notes.txt"}',
+    digest: 'fedcba9876543210fedcba9876543210',
+    policyVersion: 1,
+    revision: 1,
+    requestedAt: occurredAt,
+    expiresAt: '2099-08-13T10:05:00.000Z',
+    source: 'explicit',
+    status: 'pending',
+    reason: null,
+  };
+  relay.fetchApprovals.mockResolvedValue([approval]);
+
+  render(Review, { props: { sessions: [{ id: sessionId }], onBack: vi.fn(), focusId: null } });
+
+  const approveOnce = await screen.findByRole('button', { name: 'Approve once' });
+  expect(screen.getByRole('button', { name: 'Deny' })).toBeInTheDocument();
+
+  if (hasGrant) {
+    const grant = screen.getByRole('button', { name: 'Accept next 3 edits' });
+    const singleApprovalGroup = screen.getByRole('group', { name: 'Single action approval' });
+    const grantGroup = screen.getByRole('group', { name: 'Standing approval grant' });
+
+    expect(singleApprovalGroup).toContainElement(approveOnce);
+    expect(grantGroup).toContainElement(grant);
+    expect(singleApprovalGroup).not.toContainElement(grant);
+    expect(grantGroup).not.toContainElement(approveOnce);
+  } else {
+    expect(screen.queryByRole('button', { name: 'Accept next 3 edits' })).not.toBeInTheDocument();
+  }
+});
+
 it('renders the Attention Inbox', async () => {
   const item: AttentionItemDto = {
     lookupId: 'attention_web_001',

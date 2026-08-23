@@ -17,13 +17,14 @@ const meta = {
   title: 'Attachments/AttachmentRail',
   component: AttachmentRail,
   tags: ['autodocs'],
-  // Decorators wrap outermost-first: Provider > Host > rail.
+  // Storybook wraps with the LAST decorator outermost, so the Provider is listed
+  // last: Provider > Host > rail.
   decorators: [
+    () => ({ Component: AttachmentDraftStoryHost }),
     () => ({
       Component: AttachmentDraftProvider,
       props: { capability: { enabled: true, imageIn: true }, modelCanViewPhotos: true },
     }),
-    () => ({ Component: AttachmentDraftStoryHost }),
   ],
 } satisfies Meta<typeof AttachmentRail>;
 

@@ -18,13 +18,14 @@ const meta = {
   title: 'Attachments/AttachmentPreviewDialog',
   component: AttachmentPreviewDialog,
   tags: ['autodocs'],
-  // Decorators wrap outermost-first: Provider > Host > dialog.
+  // Storybook wraps with the LAST decorator outermost, so the Provider is listed
+  // last: Provider > Host > dialog.
   decorators: [
+    () => ({ Component: AttachmentDraftStoryHost, props: { openPreview: true } }),
     () => ({
       Component: AttachmentDraftProvider,
       props: { capability: { enabled: true, imageIn: true }, modelCanViewPhotos: true },
     }),
-    () => ({ Component: AttachmentDraftStoryHost, props: { openPreview: true } }),
   ],
 } satisfies Meta<typeof AttachmentPreviewDialog>;
 

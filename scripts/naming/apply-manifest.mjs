@@ -90,18 +90,32 @@ function emitSpecifier(originalSpecifier, newKey, fromFile) {
 }
 
 const SPECIFIER_PATTERN = /(from\s+|import\s+|import\(\s*)(['"])([^'"]+)\2/g;
+// A worker is addressed by URL construction rather than by an import, so a
+// rewrite that only understands import syntax moves the file and leaves the
+// worker unreachable at runtime — with nothing failing at build time.
+const URL_SPECIFIER_PATTERN = /(new URL\(\s*)(['"])([^'"]+)\2(\s*,\s*import\.meta\.url)/g;
 
 function rewriteFile(filePath, moveMap, originOf) {
   const original = readFileSync(join(REPO_ROOT, filePath), 'utf8');
   let changes = 0;
-  const updated = original.replace(SPECIFIER_PATTERN, (match, lead, quote, specifier) => {
+  const rewriteImport = (match, lead, quote, specifier) => {
     const key = resolveSpecifier(specifier, filePath, originOf);
     if (key === null) return match;
     const moved = moveMap.get(key);
     if (moved === undefined) return match;
     changes += 1;
     return `${lead}${quote}${emitSpecifier(specifier, moved, filePath)}${quote}`;
-  });
+  };
+  const updated = original
+    .replace(SPECIFIER_PATTERN, rewriteImport)
+    .replace(URL_SPECIFIER_PATTERN, (match, lead, quote, specifier, tail) => {
+      const key = resolveSpecifier(specifier, filePath, originOf);
+      if (key === null) return match;
+      const moved = moveMap.get(key);
+      if (moved === undefined) return match;
+      changes += 1;
+      return `${lead}${quote}${emitSpecifier(specifier, moved, filePath)}${quote}${tail}`;
+    });
   return { updated, changes, original };
 }
 

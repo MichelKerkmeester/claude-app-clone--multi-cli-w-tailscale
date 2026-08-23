@@ -1,16 +1,16 @@
 ---
 title: "Child 016/001 implementation summary — projection integrity"
-description: "Continuity anchor. Nothing is implemented yet: this records the verified data-loss chain, why the ordering is what it is, and what stays unknown."
+description: "The projection, framing and retention halves shipped and are proven by negative control. The epoch half is held for an operator decision, and three new defects were found on the same path."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"
-    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_at: "2026-08-23T16:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped from a verified defect chain; no code changed."
-    next_safe_action: "Write the reproduction test and watch it fail."
+    recent_action: "Projection sequencing, framing labels and attachment retention shipped."
+    next_safe_action: "Answer the epoch-rotation question, then ship rotation with collection."
     blockers: []
-    completion_pct: 0
+    completion_pct: 70
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,8 +27,9 @@ _memory:
 |---|---|
 | Parent | `016-relay-correctness` |
 | Level | 2 |
-| Status | **Scoped, not started** |
-| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+| Status | **Projection, framing and retention shipped; epoch half held** |
+| Requirements shipped | REQ-001, REQ-002, REQ-003, REQ-006, REQ-007 |
+| Requirements held | REQ-004, REQ-005 — both epoch-side, pending an operator decision |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -36,20 +37,23 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing. No relay source has been edited.
+The silent data loss is closed. A block that reaches the projector now reaches the transcript, and a
+throw that used to disappear now reaches stderr with a label that names the layer it came from.
 
-What was produced is a verified defect chain. Each link was read in the source during scoping rather
-than taken from the research synthesis:
-
-| Link | State |
+| Change | File |
 |---|---|
-| `app-relay/src/index.ts` caches the next sequence and increments locally | confirmed |
-| `app-relay/src/store/relay-store.ts` returns early for control-plane residue, before the transaction that advances the high sequence | confirmed |
-| Store throws when the next block's sequence does not match the expected one | confirmed |
-| `app-relay/src/rpc/framing.ts` wraps the whole record handler in one `try`, not just the parse, and relabels the throw | confirmed |
-| No error-listener registration exists in the entry point | confirmed — the grep returns nothing |
+| The sequence is allocated from the store at publish time, per block, for both the envelope and the block payload | `app-relay/src/index.ts` |
+| The supervisor's errors are written to stderr using the idiom already in the file | `app-relay/src/index.ts` |
+| The framing `try` covers the parse alone; record-handling failures report as themselves | `app-relay/src/rpc/framing.ts` |
+| A parse failure reports the record's byte length instead of its contents | `app-relay/src/rpc/framing.ts` |
+| Managed sets, submission records and delivery markers each gained a ceiling and an eviction that skips live records | `app-relay/src/attachments/attachment-service.ts` |
 
-That is a live silent data loss on a first-party path, not a hypothesis.
+The sequence fix is not the one the analysis first suggested. Re-reading the store inside the
+projection callback would have handed every block in a batch the same number, because the projector
+assigns all of them before any is published. The allocation had to move to the publish site.
+
+**Held back:** epoch rotation on host restart and the cross-epoch collection it obliges. They ship
+together or not at all, and whether they ship is the operator's call.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -57,9 +61,12 @@ That is a live silent data loss on a first-party path, not a hypothesis.
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-Per-phase commits in a fixed order: reproduce, make audible, fix the counter, rotate, collect.
+Per-phase commits, negative control first throughout. The reproduction was committed while still
+failing, so the fix commit is the thing that turns it green and a bisect tells the truth.
 
-The executor writes `app-relay/src/**`. Claude verifies each negative control and owns git.
+Relay source was written by a dispatched executor under explicit write paths; the reproduction, the
+framing tests and the retention-bound test were written and verified outside its sandbox, as was
+every command output quoted below.
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -67,20 +74,20 @@ The executor writes `app-relay/src/**`. Claude verifies each negative control an
 <!-- ANCHOR:decisions -->
 ## KEY DECISIONS
 
-**The listener lands before the counter fix.** There is no output today when this fails, so the fix
-could not otherwise be verified. Registering it first also pays for itself twice — it makes the
-protocol-error path audible as well, which is what would surface an upstream rename.
+**Allocate at publish time, not in the projection callback.** The projector builds the whole batch
+before the caller publishes any of it, so a callback that reads the store returns the same value for
+every block. The store stays the sole owner of its counter; the caller just asks later.
 
-**Remove the assumption, not the arithmetic.** The loop assumes every projected block is persisted.
-Rather than special-casing the drop, the sequence is re-read from the store per block, so the store
-stays the sole owner of its counter. Two call sites in the same codebase already work this way.
+**A parse failure reports a size, not a snippet.** These errors now reach the host's stderr, and a
+malformed record is still session content. Making errors audible must not make transcripts audible,
+so the wire-format branch reports the record's byte length and nothing from the record.
 
-**Rotation and collection are one change.** Retention is bounded per epoch, so rotating far more often
-without any cross-epoch collection would trade a silent correctness bug for a storage-growth bug.
-Neither ships alone.
+**Eviction skips anything live.** A managed set is droppable only when it holds no quota and has
+nothing in flight; a submission or delivery marker only once its set is gone. Evicting a live record
+would release a quota its owner still holds.
 
-**Narrowing the `try` is part of the fix, not tidying.** A downstream throw reported as a wire-format
-failure sends the next reader to the wrong layer entirely.
+**The epoch half is not a judgement call to make here.** Rotation without collection makes storage
+strictly worse, and the retained-epoch count is a retention policy. That belongs to the operator.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -88,17 +95,28 @@ failure sends the next reader to the wrong layer entirely.
 <!-- ANCHOR:verification -->
 ## VERIFICATION
 
+Every negative control below was observed failing before the fix and passing after.
+
 | Check | Result |
 |---|---|
-| Reproduction test | not written |
-| Error listener registered | not done |
-| Sequence allocation fixed | not done |
-| Epoch rotation | not done |
-| Cross-epoch collection | not done |
-| Backend suite (`npm test`, four real dirs) | baseline not captured |
-| `validate.sh --strict` via realpath | not run |
+| Reproduction, pre-fix | FAIL — `Relay expected sequence 2 for epoch 'epoch_projection_integrity', received 3.` at `relay-store.ts:265` via `publishPiEvent` |
+| Reproduction, post-fix | PASS — 2 tests, exit 0 |
+| Framing labels, pre-fix | FAIL — `expected 'RPC JSONL parse failed: Relay expecte…' not to contain 'parse failed'` |
+| Framing labels, post-fix | PASS — 2 tests, exit 0 |
+| Error listener registered | PASS — `grep onError app-relay/src/index.ts` returns line 155; the same grep returned nothing before |
+| Retention bound, pre-fix | FAIL — `expected function to throw an error, but it didn't` |
+| Retention bound, post-fix | PASS — the oldest released reservation is evicted, the newest still answers |
+| Backend suite, four real directories | PASS — 51 files / 384 tests, exit 0 (baseline was 48 / 379) |
+| `npm run build` | PASS — exit 0 |
+| `npm run typecheck` | PASS — exit 0, 1123 files, 0 errors |
+| Token identity, three themes | PASS — 0 CHANGED / 0 VANISHED / 0 ADDED, corpus confirmed at 96 components plus `app.css` before the result was trusted |
+| Epoch rotation | not run — held |
+| Cross-epoch collection | not run — held |
 
-No completion claim is made or implied.
+`app-relay/tests/auth.test.ts` failed intermittently during this work. It was characterised rather
+than assumed: eight runs with the change and eight against `HEAD` both failed on the identical
+assertion (`expected 201 to be 403`) in the identical test, and no change here touches that path.
+It is the documented baseline flake.
 <!-- /ANCHOR:verification -->
 
 ---
@@ -106,15 +124,25 @@ No completion claim is made or implied.
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-**Incidence is unknown.** The mechanism is confirmed; how often a user has actually lost a block is
-not, and cannot be recovered from logs that were never written. That is an argument for the fix, not
-against it, but it means the packet cannot claim a measured user impact.
+**Three further defects on this same path were found and not fixed here.** Narrowing the `try` was
+expected to surface throws; building the reproduction surfaced them sooner. All three are reported
+rather than absorbed, because each belongs to a different surface:
 
-**Collection introduces a policy that will need revisiting.** A retained-epoch count is a number
-someone will have to reconsider against real usage, and this packet creates that obligation where none
-existed.
+1. **A text artifact preview can never be delivered.** `isFilePreviewContent` treats `firstLine` as
+   required for inline text — its key check demands exact key equality — while the very next line
+   treats it as optional, and `sanitizeArtifactSnapshot` omits it unless the host supplies one. A
+   host text artifact without an explicit first line therefore builds a descriptor the store refuses,
+   throwing from inside the projector into precisely the path this child just closed. This is a
+   second live silent data loss, found by fixture-building rather than by analysis.
+2. **The artifact revision grammars disagree.** The sanitizer accepts an underscore-bearing revision
+   that the protocol's own revision guard rejects, with the same consequence.
+3. **A second cached sequence remains.** `projectSubmittedAttachments` reads the sequence once and
+   increments locally across a batch — the pattern just removed from the entry point. It is safe
+   today only because every card in that batch persists, which is an assumption the code does not
+   state.
 
-**Narrowing the `try` may surface throws nobody has seen.** They will be reported rather than fixed
-here, so this child may end by handing findings to other packets — which is the correct outcome and
-also means its scope is not fully knowable in advance.
+**Incidence is still unknown**, and cannot be recovered from logs that were never written.
+
+**The retention ceilings are counts, not measurements.** They are set where they cannot fire during
+normal use; nothing here establishes what normal use is.
 <!-- /ANCHOR:limitations -->

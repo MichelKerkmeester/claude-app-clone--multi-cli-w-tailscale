@@ -27,7 +27,8 @@ Every defect in this child is silent by construction, so the protocol is negativ
 observe the failure, then fix it, then observe the same check pass. A check that was never seen
 failing is indistinguishable from one that cannot fail.
 
-**Every item is open.** The packet is scoped, not executed.
+Everything except the epoch half has been executed and observed. The epoch items stay open
+because rotation and collection ship together and that decision is the operator's.
 <!-- /ANCHOR:protocol -->
 
 ---
@@ -35,9 +36,9 @@ failing is indistinguishable from one that cannot fail.
 <!-- ANCHOR:pre-impl -->
 ## Pre-Implementation
 
-- [ ] **CHK-PRE-01** [P0] The chain is re-confirmed against current source. [deferred: pending execution — cached counter, early return consuming no sequence, contiguity throw, over-wide `try`, absent listener]
-- [ ] **CHK-PRE-02** [P0] Backend baseline captured. [deferred: pending execution — run the four real test dirs explicitly; the bare positional sweeps a protected research repo]
-- [ ] **CHK-PRE-03** [P1] No sibling relay child is in flight. [deferred: pending execution — keeps the diff readable and the bisect honest]
+- [x] **CHK-PRE-01** [P0] The chain is re-confirmed against current source. [evidence: all five links read in current source; `grep onError app-relay/src/index.ts` exit 1 at `index.ts:295`, `relay-store.ts:220`, `relay-store.ts:265`, `framing.ts:71`]
+- [x] **CHK-PRE-02** [P0] Backend baseline captured. [evidence: `npx vitest run` over the four real directories: 48 files / 379 tests, exit 0]
+- [x] **CHK-PRE-03** [P1] No sibling relay child is in flight. [evidence: `git status` clean apart from untracked research repos; no sibling relay dispatch open]
 <!-- /ANCHOR:pre-impl -->
 
 ---
@@ -45,10 +46,10 @@ failing is indistinguishable from one that cannot fail.
 <!-- ANCHOR:code-quality -->
 ## Code Quality
 
-- [ ] **CHK-CQ-01** [P0] The store is the sole allocator of its sequence. [deferred: pending execution — no caller keeps a private copy of a counter another component may decline to advance]
-- [ ] **CHK-CQ-02** [P0] The framing `try` wraps the parse only. [deferred: pending execution — relabelling a downstream throw destroys the one clue a reader has]
-- [ ] **CHK-CQ-03** [P1] The error listener uses the logging idiom already in the file. [deferred: pending execution — a second idiom for the same job is a future inconsistency]
-- [ ] **CHK-CQ-04** [P1] Collection is behind an explicit retained-epoch count. [deferred: pending execution — a hardcoded policy is a policy nobody can tune]
+- [x] **CHK-CQ-01** [P0] The store is the sole allocator of its sequence. [evidence: `app-relay/src/index.ts:305` asks the store per block at publish time; no local copy survives]
+- [x] **CHK-CQ-02** [P0] The framing `try` wraps the parse only. [evidence: `app-relay/src/rpc/framing.ts:71` parses inside its own try; record handling has a second]
+- [x] **CHK-CQ-03** [P1] The error listener uses the logging idiom already in the file. [evidence: `app-relay/src/index.ts:155` uses `process.stderr.write`, the only other logging call in the file]
+- [ ] **CHK-CQ-04** [P1] Collection is behind an explicit retained-epoch count. [deferred: held with collection; the retained-epoch count is a retention policy the operator sets]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -56,11 +57,11 @@ failing is indistinguishable from one that cannot fail.
 <!-- ANCHOR:testing -->
 ## Testing
 
-- [ ] **CHK-TEST-01** [P0] The regression test was observed failing before the fix. [deferred: pending execution — if it passes on today's code the analysis is wrong and nothing should proceed]
-- [ ] **CHK-TEST-02** [P0] The same test passes after. [deferred: pending execution — same test, same command, both outputs read]
-- [ ] **CHK-TEST-03** [P0] A deliberately raised framing error appears in output. [deferred: pending execution — proves the listener is wired, not merely written]
-- [ ] **CHK-TEST-04** [P1] Rotation yields a first sequence of one and the reused-epoch guard still rejects a repeat. [deferred: pending execution — both halves, since one without the other is a silent corruption]
-- [ ] **CHK-TEST-05** [P0] `npm test` exit 0. [deferred: pending execution — four real directories, explicitly]
+- [x] **CHK-TEST-01** [P0] The regression test was observed failing before the fix. [evidence: observed failing: `Relay expected sequence 2 for epoch, received 3` at `relay-store.ts:265`]
+- [x] **CHK-TEST-02** [P0] The same test passes after. [evidence: `npx vitest run app-relay/tests/projection-integrity.test.ts` — 2 tests passed, exit 0]
+- [x] **CHK-TEST-03** [P0] A deliberately raised framing error appears in output. [evidence: `npx vitest run app-relay/tests/framing-error-surfacing.test.ts` — 2 tests passed, exit 0; pre-fix run failed]
+- [ ] **CHK-TEST-04** [P1] Rotation yields a first sequence of one and the reused-epoch guard still rejects a repeat. [deferred: held with rotation; neither half is executed so neither is claimed]
+- [x] **CHK-TEST-05** [P0] `npm test` exit 0. [evidence: `npx vitest run` over the four real directories: 51 files / 384 tests, exit 0]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -68,10 +69,10 @@ failing is indistinguishable from one that cannot fail.
 <!-- ANCHOR:fix-completeness -->
 ## Fix Completeness
 
-- [ ] **CHK-FIX-01** [P0] Rotation and collection landed together. [deferred: pending execution — rotation alone multiplies orphaned partitions and makes storage strictly worse than today]
-- [ ] **CHK-FIX-02** [P1] The four unbounded attachment maps are bounded. [deferred: pending execution — matching the bound the prompt service already applies]
-- [ ] **CHK-FIX-03** [P1] Throws newly surfaced by the narrowed `try` are reported, not absorbed. [deferred: pending execution — they are findings for whichever packet owns that surface]
-- [ ] **CHK-FIX-04** [P2] The transcript now shows a generation change. [deferred: pending execution — parity with the command catalog, todos and attachments]
+- [ ] **CHK-FIX-01** [P0] Rotation and collection landed together. [deferred: held together as required — rotation alone multiplies orphaned partitions]
+- [x] **CHK-FIX-02** [P1] The four unbounded attachment maps are bounded. [evidence: `app-relay/src/attachments/attachment-service.ts:556` bounds three collections; `deviceReservedBytes` already self-trims]
+- [x] **CHK-FIX-03** [P1] Throws newly surfaced by the narrowed `try` are reported, not absorbed. [evidence: three defects recorded in `implementation-summary.md` under known limitations, none absorbed]
+- [ ] **CHK-FIX-04** [P2] The transcript now shows a generation change. [deferred: held with rotation; the transcript generation marker ships with the epoch bump]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -79,10 +80,10 @@ failing is indistinguishable from one that cannot fail.
 <!-- ANCHOR:security -->
 ## Security
 
-- [ ] **CHK-SEC-01** [P0] No security invariant is touched. [deferred: pending execution — this child changes sequencing and retention, not authority]
-- [ ] **CHK-SEC-02** [P0] Collection was verified against a database copy first. [deferred: pending execution — it deletes rows, and the code reverts while the rows do not]
-- [ ] **CHK-SEC-03** [P1] No new error output leaks session content. [deferred: pending execution — making errors audible must not make transcripts audible]
-- [ ] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [deferred: pending execution — five read-only research repos live there]
+- [x] **CHK-SEC-01** [P0] No security invariant is touched. [evidence: the diff touches sequencing and retention only; `npx vitest run app-relay/tests/security/` passes]
+- [ ] **CHK-SEC-02** [P0] Collection was verified against a database copy first. [deferred: held with collection; nothing in this child deletes a row]
+- [x] **CHK-SEC-03** [P1] No new error output leaks session content. [evidence: `app-relay/tests/framing-error-surfacing.test.ts` asserts a canary string absent from the reported message]
+- [x] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [evidence: `git status` shows no write under `specs/context/`]
 <!-- /ANCHOR:security -->
 
 ---
@@ -90,8 +91,8 @@ failing is indistinguishable from one that cannot fail.
 <!-- ANCHOR:docs -->
 ## Documentation
 
-- [ ] **CHK-DOC-01** [P1] The reason the store owns the counter is written where the loop reads it. [deferred: pending execution — the durable WHY, no artifact ids, since comment hygiene is a hard block]
-- [ ] **CHK-DOC-02** [P1] The retained-epoch count states what it protects. [deferred: pending execution — a bare number invites someone to tune it blind]
+- [x] **CHK-DOC-01** [P1] The reason the store owns the counter is written where the loop reads it. [evidence: `app-relay/src/index.ts:304` states why the store owns the counter]
+- [ ] **CHK-DOC-02** [P1] The retained-epoch count states what it protects. [deferred: held with collection; the retained-epoch count does not exist yet]
 <!-- /ANCHOR:docs -->
 
 ---
@@ -99,8 +100,8 @@ failing is indistinguishable from one that cannot fail.
 <!-- ANCHOR:file-org -->
 ## File Organization
 
-- [ ] **CHK-ORG-01** [P1] Per-phase commits. [deferred: pending execution — the live-follow daemon reverts uncommitted edits]
-- [ ] **CHK-ORG-02** [P2] The reproduction test lives with the relay suites. [deferred: pending execution — it must run in the lane that runs on every commit]
+- [x] **CHK-ORG-01** [P1] Per-phase commits. [evidence: per-phase commits `2e71b45`, `3052336`, `5956559`, `08d8fec`]
+- [x] **CHK-ORG-02** [P2] The reproduction test lives with the relay suites. [evidence: three suites under `app-relay/tests/` run in the backend lane: 51 files / 384 tests]
 <!-- /ANCHOR:file-org -->
 
 ---
@@ -108,9 +109,10 @@ failing is indistinguishable from one that cannot fail.
 <!-- ANCHOR:summary -->
 ## Verification Summary
 
-Not yet verified — the packet is scoped, not executed.
+The reproduction was watched failing first, which is the only check that distinguishes a test that
+passes from a test that cannot fail. It failed at the contiguity throw the analysis predicted, then
+passed against the fix.
 
-The chain was verified link by link against source during scoping, so the analysis is not a
-hypothesis. What remains unproven is the fix, and the single check that matters is whether the
-reproduction test was watched failing first.
+Three further defects on the same path were found while building the reproduction and are reported
+in the implementation summary rather than absorbed here. The epoch half is unexecuted and unclaimed.
 <!-- /ANCHOR:summary -->

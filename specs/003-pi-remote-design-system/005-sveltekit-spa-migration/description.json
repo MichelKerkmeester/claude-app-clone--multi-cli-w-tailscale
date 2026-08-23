@@ -1,4 +1,5 @@
 {
+  "level": "phase",
   "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "description": "The Pi Remote mobile web app is hard to author as a designer",
   "keywords": [
@@ -10,14 +11,12 @@
     "author",
     "designer"
   ],
-  "lastUpdated": "2026-08-19T17:14:21.005Z",
+  "lastUpdated": "2026-08-23T13:16:51.395Z",
   "specId": "005",
   "folderSlug": "sveltekit-spa-migration",
   "parentChain": [
-    "app-mobile-cli",
     "003-pi-remote-design-system"
   ],
   "memorySequence": 0,
-  "memoryNameHistory": [],
-  "level": "phase"
+  "memoryNameHistory": []
 }

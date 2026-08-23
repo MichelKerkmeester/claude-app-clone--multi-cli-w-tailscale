@@ -89,20 +89,28 @@ outside scope.
 source is repaired by the executor, not by the orchestrator. The orchestrator owns barrier files and
 verification; taking over source repair blurs that line and has caused rework before.
 
-**Executor ladder — try in order, fall through on auth wall, rate limit or empty output:**
+**Executor ladder — try in this order, fall through on an auth wall, rate limit or empty output:**
 
-1. **Primary — GPT-5.6 Luna at xhigh, fast variant.** Reachable three ways: `cli-codex`,
-   `cli-opencode` (`--model openai/gpt-5.6-luna-fast`) and `cli-pi`. Pick whichever surface suits the
-   dispatch; they are the same model behind three CLIs, so a refusal on one is worth retrying on the
-   next before dropping a tier.
-2. **Fallback — Gemini 3.7 Flash at high, via `cli-devin`.**
-3. **Final fallback — GLM-5.2 at high, via `cli-devin`** (free tier).
+1. **`cli-pi`** — `pi -p --model openai-codex/gpt-5.6-luna:max`. **Currently walled:** its copy of the
+   codex token is expired and refuses both offline and online; `pi auth check` reports `ready`
+   anyway, which is exactly why that packet's own rule says never to trust an exit code or a check
+   over the dispatch's output text.
+2. **`cli-codex`** — `codex exec --model gpt-5.6-luna -c model_reasoning_effort="max" -c service_tier="fast" --sandbox workspace-write --cd <repo>`. **Confirmed live.** This is the working route.
+3. **`cli-opencode`** — `opencode run --model openai/gpt-5.6-luna --variant max --dir <repo> </dev/null`.
+   Confirmed live; the `-fast` model suffix selects the fast variant there rather than a tier flag.
 
-Every dispatch composes `{resolved agent persona + task prompt}` — inline the persona from
-`.claude/agents/<name>.md` (`code` for source, `review` for audit, `markdown` for docs); a
-persona-less leaf silently loses its tool-scope and verification contract. Non-interactive
-`opencode run` needs `</dev/null`, `NODE_PRESERVE_SYMLINKS=1`, `SYSTEM_SPEC_GATE_ENFORCE=0` and
-`AI_SESSION_CHILD=1`, and never a top-level `--agent general`.
+Then Gemini 3.7 Flash at high via `cli-devin`, and GLM-5.2 at high via `cli-devin` (free) as the
+lower tiers.
+
+**Run several at once when their write paths are disjoint.** Three or four agents against different
+trees finish in the time one would; two against the same tree corrupt each other. The write map is in
+`scripts/queue/graph.json`, and `scripts/queue/next-node.mjs` prints which ready nodes may overlap.
+
+Every dispatch composes `{inlined persona + task}` — the persona body from `.claude/agents/<name>.md`
+(`code` for source, `review` for audit, `markdown` for docs) — and carries literal ALLOWED WRITE PATHS
+and BANNED OPERATIONS. A persona-less leaf silently loses its tool scope and its verification gates.
+Non-interactive `opencode run` needs `</dev/null`, `NODE_PRESERVE_SYMLINKS=1`,
+`SYSTEM_SPEC_GATE_ENFORCE=0` and `AI_SESSION_CHILD=1`, and never a top-level `--agent general`.
 
 ---
 

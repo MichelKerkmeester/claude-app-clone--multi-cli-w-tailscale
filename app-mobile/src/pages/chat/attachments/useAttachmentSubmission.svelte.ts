@@ -2,6 +2,10 @@
 // MODULE: Explicit Attachment Submission State Machine
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   AttachmentClientError,
   cancelAttachmentReservation,
@@ -17,6 +21,10 @@ import {
   type AttachmentSubmissionReservation,
 } from './attachment-client.js';
 import { getAttachmentDraft } from './AttachmentDraftProvider.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SUBMISSION STATE TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export type AttachmentSubmissionPhase =
   | 'waiting-for-connection'
@@ -68,6 +76,10 @@ interface ActiveSubmission {
   commitStarted: boolean;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const IDLE_STATE: AttachmentSubmissionState = {
   phase: 'sent',
   submissionId: null,
@@ -82,6 +94,10 @@ const BUSY_PHASES: ReadonlySet<AttachmentSubmissionPhase> = new Set([
   'server-checking',
   'committing',
 ]);
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HOOK STATE AND INVALIDATION
+// ───────────────────────────────────────────────────────────────────
 
 export function useAttachmentSubmission(
   getOptions: () => UseAttachmentSubmissionOptions,
@@ -131,6 +147,10 @@ export function useAttachmentSubmission(
             : null),
     });
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. GUARD EFFECTS
+  // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
     mountedRef = true;
@@ -196,6 +216,10 @@ export function useAttachmentSubmission(
       invalidate('failed-stale', 'The session changed before these photos could be sent.');
     }
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. SUBMIT AND CANCEL HANDLERS
+  // ───────────────────────────────────────────────────────────────────
 
   function submit(streamingBehavior?: 'steer' | 'followUp'): boolean {
     const options = getOptions();
@@ -299,6 +323,10 @@ export function useAttachmentSubmission(
     invalidate('canceled');
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 7. PUBLIC CONTROLLER
+  // ───────────────────────────────────────────────────────────────────
+
   return {
     get state() {
       return state;
@@ -320,6 +348,10 @@ export function useAttachmentSubmission(
       return submissionStatusMessage(state);
     },
   };
+
+  // ───────────────────────────────────────────────────────────────────
+  // 8. SUBMISSION PIPELINE
+  // ───────────────────────────────────────────────────────────────────
 
   async function runSubmission(active: ActiveSubmission): Promise<void> {
     const signal = active.controller.signal;
@@ -425,6 +457,10 @@ export function useAttachmentSubmission(
     );
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 9. MODULE HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function phaseForError(code: AttachmentClientErrorCode): AttachmentSubmissionPhase {
   switch (code) {

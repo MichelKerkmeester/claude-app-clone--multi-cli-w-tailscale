@@ -2,6 +2,10 @@
 // MODULE: Ticketed Attachment Submission Client
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   DEFAULT_MEDIA_POLICY,
   type AttachmentManifestItem,
@@ -22,8 +26,16 @@ import {
 } from '$shared/data/relay.js';
 import type { AttachmentDraftItem } from './attachment-state.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const MAX_PARALLEL_UPLOADS = 2;
 const SHA256_LENGTH = 43;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CLIENT ERROR AND SUBMISSION TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export type AttachmentClientErrorCode = 'retryable' | 'stale' | 'expired' | 'canceled' | 'unknown';
 
@@ -73,6 +85,10 @@ export interface AttachmentProgressUpdate {
   readonly loaded: number;
   readonly total: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TRANSFER PREPARATION
+// ───────────────────────────────────────────────────────────────────
 
 export function createAttachmentSubmissionId(): string {
   return `attachment_submission_${crypto.randomUUID().replaceAll('-', '_')}`;
@@ -137,6 +153,10 @@ export async function prepareAttachmentTransfers(
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. ATTACHMENT RESERVATION
+// ───────────────────────────────────────────────────────────────────
+
 export async function createAttachmentReservation(
   input: AttachmentSubmissionInputs,
   transfers: readonly PreparedAttachmentTransfer[],
@@ -189,6 +209,10 @@ export async function createAttachmentReservation(
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 6. PARALLEL PART UPLOAD
+// ───────────────────────────────────────────────────────────────────
+
 /** Upload at most two parts at once, with progress emitted only by XHR events. */
 export async function uploadPreparedAttachments(
   reservation: AttachmentSubmissionReservation,
@@ -227,6 +251,10 @@ export async function uploadPreparedAttachments(
     Array.from({ length: Math.min(MAX_PARALLEL_UPLOADS, transfers.length) }, () => uploadOne()),
   );
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. STATUS CHECK, CANCELLATION, AND COMMIT
+// ───────────────────────────────────────────────────────────────────
 
 export async function reconcileAttachmentSet(
   reservation: AttachmentSubmissionReservation,
@@ -299,6 +327,10 @@ export async function commitAttachmentSubmission(
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 8. STATUS MATCHING AND ERROR CLASSIFICATION
+// ───────────────────────────────────────────────────────────────────
+
 function statusPartsMatchReservation(
   status: AttachmentStatusResponse,
   reservation: AttachmentSubmissionReservation,
@@ -356,6 +388,10 @@ export function classifyAttachmentError(
     error,
   );
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 9. HEIC TO JPEG CONVERSION
+// ───────────────────────────────────────────────────────────────────
 
 export async function convertHeicToJpeg(blob: Blob, signal?: AbortSignal): Promise<Blob> {
   throwIfAborted(signal);
@@ -438,6 +474,10 @@ function canvasToJpeg(canvas: HTMLCanvasElement, signal?: AbortSignal): Promise<
     );
   });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 10. WORKER HASHING AND UTILITIES
+// ───────────────────────────────────────────────────────────────────
 
 async function hashExactBlobInWorker(blob: Blob, signal?: AbortSignal): Promise<string> {
   throwIfAborted(signal);

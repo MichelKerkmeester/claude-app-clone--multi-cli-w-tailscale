@@ -2,13 +2,25 @@
 // MODULE: Local Attachment Draft State
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   MEDIA_SOURCE_MIME_TYPES,
   type RuntimeMediaCapabilityDto,
 } from '@pi-remote/pi-rpc-protocol';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. DRAFT LIMITS AND ACCEPTED TYPES
+// ───────────────────────────────────────────────────────────────────
+
 export const MAX_ATTACHMENT_COUNT = 4;
 export const ATTACHMENT_ACCEPT = MEDIA_SOURCE_MIME_TYPES.join(',');
+
+// ───────────────────────────────────────────────────────────────────
+// 3. DRAFT STATE TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export type AttachmentPreviewState = 'available' | 'unavailable';
 export type AttachmentItemStatus =
@@ -80,6 +92,10 @@ export type AttachmentDraftAction =
 
 export type AttachmentCapability = Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'>;
 
+// ───────────────────────────────────────────────────────────────────
+// 4. DEFAULT STATE AND USER MESSAGES
+// ───────────────────────────────────────────────────────────────────
+
 export const EMPTY_ATTACHMENT_DRAFT: AttachmentDraftState = {
   items: [],
   phase: 'idle',
@@ -92,6 +108,10 @@ export const EMPTY_ATTACHMENT_DRAFT: AttachmentDraftState = {
 const LIMIT_MESSAGE = 'You can add up to four photos.';
 const UNSUPPORTED_MESSAGE = 'One or more selections are not supported photos.';
 const MODEL_BLOCKED_MESSAGE = 'Current model cannot view photos.';
+
+// ───────────────────────────────────────────────────────────────────
+// 5. DRAFT REDUCER
+// ───────────────────────────────────────────────────────────────────
 
 export function attachmentDraftReducer(
   state: AttachmentDraftState,
@@ -208,6 +228,10 @@ export function attachmentDraftReducer(
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 6. PUBLIC DRAFT HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 export function capabilityAllowsPhotos(
   capability: AttachmentCapability | null | undefined,
 ): boolean {
@@ -230,6 +254,10 @@ export function attachmentStatusLabel(item: AttachmentDraftItem): string {
 export function modelBlockedMessage(): string {
   return MODEL_BLOCKED_MESSAGE;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. PHASE AND ORDINAL HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function phaseForItems(items: readonly AttachmentDraftItem[]): AttachmentDraftPhase {
   if (items.some((item) => item.status === 'local-validating')) return 'local-validating';

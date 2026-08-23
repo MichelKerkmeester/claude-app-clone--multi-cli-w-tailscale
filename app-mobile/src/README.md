@@ -1,75 +1,131 @@
----
-title: 'Web source: screen map (routes → pages → shared)'
-description: 'The canonical route→folder→file map for the Svelte SPA: where each screen lives and how the shell, pages, and shared layers fit together.'
-trigger_phrases:
-  - 'pi remote web source'
-  - 'svelte screen map'
-  - 'where does this screen live'
+# Web source: routes, screens and shared logic
+
+> The SvelteKit source tree for the `@pi-remote/web` browser client.
+
 ---
 
-# Web source — screen map
+## 1. OVERVIEW
 
-`src/` is the browser client for `@pi-remote/web`: a **Svelte 5 / SvelteKit SPA** (client-side only — `ssr = false`, `prerender = false`). Every screen and component is one `.svelte` file (markup + scoped `<style>` + typed `<script>`); all logic lives in `shared/data/`.
+`src/` contains the Svelte 5 browser client. `routes/` maps the three URLs to page components,
+`pages/` owns screen markup and `shared/` owns state, transport, formatting, primitives and catalogs.
+`app.css`, `app.html` and `app.d.ts` provide the global style foundation, document shell and type
+augmentation.
 
-Open a screen by following the route to its page folder to the component file. This document is that map.
+The useful editing path is route to page to shared logic. A route supplies URL parameters and shell
+callbacks. A page composes the view. Shared modules handle relay requests, device enrollment, the
+read-only cache and state transitions.
 
-## The URL surface (`routes/`)
+### Key Statistics
 
-Only **three URLs** exist; Review and Inbox are overlays, and Enrollment is an auth branch (not a route).
+| Metric | Current behavior |
+|---|---|
+| Status | Shipped Svelte 5 and SvelteKit SPA source |
+| URL surface | `/`, `/session/[id]` and `/attention/[lookupId]` |
+| Screen groups | Home, chat, Review, Inbox and Enrollment |
+| Offline behavior | Cached roster and transcript data stays read-only |
 
-| URL | Route file | Renders |
-|-----|-----------|---------|
-| `/` | `routes/+page.svelte` | `pages/home/screen-home.svelte` (session roster) |
-| `/session/[id]` | `routes/session/[id]/+page.svelte` | `pages/chat/screen-chat.svelte` (the conversation) |
-| `/attention/[lookupId]` | `routes/attention/[lookupId]/+page.svelte` | resolves the lookup, then redirects to the Review overlay or the target session |
+---
 
-- `routes/+layout.svelte` is the **app shell**: it mounts the context providers, theme, and service-worker registration, and hosts the **Review / Inbox overlays** above the routed page.
-- `routes/+layout.ts` pins `ssr = false; prerender = false`.
-- Pages read state + actions from the shell via context (`getAppState` / `getAppActions` from `shared/state/app-state.svelte.ts`); they don't fetch directly.
+## 2. FEATURES
 
-> The conversation view's file is `pages/chat/screen-chat.svelte`. The `/session/[id]` route and the internal session-protocol names are unchanged — the route still imports it as `Session`.
+| Feature | What it does |
+|---|---|
+| Routed screens | Connects the URL to the home roster, one live session or an attention resolver. |
+| Shared runtime | Keeps app state, reducers, relay sync, runtime controls and formatting outside route files. |
+| Device access | Enrolls a device, restores its session and reports auth state to the shell. |
+| Read-only cache | Seeds the first paint from local storage and writes only relay-sourced display data. |
+| Global styling | Keeps tokens and shared surfaces in `app.css` while component-only rules stay scoped. |
 
-## Folder layout
+---
+
+## 3. REQUIREMENTS
+
+| Requirement | Minimum | Notes |
+|---|---|---|
+| Web package | `@pi-remote/web` | Scripts live in `app-mobile/package.json`. |
+| Runtime | Svelte 5 and SvelteKit | Components use Svelte markup, runes and scoped styles. |
+| Live data | An enrolled browser and the relay | The cache can show a read-only snapshot before the relay responds. |
+
+---
+
+## 4. STRUCTURE
 
 ```text
 src/
-├─ routes/            SvelteKit route files (the 3 URLs + the shell layout)
-├─ pages/             one folder per screen
-│  ├─ home/           Home (roster) + EmptyState, Freshness, PushSettings
-│  ├─ chat/           Chat.svelte + its sub-areas:
-│  │  ├─ artifacts/     artifact/image/pdf/code viewers
-│  │  ├─ attachments/   attachment drafts + preview
-│  │  ├─ chrome/        composer, header, runtime strip, plan-mode, palette
-│  │  ├─ features/ask-question/   the ask-question card flow
-│  │  ├─ rich-content/  markdown/rich block rendering
-│  │  └─ transcript/    the transcript list + block rendering
-│  ├─ review/         Review overlay
-│  ├─ inbox/          Attention inbox overlay
-│  └─ enrollment/     device-enrollment auth gate
-├─ shared/
-│  ├─ primitives/     accessible UI primitives (Button + Bits UI wrappers) — see its README
-│  ├─ chrome/         shared chrome bits (Header, StatusPill, ThemeControl, …)
-│  └─ data/           the logic layer (relay, auth, reducers, runes stores) — see its README
-├─ app.css            global foundation: tokens, @font-face, theme blocks, resets
-└─ app.html           the SPA shell document
++-- routes/       # URL adapters and the app shell
++-- pages/        # Home, chat, Review, Inbox and Enrollment screens
++-- shared/       # State, transport, formatting, primitives and catalogs
++-- app.css       # Global tokens and shared surfaces
++-- app.html      # Browser document shell
+`-- app.d.ts      # SvelteKit App namespace augmentation
 ```
 
-Each folder carries its own `README.md` (what/why) and, where it earns one, a `CODE.md` (structure/logic).
+| Folder or file | Role |
+|---|---|
+| [`routes/README.md`](./routes/README.md) | URL map and route behavior. |
+| [`pages/`](./pages/) | Screen components and chat sub-areas. |
+| [`shared/README.md`](./shared/README.md) | Shared state and logic map. |
+| [`shared/state/`](./shared/state/) | Reducers, runes state and runtime state. |
+| [`shared/transport/`](./shared/transport/) | Relay calls, socket sync, device auth and cache. |
+| [`app.css`](./app.css) | Theme tokens, global resets and shared styling surfaces. |
+| [`app.html`](./app.html) | HTML metadata, manifest and SvelteKit body slot. |
 
-## Boundaries
+The source subfolders are `pages/chat`, `pages/enrollment`, `pages/home`, `pages/inbox`,
+`pages/review`, `shared/catalog`, `shared/chrome`, `shared/commands`, `shared/fixtures`,
+`shared/format`, `shared/primitives`, `shared/state`, `shared/transport` and `shared/viewport`.
+Each source folder has a feature README. Larger folders also have a CODE document for code flow.
 
-- **Screens are thin.** A page renders; it takes state/actions via `$props()` or shell context. Behaviour lives in `shared/data/`.
-- **One socket, one cache, one auth store.** All relay traffic is in `shared/transport/relay.ts`; storage in `cache.ts` (read-only snapshot) and `auth.ts` (device key). Don't open sockets or touch storage from a component.
-- **Styling is co-located.** A component's CSS is in its own scoped `<style>`; only genuinely shared/global rules live in `app.css`.
+---
 
-## Validate (from repo root)
+## 5. USAGE EXAMPLES
 
-```bash
-npm run build
-npm run typecheck   # svelte-check
-npm run test:web
-```
+| Change you need | Start here |
+|---|---|
+| Change the home URL | [`routes/+page.svelte`](./routes/+page.svelte), then [`pages/home/README.md`](./pages/home/README.md). |
+| Change session routing | [`routes/session/[id]/+page.svelte`](./routes/session/[id]/+page.svelte), then [`pages/chat/README.md`](./pages/chat/README.md). |
+| Change the attention deep link | [`routes/attention/[lookupId]/+page.svelte`](./routes/attention/[lookupId]/+page.svelte), then [`shared/format/attention.ts`](./shared/format/attention.ts). |
+| Change device enrollment | [`shared/transport/auth.ts`](./shared/transport/auth.ts) and [`pages/enrollment/screen-enrollment.svelte`](./pages/enrollment/screen-enrollment.svelte). |
+| Change relay or socket behavior | [`shared/transport/relay.ts`](./shared/transport/relay.ts) and [`shared/transport/use-sync-socket.svelte.ts`](./shared/transport/use-sync-socket.svelte.ts). |
+| Change cached first paint | [`shared/transport/cache.ts`](./shared/transport/cache.ts) and [`shared/state/app-state.svelte.ts`](./shared/state/app-state.svelte.ts). |
 
-## Related
+---
 
-- [Package README](../README.md) · [`shared/primitives/README.md`](./shared/primitives/README.md) · [`shared/README.md`](./shared/data/README.md)
+## 6. TROUBLESHOOTING
+
+| What you see | Cause | Fix |
+|---|---|---|
+| A page cannot read app state | The route or page is outside the layout context. | Check [`routes/+layout.svelte`](./routes/+layout.svelte) and use the context accessors from [`shared/state/app-state.svelte.ts`](./shared/state/app-state.svelte.ts). |
+| The first paint shows old sessions | The browser loaded the read-only cache before relay sync. | Check [`shared/transport/cache.ts`](./shared/transport/cache.ts), then wait for the roster fetch. |
+| A component cannot reach the relay | Transport work was added to a view without the shared client path. | Move the request to [`shared/transport/relay.ts`](./shared/transport/relay.ts) and pass state into the page. |
+| A style change affects every screen | The rule was placed in `app.css` instead of a component's scoped style. | Keep global tokens and shared surfaces in `app.css`. Put one-component rules beside that component. |
+
+---
+
+## 7. FAQ
+
+**Q: Why do Review and Inbox have no route folder?**
+
+A: `routes/+layout.svelte` renders them as authenticated overlays. Enrollment is the unauthenticated
+branch in the same shell.
+
+**Q: Where does the selected session id live?**
+
+A: In the SvelteKit URL at `/session/[id]`. The app state stores the transcript and roster, not a
+second selected-session value.
+
+**Q: Which files hold device auth and cache behavior?**
+
+A: [`shared/transport/auth.ts`](./shared/transport/auth.ts) owns device enrollment and sessions.
+[`shared/transport/cache.ts`](./shared/transport/cache.ts) owns the bounded read-only snapshot.
+
+---
+
+## 8. RELATED RESOURCES
+
+| Document | Purpose |
+|---|---|
+| [`CODE.md`](./CODE.md) | Source-root architecture, dependency direction and flow. |
+| [`routes/README.md`](./routes/README.md) | URL surface and route-specific guidance. |
+| [`routes/CODE.md`](./routes/CODE.md) | Route entrypoints and shell boundaries. |
+| [`shared/README.md`](./shared/README.md) | Shared behavior and logic ownership. |
+| [`pages/chat/README.md`](./pages/chat/README.md) | Chat screen and its sub-areas. |

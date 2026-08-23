@@ -1,15 +1,97 @@
-# `viewport/` — structure & logic
+# viewport/: visual-viewport measurement hook
 
-Editor map. For *what/why*, see `README.md`.
+---
 
-## Shape
+## 1. OVERVIEW
 
-- **`use-visual-viewport-anchor.svelte.ts`** — `VISUAL_VIEWPORT_HEIGHT_VAR`, `VisualViewportAnchorResult`, and `useVisualViewportAnchor`; the hook owns measurement, CSS mirroring, event listeners, and cleanup.
+`viewport/` owns one hook that converts browser viewport events into a keyboard-safe layout budget. It stores the latest visual height and anchor position in Svelte state, mirrors the height into the shared CSS variable and cleans up every listener it installs.
 
-## Do-not
+Current state:
 
-- **Don't position the completion surface from `window.innerHeight` alone.** That is the layout viewport on the phone; use the visual viewport height and offset when available.
-- **Don't scroll the page from this hook.** It reports `viewportHeightPx` and `anchorTopPx`; consumers decide how to fit the surface.
-- **Don't measure on every raw viewport event.** Keep the `requestAnimationFrame` scheduler so keyboard, rotation, and foreground changes settle into one repaint.
-- **Don't leave listeners or a pending frame behind.** The effect cleanup must cancel the frame and remove every visual-viewport, window, and document listener it installed.
-- **Don't write a second CSS variable for the same budget.** `VISUAL_VIEWPORT_HEIGHT_VAR` is the shared `--visual-viewport-height` contract.
+- The visual viewport is preferred when available. `window.innerHeight` is the fallback.
+- Anchor position subtracts `visualViewport.offsetTop` when the API provides it.
+- A `requestAnimationFrame` scheduler coalesces resize, scroll, orientation, focus, visibility and pageshow events.
+- The hook never scrolls the page or decides how a caller places its surface.
+
+---
+
+## 2. ARCHITECTURE
+
+The hook has one input and two output paths:
+
+```text
+visualViewport or window events -> requestAnimationFrame -> measure()
+anchor getter -------------------^                  |
+                                                     +-> viewportHeightPx
+                                                     +-> anchorTopPx
+                                                     +-> --visual-viewport-height
+```
+
+The effect installs listeners only in a browser. It updates state and CSS only when a measured value changes, then removes the listeners and cancels the frame during cleanup.
+
+---
+
+## 3. KEY FILES
+
+The folder is a one-file package:
+
+| File | Responsibility |
+|---|---|
+| [`use-visual-viewport-anchor.svelte.ts`](./use-visual-viewport-anchor.svelte.ts) | Measurement, scheduling, CSS mirroring and listener cleanup. |
+| [`README.md`](./README.md) | Feature orientation for keyboard-safe layout. |
+| [`CODE.md`](./CODE.md) | This code-folder map. |
+
+---
+
+## 4. BOUNDARIES AND FLOW
+
+| Boundary | Rule |
+|---|---|
+| Measurement | Read the visual viewport when present and fall back to `window.innerHeight`. |
+| Anchor | Read `getBoundingClientRect().top` and subtract the visual viewport offset. |
+| Scheduling | Keep one pending animation frame, even when several raw events arrive. |
+| CSS | Write only `VISUAL_VIEWPORT_HEIGHT_VAR`, which names `--visual-viewport-height`. |
+| Layout | Return the budget to the caller. Do not scroll or reposition another surface here. |
+| Cleanup | Cancel a pending frame and remove visual viewport, window and document listeners. |
+
+Main flow:
+
+```text
+useVisualViewportAnchor(getAnchor)
+        -> install browser listeners
+        -> schedule one animation frame
+        -> read viewport and anchor geometry
+        -> write state and CSS variable when changed
+        -> return viewportHeightPx and anchorTopPx
+        -> cleanup listeners and frame on effect end
+```
+
+---
+
+## 5. ENTRYPOINTS
+
+| Entrypoint | Type | Purpose |
+|---|---|---|
+| `VISUAL_VIEWPORT_HEIGHT_VAR` | Constant | Names the shared CSS height variable. |
+| `VisualViewportAnchorResult` | Interface | Describes the nullable height and anchor measurements. |
+| `useVisualViewportAnchor` | Svelte hook | Measures the visible viewport and returns reactive layout data. |
+
+---
+
+## 6. VALIDATION
+
+Run from the repository root:
+
+```bash
+node "$PWD/scripts/naming/scan-folder-docs.mjs"
+```
+
+The folder is healthy when both documents exist and the scan reports no broken references for this folder.
+
+---
+
+## 7. RELATED
+
+- [`README.md`](./README.md)
+- [Chrome documentation](../chrome/CODE.md)
+- [Chat screen documentation](../../pages/chat/CODE.md)

@@ -2,7 +2,15 @@
 // MODULE: Model Catalog Organization
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { AvailableModelDto } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface ModelCatalogGroup {
   readonly provider: string;
@@ -14,6 +22,10 @@ export interface OrganizedModelCatalog {
   readonly retiredCurrent: AvailableModelDto | null;
   readonly groups: readonly ModelCatalogGroup[];
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. MODEL IDENTITY AND DISPLAY HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
@@ -69,6 +81,10 @@ export function modelCapabilities(model: AvailableModelDto): readonly string[] {
   }
   return capabilities;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CATALOG ORGANIZATION AND FILTERING
+// ───────────────────────────────────────────────────────────────────
 
 export function organizeModelCatalog(
   models: readonly AvailableModelDto[],
@@ -135,6 +151,10 @@ export function filterAndRankModels(
       return compareModels(first, second);
     });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. COMPARISON AND FORMAT HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function compareModels(first: AvailableModelDto, second: AvailableModelDto): number {
   return (

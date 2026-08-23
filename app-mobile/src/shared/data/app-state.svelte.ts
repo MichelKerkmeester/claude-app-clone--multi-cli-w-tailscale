@@ -10,6 +10,10 @@
 // URL. The dispatch functions are defined once so their identity is
 // stable: the Session view's socket effect captures them a single time.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { browser } from '$app/environment';
 import { getContext, setContext } from 'svelte';
 
@@ -32,6 +36,10 @@ import {
 } from './state.js';
 import { readThemePreference, type ThemePreference } from './view-helpers.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONTEXT KEYS AND CONFIG TYPES
+// ───────────────────────────────────────────────────────────────────
+
 const APP_STATE_KEY = Symbol('pi-remote:app-state');
 const APP_ACTIONS_KEY = Symbol('pi-remote:app-actions');
 
@@ -40,6 +48,10 @@ export interface AppConfig {
   readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
   readonly askQuestionPrincipal?: string | undefined;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. REDUCER STORES AND STABLE DISPATCHERS
+// ───────────────────────────────────────────────────────────────────
 
 export function createAppState({
   mediaCapability = DEFAULT_MEDIA_CAPABILITY_OFF,
@@ -88,6 +100,10 @@ export function createAppState({
   function dispatchTodoProjection(action: Parameters<typeof todoProjectionReducer>[1]): void {
     todoProjection = todoProjectionReducer(todoProjection, action);
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. STATE ACCESSORS
+  // ───────────────────────────────────────────────────────────────────
 
   return {
     initialCache,
@@ -154,6 +170,10 @@ export function createAppState({
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. APP STATE CONTEXT
+// ───────────────────────────────────────────────────────────────────
+
 export type AppState = ReturnType<typeof createAppState>;
 
 export function setAppState(state: AppState): AppState {
@@ -164,6 +184,10 @@ export function setAppState(state: AppState): AppState {
 export function getAppState(): AppState {
   return getContext(APP_STATE_KEY) as AppState;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. SHELL ACTIONS CONTEXT
+// ───────────────────────────────────────────────────────────────────
 
 // Shell actions that combine routing (`goto`) and async auth with state
 // mutation. Implemented in `+layout.svelte` (which holds the SvelteKit

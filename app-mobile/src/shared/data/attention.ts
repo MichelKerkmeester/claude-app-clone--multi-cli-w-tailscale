@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Web Attention and Push Client
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isAttentionItemDto,
   isAttentionResolutionDto,
@@ -14,11 +18,19 @@ import {
 
 import { establishSession } from './auth.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. PUSH CONFIG TYPE
+// ───────────────────────────────────────────────────────────────────
+
 export interface PushConfig {
   readonly supported: boolean;
   readonly vapidPublicKey: string | null;
   readonly preferences: PushPreferences | null;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. ATTENTION ENDPOINTS
+// ───────────────────────────────────────────────────────────────────
 
 export async function fetchAttention(signal?: AbortSignal): Promise<readonly AttentionItemDto[]> {
   const payload = await postJson('/api/attention', undefined, signal);
@@ -43,6 +55,10 @@ export async function openAttentionHint(
   if (!isAttentionResolutionDto(payload)) throw new Error('This attention hint is stale.');
   return payload;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. PUSH SUBSCRIPTION LIFECYCLE
+// ───────────────────────────────────────────────────────────────────
 
 export async function fetchPushConfig(signal?: AbortSignal): Promise<PushConfig> {
   const payload = await postJson('/api/push/config', undefined, signal);
@@ -98,6 +114,10 @@ export async function unsubscribeFromPush(): Promise<void> {
 export async function setPushForeground(foreground: boolean): Promise<void> {
   await postJson('/api/push/foreground', { foreground });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TRANSPORT HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function postJson(path: string, body: unknown, signal?: AbortSignal): Promise<unknown> {
   const response = await fetch(path, {

@@ -14,6 +14,10 @@
 // cast are preserved verbatim. Session consumes nothing back — all
 // effects flow through the dispatch* reducers.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { untrack } from 'svelte';
 
 import type { SyncCursor, SyncMessage } from '@pi-remote/pi-rpc-protocol';
@@ -26,6 +30,10 @@ import {
   type TodoProjectionAction,
 } from './state.js';
 import { messageFrom } from './view-helpers.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SYNC MESSAGE HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 const ignoreTodoAction: (action: TodoProjectionAction) => void = () => undefined;
 
@@ -72,6 +80,10 @@ function planInvalidationFromSync(message: SyncMessage): 'superseded' | 'invalid
 function isRecordValue(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HOOK ENTRY AND INITIAL LOAD
+// ───────────────────────────────────────────────────────────────────
 
 /** Read-only sync-socket lifecycle for one session view. Returns nothing. */
 export function useSyncSocket(deps: {
@@ -146,6 +158,10 @@ export function useSyncSocket(deps: {
           dispatchTranscript({ type: 'error', error: messageFrom(error) });
         }
       });
+
+    // ───────────────────────────────────────────────────────────────────
+    // 4. SOCKET CONNECT AND RETRY
+    // ───────────────────────────────────────────────────────────────────
 
     let socket: WebSocket | null = null;
     let retryTimer: number | null = null;
@@ -237,6 +253,10 @@ export function useSyncSocket(deps: {
     // take `connection` as a dep and re-fire on the status it just wrote (async retries via
     // setTimeout already run outside tracking).
     untrack(() => connect());
+
+    // ───────────────────────────────────────────────────────────────────
+    // 5. TEARDOWN
+    // ───────────────────────────────────────────────────────────────────
 
     return () => {
       stopped = true;

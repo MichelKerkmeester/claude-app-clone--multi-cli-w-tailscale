@@ -8,6 +8,10 @@
 // overwrite the current snapshot with a different session's rows. The
 // snapshot is intentionally never persisted to any browser storage.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { untrack } from 'svelte';
 
 import type { CommandCatalogDto } from '@pi-remote/pi-rpc-protocol';
@@ -25,6 +29,10 @@ import {
   type CatalogLifecycleCode,
 } from './relay.js';
 import type { ConnectionPhase } from './state.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CATALOG STATE AND REDUCER
+// ───────────────────────────────────────────────────────────────────
 
 interface CatalogState {
   readonly status: HostCommandCatalogStatus;
@@ -68,6 +76,10 @@ function catalogReducer(current: CatalogState, action: CatalogAction): CatalogSt
       return current;
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. REFRESH LIFECYCLE
+// ───────────────────────────────────────────────────────────────────
 
 /** Session-scoped in-memory catalog with shared in-flight requests. */
 export function useHostCommandCatalog(
@@ -153,6 +165,10 @@ export function useHostCommandCatalog(
     }
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 4. SCOPE AND CONNECTION EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     // A host-epoch or session transition invalidates every in-flight read and
     // clears the snapshot so no other session's rows can be shown.
@@ -184,6 +200,10 @@ export function useHostCommandCatalog(
     };
   });
 
+  // ───────────────────────────────────────────────────────────────────
+  // 5. PUBLIC API
+  // ───────────────────────────────────────────────────────────────────
+
   return {
     get status() {
       return state.status;
@@ -197,6 +217,10 @@ export function useHostCommandCatalog(
     refresh,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. FAILURE CODE MAPPING
+// ───────────────────────────────────────────────────────────────────
 
 function catalogFailureCode(error: unknown): CatalogLifecycleCode {
   if (error instanceof CatalogLifecycleError) return error.code;

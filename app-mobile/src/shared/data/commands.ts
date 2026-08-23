@@ -8,7 +8,15 @@
 // host-epoch change can never bind another session's row. The live catalog
 // fetch/refresh lifecycle lives in the runes twin.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type HostCommandCatalogStatus =
   | 'loading'
@@ -55,8 +63,16 @@ export type CatalogRefreshReason =
   | 'online'
   | 'manual';
 
+// ───────────────────────────────────────────────────────────────────
+// 3. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 /** Revalidation triggers that must wait until the snapshot is older than this. */
 export const CATALOG_STALE_AFTER_MS = 30_000;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. BINDING RESOLUTION
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * Resolve a canonical name inside the CURRENT scoped snapshot. No binding is

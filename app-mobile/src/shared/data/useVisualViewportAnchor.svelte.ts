@@ -9,6 +9,10 @@
 // measured height is mirrored into --visual-viewport-height for CSS that
 // cannot read the API directly.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. PUBLIC CONSTANTS AND RESULT TYPE
+// ───────────────────────────────────────────────────────────────────
+
 export const VISUAL_VIEWPORT_HEIGHT_VAR = '--visual-viewport-height';
 
 export interface VisualViewportAnchorResult {
@@ -17,6 +21,10 @@ export interface VisualViewportAnchorResult {
   /** Distance from the visual-viewport top to the anchor's top edge, or null. */
   readonly anchorTopPx: number | null;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 2. MEASURED ANCHOR STATE
+// ───────────────────────────────────────────────────────────────────
 
 export function useVisualViewportAnchor(
   getAnchor: () => Element | null = () => null,
@@ -54,6 +62,10 @@ export function useVisualViewportAnchor(
     const schedule = () => {
       if (frame === null) frame = requestAnimationFrame(measure);
     };
+
+    // ───────────────────────────────────────────────────────────────────
+    // 3. VIEWPORT EVENT LIFECYCLE
+    // ───────────────────────────────────────────────────────────────────
 
     const viewport = window.visualViewport;
     if (viewport !== null && viewport !== undefined) {

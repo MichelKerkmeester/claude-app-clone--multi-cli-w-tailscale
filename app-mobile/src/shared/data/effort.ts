@@ -7,6 +7,10 @@
 // list, so raw host IDs can never reach copy. The host's advertised
 // order and subset are always preserved by callers, never re-sorted here.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. KNOWN EFFORT IDS
+// ───────────────────────────────────────────────────────────────────
+
 export const KNOWN_EFFORT_IDS: readonly string[] = [
   'off',
   'minimal',
@@ -16,6 +20,10 @@ export const KNOWN_EFFORT_IDS: readonly string[] = [
   'xhigh',
   'max',
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// 2. EFFORT CATALOG
+// ───────────────────────────────────────────────────────────────────
 
 export interface EffortLevelInfo {
   readonly label: string;
@@ -53,6 +61,10 @@ const EFFORT_CATALOG: Readonly<Record<string, EffortLevelInfo>> = {
   },
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SHARED UI STRINGS
+// ───────────────────────────────────────────────────────────────────
+
 export const effortStrings = {
   thinkingEffort: 'Thinking effort',
   unknownLevel: 'Host-defined level',
@@ -70,6 +82,10 @@ export const effortStrings = {
   closeSheet: 'Close sheet',
   unconfirmed: '—',
 } as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. LEVEL LOOKUP AND FORMATTERS
+// ───────────────────────────────────────────────────────────────────
 
 /** Catalog lookup only; null for IDs this client does not know. */
 export function effortLevelInfo(level: string): EffortLevelInfo | null {
@@ -118,6 +134,10 @@ export function effortTriggerText(
   const ordinal = effortOrdinal(level, advertised);
   return ordinal === null ? effortStrings.unconfirmed : `${effortStrings.unknownLevel} ${ordinal}`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. MESSAGE AND ACCESSIBLE NAMES
+// ───────────────────────────────────────────────────────────────────
 
 /** Pending copy for the requested row and status line: `Applying High…`. */
 export function applyingEffortMessage(level: string, advertised: readonly string[]): string {

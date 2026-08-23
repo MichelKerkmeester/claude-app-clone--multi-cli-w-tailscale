@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Web Device Enrollment
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   enrollmentProof,
   isApplicationSessionResponse,
@@ -14,6 +18,10 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { DEMO_IDENTITY, isDemoMode } from './demo.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS AND DEVICE TYPES
+// ───────────────────────────────────────────────────────────────────
 
 const DATABASE_NAME = 'pi-remote-device-v1';
 const STORE_NAME = 'credentials';
@@ -31,6 +39,10 @@ export interface DeviceIdentity {
   readonly deviceId: string;
   readonly hostFingerprint: string;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. DEVICE ENROLLMENT
+// ───────────────────────────────────────────────────────────────────
 
 export async function enrollDevice(serializedQr: string): Promise<DeviceIdentity> {
   const enrollment = parseEnrollment(serializedQr);
@@ -65,6 +77,10 @@ export async function enrollDevice(serializedQr: string): Promise<DeviceIdentity
   });
   return response;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. SESSION ESTABLISHMENT AND REVOCATION
+// ───────────────────────────────────────────────────────────────────
 
 export async function establishSession(): Promise<DeviceIdentity | null> {
   if (isDemoMode()) return DEMO_IDENTITY;
@@ -105,6 +121,10 @@ export async function logoutDevice(): Promise<void> {
   await postJson('/api/auth/logout', undefined);
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. QR IMAGE SCANNING
+// ───────────────────────────────────────────────────────────────────
+
 export async function scanQrImage(file: File): Promise<string> {
   const Detector = (
     globalThis as typeof globalThis & {
@@ -128,6 +148,10 @@ export async function scanQrImage(file: File): Promise<string> {
     image.close();
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. SIGNING AND RELAY REQUEST HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function parseEnrollment(serialized: string): EnrollmentQr {
   try {
@@ -177,6 +201,10 @@ function toBase64Url(bytes: Uint8Array): string {
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/u, '');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. DEVICE STORAGE
+// ───────────────────────────────────────────────────────────────────
 
 async function loadDevice(): Promise<StoredDevice | null> {
   const database = await openDatabase();

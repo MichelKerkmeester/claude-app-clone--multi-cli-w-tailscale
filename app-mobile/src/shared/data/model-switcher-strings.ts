@@ -2,7 +2,15 @@
 // MODULE: Model Switcher Strings
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeControlOutcome } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SHARED STRINGS
+// ───────────────────────────────────────────────────────────────────
 
 export const modelSwitcherStrings = {
   title: 'Change model',
@@ -45,6 +53,10 @@ export const modelSwitcherStrings = {
   thinkingEffort: 'Thinking effort',
 } as const;
 
+// ───────────────────────────────────────────────────────────────────
+// 3. TRIGGER AND STATUS MESSAGES
+// ───────────────────────────────────────────────────────────────────
+
 export function modelTriggerName(label: string, provider: string): string {
   return `Model, ${label}, ${provider}`;
 }
@@ -65,6 +77,10 @@ export function modelSwitchedMessage(label: string): string {
 export function modelStatusAnnouncement(message: string): string {
   return `Model switch status: ${message}`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. ROW ACCESSIBLE NAME
+// ───────────────────────────────────────────────────────────────────
 
 export function modelRowName({
   label,
@@ -98,6 +114,10 @@ export function modelRowName({
     .filter((part): part is string => part !== null && part.length > 0)
     .join(', ');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. RUNTIME OUTCOME MAPPING
+// ───────────────────────────────────────────────────────────────────
 
 export function runtimeOutcomeMessage(outcome: RuntimeControlOutcome): string {
   switch (outcome.status) {

@@ -11,6 +11,10 @@
 // envelope submitted; no outcome is retried, converted to text, or mapped
 // to steer/followUp. The draft itself is never touched by this module.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TextBlock } from '@pi-remote/pi-rpc-protocol';
 
 import {
@@ -20,6 +24,10 @@ import {
 } from './commands.js';
 import { RelayRequestError, SlashSubmitError, requestTicket, submitSlashCommand } from './relay.js';
 import type { ConnectionPhase } from './state.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. OUTCOME AND INPUT TYPES
+// ───────────────────────────────────────────────────────────────────
 
 /** Every fail-closed outcome a draft submission can settle to, except acceptance. */
 export type SlashSubmitFailureCode =
@@ -54,6 +62,10 @@ export interface SubmitSlashDraftInput {
   readonly running: boolean;
   readonly signal?: AbortSignal;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. DRAFT SUBMISSION PIPELINE
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * Submit one explicit slash draft. Returns an outcome; throws only on
@@ -109,6 +121,10 @@ export function canonicalSlashMessage(draft: string, name: string): string | nul
   const args = rest.trim();
   return args.length === 0 ? token : `${token} ${args}`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. FAILURE CLASSIFICATION
+// ───────────────────────────────────────────────────────────────────
 
 function preSubmitFailureCode(error: unknown): SlashSubmitFailureCode {
   // Nothing reached the relay: every transport classification is bounded and

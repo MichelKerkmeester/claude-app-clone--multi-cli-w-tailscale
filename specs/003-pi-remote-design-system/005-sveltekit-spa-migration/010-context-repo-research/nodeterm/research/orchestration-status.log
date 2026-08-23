@@ -1,0 +1,2 @@
+{"event":"progress","label":"single","at":"2026-08-23T00:29:29.389Z","duration_ms":1547389,"loop_type":"research","sessionId":"dr-20260823-000127","generation":1,"run":1,"status":"complete","gauges":{"iterations":1,"elapsed_ms":1547389,"score":1}}
+{"event":"completed","label":"single","terminal":true,"reason":"maxIterationsReached","at":"2026-08-23T02:08:51.762Z","duration_ms":0,"loop_type":"research","sessionId":"dr-20260823-000127","generation":1,"gauges":{"iterations":10,"elapsed_ms":0,"score":0.75}}

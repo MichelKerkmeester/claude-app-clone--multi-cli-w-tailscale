@@ -1,0 +1,1257 @@
+{
+  "sessionId": "dr-20260823-000127",
+  "parentSessionId": null,
+  "lineageMode": "new",
+  "generation": 1,
+  "continuedFromRun": null,
+  "terminalStop": null,
+  "keyQuestions": [
+    {
+      "id": "question-1-kq1-architecture-how-does-nodeterm-drive-one-agent-core-over-three-carriers-elec",
+      "inboxId": "inbox-001",
+      "text": "KQ1 [architecture] How does nodeterm drive one agent core over three carriers (Electron preload, browser WebSocket, E2EE relay tunnel) behind a single RpcClient/FrameTransport contract, and what is the exact transport interface, frame discrimination, in-flight failure, and RPC envelope shape?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [architecture]",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": null,
+      "resolved": false
+    },
+    {
+      "id": "question-2-kq2-security-what-is-the-exact-layered-security-envelope-of-nodeterm-s-untrusted",
+      "inboxId": "inbox-002",
+      "text": "KQ2 [security] What is the exact layered security envelope of nodeterm's untrusted-relay E2EE design (NaCl box, HKDF per-session keys, seq anti-replay, role check, SAS mutual approval, approval-from-ciphertext-only rule), and which specific attack does each layer defeat?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [other] relay security",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 9,
+      "resolved": true
+    },
+    {
+      "id": "question-3-kq3-logic-how-does-reduceentry-reduce-raw-agent-hook-events-into-working-waiting",
+      "inboxId": "inbox-003",
+      "text": "KQ3 [logic] How does reduceEntry reduce raw agent hook events into working/waiting/blocked/done status without race-condition false flips (DONE_HOLDOFF, stale-working sweeper, interrupt inference, awaitingInput hold, idle-rescue, newTurn gating, transient-vs-persisted fields)?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [logic] status state machine",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 7,
+      "resolved": true
+    },
+    {
+      "id": "question-4-kq4-logic-how-does-nodeterm-normalize-heterogeneous-agent-transcript-hook-format",
+      "inboxId": "inbox-004",
+      "text": "KQ4 [logic] How does nodeterm normalize heterogeneous agent transcript/hook formats into one universal event shape (NormalizedAgentEvent, per-agent normalizers), and how does it tail live transcripts including subagent fan-out and context-window fill?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [logic] normalization + tails",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 8,
+      "resolved": true
+    },
+    {
+      "id": "question-5-kq5-ease-of-use-how-does-hook-reply-approve-deny-deliver-deterministic-approvals",
+      "inboxId": "inbox-005",
+      "text": "KQ5 [ease-of-use] How does hook-reply Approve/Deny deliver deterministic approvals without keystroke injection (per-decision answer files, pendingId generation and path-traversal validation, stale sweeping, fail-open timeout, askKind distinction, re-read-before-send)?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [ease-of-use] approvals",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 3,
+      "resolved": true
+    },
+    {
+      "id": "question-6-kq6-ux-what-data-contract-mirrorfile-mirrorinbox-inboxevent-inboxnodenow-powers-",
+      "inboxId": "inbox-006",
+      "text": "KQ6 [ux] What data contract (MirrorFile/MirrorInbox, InboxEvent, InboxNodeNow) powers the mobile companion screen, and what are its event production, title/dedup, resolve/archive, live-card, and quick-approve rules?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [ux] mobile inbox",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 2,
+      "resolved": true
+    },
+    {
+      "id": "question-7-kq7-ux-how-does-nodeterm-keep-remote-sessions-usable-across-drops-connected-conn",
+      "inboxId": "inbox-007",
+      "text": "KQ7 [ux] How does nodeterm keep remote sessions usable across drops (connected/connecting/offline model, reconnect-in-place, ready()-can-hang fix, carrier-close in-flight failure, WS heartbeat/reap, backpressure and frame-size caps)?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [ux] drop resilience",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 4,
+      "resolved": true
+    },
+    {
+      "id": "question-8-kq8-ease-of-use-how-does-push-notification-decisioning-decide-when-to-ping-the-p",
+      "inboxId": "inbox-008",
+      "text": "KQ8 [ease-of-use] How does push-notification decisioning decide when to ping the phone (batch window, per-node throttle, presence-aware hold queue, grant model, three-surface degrade, deliver-on-idle with flush-time re-validation)?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [ease-of-use] push decisioning",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 6,
+      "resolved": true
+    }
+  ],
+  "openQuestions": [
+    {
+      "id": "question-1-kq1-architecture-how-does-nodeterm-drive-one-agent-core-over-three-carriers-elec",
+      "inboxId": "inbox-001",
+      "text": "KQ1 [architecture] How does nodeterm drive one agent core over three carriers (Electron preload, browser WebSocket, E2EE relay tunnel) behind a single RpcClient/FrameTransport contract, and what is the exact transport interface, frame discrimination, in-flight failure, and RPC envelope shape?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [architecture]",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": null
+    }
+  ],
+  "resolvedQuestions": [
+    {
+      "id": "question-2-kq2-security-what-is-the-exact-layered-security-envelope-of-nodeterm-s-untrusted",
+      "inboxId": "inbox-002",
+      "text": "KQ2 [security] What is the exact layered security envelope of nodeterm's untrusted-relay E2EE design (NaCl box, HKDF per-session keys, seq anti-replay, role check, SAS mutual approval, approval-from-ciphertext-only rule), and which specific attack does each layer defeat?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [other] relay security",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 9
+    },
+    {
+      "id": "question-3-kq3-logic-how-does-reduceentry-reduce-raw-agent-hook-events-into-working-waiting",
+      "inboxId": "inbox-003",
+      "text": "KQ3 [logic] How does reduceEntry reduce raw agent hook events into working/waiting/blocked/done status without race-condition false flips (DONE_HOLDOFF, stale-working sweeper, interrupt inference, awaitingInput hold, idle-rescue, newTurn gating, transient-vs-persisted fields)?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [logic] status state machine",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 7
+    },
+    {
+      "id": "question-4-kq4-logic-how-does-nodeterm-normalize-heterogeneous-agent-transcript-hook-format",
+      "inboxId": "inbox-004",
+      "text": "KQ4 [logic] How does nodeterm normalize heterogeneous agent transcript/hook formats into one universal event shape (NormalizedAgentEvent, per-agent normalizers), and how does it tail live transcripts including subagent fan-out and context-window fill?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [logic] normalization + tails",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 8
+    },
+    {
+      "id": "question-5-kq5-ease-of-use-how-does-hook-reply-approve-deny-deliver-deterministic-approvals",
+      "inboxId": "inbox-005",
+      "text": "KQ5 [ease-of-use] How does hook-reply Approve/Deny deliver deterministic approvals without keystroke injection (per-decision answer files, pendingId generation and path-traversal validation, stale sweeping, fail-open timeout, askKind distinction, re-read-before-send)?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [ease-of-use] approvals",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 3
+    },
+    {
+      "id": "question-6-kq6-ux-what-data-contract-mirrorfile-mirrorinbox-inboxevent-inboxnodenow-powers-",
+      "inboxId": "inbox-006",
+      "text": "KQ6 [ux] What data contract (MirrorFile/MirrorInbox, InboxEvent, InboxNodeNow) powers the mobile companion screen, and what are its event production, title/dedup, resolve/archive, live-card, and quick-approve rules?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [ux] mobile inbox",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 2
+    },
+    {
+      "id": "question-7-kq7-ux-how-does-nodeterm-keep-remote-sessions-usable-across-drops-connected-conn",
+      "inboxId": "inbox-007",
+      "text": "KQ7 [ux] How does nodeterm keep remote sessions usable across drops (connected/connecting/offline model, reconnect-in-place, ready()-can-hang fix, carrier-close in-flight failure, WS heartbeat/reap, backpressure and frame-size caps)?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [ux] drop resilience",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 4
+    },
+    {
+      "id": "question-8-kq8-ease-of-use-how-does-push-notification-decisioning-decide-when-to-ping-the-p",
+      "inboxId": "inbox-008",
+      "text": "KQ8 [ease-of-use] How does push-notification decisioning decide when to ping the phone (batch window, per-node throttle, presence-aware hold queue, grant model, three-surface degrade, deliver-on-idle with flush-time re-validation)?",
+      "origin": "angle-bank",
+      "source": "charter.md angle [ease-of-use] push decisioning",
+      "injectedAtIteration": 1,
+      "promotedQuestionId": null,
+      "addedAtIteration": 1,
+      "resolvedAtIteration": 6
+    }
+  ],
+  "carriedForwardOpenQuestions": [
+    {
+      "text": "KQ5 (hook-reply approvals)",
+      "addedAtIteration": 1,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ7 (drop resilience: heartbeat/reap, backpressure, frame caps — partially seeded by F3)",
+      "addedAtIteration": 1,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ4 (event normalization/transcript tails)",
+      "addedAtIteration": 1,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ2 (E2EE security layers)",
+      "addedAtIteration": 1,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ8 (push-notification decisioning)",
+      "addedAtIteration": 1,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ3 (reduceEntry status machine)",
+      "addedAtIteration": 1,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ6 (mirror/inbox data contract)",
+      "addedAtIteration": 1,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ3 [logic] How does reduceEntry reduce raw agent hook events into working/waiting/blocked/done status without race-condition false flips (DONE_HOLDOFF, stale-working sweeper, interrupt inference, awaitingInput hold, idle-rescue, newTurn gating, transient-vs-persisted fields)?",
+      "addedAtIteration": 2,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ5 [ease-of-use] How does hook-reply Approve/Deny deliver deterministic approvals without keystroke injection (per-decision answer files, pendingId generation and path-traversal validation, stale sweeping, fail-open timeout, askKind distinction, re-read-before-send)?",
+      "addedAtIteration": 2,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ4 [logic] How does nodeterm normalize heterogeneous agent transcript/hook formats into one universal event shape (NormalizedAgentEvent, per-agent normalizers), and how does it tail live transcripts including subagent fan-out and context-window fill?",
+      "addedAtIteration": 2,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ8 [ease-of-use] How does push-notification decisioning decide when to ping the phone (batch window, per-node throttle, presence-aware hold queue, grant model, three-surface degrade, deliver-on-idle with flush-time re-validation)?",
+      "addedAtIteration": 2,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ7 [ux] How does nodeterm keep remote sessions usable across drops (connected/connecting/offline model, reconnect-in-place, ready()-can-hang fix, carrier-close in-flight failure, WS heartbeat/reap, backpressure and frame-size caps)?",
+      "addedAtIteration": 2,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "KQ2 [security] What is the exact layered security envelope of nodeterm's untrusted-relay E2EE design (NaCl box, HKDF per-session keys, seq anti-replay, role check, SAS mutual approval, approval-from-ciphertext-only rule), and which specific attack does each layer defeat?",
+      "addedAtIteration": 2,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "None. All 8 key questions are now answered (KQ2 closed this iteration; KQ1/3/4/5/6/7/8 closed in iterations 1–8).",
+      "addedAtIteration": 9,
+      "source": "iteration-markdown"
+    },
+    {
+      "text": "None — all eight key questions answered.",
+      "addedAtIteration": 10,
+      "source": "iteration-markdown"
+    }
+  ],
+  "uncoveredQuestions": [
+    "KQ1 [architecture] How does nodeterm drive one agent core over three carriers (Electron preload, browser WebSocket, E2EE relay tunnel) behind a single RpcClient/FrameTransport contract, and what is the exact transport interface, frame discrimination, in-flight failure, and RPC envelope shape?"
+  ],
+  "keyFindings": [
+    {
+      "id": "finding-1-1-f-1-the-carrier-seam-is-a-four-method-interface-with-exactly-two-implementations",
+      "text": "F-1 — The carrier seam is a four-method interface with exactly two implementations",
+      "addedAtIteration": 1,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts (all 103 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/ws-bridge.ts (lines 1-400; RpcClient + builders)",
+        "specs/context/nodeterm-main/src/renderer/bridge/relay-api.ts (all 162 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/stubs.ts (all 439 lines)",
+        "specs/context/nodeterm-main/src/shared/rpc.ts (all 141 lines)",
+        "specs/context/nodeterm-main/src/shared/ipc.ts (channel registry, relay namespace)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-1-2-f-2-frame-discrimination-string-json-rpc-frame-uint8array-binary-pty-data",
+      "text": "F-2 — Frame discrimination: string = JSON RPC frame, Uint8Array = binary pty-data",
+      "addedAtIteration": 1,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts (all 103 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/ws-bridge.ts (lines 1-400; RpcClient + builders)",
+        "specs/context/nodeterm-main/src/renderer/bridge/relay-api.ts (all 162 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/stubs.ts (all 439 lines)",
+        "specs/context/nodeterm-main/src/shared/rpc.ts (all 141 lines)",
+        "specs/context/nodeterm-main/src/shared/ipc.ts (channel registry, relay namespace)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-1-3-f-3-carrier-close-fails-every-in-flight-request-before-overlay-hooks-with-a-code",
+      "text": "F-3 — Carrier close fails every in-flight request BEFORE overlay hooks, with a coded error",
+      "addedAtIteration": 1,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts (all 103 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/ws-bridge.ts (lines 1-400; RpcClient + builders)",
+        "specs/context/nodeterm-main/src/renderer/bridge/relay-api.ts (all 162 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/stubs.ts (all 439 lines)",
+        "specs/context/nodeterm-main/src/shared/rpc.ts (all 141 lines)",
+        "specs/context/nodeterm-main/src/shared/ipc.ts (channel registry, relay namespace)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-1-4-f-4-one-api-surface-rebuilt-over-either-carrier-by-reusing-the-same-builders",
+      "text": "F-4 — One api surface rebuilt over either carrier by reusing the same builders",
+      "addedAtIteration": 1,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts (all 103 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/ws-bridge.ts (lines 1-400; RpcClient + builders)",
+        "specs/context/nodeterm-main/src/renderer/bridge/relay-api.ts (all 162 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/stubs.ts (all 439 lines)",
+        "specs/context/nodeterm-main/src/shared/rpc.ts (all 141 lines)",
+        "specs/context/nodeterm-main/src/shared/ipc.ts (channel registry, relay namespace)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-1-5-f-5-rpc-envelope-five-t-discriminated-shapes-incrementing-id-correlation-out-of-",
+      "text": "F-5 — RPC envelope: five `t`-discriminated shapes, incrementing-id correlation, out-of-band `undef`",
+      "addedAtIteration": 1,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts (all 103 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/ws-bridge.ts (lines 1-400; RpcClient + builders)",
+        "specs/context/nodeterm-main/src/renderer/bridge/relay-api.ts (all 162 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/stubs.ts (all 439 lines)",
+        "specs/context/nodeterm-main/src/shared/rpc.ts (all 141 lines)",
+        "specs/context/nodeterm-main/src/shared/ipc.ts (channel registry, relay namespace)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-1-6-f-6-early-event-replay-buffer-closes-the-open-vs-subscribe-race",
+      "text": "F-6 — Early-event replay buffer closes the open-vs-subscribe race",
+      "addedAtIteration": 1,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts (all 103 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/ws-bridge.ts (lines 1-400; RpcClient + builders)",
+        "specs/context/nodeterm-main/src/renderer/bridge/relay-api.ts (all 162 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/stubs.ts (all 439 lines)",
+        "specs/context/nodeterm-main/src/shared/rpc.ts (all 141 lines)",
+        "specs/context/nodeterm-main/src/shared/ipc.ts (channel registry, relay namespace)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-1-7-f-7-the-third-surface-a-stub-api-whose-degrades-are-typed-deliberate-and-compile",
+      "text": "F-7 — The third surface: a stub api whose degrades are typed, deliberate, and compiler-enforced",
+      "addedAtIteration": 1,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts (all 103 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/ws-bridge.ts (lines 1-400; RpcClient + builders)",
+        "specs/context/nodeterm-main/src/renderer/bridge/relay-api.ts (all 162 lines)",
+        "specs/context/nodeterm-main/src/renderer/bridge/stubs.ts (all 439 lines)",
+        "specs/context/nodeterm-main/src/shared/rpc.ts (all 141 lines)",
+        "specs/context/nodeterm-main/src/shared/ipc.ts (channel registry, relay namespace)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-2-1-f-1-additive-inbox-block-rides-the-existing-v1-mirror-file-no-new-transport",
+      "text": "F-1 — Additive inbox block rides the existing v1 mirror file; no new transport",
+      "addedAtIteration": 2,
+      "sources": [
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:1-143",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:31-36,146-354,360-448,468-481,510-511,537-587,589-628,656-748,771-803,805-868,886-968,970-1001,1003-1010,1076-1164,1214-1236,1238-1429,1431-1437,1439-1507,1509-1528,1530-1575,1592-1673,1690-1712,1733-1782",
+        "specs/context/nodeterm-main/src/main/remote-ssh/remote-status-push.ts:1-90"
+      ]
+    },
+    {
+      "id": "finding-2-2-f-2-inboxevent-inboxnodenow-mirrorinbox-shapes-with-hard-caps",
+      "text": "F-2 — InboxEvent / InboxNodeNow / MirrorInbox shapes with hard caps",
+      "addedAtIteration": 2,
+      "sources": [
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:1-143",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:31-36,146-354,360-448,468-481,510-511,537-587,589-628,656-748,771-803,805-868,886-968,970-1001,1003-1010,1076-1164,1214-1236,1238-1429,1431-1437,1439-1507,1509-1528,1530-1575,1592-1673,1690-1712,1733-1782",
+        "specs/context/nodeterm-main/src/main/remote-ssh/remote-status-push.ts:1-90"
+      ]
+    },
+    {
+      "id": "finding-2-3-f-3-event-production-stash-priority-classification-not-raw-state-mapping",
+      "text": "F-3 — Event production: stash-priority classification, not raw state mapping",
+      "addedAtIteration": 2,
+      "sources": [
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:1-143",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:31-36,146-354,360-448,468-481,510-511,537-587,589-628,656-748,771-803,805-868,886-968,970-1001,1003-1010,1076-1164,1214-1236,1238-1429,1431-1437,1439-1507,1509-1528,1530-1575,1592-1673,1690-1712,1733-1782",
+        "specs/context/nodeterm-main/src/main/remote-ssh/remote-status-push.ts:1-90"
+      ]
+    },
+    {
+      "id": "finding-2-4-f-4-dedup-is-title-based-and-bounded-and-survives-restarts",
+      "text": "F-4 — Dedup is TITLE-based and bounded, and survives restarts",
+      "addedAtIteration": 2,
+      "sources": [
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:1-143",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:31-36,146-354,360-448,468-481,510-511,537-587,589-628,656-748,771-803,805-868,886-968,970-1001,1003-1010,1076-1164,1214-1236,1238-1429,1431-1437,1439-1507,1509-1528,1530-1575,1592-1673,1690-1712,1733-1782",
+        "specs/context/nodeterm-main/src/main/remote-ssh/remote-status-push.ts:1-90"
+      ]
+    },
+    {
+      "id": "finding-2-5-f-5-resolve-archive-live-card-lifecycle-host-owns-resolution-phone-owns-reading",
+      "text": "F-5 — Resolve/archive/live-card lifecycle: host owns resolution, phone owns reading",
+      "addedAtIteration": 2,
+      "sources": [
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:1-143",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:31-36,146-354,360-448,468-481,510-511,537-587,589-628,656-748,771-803,805-868,886-968,970-1001,1003-1010,1076-1164,1214-1236,1238-1429,1431-1437,1439-1507,1509-1528,1530-1575,1592-1673,1690-1712,1733-1782",
+        "specs/context/nodeterm-main/src/main/remote-ssh/remote-status-push.ts:1-90"
+      ]
+    },
+    {
+      "id": "finding-2-6-f-6-quick-approve-re-read-before-send-ssh-slices-keep-a-filtered-inbox",
+      "text": "F-6 — Quick-approve: re-read-before-send; SSH slices keep a filtered inbox",
+      "addedAtIteration": 2,
+      "sources": [
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:1-143",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:31-36,146-354,360-448,468-481,510-511,537-587,589-628,656-748,771-803,805-868,886-968,970-1001,1003-1010,1076-1164,1214-1236,1238-1429,1431-1437,1439-1507,1509-1528,1530-1575,1592-1673,1690-1712,1733-1782",
+        "specs/context/nodeterm-main/src/main/remote-ssh/remote-status-push.ts:1-90"
+      ]
+    },
+    {
+      "id": "finding-3-1-f-1-held-hook-answer-file-contract-the-reply-channel-is-a-file-on-the-host-the-a",
+      "text": "F-1 — Held-hook + answer-file contract: the reply channel is a file on the host the agent runs on",
+      "addedAtIteration": 3,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/agents/pending-approvals.ts:1-136 (answer-file writer, PENDING_ID_RE, sweeper, synthetic event)",
+        "specs/context/nodeterm-main/docs/hook-reply-approvals.md:1-67 (v1 contract: request/poll/reply, answerers, env gating, cleanup)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-110 (NormalizedAgentEvent: pendingId, askKind, nodeterm_answered docs)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1180-1264 (recordAgentEvent enrichment, NeedsYouClassification, state-leave resolution)",
+        "specs/context/nodeterm-main/src/shared/agents/approval-mode.ts:1-222 (dialect table, modeSupported, approvalFlags, withPermissionMode, derived copy)",
+        "specs/context/nodeterm-main/src/renderer/state/permissionMode.ts:97-162 (activePermissionMode resolver, claude-only auto gate, SSH handling — via grep line evidence)",
+        "specs/context/nodeterm-main/src/shared/agents/config.ts:211,599 (gate ownership note, resolvePermissionMode home — via grep line evidence)"
+      ]
+    },
+    {
+      "id": "finding-3-2-f-2-pendingid-generation-and-pending-id-re-the-only-value-interpolated-into-a-fi",
+      "text": "F-2 — pendingId generation and PENDING_ID_RE: the only value interpolated into a filename is allowlisted",
+      "addedAtIteration": 3,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/agents/pending-approvals.ts:1-136 (answer-file writer, PENDING_ID_RE, sweeper, synthetic event)",
+        "specs/context/nodeterm-main/docs/hook-reply-approvals.md:1-67 (v1 contract: request/poll/reply, answerers, env gating, cleanup)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-110 (NormalizedAgentEvent: pendingId, askKind, nodeterm_answered docs)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1180-1264 (recordAgentEvent enrichment, NeedsYouClassification, state-leave resolution)",
+        "specs/context/nodeterm-main/src/shared/agents/approval-mode.ts:1-222 (dialect table, modeSupported, approvalFlags, withPermissionMode, derived copy)",
+        "specs/context/nodeterm-main/src/renderer/state/permissionMode.ts:97-162 (activePermissionMode resolver, claude-only auto gate, SSH handling — via grep line evidence)",
+        "specs/context/nodeterm-main/src/shared/agents/config.ts:211,599 (gate ownership note, resolvePermissionMode home — via grep line evidence)"
+      ]
+    },
+    {
+      "id": "finding-3-3-f-3-atomic-answer-write-with-fail-open-error-semantics",
+      "text": "F-3 — Atomic answer write with fail-open error semantics",
+      "addedAtIteration": 3,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/agents/pending-approvals.ts:1-136 (answer-file writer, PENDING_ID_RE, sweeper, synthetic event)",
+        "specs/context/nodeterm-main/docs/hook-reply-approvals.md:1-67 (v1 contract: request/poll/reply, answerers, env gating, cleanup)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-110 (NormalizedAgentEvent: pendingId, askKind, nodeterm_answered docs)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1180-1264 (recordAgentEvent enrichment, NeedsYouClassification, state-leave resolution)",
+        "specs/context/nodeterm-main/src/shared/agents/approval-mode.ts:1-222 (dialect table, modeSupported, approvalFlags, withPermissionMode, derived copy)",
+        "specs/context/nodeterm-main/src/renderer/state/permissionMode.ts:97-162 (activePermissionMode resolver, claude-only auto gate, SSH handling — via grep line evidence)",
+        "specs/context/nodeterm-main/src/shared/agents/config.ts:211,599 (gate ownership note, resolvePermissionMode home — via grep line evidence)"
+      ]
+    },
+    {
+      "id": "finding-3-4-f-4-fail-open-timeout-and-stale-request-sweeping-bound-every-ticket-s-lifetime",
+      "text": "F-4 — Fail-open timeout and stale-request sweeping bound every ticket's lifetime",
+      "addedAtIteration": 3,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/agents/pending-approvals.ts:1-136 (answer-file writer, PENDING_ID_RE, sweeper, synthetic event)",
+        "specs/context/nodeterm-main/docs/hook-reply-approvals.md:1-67 (v1 contract: request/poll/reply, answerers, env gating, cleanup)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-110 (NormalizedAgentEvent: pendingId, askKind, nodeterm_answered docs)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1180-1264 (recordAgentEvent enrichment, NeedsYouClassification, state-leave resolution)",
+        "specs/context/nodeterm-main/src/shared/agents/approval-mode.ts:1-222 (dialect table, modeSupported, approvalFlags, withPermissionMode, derived copy)",
+        "specs/context/nodeterm-main/src/renderer/state/permissionMode.ts:97-162 (activePermissionMode resolver, claude-only auto gate, SSH handling — via grep line evidence)",
+        "specs/context/nodeterm-main/src/shared/agents/config.ts:211,599 (gate ownership note, resolvePermissionMode home — via grep line evidence)"
+      ]
+    },
+    {
+      "id": "finding-3-5-f-5-askkind-distinction-a-question-strips-its-pendingid-so-approve-deny-ui-can-n",
+      "text": "F-5 — askKind distinction: a question strips its pendingId so approve/deny UI can never render on a picker",
+      "addedAtIteration": 3,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/agents/pending-approvals.ts:1-136 (answer-file writer, PENDING_ID_RE, sweeper, synthetic event)",
+        "specs/context/nodeterm-main/docs/hook-reply-approvals.md:1-67 (v1 contract: request/poll/reply, answerers, env gating, cleanup)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-110 (NormalizedAgentEvent: pendingId, askKind, nodeterm_answered docs)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1180-1264 (recordAgentEvent enrichment, NeedsYouClassification, state-leave resolution)",
+        "specs/context/nodeterm-main/src/shared/agents/approval-mode.ts:1-222 (dialect table, modeSupported, approvalFlags, withPermissionMode, derived copy)",
+        "specs/context/nodeterm-main/src/renderer/state/permissionMode.ts:97-162 (activePermissionMode resolver, claude-only auto gate, SSH handling — via grep line evidence)",
+        "specs/context/nodeterm-main/src/shared/agents/config.ts:211,599 (gate ownership note, resolvePermissionMode home — via grep line evidence)"
+      ]
+    },
+    {
+      "id": "finding-3-6-f-6-optimistic-answered-event-and-the-second-post-handshake-instant-ui-idempoten",
+      "text": "F-6 — Optimistic answered event and the second-POST handshake: instant UI, idempotent convergence",
+      "addedAtIteration": 3,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/agents/pending-approvals.ts:1-136 (answer-file writer, PENDING_ID_RE, sweeper, synthetic event)",
+        "specs/context/nodeterm-main/docs/hook-reply-approvals.md:1-67 (v1 contract: request/poll/reply, answerers, env gating, cleanup)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-110 (NormalizedAgentEvent: pendingId, askKind, nodeterm_answered docs)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1180-1264 (recordAgentEvent enrichment, NeedsYouClassification, state-leave resolution)",
+        "specs/context/nodeterm-main/src/shared/agents/approval-mode.ts:1-222 (dialect table, modeSupported, approvalFlags, withPermissionMode, derived copy)",
+        "specs/context/nodeterm-main/src/renderer/state/permissionMode.ts:97-162 (activePermissionMode resolver, claude-only auto gate, SSH handling — via grep line evidence)",
+        "specs/context/nodeterm-main/src/shared/agents/config.ts:211,599 (gate ownership note, resolvePermissionMode home — via grep line evidence)"
+      ]
+    },
+    {
+      "id": "finding-3-7-f-7-approval-mode-mapping-per-agent-dialects-no-nearest-match-substitution-re-va",
+      "text": "F-7 — Approval-mode mapping: per-agent dialects, no nearest-match substitution, re-validation at the interpolation site",
+      "addedAtIteration": 3,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/agents/pending-approvals.ts:1-136 (answer-file writer, PENDING_ID_RE, sweeper, synthetic event)",
+        "specs/context/nodeterm-main/docs/hook-reply-approvals.md:1-67 (v1 contract: request/poll/reply, answerers, env gating, cleanup)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-110 (NormalizedAgentEvent: pendingId, askKind, nodeterm_answered docs)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1180-1264 (recordAgentEvent enrichment, NeedsYouClassification, state-leave resolution)",
+        "specs/context/nodeterm-main/src/shared/agents/approval-mode.ts:1-222 (dialect table, modeSupported, approvalFlags, withPermissionMode, derived copy)",
+        "specs/context/nodeterm-main/src/renderer/state/permissionMode.ts:97-162 (activePermissionMode resolver, claude-only auto gate, SSH handling — via grep line evidence)",
+        "specs/context/nodeterm-main/src/shared/agents/config.ts:211,599 (gate ownership note, resolvePermissionMode home — via grep line evidence)"
+      ]
+    },
+    {
+      "id": "finding-4-1-f-1-three-state-session-status-model-mutated-in-place",
+      "text": "F-1 — Three-state session status model mutated in place",
+      "addedAtIteration": 4,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/session/session.ts:17,36,54-59,85-130,180-194",
+        "specs/context/nodeterm-main/src/renderer/session/relay-tab.ts:9-15,31,69-77,91-94,111-137,153-181,183-212",
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts:18-29,49-61,83-85,96-102",
+        "specs/context/nodeterm-main/src/server/ws.ts:24-54,80-106,108-146,168-172,204-210"
+      ]
+    },
+    {
+      "id": "finding-4-2-f-2-involuntary-drop-keeps-the-entry-and-binding-user-close-does-not",
+      "text": "F-2 — Involuntary drop keeps the entry and binding; user close does not",
+      "addedAtIteration": 4,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/session/session.ts:17,36,54-59,85-130,180-194",
+        "specs/context/nodeterm-main/src/renderer/session/relay-tab.ts:9-15,31,69-77,91-94,111-137,153-181,183-212",
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts:18-29,49-61,83-85,96-102",
+        "specs/context/nodeterm-main/src/server/ws.ts:24-54,80-106,108-146,168-172,204-210"
+      ]
+    },
+    {
+      "id": "finding-4-3-f-3-ready-can-hang-trap-fixed-by-racing-approval-against-real-close-signal-plus-",
+      "text": "F-3 — ready()-can-hang trap fixed by racing approval against real close signal plus timeout backstop",
+      "addedAtIteration": 4,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/session/session.ts:17,36,54-59,85-130,180-194",
+        "specs/context/nodeterm-main/src/renderer/session/relay-tab.ts:9-15,31,69-77,91-94,111-137,153-181,183-212",
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts:18-29,49-61,83-85,96-102",
+        "specs/context/nodeterm-main/src/server/ws.ts:24-54,80-106,108-146,168-172,204-210"
+      ]
+    },
+    {
+      "id": "finding-4-4-f-4-offline-tab-is-a-connection-bookmark-grey-out-click-to-reconnect-deferred-st",
+      "text": "F-4 — Offline tab is a connection bookmark: grey out, click-to-reconnect, deferred stale-session disposal",
+      "addedAtIteration": 4,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/session/session.ts:17,36,54-59,85-130,180-194",
+        "specs/context/nodeterm-main/src/renderer/session/relay-tab.ts:9-15,31,69-77,91-94,111-137,153-181,183-212",
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts:18-29,49-61,83-85,96-102",
+        "specs/context/nodeterm-main/src/server/ws.ts:24-54,80-106,108-146,168-172,204-210"
+      ]
+    },
+    {
+      "id": "finding-4-5-f-5-carrier-close-fails-in-flight-requests-and-shows-the-reconnect-overlay-trans",
+      "text": "F-5 — Carrier close fails in-flight requests and shows the reconnect overlay (transport contract)",
+      "addedAtIteration": 4,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/session/session.ts:17,36,54-59,85-130,180-194",
+        "specs/context/nodeterm-main/src/renderer/session/relay-tab.ts:9-15,31,69-77,91-94,111-137,153-181,183-212",
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts:18-29,49-61,83-85,96-102",
+        "specs/context/nodeterm-main/src/server/ws.ts:24-54,80-106,108-146,168-172,204-210"
+      ]
+    },
+    {
+      "id": "finding-4-6-f-6-ws-heartbeat-reap-ping-every-30-s-one-missed-round-terminates-sized-for-prox",
+      "text": "F-6 — WS heartbeat/reap: ping every 30 s, one missed round terminates, sized for proxy idle timeouts",
+      "addedAtIteration": 4,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/session/session.ts:17,36,54-59,85-130,180-194",
+        "specs/context/nodeterm-main/src/renderer/session/relay-tab.ts:9-15,31,69-77,91-94,111-137,153-181,183-212",
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts:18-29,49-61,83-85,96-102",
+        "specs/context/nodeterm-main/src/server/ws.ts:24-54,80-106,108-146,168-172,204-210"
+      ]
+    },
+    {
+      "id": "finding-4-7-f-7-8-mib-frame-cap-rejects-oversized-frames-pre-dispatch-as-shared-process-dos-",
+      "text": "F-7 — 8 MiB frame cap rejects oversized frames pre-dispatch as shared-process DoS guard",
+      "addedAtIteration": 4,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/session/session.ts:17,36,54-59,85-130,180-194",
+        "specs/context/nodeterm-main/src/renderer/session/relay-tab.ts:9-15,31,69-77,91-94,111-137,153-181,183-212",
+        "specs/context/nodeterm-main/src/renderer/bridge/frame-transport.ts:18-29,49-61,83-85,96-102",
+        "specs/context/nodeterm-main/src/server/ws.ts:24-54,80-106,108-146,168-172,204-210"
+      ]
+    },
+    {
+      "id": "finding-6-1-f-01-one-actionable-event-seam-feeds-both-the-inbox-and-the-push-service",
+      "text": "F-01 — One actionable-event seam feeds BOTH the inbox and the push service",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-6-2-f-02-batch-window-coalesces-close-together-events-hard-cap-of-10-events-per-post",
+      "text": "F-02 — Batch window coalesces close-together events; hard cap of 10 events per POST; the gate is re-checked at flush time",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-6-3-f-03-per-node-5-second-throttle-charged-only-when-an-event-is-accepted",
+      "text": "F-03 — Per-node 5-second throttle, charged only when an event is accepted",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-6-4-f-04-presence-aware-hold-queue-hold-alerts-while-the-user-is-at-the-desktop-flus",
+      "text": "F-04 — Presence-aware hold queue: hold alerts while the user is at the desktop, flush the still-unresolved ones on the present→away edge",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-6-5-f-05-grant-model-ssh-possession-is-the-authorization-a-capability-file-the-phone",
+      "text": "F-05 — Grant model: SSH possession IS the authorization — a capability file the phone drops, zero open ports, self-healing dead-mark",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-6-6-f-06-remote-grant-sweep-per-device-dedupe-targeting-is-a-union-and-the-residual-",
+      "text": "F-06 — Remote grant sweep + per-device dedupe; targeting is a UNION, and the residual double-push is documented as the cheap side of the tradeoff",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-6-7-f-07-deliberate-three-surface-degrade-the-service-ships-everywhere-but-only-the-",
+      "text": "F-07 — Deliberate three-surface degrade: the service ships everywhere but only the surface with prerequisites constructs it",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-6-8-f-08-delivery-queue-deliver-on-idle-flush-time-re-validation-is-the-load-bearing",
+      "text": "F-08 — Delivery-queue deliver-on-idle: flush-time re-validation is the load-bearing property, and no outcome is ever silent",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-6-9-f-09-the-live-update-stream-state-edges-post-fast-activity-ticks-coalesce-and-a-",
+      "text": "F-09 — The live-update stream: state edges post fast, activity ticks coalesce, and a parked tick can never contradict an end edge",
+      "addedAtIteration": 6,
+      "sources": [
+        "specs/context/nodeterm-main/src/core/push-notify.ts:4-8,19-33,46-78,88-148,150-177,207-222,242-247,263-269,282-289,291-310,330-353,355-389,410-432,456-473,534-548,587-593,611-614,674-681",
+        "specs/context/nodeterm-main/src/core/push-grants.ts:1-13,19-28,56-105,145-207",
+        "specs/context/nodeterm-main/src/core/remote-push-grants.ts:1-17,21-39,44-72,85-118",
+        "specs/context/nodeterm-main/src/core/agents/delivery-queue.ts:5-63,122-134,161-200,202-265",
+        "specs/context/nodeterm-main/src/core/presence/hub.ts:30-61,64-93,168-199",
+        "specs/context/nodeterm-main/src/shared/presence.ts:1-6,97-102,129-151",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json (boundary/budget verification)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md (exhausted approaches, next focus)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl (iteration count = 5 → this is 6)"
+      ]
+    },
+    {
+      "id": "finding-7-1-f-01-done-holdoff-a-3-s-parallel-hook-guard-duplicated-on-both-sides-of-the-seam",
+      "text": "F-01 — DONE_HOLDOFF: a 3 s parallel-hook guard duplicated on both sides of the seam",
+      "addedAtIteration": 7,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/state/agentStatus.ts:1-653 (full)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1-1072, 1073-1815 (full, two passes)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-719 (full)",
+        "specs/context/nodeterm-main/src/shared/agents/stale.ts:1-31 (full)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-7-2-f-02-stale-working-sweeper-one-constant-one-decider-one-synthetic-end-edge",
+      "text": "F-02 — Stale-working sweeper: ONE constant, ONE decider, one synthetic end edge",
+      "addedAtIteration": 7,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/state/agentStatus.ts:1-653 (full)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1-1072, 1073-1815 (full, two passes)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-719 (full)",
+        "specs/context/nodeterm-main/src/shared/agents/stale.ts:1-31 (full)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-7-3-f-03-interrupt-inference-settle-window-unchanged-freshness-baseline",
+      "text": "F-03 — Interrupt inference: settle window + unchanged freshness baseline",
+      "addedAtIteration": 7,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/state/agentStatus.ts:1-653 (full)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1-1072, 1073-1815 (full, two passes)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-719 (full)",
+        "specs/context/nodeterm-main/src/shared/agents/stale.ts:1-31 (full)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-7-4-f-04-awaitinginput-hold-a-needs-you-that-survives-its-own-turn-end-done",
+      "text": "F-04 — awaitingInput hold: a needs-you that survives its own turn-end done",
+      "addedAtIteration": 7,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/state/agentStatus.ts:1-653 (full)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1-1072, 1073-1815 (full, two passes)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-719 (full)",
+        "specs/context/nodeterm-main/src/shared/agents/stale.ts:1-31 (full)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-7-5-f-05-idle-rescue-may-only-move-a-still-working-node-and-remembers-which-kind-of-",
+      "text": "F-05 — Idle-rescue: may only move a still-working node, and remembers which kind of done it is",
+      "addedAtIteration": 7,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/state/agentStatus.ts:1-653 (full)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1-1072, 1073-1815 (full, two passes)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-719 (full)",
+        "specs/context/nodeterm-main/src/shared/agents/stale.ts:1-31 (full)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-7-6-f-06-newturn-gating-one-explicit-turn-start-flag-gates-resurrection-fan-out-rese",
+      "text": "F-06 — newTurn gating: one explicit turn-start flag gates resurrection, fan-out reset, and guard clearing",
+      "addedAtIteration": 7,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/state/agentStatus.ts:1-653 (full)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1-1072, 1073-1815 (full, two passes)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-719 (full)",
+        "specs/context/nodeterm-main/src/shared/agents/stale.ts:1-31 (full)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-7-7-f-07-transient-vs-persisted-persist-identity-never-live-state-or-clocks-label-re",
+      "text": "F-07 — Transient vs persisted: persist identity, never live state or clocks; label restored evidence",
+      "addedAtIteration": 7,
+      "sources": [
+        "specs/context/nodeterm-main/src/renderer/state/agentStatus.ts:1-653 (full)",
+        "specs/context/nodeterm-main/src/core/agent-status-mirror.ts:1-1072, 1073-1815 (full, two passes)",
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:1-719 (full)",
+        "specs/context/nodeterm-main/src/shared/agents/stale.ts:1-31 (full)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-strategy.md",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-state.jsonl"
+      ]
+    },
+    {
+      "id": "finding-8-1-f-01-one-universal-event-shape-per-agent-normalizers-absorb-every-dialect",
+      "text": "F-01 — One universal event shape; per-agent normalizers absorb every dialect",
+      "addedAtIteration": 8,
+      "sources": [
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:5-40,142,301,353,414,465,583,711",
+        "specs/context/nodeterm-main/src/core/transcript-reader.ts:20-103,125-181,189-240,270-345",
+        "specs/context/nodeterm-main/src/core/transcript-index-core.ts:1-102",
+        "specs/context/nodeterm-main/src/core/subagent-tail.ts:1-15,73-133,163-236",
+        "specs/context/nodeterm-main/src/core/context-tail.ts:10-62,64-139,141-219,222-315",
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:75-97,99-118,130-134",
+        "specs/context/nodeterm-main/src/core/__fixtures__/codex/rollout.jsonl:1-3",
+        "specs/context/nodeterm-main/src/core/__fixtures__/gemini/session.jsonl:1-2",
+        "specs/context/nodeterm-main/src/core/__fixtures__/grok/summary.json"
+      ]
+    },
+    {
+      "id": "finding-8-2-f-02-fixtures-confirm-how-heterogeneous-the-raw-formats-are",
+      "text": "F-02 — Fixtures confirm how heterogeneous the raw formats are",
+      "addedAtIteration": 8,
+      "sources": [
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:5-40,142,301,353,414,465,583,711",
+        "specs/context/nodeterm-main/src/core/transcript-reader.ts:20-103,125-181,189-240,270-345",
+        "specs/context/nodeterm-main/src/core/transcript-index-core.ts:1-102",
+        "specs/context/nodeterm-main/src/core/subagent-tail.ts:1-15,73-133,163-236",
+        "specs/context/nodeterm-main/src/core/context-tail.ts:10-62,64-139,141-219,222-315",
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:75-97,99-118,130-134",
+        "specs/context/nodeterm-main/src/core/__fixtures__/codex/rollout.jsonl:1-3",
+        "specs/context/nodeterm-main/src/core/__fixtures__/gemini/session.jsonl:1-2",
+        "specs/context/nodeterm-main/src/core/__fixtures__/grok/summary.json"
+      ]
+    },
+    {
+      "id": "finding-8-3-f-03-transcript-reader-bounded-tails-traversal-proof-ids-account-scoped-caching",
+      "text": "F-03 — Transcript reader: bounded tails, traversal-proof ids, account-scoped caching",
+      "addedAtIteration": 8,
+      "sources": [
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:5-40,142,301,353,414,465,583,711",
+        "specs/context/nodeterm-main/src/core/transcript-reader.ts:20-103,125-181,189-240,270-345",
+        "specs/context/nodeterm-main/src/core/transcript-index-core.ts:1-102",
+        "specs/context/nodeterm-main/src/core/subagent-tail.ts:1-15,73-133,163-236",
+        "specs/context/nodeterm-main/src/core/context-tail.ts:10-62,64-139,141-219,222-315",
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:75-97,99-118,130-134",
+        "specs/context/nodeterm-main/src/core/__fixtures__/codex/rollout.jsonl:1-3",
+        "specs/context/nodeterm-main/src/core/__fixtures__/gemini/session.jsonl:1-2",
+        "specs/context/nodeterm-main/src/core/__fixtures__/grok/summary.json"
+      ]
+    },
+    {
+      "id": "finding-8-4-f-04-transcript-index-pure-helpers-mtime-incremental-refresh-parser-consistent-w",
+      "text": "F-04 — Transcript index: pure helpers, mtime-incremental refresh, parser-consistent with the chat view",
+      "addedAtIteration": 8,
+      "sources": [
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:5-40,142,301,353,414,465,583,711",
+        "specs/context/nodeterm-main/src/core/transcript-reader.ts:20-103,125-181,189-240,270-345",
+        "specs/context/nodeterm-main/src/core/transcript-index-core.ts:1-102",
+        "specs/context/nodeterm-main/src/core/subagent-tail.ts:1-15,73-133,163-236",
+        "specs/context/nodeterm-main/src/core/context-tail.ts:10-62,64-139,141-219,222-315",
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:75-97,99-118,130-134",
+        "specs/context/nodeterm-main/src/core/__fixtures__/codex/rollout.jsonl:1-3",
+        "specs/context/nodeterm-main/src/core/__fixtures__/gemini/session.jsonl:1-2",
+        "specs/context/nodeterm-main/src/core/__fixtures__/grok/summary.json"
+      ]
+    },
+    {
+      "id": "finding-8-5-f-05-subagent-tail-meta-correlated-fan-out-streaming-with-tear-safe-carries",
+      "text": "F-05 — Subagent tail: meta-correlated fan-out streaming with tear-safe carries",
+      "addedAtIteration": 8,
+      "sources": [
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:5-40,142,301,353,414,465,583,711",
+        "specs/context/nodeterm-main/src/core/transcript-reader.ts:20-103,125-181,189-240,270-345",
+        "specs/context/nodeterm-main/src/core/transcript-index-core.ts:1-102",
+        "specs/context/nodeterm-main/src/core/subagent-tail.ts:1-15,73-133,163-236",
+        "specs/context/nodeterm-main/src/core/context-tail.ts:10-62,64-139,141-219,222-315",
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:75-97,99-118,130-134",
+        "specs/context/nodeterm-main/src/core/__fixtures__/codex/rollout.jsonl:1-3",
+        "specs/context/nodeterm-main/src/core/__fixtures__/gemini/session.jsonl:1-2",
+        "specs/context/nodeterm-main/src/core/__fixtures__/grok/summary.json"
+      ]
+    },
+    {
+      "id": "finding-8-6-f-06-context-tail-backward-scanned-usage-per-agent-parse-dep-owns-the-denominato",
+      "text": "F-06 — Context tail: backward-scanned usage, per-agent parse dep owns the denominator, two free side-channel signals",
+      "addedAtIteration": 8,
+      "sources": [
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:5-40,142,301,353,414,465,583,711",
+        "specs/context/nodeterm-main/src/core/transcript-reader.ts:20-103,125-181,189-240,270-345",
+        "specs/context/nodeterm-main/src/core/transcript-index-core.ts:1-102",
+        "specs/context/nodeterm-main/src/core/subagent-tail.ts:1-15,73-133,163-236",
+        "specs/context/nodeterm-main/src/core/context-tail.ts:10-62,64-139,141-219,222-315",
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:75-97,99-118,130-134",
+        "specs/context/nodeterm-main/src/core/__fixtures__/codex/rollout.jsonl:1-3",
+        "specs/context/nodeterm-main/src/core/__fixtures__/gemini/session.jsonl:1-2",
+        "specs/context/nodeterm-main/src/core/__fixtures__/grok/summary.json"
+      ]
+    },
+    {
+      "id": "finding-8-7-f-07-activity-strings-contextpercent-the-raw-listener-mobile-live-card-pipeline",
+      "text": "F-07 — Activity strings + contextPercent: the raw-listener → mobile live-card pipeline",
+      "addedAtIteration": 8,
+      "sources": [
+        "specs/context/nodeterm-main/src/shared/agents/normalize.ts:5-40,142,301,353,414,465,583,711",
+        "specs/context/nodeterm-main/src/core/transcript-reader.ts:20-103,125-181,189-240,270-345",
+        "specs/context/nodeterm-main/src/core/transcript-index-core.ts:1-102",
+        "specs/context/nodeterm-main/src/core/subagent-tail.ts:1-15,73-133,163-236",
+        "specs/context/nodeterm-main/src/core/context-tail.ts:10-62,64-139,141-219,222-315",
+        "specs/context/nodeterm-main/docs/mobile-usage-inbox.md:75-97,99-118,130-134",
+        "specs/context/nodeterm-main/src/core/__fixtures__/codex/rollout.jsonl:1-3",
+        "specs/context/nodeterm-main/src/core/__fixtures__/gemini/session.jsonl:1-2",
+        "specs/context/nodeterm-main/src/core/__fixtures__/grok/summary.json"
+      ]
+    },
+    {
+      "id": "finding-9-1-f-01-nacl-box-authenticated-encryption-with-strict-key-validation-and-fail-close",
+      "text": "F-01 — NaCl box authenticated encryption with strict key validation and fail-closed decrypt",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-9-2-f-02-two-key-separation-stable-basekey-identity-sas-vs-per-session-hkdf-traffic-",
+      "text": "F-02 — Two-key separation: stable baseKey (identity/SAS) vs per-session HKDF traffic key",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-9-3-f-03-sealed-plaintext-header-role-seq-tag-all-security-metadata-inside-the-box",
+      "text": "F-03 — Sealed-plaintext header `[role][seq][tag]`: all security metadata inside the box",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-9-4-f-04-role-byte-must-equal-peer-check-anti-reflection",
+      "text": "F-04 — Role-byte-must-equal-peer check (anti-reflection)",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-9-5-f-05-strictly-increasing-inbound-anti-replay-seq",
+      "text": "F-05 — Strictly-increasing inbound anti-replay seq",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-9-6-f-06-handshake-processed-exactly-once-no-mid-session-re-key-per-frame-peer-key-p",
+      "text": "F-06 — Handshake processed exactly once: no mid-session re-key + per-frame peer-key pin",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-9-7-f-07-out-of-band-6-digit-sas-with-mutual-approval-and-pin-once-peer-keys",
+      "text": "F-07 — Out-of-band 6-digit SAS with mutual approval and pin-once peer keys",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-9-8-f-08-approval-advances-only-from-ciphertext-the-single-trust-choke-point",
+      "text": "F-08 — Approval advances ONLY from ciphertext: the single trust choke point",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-9-9-f-09-endianness-discipline-traps-three-different-byte-orders-in-one-protocol",
+      "text": "F-09 — Endianness discipline traps (three different byte orders in one protocol)",
+      "addedAtIteration": 9,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/e2ee.ts:1-5, 22-39, 41-48, 50-53, 55-73, 76-84, 86-95, 97-107",
+        "specs/context/nodeterm-main/src/main/remote/relay-trust.ts:9-27, 40-46, 86-88, 112-131",
+        "specs/context/nodeterm-main/src/main/remote/mutual-approval-core.ts:1-31, 35-54, 61-98",
+        "specs/context/nodeterm-main/src/main/remote/framing.ts:7-15, 45-49, 51-64, 66-88",
+        "specs/context/nodeterm-main/docs/ios-protocol-migration.md:6-8, 160-163, 176-185, 232-273, 275-302, 306-386, 471-489, 569-594, 598-604, 629-638"
+      ]
+    },
+    {
+      "id": "finding-10-1-f-01-sealed-role-seq-tag-header-construction-verified-at-primary-lines-upgrades-",
+      "text": "F-01 — Sealed `[role][seq][tag]` header construction VERIFIED at primary lines (upgrades iteration-9 F-03)",
+      "addedAtIteration": 10,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/relay-socket.ts:125-136, 176-177, 188-199, 212-218, 250-265, 291-299, 301-348, 350-398, 427-483, 485-492, 501-535, 557-562, 691-705",
+        "specs/context/nodeterm-main/src/main/remote/relay-client.ts:9-28, 46-68, 71-84, 86-110, 113-118, 120-167",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/iterations/iteration-009.md (claim-comparison baseline)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json, deep-research-state.jsonl, deep-research-strategy.md (state)"
+      ]
+    },
+    {
+      "id": "finding-10-2-f-02-receiver-check-chain-verified-decrypt-length-9-role-peer-role-seq-strictly-",
+      "text": "F-02 — Receiver check chain VERIFIED: decrypt → length ≥ 9 → role == PEER_ROLE → seq strictly increasing → strip + dispatch (upgrades iteration-9 F-04/F-05)",
+      "addedAtIteration": 10,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/relay-socket.ts:125-136, 176-177, 188-199, 212-218, 250-265, 291-299, 301-348, 350-398, 427-483, 485-492, 501-535, 557-562, 691-705",
+        "specs/context/nodeterm-main/src/main/remote/relay-client.ts:9-28, 46-68, 71-84, 86-110, 113-118, 120-167",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/iterations/iteration-009.md (claim-comparison baseline)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json, deep-research-state.jsonl, deep-research-strategy.md (state)"
+      ]
+    },
+    {
+      "id": "finding-10-3-f-03-handshake-frozen-after-ready-verified-late-control-frames-dropped-without-r",
+      "text": "F-03 — Handshake-frozen-after-ready VERIFIED: late control frames dropped without re-key or close (upgrades iteration-9 F-06)",
+      "addedAtIteration": 10,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/relay-socket.ts:125-136, 176-177, 188-199, 212-218, 250-265, 291-299, 301-348, 350-398, 427-483, 485-492, 501-535, 557-562, 691-705",
+        "specs/context/nodeterm-main/src/main/remote/relay-client.ts:9-28, 46-68, 71-84, 86-110, 113-118, 120-167",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/iterations/iteration-009.md (claim-comparison baseline)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json, deep-research-state.jsonl, deep-research-strategy.md (state)"
+      ]
+    },
+    {
+      "id": "finding-10-4-f-04-exactly-once-processing-mechanics-verified-with-new-primary-detail-not-reco",
+      "text": "F-04 — Exactly-once processing mechanics VERIFIED with new primary detail (not recorded in iteration 9)",
+      "addedAtIteration": 10,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/relay-socket.ts:125-136, 176-177, 188-199, 212-218, 250-265, 291-299, 301-348, 350-398, 427-483, 485-492, 501-535, 557-562, 691-705",
+        "specs/context/nodeterm-main/src/main/remote/relay-client.ts:9-28, 46-68, 71-84, 86-110, 113-118, 120-167",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/iterations/iteration-009.md (claim-comparison baseline)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json, deep-research-state.jsonl, deep-research-strategy.md (state)"
+      ]
+    },
+    {
+      "id": "finding-10-5-f-05-relay-client-ts-client-half-obligations-now-primary-cited-iteration-9-held-",
+      "text": "F-05 — relay-client.ts client-half obligations now primary-cited (iteration 9 held only the host-side pin via doc)",
+      "addedAtIteration": 10,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/relay-socket.ts:125-136, 176-177, 188-199, 212-218, 250-265, 291-299, 301-348, 350-398, 427-483, 485-492, 501-535, 557-562, 691-705",
+        "specs/context/nodeterm-main/src/main/remote/relay-client.ts:9-28, 46-68, 71-84, 86-110, 113-118, 120-167",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/iterations/iteration-009.md (claim-comparison baseline)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json, deep-research-state.jsonl, deep-research-strategy.md (state)"
+      ]
+    },
+    {
+      "id": "finding-10-6-f-06-relay-side-timing-constants-anchored-reconnect-backoff-table-is-dead-code-n",
+      "text": "F-06 — Relay-side timing constants anchored; reconnect backoff table is DEAD CODE (nuance/correction)",
+      "addedAtIteration": 10,
+      "sources": [
+        "specs/context/nodeterm-main/src/main/remote/relay-socket.ts:125-136, 176-177, 188-199, 212-218, 250-265, 291-299, 301-348, 350-398, 427-483, 485-492, 501-535, 557-562, 691-705",
+        "specs/context/nodeterm-main/src/main/remote/relay-client.ts:9-28, 46-68, 71-84, 86-110, 113-118, 120-167",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/iterations/iteration-009.md (claim-comparison baseline)",
+        "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/deep-research-config.json, deep-research-state.jsonl, deep-research-strategy.md (state)"
+      ]
+    }
+  ],
+  "ruledOutDirections": [
+    {
+      "id": "ruled-out-4efdc5d03cfe",
+      "text": "None. All three named sources were readable and mutually consistent.",
+      "contentHash": "4efdc5d03cfe",
+      "addedAtIteration": 2
+    },
+    {
+      "id": "ruled-out-53c3b41a281b",
+      "text": "Nothing ruled out this iteration; no approach failed. No exhausted-approach categories exist in strategy §9 and none were hit.",
+      "contentHash": "53c3b41a281b",
+      "addedAtIteration": 2
+    },
+    {
+      "id": "ruled-out-d54efb60a198",
+      "text": "Treating `PresenceHub` as the push-presence signal: the code shows push deferral keys on an injected desktop powerMonitor idle/lock present→away edge (`isUserPresent`/`subscribePresence` deps), not the team-presence peer table; hub.ts/presence.ts contribute adjacent adoptable patterns (token buckets, clearing-cast exemption, entry-point rate limiting) recorded under F-04. [SOURCE: specs/context/nodeterm-main/src/core/push-notify.ts:207-222]",
+      "contentHash": "d54efb60a198",
+      "addedAtIteration": 6
+    },
+    {
+      "id": "ruled-out-eb07687a9344",
+      "text": "Nothing ruled out this iteration; no approach failed. One near-misreading corrected en route: the renderer sweeper and the mirror sweep are NOT one mechanism — they are two deliberate layers with different semantics (renderer blanks to Unknown for local badges; mirror commits `done` + synthetic stale end edge for phone/notch surfaces). Recorded as F-02 evidence, not a dead end.",
+      "contentHash": "eb07687a9344",
+      "addedAtIteration": 7
+    },
+    {
+      "id": "ruled-out-cb96851523ab",
+      "text": "**framing.ts as a live KQ2 security layer.** Read in full per the focus list; it is the LEGACY opcode dialect the Stage-4 migration deletes (`OP.*` codes, snapshot flow) [SOURCE: specs/context/nodeterm-main/docs/ios-protocol-migration.md:471-489, 636]. Its residual relevance is the little-endian 16-byte header pattern (F-09) and the shared backpressure constant `MAX_BINARY_BUFFERED_AMOUNT` (KQ7 territory) — not security enforcement. Not retried as a security source.",
+      "contentHash": "cb96851523ab",
+      "addedAtIteration": 9
+    },
+    {
+      "id": "ruled-out-61949acb1b64",
+      "text": "**relay-client.ts / relay-socket.ts direct reads this iteration.** Deferred under the 12-call budget in favor of the four core security files + the protocol doc; see Edge Cases.",
+      "contentHash": "61949acb1b64",
+      "addedAtIteration": 9
+    },
+    {
+      "id": "ruled-out-79c96eab1a3f",
+      "text": "Re-verifying `src/server/ws.ts` heartbeat/reap constants: already primary-cited in iteration 4; relay-socket.ts carries only the relay-side analog (`KEEPALIVE_INTERVAL_MS = 25_000` encrypted keepalive), so a ws.ts reread would add nothing this iteration.",
+      "contentHash": "79c96eab1a3f",
+      "addedAtIteration": 10
+    },
+    {
+      "id": "ruled-out-99478efe391d",
+      "text": "Treating `RECONNECT_DELAYS_MS`/`scheduleReconnect` as a live auto-reconnect mechanism: defined but never invoked; reconnection is caller-owned via fresh-token mint (see F-06).",
+      "contentHash": "99478efe391d",
+      "addedAtIteration": 10
+    }
+  ],
+  "rejectedPatterns": [],
+  "rejectedPatternIndex": {
+    "maxEntries": 100,
+    "fuzzyThreshold": 0.85,
+    "entries": []
+  },
+  "rejectedPatternWarnings": [],
+  "suppressedCandidates": [],
+  "minIdeaObservations": 2,
+  "observedIdeas": [],
+  "promotedIdeas": [],
+  "suppressedIdeas": [],
+  "blockedStopHistory": [],
+  "graphConvergenceScore": 0.73,
+  "graphDecision": "STOP_BLOCKED",
+  "graphBlockers": [],
+  "divergence": {
+    "started": [],
+    "completed": [],
+    "failed": [],
+    "overrides": [],
+    "saturatedDirections": [],
+    "remainingFrontier": [],
+    "currentFocus": "",
+    "activePivotId": null,
+    "activeSourceIteration": null
+  },
+  "metrics": {
+    "iterationsCompleted": 10,
+    "openQuestions": 1,
+    "resolvedQuestions": 7,
+    "carriedForwardOpenQuestions": 15,
+    "keyFindings": 65,
+    "rejectedPatterns": 0,
+    "suppressedCandidates": 0,
+    "observedIdeas": 0,
+    "promotedIdeas": 0,
+    "suppressedIdeas": 0,
+    "convergenceScore": 0.75,
+    "coverageBySources": {
+      "code": 39,
+      "other": 54
+    },
+    "completedPivots": 0,
+    "failedPivots": 0,
+    "pivotOverrides": 0
+  },
+  "corruptionWarnings": [],
+  "inboxPath": "/Users/michelkerkmeester/MEGA/Development/Mobile CLI/specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/nodeterm/research/inbox.jsonl",
+  "inboxWarnings": [],
+  "status": "INITIALIZED",
+  "advisoryEvents": []
+}

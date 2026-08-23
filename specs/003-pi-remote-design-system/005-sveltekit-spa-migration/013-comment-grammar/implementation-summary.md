@@ -45,6 +45,7 @@ whose reason spilled onto a second comment line now give it in one.
 |---|---|---|
 | Modules without a section banner | 48 | 1 |
 | Comment sentences starting lowercase | 16 | 0 |
+| Commented-out code lines | 5 | 0 |
 | Fence reasons spilling to a second line | 46 | 3 |
 | `@ds guardrail:` fences | 277 | 277 |
 | `do-not-edit` markers | 184 | 184 |
@@ -79,6 +80,12 @@ trailing comments anyway, so a gate that errs toward stopping is the right kind 
 **The fence counter was counting a narrower scope than the gate.** It reported fences rising from 140
 to 145 when none had been added: a reformatted fence moved into the set it recognised. It now counts
 the marker exactly as the gate does, and the two agree at 277.
+
+**The scan was told to skip commented-out code, which was the wrong correction.** Five commented-out
+declarations survived in `app.d.ts` — SvelteKit's list of augmentable interfaces — and making the
+counter ignore that category is how the category survives. The checklist already required that no
+commented-out code be *left*. The scan now counts them, the five are gone, and the file says in one
+sentence what the commented-out lines were there to say.
 
 **The capitalisation counter was counting wrapped prose.** Every line of a comment run read as a
 sentence start, which turned sixteen real violations into seven hundred and forty-six. Acting on that
@@ -123,5 +130,5 @@ otherwise. The three counted properties are proxies; the substance was reviewed 
 a reader who disagrees with a particular comment has no scan to appeal to.
 
 **The ambient declaration files carry no banner by design.** `app.d.ts` and `vite-env.d.ts` are
-SvelteKit's template boilerplate; adding house sections to them would be structure for its own sake.
+short SvelteKit template files; adding house sections to them would be structure for its own sake.
 <!-- /ANCHOR:limitations -->

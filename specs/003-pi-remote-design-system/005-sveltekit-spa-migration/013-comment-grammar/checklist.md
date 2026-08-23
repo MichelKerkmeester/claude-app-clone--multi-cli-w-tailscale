@@ -76,7 +76,7 @@ produce its evidence rather than claiming a result.
 - [x] **CHK-FIX-01** [P0] All 45 multi-line fence explanations are one line of reason. [evidence: `scan-comments.mjs` reports 3 remaining, down from 46; the three are named in `implementation-summary.md`]
 - [x] **CHK-FIX-02** [P0] The flagged reference case is rewritten. [evidence: the fence reason in `artifact-viewer-host.svelte` is now one line and its marker is untouched]
 - [x] **CHK-FIX-03** [P1] Comments that cost the reader nothing were deleted, not reworded. [evidence: `git diff --stat` on batch 3 shows 322 deletions against 317 insertions across comment lines]
-- [x] **CHK-FIX-04** [P1] No commented-out code introduced or left. [evidence: no commented-out code added; `scan-comments.mjs` skips existing commented-out declarations rather than counting them as prose]
+- [x] **CHK-FIX-04** [P1] No commented-out code introduced or left. [evidence: `node scripts/naming/scan-comments.mjs` reports 0 commented-out code lines, down from the 5 SvelteKit template lines it used to skip]
 <!-- /ANCHOR:fix-completeness -->
 
 ---

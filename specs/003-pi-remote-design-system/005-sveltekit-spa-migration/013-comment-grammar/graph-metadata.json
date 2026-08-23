@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Bring every source file up to the sk-code-opencode commenting standard: section banners on the 51 files that lack them, and a rewrite of in-section comments from WHAT-narration to durable WHY. No behaviour, token or a11y change.",
     "created_at": "2026-08-23T09:57:25.106Z",
-    "last_save_at": "2026-08-23T16:57:50.171Z",
+    "last_save_at": "2026-08-23T17:02:22.733Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:7363c962eb01d4bc57b679cb9f6168dff64bc859eddca80b694e8aa5612615e8",
+    "source_fingerprint": "sha256:d11c60c4babb3da49508c73dfb7baf70aa649d116674166f57c58ab490449998",
     "source_doc_hashes": {
       "spec.md": "a47acabeeef68a0e6ecb08fb168b8cbc5755991d298c4bb1b460f6ecb27969e7",
       "plan.md": "b9b2aaf1717c68aef39f7e5856059b77bfcba8209fb0dc7ea5d98ae06ce7795d",
       "tasks.md": "53f83ca1d9ac970753460c70cd7d6662d4e825b4ebd2c4eddb8fe1d72fac50c1",
-      "checklist.md": "5d1652db265e7e0876856cffdd5dc92ad5b95032838cad017140ba0cca05691b",
-      "implementation-summary.md": "fb88de3a15ff2dd0455ab184b424e9f33b04b2464c30aee005f17aefb5d32f4d"
+      "checklist.md": "cc3d18dd0d22d113a9636791118dbcbba8b50fd3bbd20ff9de5859526697b553",
+      "implementation-summary.md": "8030e3a49a387ef26be8eca034249679b79a49104464b32ffb077fd9119562e0"
     },
     "last_active_child_id": null,
     "last_active_at": null

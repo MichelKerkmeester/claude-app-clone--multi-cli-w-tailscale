@@ -65,6 +65,7 @@ function main() {
   const fenceScope = walkAll(join(REPO_ROOT, SOURCE_ROOT));
 
   const withoutBanner = [];
+  let commentedOutCode = 0;
   let lowercaseStarts = 0;
   let multiLineFences = 0;
 
@@ -92,9 +93,14 @@ function main() {
       }
       if (body.includes(RULE) || /^[A-Z0-9. ]+$/.test(body)) return;
       if (NOT_A_SENTENCE.test(body)) return;
+      // Commented-out code is counted before the continuation guard, or a run
+      // of it reports as one line. Making the instrument look away from a
+      // category is how the category survives.
+      if (/^(interface|const|let|var|function|import|export|type|declare|class)\b/.test(body)) {
+        commentedOutCode += 1;
+        return;
+      }
       if (isContinuation) return;
-      // Commented-out declarations are code kept for reference, not prose.
-      if (/^(interface|const|let|var|function|import|export|type|declare|class)\b/.test(body)) return;
       if (/^[a-z]/.test(body)) lowercaseStarts += 1;
     });
   }
@@ -108,6 +114,7 @@ function main() {
     filesWithoutBanner: withoutBanner.length,
     modulesWithoutBanner: withoutBanner.filter((file) => !isStory(file)).length,
     lowercaseCommentStarts: lowercaseStarts,
+    commentedOutCodeLines: commentedOutCode,
     guardrailFences: fenceScope.reduce(
       (total, file) =>
         total +

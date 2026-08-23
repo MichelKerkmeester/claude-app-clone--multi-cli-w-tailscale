@@ -10,9 +10,9 @@ const resource = vi.hoisted(() => ({
   useArtifactResource: vi.fn(),
 }));
 
-vi.mock('../src/pages/chat/artifacts/useArtifactResource.svelte.js', () => resource);
+vi.mock('../src/pages/chat/artifacts/use-artifact-resource.svelte.js', () => resource);
 
-import InboundImageCard from '../src/pages/chat/artifacts/InboundImageCard.svelte';
+import InboundImageCard from '../src/pages/chat/artifacts/card-inbound-image.svelte';
 
 const READY_BLOCK: InboundImageReadyBlock = {
   id: 'blk_inbound_card_001',

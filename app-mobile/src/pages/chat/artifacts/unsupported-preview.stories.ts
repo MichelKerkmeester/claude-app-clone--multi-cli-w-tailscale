@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import UnsupportedPreview from './UnsupportedPreview.svelte';
+import UnsupportedPreview from './unsupported-preview.svelte';
 import { DEMO_ARTIFACT_BLOCKS } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_ARTIFACT_BLOCKS unsupported fixture so every story

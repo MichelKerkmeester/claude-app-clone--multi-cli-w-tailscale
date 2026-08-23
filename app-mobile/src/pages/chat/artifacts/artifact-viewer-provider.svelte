@@ -148,12 +148,12 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import ArtifactViewerHost from './ArtifactViewerHost.svelte';
+  import ArtifactViewerHost from './artifact-viewer-host.svelte';
   import {
     clearArtifactFullResourceStore,
     clearArtifactResourceStore,
-  } from './useArtifactResource.svelte.js';
-  import { useArtifactHistory } from './useArtifactHistory.svelte.js';
+  } from './use-artifact-resource.svelte.js';
+  import { useArtifactHistory } from './use-artifact-history.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

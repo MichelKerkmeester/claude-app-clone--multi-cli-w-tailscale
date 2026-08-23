@@ -16,14 +16,14 @@ const resource = vi.hoisted(() => ({
   useArtifactResource: vi.fn(),
 }));
 
-vi.mock('../src/pages/chat/artifacts/useArtifactResource.svelte.js', () => resource);
+vi.mock('../src/pages/chat/artifacts/use-artifact-resource.svelte.js', () => resource);
 
 import InboundImageStatesCorpus from './support/InboundImageStatesCorpus.svelte';
 import {
   imageStatusDefinition,
   INBOUND_IMAGE_LIFECYCLE_STATES,
   type InboundImageLifecycleState,
-} from '../src/pages/chat/artifacts/ImageStatus.svelte';
+} from '../src/pages/chat/artifacts/image-status.svelte';
 
 const READY_BLOCK: InboundImageReadyBlock = {
   id: 'blk_inbound_states_001',

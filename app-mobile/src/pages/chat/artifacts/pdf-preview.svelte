@@ -20,7 +20,7 @@
 
   import type { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist';
 
-  import PdfPage from './PdfPage.svelte';
+  import PdfPage from './pdf-page.svelte';
   import {
     clampZoom,
     isBoundedPageCount,

@@ -3,7 +3,7 @@
   // mirroring the React oracle's test 11 harness: <ArtifactViewerProvider><ApiCapture/>
   // so tests can drive api.openDiff(...) directly with trigger=null and no
   // transcript scroll in the DOM.
-  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
+  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/artifact-viewer-provider.svelte';
   import ArtifactViewerApiCapture from './ArtifactViewerApiCapture.svelte';
   import type { ArtifactViewerContextValue } from '../../src/pages/chat/artifacts/types.js';
 

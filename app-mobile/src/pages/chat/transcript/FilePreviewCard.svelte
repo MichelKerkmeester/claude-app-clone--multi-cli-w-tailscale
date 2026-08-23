@@ -12,7 +12,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { getOptionalArtifactViewer } from '../artifacts/ArtifactViewerProvider.svelte';
+  import { getOptionalArtifactViewer } from '../artifacts/artifact-viewer-provider.svelte';
   import { filePreviewAvailability } from '$shared/state/state.js';
   import { formatArtifactSize } from '$shared/format/format.js';
   import Button from '$shared/primitives/button/button.svelte';

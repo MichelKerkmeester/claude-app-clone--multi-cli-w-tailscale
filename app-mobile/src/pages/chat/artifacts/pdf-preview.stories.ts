@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import PdfPreview from './PdfPreview.svelte';
+import PdfPreview from './pdf-preview.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_IMAGE_PDF_BLOCKS entries so every story arg is

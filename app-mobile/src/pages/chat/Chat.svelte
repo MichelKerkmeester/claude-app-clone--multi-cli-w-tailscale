@@ -100,7 +100,7 @@
   import LeavePlanSheet from './chrome/LeavePlanSheet.svelte';
   import ModelEffortSheet from './chrome/ModelEffortSheet.svelte';
   import SessionStateIcon from '$shared/chrome/session-state-icon.svelte';
-  import ArtifactViewerProvider from './artifacts/ArtifactViewerProvider.svelte';
+  import ArtifactViewerProvider from './artifacts/artifact-viewer-provider.svelte';
   import AttachmentDraftProvider from './attachments/AttachmentDraftProvider.svelte';
 
   // ───────────────────────────────────────────────────────────────────

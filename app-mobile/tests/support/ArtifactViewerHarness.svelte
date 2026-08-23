@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
+  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/artifact-viewer-provider.svelte';
   import ArtifactViewerTrigger from './ArtifactViewerTrigger.svelte';
 </script>
 

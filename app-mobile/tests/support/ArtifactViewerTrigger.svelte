@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import { getArtifactViewer } from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
+  import { getArtifactViewer } from '../../src/pages/chat/artifacts/artifact-viewer-provider.svelte';
 
   // Consumes the viewer context from inside the provider, mirroring the React
   // useArtifactViewer() harness so the a11y suite drives the real open path.

@@ -4,7 +4,7 @@
   // ApiCapture child that hands the live viewer API to the test via onReady,
   // so the test can drive api.openInMemory / updateInMemory / close directly
   // with trigger=null (no transcript scroll in the DOM).
-  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
+  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/artifact-viewer-provider.svelte';
   import ArtifactViewerApiCapture from './ArtifactViewerApiCapture.svelte';
   import type { ArtifactViewerContextValue } from '../../src/pages/chat/artifacts/types.js';
 

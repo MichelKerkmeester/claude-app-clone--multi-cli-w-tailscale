@@ -18,7 +18,7 @@ import type { ArtifactResource } from '../src/shared/transport/relay.js';
 
 import {
   clearArtifactResourceStore,
-} from '../src/pages/chat/artifacts/useArtifactResource.svelte.js';
+} from '../src/pages/chat/artifacts/use-artifact-resource.svelte.js';
 
 import ArtifactResourceProbe from './support/ArtifactResourceProbe.svelte';
 

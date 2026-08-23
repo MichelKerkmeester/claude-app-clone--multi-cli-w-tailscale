@@ -5,7 +5,7 @@ import type { FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 import ImagePreview, {
   IMAGE_PREVIEW_MAX_BYTES,
   IMAGE_PREVIEW_MAX_ZOOM,
-} from '../src/pages/chat/artifacts/ImagePreview.svelte';
+} from '../src/pages/chat/artifacts/image-preview.svelte';
 
 function block(overrides: Partial<FilePreviewBlock> = {}): FilePreviewBlock {
   return {

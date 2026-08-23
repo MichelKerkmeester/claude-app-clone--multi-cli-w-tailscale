@@ -9,7 +9,7 @@
 </script>
 
 <script lang="ts">
-  import { getOptionalArtifactViewer } from './ArtifactViewerProvider.svelte';
+  import { getOptionalArtifactViewer } from './artifact-viewer-provider.svelte';
   import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
 
   let { block }: ArtifactCardProps = $props();

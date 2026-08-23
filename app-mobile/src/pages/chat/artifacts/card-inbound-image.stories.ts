@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
-import InboundImageCard from './InboundImageCard.svelte';
-import ArtifactViewerProvider from './ArtifactViewerProvider.svelte';
-import type { InboundImageLifecycleState } from './ImageStatus.svelte';
+import InboundImageCard from './card-inbound-image.svelte';
+import ArtifactViewerProvider from './artifact-viewer-provider.svelte';
+import type { InboundImageLifecycleState } from './image-status.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
 // Re-host the demo module's private DEMO_INBOUND_MEDIA_READY_BLOCK (in

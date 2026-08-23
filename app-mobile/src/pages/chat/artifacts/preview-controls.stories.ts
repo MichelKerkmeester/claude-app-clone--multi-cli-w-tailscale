@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import PreviewControls from './PreviewControls.svelte';
+import PreviewControls from './preview-controls.svelte';
 import { DEMO_DIFF_FIXTURE, DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen demo fixtures so every data-bearing story arg is sourced

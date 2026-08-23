@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import ArtifactDetails, { type ArtifactDetailsModel } from './ArtifactDetails.svelte';
+import ArtifactDetails, { type ArtifactDetailsModel } from './artifact-details.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_IMAGE_PDF_BLOCKS image-ready fixture as a real

@@ -1,8 +1,8 @@
 <script module lang="ts">
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import type { ArtifactResourceStatus } from './useArtifactResource.svelte.js';
-  import type { InboundImageLifecycleState } from './ImageStatus.svelte';
+  import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
+  import type { InboundImageLifecycleState } from './image-status.svelte';
 
   export interface VerifiedImageProps {
     readonly block: InboundImageReadyBlock;
@@ -53,7 +53,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { demoInboundArtifactResource, isDemoMode } from '$shared/fixtures/demo.js';
-  import { useArtifactResource } from './useArtifactResource.svelte.js';
+  import { useArtifactResource } from './use-artifact-resource.svelte.js';
 
   let {
     block,

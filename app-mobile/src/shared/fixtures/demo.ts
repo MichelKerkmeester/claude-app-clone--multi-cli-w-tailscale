@@ -30,7 +30,7 @@ import type {
   ArtifactResource,
   ArtifactResourceBlock,
 } from '../transport/relay.js';
-import type { InboundImageLifecycleState } from '../../pages/chat/artifacts/ImageStatus.svelte';
+import type { InboundImageLifecycleState } from '../../pages/chat/artifacts/image-status.svelte';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. CONSTANTS

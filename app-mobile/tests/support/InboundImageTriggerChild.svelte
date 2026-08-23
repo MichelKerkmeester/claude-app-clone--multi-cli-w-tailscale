@@ -3,7 +3,7 @@
   // so getArtifactViewer() resolves. Mirrors the React OpenInboundImage helper.
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import { getArtifactViewer } from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
+  import { getArtifactViewer } from '../../src/pages/chat/artifacts/artifact-viewer-provider.svelte';
 
   let {
     block,

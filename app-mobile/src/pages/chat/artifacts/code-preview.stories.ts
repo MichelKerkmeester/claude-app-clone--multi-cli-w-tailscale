@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import CodePreview from './CodePreview.svelte';
+import CodePreview from './code-preview.svelte';
 import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_TEXT_CODE_SHARE_BLOCKS code fixture so every story

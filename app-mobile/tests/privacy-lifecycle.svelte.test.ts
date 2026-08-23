@@ -14,8 +14,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sha256, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 
 import type { ArtifactResource } from '../src/shared/transport/relay.js';
-import type { ArtifactResourceSnapshot } from '../src/pages/chat/artifacts/useArtifactResource.svelte.js';
-import { clearArtifactResourceStore } from '../src/pages/chat/artifacts/useArtifactResource.svelte.js';
+import type { ArtifactResourceSnapshot } from '../src/pages/chat/artifacts/use-artifact-resource.svelte.js';
+import { clearArtifactResourceStore } from '../src/pages/chat/artifacts/use-artifact-resource.svelte.js';
 
 import PrivacyDiffHarness from './support/PrivacyDiffHarness.svelte';
 import ArtifactResourceProbe from './support/ArtifactResourceProbe.svelte';

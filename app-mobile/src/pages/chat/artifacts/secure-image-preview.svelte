@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { ArtifactResourceStatus } from './useArtifactResource.svelte.js';
+  import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
 
   export interface ImagePan {
     readonly x: number;

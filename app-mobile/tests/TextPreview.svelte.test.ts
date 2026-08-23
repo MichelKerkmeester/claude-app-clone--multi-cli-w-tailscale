@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
-import TextPreview from '../src/pages/chat/artifacts/TextPreview.svelte';
+import TextPreview from '../src/pages/chat/artifacts/text-preview.svelte';
 
 describe('TextPreview', () => {
   it('renders exact text as selectable DOM content and supports bounded chunks', () => {

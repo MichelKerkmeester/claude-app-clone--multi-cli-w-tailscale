@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import SecureImagePreview from './SecureImagePreview.svelte';
-import type { ImagePan } from './SecureImagePreview.svelte';
+import SecureImagePreview from './secure-image-preview.svelte';
+import type { ImagePan } from './secure-image-preview.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_IMAGE_PDF_BLOCKS image-ready entry so every story arg

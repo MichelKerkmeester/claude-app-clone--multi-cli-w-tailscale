@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { ArtifactResourceStatus } from './useArtifactResource.svelte.js';
+  import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
   import type { ArtifactViewerPhase } from './types.js';
 
   export interface ArtifactStatusProps {

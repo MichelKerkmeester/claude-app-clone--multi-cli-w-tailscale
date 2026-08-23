@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import MarkdownPreview from './MarkdownPreview.svelte';
+import MarkdownPreview from './markdown-preview.svelte';
 import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_TEXT_CODE_SHARE_BLOCKS markdown fixture so every story

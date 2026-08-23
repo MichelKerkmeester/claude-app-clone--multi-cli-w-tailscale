@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import ArtifactStatus from './ArtifactStatus.svelte';
-import type { ArtifactResourceStatus } from './useArtifactResource.svelte.js';
+import ArtifactStatus from './artifact-status.svelte';
+import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
 import type { ArtifactViewerPhase } from './types.js';
 import { catalogSurfaceById } from '$shared/catalog/catalog-registry.js';
 import { DEMO_DIFF_FIXTURE, DEMO_ARTIFACT_STATES_FIXTURE } from '$shared/fixtures/demo.js';

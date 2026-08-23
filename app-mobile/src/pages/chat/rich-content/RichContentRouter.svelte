@@ -68,7 +68,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { getOptionalArtifactViewer } from '../artifacts/ArtifactViewerProvider.svelte';
+  import { getOptionalArtifactViewer } from '../artifacts/artifact-viewer-provider.svelte';
   import CodeCard from './CodeCard.svelte';
   import CommandOutputCard from './CommandOutputCard.svelte';
   import { createInMemoryArtifactDocument } from './F6ViewerAdapter.js';

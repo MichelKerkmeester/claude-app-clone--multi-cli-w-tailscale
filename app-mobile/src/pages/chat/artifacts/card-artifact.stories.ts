@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
-import ArtifactCard from './ArtifactCard.svelte';
-import ArtifactViewerProvider from './ArtifactViewerProvider.svelte';
+import ArtifactCard from './card-artifact.svelte';
+import ArtifactViewerProvider from './artifact-viewer-provider.svelte';
 import { DEMO_DIFF_FIXTURE } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_DIFF_FIXTURE as a real FileDiffBlock so the story

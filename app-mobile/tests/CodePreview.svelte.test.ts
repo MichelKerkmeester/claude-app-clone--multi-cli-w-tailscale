@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import CodePreview from '../src/pages/chat/artifacts/CodePreview.svelte';
+import CodePreview from '../src/pages/chat/artifacts/code-preview.svelte';
 
 afterEach(() => {
   vi.unstubAllGlobals();

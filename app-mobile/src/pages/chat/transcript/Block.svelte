@@ -16,8 +16,8 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import ArtifactCard from '../artifacts/ArtifactCard.svelte';
-  import InboundImageBlockView from '../artifacts/InboundImageBlockView.svelte';
+  import ArtifactCard from '../artifacts/card-artifact.svelte';
+  import InboundImageBlockView from '../artifacts/inbound-image-block-view.svelte';
   import AskQuestionCard from '../features/ask-question/AskQuestionCard.svelte';
   import { formatNumber, formatCost, formatTime } from '$shared/format/format.js';
   import CollapsedEvidence from './CollapsedEvidence.svelte';

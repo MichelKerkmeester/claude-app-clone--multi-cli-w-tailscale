@@ -5,8 +5,8 @@
   // drive openDiff/close directly can reach the context value.
   import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/ArtifactViewerProvider.svelte';
-  import ArtifactCard from '../../src/pages/chat/artifacts/ArtifactCard.svelte';
+  import ArtifactViewerProvider from '../../src/pages/chat/artifacts/artifact-viewer-provider.svelte';
+  import ArtifactCard from '../../src/pages/chat/artifacts/card-artifact.svelte';
   import ArtifactViewerApiCapture from './ArtifactViewerApiCapture.svelte';
   import type { ArtifactViewerContextValue } from '../../src/pages/chat/artifacts/types.js';
 

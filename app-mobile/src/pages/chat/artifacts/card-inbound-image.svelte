@@ -5,7 +5,7 @@
     imageStatusDefinition,
     type InboundImageLifecycleState,
     type InboundImageStatusAction,
-  } from './ImageStatus.svelte';
+  } from './image-status.svelte';
 
   export interface InboundImageCardProps {
     readonly block: InboundImageBlock;
@@ -80,11 +80,11 @@
 
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
-  import { getOptionalArtifactViewer } from './ArtifactViewerProvider.svelte';
+  import { getOptionalArtifactViewer } from './artifact-viewer-provider.svelte';
   import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
-  import ImagePlaceholder from './ImagePlaceholder.svelte';
-  import ImageStatus from './ImageStatus.svelte';
-  import VerifiedImage from './VerifiedImage.svelte';
+  import ImagePlaceholder from './image-placeholder.svelte';
+  import ImageStatus from './image-status.svelte';
+  import VerifiedImage from './verified-image.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import ImagePlaceholder from './ImagePlaceholder.svelte';
+import ImagePlaceholder from './image-placeholder.svelte';
 import {
   INBOUND_IMAGE_LIFECYCLE_STATES,
   imageStatusDefinition,
   type InboundImageLifecycleState,
-} from './ImageStatus.svelte';
+} from './image-status.svelte';
 
 // Re-host the frozen inbound-image lifecycle vocabulary so every story `state`
 // arg is sourced from the real INBOUND_IMAGE_LIFECYCLE_STATES list — nothing is

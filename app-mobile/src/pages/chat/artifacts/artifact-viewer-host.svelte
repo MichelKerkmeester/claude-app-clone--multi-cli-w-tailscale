@@ -13,7 +13,7 @@
     ArtifactViewerPhase,
     InMemoryArtifactDocument,
   } from './types.js';
-  import type { ArtifactResourceStatus } from './useArtifactResource.svelte.js';
+  import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
 
   export interface ArtifactViewerHostProps {
     readonly phase: ArtifactViewerPhase;
@@ -195,18 +195,18 @@
     shareDisplayedArtifact,
     type DisplayedArtifactShareInput,
   } from './artifact-share.js';
-  import ArtifactDetails, { type ArtifactDetailsModel } from './ArtifactDetails.svelte';
-  import ArtifactHeader from './ArtifactHeader.svelte';
-  import ArtifactStatus from './ArtifactStatus.svelte';
-  import CodePreview from './CodePreview.svelte';
-  import DiffPreview from './DiffPreview.svelte';
-  import MarkdownPreview from './MarkdownPreview.svelte';
-  import PdfPreview, { type PdfPreviewState } from './PdfPreview.svelte';
-  import PreviewControls from './PreviewControls.svelte';
-  import SecureImagePreview, { type ImagePan } from './SecureImagePreview.svelte';
-  import TextPreview from './TextPreview.svelte';
-  import UnsupportedPreview from './UnsupportedPreview.svelte';
-  import { useArtifactResource } from './useArtifactResource.svelte.js';
+  import ArtifactDetails, { type ArtifactDetailsModel } from './artifact-details.svelte';
+  import ArtifactHeader from './artifact-header.svelte';
+  import ArtifactStatus from './artifact-status.svelte';
+  import CodePreview from './code-preview.svelte';
+  import DiffPreview from './diff-preview.svelte';
+  import MarkdownPreview from './markdown-preview.svelte';
+  import PdfPreview, { type PdfPreviewState } from './pdf-preview.svelte';
+  import PreviewControls from './preview-controls.svelte';
+  import SecureImagePreview, { type ImagePan } from './secure-image-preview.svelte';
+  import TextPreview from './text-preview.svelte';
+  import UnsupportedPreview from './unsupported-preview.svelte';
+  import { useArtifactResource } from './use-artifact-resource.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

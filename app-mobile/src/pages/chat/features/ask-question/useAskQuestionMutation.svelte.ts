@@ -2,6 +2,10 @@
 // MODULE: Ask-Question Answer Mutation
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   askQuestionAnswerDigest,
   isAskQuestionAnswer,
@@ -21,10 +25,18 @@ import type {
   AskQuestionViewModel,
 } from './askQuestionTypes.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. PUBLIC API CONTRACT
+// ───────────────────────────────────────────────────────────────────
+
 export interface AskQuestionMutationApi {
   readonly submitting: boolean;
   readonly submit: (intent: AskQuestionSubmitIntent) => Promise<void>;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. ANSWER SUBMISSION FLOW
+// ───────────────────────────────────────────────────────────────────
 
 export function useAskQuestionMutation(
   getSessionId: () => string,
@@ -108,6 +120,10 @@ export function useAskQuestionMutation(
     submit,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function readAskQuestionPrincipal(principal: string | undefined): string | null {
   const supplied = principal?.trim();

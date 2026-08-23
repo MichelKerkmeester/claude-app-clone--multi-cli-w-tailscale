@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isAskQuestionTranscriptMeta,
   type AskQuestionAnswer,
@@ -8,6 +12,10 @@ import {
   askQuestionKey,
   type AskQuestionViewModel,
 } from './askQuestionTypes.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. STORE TYPES AND STATE
+// ───────────────────────────────────────────────────────────────────
 
 export interface AskQuestionEphemeralDraft {
   readonly selectedOptionIds: readonly string[];
@@ -20,6 +28,10 @@ export interface AskQuestionEphemeralEntry {
 }
 
 const entries = new Map<string, AskQuestionEphemeralEntry>();
+
+// ───────────────────────────────────────────────────────────────────
+// 3. DRAFT ACCESSORS
+// ───────────────────────────────────────────────────────────────────
 
 export function getAskQuestionEphemeralEntry(
   questionId: string,
@@ -54,6 +66,10 @@ export function setAskQuestionDraft(
   });
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. STORE LIFECYCLE
+// ───────────────────────────────────────────────────────────────────
+
 export function releaseAskQuestionEphemeral(questionId: string, revision: number): void {
   entries.delete(askQuestionKey(questionId, revision));
 }
@@ -65,6 +81,10 @@ export function clearAskQuestionEphemeralStore(): void {
 export function askQuestionEphemeralEntryCount(): number {
   return entries.size;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. ANSWER AND METADATA HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 export function askQuestionDraftAsAnswer(draft: AskQuestionEphemeralDraft): AskQuestionAnswer {
   return {

@@ -25,6 +25,10 @@ import {
   type AskQuestionViewModel,
 } from './askQuestionTypes.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 1. PUBLIC API TYPES
+// ───────────────────────────────────────────────────────────────────
+
 export interface AskQuestionStateOptions {
   readonly initialState?: AskQuestionUiState;
 }
@@ -50,6 +54,10 @@ type AskQuestionAction =
   | { readonly type: 'result'; readonly result: AskQuestionAnswerResult }
   | { readonly type: 'transcript-status'; readonly state: AskQuestionUiState };
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const EMPTY_STATE: AskQuestionFormState = {
   phase: 'presented',
   selectedOptionIds: [],
@@ -63,6 +71,10 @@ let mutationSequence = 0;
 function askQuestionIdentity(viewModel: AskQuestionViewModel | null): string | null {
   return viewModel === null ? null : askQuestionKey(viewModel.questionId, viewModel.revision);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. STATE CREATION AND VALIDATION
+// ───────────────────────────────────────────────────────────────────
 
 export function createAskQuestionState(
   viewModel: AskQuestionViewModel | null,
@@ -127,6 +139,10 @@ export function validateAskQuestionAnswer(
   }
   return { valid: true, message: null };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. FORM STATE REDUCER
+// ───────────────────────────────────────────────────────────────────
 
 export function askQuestionStateReducer(
   state: AskQuestionFormState,
@@ -228,11 +244,19 @@ export function askQuestionStateReducer(
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function nextMutationId(): string {
   mutationSequence += 1;
   const random = globalThis.crypto?.randomUUID?.().replaceAll('-', '_');
   return `ask_mutation_${random ?? `${Date.now()}_${mutationSequence}`}`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. REACTIVE HOOK
+// ───────────────────────────────────────────────────────────────────
 
 export function useAskQuestionState(
   getViewModel: () => AskQuestionViewModel | null,
@@ -336,6 +360,10 @@ export function useAskQuestionState(
     applyTranscriptStatus,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. EXPORTED UTILITIES
+// ───────────────────────────────────────────────────────────────────
 
 export function isRetryableAskQuestionReason(reason: AskQuestionResultReason): boolean {
   return !isAskQuestionTerminalReason(reason);

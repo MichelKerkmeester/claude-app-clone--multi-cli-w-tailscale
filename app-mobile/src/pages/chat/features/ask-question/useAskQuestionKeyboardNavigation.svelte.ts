@@ -2,6 +2,10 @@
 // MODULE: Ask-Question Keyboard Navigation
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. OPTIONS AND FOCUS TARGET TYPES
+// ───────────────────────────────────────────────────────────────────
+
 export interface UseAskQuestionKeyboardNavigationOptions {
   readonly identity: string | null;
   readonly enabled: boolean;
@@ -19,6 +23,10 @@ export interface UseAskQuestionKeyboardNavigationOptions {
 
 type AnswerStop = HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement;
 
+// ───────────────────────────────────────────────────────────────────
+// 2. KEYBOARD NAVIGATION HOOK
+// ───────────────────────────────────────────────────────────────────
+
 export function useAskQuestionKeyboardNavigation(
   getCard: () => HTMLElement | null,
   getOptions: () => UseAskQuestionKeyboardNavigationOptions,
@@ -29,6 +37,10 @@ export function useAskQuestionKeyboardNavigation(
   let composition = false;
   let entered = false;
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. IDENTITY RESET
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     const identity = getOptions().identity;
     if (identityRef === identity) return;
@@ -37,6 +49,10 @@ export function useAskQuestionKeyboardNavigation(
     previousFocus = null;
     lastFocusedInCard = null;
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. ARIA ATTRIBUTE WIRING
+  // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
     const card = getCard();
@@ -105,6 +121,10 @@ export function useAskQuestionKeyboardNavigation(
       else textControl.removeAttribute('aria-errormessage');
     }
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. KEY AND FOCUS EVENT HANDLING
+  // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
     const card = getCard();
@@ -273,6 +293,10 @@ export function useAskQuestionKeyboardNavigation(
     };
   });
 
+  // ───────────────────────────────────────────────────────────────────
+  // 6. INITIAL FOCUS ON ENTRY
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     const card = getCard();
     if (card === null || entered) return;
@@ -295,6 +319,10 @@ export function useAskQuestionKeyboardNavigation(
     focusElement(firstStop);
   });
 
+  // ───────────────────────────────────────────────────────────────────
+  // 7. TERMINAL FOCUS RETURN
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     const card = getCard();
     if (card === null || !getOptions().terminal) return;
@@ -305,6 +333,10 @@ export function useAskQuestionKeyboardNavigation(
     focusElement(card);
   });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 8. FOCUS HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function activeAnswerStops(card: HTMLElement): AnswerStop[] {
   return Array.from(

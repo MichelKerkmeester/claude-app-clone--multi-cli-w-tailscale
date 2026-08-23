@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isAskQuestionAnswerResult,
   isAskQuestionDisplayDto,
@@ -7,6 +11,10 @@ import {
   type AskQuestionResultReason,
   type AskQuestionTranscriptMeta,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. VIEW MODEL AND FORM STATE TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export type AskQuestionViewModel = AskQuestionDisplayDto;
 
@@ -33,6 +41,10 @@ export interface AskQuestionSubmitIntent {
   readonly answer: AskQuestionAnswer;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. KEY AND TYPE GUARDS
+// ───────────────────────────────────────────────────────────────────
+
 export function askQuestionKey(questionId: string, revision: number): string {
   return `${questionId}:${revision}`;
 }
@@ -50,6 +62,10 @@ export function isAskQuestionAnswerResultValue(
 ): value is AskQuestionAnswerResult {
   return isAskQuestionAnswerResult(value);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. UI STATE MAPPING AND TERMINAL CLASSIFICATION
+// ───────────────────────────────────────────────────────────────────
 
 export function transcriptStatusToUiState(
   status: AskQuestionTranscriptMeta['status'],
@@ -97,6 +113,10 @@ export function uiStateForAskQuestionReason(
   if (reason === 'question-already-answered') return 'answered-immutable';
   return 'expired';
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. STATUS MESSAGE TEXT
+// ───────────────────────────────────────────────────────────────────
 
 export function safeAskQuestionStatusMessage(
   state: AskQuestionUiState,

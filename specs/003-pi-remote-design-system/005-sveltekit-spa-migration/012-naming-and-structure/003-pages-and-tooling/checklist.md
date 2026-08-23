@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"
-    last_updated_at: "2026-08-23T14:00:00Z"
+    last_updated_at: "2026-08-23T20:24:46Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Checklist authored; all items open pending execution."
-    next_safe_action: "Wait for children 001 and 002 to land."
+    recent_action: "Naming stop-gap landed in the conventions authority; every item closed."
+    next_safe_action: "None — the child is complete; 014 and 018 unblock from here."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 # Verification Checklist: Child 003 — Pages rename and tooling catch-up
@@ -95,8 +95,8 @@ zero.
 <!-- ANCHOR:docs -->
 ## Documentation
 
-- [ ] **CHK-DOC-01** [P0] The conventions authority's naming section teaches the shipped grammar. [deferred: the conventions authority still teaches the old grammar; the stop-gap is a cross-repository edit that has not landed]
-- [ ] **CHK-DOC-02** [P1] The stop-gap is one section, not a rewrite. [deferred: held with the stop-gap itself; the full refresh remains packet 019]
+- [x] **CHK-DOC-01** [P0] The conventions authority's naming section teaches the shipped grammar. [evidence: `## 3b. FILE AND COMPONENT NAMING (the shipped grammar)` added to `.opencode/skills/sk-code/sk-code-mobile-cli/SKILL.md` in the Public repository, commit `3f53552ed2`]
+- [x] **CHK-DOC-02** [P1] The stop-gap is one section, not a rewrite. [evidence: commit `3f53552ed2` touches only `sk-code-mobile-cli/SKILL.md`, adding 29 lines and deleting none; the full refresh remains packet 019]
 - [x] **CHK-DOC-03** [P2] Folder READMEs naming moved files are corrected or explicitly handed to 014. [evidence: the stale folder-document prose is recorded in `implementation-summary.md` and handed to 013 and 014]
 <!-- /ANCHOR:docs -->
 
@@ -106,7 +106,7 @@ zero.
 ## File Organization
 
 - [x] **CHK-ORG-01** [P0] Each folder is one atomic commit. [evidence: one commit per folder batch: `a66af5c`, `3410e6d`, `d827518`]
-- [ ] **CHK-ORG-02** [P1] The conventions edit is a separate commit in a separate repository. [deferred: held with the stop-gap; it lands as its own commit in the Public repository through an isolated worktree]
+- [x] **CHK-ORG-02** [P1] The conventions edit is a separate commit in a separate repository. [evidence: authored in the isolated worktree `worktrees/025-naming-grammar-stopgap`, fast-forwarded onto `skilled/v4.0.0.0` as `a3604c6925..3f53552ed2`; the shared checkout's working tree was never touched]
 - [x] **CHK-ORG-03** [P2] Chunk splitting is unchanged. [evidence: `npm run build` exit 0 with no chunking warning; only module paths changed]
 <!-- /ANCHOR:file-org -->
 

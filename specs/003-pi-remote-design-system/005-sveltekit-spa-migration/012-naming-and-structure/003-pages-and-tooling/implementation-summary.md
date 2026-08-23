@@ -5,13 +5,13 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"
-    last_updated_at: "2026-08-23T18:54:06Z"
+    last_updated_at: "2026-08-23T20:24:46Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Pages renamed kind-first; scan reports zero offenders across 219 files."
-    next_safe_action: "Land the naming stop-gap in the conventions authority through an isolated worktree."
+    recent_action: "Naming stop-gap landed in the conventions authority; the child is complete."
+    next_safe_action: "None — 014 and 018 unblock from here."
     blockers:
       - "The conventions-authority correction is a cross-repository edit and is not yet landed."
-    completion_pct: 90
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -28,9 +28,9 @@ _memory:
 |---|---|
 | Parent | `012-naming-and-structure` |
 | Level | 2 |
-| Status | **In-repository work shipped; the cross-repository correction remains** |
+| Status | **Complete — in-repository work shipped and the conventions authority corrected** |
 | Requirements shipped | REQ-001, REQ-002, REQ-003, REQ-004, REQ-007 |
-| Requirements open | REQ-005, REQ-006 — the conventions-authority stop-gap |
+| Requirements open | None |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -116,9 +116,9 @@ by their old component names in prose. Correcting that text is packet 013 and 01
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-**The conventions-authority correction has not landed.** It is a cross-repository edit that must go
-through an isolated worktree because the shared checkout holds another session's staged files, and
-until it lands the authority teaches a grammar the tree no longer uses.
+**The conventions authority now teaches the shipped grammar, as a stop-gap only.** The section
+added in `3f53552ed2` states the grammar the tree actually uses; the surrounding document still
+predates the migration in other respects, and packet 019 owns that refresh.
 
 **Documentation prose still names old paths.** Ten folder documents and several story-file comments
 reference components and folders by names that have changed. Nothing resolves those strings, so

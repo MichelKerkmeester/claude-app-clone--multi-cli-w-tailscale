@@ -81,7 +81,7 @@ import {
   type TextBlock,
 } from '@pi-remote/pi-rpc-protocol';
 
-import { establishSession } from './auth.js';
+import { DEMO_SESSION_EXPIRES_AT, establishSession } from './auth.js';
 import { demoArtifactBytes, demoPostJson, demoSocket, isDemoMode } from '../fixtures/demo.js';
 
 // ───────────────────────────────────────────────────────────────────
@@ -1609,14 +1609,24 @@ function parseContentDigest(value: string | null): string | null {
 // 12. SYNC SOCKET
 // ───────────────────────────────────────────────────────────────────
 
+export type SyncSocket = WebSocket & {
+  readonly sessionExpiresAt?: string;
+};
+
 export async function openSyncSocket(
   sessionId: string,
   cursor: SyncCursor | null,
   onMessage: (message: SyncMessage) => void,
   signal?: AbortSignal,
-): Promise<WebSocket> {
-  if (isDemoMode()) return demoSocket(sessionId, onMessage as (message: unknown) => void);
-  if ((await establishSession()) === null) {
+): Promise<SyncSocket> {
+  if (isDemoMode()) {
+    return withSessionExpiry(
+      demoSocket(sessionId, onMessage as (message: unknown) => void),
+      DEMO_SESSION_EXPIRES_AT,
+    );
+  }
+  const session = await establishSession();
+  if (session === null) {
     throw new Error('Device enrollment is required before opening the read-only stream.');
   }
   const ticket = await requestTicket(signal);
@@ -1645,7 +1655,15 @@ export async function openSyncSocket(
       // Malformed frames cannot enter display state.
     }
   });
-  return socket;
+  return withSessionExpiry(socket, session.expiresAt);
+}
+
+function withSessionExpiry(socket: WebSocket, expiresAt: string): SyncSocket {
+  Object.defineProperty(socket, 'sessionExpiresAt', {
+    configurable: true,
+    value: expiresAt,
+  });
+  return socket as SyncSocket;
 }
 
 export function isReadOnlySyncMessage(value: unknown, sessionId: string): value is SyncMessage {

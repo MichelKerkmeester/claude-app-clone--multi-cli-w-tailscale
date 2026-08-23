@@ -36,6 +36,28 @@ import { messageFrom } from '../format/view-helpers.js';
 
 const ignoreTodoAction: (action: TodoProjectionAction) => void = () => undefined;
 
+// Refresh before the relay's session timer can close the current socket.
+const SESSION_REFRESH_FRACTION = 0.8;
+// Keep an expired or near-expired session from creating a zero-delay loop.
+const MIN_SESSION_REFRESH_DELAY_MS = 1_000;
+// Avoid browser timeout overflow turning a far-future demo deadline into an immediate timer.
+const MAX_SESSION_REFRESH_DELAY_MS = 2_147_483_647;
+
+type ConnectMode = 'initial' | 'retry' | 'expired' | 'preemptive';
+
+function sessionRefreshDelay(expiresAt: string | undefined): number | null {
+  if (expiresAt === undefined) return null;
+  const remainingMs = Date.parse(expiresAt) - Date.now();
+  if (!Number.isFinite(remainingMs)) return null;
+  return Math.max(
+    MIN_SESSION_REFRESH_DELAY_MS,
+    Math.min(
+      MAX_SESSION_REFRESH_DELAY_MS,
+      Math.floor(remainingMs * SESSION_REFRESH_FRACTION),
+    ),
+  );
+}
+
 function dispatchArtifactLifecycleEvent(name: string): void {
   window.dispatchEvent(new Event(name));
 }
@@ -162,17 +184,46 @@ export function useSyncSocket(deps: {
     // 4. SOCKET CONNECT AND RETRY
     // ───────────────────────────────────────────────────────────────────
 
-    let socket: WebSocket | null = null;
+    let socket: (WebSocket & { readonly sessionExpiresAt?: string }) | null = null;
     let retryTimer: number | null = null;
+    let sessionRefreshTimer: number | null = null;
     let retryCount = 0;
     let stopped = false;
+    let connectionAttempt = 0;
 
-    const connect = () => {
+    const clearRetryTimer = (): void => {
+      if (retryTimer === null) return;
+      window.clearTimeout(retryTimer);
+      retryTimer = null;
+    };
+
+    const clearSessionRefreshTimer = (): void => {
+      if (sessionRefreshTimer === null) return;
+      window.clearTimeout(sessionRefreshTimer);
+      sessionRefreshTimer = null;
+    };
+
+    const stopForRevocation = (): void => {
+      stopped = true;
+      clearRetryTimer();
+      clearSessionRefreshTimer();
+      dispatchConnection({ type: 'unenrolled' });
+    };
+
+    let connect: (mode: ConnectMode) => void;
+
+    connect = (mode: ConnectMode) => {
       if (stopped || !navigator.onLine) {
         dispatchConnection({ type: 'offline' });
         return;
       }
-      dispatchConnection({ type: 'connecting', reconnect: retryCount > 0 });
+      if (mode !== 'preemptive') {
+        dispatchConnection({
+          type: 'connecting',
+          reconnect: mode !== 'initial' || retryCount > 0,
+        });
+      }
+      const attempt = ++connectionAttempt;
       void openSyncSocket(
         sessionId,
         cursor,
@@ -224,34 +275,71 @@ export function useSyncSocket(deps: {
         controller.signal,
       )
         .then((openedSocket) => {
-          if (stopped) {
+          if (stopped || attempt !== connectionAttempt) {
             openedSocket.close();
             return;
           }
+          clearRetryTimer();
+          clearSessionRefreshTimer();
+          const previousSocket = socket;
           socket = openedSocket;
           noteRelayHeartbeat();
-          openedSocket.addEventListener('close', () => {
+          openedSocket.addEventListener('close', (event) => {
             if (stopped) return;
+            if (event.code === 4003) {
+              stopForRevocation();
+              return;
+            }
+            if (openedSocket !== socket) return;
+            socket = null;
+            clearSessionRefreshTimer();
+            if (event.code === 4001) {
+              connect('expired');
+              return;
+            }
             retryCount += 1;
             dispatchConnection({
               type: navigator.onLine ? 'connecting' : 'offline',
               ...(navigator.onLine ? { reconnect: true } : {}),
             } as ConnectionAction);
-            retryTimer = window.setTimeout(connect, Math.min(1_000 * 2 ** retryCount, 15_000));
+            retryTimer = window.setTimeout(() => {
+              retryTimer = null;
+              connect('retry');
+            }, Math.min(1_000 * 2 ** retryCount, 15_000));
           });
-          openedSocket.addEventListener('error', () => openedSocket.close());
+          openedSocket.addEventListener('error', () => {
+            if (openedSocket === socket) openedSocket.close();
+          });
+          const refreshDelay = sessionRefreshDelay(openedSocket.sessionExpiresAt);
+          if (refreshDelay !== null) {
+            sessionRefreshTimer = window.setTimeout(() => {
+              sessionRefreshTimer = null;
+              connect('preemptive');
+            }, refreshDelay);
+          }
+          if (previousSocket !== null && previousSocket !== openedSocket) previousSocket.close();
         })
         .catch(() => {
-          if (stopped) return;
+          if (stopped || attempt !== connectionAttempt) return;
+          if (mode === 'preemptive' && socket !== null) {
+            retryTimer = window.setTimeout(() => {
+              retryTimer = null;
+              connect('preemptive');
+            }, MIN_SESSION_REFRESH_DELAY_MS);
+            return;
+          }
           retryCount += 1;
           dispatchConnection({ type: 'connecting', reconnect: true });
-          retryTimer = window.setTimeout(connect, Math.min(1_000 * 2 ** retryCount, 15_000));
+          retryTimer = window.setTimeout(() => {
+            retryTimer = null;
+            connect('retry');
+          }, Math.min(1_000 * 2 ** retryCount, 15_000));
         });
     };
     // Connect() synchronously dispatchConnection({connecting}) — untrack so the effect does not
     // Take `connection` as a dep and re-fire on the status it just wrote (async retries via
     // SetTimeout already runs outside tracking).
-    untrack(() => connect());
+    untrack(() => connect('initial'));
 
     // ───────────────────────────────────────────────────────────────────
     // 5. TEARDOWN
@@ -262,7 +350,8 @@ export function useSyncSocket(deps: {
       controller.abort();
       if (frame !== null) window.cancelAnimationFrame(frame);
       pendingMessages = [];
-      if (retryTimer !== null) window.clearTimeout(retryTimer);
+      clearRetryTimer();
+      clearSessionRefreshTimer();
       socket?.close();
     };
   });

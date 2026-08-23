@@ -26,6 +26,8 @@ import { DEMO_IDENTITY, isDemoMode } from '../fixtures/demo.js';
 const DATABASE_NAME = 'pi-remote-device-v1';
 const STORE_NAME = 'credentials';
 const DEVICE_RECORD = 'device';
+// Demo has no relay expiry, so keep its observable deadline outside normal app lifetimes.
+export const DEMO_SESSION_EXPIRES_AT = '9999-12-31T23:59:59.999Z';
 
 interface StoredDevice {
   readonly id: typeof DEVICE_RECORD;
@@ -38,6 +40,10 @@ interface StoredDevice {
 export interface DeviceIdentity {
   readonly deviceId: string;
   readonly hostFingerprint: string;
+}
+
+export interface ApplicationSession extends DeviceIdentity {
+  readonly expiresAt: string;
 }
 
 // ───────────────────────────────────────────────────────────────────
@@ -82,8 +88,8 @@ export async function enrollDevice(serializedQr: string): Promise<DeviceIdentity
 // 4. SESSION ESTABLISHMENT AND REVOCATION
 // ───────────────────────────────────────────────────────────────────
 
-export async function establishSession(): Promise<DeviceIdentity | null> {
-  if (isDemoMode()) return DEMO_IDENTITY;
+export async function establishSession(): Promise<ApplicationSession | null> {
+  if (isDemoMode()) return { ...DEMO_IDENTITY, expiresAt: DEMO_SESSION_EXPIRES_AT };
   const device = await loadDevice();
   if (device === null) return null;
   if (device.origin !== window.location.origin) {
@@ -106,7 +112,11 @@ export async function establishSession(): Promise<DeviceIdentity | null> {
   if (!isApplicationSessionResponse(session)) {
     throw new Error('The relay returned an invalid application session.');
   }
-  return { deviceId: device.deviceId, hostFingerprint: device.hostFingerprint };
+  return {
+    deviceId: device.deviceId,
+    hostFingerprint: device.hostFingerprint,
+    expiresAt: session.expiresAt,
+  };
 }
 
 export async function revokeDevice(): Promise<void> {

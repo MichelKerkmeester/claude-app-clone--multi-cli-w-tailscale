@@ -232,9 +232,10 @@ export async function startReadOnlyServer(
       return;
     }
     const rateKey = `${ingress.principal}\0${request.socket.remoteAddress ?? 'unknown'}`;
-    if (!requestLimiter.consume(rateKey).allowed) {
+    const admission = requestLimiter.consume(rateKey);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      rejectUpgrade(socket, 429);
+      rejectUpgrade(socket, 429, admission.retryAfterSeconds);
       return;
     }
     const requestUrl = new URL(request.url ?? '/', 'http://localhost');
@@ -395,10 +396,16 @@ async function handleHttp(
     return;
   }
   const rateKey = `${ingress.principal}\0${request.socket.remoteAddress ?? 'unknown'}`;
-  if (!requestLimiter.consume(rateKey).allowed) {
+  const admission = requestLimiter.consume(rateKey);
+  if (!admission.allowed) {
     auth.metrics.rateLimited += 1;
     discardRequest(request);
-    sendJson(response, 429, { error: 'rate_limited' });
+    sendJson(
+      response,
+      429,
+      { error: 'rate_limited' },
+      retryAfterHeaders(admission.retryAfterSeconds),
+    );
     return;
   }
   if (isAttachmentRoute(ingress.path) && options.mediaEnabled !== true) {
@@ -421,10 +428,16 @@ async function handleHttp(
   }
 
   if (ingress.path === '/api/auth/enroll') {
-    if (!enrollmentLimiter.consume(rateKey).allowed) {
+    const admission = enrollmentLimiter.consume(rateKey);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
       discardRequest(request);
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     const body = await readJsonBody(request);
@@ -540,9 +553,15 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!askQuestionTicketLimiter.consume(session.deviceId).allowed) {
+    const admission = askQuestionTicketLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     const result = await options.askQuestions.issueAnswerTicket(session, body, auth);
@@ -566,9 +585,15 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!askQuestionAnswerLimiter.consume(session.deviceId).allowed) {
+    const admission = askQuestionAnswerLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     const result = await options.askQuestions.commitAnswer(session, body, auth);
@@ -598,10 +623,11 @@ async function handleHttp(
       sendArtifactFailure(response, 405);
       return;
     }
-    if (!artifactReadLimiter.consume(session.deviceId).allowed) {
+    const admission = artifactReadLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
       discardRequest(request);
-      sendArtifactFailure(response, 429);
+      sendArtifactFailure(response, 429, admission.retryAfterSeconds);
       return;
     }
     const rangeHeader = singleHeader(request.headers.range);
@@ -795,9 +821,15 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!approvalDecisionLimiter.consume(session.deviceId).allowed) {
+    const admission = approvalDecisionLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     const result = options.approvals.decide(body, session.deviceId, session.principal);
@@ -842,9 +874,15 @@ async function handleHttp(
       sendJson(response, 503, { error: 'delivery_unknown' });
       return;
     }
-    if (!promptLimiter.consume(session.deviceId).allowed) {
+    const admission = promptLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     try {
@@ -945,9 +983,15 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!runtimeTicketLimiter.consume(session.deviceId).allowed) {
+    const admission = runtimeTicketLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     const reasonCode = await options.runtime.validateFreshModelTicketRequest(body);
@@ -1022,9 +1066,15 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!runtimeControlLimiter.consume(session.deviceId).allowed) {
+    const admission = runtimeControlLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     try {
@@ -1055,9 +1105,15 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!planControlLimiter.consume(session.deviceId).allowed) {
+    const admission = planControlLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     try {
@@ -1085,9 +1141,15 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!planBindingLimiter.consume(session.deviceId).allowed) {
+    const admission = planBindingLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     const binding = options.runtime.getPlanBinding({
@@ -1122,9 +1184,15 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!acceptEditsLimiter.consume(session.deviceId).allowed) {
+    const admission = acceptEditsLimiter.consume(session.deviceId);
+    if (!admission.allowed) {
       auth.metrics.rateLimited += 1;
-      sendJson(response, 429, { error: 'rate_limited' });
+      sendJson(
+        response,
+        429,
+        { error: 'rate_limited' },
+        retryAfterHeaders(admission.retryAfterSeconds),
+      );
       return;
     }
     try {
@@ -2337,12 +2405,23 @@ function sendJson(
   response.end(body);
 }
 
-function sendArtifactFailure(response: ServerResponse, statusCode: number): void {
+function retryAfterHeaders(retryAfterSeconds: number): Readonly<Record<string, string>> {
+  return { 'retry-after': String(Math.max(1, retryAfterSeconds)) };
+}
+
+function sendArtifactFailure(
+  response: ServerResponse,
+  statusCode: number,
+  retryAfterSeconds?: number,
+): void {
   sendJson(
     response,
     statusCode,
     { error: 'artifact_unavailable' },
-    { 'cross-origin-resource-policy': 'same-origin' },
+    {
+      'cross-origin-resource-policy': 'same-origin',
+      ...(retryAfterSeconds === undefined ? {} : retryAfterHeaders(retryAfterSeconds)),
+    },
   );
 }
 
@@ -2355,15 +2434,14 @@ function sendInboundArtifactReadFailure(
     response,
     statusCode,
     { error: statusCode === 429 ? 'rate_limited' : 'artifact_unavailable' },
-    retryAfterSeconds === undefined
-      ? {}
-      : { 'retry-after': String(Math.max(1, retryAfterSeconds)) },
+    retryAfterSeconds === undefined ? {} : retryAfterHeaders(retryAfterSeconds),
   );
 }
 
 function rejectUpgrade(
   socket: NodeJS.WritableStream & { destroy: () => void },
   status: number,
+  retryAfterSeconds?: number,
 ): void {
   const reason =
     status === 401
@@ -2373,7 +2451,11 @@ function rejectUpgrade(
         : status === 404
           ? 'Not Found'
           : 'Forbidden';
-  socket.write(`HTTP/1.1 ${status} ${reason}\r\nConnection: close\r\n\r\n`);
+  const retryAfterHeader =
+    retryAfterSeconds === undefined
+      ? ''
+      : `retry-after: ${retryAfterHeaders(retryAfterSeconds)['retry-after']}\r\n`;
+  socket.write(`HTTP/1.1 ${status} ${reason}\r\nConnection: close\r\n${retryAfterHeader}\r\n`);
   socket.destroy();
 }
 

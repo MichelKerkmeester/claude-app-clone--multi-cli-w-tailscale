@@ -210,21 +210,26 @@ code comment. Write the durable WHY instead. A pre-commit gate enforces it.
 
 ---
 
-## 7. WHAT IS STILL THE OPERATOR'S CALL
+## 7. OPERATOR DECISIONS — ALL FOUR ANSWERED
 
-Four items are recorded as open questions in their packets and must not be decided unilaterally.
+Nothing in this queue is waiting on a decision any more.
 
-1. **Ship the client close-code classification without a test, or build the harness?** The harness is
-   roughly fifteen times the ten-line fix, because `app-mobile/tests/` has no WebSocket-level test at
-   all. This is the one place "no ship without a test" genuinely conflicts with proportionality.
-   Recorded in `016/003-connection-lifecycle`.
-2. **Is epoch rotation worth its retention obligation?** The mechanism is confirmed; the incidence of
-   a mid-session host restart is not. Rotation without garbage collection makes storage worse.
-   Recorded in `016`.
-3. **Reword the two runtime strings that read as terminal but are recoverable?**
-   `foreground-required` and `host-unavailable`. Recorded in `011`, recommended yes.
-4. **Allow aborting a turn without discarding the draft?** Recorded in `011`, recommended no — the
-   user can already interrupt while typing via Steer.
+1. **Client close-code classification.** **Do both halves.** Asking why the credential expires so
+   quickly reframed the problem: the fifteen-minute session life is not a login timeout, because the
+   device key never expires and re-authenticating is silent. So refresh at roughly four fifths of the
+   session's life — the expiry path is then normally never reached — and classify the close correctly
+   as the safety net for a sleeping phone or a lost network. Raising the fifteen minutes was rejected:
+   it hides the defect and lengthens the window a stolen session cookie stays useful.
+2. **Epoch rotation.** **Ship it, retaining ten ended epochs.** Rotation and cross-epoch collection
+   ship together; rotation alone makes storage strictly worse. Ten keeps several restarts inspectable
+   while debugging one.
+3. **The two misleading runtime strings.** **Not selected.** Still available, nothing depends on it.
+4. **Aborting a turn without discarding the draft.** **Do it.** The earlier recommendation against
+   this was wrong about the expectation: losing typed text on abort surprises people whether or not
+   an interrupt path exists.
+
+The conventions-authority stop-gap is also settled: **land the minimal one-section correction now**,
+with the full rewrite still belonging to the last packet.
 
 ---
 

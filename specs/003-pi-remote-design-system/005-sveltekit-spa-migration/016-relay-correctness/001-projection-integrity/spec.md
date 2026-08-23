@@ -148,11 +148,14 @@ the retention window itself, which is a separate operator decision.
 <!-- ANCHOR:questions -->
 ## 7. OPEN QUESTIONS
 
-1. **Does rotation ship now or wait for an observed restart?** The mechanism is confirmed; the
-   incidence is unknown. Recommendation: ship it, because the failure — a context-free process
-   appending silently to the previous conversation — cannot be diagnosed after the fact, which is
-   precisely why nobody has reported it.
-2. **What is the collection policy?** Proposed: collect ended epochs older than the current one beyond
-   a small retained count, so a recent rollback is still inspectable. The retained count is the
-   operator's call.
+Both answered by the operator; neither is open.
+
+1. **Does rotation ship now or wait for an observed restart?** **Answered: ship it.** A context-free
+   process appending silently to the previous conversation cannot be diagnosed after the fact, which
+   is precisely why nobody has reported it. Rotation ships together with cross-epoch collection, as
+   the requirement states — neither alone.
+2. **What is the collection policy?** **Answered: retain ten ended epochs.** Ten keeps several
+   restarts inspectable when debugging one, at a storage cost the operator accepted explicitly.
+   The count is a named constant so it can be tuned without reading the collection logic.
+
 <!-- /ANCHOR:questions -->

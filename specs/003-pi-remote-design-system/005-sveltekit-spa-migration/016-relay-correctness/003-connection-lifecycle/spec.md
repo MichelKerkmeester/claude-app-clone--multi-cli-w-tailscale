@@ -136,13 +136,24 @@ question.
 <!-- ANCHOR:questions -->
 ## 7. OPEN QUESTIONS
 
-1. **Ship the client half without its test, or fund the harness?** The fix is about ten lines; the
-   harness is roughly fifteen times that. This is the one place where the rule "no ship without a
-   test" genuinely conflicts with proportionality, and both council lenses that examined it held their
-   positions. Recommendation: build the harness, because it is the same harness the next three client
-   defects will need — but the cost is real and the decision is the operator's.
-2. **What heartbeat interval?** Thirty seconds with one-miss termination is the pattern the sibling
-   products use, and it reclaims a slot within a minute. Slower is safer for a poor link; faster
-   reclaims sooner. Recommendation: thirty seconds, injectable, revisit if a healthy phone is ever
-   dropped.
+Answered by the operator, and the answer reframed the problem.
+
+**Was: ship the client close-code classification without a test, or build the harness?**
+
+The operator asked why the credential expires so quickly at all. Investigating that changed the
+shape of the fix: the fifteen-minute session life is not a login timeout. The device key lives in
+browser storage and never expires, so re-authenticating is entirely silent — no rescan, no tap. The
+expiry was never meant to be visible, and the spinner exists only because the client mistakes a
+scheduled event for a dropped connection.
+
+**Answered: do both halves.**
+
+1. **Refresh before expiry**, at roughly four fifths of the session's life, so the expiry path is
+   normally never reached and nothing is visible at all.
+2. **Classify the close correctly** as the safety net for when early refresh cannot run — a sleeping
+   phone, a lost network — so the recovery is immediate rather than backed off.
+
+Raising the fifteen minutes was considered and rejected: it hides the defect and lengthens the window
+in which a stolen session cookie stays useful. The window is deliberate and stays as it is.
+
 <!-- /ANCHOR:questions -->

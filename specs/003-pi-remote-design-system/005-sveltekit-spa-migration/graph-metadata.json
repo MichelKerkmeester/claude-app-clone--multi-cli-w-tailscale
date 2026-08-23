@@ -164,17 +164,17 @@
     ],
     "causal_summary": "The Pi Remote mobile web app is hard to author as a designer",
     "created_at": "2026-08-19T17:23:39.714Z",
-    "last_save_at": "2026-08-23T15:09:22.092Z",
+    "last_save_at": "2026-08-23T18:52:16.416Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "handover.md"
     ],
-    "source_fingerprint": "sha256:b799c6723daabd5bc40534d10eed6ad6f3d61fa4a5f4259921028b6d704b31b6",
+    "source_fingerprint": "sha256:dafcdd318967e244502a14038b60890ef62967b2651890675ef425f972ce3adb",
     "source_doc_hashes": {
       "spec.md": "e0e8b7af0da967b131ec6ebf752ca151be49c1f85680ddc0229e1ceba0102edf",
-      "handover.md": "7f76d55a9d0441a42e5a7b12d43c2a2fb607abefddfc35235542c322cb962f0d"
+      "handover.md": "7444877c639bf1a6285a29af1063e8c749cdf9a2dd1073a63d7117116832c373"
     },
     "last_active_child_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
     "last_active_at": null

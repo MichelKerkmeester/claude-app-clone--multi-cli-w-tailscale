@@ -194,6 +194,41 @@ describe('privacy-minimized push and Attention Inbox', () => {
     }
   });
 
+  it('wakes a device whose socket dropped even though it still asserts foreground', async () => {
+    const { store, service, sendNotification } = harness();
+    try {
+      service.subscribe('device_one', SUBSCRIPTION);
+      // The phone said it was in the foreground and then lost its socket. It has
+      // already lost authority on every gated route, so suppressing its wake-up
+      // hint too would leave it unable to act and unable to be told to come back.
+      service.setForeground('device_one', true);
+
+      expect(
+        await service.publish(attentionEnvelope('finished'), {
+          committed: true,
+          foregroundDeviceIds: new Set(),
+        }),
+      ).toBe(1);
+      expect(sendNotification).toHaveBeenCalledTimes(1);
+    } finally {
+      store.close();
+    }
+  });
+
+  it('still honours the client assertion when no observed set is available', async () => {
+    const { store, service, sendNotification } = harness();
+    try {
+      service.subscribe('device_one', SUBSCRIPTION);
+      service.setForeground('device_one', true);
+
+      // Without an observed set the assertion is the only signal there is.
+      expect(await service.publish(attentionEnvelope('finished'), { committed: true })).toBe(0);
+      expect(sendNotification).not.toHaveBeenCalled();
+    } finally {
+      store.close();
+    }
+  });
+
   it('does not deliver uncommitted hints and cleans invalid endpoints', async () => {
     const store = new RelayStore();
     const sender = { sendNotification: vi.fn().mockRejectedValue({ statusCode: 410 }) };

@@ -76,7 +76,7 @@ export class PushService {
   private readonly key: Buffer;
   private readonly sender: PushSender;
   private readonly now: () => number;
-  private readonly foregroundDevices = new Set<string>();
+  private readonly assertedForegroundDevices = new Set<string>();
   public readonly vapidPublicKey: string | null;
 
   public constructor(private readonly options: PushServiceOptions) {
@@ -149,7 +149,7 @@ export class PushService {
   }
 
   public unsubscribe(deviceId: string): boolean {
-    this.foregroundDevices.delete(deviceId);
+    this.assertedForegroundDevices.delete(deviceId);
     return (
       this.database.prepare('DELETE FROM push_subscriptions WHERE device_id = ?').run(deviceId)
         .changes > 0
@@ -157,8 +157,8 @@ export class PushService {
   }
 
   public setForeground(deviceId: string, foreground: boolean): void {
-    if (foreground) this.foregroundDevices.add(deviceId);
-    else this.foregroundDevices.delete(deviceId);
+    if (foreground) this.assertedForegroundDevices.add(deviceId);
+    else this.assertedForegroundDevices.delete(deviceId);
   }
 
   public listAttention(): readonly AttentionItemDto[] {
@@ -278,6 +278,10 @@ export class PushService {
       )
       .all() as SubscriptionRow[];
     let sent = 0;
+    // A client assertion can go stale and strand a device; observed socket state is
+    // the foreground state the server can actually see whenever it is available.
+    const foregroundDeviceIds =
+      context.foregroundDeviceIds ?? this.assertedForegroundDevices;
     await Promise.all(
       rows.map(async (row) => {
         const preferences = this.parsePreferences(row.preferencesJson);
@@ -286,8 +290,7 @@ export class PushService {
             ? Object.values(preferences).some(Boolean)
             : preferences[attentionClass];
         if (
-          this.foregroundDevices.has(row.deviceId) ||
-          context.foregroundDeviceIds?.has(row.deviceId) ||
+          foregroundDeviceIds.has(row.deviceId) ||
           !enabled
         ) {
           return;

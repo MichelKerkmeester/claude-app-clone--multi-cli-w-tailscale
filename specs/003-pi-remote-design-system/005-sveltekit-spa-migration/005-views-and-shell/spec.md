@@ -8,13 +8,13 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/005-views-and-shell"
-    last_updated_at: "2026-08-19T00:00:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Spec authored (L4+L5 child)"
-    next_safe_action: "Views in parallel, Session alone; then Claude wires the shell + routes"
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/005-views-and-shell"
+    last_updated_at: "2026-08-23T10:00:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Packet documentation completed retrospectively."
+    next_safe_action: "None; child shipped and superseded by later layers."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -74,18 +74,22 @@ value; installs.
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- R1: The four non-Session views are disjoint (parallel-safe); Session runs alone.
-- R2: Socket lifecycle is centralized in the Session `onMount` (abort + close on teardown); async
+- **REQ-001** — The four non-Session views are disjoint (parallel-safe); Session runs alone.
+- **REQ-002** — Socket lifecycle is centralized in the Session `onMount` (abort + close on teardown); async
   open is guarded against early teardown. (Svelte has no StrictMode double-mount.)
-- R3: The 3-URL routing behaves identically to the React `pushState`/`popstate` app, including the
+- **REQ-003** — The 3-URL routing behaves identically to the React `pushState`/`popstate` app, including the
   `/attention/:lookupId` deep link through the SPA fallback.
-- R4: Both context providers mount once in `+layout`; theme + SW registration match the React shell.
+- **REQ-004** — Both context providers mount once in `+layout`; theme + SW registration match the React shell.
+- **REQ-005** — The virtualizer keeps dynamic row measurement across the library swap.
+  `@tanstack/svelte-virtual` returns a **store**, not a rune, so reactive count must go through a
+  merging `setOptions` call and rows must measure via `{@attach}` — a naive rune-shaped port silently
+  drops the injected observers and breaks variable-height rows.
 <!-- /ANCHOR:requirements -->
 
 ---
 
 <!-- ANCHOR:success-criteria -->
-## 5. SUCCESS CRITERIA (barrier gate)
+## 5. SUCCESS CRITERIA
 
 - The app runs end-to-end against the relay (enroll → home → session with live socket → review/inbox).
 - All three URLs resolve and deep-link correctly; `svelte-check` clean.

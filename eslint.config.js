@@ -3,19 +3,26 @@
 // ───────────────────────────────────────────────────────────────────
 
 import js from '@eslint/js';
-import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
+import svelte from 'eslint-plugin-svelte';
+import svelteParser from 'svelte-eslint-parser';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    // Runtime tooling is symlinked into this app's root in the standalone deployment; do not lint it.
     ignores: [
       '**/dist/**',
       '**/node_modules/**',
       '**/release/evidence/**',
       '**/coverage/**',
+      // Generated output. Linting it reports thousands of findings nobody can
+      // act on, which drowns the findings in authored code.
+      '**/.svelte-kit/**',
+      '**/storybook-static/**',
+      // Spec folders carry read-only research repositories checked out whole.
+      // They are inputs, not this project's source, and must never be edited.
+      'specs/**',
+      // Runtime tooling is symlinked into this app's root in the standalone deployment; do not lint it.
       '.opencode/**',
       '.pi/**',
       '.claude/**',
@@ -41,18 +48,25 @@ export default tseslint.config(
         ...globals.browser,
       },
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
-    rules: {
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
-      ...reactRefresh.configs.vite.rules,
+  },
+  // Svelte components were unparsed until now, so no rule had ever read one.
+  // The runes doctrine lives as prose rather than as a custom rule, but the
+  // recommended set still catches the ordinary component mistakes.
+  ...svelte.configs['flat/recommended'],
+  {
+    files: ['**/*.svelte'],
+    languageOptions: {
+      parser: svelteParser,
+      parserOptions: {
+        parser: tseslint.parser,
+      },
+      globals: {
+        ...globals.browser,
+      },
     },
   },
   {
-    files: ['app-mobile/public/service-worker.js'],
+    files: ['app-mobile/static/service-worker.js'],
     languageOptions: {
       globals: {
         ...globals.serviceworker,

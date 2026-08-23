@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../007-verify-and-cutover/spec.md |
+| **Successor** | ../009-storybook-experience/spec.md |
 | **Level** | 2 |
 | **Layer** | spans the run — **draft before L1**, **finalize at L7** (not a position in the sequence) |
 | **Writer** | Claude (conventions authority), optional markdown-agent fan-out for mechanical conformance |

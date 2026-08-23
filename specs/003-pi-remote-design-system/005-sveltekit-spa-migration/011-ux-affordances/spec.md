@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |---|---|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../010-context-repo-research/spec.md |
+| **Successor** | none — last child in the sequence |
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 1 |
 | Status | In Progress |

@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |---|---|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../009-storybook-experience/spec.md |
+| **Successor** | ../011-ux-affordances/spec.md |
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 1 |
 | Status | Complete — recommendations awaiting operator decision |

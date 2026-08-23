@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../003-feature-dirs/spec.md |
+| **Successor** | ../005-views-and-shell/spec.md |
 | **Level** | 2 |
 | **Layer** | L3 — chrome parallel; composer + LeavePlanSheet serial, **K=1** |
 | **Writer** | cli-devin (GLM-5.2 High) → Claude verifies |

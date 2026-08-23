@@ -9,11 +9,11 @@ trigger_phrases:
 importance_tier: "important"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration"
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration"
     last_updated_at: "2026-08-19T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Scaffolded the phase parent + eight phase children (spec-only) — the seven-step build sequence plus the sk-code-mobile-cli skill refactor — with the spanning goal, the React→SvelteKit amendment, and the delegation/parallelization strategy"
-    next_safe_action: "Create the git worktree (sk-git allocator), then execute L0 (child 001 move+scaffold, Claude infra)"
+    recent_action: "All 11 children documented; gate 9 green program-wide."
+    next_safe_action: "Await operator decision on the 010 recommendations."
     blockers: []
     key_files:
       - "spec.md"

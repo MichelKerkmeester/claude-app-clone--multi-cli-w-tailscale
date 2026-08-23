@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../006-catalog/spec.md |
+| **Successor** | ../008-sk-code-svelte-refactor/spec.md |
 | **Level** | 2 |
 | **Layer** | L7 — parallel groundwork → barrier → FINAL GATE |
 | **Writer** | cli-devin (test rewrite) + Claude (gates, deep-review, cutover, git) |

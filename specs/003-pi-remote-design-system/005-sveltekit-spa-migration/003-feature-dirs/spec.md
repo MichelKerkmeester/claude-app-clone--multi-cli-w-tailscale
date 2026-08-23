@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../002-ports-and-primitives/spec.md |
+| **Successor** | ../004-chrome-and-composer/spec.md |
 | **Level** | 2 |
 | **Layer** | L2 — 4 parallel cli-devin, one dispatch per directory |
 | **Writer** | cli-devin (GLM-5.2 High) → Claude verifies |

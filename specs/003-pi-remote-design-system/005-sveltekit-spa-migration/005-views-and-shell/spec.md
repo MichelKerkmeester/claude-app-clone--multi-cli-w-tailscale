@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../004-chrome-and-composer/spec.md |
+| **Successor** | ../006-catalog/spec.md |
 | **Level** | 2 |
 | **Layer** | L4 (views) + L5 (shell) — mostly serial; Session alone; shell is Claude + 1 dispatch |
 | **Writer** | cli-devin (views) + Claude (shell/routes/integration) |

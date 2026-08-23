@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "description": "The Pi Remote mobile web app is hard to author as a designer",
   "keywords": [
     "remote",

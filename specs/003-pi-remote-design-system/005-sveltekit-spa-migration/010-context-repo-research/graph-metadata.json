@@ -63,6 +63,12 @@
         "source": "derived"
       },
       {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
         "name": "evidence",
         "kind": "key_phrase",
         "path": "spec.md",
@@ -88,12 +94,6 @@
       },
       {
         "name": "1. METADATA",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "2. PROBLEM & PURPOSE",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
@@ -185,7 +185,7 @@
     ],
     "causal_summary": "Mine five checked-out reference codebases for patterns that a phone-remote for an AI coding CLI has to get right, and hand the operator a decision-ready recommendation list. Research only: the sweep reads the context repos and writes findings, it never modifies them and never scaffolds anything into the product without approval.",
     "created_at": "2026-08-23T06:30:13.518Z",
-    "last_save_at": "2026-08-23T06:31:15.287Z",
+    "last_save_at": "2026-08-23T07:20:09.147Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -194,9 +194,9 @@
       "tasks.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8260bbe0e0665a0f98ca9b23b12a7c9721674f6d15e1dc6217427d53fe78e3eb",
+    "source_fingerprint": "sha256:f3feb804f2a22edf5213e72d3e27d5cba74b2b1474866189ee9b422f1d4c9ed1",
     "source_doc_hashes": {
-      "spec.md": "a518a87603bd463047351afd02e8d82ac4479f1b8c3685ace68ad49fb716e532",
+      "spec.md": "f4ad92e6ff811586823fec218bb8d9416f3a427ff7c91137264eb9870bf85f23",
       "plan.md": "f39d8b5a269c2cda6f2a39e84d61c48770816ef37ee2646e2d5851918ff2ca90",
       "tasks.md": "a3d45d6a9e3a223f5ebb6b94f01d4df2cab6fcbc48fff6270802ba4ed1e814c6",
       "implementation-summary.md": "a1b8ce4873a246af575ceb2ba3d5611ac04280b7f2233f0f7b5eabeefefc81aa"

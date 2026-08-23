@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | none — this child gates every other |
+| **Successor** | ../002-ports-and-primitives/spec.md |
 | **Level** | 2 |
 | **Layer** | L0 — Claude infra, sequential (no parallel dispatch) |
 | **Writer** | Claude (infra + config, not app logic) |

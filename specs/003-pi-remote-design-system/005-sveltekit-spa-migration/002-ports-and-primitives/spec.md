@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../001-move-and-scaffold/spec.md |
+| **Successor** | ../003-feature-dirs/spec.md |
 | **Level** | 2 |
 | **Layer** | L1 — K parallel cli-devin, disjoint files |
 | **Writer** | cli-devin (GLM-5.2 High) → Claude verifies |

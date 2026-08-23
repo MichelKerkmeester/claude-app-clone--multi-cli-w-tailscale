@@ -63,6 +63,12 @@
         "source": "derived"
       },
       {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
         "name": "In Progress",
         "kind": "proper_noun",
         "path": "spec.md",
@@ -88,12 +94,6 @@
       },
       {
         "name": "2. PROBLEM & PURPOSE",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "3. SCOPE",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
@@ -179,7 +179,7 @@
     ],
     "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
     "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-23T06:31:50.991Z",
+    "last_save_at": "2026-08-23T07:20:09.302Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -188,9 +188,9 @@
       "tasks.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:f176ad367b65dcb7d320e48c3d272f4e8a7871626300455d96324510bbb8c8b4",
+    "source_fingerprint": "sha256:0ca6f5ccdfe12263c0af7adc106bae95010f8102ddec873825b1d9cf82911c01",
     "source_doc_hashes": {
-      "spec.md": "3e614453315be110c6a11a5b6afdccf334aa910c309720501561fc69deb1690b",
+      "spec.md": "38f6c60a3e3592851ece045bafd3b78d5ccf0c30000ca77d9ddf08fd4c3f618f",
       "plan.md": "574a68baf7b1dd8368a4fe5ff950db368c76e753d9552c14d1cdb4214cae88c4",
       "tasks.md": "b6143e7bde79de080e763775e871d232ecc41e70761a60de12d4fb0f6e90ecfd",
       "implementation-summary.md": "377d17c41dea767ca56d29ae7717a5deb9288aeac143f233e011eb79b77da68e"

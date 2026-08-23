@@ -69,6 +69,12 @@
         "source": "derived"
       },
       {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
         "name": "No React",
         "kind": "proper_noun",
         "path": "spec.md",
@@ -94,12 +100,6 @@
       },
       {
         "name": "3. SCOPE",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "4. REQUIREMENTS",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
@@ -185,7 +185,7 @@
     ],
     "causal_summary": "Completely refactor the sk-code-mobile-cli surface skill so it teaches the SvelteKit 5 / Svelte 5 stack instead of React — SMART ROUTING + surface-detection markers, the @ds grammar's .svelte seam form, the per-component scoped <style> model, the Bits UI / Melt UI mapping, runes verification, and setup/standards. It is the conventions authority every cli-devin dispatch loads, so it drafts before the first code dispatch and finalizes at cutover. The skill lives in the Public monorepo (symlinked); it lands via an isolated Public worktree.",
     "created_at": "2026-08-19T17:24:04.580Z",
-    "last_save_at": "2026-08-23T07:07:38.022Z",
+    "last_save_at": "2026-08-23T07:20:08.840Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -195,9 +195,9 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:62677210c406fda8ac821059ec00f50832ebcfe5d71d2009c5fa42b074a82a5e",
+    "source_fingerprint": "sha256:df87cd93ea5d735d0daca1988b402e1bbe45632abc0f3e83a34a8340b376dc95",
     "source_doc_hashes": {
-      "spec.md": "c355e36867d5e4101ce7bd729253adc53a588d1ea9e0291d567fb16edd6e848d",
+      "spec.md": "8788d402bf5dc4de370912c89d33889be17983a4903dac3e402336c9b947731a",
       "plan.md": "2df019f0cf969cc9542c8a3eeced93f461e125b5eac8161683a19b3f935caad9",
       "tasks.md": "c2b678a1a537c2626ab3dc642695237e6fc6c6709530199d3f7668805ec8f587",
       "checklist.md": "9b3068da1ad8fcf54ced2693219855d80e55f302c70fbf906e66ccf6a32dbd83",

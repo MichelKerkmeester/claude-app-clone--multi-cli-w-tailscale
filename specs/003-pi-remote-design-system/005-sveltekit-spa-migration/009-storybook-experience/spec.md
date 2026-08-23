@@ -49,6 +49,9 @@ coverage gate and the catalog smoke were green on it.
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../008-sk-code-svelte-refactor/spec.md |
+| **Successor** | ../010-context-repo-research/spec.md |
 | **Level** | 3 (developer-experience architecture + automation + docs; heavier companion docs — plan/tasks/decision-record — authored when execution opens) |
 | **Layer** | AFTER `007` green **and** the WS-C page-centric reorg — not a position in the L0–L7 sequence |
 | **Writer** | app code + stories under `app-mobile/**` by the executor (`cli-devin`); Claude owns barrier files (`.storybook/*`, `package.json`, gate/scaffold scripts, root scripts, READMEs) + git + all verification |

@@ -29,6 +29,9 @@ _memory:
 
 | Field | Value |
 |-------|-------|
+| **Parent Spec** | ../spec.md |
+| **Predecessor** | ../005-views-and-shell/spec.md |
+| **Successor** | ../007-verify-and-cutover/spec.md |
 | **Level** | 2 |
 | **Layer** | L6 — stories in parallel per surface (with the verification migration) |
 | **Writer** | cli-devin (GLM-5.2 High) → Claude verifies |

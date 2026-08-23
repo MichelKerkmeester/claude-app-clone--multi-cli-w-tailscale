@@ -75,6 +75,12 @@
         "source": "derived"
       },
       {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
         "name": "regression",
         "kind": "key_phrase",
         "path": "spec.md",
@@ -94,12 +100,6 @@
       },
       {
         "name": "1. METADATA",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "2. PROBLEM & PURPOSE",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
@@ -185,7 +185,7 @@
     ],
     "causal_summary": "Rewrite the shared chrome (SessionHeader, RuntimeStrip, TodoPanel, plan components, ModelEffortSheet) in parallel, then the composer (SessionComposer + ComposerCommandAutocomplete) and LeavePlanSheet serially and single-focus — these hand-roll focus/IME/slash and are the highest a11y-parity risk. Composer autocomplete uses Melt UI (focus stays in the textarea).",
     "created_at": "2026-08-19T17:24:03.332Z",
-    "last_save_at": "2026-08-23T06:57:02.124Z",
+    "last_save_at": "2026-08-23T07:20:08.208Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -195,9 +195,9 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:42682a9968008a188f8213f3bdc8ee19761a3f89bf21d8d80807e97b13166c0f",
+    "source_fingerprint": "sha256:3ae5441c2b51320372acbb1009d0ced9fcb41866fa2e047fa433084964d51547",
     "source_doc_hashes": {
-      "spec.md": "12bf8e6b4ef567a4c3868d07f21bcafd9683bdfe8b5c2608580e3ef81a1072d8",
+      "spec.md": "75ba288bc5ca05a7e8dfff3f894e260a57cea1b07635fc99bc3f10c15d31152d",
       "plan.md": "11071d8818eff96ac7f57832bab890dbb9c41f549e9cba9a4c05cb2d2eb4fbd9",
       "tasks.md": "aae4ef97a96d4088f3aaa4a148c9c8de1b61b5686a8ae69466f79f57b129b181",
       "checklist.md": "124f3b88e128cac34e8a0e981d697f8588a6d403f96bc9ce2a2c09d13e471e02",

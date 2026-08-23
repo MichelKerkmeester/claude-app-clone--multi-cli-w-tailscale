@@ -89,6 +89,12 @@
         "source": "derived"
       },
       {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
         "name": "the",
         "kind": "key_phrase",
         "path": "spec.md",
@@ -108,12 +114,6 @@
       },
       {
         "name": "2. PROBLEM & PURPOSE",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "3. SCOPE",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Build the CSS-corpus builder, commit the token-identity resolver gate (0 diffs across 3 themes = the pixel-identity proof), rewrite the 75 tests to @testing-library/svelte, repoint CDP at the built preview, run a deep-review fan-out against the frozen contracts, then cut over: all nine objective gates green + validate.sh --strict, and close the spec amendment.",
     "created_at": "2026-08-19T17:24:04.291Z",
-    "last_save_at": "2026-08-23T06:41:54.195Z",
+    "last_save_at": "2026-08-23T07:20:08.685Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,9 +198,9 @@
       "implementation-summary.md",
       "handover.md"
     ],
-    "source_fingerprint": "sha256:a47ba1f97a8f1027ced52788e7d89c15dd29e7fff7b4bcbf28a2b352c5bcc72d",
+    "source_fingerprint": "sha256:2ededc7ffe1716564fdff2c549dcaf68379c095f1aed1cede01a2a2b0ba42543",
     "source_doc_hashes": {
-      "spec.md": "cbaec74c8b859e8562d569193447fe62812002158de2ee8fa43fe2f37dc52074",
+      "spec.md": "2921f7157321d0939fdb443c5b3134a6059dd0003d66f138781459f6b709a09c",
       "plan.md": "a45fc97cd8dca1b37ffb33f4b15b5c78152428f81e1dcd782d75b885fc7d4879",
       "tasks.md": "8d31d26a7cda206893c0eb30fd8b28c6d9c3ec2c1ddcc306a84d0b994e9e06c3",
       "checklist.md": "69bb3c607f118790aecc7a76901f30b5ccbf49ad808a2b54de74f39aaf52561d",

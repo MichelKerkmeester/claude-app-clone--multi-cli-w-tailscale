@@ -30,13 +30,13 @@
       "test"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "checklist.md",
-      "tasks.md",
-      "implementation-summary.md"
+      "implementation-summary.md",
+      "tasks.md"
     ],
     "entities": [
       {
@@ -58,15 +58,15 @@
         "source": "derived"
       },
       {
-        "name": "tasks.md",
-        "kind": "doc",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "implementation-summary.md",
         "kind": "doc",
         "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Replace the hardcoded logic-test allowlist with a glob, stop mocking the virtualizer out of existence, give ESLint a Svelte parser, and cover the transcript reducer. A precondition packet: it makes every later fix provable.",
     "created_at": "2026-08-23T10:26:59.698Z",
-    "last_save_at": "2026-08-23T10:26:59.698Z",
+    "last_save_at": "2026-08-23T13:58:23.509Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:e661d5b7ac45d18cdc541ca71c63f94ee4fcd696b7bfe7632b5a6b469d09acab",
+    "source_fingerprint": "sha256:b055359a338e1f2c2340f456ba571eada770a5fbd978b956191c1e1399f9f3b7",
     "source_doc_hashes": {
       "spec.md": "a40161fd69446d42a8620392458e42130c42e480c766255fd5b803572c189cc9",
       "plan.md": "c427ab2ff94bd91fc2d5ec821402de9b8300e81331995e48d8ed4deaaf756e3d",
-      "tasks.md": "7d3b0903e682755aaa2b621cc856804c3fe9bb90a7cc0c040989626a0a6cb10b",
-      "checklist.md": "0fb34bf14e9d6813cd5ef53ece3f72b8092a9eb7f22862a80a3fe358aa53bb6b",
-      "implementation-summary.md": "c2dfbafd3c6438cc84f51b2f102f44362f1743385bc0c71d423e23c7409df3e5"
+      "tasks.md": "33fa8f7a4df4380bc089c2d0d4a8284855cd001ddafa41e4a0e9b33f18f6e3c7",
+      "checklist.md": "56081632d14a6b478a8409d4a130cd3cdc792af1416c15d20d8bc9758f69bb35",
+      "implementation-summary.md": "4d1a1115ad1caac24c6e1c544a371a3c793896732c812adc5480ecec0459f65b"
     },
     "last_active_child_id": null,
     "last_active_at": null

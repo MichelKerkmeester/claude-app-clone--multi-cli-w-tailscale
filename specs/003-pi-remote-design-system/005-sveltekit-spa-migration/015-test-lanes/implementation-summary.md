@@ -1,16 +1,16 @@
 ---
-title: "Child 015 implementation summary — test lanes repaired"
-description: "Continuity anchor for the test-infrastructure packet. Nothing is implemented yet: this records the verified measurements and why the packet runs first."
+title: "Child 015 implementation summary — test lanes"
+description: "The logic lane resolves by glob, the real virtualizer is exercised, ESLint parses Svelte against an honest scope, and the transcript reducer is covered with a negative control."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/015-test-lanes"
-    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_at: "2026-08-23T16:30:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Packet scoped from verified measurements; nothing changed."
-    next_safe_action: "Record baselines, then swap the allowlist for a glob."
+    recent_action: "Glob lane, real-virtualizer suite, Svelte lint scope and reducer coverage landed."
+    next_safe_action: "Start 012/001, which this packet unblocks."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | **Scoped, not started** |
-| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+| Status | **Shipped** |
+| Requirements shipped | REQ-001 … REQ-007 |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -36,21 +36,32 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing. No test or config has been edited.
+Three instruments that reported green while measuring less than they appeared to now measure what
+they claim.
 
-The measurements below were verified directly against the tree rather than inherited from the research
-synthesis:
+**The logic lane resolves by glob.** A new file in the tests directory runs without a config edit —
+proven by adding one, watching the lane go from 15 files to 16, and removing it again. The four files
+the old config named as dead are excluded explicitly, each with the reason observed by running it
+rather than assumed.
 
-| Measurement | Value |
-|---|---|
-| Paths in the logic-lane allowlist | 15, hardcoded |
-| Tests the config itself names as dead | 4, documented in its own header comment |
-| Suites mocking the virtualizer to return every row | 4 |
-| Tests that have ever exercised the real virtualizer | 0 |
-| `**/*.svelte` blocks in the ESLint config | 0 |
-| Svelte ESLint parser or plugin installed | neither |
-| `$effect` occurrences in app source, unread by any rule | 114 |
-| Historical `$effect` self-invalidation incidents in this program | 7 |
+**The real virtualizer is exercised.** Every suite that renders the transcript replaced the
+virtualizer with a stub returning every row, so virtualization itself had never been observed. A new
+suite stubs the layout jsdom cannot provide instead of the component under test: the virtualizer
+sizes its viewport from `offsetHeight`, which jsdom always reports as zero. With two hundred blocks
+in a six-hundred-pixel viewport the list renders ten rows and still sizes its scrolled area for all
+two hundred. The existing mocks stay where a test genuinely needs every row.
+
+**ESLint parses Svelte, against an honest scope.** No rule had ever read a component: no parser was
+installed and no block matched `.svelte`. Ninety-six components are now linted. The run also swept
+generated output and the read-only research repositories checked out under `specs/`, reporting 36,934
+problems nobody could act on; scoped to this project's own source the baseline is 113.
+
+**The transcript reducer is covered.** Snapshot, delta beyond the cursor, epoch change, gap and the
+recovery barrier. Removing the barrier fails the barrier case, which is what makes the coverage worth
+having.
+
+**A test filename stopped claiming coverage it did not provide.** `disclosure-persistence` asserts
+that an image card sits outside the collapsing group and stays operable — placement, not persistence.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -58,11 +69,9 @@ synthesis:
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-Per-phase commits, baseline first. The executor writes tests and configs; Claude verifies the counts
-and owns git.
-
-The packet runs before every other post-cutover item, because each of those is verified by these
-lanes. A fix written against an unrepaired lane produces a green board and no coverage.
+Six commits, one per change, all authored here: this packet touches only configs and tests, which sit
+outside the executor's write scope. No source file under `app-mobile/src/` or `app-relay/src/`
+changed in any of them.
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -70,18 +79,19 @@ lanes. A fix written against an unrepaired lane produces a green board and no co
 <!-- ANCHOR:decisions -->
 ## KEY DECISIONS
 
-**A glob, not a longer allowlist.** The defect is the shape, not the contents. An allowlist fails
-silently when someone adds a file; a glob fails loudly. Adding the four missing paths would fix
-today's symptom and leave tomorrow's.
+**Quarantine the four dead tests rather than repair them**, as the packet recommended. Each carries
+its own reason in the config, where the next reader will look. Repairing them is real work of unknown
+size and bundling an unknown into a precondition is how preconditions stop being cheap.
 
-**Every exclusion carries a written reason, in the config.** The next reader opens the config, not the
-commit log. An explicit gap is the outcome being bought here; a silent one is the defect.
+**Stub the layout, not the virtualizer.** Removing the mock from an existing suite made it render
+zero rows, because jsdom has no layout at all — the honest fix is to supply the one thing jsdom
+cannot, and let the real component run.
 
-**Negative controls where they are cheap.** A test that cannot fail is an assertion-shaped comment.
-The reducer test gets one; the packet does not pretend to give one to everything.
+**Scope the lint run before recording its baseline.** A number dominated by findings in read-only
+research repositories is not a baseline anyone can ratchet against.
 
-**Report, do not fix, what the un-mocked virtualizer exposes.** Those are findings for the packets
-that own those surfaces. Absorbing them here would turn a precondition into an open-ended project.
+**Baseline and ratchet rather than triage now**, as the packet recommended. 113 findings, 48 of them
+unused variables, are written down rather than silenced.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -91,13 +101,21 @@ that own those surfaces. Absorbing them here would turn a precondition into an o
 
 | Check | Result |
 |---|---|
-| Baseline counts | not recorded |
-| Glob swap | not run |
-| Virtualizer un-mock | not run |
-| ESLint Svelte pass | not run |
-| Reducer test and negative control | not written |
-
-No completion claim is made or implied.
+| Logic lane, before | 15 files / 182 tests |
+| Logic lane, after | 16 files / 188 tests, exit 0 — one new file, six new tests |
+| Svelte lane, before | 65 files / 530 passed, 3 skipped |
+| Svelte lane, after | 66 files / 532 passed, 3 skipped — one new file, two new tests |
+| `npm run test:web` | PASS — exit 0, verified by both suite summaries being present rather than by a piped status |
+| Glob property | PASS — a temporary file ran without a config edit and was removed again |
+| Real virtualizer | PASS — 10 rows rendered of 200, spacer sized for all 200 |
+| Reducer negative control | PASS — removing the barrier fails the barrier case |
+| ESLint over `.svelte` | PASS — 96 components linted, 22 with findings; baseline 113 errors |
+| No source changed | PASS — the six commits touch tests and configs only |
+| Dev dependencies are dev-only | PASS — both under `devDependencies` |
+| Backend suite unaffected | PASS — 51 files / 384 tests, exit 0 |
+| `npm run build` | PASS — exit 0 |
+| `npm run typecheck` | PASS — exit 0, 0 errors |
+| Token identity, three themes | PASS — 0 CHANGED / 0 VANISHED / 0 ADDED |
 <!-- /ANCHOR:verification -->
 
 ---
@@ -105,15 +123,13 @@ No completion claim is made or implied.
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-**This packet fixes no user-visible defect.** Its entire value is downstream, which makes it the
-easiest one to deprioritise and the most expensive one to skip — every later fix would be verified by
-instruments already known to be measuring less than they report.
+**The four quarantined tests are still not running**, and one of them fails for a reason worth
+naming: `highlight.worker.test.ts` throws at import because the worker's token regex carries an
+invalid escape under the unicode flag. That is a source defect, reported here rather than fixed,
+because this packet changes no source.
 
-**The ESLint first pass is an unknown quantity.** 114 `$effect` occurrences have never been linted, so
-the finding count could be large. The plan is to baseline and ratchet rather than to triage
-everything, which means the lane lands with known debt rather than clean.
+**The 113-error lint baseline is a starting notch, not a clean board.** Nothing ratchets it yet.
 
-**Quarantine is not repair.** Four tests are expected to be quarantined with reasons rather than
-fixed, because they fail on stale fetch-mock and Worker-environment assumptions of unknown size.
-That leaves real coverage missing — visibly, which is the improvement.
+**The virtualization suite proves a window exists, not that the window is right.** jsdom has no
+compositor, so scroll-driven behaviour and momentum still need a device.
 <!-- /ANCHOR:limitations -->

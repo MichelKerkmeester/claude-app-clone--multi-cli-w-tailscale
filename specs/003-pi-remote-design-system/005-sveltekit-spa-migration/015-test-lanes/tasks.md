@@ -33,12 +33,12 @@ A repair is done when the test runs and a negative control proves it can fail.
 <!-- ANCHOR:phase-1 -->
 ## PHASE 1: SETUP
 
-- [ ] **T1.1** Record baseline counts per lane — files collected and tests passed — so later numbers
+- [x] **T1.1** Record baseline counts per lane — files collected and tests passed — so later numbers
       have something to be compared against.
-- [ ] **T1.2** Enumerate every test file in the repository and mark which lane, if any, collects it.
+- [x] **T1.2** Enumerate every test file in the repository and mark which lane, if any, collects it.
       The gap between those two sets is the packet's actual scope.
-- [ ] **T1.3** Confirm 012 has not started, so no rename collides with a config edit.
-- [ ] **T1.4** Get approval for the two dev dependencies — `eslint-plugin-svelte` and
+- [x] **T1.3** Confirm 012 has not started, so no rename collides with a config edit.
+- [x] **T1.4** Get approval for the two dev dependencies — `eslint-plugin-svelte` and
       `svelte-eslint-parser` — since installation is a scoped mutation.
 <!-- /ANCHOR:phase-1 -->
 
@@ -49,38 +49,38 @@ A repair is done when the test runs and a negative control proves it can fail.
 
 **Glob the logic lane**
 
-- [ ] **T2.1** Replace the fifteen-path `LOGIC_TESTS` allowlist with a glob and run it.
-- [ ] **T2.2** Triage every new failure into repairable-now or quarantined-with-a-reason. Nothing
+- [x] **T2.1** Replace the fifteen-path `LOGIC_TESTS` allowlist with a glob and run it.
+- [x] **T2.2** Triage every new failure into repairable-now or quarantined-with-a-reason. Nothing
       returns to an implicit exclusion — that is the shape this packet exists to remove.
-- [ ] **T2.3** Handle the four tests the config itself names as dead: `highlight.worker`,
+- [x] **T2.3** Handle the four tests the config itself names as dead: `highlight.worker`,
       `relay-runtime-transport`, `submitSlashDraft`, `submitSlashDraftTransport`.
-- [ ] **T2.4** Resist re-narrowing the glob when it turns red. A green board bought by shrinking the
+- [x] **T2.4** Resist re-narrowing the glob when it turns red. A green board bought by shrinking the
       include set reproduces the original defect with extra steps.
 
 **Virtualizer and naming**
 
-- [ ] **T2.5** Remove the blanket `@tanstack/svelte-virtual` mock from the suite where real
+- [x] **T2.5** Remove the blanket `@tanstack/svelte-virtual` mock from the suite where real
       virtualization matters, so at least one test observes rows unmounting.
-- [ ] **T2.6** Keep the mock where a test legitimately needs every row, and say so in the file.
-- [ ] **T2.7** Rename `disclosure-persistence.svelte.test.ts` to describe what it asserts — card
+- [x] **T2.6** Keep the mock where a test legitimately needs every row, and say so in the file.
+- [x] **T2.7** Rename `disclosure-persistence.svelte.test.ts` to describe what it asserts — card
       placement — because a filename claiming coverage that does not exist is worse than no file.
-- [ ] **T2.8** Report, do not fix, any real bug the un-mocked virtualizer exposes. Those are findings
+- [x] **T2.8** Report, do not fix, any real bug the un-mocked virtualizer exposes. Those are findings
       for another packet.
 
 **ESLint lane**
 
-- [ ] **T2.9** Install `eslint-plugin-svelte` and `svelte-eslint-parser`.
-- [ ] **T2.10** Add the `**/*.svelte` block to `eslint.config.js`.
-- [ ] **T2.11** Delete the `react-hooks` and `react-refresh` configuration — React is gone from this
+- [x] **T2.9** Install `eslint-plugin-svelte` and `svelte-eslint-parser`.
+- [x] **T2.10** Add the `**/*.svelte` block to `eslint.config.js`.
+- [x] **T2.11** Delete the `react-hooks` and `react-refresh` configuration — React is gone from this
       tree — and fix the override pointing at a directory that no longer exists.
-- [ ] **T2.12** Run the first Svelte pass and record the finding count as a baseline. Triage or
+- [x] **T2.12** Run the first Svelte pass and record the finding count as a baseline. Triage or
       ratchet; do not silence.
 
 **Reducer coverage**
 
-- [ ] **T2.13** Write a focused test over transcript reducer handling: snapshot, delta, gap, and the
+- [x] **T2.13** Write a focused test over transcript reducer handling: snapshot, delta, gap, and the
       mutation barrier during recovery.
-- [ ] **T2.14** Add the negative control — remove the barrier and confirm the test fails. A test that
+- [x] **T2.14** Add the negative control — remove the barrier and confirm the test fails. A test that
       passes against broken code is not a test.
 <!-- /ANCHOR:phase-2 -->
 
@@ -89,13 +89,13 @@ A repair is done when the test runs and a negative control proves it can fail.
 <!-- ANCHOR:phase-3 -->
 ## PHASE 3: VERIFICATION
 
-- [ ] **T3.1** Test count before and after recorded, with every delta accounted for.
-- [ ] **T3.2** Zero test files uncollected by every lane without a written reason.
-- [ ] **T3.3** `npm run test:web` exit 0, verified by content — piping to `tail` reports the pipe's
+- [x] **T3.1** Test count before and after recorded, with every delta accounted for.
+- [x] **T3.2** Zero test files uncollected by every lane without a written reason.
+- [x] **T3.3** `npm run test:web` exit 0, verified by content — piping to `tail` reports the pipe's
       status rather than the runner's.
-- [ ] **T3.4** ESLint runs over `.svelte` and its baseline is recorded.
-- [ ] **T3.5** No source file under `app-mobile/src/` or `app-relay/src/` changed.
-- [ ] **T3.6** `validate.sh --strict` exit 0 through its realpath.
+- [x] **T3.4** ESLint runs over `.svelte` and its baseline is recorded.
+- [x] **T3.5** No source file under `app-mobile/src/` or `app-relay/src/` changed.
+- [x] **T3.6** `validate.sh --strict` exit 0 through its realpath.
 <!-- /ANCHOR:phase-3 -->
 
 ---

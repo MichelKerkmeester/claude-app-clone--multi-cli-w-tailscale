@@ -1,0 +1,117 @@
+---
+title: "Child 019 implementation summary — surface skill refresh"
+description: "Continuity anchor. Nothing is implemented yet: this records why the authority is wrong, why the branch is stranded, and why the packet is deliberately last."
+contextType: "implementation"
+_memory:
+  continuity:
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/019-surface-skill-refresh"
+    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Scoped as the terminal packet; no files changed."
+    next_safe_action: "Wait for 012, 013 and 014, then audit the skill."
+    blockers: ["depends on 012, 013 and 014 landing first"]
+    completion_pct: 0
+---
+
+<!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 2 -->
+
+# Child 019 implementation summary
+
+---
+
+<!-- ANCHOR:metadata -->
+## METADATA
+
+| Field | Value |
+|---|---|
+| Parent | `005-sveltekit-spa-migration` |
+| Level | 2 |
+| Status | **Scoped, not started** — blocked on 012, 013 and 014 |
+| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+<!-- /ANCHOR:metadata -->
+
+---
+
+<!-- ANCHOR:what-built -->
+## WHAT WAS BUILT
+
+Nothing. The skill has not been edited.
+
+The state this packet inherits:
+
+| Fact | State |
+|---|---|
+| Conventions authority loaded by every code dispatch on this app | `sk-code-mobile-cli`, in the Public monorepo |
+| Divider grammar it teaches | the compact form, superseded during the editability pass |
+| Files and dividers the codebase actually converted | 45 files, 213 dividers |
+| Branch carrying the framework refactor | allocated, three commits, **never merged** |
+| Consequence of the strand | no workflow loads the refactor at all |
+| Conventions about to become stale | naming, comments, folder documentation — one per editability packet |
+| Runes self-invalidation incidents in this programme | 7, with 19 hand-placed suppressions across 11 files |
+<!-- /ANCHOR:what-built -->
+
+---
+
+<!-- ANCHOR:how-delivered -->
+## HOW IT WAS DELIVERED
+
+Audit, rewrite, land through an isolated worktree, merge. Claude owns the whole packet — it is
+cross-repository work with landing discipline rather than app code.
+<!-- /ANCHOR:how-delivered -->
+
+---
+
+<!-- ANCHOR:decisions -->
+## KEY DECISIONS
+
+**Deliberately last.** A conventions authority documents what shipped. Every earlier attempt to write
+this mid-flight would have described a tree that was still moving, and would have been rewritten.
+
+**The naming packet keeps a minimal stop-gap.** Without it, the window between the rename and this
+refresh would have the authority teaching the opposite of the tree. The full refresh lives here; the
+one-paragraph correction lives there.
+
+**The runes doctrine goes here because the lint rule was declined.** Standing up a Svelte lint lane —
+installing a parser, triaging a first pass, authoring a custom rule no upstream plugin expresses, then
+keeping a tenth gate green forever — was judged too expensive for a one-person project. That decision
+is only defensible if the knowledge is written down somewhere a dispatch reads.
+
+**The merge is inside this packet.** Leaving it stranded a second time would mean two packets have
+produced work that nothing loads.
+<!-- /ANCHOR:decisions -->
+
+---
+
+<!-- ANCHOR:verification -->
+## VERIFICATION
+
+| Check | Result |
+|---|---|
+| Audit against the shipped tree | not run |
+| Reference-integrity scan | not built |
+| Divider grammar replaced | not done |
+| Runes doctrine written | not done |
+| Branch merged | no |
+| Dispatch against the merged surface | not run |
+| `validate.sh --strict` via realpath | not run |
+
+No completion claim is made or implied.
+<!-- /ANCHOR:verification -->
+
+---
+
+<!-- ANCHOR:limitations -->
+## KNOWN LIMITATIONS
+
+**Correctness here is not mechanically checkable.** A scan proves every path resolves and a grep proves
+the old grammar is gone. Neither proves the new prose is right about Svelte. Only a dispatch loading
+the merged surface tests meaning, and a single dispatch is a sample rather than a proof.
+
+**Failure is silent and delayed.** A wrong conventions document does not break a build; it misdirects
+future work, and the cost appears later as code in the wrong shape. There is no gate that turns red.
+
+**This packet depends on three others and is depended on by none.** That makes it the easiest to
+postpone indefinitely — and postponing it is how the previous refactor ended up stranded in the first
+place.
+<!-- /ANCHOR:limitations -->

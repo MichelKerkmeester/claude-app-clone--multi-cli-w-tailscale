@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/018-transcript-affordances",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/018-transcript-affordances",
   "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
@@ -11,23 +11,23 @@
   },
   "derived": {
     "trigger_phrases": [
-      "folder readme sk-doc template",
-      "code folder documentation svelte",
-      "feature readme structure logic"
+      "disclosure state virtualized rows",
+      "blanket grant differentiation approval",
+      "working versus stalled transcript"
     ],
     "key_topics": [
-      "folder",
-      "readme",
-      "sk-doc",
-      "template",
-      "code",
-      "documentation",
-      "svelte",
-      "feature",
-      "structure",
-      "logic",
-      "rewrite",
-      "barebones"
+      "disclosure",
+      "state",
+      "virtualized",
+      "rows",
+      "blanket",
+      "grant",
+      "differentiation",
+      "approval",
+      "working",
+      "versus",
+      "stalled",
+      "transcript"
     ],
     "importance_tier": "important",
     "status": "in_progress",
@@ -76,75 +76,57 @@
         "source": "derived"
       },
       {
+        "name": "Headless Chrome",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
         "name": "it",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "source",
-        "kind": "key_phrase",
+        "name": "1. METADATA",
+        "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "filler",
-        "kind": "key_phrase",
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "the",
+        "name": "Repairability Change",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "operator",
         "kind": "key_phrase",
-        "path": "spec.md",
+        "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "all",
+        "name": "is",
         "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Key Statistics",
-        "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Quick Start",
-        "kind": "proper_noun",
+        "name": "1. SUMMARY",
+        "kind": "heading",
         "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Usage Examples",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Related Resources",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Package Topology",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Directory Tree",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "a",
-        "kind": "key_phrase",
-        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -182,11 +164,29 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "Verification Protocol The",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Fix Completeness",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Rewrite the 16 barebones folder READMEs and 7 CODE files onto sk-doc's feature and code-folder templates, and add the ones that are missing, so each folder explains what the feature does and how its logic is arranged.",
-    "created_at": "2026-08-23T09:57:25.479Z",
-    "last_save_at": "2026-08-23T10:47:40.087Z",
+    "causal_summary": "Three client changes the virtualizer and the copy catalog make necessary: disclosure state that survives scrolling, an approval row where the blanket grant is not a twin of the single one, and a transcript that can say stalled rather than working forever.",
+    "created_at": "2026-08-23T10:47:21.093Z",
+    "last_save_at": "2026-08-23T10:48:24.154Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b99f94f93724f941ccc2db54e6ec46c70a327d12ee53bafa1bffe4669d6d6ea8",
+    "source_fingerprint": "sha256:0fd4343ea9b52f057c1b534b89477c226c2840d7b8a98a4658968bb49b3abef4",
     "source_doc_hashes": {
-      "spec.md": "061f5fae5f81249d07fc9c9299bd00c2db74dfc041c1426ca1439982f3dfeea8",
-      "plan.md": "cd3114504e4bce0fba8e2aa77f3e0cb4e431c1bc03511aba0b35cd00b0a4f62d",
-      "tasks.md": "5e15a4cd1993c538cb74dc00d64aded15dbad577aa3d8ba323da11d38e7c0955",
-      "checklist.md": "2a3e73bd936cfbc1b69d420835faf4540a24dc1a0a6db2490305c0cb7b32587c",
-      "implementation-summary.md": "50159301d0d710ed980365940370d464a476944cf3f504d21b3e9b15f5a864bd"
+      "spec.md": "e79dcd95c1d5d1c4a32834aaee97aa885e2eb0065c06996dfa075277f3c8a4bc",
+      "plan.md": "9234d474469013e7aeb529646f3c5474d0b8ccddcc90748d9451badb2f8647f1",
+      "tasks.md": "b92fbc3d48301ec86eaa42475cd8b10f33b28a60026f8850de1ce73caf95746b",
+      "checklist.md": "d056edbc78fa723bb24458532e591edef17651b8399ce23184fee380b49c23d3",
+      "implementation-summary.md": "aa526349c4c1744c9853941356373783788f51ab13dde4f1be8ea595807cf25e"
     },
     "last_active_child_id": null,
     "last_active_at": null

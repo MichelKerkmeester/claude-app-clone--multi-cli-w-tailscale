@@ -1,0 +1,30 @@
+{
+  "level": "2",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/018-transcript-affordances",
+  "description": "Three client changes the virtualizer and the copy catalog make necessary: disclosure state that survives scrolling, an approval row where the blanket",
+  "keywords": [
+    "three",
+    "client",
+    "changes",
+    "virtualizer",
+    "copy",
+    "catalog",
+    "necessary",
+    "disclosure",
+    "state",
+    "survives",
+    "scrolling",
+    "approval",
+    "row",
+    "blanket"
+  ],
+  "lastUpdated": "2026-08-23T10:48:17.042Z",
+  "specId": "018",
+  "folderSlug": "transcript-affordances",
+  "parentChain": [
+    "003-pi-remote-design-system",
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

@@ -32,7 +32,7 @@ _memory:
 |-------|-------|
 | **Parent Spec** | ../spec.md |
 | **Predecessor** | ../013-comment-grammar/spec.md |
-| **Successor** | none — currently the last child |
+| **Successor** | ../015-test-lanes/spec.md |
 | **Level** | 2 |
 | **Layer** | post-cutover editability — documentation pass |
 | **Writer** | executor (folder docs) + Claude (template conformance, gates, git) |

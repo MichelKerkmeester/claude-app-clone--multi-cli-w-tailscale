@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/019-surface-skill-refresh",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/019-surface-skill-refresh",
   "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
@@ -11,23 +11,23 @@
   },
   "derived": {
     "trigger_phrases": [
-      "folder readme sk-doc template",
-      "code folder documentation svelte",
-      "feature readme structure logic"
+      "sk-code-mobile-cli conventions refresh",
+      "surface skill re-open after editability",
+      "stranded skill branch merge"
     ],
     "key_topics": [
-      "folder",
-      "readme",
-      "sk-doc",
-      "template",
-      "code",
-      "documentation",
-      "svelte",
-      "feature",
-      "structure",
-      "logic",
-      "rewrite",
-      "barebones"
+      "sk-code-mobile-cli",
+      "conventions",
+      "refresh",
+      "surface",
+      "skill",
+      "re-open",
+      "editability",
+      "stranded",
+      "branch",
+      "merge",
+      "naming",
+      "comment"
     ],
     "importance_tier": "important",
     "status": "in_progress",
@@ -76,19 +76,13 @@
         "source": "derived"
       },
       {
-        "name": "it",
+        "name": "one",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "source",
-        "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "filler",
+        "name": "its",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
@@ -100,51 +94,45 @@
         "source": "derived"
       },
       {
-        "name": "all",
+        "name": "a",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Key Statistics",
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Audit Walk",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Quick Start",
-        "kind": "proper_noun",
+        "name": "1. SUMMARY",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Usage Examples",
-        "kind": "proper_noun",
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Related Resources",
-        "kind": "proper_noun",
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Package Topology",
-        "kind": "proper_noun",
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
         "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Directory Tree",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "a",
-        "kind": "key_phrase",
-        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -166,27 +154,39 @@
         "source": "derived"
       },
       {
-        "name": "PHASE 2: IMPLEMENTATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "PHASE 3: VERIFICATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Fix Completeness",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "File Organization",
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "Rewrite the 16 barebones folder READMEs and 7 CODE files onto sk-doc's feature and code-folder templates, and add the ones that are missing, so each folder explains what the feature does and how its logic is arranged.",
-    "created_at": "2026-08-23T09:57:25.479Z",
-    "last_save_at": "2026-08-23T10:47:40.087Z",
+    "causal_summary": "Re-open the sk-code-mobile-cli surface skill once the naming, comment and documentation packets have landed, teach it what actually shipped, and merge the branch that has been stranded since the framework refactor.",
+    "created_at": "2026-08-23T10:47:21.393Z",
+    "last_save_at": "2026-08-23T10:47:21.393Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b99f94f93724f941ccc2db54e6ec46c70a327d12ee53bafa1bffe4669d6d6ea8",
+    "source_fingerprint": "sha256:4265281d7a42c29f3a0d0105a16fa106e3c6d3fb80da4579b04cc173243137f3",
     "source_doc_hashes": {
-      "spec.md": "061f5fae5f81249d07fc9c9299bd00c2db74dfc041c1426ca1439982f3dfeea8",
-      "plan.md": "cd3114504e4bce0fba8e2aa77f3e0cb4e431c1bc03511aba0b35cd00b0a4f62d",
-      "tasks.md": "5e15a4cd1993c538cb74dc00d64aded15dbad577aa3d8ba323da11d38e7c0955",
-      "checklist.md": "2a3e73bd936cfbc1b69d420835faf4540a24dc1a0a6db2490305c0cb7b32587c",
-      "implementation-summary.md": "50159301d0d710ed980365940370d464a476944cf3f504d21b3e9b15f5a864bd"
+      "spec.md": "2f3f40cc61a8ce4fbdff3df70a7d41ffbad2806a8d5abf2cdf03caea8c793eaf",
+      "plan.md": "181c0600e7b47b4b865546da934ccd4f562182adb6e0fbdb8a354482c8a11721",
+      "tasks.md": "050a2347bf5b981c410e6e3da891f967ccffef3840f61724db16ddad325e488f",
+      "checklist.md": "07d4c03b6839c35638537649bba0ff255a607c3533de14353fcbc46861fa3d70",
+      "implementation-summary.md": "a8a316c962afd7ce1cc6ed8ed9e77b9d3df71d5537a612d751968d7136ac5ac5"
     },
     "last_active_child_id": null,
     "last_active_at": null

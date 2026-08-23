@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/017-ask-question-activation",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/017-ask-question-activation",
   "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
@@ -11,25 +11,25 @@
   },
   "derived": {
     "trigger_phrases": [
-      "folder readme sk-doc template",
-      "code folder documentation svelte",
-      "feature readme structure logic"
+      "ask question service unwired relay",
+      "503 ask_question_unavailable",
+      "present question producer path"
     ],
     "key_topics": [
-      "folder",
-      "readme",
-      "sk-doc",
-      "template",
-      "code",
-      "documentation",
-      "svelte",
-      "feature",
-      "structure",
-      "logic",
-      "rewrite",
-      "barebones"
+      "ask",
+      "question",
+      "service",
+      "unwired",
+      "relay",
+      "present",
+      "producer",
+      "path",
+      "wire",
+      "one",
+      "never",
+      "constructed"
     ],
-    "importance_tier": "important",
+    "importance_tier": "critical",
     "status": "in_progress",
     "key_files": [
       "spec.md",
@@ -76,19 +76,7 @@
         "source": "derived"
       },
       {
-        "name": "it",
-        "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "source",
-        "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "filler",
+        "name": "six",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
@@ -100,51 +88,51 @@
         "source": "derived"
       },
       {
-        "name": "all",
+        "name": "a",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Key Statistics",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Quick Start",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Usage Examples",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Related Resources",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Package Topology",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Directory Tree",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "a",
+        "name": "how",
         "kind": "key_phrase",
-        "path": "tasks.md",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "every",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
+        "path": "plan.md",
         "source": "derived"
       },
       {
@@ -172,21 +160,33 @@
         "source": "derived"
       },
       {
-        "name": "PHASE 3: VERIFICATION",
-        "kind": "heading",
-        "path": "tasks.md",
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
         "source": "derived"
       },
       {
-        "name": "Verification Checklist",
+        "name": "Verification Protocol The",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Fix Completeness",
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "Rewrite the 16 barebones folder READMEs and 7 CODE files onto sk-doc's feature and code-folder templates, and add the ones that are missing, so each folder explains what the feature does and how its logic is arranged.",
-    "created_at": "2026-08-23T09:57:25.479Z",
-    "last_save_at": "2026-08-23T10:47:40.087Z",
+    "causal_summary": "Wire the one relay service that was never constructed. The client ships the whole feature and every route answers 503, because the service is instantiated only inside its own test and nothing ever calls its presenter.",
+    "created_at": "2026-08-23T10:47:20.810Z",
+    "last_save_at": "2026-08-23T10:47:20.810Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b99f94f93724f941ccc2db54e6ec46c70a327d12ee53bafa1bffe4669d6d6ea8",
+    "source_fingerprint": "sha256:ca2eb8d1e08777f3eb21513526fdd0d2f459d55d6ba6d2b48a8a0e51a26cac7f",
     "source_doc_hashes": {
-      "spec.md": "061f5fae5f81249d07fc9c9299bd00c2db74dfc041c1426ca1439982f3dfeea8",
-      "plan.md": "cd3114504e4bce0fba8e2aa77f3e0cb4e431c1bc03511aba0b35cd00b0a4f62d",
-      "tasks.md": "5e15a4cd1993c538cb74dc00d64aded15dbad577aa3d8ba323da11d38e7c0955",
-      "checklist.md": "2a3e73bd936cfbc1b69d420835faf4540a24dc1a0a6db2490305c0cb7b32587c",
-      "implementation-summary.md": "50159301d0d710ed980365940370d464a476944cf3f504d21b3e9b15f5a864bd"
+      "spec.md": "4c1716c18126353223e826676ffdf93621916735df7b06c5456b9a18a748bdce",
+      "plan.md": "76083c07c98d76a672cb855bccb22411ee893834df8bfa2b06ed9491c310e043",
+      "tasks.md": "9106fb37399e548fbbe95d8f7d20177cf7b3b89610c19b6998665f5d00ab7492",
+      "checklist.md": "33ba15e09958b6f2f6833e652470205129faf87a102e6e79c27099b98809ed26",
+      "implementation-summary.md": "bdf46e4ca4b68bbb5cfe56b2abc043b1b40731da5ef90bf98549c76c811ad9d7"
     },
     "last_active_child_id": null,
     "last_active_at": null

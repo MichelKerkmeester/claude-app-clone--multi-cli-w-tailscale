@@ -8,11 +8,11 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
-    last_updated_at: "2026-08-23T02:30:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "COMPLETE + landed on Public branch branches/008-sk-code-mobile-cli-svelte (origin 2b7622c32d, 3 commits). Surface skill refactored React→Svelte: new svelte-conventions.md, verification.md rewritten to the app.css+scoped-<style> corpus + token-identity gate, SKILL.md detection/routing/standards moved to Svelte, path swaps across ds-grammar/checklists/token-cores/setup, changelog v1.2.0.0. Gates green (package_skill PASS 0-new-warn, validate_document 0-issues×12, skill-root-metadata passed=13, validate.sh --strict exit 0). See implementation-summary.md."
-    next_safe_action: "009-storybook-experience: dummy-proof self-maintaining Storybook (app-mobile-local). Research pipeline (background): nodeterm running (task bsyvmnl97) → openclaude-android → remote-for-opencode."
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
+    last_updated_at: "2026-08-23T10:00:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Packet documentation completed; two open items recorded."
+    next_safe_action: "Update svelte-conventions.md to Format A, then merge the branch."
     blockers: []
     completion_pct: 100
 ---
@@ -87,15 +87,15 @@ app-guide content that is framework-agnostic (touched only where it names React)
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- R1: **Draft milestone (before L1):** the surface teaches the Svelte stack accurately enough that a
+- **REQ-001** — **Draft milestone (before L1):** the surface teaches the Svelte stack accurately enough that a
   dispatch loading it produces correct runes / Bits-Melt / scoped-`<style>` / `@ds` output.
-- R2: **Finalize milestone (at L7):** the proven patterns (real `:global()` scoping rules, the
+- **REQ-002** — **Finalize milestone (at L7):** the proven patterns (real `:global()` scoping rules, the
   runes-split reference, the socket-lifecycle pattern) are folded back in.
-- R3: Carried-verbatim content (the token model, the `@ds` grammar meaning, the guardrail semantics,
+- **REQ-003** — Carried-verbatim content (the token model, the `@ds` grammar meaning, the guardrail semantics,
   the design-reference UI) is preserved; only the framework medium changes. **No token value edits.**
-- R4: The surface contract fields (`packetKind: surface`, read-only `toolSurface`, advisor-invisible,
+- **REQ-004** — The surface contract fields (`packetKind: surface`, read-only `toolSurface`, advisor-invisible,
   routing class) are unchanged.
-- R5: The finished refactor **lands via an isolated Public worktree**; nothing is staged or committed
+- **REQ-005** — The finished refactor **lands via an isolated Public worktree**; nothing is staged or committed
   in the shared Public checkout (per the repo-protection memory).
 <!-- /ANCHOR:requirements -->
 

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: REDACTION BADGE STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { RedactionMetadata, TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -8,11 +12,7 @@ import {
   type NormalizedCommandBlock,
 } from './normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer and
-// read the redaction metadata that the fixtures already carry — nothing is
-// invented. RedactionBadge is the shared redaction indicator rendered inside
-// RichBlockFrame; the fixtures yield a `command`-reason redaction and a
-// `cache`+`command`-reason redaction, plus the null case.
+// Reuse normalized fixture metadata so relay, cache, and absent-redaction states stay real.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

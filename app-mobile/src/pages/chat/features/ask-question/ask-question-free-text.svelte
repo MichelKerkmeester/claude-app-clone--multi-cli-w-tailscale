@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ASK QUESTION FREE TEXT
+  // ───────────────────────────────────────────────────────────────────
+
   import type { AskQuestionViewModel } from './ask-question-types.js';
 
   export interface AskQuestionFreeTextProps {
@@ -76,7 +80,7 @@
     border-color: var(--accent-ink);
   }
 
-  /* @ds guardrail: focus-visible — the shared AA focus ring across option rows, free text, and submit. */
+  /* @ds guardrail: focus-visible — The shared AA focus ring across option rows, free text, and submit. */
   .ask-question-free-text textarea:focus-visible {
     outline: 3px solid var(--accent-ink);
     outline-offset: 3px;

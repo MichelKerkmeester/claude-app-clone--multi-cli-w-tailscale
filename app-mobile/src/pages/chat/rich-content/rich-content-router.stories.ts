@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: RICH CONTENT ROUTER STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -10,10 +14,7 @@ import {
   type NormalizedTranscriptBlock,
 } from './normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so
-// every story args object is a real NormalizedTranscriptBlock sourced from the
-// demo data — nothing is invented. The `rich-content-cards` surface declares
-// ten states; RichContentRouter dispatches all of them, so one story per state.
+// Reuse normalized demo fixtures so every router story exercises a real transcript state.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [
@@ -47,8 +48,7 @@ const meta = {
   title: 'Rich Content/RichContentRouter',
   component: RichContentRouter,
   tags: ['autodocs'],
-  // RichContentRouter reads the ArtifactViewer context via getOptionalArtifactViewer;
-  // the self-providing ArtifactViewerProvider supplies it as a Storybook decorator.
+  // Provide the viewer context so open actions use the same handoff as the live surface.
   decorators: [() => ({ Component: ArtifactViewerProvider })],
 } satisfies Meta<typeof RichContentRouter>;
 

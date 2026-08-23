@@ -92,7 +92,7 @@
 </script>
 
 <!-- @ds surface: review-view — exact-action review list. States: empty · pending · expired · submitted · error. -->
-<!-- @ds guardrail: approval decisioning + grant tracking — not designer-editable. -->
+<!-- @ds guardrail: approval decisioning + grant tracking — Not designer-editable. -->
 <main class="review-view">
   <div class="session-toolbar">
     <!-- @ds surface: back-button — quiet back arrow. react-aria Button wiring guarded. -->
@@ -118,7 +118,7 @@
   {#if error !== null}
     <div class="inline-alert">{error}</div>
   {/if}
-  <!-- @ds guardrail: sr-only live region announces decision state — not designer-editable. -->
+  <!-- @ds guardrail: sr-only live region announces decision state — Not designer-editable. -->
   <div class="sr-only" aria-live="polite" aria-atomic="true">
     {pendingId === null ? '' : 'Decision submitted. Verifying at host.'}
   </div>
@@ -157,7 +157,7 @@
           </div>
           {#if approval.status === 'pending' && !expired}
             <div class="approval-actions">
-              <!-- @ds guardrail: deny / approve / grant onPress decisioning — not designer-editable. -->
+              <!-- @ds guardrail: deny / approve / grant onPress decisioning — Not designer-editable. -->
               <Button class="deny-button" disabled={submitted} onclick={() => decide(approval, 'deny')}>
                 Deny
               </Button>

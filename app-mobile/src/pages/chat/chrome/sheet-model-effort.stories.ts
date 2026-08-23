@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: MODEL EFFORT SHEET STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type {
   RuntimeStateDto,
@@ -13,14 +17,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo runtime fixtures through the real reducer so every
-// ModelEffortSheet story's `runtimeControls.runtime` is a real RuntimeUiState
-// sourced from demo.ts — nothing is invented. The idle session hydrates to
-// `ready-adjustable` with the full demo model catalog (9 models, so the search
-// input shows) and the demo effort levels (['off', 'high', 'max'], confirmed
-// 'high'). The sheet takes `isOpen`, so these stories force it open to render
-// the real sheet content through its portal. The remaining RuntimeControls
-// methods are no-ops: the sheet only reads `runtime` and routes open-change.
+// Reuse reducer and demo catalog fixtures so the open sheet shows real model and effort authority.
 const DEMO_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;

@@ -124,7 +124,7 @@
   const runtime = $derived(runtimeControls.runtime);
 
   // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
-  // copy is restored to the host value after every change (non-optimistic).
+  // Copy is restored to the host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
   let sheetOpen = $state(false);
 
@@ -160,7 +160,7 @@
   } | null = null;
   let snapTimerRef: number | null = null;
   // The last announced effort-pending level; guards the one polite status
-  // region so a settled outcome is announced exactly once per transition.
+  // Region so a settled outcome is announced exactly once per transition.
   let prevEffortPending: string | null = null;
 
   // ───────────────────────────────────────────────────────────────────
@@ -281,7 +281,7 @@
   });
 
   // Virtual focus keeps the active search option visible without moving DOM focus
-  // away from the input, which preserves the mobile keyboard interaction.
+  // Away from the input, which preserves the mobile keyboard interaction.
   $effect(() => {
     const activeKey = activeSearchOptionKey;
     if (!isOpen || section !== 'model' || !showSearch || activeKey === null) return;
@@ -386,8 +386,7 @@
     sheetOpen = hostOpen;
   }
 
-  // @ds guardrail: do-not-edit — Bits Dialog default auto-focus is prevented so the
-  // catalog row / effort radio receives focus, never the close control.
+  // @ds guardrail: do-not-edit — Bits Dialog default auto-focus is prevented so the catalog row / effort radio receives focus, never the close control.
   function onOpenAutoFocus(event: Event): void {
     event.preventDefault();
   }
@@ -407,8 +406,7 @@
   }
 
   // @ds slot: drag-handle — grabber + swipe surface.
-  // @ds guardrail: do-not-edit — swipe-dismiss gesture wiring; pairs with the
-  // react-aria modal drag choreography.
+  // @ds guardrail: do-not-edit — Swipe-dismiss gesture wiring pairs with the react-aria modal drag choreography.
   const beginSwipe = (event: PointerEvent) => {
     if (isCommitting || event.button !== 0) return;
     if (
@@ -459,7 +457,7 @@
     snapTimerRef = window.setTimeout(() => (isSnapping = false), 220);
   };
 
-  // @ds guardrail: do-not-edit — sheet keyboard wiring (Escape and '/' shortcuts).
+  // @ds guardrail: do-not-edit — Sheet keyboard wiring (Escape and '/' shortcuts).
   const handleSheetKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape' && section === 'model' && query.length > 0 && !isCommitting) {
       event.preventDefault();
@@ -482,8 +480,7 @@
     }
   };
 
-  // @ds guardrail: do-not-edit — the model commit path. A row selection only stages a
-  // draft; commit is the single request to the host (setModel), guarded by canCommit.
+  // @ds guardrail: do-not-edit — The model commit path stages a draft; commit is the single request to the host (setModel), guarded by canCommit.
   const commit = async () => {
     if (!canCommit || draft === null) return;
     isCommitting = true;
@@ -500,8 +497,7 @@
     handleOutcome(response, draft);
   };
 
-  // @ds guardrail: do-not-edit — outcome reconciliation: accepted / stale /
-  // policy_blocked / delivery-unknown map the host's authoritative answer.
+  // @ds guardrail: do-not-edit — Outcome reconciliation maps accepted, stale, policy_blocked, and delivery-unknown to the host's authoritative answer.
   const handleOutcome = (response: RuntimeControlResponse, target: AvailableModelDto) => {
     switch (response.outcome.status) {
       case 'accepted':
@@ -532,9 +528,7 @@
     }
   };
 
-  // @ds guardrail: do-not-edit — effort mutation gating. anyPending / groupDisabled
-  // decide whether a request may fire; requestEffort is the single request path
-  // (setThinkingLevel), one in-flight request at a time.
+  // @ds guardrail: do-not-edit — Effort mutation gating uses anyPending and groupDisabled; requestEffort is the single one-at-a-time request path (setThinkingLevel).
   const requestEffort = (level: string) => {
     const state = runtime.state;
     if (state === null || state.thinkingLevel === level) return;
@@ -660,8 +654,7 @@
 </script>
 
 <!-- @ds surface: model-effort-sheet — host-backed modal overlay. -->
-<!-- @ds guardrail: do-not-edit — react-aria Modal/ModalOverlay wiring (open, dismiss,
-     isKeyboardDismissDisabled) and the polite live announcer. -->
+<!-- @ds guardrail: do-not-edit — React-aria Modal/ModalOverlay wiring (open, dismiss, isKeyboardDismissDisabled) and the polite live announcer. -->
 <span
   class="sr-only"
   role="status"
@@ -696,8 +689,7 @@
       <div class="model-sheet-dialog" {@attach attachDialog}>
         <div class="model-sheet-content" onkeydowncapture={handleSheetKeyDown}>
           <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <!-- @ds slot: drag-handle — grabber + swipe region.
-               @ds guardrail: do-not-edit — pointer swipe handlers. -->
+          <!-- @ds slot: drag-handle — grabber + swipe region. @ds guardrail: do-not-edit — Pointer swipe handlers. -->
           <div
             class="model-sheet-drag-region"
             data-testid="model-sheet-drag-region"
@@ -868,7 +860,7 @@
           {:else}
             <!-- @ds slot: effort-group — the effort section of the sheet (effort-open). -->
             <!-- @ds state: group aria-busy / pending-effort — while a request is in flight. -->
-            <!-- @ds guardrail: do-not-edit — effort radio group wiring. -->
+            <!-- @ds guardrail: do-not-edit — Effort radio group wiring. -->
             <section class="effort-sheet-section" aria-label={effortStrings.thinkingEffort}>
               {#if effortStatus !== null}
                 <p id="effort-sheet-status" class="effort-sheet-status">
@@ -992,8 +984,7 @@
     isApplying,
   })}
   <!-- @ds slot: model-list row. -->
-  <!-- @ds guardrail: do-not-edit — react-aria ListBoxItem wiring: aria-current,
-       aria-busy, aria-describedby, roving focus, onAction/onKeyDown. -->
+   <!-- @ds guardrail: do-not-edit — React-aria ListBoxItem wiring: aria-current, aria-busy, aria-describedby, roving focus, onAction/onKeyDown. -->
   <div
     role="option"
     id={key}
@@ -1117,9 +1108,7 @@
   }
 
   /* @ds state: exiting — backdrop fade-out while the overlay unmounts. */
-  /* @ds guardrail: do-not-edit — the data-exiting / drag / snap choreography is
-     driven by the Modal exit + swipe-dismiss handlers in .tsx; the dismissal
-     semantics never change here. */
+   /* @ds guardrail: do-not-edit — The data-exiting / drag / snap choreography is driven by the modal exit and swipe-dismiss handlers; dismissal semantics never change here. */
   :global(.model-sheet-overlay[data-exiting]) {
     animation: model-sheet-backdrop-out 220ms ease-in;
   }

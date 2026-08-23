@@ -44,10 +44,7 @@
   let { block, canAnswer = true, principal }: AskQuestionCardProps = $props();
 
   // @ds surface: ask-question — the one-use interactive question card; slot seams below.
-  // @ds guardrail: one-use ticketed, revision-bound, FAIL-CLOSED mutation path. The ticket,
-  //   revision binding, non-optimistic submit, and keyboard/a11y wiring live in the hooks
-  //   (useAskQuestionState / useAskQuestionMutation / useAskQuestionKeyboardNavigation) and are
-  //   NOT designer-editable. Only the @ds surface: ask-question CSS is editable.
+  // @ds guardrail: One-use ticketed, revision-bound, FAIL-CLOSED mutation path. Ticketing, revision binding, non-optimistic submit, and keyboard/a11y wiring live in the hooks and are NOT designer-editable. Only the @ds surface: ask-question CSS is editable.
 
   // ───────────────────────────────────────────────────────────────────
   // 3. LOCAL STATE
@@ -303,7 +300,7 @@
     animation: ask-question-progress 1.2s var(--ease-out-interface) infinite;
   }
 
-  /* @ds guardrail: keyframes — the submitting progress choreography; not designer-editable. */
+  /* @ds guardrail: keyframes — The submitting progress choreography; not designer-editable. */
   @keyframes ask-question-progress {
     0% {
       opacity: 0.45;
@@ -364,7 +361,7 @@
     }
   }
 
-  /* @ds guardrail: do-not-edit — reduced-motion collapses card + submit animation/transition. */
+  /* @ds guardrail: do-not-edit — Reduced-motion collapses card + submit animation/transition. */
   @media (prefers-reduced-motion: reduce) {
     .ask-question-card {
       animation: none !important;

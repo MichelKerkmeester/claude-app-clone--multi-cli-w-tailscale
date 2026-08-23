@@ -40,7 +40,7 @@
   const isPlanReady = $derived(variant === 'plan-ready' || planReady);
 
   // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
-  // copy is restored to the host value after every change (non-optimistic).
+  // Copy is restored to the host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
 
   // ───────────────────────────────────────────────────────────────────
@@ -60,8 +60,8 @@
 
   const restoreTriggerFocus = () => {
     // The modal restores focus on its own; this timer covers paths where the
-    // previously focused menu row has unmounted, so the mode button is the
-    // deterministic landing spot.
+    // Previously focused menu row has unmounted, so the mode button is the
+    // Deterministic landing spot.
     window.setTimeout(() => triggerRef?.focus({ preventScroll: true }), 0);
   };
 
@@ -80,8 +80,7 @@
     sheetOpen = hostOpen;
   }
 
-  // @ds guardrail: do-not-edit — Bits Dialog default auto-focus is prevented so the
-  // safe action (Stay) receives focus, never Switch to Build.
+  // @ds guardrail: do-not-edit — Bits Dialog default auto-focus is prevented so the safe action (Stay) receives focus, never Switch to Build.
   function onOpenAutoFocus(event: Event): void {
     event.preventDefault();
     stayEl?.focus({ preventScroll: true });
@@ -96,7 +95,7 @@
     if (event.target === event.currentTarget) close();
   }
 
-  // @ds guardrail: do-not-edit — safe-action focus effect; lands on Stay, never Switch to Build.
+  // @ds guardrail: do-not-edit — Safe-action focus effect; lands on Stay, never Switch to Build.
   $effect(() => {
     if (!isOpen) return;
     // Initial focus lands on the safe action, never on Switch to Build.
@@ -123,12 +122,9 @@
      action and returns to the mode button when the sheet closes. -->
 
 <!-- @ds surface: leave-plan-sheet — confirmation before Plan → Build expands host authority. -->
-<!-- @ds guardrail: do-not-edit — onSwitchToBuild is the only host mutation path; Stay and every
-     dismissal leave the confirmed Plan state untouched, and focus lands on Stay first. Not
-     designer-editable. -->
+<!-- @ds guardrail: do-not-edit — onSwitchToBuild is the only host mutation path; Stay and every dismissal leave the confirmed Plan state untouched, and focus lands on Stay first. Not designer-editable. -->
 <!-- @ds state: mode · plan-ready — variants of the same authority-expanding confirmation (copy only). -->
-<!-- @ds guardrail: do-not-edit — ModalOverlay/Modal/Dialog react-aria wiring (open, dismiss,
-     focus restore) — not designer-editable. -->
+<!-- @ds guardrail: do-not-edit — ModalOverlay/Modal/Dialog React-aria wiring (open, dismiss, focus restore) — Not designer-editable. -->
 <Sheet bind:open={sheetOpen} onOpenChange={onSheetOpenChange}>
   <!-- @ds slot: overlay — fixed scrim + bottom-sheet placement.
        Bits Overlay/Content are siblings, so the overlay class lives on Content and the
@@ -154,8 +150,7 @@
         </p>
         <!-- @ds slot: actions — stay · switch rail. -->
         <div class="leave-plan-actions">
-          <!-- @ds state: stay — the safe, authority-preserving action.
-               @ds guardrail: do-not-edit — react-aria Button wiring (ref, onPress). -->
+           <!-- @ds state: stay — the safe, authority-preserving action. @ds guardrail: do-not-edit — React-aria Button wiring (ref, onPress). -->
           <Button
             type="button"
             class="leave-plan-stay"
@@ -164,9 +159,7 @@
           >
             Stay in plan
           </Button>
-          <!-- @ds state: switch — the only authority-expanding path; copy switches on the
-               mode / plan-ready variant.
-               @ds guardrail: do-not-edit — react-aria Button wiring + the mutation call. -->
+           <!-- @ds state: switch — the only authority-expanding path; copy switches on the mode / plan-ready variant. @ds guardrail: do-not-edit — React-aria Button wiring + the mutation call. -->
           <Button
             type="button"
             class="leave-plan-switch"
@@ -209,9 +202,7 @@
   /* @ds slot: sheet — constraint + raised sheet + entry. */
   /* @ds slot: panel — the raised bottom-sheet surface. */
   /* @ds state: open — the resting raised sheet (settle transition). */
-  /* @ds guardrail: do-not-edit — leave-plan is an authority-gating overlay; its
-     dismissal and safe-action semantics live in .tsx. Edit look + motion only,
-     never the dismissal behaviour. */
+  /* @ds guardrail: do-not-edit — Leave-plan is an authority-gating overlay; its dismissal and safe-action semantics live in the component logic. Edit look and motion only; never the dismissal behavior. */
   .leave-plan-sheet {
     inline-size: 100%;
     max-inline-size: 34rem;

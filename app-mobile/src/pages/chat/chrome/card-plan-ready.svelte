@@ -1,9 +1,12 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: PLAN READY CARD
+  // ───────────────────────────────────────────────────────────────────
+
   import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 
   // @ds surface: plan-ready-card — live validated plan summary + review entry.
-  // @ds guardrail: do-not-edit — isReviewablePlanArtifact gates rendering on live + newest + valid,
-  // and canReview disables the review CTA until the host binds the plan. Not designer-editable.
+  // @ds guardrail: do-not-edit — isReviewablePlanArtifact gates rendering on live + newest + valid, and canReview disables the review CTA until the host binds the plan. Not designer-editable.
   const PLAN_TITLE_DISPLAY_CAP = 160;
 
   export interface PlanReadyCardProps {
@@ -18,7 +21,7 @@
     reviewButtonRef?: HTMLButtonElement | null;
   }
 
-  // @ds guardrail: do-not-edit — the reviewability gate (live · newest · valid) — not designer-editable.
+  // @ds guardrail: do-not-edit — The reviewability gate (live · newest · valid) — Not designer-editable.
   export function isReviewablePlanArtifact(
     artifact: PlanArtifactDto | null | undefined,
     isLive: boolean,
@@ -99,7 +102,7 @@
       </div>
     </dl>
     <!-- @ds state: review CTA — canReview → 'Review plan' (waiting-for-live-confirmation below).
-        @ds guardrail: do-not-edit — react-aria Button wiring (ref, isDisabled, onPress). -->
+        @ds guardrail: do-not-edit — React-aria Button wiring (ref, isDisabled, onPress). -->
     <Button
       class="plan-ready-review"
       type="button"

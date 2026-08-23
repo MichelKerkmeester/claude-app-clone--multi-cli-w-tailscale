@@ -92,7 +92,7 @@ const PAGE_LIMIT = 100;
 const MAX_PAGES = 100;
 
 // Retry metadata is bounded before it can reach UI state: only integer
-// delta-seconds are accepted, and any delay beyond the cap is clamped.
+// Delta-seconds are accepted, and any delay beyond the cap is clamped.
 const MAX_RETRY_AFTER_MS = 60_000;
 export const MAX_ARTIFACT_BYTES = 50 * 1024 * 1024;
 const RELAY_HEARTBEAT_MAX_AGE_MS = 15_000;
@@ -317,8 +317,8 @@ export async function fetchSessions(signal: AbortSignal): Promise<readonly Sessi
 
 /**
  * Request ONE fresh one-use relay ticket. Every write path mints its own
- * ticket immediately before submission; tickets are never cached, replayed,
- * or persisted. A malformed ticket response is rejected outright.
+ * Ticket immediately before submission; tickets are never cached, replayed,
+ * Or persisted. A malformed ticket response is rejected outright.
  */
 export async function requestTicket(signal?: AbortSignal): Promise<string> {
   const ticketPayload = await postJson('/api/auth/ticket', undefined, signal);
@@ -597,11 +597,11 @@ export async function submitPrompt(
 
 /**
  * Submit one explicit slash command. A fresh one-use ticket is obtained
- * immediately before the write, and the relay revalidates the bound host,
- * session, and catalog revisions before any forwarding; stale and denied
- * outcomes throw typed errors and are never retried automatically. The
- * request body is built from guarded parts only, and the response must be
- * either an accepted prompt projection or a typed issue response.
+ * Immediately before the write, and the relay revalidates the bound host,
+ * Session, and catalog revisions before any forwarding; stale and denied
+ * Outcomes throw typed errors and are never retried automatically. The
+ * Request body is built from guarded parts only, and the response must be
+ * Either an accepted prompt projection or a typed issue response.
  */
 export async function submitSlashCommand(
   sessionId: string,
@@ -757,9 +757,9 @@ function isAbortError(error: unknown): boolean {
 
 /**
  * Read the relay-filtered command catalog for the current host epoch and
- * session. Transport failures are classified so the lifecycle can fail closed
- * without guessing why a read failed; malformed payloads are rejected outright
- * and never partially rendered.
+ * Session. Transport failures are classified so the lifecycle can fail closed
+ * Without guessing why a read failed; malformed payloads are rejected outright
+ * And never partially rendered.
  */
 export async function fetchCommands(signal?: AbortSignal): Promise<CommandCatalogDto> {
   let payload: unknown;
@@ -783,10 +783,10 @@ export async function fetchCommands(signal?: AbortSignal): Promise<CommandCatalo
 
 /**
  * Send one host-confirmed runtime mutation. A fresh one-use ticket is obtained
- * immediately before the write, and a unique control ID is minted per attempt;
- * neither is cached or persisted. Every settled outcome — including stale,
- * unsupported, and delivery-unknown — is returned rather than thrown, so the UI can
- * reconcile without ever inventing an optimistic committed value or auto-retrying.
+ * Immediately before the write, and a unique control ID is minted per attempt;
+ * Neither is cached or persisted. Every settled outcome — including stale,
+ * Unsupported, and delivery-unknown — is returned rather than thrown, so the UI can
+ * Reconcile without ever inventing an optimistic committed value or auto-retrying.
  */
 export async function controlRuntime(
   sessionId: string,
@@ -841,7 +841,7 @@ export async function controlRuntime(
   } catch (error: unknown) {
     if (!controlStarted) {
       // The mutation never reached the host: map transport blocks to bounded
-      // issues. An ambiguous failure here is still safe to redact.
+      // Issues. An ambiguous failure here is still safe to redact.
       const issueCode = runtimeIssueForTransportError(error);
       return {
         outcome: {
@@ -859,12 +859,12 @@ export async function controlRuntime(
 
 /**
  * Send one host-confirmed Build/Plan mode switch through the dedicated plan
- * control lane. A fresh one-use ticket is obtained immediately before the
- * write and a unique control ID is minted per attempt; neither is cached or
- * persisted. The request carries the expected runtime revision so a stale
- * client can never move authority, and every outcome — accepted, stale,
- * unsupported, and delivery-unknown — returns as a bounded response so the UI
- * reconciles read-only instead of retrying an uncertain mutation.
+ * Control lane. A fresh one-use ticket is obtained immediately before the
+ * Write and a unique control ID is minted per attempt; neither is cached or
+ * Persisted. The request carries the expected runtime revision so a stale
+ * Client can never move authority, and every outcome — accepted, stale,
+ * Unsupported, and delivery-unknown — returns as a bounded response so the UI
+ * Reconciles read-only instead of retrying an uncertain mutation.
  */
 export async function setMode(
   sessionId: string,
@@ -874,7 +874,7 @@ export async function setMode(
 ): Promise<RuntimeControlResponse> {
   if (isDemoMode()) {
     // The preview fixture answers mode switches on the generic lane; real
-    // deployments never send a mode switch through that lane.
+    // Deployments never send a mode switch through that lane.
     return controlRuntime(
       sessionId,
       expectedRuntimeRevision,
@@ -913,14 +913,14 @@ export async function setMode(
       };
     }
     // Once submission starts, transport failure is terminal and ambiguous:
-    // reconciliation is the only safe path, never an automatic retry.
+    // Reconciliation is the only safe path, never an automatic retry.
     return { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
   }
 }
 
 /**
  * Submit one atomic reviewed-plan handoff. The ticket is minted immediately
- * before the request and is never retained for a later attempt.
+ * Before the request and is never retained for a later attempt.
  */
 export async function executePlan(
   sessionId: string,
@@ -976,9 +976,9 @@ export async function executePlan(
 
 /**
  * Fold the plan control outcome into the shared runtime response shape. Only
- * the status and the bounded issue code are load-bearing for the reducer; the
- * plan-specific reason codes are intentionally dropped so no raw reason text
- * can reach UI state.
+ * The status and the bounded issue code are load-bearing for the reducer; the
+ * Plan-specific reason codes are intentionally dropped so no raw reason text
+ * Can reach UI state.
  */
 function normalizePlanControlResponse(response: PlanControlResponse): RuntimeControlResponse {
   const outcome: PlanControlOutcome = response.outcome;

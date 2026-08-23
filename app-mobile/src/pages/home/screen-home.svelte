@@ -44,12 +44,12 @@
   // 3. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: staleness derivation — not designer-editable.
+  // @ds guardrail: staleness derivation — Not designer-editable.
   const isStale = $derived(sessions.source === 'cache' || connection !== 'live');
 </script>
 
 <!-- @ds surface: home-view — hero, session roster, device footer, push settings. States: loading · empty · error · stale. -->
-<!-- @ds guardrail: staleness derivation + select/revoke/logout handlers — not designer-editable. -->
+<!-- @ds guardrail: staleness derivation + select/revoke/logout handlers — Not designer-editable. -->
 <main class="home-view">
   <section class="hero">
     <div class="hero-copy-block">
@@ -81,7 +81,7 @@
     {:else}
       <div class="session-grid">
         {#each sessions.items as session (session.id)}
-          <!-- @ds guardrail: session open onPress → onSelect route — not designer-editable. -->
+          <!-- @ds guardrail: session open onPress → onSelect route — Not designer-editable. -->
           <Button class="session-card" onclick={() => onSelect(session.id)}>
             <span class={`session-state state-${session.status}`}>
               <SessionStateIcon status={session.status} />
@@ -104,7 +104,7 @@
       {device === null ? 'Device key active' : `Host ${compactId(device.hostFingerprint)}`}
     </span>
     <div>
-      <!-- @ds guardrail: device logout / revoke onPress handlers — not designer-editable. -->
+      <!-- @ds guardrail: device logout / revoke onPress handlers — Not designer-editable. -->
       <Button onclick={onLogout}>Log out</Button>
       <Button onclick={onRevoke}>Revoke this device</Button>
     </div>
@@ -260,7 +260,7 @@
   :global(.session-card::after) {
     position: absolute;
     top: 0;
-    /* symmetric right:0/left:0 → logical inline span (equivalent in any locale). */
+    /* Symmetric right:0/left:0 → logical inline span (equivalent in any locale). */
     inset-inline: 0;
     height: 2px;
     background: var(--accent);

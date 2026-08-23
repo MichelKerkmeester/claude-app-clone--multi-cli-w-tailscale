@@ -1,10 +1,6 @@
 <script module lang="ts">
   // @ds surface: safe-markdown — renders already-redacted Markdown to safe prose.
-  // @ds guardrail: do-not-edit — this module is the read-only sanitization
-  // boundary. The allowlist, URL/scheme filtering, and character escaping below
-  // are frozen and NOT designer-editable; the exact-copy affordance in the cards
-  // and the data-verbatim-copy seam depend on the canonical source staying
-  // unaltered.
+  // @ds guardrail: do-not-edit — This module is the read-only sanitization boundary; the allowlist, URL/scheme filtering, and character escaping are frozen and NOT designer-editable.
 
   interface ParagraphNode {
     readonly kind: 'paragraph';
@@ -49,9 +45,7 @@
     | { readonly kind: 'em'; readonly text: string }
     | { readonly kind: 'del'; readonly text: string };
 
-  // @ds guardrail: do-not-edit — the sanitization patterns. Raw HTML/markup,
-  // unsafe URL schemes, and control/bidi characters are matched and rejected
-  // verbatim; do not add, remove, or broaden any pattern here.
+  // @ds guardrail: do-not-edit — The sanitization patterns reject raw HTML/markup, unsafe URL schemes, and control/bidi characters verbatim; do not broaden them.
   const RAW_HTML_PATTERN =
     /<\s*\/?\s*(?:script|style|form|input|textarea|button|img|iframe|frame|object|embed|audio|video|source|svg|link|meta|base)\b|<\s*\/?\s*[a-z][^>]*>/iu;
   const RAW_MARKUP_PATTERN = /<!--[\s\S]*?-->|<!doctype\b|<!\[cdata\[/iu;
@@ -82,9 +76,7 @@
   const ASCII_CONTROL_PATTERN = new RegExp(`[${ASCII_CONTROL_CLASS}]`, 'gu');
   const FENCE_PATTERN = /^ {0,3}(`{3,}|~{3,})([^\r\n]*)\r?$/u;
 
-  // @ds guardrail: do-not-edit — parseSafeMarkdown is the fail-closed AST boundary:
-  // on any unsafe input it returns null and SafeMarkdown falls back to escaped
-  // verbatim text. It is exported so security tests verify that boundary.
+  // @ds guardrail: do-not-edit — parseSafeMarkdown is the fail-closed AST boundary: unsafe input returns null and SafeMarkdown falls back to escaped verbatim text.
   export function parseSafeMarkdown(source: string): readonly SafeMarkdownNode[] | null {
     if (isUnsafeMarkdown(source)) return null;
     const lines = source.split(/\r?\n/u);
@@ -190,9 +182,7 @@
     return nodes;
   }
 
-  // @ds guardrail: do-not-edit — inline rendering interprets only the fixed inline
-  // tokenPattern (code, strong, em, del, links); every other run renders as plain
-  // text and every link destination is scheme-filtered before it is emitted.
+  // @ds guardrail: do-not-edit — Inline rendering interprets only the fixed tokenPattern; other runs stay plain and every link destination is scheme-filtered.
   function renderInlineParts(source: string): readonly SafeMarkdownInlinePart[] {
     const parts: SafeMarkdownInlinePart[] = [];
     let remaining = source;
@@ -227,9 +217,7 @@
     return parts;
   }
 
-  // @ds guardrail: do-not-edit — the sanitization gate: raw HTML/markup rejection,
-  // control-character rejection, and unsafe-scheme rejection of every Markdown
-  // destination. The allowlist and scheme filtering are frozen.
+  // @ds guardrail: do-not-edit — The sanitization gate rejects raw HTML/markup, control characters, and unsafe schemes in every Markdown destination.
   function isUnsafeMarkdown(source: string): boolean {
     if (
       RAW_HTML_PATTERN.test(source) ||
@@ -248,8 +236,7 @@
     return false;
   }
 
-  // @ds guardrail: do-not-edit — normalizes a destination for the unsafe-scheme
-  // check (strips control characters and decodes percent-encoding before matching).
+  // @ds guardrail: do-not-edit — Normalize destinations before the unsafe-scheme check so control characters and percent-encoding cannot hide a match.
   function normalizeForSchemeCheck(value: string): string {
     const schemeControlPattern = new RegExp(
       `[${characterRange(0x00, 0x20)}${characterRange(0x7f, 0x9f)}]`,
@@ -268,8 +255,7 @@
     return normalized;
   }
 
-  // @ds guardrail: do-not-edit — control/bidi characters are shown as visible
-  // markers (never executed) so the copied canonical text stays verbatim.
+  // @ds guardrail: do-not-edit — Control/bidi characters become visible markers, never executable content, so copied canonical text stays verbatim.
   function presentInvisibleCharacters(value: string): {
     readonly value: string;
     readonly changed: boolean;
@@ -341,8 +327,7 @@
       .map((cell) => cell.trim());
   }
 
-  // @ds guardrail: do-not-edit — the language allowlist. Any fenced language label
-  // outside this set renders unlabeled/plain; the set is frozen.
+  // @ds guardrail: do-not-edit — The language allowlist keeps unknown fenced labels unlabeled/plain; the set is frozen.
   function safeLanguageLabel(value: string): string | null {
     const normalized = value.toLocaleLowerCase();
     const allowed = new Set([
@@ -399,9 +384,7 @@
 {#snippet inline(text: string)}{#each renderInlineParts(text) as part, i (i)}{#if part.kind === 'code'}<code>{part.text}</code>{:else if part.kind === 'strong'}<strong>{part.text}</strong>{:else if part.kind === 'em'}<em>{part.text}</em>{:else if part.kind === 'del'}<del>{part.text}</del>{:else}{part.text}{/if}{/each}{/snippet}
 
 {#if ast === null}
-  <!-- @ds guardrail: do-not-edit — the fail-closed fallback. If the AST boundary
-       rejects the source it renders verbatim (escaping only control characters),
-       and data-verbatim-copy marks the canonical source as the exact-copy text. -->
+  <!-- @ds guardrail: do-not-edit — The fail-closed fallback renders rejected source verbatim and marks the canonical source for exact copying. -->
   <div
     class={`${classes} safe-markdown-fallback`}
     aria-label={ariaLabel}
@@ -451,8 +434,7 @@
   }
 
   /* @ds slot: safe-markdown — the safe-Markdown renderer's prose output. */
-  /* @ds guardrail: do-not-edit — this is the presentation of already-sanitized
-     Markdown; the allowlist and scheme-filtering live in the module script above. */
+  /* @ds guardrail: do-not-edit — This is presentation for already-sanitized Markdown; allowlisting and scheme filtering remain in the module script. */
   .safe-markdown,
   .safe-markdown-fallback {
     min-inline-size: 0;

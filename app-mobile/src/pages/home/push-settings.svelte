@@ -20,7 +20,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   // @ds surface: push-settings — device notification preferences. States: loading · disabled · off · on.
-  // @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — not designer-editable.
+  // @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — Not designer-editable.
   let config = $state<PushConfig | null>(null);
   let error = $state<string | null>(null);
 
@@ -43,7 +43,7 @@
 </script>
 
 <!-- @ds surface: push-settings — device notification preferences. States: loading · disabled · off · on. -->
-<!-- @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — not designer-editable. -->
+<!-- @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — Not designer-editable. -->
 <section class="push-settings">
   <div>
     <p class="surface-kicker">This device</p>
@@ -67,7 +67,7 @@
           .catch((cause: unknown) => (error = messageFrom(cause)));
       }}
     >
-      <!-- @ds guardrail: push subscribe onPress handler — not designer-editable. -->
+      <!-- @ds guardrail: push subscribe onPress handler — Not designer-editable. -->
       Enable notifications
     </Button>
   {:else}
@@ -81,7 +81,7 @@
           data-selected={selected ? '' : undefined}
           onclick={() => setPreferences({ ...config!.preferences!, [attentionClass]: !selected })}
         >
-          <!-- @ds guardrail: preference Switch onChange → updatePushPreferences — not designer-editable. -->
+          <!-- @ds guardrail: preference Switch onChange → updatePushPreferences — Not designer-editable. -->
           <span class="switch-track" aria-hidden="true">
             <span></span>
           </span>
@@ -89,7 +89,7 @@
         </button>
       {/each}
     </div>
-    <!-- @ds guardrail: push unsubscribe onPress handler — not designer-editable. -->
+    <!-- @ds guardrail: push unsubscribe onPress handler — Not designer-editable. -->
     <Button
       class="push-disable"
       onclick={() => {

@@ -1,9 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ATTENTION INBOX STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import AttentionInbox from './screen-attention-inbox.svelte';
 
-// The inbox fetches attention signals itself; with no live relay it renders its
-// empty state. Handlers are no-op arrows — the open callback's resolution type
-// is supplied by the host at runtime and is ignored here.
+// Leave fetching and callbacks internal so the story exercises the real empty-state fallback.
 const noop = (): void => {};
 
 const meta = {

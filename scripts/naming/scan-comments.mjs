@@ -21,6 +21,16 @@ const RULE = '─';
 // capitalisation violations.
 const NOT_A_SENTENCE = /^(eslint-|@ts-|prettier-|svelte-ignore|deno-|c8 |istanbul |ANCHOR|\/|\*|-|@)/;
 
+/** Every file under the source root, for counts that must match the gate. */
+function walkAll(dir, out = []) {
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) walkAll(full, out);
+    else out.push(full);
+  }
+  return out;
+}
+
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
@@ -48,20 +58,27 @@ function main() {
     .map((full) => relative(REPO_ROOT, full).split('\\').join('/'))
     .sort();
 
+  // The fence total is counted the way the gate counts it: every line carrying
+  // the marker anywhere under the source root, stylesheet and route tree
+  // included. Counting a narrower set makes a reformatted fence read as a fence
+  // that was added, which is exactly the false alarm this packet must not raise.
+  const fenceScope = walkAll(join(REPO_ROOT, SOURCE_ROOT));
+
   const withoutBanner = [];
   let lowercaseStarts = 0;
   let multiLineFences = 0;
-  let fences = 0;
+
 
   for (const file of files) {
     const lines = readFileSync(join(REPO_ROOT, file), 'utf8').split('\n');
     if (!lines.some((line) => line.includes(RULE))) withoutBanner.push(file);
 
+
     lines.forEach((line, index) => {
       const body = commentBody(line);
       if (body === null || body.length === 0) return;
       if (body.includes('@ds guardrail:')) {
-        fences += 1;
+        // Counted separately over the gate's scope; here only its shape matters.
         // A fence whose reason spills onto the next comment line is the shape
         // being corrected: one line of reason, or the reader stops reading.
         const next = commentBody(lines[index + 1] ?? '');
@@ -83,7 +100,14 @@ function main() {
     filesWithoutBanner: withoutBanner.length,
     modulesWithoutBanner: withoutBanner.filter((file) => !isStory(file)).length,
     lowercaseCommentStarts: lowercaseStarts,
-    guardrailFences: fences,
+    guardrailFences: fenceScope.reduce(
+      (total, file) =>
+        total +
+        readFileSync(file, 'utf8')
+          .split('\n')
+          .filter((line) => line.includes('@ds guardrail:')).length,
+      0,
+    ),
     multiLineFenceExplanations: multiLineFences,
   };
 

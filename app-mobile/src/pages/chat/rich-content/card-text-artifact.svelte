@@ -70,8 +70,7 @@
 
 {#snippet actionsSnippet()}
   <!-- @ds slot: actions — Copy text + full-screen Open handoff. -->
-  <!-- @ds guardrail: do-not-edit — the exact-copy clipboard boundary; Open is a
-       pass-through with no fetch/endpoint/ticket/download/host-file read. -->
+  <!-- @ds guardrail: do-not-edit — The exact-copy clipboard boundary; Open is a pass-through with no fetch/endpoint/ticket/download/host-file read. -->
   {#if feedback.canCopy}
     <button
       class="rich-block-action"
@@ -102,7 +101,7 @@
   {#if lines.length > PREVIEW_LINES}
     <p class="rich-continuation">{lines.length - PREVIEW_LINES} more lines</p>
   {/if}
-  <!-- @ds guardrail: do-not-edit — polite live region announcing Copy outcomes. -->
+  <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
   <p class="rich-copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
 

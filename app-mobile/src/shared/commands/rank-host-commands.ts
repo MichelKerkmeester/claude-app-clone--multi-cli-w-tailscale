@@ -2,11 +2,11 @@
 // MODULE: Deterministic Host Command Ranking (pure)
 // ───────────────────────────────────────────────────────────────────
 // Local-only filtering over the relay-filtered catalog. Comparison text is
-// normalized for case, diacritics, and Unicode without ever changing the
-// canonical host string that is displayed or inserted. Exact tiers win over
-// prefixes, prefixes over substrings, and host order breaks every tie.
+// Normalized for case, diacritics, and Unicode without ever changing the
+// Canonical host string that is displayed or inserted. Exact tiers win over
+// Prefixes, prefixes over substrings, and host order breaks every tie.
 // Nothing here performs transport, history, or edit-distance correction: a
-// plausible typo simply matches nothing.
+// Plausible typo simply matches nothing.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -65,7 +65,7 @@ export interface RankedHostCommand extends CommandDescriptorDto {
   /** The best tier this row matched, or host-order for an empty query. */
   readonly matchTier: HostCommandMatchTier;
   /** Matching grapheme ranges within the canonical name; empty when only
-   * aliases, descriptions, or hints matched. */
+   * Aliases, descriptions, or hints matched. */
   readonly matchRanges: readonly GraphemeRange[];
 }
 

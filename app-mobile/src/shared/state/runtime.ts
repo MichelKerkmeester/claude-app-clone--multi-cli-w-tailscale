@@ -2,12 +2,12 @@
 // MODULE: Non-Optimistic Runtime Control State Machine
 // ───────────────────────────────────────────────────────────────────
 // The browser enforces the synthesis lifecycle at its final mutation
-// boundary. Three buckets stay separate: the host-confirmed snapshot
+// Boundary. Three buckets stay separate: the host-confirmed snapshot
 // (`state`, which only ever changes to a value Pi confirmed), the pending
-// intent (`pending`, shown as applying but never committed), and the
-// bounded issue state (`issue`, redacted local copy only). The complete
-// state table lives in `phase`; `status` is the coarse projection the
-// legacy control surfaces already understand.
+// Intent (`pending`, shown as applying but never committed), and the
+// Bounded issue state (`issue`, redacted local copy only). The complete
+// State table lives in `phase`; `status` is the coarse projection the
+// Legacy control surfaces already understand.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -35,9 +35,9 @@ export type RuntimeStatus = 'checking' | 'ready' | 'pending' | 'stale' | 'error'
 
 // ── Plan-mode authority projection ────────────────────────────────────────────
 // The browser models mode authority as INDEPENDENT fields, never one `isPlan`
-// flag: the host-confirmed mode, the client's pending transition intent, the
-// delivery verdict, the structured plan phase, the host runtime revision, and
-// the turn state each come from a different source and fail closed separately.
+// Flag: the host-confirmed mode, the client's pending transition intent, the
+// Delivery verdict, the structured plan phase, the host runtime revision, and
+// The turn state each come from a different source and fail closed separately.
 
 /** The host-confirmed mode. Only a host snapshot can move this value. */
 export type ConfirmedMode = 'build' | 'plan' | 'executing-plan' | 'unknown';
@@ -189,7 +189,7 @@ export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): 
   switch (action.type) {
     case 'checking':
       // A read-only hydrate begins. Confirmed state and a terminal
-      // delivery-unknown block survive until a successful hydrate clears them.
+      // Delivery-unknown block survives until a successful hydrate clears it.
       return {
         ...current,
         status: 'checking',
@@ -622,9 +622,9 @@ function phaseForIssue(issueCode: RuntimeIssueCode): RuntimePhase {
 
 /**
  * The one authority projection every mode surface reads. Everything is
- * derived straight from the committed host snapshot and the pending intent;
- * no optimistic value can leak in because `state` only ever changes to a
- * value the host confirmed.
+ * Derived straight from the committed host snapshot and the pending intent;
+ * No optimistic value can leak in because `state` only ever changes to a
+ * Value the host confirmed.
  */
 export function modeAuthority(runtime: RuntimeUiState): ModeAuthority {
   const state = runtime.state;
@@ -669,8 +669,8 @@ export interface RuntimeControls {
 }
 
 // The mutation lane fails closed outside settled ready authority. Streaming is
-// deliberately absent: the host-gated model switch stays legal while streaming,
-// and the streaming capability check below blocks everything else.
+// Deliberately absent: the host-gated model switch stays legal while streaming,
+// And the streaming capability check below blocks everything else.
 export const BLOCKED_MUTATION_PHASES: ReadonlySet<RuntimePhase> = new Set([
   'checking',
   'pending',
@@ -689,8 +689,8 @@ export const MUTATION_DEADLINE_MS = 10_000;
 
 /**
  * Bounded announcement copy for the one document-level polite atomic status
- * region. Every branch comes from the local catalog; raw host or transport
- * text can never reach assistive copy through this path.
+ * Region. Every branch comes from the local catalog; raw host or transport
+ * Text can never reach assistive copy through this path.
  */
 export function runtimeAnnouncement(runtime: RuntimeUiState): string {
   switch (runtime.phase) {
@@ -735,7 +735,7 @@ export function runtimeAnnouncement(runtime: RuntimeUiState): string {
 
 /**
  * Prefer the bounded reconcile snapshot; compose it from the two read-only
- * endpoints when the transport does not expose the reconcile function.
+ * Endpoints when the transport does not expose the reconcile function.
  */
 interface RuntimeHydration {
   readonly snapshot: RuntimeSnapshotDto;
@@ -849,7 +849,7 @@ function snapshotTransport(): ((signal: AbortSignal) => Promise<RuntimeSnapshotD
     return candidate as (signal: AbortSignal) => Promise<RuntimeSnapshotDto>;
   } catch {
     // Transports that do not expose the reconcile snapshot fall back to the
-    // two read-only endpoints.
+    // Two read-only endpoints.
     return null;
   }
 }
@@ -866,7 +866,7 @@ interface RelayIssueShape {
 /**
  * Only an allowlisted issue code on a thrown error may drive issue state.
  * The shape is validated rather than the class so every transport normalizes
- * identically; retry metadata stays clamped to the bounded window.
+ * Identically; retry metadata stays clamped to the bounded window.
  */
 export function runtimeIssueFrom(error: unknown): RelayIssueShape | null {
   if (typeof error !== 'object' || error === null) return null;

@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: FRESHNESS
+  // ───────────────────────────────────────────────────────────────────
+
   export interface FreshnessProps {
     readonly stale: boolean;
     readonly at: string | null;

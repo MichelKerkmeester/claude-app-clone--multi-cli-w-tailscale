@@ -2,11 +2,11 @@
 // MODULE: Composer-Scoped Plan Mode Keyboard Shortcuts
 // ───────────────────────────────────────────────────────────────────
 // `Shift+Tab` toggles mode only while the composer textarea is focused,
-// the CLI-style preference is on, no overlay is open, and the runtime is
-// connected, ready, idle, and settled. Bare `Tab` and outside-composer
+// The CLI-style preference is on, no overlay is open, and the runtime is
+// Connected, ready, idle, and settled. Bare `Tab` and outside-composer
 // `Shift+Tab` are never touched, and `⌘⇧M` opens the mode menu without
-// changing mode. The returned handler reports whether it consumed the
-// key; the caller runs it before its own key handling.
+// Changing mode. The returned handler reports whether it consumed the
+// Key; the caller runs it before its own key handling.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -59,7 +59,7 @@ export function createPlanModeShortcut(
     if (event.isComposing || event.repeat || event.defaultPrevented) return false;
     if (event.altKey) return false;
     // Composer scope: the textarea must hold real focus. This keeps the
-    // guard self-contained no matter where the handler is attached.
+    // Guard self-contained no matter where the handler is attached.
     if (document.activeElement !== options.getComposer()) return false;
 
     const isShiftTab = event.key === 'Tab' && event.shiftKey && !event.metaKey && !event.ctrlKey;
@@ -75,14 +75,14 @@ export function createPlanModeShortcut(
 
     if (isMetaShiftM) {
       // Opening the menu is read-only, so it only needs the overlay guard;
-      // a disabled control cannot be opened this way either.
+      // A disabled control cannot be opened this way either.
       if (overlayOpen || runtime.status !== 'ready' || runtime.deliveryUnknown) return false;
       onOpenMenu();
       return true;
     }
 
     // Shift+Tab: the full fail-closed guard chain. Any guard failing means
-    // the key keeps its ordinary browser reverse-tab behavior.
+    // The key keeps its ordinary browser reverse-tab behavior.
     if (!enabled) return false;
     if (overlayOpen) return false;
     if (connection !== 'live') return false;

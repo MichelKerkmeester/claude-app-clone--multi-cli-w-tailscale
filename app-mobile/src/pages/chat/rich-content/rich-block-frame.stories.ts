@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: RICH BLOCK FRAME STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { createRawSnippet } from 'svelte';
@@ -10,11 +14,8 @@ import {
   type NormalizedProseBlock,
 } from './normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so
-// every frame story is sourced from the demo data — nothing is invented.
-// RichBlockFrame is the shared chrome every rich card renders inside; the
-// `children` Snippet is built with createRawSnippet from a fixture block's
-// canonical text so no wrapper .svelte file is needed.
+// Reuse normalized demo fixtures so the shared frame stories exercise real command and prose content.
+// Raw snippets keep the story focused on frame chrome without adding wrapper components.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

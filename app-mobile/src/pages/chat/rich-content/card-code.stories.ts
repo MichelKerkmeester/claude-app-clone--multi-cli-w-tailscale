@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: CODE CARD STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -8,10 +12,7 @@ import {
   type NormalizedCodeBlock,
 } from './normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so
-// the story args object is a real NormalizedCodeBlock sourced from the demo
-// data — nothing is invented. The `rich-content-cards` surface declares the
-// `code` state; one story for the fenced bash block emitted by the fixtures.
+// Reuse normalized demo fixtures so the story exercises a real code block and its declared state.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

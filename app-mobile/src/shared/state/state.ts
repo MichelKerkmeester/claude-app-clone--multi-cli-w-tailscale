@@ -50,8 +50,8 @@ export const DEFAULT_MEDIA_CAPABILITY_OFF: Pick<RuntimeMediaCapabilityDto, 'enab
 // 3. COMPOSER KEYBOARD PREFERENCE
 // ───────────────────────────────────────────────────────────────────
 // A preference, not a mode state: it only gates whether the composer
-// intercepts Shift+Tab. It never changes host authority and cannot enable
-// any mutation by itself.
+// Intercepts Shift+Tab. It never changes host authority and cannot enable
+// Any mutation by itself.
 
 const COMPOSER_SHIFT_TAB_KEY = 'pi-remote.composer-shift-tab';
 
@@ -292,7 +292,7 @@ export function transcriptReducer(
       };
     case 'page':
       // A cache hydrate may omit volatile blocks while retaining the relay cursor. The
-      // authoritative page must still replace that history projection before sync resumes.
+      // Authoritative page must still replace that history projection before sync resumes.
       if (
         state.sessionId !== action.sessionId ||
         state.source === 'relay' ||
@@ -370,8 +370,8 @@ export function transcriptReducer(
       };
     case 'promptOptimistic':
       // A submission belongs to the session that started it: a settlement
-      // arriving after a session switch can never touch another session's
-      // transcript rows.
+      // Arriving after a session switch can never touch another session's
+      // Transcript rows.
       if (state.sessionId !== action.sessionId) return state;
       return {
         ...state,

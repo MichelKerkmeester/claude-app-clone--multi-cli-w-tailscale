@@ -1,13 +1,14 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ATTACHMENT TILE STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import AttachmentTile from './attachment-tile.svelte';
 import type { AttachmentDraftItem } from './attachment-state.js';
 
-// Smoke story: a context-free draft photo tile, one variant per status the
-// component renders differently. Prop-driven — no AttachmentDraftProvider, no
-// File. `onOpen`/`onRemove` are no-ops; `previewUrl` is null for non-image /
-// validating states and a 1x1 transparent PNG data URL for ready/blocked
-// image states (UI scaffolding only, not fabricated app data).
+// Cover each tile status without a provider so preview, validation, and rejection states stay isolated.
+// The 1x1 image is UI scaffolding, not application data.
 const TRANSPARENT_PIXEL =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 

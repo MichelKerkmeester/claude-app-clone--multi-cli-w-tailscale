@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ASK QUESTION PROMPT
+  // ───────────────────────────────────────────────────────────────────
+
   import type { AskQuestionViewModel } from './ask-question-types.js';
 
   export interface AskQuestionPromptProps {

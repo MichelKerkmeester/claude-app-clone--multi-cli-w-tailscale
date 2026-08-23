@@ -36,7 +36,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   // Host-confirmed mode only; Bits MenuItem has no selection to bind, so a local
-  // copy is restored to the host value after every activation (non-optimistic).
+  // Copy is restored to the host value after every activation (non-optimistic).
   const hostMode = $derived(confirmedMode);
 
   // ───────────────────────────────────────────────────────────────────
@@ -58,10 +58,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   function onRowSelect(target: 'build' | 'plan'): void {
-    // @ds guardrail: do-not-edit — a row activation here is the only request path,
-    // never a commit; the read-only guard keeps a stale event from firing.
-    // Read-only event guards: disabled or already-confirmed input is ignored even
-    // if a stale event slips past the item's own disabled state.
+    // @ds guardrail: do-not-edit — A row activation here is the only request path, never a commit; read-only guards ignore disabled or already-confirmed input even if a stale event slips past the item's disabled state.
     if (!rowsDisabled && localMode !== target) onSelect(target);
     localMode = hostMode;
   }
@@ -78,9 +75,7 @@
 </script>
 
 <!-- @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. -->
-<!-- @ds guardrail: do-not-edit — react-aria Menu/MenuItem/Popover wiring (id, onAction,
-     isDisabled, Text slots); rows are read-only, focus movement never mutates, and only an
-     activated row reports a choice to the caller. Not designer-editable. -->
+<!-- @ds guardrail: do-not-edit — React-aria Menu/MenuItem/Popover wiring (id, onAction, isDisabled, Text slots); rows are read-only, focus movement never mutates, and only an activated row reports a choice to the caller. Not designer-editable. -->
 <!-- @ds slot: popover — floating placement chrome. -->
 <MenuContent class="plan-mode-popover" aria-label="Agent mode">
     <div class="plan-mode-menu">

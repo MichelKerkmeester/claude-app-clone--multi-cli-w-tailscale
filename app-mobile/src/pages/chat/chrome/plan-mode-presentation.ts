@@ -1,8 +1,8 @@
 // The fail-closed plan-mode presentation, shared by the Svelte chrome that reads
-// host-confirmed mode authority. Ported React-free from the React PlanModeButton.tsx
+// Host-confirmed mode authority. Ported React-free from the React PlanModeButton.tsx
 // (the derivation is pure; the React file keeps its own copy until cutover) so the
 // SvelteKit bundle carries no React. Every branch is bounded local copy and no mode
-// is guessed beyond what the host confirmed.
+// Is guessed beyond what the host confirmed.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -68,11 +68,10 @@ function confirmedLabelFor(confirmedMode: string): string {
 
 /**
  * Derive the full fail-closed presentation from the committed runtime and the
- * session connection. Every branch is bounded local copy; the host-confirmed
- * mode is the only data that can ever label the control as Build or Plan.
+ * Session connection. Every branch is bounded local copy; the host-confirmed
+ * Mode is the only data that can ever label the control as Build or Plan.
  */
-// @ds guardrail: do-not-edit — default-deny, fail-closed derivation; every value is bounded
-// local copy and no mode is guessed beyond what the host confirmed. Not designer-editable.
+// @ds guardrail: do-not-edit — Default-deny, fail-closed derivation; every value is bounded local copy and no mode is guessed beyond what the host confirmed. Not designer-editable.
 export function planModePresentation(
   runtime: RuntimeUiState,
   connection: string,
@@ -200,7 +199,7 @@ export function planModePresentation(
   }
 
   // Settled ready authority: only the host-confirmed mode may label the
-  // control, and an executing-plan state disables selection with a reason.
+  // Control, and an executing-plan state disables selection with a reason.
   switch (authority.confirmedMode) {
     case 'build':
       return {

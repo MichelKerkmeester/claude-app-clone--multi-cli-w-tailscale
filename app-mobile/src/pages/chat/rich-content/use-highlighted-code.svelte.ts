@@ -277,8 +277,8 @@ function initialState(
 
 /**
  * Svelte 5 runes port of the React hook. Call it once during component init and pass a getter thunk that reads
- * the reactive inputs; the returned `current` getter exposes the reactive HighlightState. The $effect re-runs
- * whenever the tracked inputs change and its cleanup terminates the worker (matching the React useEffect).
+ * The reactive inputs; the returned `current` getter exposes the reactive HighlightState. The $effect re-runs
+ * Whenever the tracked inputs change and its cleanup terminates the worker (matching the React useEffect).
  */
 export function useHighlightedCode(
   getOptions: () => UseHighlightedCodeOptions,

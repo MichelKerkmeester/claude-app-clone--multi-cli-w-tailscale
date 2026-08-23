@@ -1,10 +1,12 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: LEAVE PLAN SHEET STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import LeavePlanSheet from './sheet-leave-plan.svelte';
 
-// Authority-expanding confirmation sheet. `isOpen: true` forces the real
-// bottom-sheet content through its portal; callbacks are no-ops — only an
-// explicit press of "Switch to Build" / "Leave without running" reaches them.
+// Keep the confirmation sheet open so the story exercises its real portal and explicit callbacks.
 const noop = (): void => {};
 
 const baseArgs = {
@@ -29,8 +31,7 @@ export const Mode: Story = {
 export const PlanReady: Story = {
   args: {
     ...baseArgs,
-    // The plan-ready variant keeps the same confirmation with safer copy:
-    // the switch action reads "Leave without running".
+    // The plan-ready variant proves the safer copy without changing the authority path.
     variant: 'plan-ready',
     onLeaveWithoutRunning: noop,
   },

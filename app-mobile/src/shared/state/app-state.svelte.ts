@@ -1,14 +1,14 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: App-shell state (Svelte runes) — the four reducer stores plus
-// the shell's own UI state, shared across routes via context.
+// The shell's own UI state, shared across routes via context.
 // ───────────────────────────────────────────────────────────────────
 // Runes port of the state React's `App` owned directly: the connection,
-// session-list, transcript, and todo-projection reducers, plus the auth
-// gate, overlay flags, and theme preference. Route-owned state
+// Session-list, transcript, and todo-projection reducers, plus the auth
+// Gate, overlay flags, and theme preference. Route-owned state
 // (the selected session id) is NOT held here — it is derived from the
 // SvelteKit route so the router stays the single source of truth for the
 // URL. The dispatch functions are defined once so their identity is
-// stable: the Session view's socket effect captures them a single time.
+// Stable: the Session view's socket effect captures them a single time.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -58,7 +58,7 @@ export function createAppState({
   askQuestionPrincipal,
 }: AppConfig = {}) {
   // The persisted roster/transcript snapshot seeds the first paint; storage
-  // is browser-only, so guard it for any non-browser module evaluation.
+  // Is browser-only, so guard it for any non-browser module evaluation.
   const initialCache: ReadOnlyCache | null = browser ? loadCache() : null;
 
   let connection = $state<ConnectionState>({
@@ -87,7 +87,7 @@ export function createAppState({
 
   // Stable dispatchers: reassigning the reducer output is a synchronous
   // $state write, and the function identities never change across the
-  // shell's life — the socket effect that captures them stays valid.
+  // Shell's life — the socket effect that captures them stays valid.
   function dispatchConnection(action: Parameters<typeof connectionReducer>[1]): void {
     connection = connectionReducer(connection, action);
   }
@@ -190,8 +190,8 @@ export function getAppState(): AppState {
 // ───────────────────────────────────────────────────────────────────
 
 // Shell actions that combine routing (`goto`) and async auth with state
-// mutation. Implemented in `+layout.svelte` (which holds the SvelteKit
-// navigation + effect context) and consumed by the route pages.
+// Mutation. Implemented in `+layout.svelte` (which holds the SvelteKit
+// Navigation + effect context) and consumed by the route pages.
 export interface AppActions {
   navigate(sessionId: string | null): void;
   openReview(): void;

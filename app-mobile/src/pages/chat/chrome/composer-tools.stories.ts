@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: COMPOSER TOOLS STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type {
   CommandDescriptorDto,
@@ -19,13 +23,8 @@ import type {
 } from '$shared/commands/commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo runtime + command fixtures so every ComposerTools story args
-// object is sourced from demo.ts — nothing is invented. The runtime hydrates to
-// `ready-adjustable` via the real reducer; the command catalog uses the demo
-// `/api/commands/list` rows bound to the demo host epoch / catalog revision
-// (the structural identity the demo's `demoSocket` envelope carries). The
-// remaining RuntimeControls / catalog methods are no-ops: the tools popover
-// only reads `runtime.status` and routes insertion / open-change callbacks.
+// Reuse runtime and command fixtures so the tools stories exercise real authority and catalog states.
+// The remaining handlers stay inert because the stories cover presentation, not mutations.
 const DEMO_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -107,10 +106,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// The "+" trigger is the always-rendered surface; the tools popover content
-// (photos · commands · keyboard) is internal bits-ui open state with no prop to
-// force it open, so it opens only on a user tap — the catalog shows the ready
-// trigger over the real catalog.
+// The popover opens through its real user interaction, so the catalog story keeps that contract intact.
 export const Default: Story = { args: { ...baseArgs } };
 
 export const MediaAvailable: Story = {

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: SESSION HEADER STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type {
   RuntimeStateDto,
@@ -13,12 +17,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo runtime fixtures through the real non-optimistic reducer so
-// every SessionHeader story's `runtimeControls.runtime` is a real RuntimeUiState
-// sourced from demo.ts — nothing is invented. The reducer's `hydrated` action is
-// exactly the path the live app uses to derive the ready runtime from a host
-// snapshot + model catalog. The remaining RuntimeControls methods are no-ops:
-// the header only reads `runtime` and routes the model-sheet open callback.
+// Reuse the reducer and demo snapshot so header labels reflect host-confirmed runtime state.
 const DEMO_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -80,8 +79,7 @@ export const Build: Story = {
 export const Plan: Story = {
   args: {
     ...Build.args,
-    // `mode` is a real RuntimeStateDto field; deriving 'plan' from the demo
-    // snapshot mirrors a host-confirmed plan transition (no copy invented).
+    // Derive the plan story from the host-shaped snapshot so no mode copy is invented.
     runtimeControls: makeRuntimeControls(
       hydratedRuntime({ ...DEMO_STATE, mode: 'plan' }),
     ),

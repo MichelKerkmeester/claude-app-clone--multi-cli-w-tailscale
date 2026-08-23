@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ASK QUESTION OPTION ROW
+  // ───────────────────────────────────────────────────────────────────
+
   import type { AskQuestionOption } from '@pi-remote/pi-rpc-protocol';
 
   export interface AskQuestionOptionRowProps {
@@ -74,7 +78,7 @@
     color: var(--ink-inverse);
   }
 
-  /* @ds guardrail: focus-visible — the shared AA focus ring across option rows, free text, and submit. */
+  /* @ds guardrail: focus-visible — The shared AA focus ring across option rows, free text, and submit. */
   .ask-question-option-row:focus-visible {
     outline: 3px solid var(--accent-ink);
     outline-offset: 3px;
@@ -135,7 +139,7 @@
     opacity: 0.82;
   }
 
-  /* @ds guardrail: do-not-edit — reduced-motion collapses option-row animation/transition. */
+  /* @ds guardrail: do-not-edit — Reduced-motion collapses option-row animation/transition. */
   @media (prefers-reduced-motion: reduce) {
     .ask-question-option-row {
       animation: none !important;

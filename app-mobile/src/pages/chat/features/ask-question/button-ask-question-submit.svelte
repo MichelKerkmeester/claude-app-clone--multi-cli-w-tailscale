@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ASK QUESTION SUBMIT BUTTON
+  // ───────────────────────────────────────────────────────────────────
+
   export interface AskQuestionSubmitButtonProps {
     readonly disabled: boolean;
   }
@@ -31,7 +35,7 @@
     scroll-margin-block: var(--space-8);
   }
 
-  /* @ds guardrail: focus-visible — the shared AA focus ring across option rows, free text, and submit. */
+  /* @ds guardrail: focus-visible — The shared AA focus ring across option rows, free text, and submit. */
   .ask-question-submit:focus-visible {
     outline: 3px solid var(--accent-ink);
     outline-offset: 3px;
@@ -50,7 +54,7 @@
     }
   }
 
-  /* @ds guardrail: do-not-edit — reduced-motion collapses submit animation/transition. */
+  /* @ds guardrail: do-not-edit — Reduced-motion collapses submit animation/transition. */
   @media (prefers-reduced-motion: reduce) {
     .ask-question-submit {
       animation: none !important;

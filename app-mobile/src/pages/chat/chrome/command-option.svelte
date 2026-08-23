@@ -3,13 +3,13 @@
   // MODULE: Slash Command Option (safe text-only row)
   // ───────────────────────────────────────────────────────────────────
   // One text-only listbox option. The canonical name is isolated LTR and
-  // never translated, matched graphemes are emphasized structurally, and
-  // every other line renders authoritative relay metadata as plain text.
+  // Never translated, matched graphemes are emphasized structurally, and
+  // Every other line renders authoritative relay metadata as plain text.
   // Rows are never focusable, never nest interactive descendants, and a
-  // press only ever completes as an insertion request for an enabled row —
-  // disabled rows surface their disclosed reason instead. Any control or
-  // bidi-override character that somehow reaches the client is replaced for
-  // display only; insertion always uses the canonical DTO string.
+  // Press only ever completes as an insertion request for an enabled row —
+  // Disabled rows surface their disclosed reason instead. Any control or
+  // Bidi-override character that somehow reaches the client is replaced for
+  // Display only; insertion always uses the canonical DTO string.
 
   import type { RankedHostCommand } from '$shared/commands/rank-host-commands.js';
 
@@ -19,9 +19,9 @@
   }
 
   /** Display-only escape: canonical names never contain these, but visible text is
-   *  a security surface. The replacement is display-only; insertion always uses the
-   *  canonical DTO string unchanged.
-   *  @ds guardrail: escaping — unsafe/bidi-override characters are display-replaced. */
+   *  A security surface. The replacement is display-only; insertion always uses the
+   *  Canonical DTO string unchanged.
+   *  @ds guardrail: escaping — Unsafe/bidi-override characters are display-replaced. */
   export const UNSAFE_NAME_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g;
 
   export function escapeUnsafeName(name: string): string {
@@ -67,13 +67,13 @@
   const DRAG_SLOP_PX = 10;
 
   // Non-reactive press tracking: a re-render must not reset the origin or the
-  // drag-cancel flag mid-gesture (useRef equivalent).
+  // Drag-cancel flag mid-gesture (useRef equivalent).
   let pressOrigin: { x: number; y: number } | null = null;
   let dragged = false;
 
   const onPointerDown = (event: PointerEvent) => {
     // Focus stays in the textarea: no focus steal, no text selection, no
-    // long-press context menu, no iOS callout.
+    // Long-press context menu, no iOS callout.
     event.preventDefault();
     pressOrigin = { x: event.clientX, y: event.clientY };
     dragged = false;
@@ -101,7 +101,7 @@
     pressOrigin = null;
     // A completed row press is only ever an insertion request for an enabled row
     // (or a disclosed-reason announcement for a disabled one); it never submits.
-    // @ds guardrail: fail-closed — press requests insertion, never submission.
+    // @ds guardrail: fail-closed — Press requests insertion, never submission.
     if (command.enabled) {
       onInsert(command.name);
     } else if (command.disabledReason !== null) {
@@ -120,8 +120,8 @@
 
 <!-- This row only restyles; its role, aria wiring, and virtual-focus hook are frozen. -->
 <!-- @ds surface: slash-autocomplete -->
-<!-- @ds guardrail: react-aria wiring — option role, aria-selected/aria-disabled,
-                data-focused virtual focus, and the focus-preserving press path. -->
+<!-- @ds guardrail: React-aria wiring — Option role, aria-selected/aria-disabled, data-focused virtual focus, and the focus-preserving press path. -->
+
 <!-- svelte-ignore a11y_interactive_supports_focus -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
@@ -262,8 +262,7 @@
 
   /* @ds edit: contrast — system-wide prefers-contrast primitive: borders carry the hierarchy the palette
      otherwise implies with fill, using the frozen tokens unchanged. */
-  /* @ds guardrail: do-not-edit — the high-contrast re-render is an accessibility guarantee; never drop
-     the border/outline carry for interactive and raised surfaces. */
+   /* @ds guardrail: do-not-edit — The high-contrast re-render is an accessibility guarantee; never drop the border/outline carry for interactive and raised surfaces. */
   @media (prefers-contrast: more) {
     .slash-option[data-focused] {
       outline-width: 3px;
@@ -272,8 +271,7 @@
 
   /* @ds edit: contrast — system-wide forced-colors primitive: the scoped palettes yield to the user's
      system scheme (Canvas / CanvasText / Highlight). */
-  /* @ds guardrail: do-not-edit — forced-colors yield is an accessibility guarantee; never restore a
-     hard-coded surface/ink over the system scheme. */
+   /* @ds guardrail: do-not-edit — Forced-colors yield is an accessibility guarantee; never restore a hard-coded surface/ink over the system scheme. */
   @media (forced-colors: active) {
     .slash-option[data-focused] {
       outline: 2px solid Highlight;

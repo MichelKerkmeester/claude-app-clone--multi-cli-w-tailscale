@@ -1,12 +1,12 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: EFFORT RADIO GROUP STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import EffortRadioGroup from './radio-effort.svelte';
 
-// Re-host the host-advertised effort levels from the demo runtime snapshot
-// (THINKING_LEVELS = ['off', 'high', 'max'], confirmed 'high') so every
-// EffortRadioGroup story's `levels` / `confirmed` / `pendingLevel` is a real
-// demo value — nothing is invented. The `off-only` story uses the single-level
-// `['off']` catalog the runtime reducer derives `ready-off-only` from.
+// Reuse host-advertised effort levels so every story reflects a real catalog shape.
 const DEMO_LEVELS: readonly string[] = ['off', 'high', 'max'];
 const DEMO_CONFIRMED = 'high';
 

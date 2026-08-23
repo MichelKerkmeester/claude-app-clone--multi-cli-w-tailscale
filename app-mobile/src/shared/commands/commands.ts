@@ -2,11 +2,11 @@
 // MODULE: Host Command Catalog Types + Binding Resolution (web)
 // ───────────────────────────────────────────────────────────────────
 // The scoped-snapshot types and the fail-closed binding resolver shared by
-// the command palette and composer. A binding is only ever created from a
-// row present in the CURRENT scoped snapshot (matching host epoch, session,
-// and revisions), so a reconnect, foreground refresh, session switch, or
-// host-epoch change can never bind another session's row. The live catalog
-// fetch/refresh lifecycle lives in the runes twin.
+// The command palette and composer. A binding is only ever created from a
+// Row present in the CURRENT scoped snapshot (matching host epoch, session,
+// And revisions), so a reconnect, foreground refresh, session switch, or
+// Host-epoch change can never bind another session's row. The live catalog
+// Fetch/refresh lifecycle lives in the runes twin.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -76,7 +76,7 @@ export const CATALOG_STALE_AFTER_MS = 30_000;
 
 /**
  * Resolve a canonical name inside the CURRENT scoped snapshot. No binding is
- * ever created from a missing, disabled, or out-of-scope row.
+ * Ever created from a missing, disabled, or out-of-scope row.
  */
 export function bindingFor(
   snapshot: ScopedCommandSnapshot | null,
@@ -96,9 +96,9 @@ export function bindingFor(
 
 /**
  * Fail-closed binding validity: a binding is only current for its exact
- * scope, and only while its canonical row still exists as an ENABLED entry
- * in the committed snapshot. A refresh that disables the command ages the
- * binding out just like a revision bump.
+ * Scope, and only while its canonical row still exists as an ENABLED entry
+ * In the committed snapshot. A refresh that disables the command ages the
+ * Binding out just like a revision bump.
  */
 export function bindingMatchesSnapshot(
   binding: SelectedCommandBinding | null,

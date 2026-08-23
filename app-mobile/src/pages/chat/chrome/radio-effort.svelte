@@ -51,7 +51,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   // Host-confirmed selection only; Bits RadioGroup writes the clicked value, so a
-  // local copy is restored to the host-confirmed level after every change
+  // Local copy is restored to the host-confirmed level after every change
   // (non-optimistic, never an empty selection flash while a request is in flight).
   const hostValue = $derived(confirmed ?? '');
 
@@ -74,10 +74,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   function onEffortChange(next: string): void {
-    // @ds guardrail: do-not-edit — a row selection here is the only request path,
-    // never a commit; the read-only guard keeps a stale event from firing.
-    // Read-only event guards: pending or disabled input is ignored even
-    // if a stale event slips past the group's own read-only state.
+    // @ds guardrail: do-not-edit — A row selection here is the only request path, never a commit; read-only guards ignore pending or disabled input even if a stale event slips past the group's state.
     if (!isPending && !isDisabled && next.length > 0) onSelect(next);
     effortValue = hostValue;
   }
@@ -97,8 +94,7 @@
 
 <!-- @ds slot: effort-group -->
 <!-- @ds state: group aria-busy / pending-effort — set while a request is in flight. -->
-<!-- @ds guardrail: do-not-edit — react-aria RadioGroup wiring: aria-labelledby,
-     aria-describedby, data-pending, and isReadOnly while pending. -->
+<!-- @ds guardrail: do-not-edit — React-aria RadioGroup wiring: aria-labelledby, aria-describedby, data-pending, and isReadOnly while pending. -->
 <RadioGroup
   class="effort-radio-group"
   aria-labelledby={labelledBy}
@@ -119,8 +115,7 @@
     {@const descriptionId = `effort-row-description-${ordinal}`}
     <!-- @ds slot: effort-group row -->
     <!-- @ds state: effort-confirmed (✓) / effort-requested (spinner) -->
-    <!-- @ds guardrail: do-not-edit — react-aria Radio wiring: aria-label, aria-describedby,
-         roving focus, and the 44px target. -->
+    <!-- @ds guardrail: do-not-edit — React-aria Radio wiring: aria-label, aria-describedby, roving focus, and the 44px target. -->
     <RadioGroupItem
       value={level}
       class={`effort-radio-row${isRequested ? ' is-requested' : ''}`}

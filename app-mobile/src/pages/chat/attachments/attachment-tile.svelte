@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ATTACHMENT TILE
+  // ───────────────────────────────────────────────────────────────────
+
   import {
     attachmentStatusLabel,
     type AttachmentDraftItem,

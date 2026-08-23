@@ -3,9 +3,9 @@
 // ───────────────────────────────────────────────────────────────────
 // The single source for visible and accessible effort copy. Seven known
 // IDs carry exact local labels and descriptions; anything else renders
-// as a bounded ordinal derived from its position in the host-advertised
-// list, so raw host IDs can never reach copy. The host's advertised
-// order and subset are always preserved by callers, never re-sorted here.
+// As a bounded ordinal derived from its position in the host-advertised
+// List, so raw host IDs can never reach copy. The host's advertised
+// Order and subset are always preserved by callers, never re-sorted here.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. KNOWN EFFORT IDS
@@ -101,7 +101,7 @@ export function effortOrdinal(level: string, advertised: readonly string[]): num
 /**
  * Visible name for one advertised level: the exact local label for known
  * IDs, or a bounded ordinal built from its position in the advertised
- * list. A raw host ID can never pass through this formatter.
+ * List. A raw host ID can never pass through this formatter.
  */
 export function effortRowName(level: string, advertised: readonly string[]): string {
   const known = EFFORT_CATALOG[level];
@@ -112,8 +112,8 @@ export function effortRowName(level: string, advertised: readonly string[]): str
 
 /**
  * Bounded description for one advertised level. Known IDs use the exact
- * local description; unknown IDs get one generic local line and never
- * echo host text.
+ * Local description; unknown IDs get one generic local line and never
+ * Echo host text.
  */
 export function effortRowDescription(level: string): string {
   return EFFORT_CATALOG[level]?.description ?? effortStrings.unknownDescription;
@@ -121,8 +121,8 @@ export function effortRowDescription(level: string): string {
 
 /**
  * Compact readout for a confirmed value: the exact local label, a bounded
- * ordinal for unknown-but-advertised IDs, or an em dash when there is no
- * confirmed value (or it is absent from the advertised list).
+ * Ordinal for unknown-but-advertised IDs, or an em dash when there is no
+ * Confirmed value (or it is absent from the advertised list).
  */
 export function effortTriggerText(
   level: string | null | undefined,

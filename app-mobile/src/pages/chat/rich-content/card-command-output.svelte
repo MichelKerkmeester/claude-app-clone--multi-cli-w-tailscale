@@ -151,8 +151,7 @@
 
 {#snippet actionsSnippet()}
   <!-- @ds slot: actions — unit Copy commands + full-screen Open handoff. -->
-  <!-- @ds guardrail: do-not-edit — the exact-copy clipboard boundary; Open is a
-       pass-through with no fetch/endpoint/ticket/download/host-file read. -->
+  <!-- @ds guardrail: do-not-edit — The exact-copy clipboard boundary; Open is a pass-through with no fetch/endpoint/ticket/download/host-file read. -->
   {#if feedback.canCopy && command !== null}
     <button
       class="rich-block-action"
@@ -202,12 +201,11 @@
     </div>
     <!-- @ds state: running-tail — data-tail-first anchors the newest output at the
          bottom while a command streams; completed output is read top-down.
-         @ds guardrail: do-not-edit — the data attribute and tail window are
-         behaviour owned by the running/streaming model. -->
+         @ds guardrail: do-not-edit — The data attribute and tail window are behavior owned by the running/streaming model. -->
     <pre class="rich-shell-well rich-output-preview" data-tail-first="true"><code>{previewLines.length > 0 ? previewLines.join('\n') : 'No output yet'}</code></pre>
     <p class="rich-output-meta">{outputLines.length} lines · {outputCompletenessText(block.outputCompleteness)}{showingLastTrustworthySnapshot ? ' · Last trustworthy redacted snapshot' : ''}</p>
   </section>
-  <!-- @ds guardrail: do-not-edit — polite live region announcing Copy outcomes. -->
+  <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
   <p class="rich-copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
 

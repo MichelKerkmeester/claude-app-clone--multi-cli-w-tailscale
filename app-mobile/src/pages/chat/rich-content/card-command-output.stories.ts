@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: COMMAND OUTPUT CARD STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -8,10 +12,7 @@ import {
   type NormalizedCommandBlock,
 } from './normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so
-// every story args object is a real NormalizedCommandBlock sourced from the
-// demo data — nothing is invented. The `rich-content-cards` surface declares
-// the six command lifecycle states; one story per state.
+// Reuse normalized demo fixtures so each command lifecycle story reflects real output states.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

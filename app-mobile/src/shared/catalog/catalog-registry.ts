@@ -3,23 +3,23 @@
 // ───────────────────────────────────────────────────────────────────
 // Pure-data backbone of the catalog. Every migrated `@ds surface:` and the
 // `@ds state:` / `@ds guardrail:` seams it declares are indexed here so the
-// catalog is a faithful, browsable index of the whole system. This module is
-// data only — it never imports a component and never touches the app shell.
+// Catalog is a faithful, browsable index of the whole system. This module is
+// Data only — it never imports a component and never touches the app shell.
 //
 // @ds grammar used here, matching the source seams:
-//   surface  — one reusable component/layout contract.
-//   state    — a declared discrete appearance the surface renders.
-//   slot     — a named, typed region inside a surface (see source components).
-//   variant  — an alternative presentation of a surface.
-//   edit     — a seam a designer may change (layout, tokens, presentation).
-//   guardrail: do-not-edit — a frozen accessibility / security / logic seam.
-//   catalog  — this read-only preview surface (the one net-new surface).
-//   theme    — the light / dark semantic remap a surface reads via tokens.
+//   Surface  — one reusable component/layout contract.
+//   State    — a declared discrete appearance the surface renders.
+//   Slot     — a named, typed region inside a surface (see source components).
+//   Variant  — an alternative presentation of a surface.
+//   Edit     — a seam a designer may change (layout, tokens, presentation).
+//   Guardrail: do-not-edit — a frozen accessibility / security / logic seam.
+//   Catalog  — this read-only preview surface (the one net-new surface).
+//   Theme    — the light / dark semantic remap a surface reads via tokens.
 //
 // A surface is `live` when the catalog renders the real component over the
-// demo fixtures; everything else is `registry-only` with the reason it cannot
-// preview safely here (needs a live host, a socket/relay/provider, or is a
-// documented CSS convention with no shared component).
+// Demo fixtures; everything else is `registry-only` with the reason it cannot
+// Preview safely here (needs a live host, a socket/relay/provider, or is a
+// Documented CSS convention with no shared component).
 
 // ───────────────────────────────────────────────────────────────────
 // 1. TYPE DEFINITIONS

@@ -1,25 +1,20 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ATTACHMENT PREVIEW DIALOG STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import AttachmentPreviewDialog from './dialog-attachment-preview.svelte';
 import AttachmentDraftProvider from './attachment-draft-provider.svelte';
 import AttachmentDraftStoryHost from './attachment-draft-story-host.svelte';
 
-// Context-only smoke story: AttachmentPreviewDialog declares no props — it
-// reads the draft through getAttachmentDraft() and renders nothing unless a
-// provider above it is media-capable AND state.previewId matches a staged
-// item. The decorator chain supplies both: AttachmentDraftProvider with a
-// photos-enabled capability ({ enabled, imageIn } — the fields
-// capabilityAllowsPhotos checks) wraps AttachmentDraftStoryHost with
-// openPreview: true, which seeds two real 1x1 transparent-pixel PNG Files via
-// draft.selectFiles and then opens the first item's preview (the
-// SessionComposer.stories / ArtifactCard.stories self-providing-provider
-// pattern). The pixel bytes are UI scaffolding, not fabricated app data.
+// Exercise the context-only dialog with a media-capable provider and an open staged preview.
+// The decorator order keeps Provider > Host > dialog, and the pixel bytes remain UI scaffolding.
 const meta: Meta<typeof AttachmentPreviewDialog> = {
   title: 'Attachments/AttachmentPreviewDialog',
   component: AttachmentPreviewDialog,
   tags: ['autodocs'],
-  // Storybook wraps with the LAST decorator outermost, so the Provider is listed
-  // last: Provider > Host > dialog.
+  // Storybook applies the last decorator outermost, so the provider must be listed last.
   decorators: [
     () => ({ Component: AttachmentDraftStoryHost, props: { openPreview: true } }),
     () => ({

@@ -3,16 +3,16 @@
   // MODULE: Session Composer (Claude-style input tray)
   // ───────────────────────────────────────────────────────────────────
   // One bottom-anchored composer object. The four agent controls (model,
-  // effort, Build/Plan, slash commands) live in a "+" tools popover instead
-  // of stacked rows in the reading path, and the primary action is a single
-  // circular button that morphs across send / steer / stop / sending —
-  // never a full-width bar. Every affordance is capability-gated: there is
-  // no voice/mic control because speech capture is not implemented, and no
-  // decorative disabled actions. Runtime labels stay host-confirmed.
+  // Effort, Build/Plan, and slash commands live in a "+" tools popover instead
+  // Of stacked rows in the reading path, and the primary action is a single
+  // Circular button that morphs across send / steer / stop / sending —
+  // Never a full-width bar. Every affordance is capability-gated: there is
+  // No voice/mic control because speech capture is not implemented, and no
+  // Decorative disabled actions. Runtime labels stay host-confirmed.
   //
   // The inline slash surface rides on top of the same tray. The textarea
-  // stays the only editing field and keeps DOM focus; Enter and the primary
-  // action route between local Insert (panel open) and native multiline/send
+  // Stays the only editing field and keeps DOM focus; Enter and the primary
+  // Action route between local Insert (panel open) and native multiline/send
   // (panel closed), and no panel interaction can ever reach submission.
 
   import type { RuntimeControls } from '$shared/state/runtime.js';
@@ -135,7 +135,7 @@
 
   let announcement = $state('');
   // Editing facts the trigger predicate consumes. The textarea remains the
-  // only editing field; everything below is derived, never a second editor.
+  // Only editing field; everything below is derived, never a second editor.
   let selection = $state({ start: 0, end: 0 });
   let isFocused = $state(false);
   let isComposing = $state(false);
@@ -144,12 +144,12 @@
   let activeName = $state<string | null>(null);
   let commitPending = $state(false);
   // Outside-press dismissal without an Escape latch: any later draft,
-  // caret, or textarea interaction re-arms the surface.
+  // Caret, or textarea interaction re-arms the surface.
   let outsideDismissed = $state(false);
 
   // The persistent mode control: a controlled menu (the keyboard path opens
-  // it) and the Plan → Build leave confirmation. Neither holds authority;
-  // the leave sheet is the only path that can lead to a Build mutation.
+  // It) and the Plan → Build leave confirmation. Neither holds authority;
+  // The leave sheet is the only path that can lead to a Build mutation.
   let modeMenuOpen = $state(false);
   let leavePlanOpen = $state(false);
   let shiftTabEnabled = $state(readComposerShiftTabPreference());
@@ -176,11 +176,11 @@
   // ───────────────────────────────────────────────────────────────────
 
   // A turn is running when either the relay session card or the host-
-  // confirmed runtime snapshot says so; both are authoritative sources and
-  // the OR is deliberately conservative for the slash gate.
+  // Confirmed runtime snapshot says so; both are authoritative sources and
+  // The OR is deliberately conservative for the slash gate.
   const running = $derived(status === 'running' || runtimeRunning);
   // A leading-slash draft is a command draft: it must never fall through to
-  // the ordinary text lane, and never convert to steer/followUp.
+  // The ordinary text lane, and never convert to steer/followUp.
   const slashDraft = $derived(prompt.trim().startsWith('/'));
   const mediaAvailable = $derived(capabilityAllowsPhotos(mediaCapability));
   const attachmentCanSubmit = $derived(!mediaAvailable || attachmentDraft.canSubmit);
@@ -203,7 +203,7 @@
   const canSendMessage = $derived(hasAttachments ? attachmentSendable : canSubmit);
 
   // The leading-slash trigger predicate (pure); re-evaluated after every
-  // committed input without side effects.
+  // Committed input without side effects.
   const trigger = $derived.by(
     () =>
       deriveSlashTrigger({
@@ -223,7 +223,7 @@
   );
 
   // The one panel state machine, shared with the presentation layer so the
-  // composer's aria wiring and the panel render the same derived state.
+  // Composer's aria wiring and the panel render the same derived state.
   const panelDerivation: SlashPanelDerivation = $derived.by(
     () =>
       deriveSlashPanelState({
@@ -245,12 +245,12 @@
   const activeRow = $derived(ranked.items.some((item) => item.name === activeName && item.enabled));
 
   // Stop is the primary action only when a turn is running and the draft is empty;
-  // any draft makes the primary Send (idle) or Steer (running). With the inline
-  // surface open, the disc becomes the local Insert action — never Send.
+  // Any draft makes the primary Send (idle) or Steer (running). With the inline
+  // Surface open, the disc becomes the local Insert action — never Send.
   const showStop = $derived(running && !hasText && !hasAttachments && !attachmentSubmission.busy);
 
   // Plan mode is conveyed redundantly: the dashed outline only ever comes
-  // from the host-confirmed mode, never from a pending request.
+  // From the host-confirmed mode, never from a pending request.
   const confirmedMode = $derived(modeAuthority(runtimeControls.runtime).confirmedMode);
   const trayOutlineClass = $derived(
     confirmedMode === 'plan'
@@ -269,7 +269,7 @@
   );
 
   // Bounded revalidation progress lives in the composer disclaimer; it is a
-  // fixed local string and never carries command content.
+  // Fixed local string and never carries command content.
   const disclaimer = $derived.by(() => {
     if (attachmentSubmission.statusMessage !== null) return attachmentSubmission.statusMessage;
     if (slashSubmitting) return 'Checking the command with the relay…';
@@ -285,9 +285,9 @@
 
   // Composer-scoped mode keyboard: Shift+Tab (preference-gated) and ⌘⇧M.
   // The overlay set covers every surface that must keep reverse-tab normal:
-  // the slash panel, the tools popover, the leave sheet, and any sheet the
-  // app opens above the composer. Rebuild the handler with current values so
-  // the closure always sees live state (the factory reads them at creation).
+  // The slash panel, the tools popover, the leave sheet, and any sheet the
+  // App opens above the composer. Rebuild the handler with current values so
+  // The closure always sees live state (the factory reads them at creation).
   const planShortcut = $derived.by(() => {
     const enabled = shiftTabEnabled;
     const overlayOpen = effectivePanelOpen || toolsOpen || leavePlanOpen || externalOverlayOpen;
@@ -352,7 +352,7 @@
   });
 
   // Adopt the ranked active row (first enabled, or the retained name when
-  // still visible); virtual focus resets when the panel closes.
+  // Still visible); virtual focus resets when the panel closes.
   $effect(() => {
     const open = panelOpen;
     const next = ranked.activeName;
@@ -366,7 +366,7 @@
   });
 
   // Outside-press dismissal: taps outside the panel, the textarea, and the
-  // tray close the surface; the tapped target keeps its normal behavior.
+  // Tray close the surface; the tapped target keeps its normal behavior.
   $effect(() => {
     if (!panelOpen) return;
     const onPointerDown = (event: PointerEvent) => {
@@ -393,7 +393,7 @@
   });
 
   // Caret placement runs after the controlled draft has rendered, so the
-  // textarea DOM already contains the inserted token when the range is set.
+  // Textarea DOM already contains the inserted token when the range is set.
   $effect(() => {
     void prompt;
     const offset = pendingCaretRef;
@@ -427,11 +427,10 @@
   // ───────────────────────────────────────────────────────────────────
 
   // Explicit send routing: a slash draft goes through the ticketed slash
-  // lane (or fails closed with a disclosed reason); ordinary drafts keep
-  // the unchanged send/steer behavior. A slash draft is never converted to
-  // steer/followUp and never falls back to the text lane.
-  // @ds guardrail: mutation path — submit / steer / stop / snapshot / slash-draft / attachment
-  // flow; presentation may not reach past here.
+  // Lane (or fails closed with a disclosed reason); ordinary drafts keep
+  // The unchanged send/steer behavior. A slash draft is never converted to
+  // Steer/followUp and never falls back to the text lane.
+  // @ds guardrail: Mutation path — Submit / steer / stop / snapshot / slash-draft / attachment flow; presentation may not reach past here.
   function submit(): void {
     if (!attachmentCanSubmit) {
       announcement = attachmentDraft.blockingMessage ?? 'Finish checking the selected photos first.';
@@ -477,7 +476,7 @@
   }
 
   // The inline path replaces the complete leading token. Both routes run
-  // through insertSlashCommand, record the revision binding, announce the
+  // Through insertSlashCommand, record the revision binding, announce the
   // "Not sent" outcome, and perform zero network work.
   function insertCommandAtToken(name: string, commandBinding: SelectedCommandBinding): void {
     const result = insertSlashCommand({
@@ -502,7 +501,7 @@
       return;
     }
     // Bindings only exist inside the current scoped snapshot; anything else
-    // fails closed without touching the draft.
+    // Fails closed without touching the draft.
     const rowBinding = bindingFor(catalog.snapshot, activeName);
     if (rowBinding === null) {
       announcement = 'No command selected.';
@@ -521,15 +520,12 @@
     activeName = enabledNames[next] ?? null;
   }
 
-  // @ds guardrail: react-aria + keyboard wiring — onKeyDown: IME early-return (isComposing),
-  // planShortcut(event) consume, panel-open Arrow/Enter/Escape routing (Enter inserts the active
-  // row + stopPropagation so it never submits; Shift+Enter native newline; Escape sets the
-  // dismissal signature), and closed-panel Enter→submit. Byte-identical.
+  // @ds guardrail: React-aria + keyboard wiring — onKeyDown handles IME, shortcuts, panel routing, dismissal, and closed-panel submit without changing the interaction contract.
   function onKeyDown(event: KeyboardEvent): void {
     // IME composition owns every key: no filtering, insertion, or submit.
     if (isComposing) return;
     // The mode shortcut consumes Shift+Tab and ⌘⇧M only when every guard
-    // passes; otherwise the key keeps its ordinary behavior below.
+    // Passes; otherwise the key keeps its ordinary behavior below.
     if (planShortcut(event)) return;
     if (effectivePanelOpen) {
       switch (event.key) {
@@ -565,8 +561,7 @@
 <!-- @ds surface: composer — the presentational seam. The tray and its slots below stay
      presentation-only; the keyboard-anchor vars (--visual-viewport-height / --trigger-width)
      feed layout unchanged. -->
-<!-- @ds guardrail: send / steer / stop / snapshot / prompt-submission and the keyboard
-     anchoring hook stay fenced; presentation may not reach past them. -->
+<!-- @ds guardrail: Send / steer / stop / snapshot / prompt-submission and the keyboard anchoring hook stay fenced; presentation may not reach past them. -->
 <div class="composer-region">
   {#if promptError !== null}<div class="inline-alert">{promptError}</div>{/if}
   <p class="composer-disclaimer">{disclaimer}</p>
@@ -646,7 +641,7 @@
       oncompositionstart={() => (isComposing = true)}
       oncompositionend={() => {
         // Composition re-evaluation resumes on the next event-loop turn
-        // so the committed value is what the predicate sees.
+        // So the committed value is what the predicate sees.
         window.setTimeout(() => (isComposing = false), 0);
       }}
       onkeydown={onKeyDown}
@@ -996,7 +991,7 @@
     animation: composer-spin 0.8s linear infinite;
   }
 
-  /* @ds guardrail: reduced-motion keeps the shared spinner static — never remove. */
+  /* @ds guardrail: reduced-motion keeps the shared spinner static — Never remove. */
   @media (prefers-reduced-motion: reduce) {
     .composer-spinner {
       animation: none;

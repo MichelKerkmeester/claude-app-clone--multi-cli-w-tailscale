@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: RUNTIME STRIP STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type {
   RuntimeStateDto,
@@ -13,13 +17,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo runtime fixtures through the real reducer so every
-// RuntimeStrip story's `controls.runtime` is a real RuntimeUiState sourced from
-// demo.ts. The idle session hydrates to `ready-adjustable`; the running session
-// (`demo-session-triage`) hydrates to `streaming` because the demo marks it
-// streaming. The remaining RuntimeControls methods are no-ops: the strip only
-// reads `runtime` and routes the effort-sheet open callback (setMode fires only
-// on a user tap of the Build/Plan toggle).
+// Feed the strip real reducer snapshots so ready and streaming states stay host-confirmed.
 const IDLE_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -87,8 +85,7 @@ export const Running: Story = {
 export const Plan: Story = {
   args: {
     ...Idle.args,
-    // `mode` is a real RuntimeStateDto field; deriving 'plan' from the demo
-    // snapshot mirrors a host-confirmed plan transition (no copy invented).
+    // Derive the plan story from the host-shaped snapshot so no mode copy is invented.
     controls: makeRuntimeControls(
       hydratedRuntime({ ...IDLE_STATE, mode: 'plan' }),
     ),

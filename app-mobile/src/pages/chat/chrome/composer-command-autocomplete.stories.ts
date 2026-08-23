@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: COMPOSER COMMAND AUTOCOMPLETE STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
@@ -12,13 +16,8 @@ import type {
 import { rankHostCommands, type RankedHostCommand } from '$shared/commands/rank-host-commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo `/api/commands/list` rows through the real ranker and the
-// panel's exported state-machine derivation so every story's `items` and
-// `derivation` are sourced from demo.ts — nothing is invented. The panel takes
-// an `open` prop, so these stories force it open to render real content (the
-// row-bearing and copy-led states). `getAnchor` returns null: the panel then
-// renders fixed at the viewport origin (no anchor rect), which is enough to
-// show the real surface without inventing a composer tray.
+// Derive every panel story from the real ranker and state machine so rows and copy stay authoritative.
+// A null anchor isolates the surface without inventing a composer tray.
 const DEMO_COMMANDS = (
   demoPostJson('/api/commands/list', {}) as {
     commands: readonly CommandDescriptorDto[];

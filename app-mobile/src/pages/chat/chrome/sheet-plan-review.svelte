@@ -50,7 +50,7 @@
   }: PlanReviewSheetProps = $props();
 
   // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
-  // copy is restored to the host value after every change (non-optimistic).
+  // Copy is restored to the host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
 
   // ───────────────────────────────────────────────────────────────────
@@ -85,8 +85,7 @@
     sheetOpen = hostOpen;
   }
 
-  // @ds guardrail: do-not-edit — Bits Dialog default auto-focus is prevented so the
-  // safe action (Keep planning) receives focus, never Execute.
+  // @ds guardrail: do-not-edit — Bits Dialog default auto-focus is prevented so the safe action (Keep planning) receives focus, never Execute.
   function onOpenAutoFocus(event: Event): void {
     event.preventDefault();
     safeActionEl?.focus({ preventScroll: true });
@@ -97,8 +96,7 @@
     restoreFocus();
   }
 
-  // @ds guardrail: do-not-edit — the open effect (safe-action focus, back-button state + popstate,
-  // focusin containment) and swipe refs below are not designer-editable.
+  // @ds guardrail: do-not-edit — The open effect (safe-action focus, back-button state + popstate, focusin containment) and swipe refs below are not designer-editable.
   $effect(() => {
     if (!isOpen) return;
     const timer = window.setTimeout(() => safeActionEl?.focus({ preventScroll: true }), 0);
@@ -127,7 +125,7 @@
   });
 
   // @ds state: swipe-dismiss — dragging the grabber/backdrop past the threshold closes the sheet.
-  // @ds guardrail: do-not-edit — the pointer/touch gesture handlers below are not designer-editable.
+  // @ds guardrail: do-not-edit — The pointer/touch gesture handlers below are not designer-editable.
   function onPointerDown(event: PointerEvent): void {
     if (event.pointerType === 'mouse') return;
     swipeStart = { x: event.clientX, y: event.clientY };
@@ -180,9 +178,7 @@
 </script>
 
 <!-- @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. -->
-<!-- @ds guardrail: do-not-edit — ModalOverlay/Modal/Dialog react-aria wiring, safe-focus restore,
-     back-button (popstate) containment, focusin dismissal, and the touch/pointer swipe-dismiss
-     gesture are not designer-editable. -->
+<!-- @ds guardrail: do-not-edit — ModalOverlay/Modal/Dialog React-aria wiring, safe-focus restore, back-button (popstate) containment, focusin dismissal, and the touch/pointer swipe-dismiss gesture are not designer-editable. -->
 {#if artifact !== null && artifact !== undefined && artifact.validity === 'valid'}
   <Sheet bind:open={sheetOpen} onOpenChange={onSheetOpenChange}>
     <!-- @ds slot: overlay — fixed scrim + centring. -->
@@ -200,8 +196,7 @@
       ontouchstart={onTouchStart}
       ontouchend={onTouchEnd}
     >
-      <!-- @ds slot: modal — bottom-docked sheet + entry.
-           @ds guardrail: do-not-edit — Modal/Dialog react-aria wiring + swipe handlers. -->
+       <!-- @ds slot: modal — bottom-docked sheet + entry. @ds guardrail: do-not-edit — Modal/Dialog React-aria wiring + swipe handlers. -->
       <div class="plan-review-modal" {@attach attachSheet}>
         <div class="plan-review-dialog">
           <!-- @ds slot: grabber — swipe-dismiss handle. -->
@@ -245,8 +240,7 @@
           </div>
           <!-- @ds slot: actions — keep · revise · leave · execute rail. -->
           <div class="plan-review-actions">
-            <!-- @ds state: keep-planning — the non-mutating safety action.
-                 @ds guardrail: do-not-edit — react-aria Button wiring (ref, onPress). -->
+             <!-- @ds state: keep-planning — the non-mutating safety action. @ds guardrail: do-not-edit — React-aria Button wiring (ref, onPress). -->
             <Button
               type="button"
               class="plan-review-safe"
@@ -265,7 +259,7 @@
             </Button>
             <!-- @ds state: execute CTA — the atomic execute path.
                  @ds state: executing — disabled while the execution lease is in flight.
-                 @ds guardrail: do-not-edit — react-aria Button wiring (isDisabled, onPress). -->
+                  @ds guardrail: do-not-edit — React-aria Button wiring (isDisabled, onPress). -->
             <Button
               type="button"
               class="plan-review-execute"
@@ -292,8 +286,7 @@
   /* @ds surface: overlay — plan-review-sheet is an INSTANCE of the shared overlay
      primitive (backdrop → raised panel → grabber → header/body/footer).
      Physical unification of the per-surface overlay chrome is a documented follow-up. */
-  /* @ds guardrail: do-not-edit — the review sheet is the only atomic execute path;
-     dismissal + execute-authority semantics live in .tsx. Edit look + motion only. */
+  /* @ds guardrail: do-not-edit — The review sheet is the only atomic execute path; dismissal and execute-authority semantics live in the component logic. Edit look and motion only. */
   /* @ds slot: overlay — fixed scrim + centring.
      @ds edit: layout — z-index 100 keeps it above every mode surface. */
   :global(.plan-review-overlay) {

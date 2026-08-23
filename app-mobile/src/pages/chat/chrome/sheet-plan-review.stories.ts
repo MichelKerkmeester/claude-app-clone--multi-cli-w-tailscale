@@ -1,14 +1,13 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: PLAN REVIEW SHEET STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 
 import PlanReviewSheet from './sheet-plan-review.svelte';
 
-// No plan-artifact fixture exists in demo.ts yet, so this DTO literal follows
-// the exact PlanArtifactDto shape (planId · planRevision · title · summary ·
-// stepCount · approachCount · validity · occurredAt) and reuses real demo
-// values: the todo plan id (`plan_demo_todos`) and its demo timestamp from
-// demo.ts. The sheet renders only for a valid artifact; `isOpen: true` forces
-// the real modal content through its portal.
+// Keep the review sheet grounded in a valid plan DTO so the real modal content renders through its portal.
 const DEMO_PLAN_ARTIFACT = {
   planId: 'plan_demo_todos',
   planRevision: 1,
@@ -49,7 +48,7 @@ export const Open: Story = {
 export const Executing: Story = {
   args: {
     ...baseArgs,
-    // The execute CTA is disabled while the execution lease is in flight.
+    // The execute CTA must fail closed while its execution lease is in flight.
     isExecuting: true,
   },
 };

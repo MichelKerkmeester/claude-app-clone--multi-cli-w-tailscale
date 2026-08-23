@@ -25,7 +25,7 @@
   }
 
   // Plain theme buttons do not emit react-aria data-hovered / data-focus-visible;
-  // pointer + focus-visible hooks match the Button primitive's interaction actions.
+  // Pointer + focus-visible hooks match the Button primitive's interaction actions.
   function onChromePointerEnter(event: PointerEvent): void {
     if (event.pointerType === 'touch') return;
     (event.currentTarget as HTMLElement).setAttribute('data-hovered', 'true');
@@ -106,7 +106,7 @@
 <!-- @ds surface: session-header — quiet in-session header. Slots: back · model · overflow. -->
 <header class="session-header">
   <!-- @ds slot: back — back-to-sessions control. -->
-  <!-- @ds guardrail: react-aria Button (onPress / aria-label) — not designer-editable. -->
+  <!-- @ds guardrail: react-aria Button (onPress / aria-label) — Not designer-editable. -->
   <Button class="session-header-icon" aria-label="Back to sessions" onclick={onBack}>
     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
       <path
@@ -122,7 +122,7 @@
 
   <!-- @ds slot: model — host-confirmed model / effort readout trigger. -->
   <div class="session-runtime-controls">
-    <!-- @ds guardrail: react-aria Button + aria-* (expanded/controls/haspopup); 44px target — not designer-editable. -->
+    <!-- @ds guardrail: react-aria Button + aria-* (expanded/controls/haspopup); 44px target — Not designer-editable. -->
     <Button
       class="session-model-trigger"
       aria-label={modelEffortTriggerName(modelLabel, modelProvider, effortText)}
@@ -158,7 +158,7 @@
     </Button>
 
     <!-- @ds slot: plan-badge — plan-mode status chip. -->
-    <!-- @ds guardrail: role="status" readout — not designer-editable. -->
+    <!-- @ds guardrail: role="status" readout — Not designer-editable. -->
     {#if snapshot?.mode === 'plan'}
       <span class="session-plan-badge" role="status" aria-label={modelSwitcherStrings.planMode}>
         {modelSwitcherStrings.planBadge}
@@ -167,7 +167,7 @@
   </div>
 
   <!-- @ds slot: overflow — nav + theme popover trigger. -->
-  <!-- @ds guardrail: react-aria DialogTrigger / Popover / Dialog wiring — not designer-editable. -->
+  <!-- @ds guardrail: react-aria DialogTrigger / Popover / Dialog wiring — Not designer-editable. -->
   <Popover.Root bind:open={overflowOpen}>
     <Popover.Trigger>
       {#snippet child({ props })}
@@ -214,7 +214,7 @@
         <section class="tools-group">
           <span class="tools-label">Go to</span>
           <!-- @ds slot: nav — Inbox · Review. -->
-          <!-- @ds guardrail: react-aria onPress nav routing — not designer-editable. -->
+          <!-- @ds guardrail: react-aria onPress nav routing — Not designer-editable. -->
           <div class="overflow-nav">
             <Button class="overflow-item" onclick={onInbox}>Inbox</Button>
             <Button class="overflow-item" onclick={onReview}>Review</Button>
@@ -223,7 +223,7 @@
         <section class="tools-group">
           <span class="tools-label">Theme</span>
           <!-- @ds slot: theme-toggle — segmented light / dark / auto. -->
-          <!-- @ds guardrail: react-aria ToggleButton group (onChange / aria-label) — not designer-editable. -->
+          <!-- @ds guardrail: react-aria ToggleButton group (onChange / aria-label) — Not designer-editable. -->
           <div class="theme-control" role="group" aria-label="Color theme">
             {#each THEME_OPTIONS as option (option)}
               <button

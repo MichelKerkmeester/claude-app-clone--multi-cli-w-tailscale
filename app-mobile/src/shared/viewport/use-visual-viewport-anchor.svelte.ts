@@ -2,12 +2,12 @@
 // MODULE: Visual-Viewport Anchor (keyboard-safe)
 // ───────────────────────────────────────────────────────────────────
 // Keeps the inline completion surface inside the visible area while the
-// software keyboard is up. All measurements run through requestAnimationFrame
-// so resize/scroll storms from the visual viewport, rotation, keyboard
-// language changes, and PWA foregrounding settle into one repaint; the hook
-// never scrolls the page, so the transcript and composer never move. The
-// measured height is mirrored into --visual-viewport-height for CSS that
-// cannot read the API directly.
+// Software keyboard is up. All measurements run through requestAnimationFrame
+// So resize/scroll storms from the visual viewport, rotation, keyboard
+// Language changes, and PWA foregrounding settle into one repaint; the hook
+// Never scrolls the page, so the transcript and composer never move. The
+// Measured height is mirrored into --visual-viewport-height for CSS that
+// Cannot read the API directly.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. PUBLIC CONSTANTS AND RESULT TYPE
@@ -32,7 +32,7 @@ export function useVisualViewportAnchor(
   let viewportHeightPx = $state<number | null>(null);
   let anchorTopPx = $state<number | null>(null);
   // The measured values are mirrored so subscribers outside this hook can
-  // read the current budget without re-rendering.
+  // Read the current budget without re-rendering.
   let lastValues = { height: 0, anchorTop: 0 };
 
   $effect(() => {
@@ -80,12 +80,12 @@ export function useVisualViewportAnchor(
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
     // An installed PWA restored from the iOS page cache fires pageshow
-    // without a visual-viewport resize; the anchor budget must remeasure
-    // so the panel never renders against a stale height.
+    // Without a visual-viewport resize; the anchor budget must remeasure
+    // So the panel never renders against a stale height.
     window.addEventListener('pageshow', schedule);
 
     // The first measurement runs immediately so the panel never renders
-    // against a stale budget.
+    // Against a stale budget.
     schedule();
 
     return () => {

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ENROLLMENT SCREEN STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { DeviceIdentity } from '$shared/transport/auth.js';
 import Enrollment from './screen-enrollment.svelte';

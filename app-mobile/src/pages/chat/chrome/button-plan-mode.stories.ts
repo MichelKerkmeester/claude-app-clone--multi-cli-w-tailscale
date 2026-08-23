@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: PLAN MODE BUTTON STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type {
   RuntimeStateDto,
@@ -12,12 +16,8 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo runtime fixtures through the real reducer so every
-// PlanModeButton story's `runtime` is a real RuntimeUiState sourced from
-// demo.ts. The button derives its presentation fail-closed via
-// `planModePresentation(runtime, connection)`; `connection: 'live'` is the
-// settled value SessionComposer stories use. Callbacks are no-ops: opening the
-// menu moves focus only, and only an activated row reports to the caller.
+// Build stories from the reducer and demo snapshot so plan-mode presentation stays host-confirmed.
+// Callbacks remain inert because the stories exercise focus and labels, not mutations.
 const IDLE_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -60,8 +60,7 @@ export const Build: Story = {
 export const Plan: Story = {
   args: {
     ...Build.args,
-    // `mode` is a real RuntimeStateDto field; deriving 'plan' from the demo
-    // snapshot mirrors a host-confirmed plan transition (no copy invented).
+    // Derive the plan story from the host-shaped snapshot so no mode copy is invented.
     runtime: hydratedRuntime({ ...IDLE_STATE, mode: 'plan' }),
   },
 };

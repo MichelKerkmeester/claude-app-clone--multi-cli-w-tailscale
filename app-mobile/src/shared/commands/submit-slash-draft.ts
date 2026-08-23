@@ -2,14 +2,14 @@
 // MODULE: Explicit Slash Draft Submission (fail-closed)
 // ───────────────────────────────────────────────────────────────────
 // The single client orchestration that turns a drafted slash binding into
-// exactly one host-visible submission. Every local gate runs before any
-// transport work: the binding must be current for the committed snapshot
+// Exactly one host-visible submission. Every local gate runs before any
+// Transport work: the binding must be current for the committed snapshot
 // (host epoch, session, and both revisions), the canonical name must still
-// resolve to an enabled row in the CURRENT filtered catalog, and the live
-// connection plus an authoritative running/plan snapshot must be present.
+// Resolve to an enabled row in the CURRENT filtered catalog, and the live
+// Connection plus an authoritative running/plan snapshot must be present.
 // Only then is ONE fresh one-use ticket requested and ONE expected-revision
-// envelope submitted; no outcome is retried, converted to text, or mapped
-// to steer/followUp. The draft itself is never touched by this module.
+// Envelope submitted; no outcome is retried, converted to text, or mapped
+// To steer/followUp. The draft itself is never touched by this module.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -69,8 +69,8 @@ export interface SubmitSlashDraftInput {
 
 /**
  * Submit one explicit slash draft. Returns an outcome; throws only on
- * programmer error. Failures never retry: the caller preserves the draft
- * and requires a fresh insertion before any second attempt.
+ * Programmer error. Failures never retry: the caller preserves the draft
+ * And requires a fresh insertion before any second attempt.
  */
 export async function submitSlashDraft(input: SubmitSlashDraftInput): Promise<SlashSubmitOutcome> {
   const { binding, snapshot } = input;
@@ -79,10 +79,10 @@ export async function submitSlashDraft(input: SubmitSlashDraftInput): Promise<Sl
   const message = canonicalSlashMessage(input.draft, binding.name);
   if (message === null) return failed('invalid-draft');
   // Host/session/catalog revision race: the binding no longer matches the
-  // committed scope. Zero Pi calls; the caller refreshes and reselects.
+  // Committed scope. Zero Pi calls; the caller refreshes and reselects.
   if (snapshot === null || !bindingMatchesSnapshot(binding, snapshot)) return failed('stale');
   // Resolve the canonical token inside the CURRENT filtered catalog. A row
-  // that vanished or became disabled fails closed before any ticket.
+  // That vanished or became disabled fails closed before any ticket.
   const descriptor = snapshot.commands.find((command) => command.name === binding.name);
   if (descriptor === undefined || !descriptor.enabled) return failed('denied');
   if (input.connection !== 'live' || input.awaitingSnapshot) return failed('not-live');
@@ -110,7 +110,7 @@ export async function submitSlashDraft(input: SubmitSlashDraftInput): Promise<Sl
 
 /**
  * The exact message the host must see: the canonical name plus the user's
- * arguments, or null when the draft no longer matches the binding token.
+ * Arguments, or null when the draft no longer matches the binding token.
  */
 export function canonicalSlashMessage(draft: string, name: string): string | null {
   const token = `/${name}`;
@@ -128,7 +128,7 @@ export function canonicalSlashMessage(draft: string, name: string): string | nul
 
 function preSubmitFailureCode(error: unknown): SlashSubmitFailureCode {
   // Nothing reached the relay: every transport classification is bounded and
-  // the outcome is unambiguous.
+  // The outcome is unambiguous.
   if (error instanceof RelayRequestError) {
     if (error.status === 401 || error.status === 403) return 'forbidden';
     if (error.status === 400) return 'incompatible';
@@ -141,8 +141,8 @@ function preSubmitFailureCode(error: unknown): SlashSubmitFailureCode {
 
 function postSubmitFailureCode(error: unknown): SlashSubmitFailureCode {
   // The submission started; only typed outcomes are definitive. A transport
-  // failure here is ambiguous — the host may have received the envelope —
-  // so it settles as delivery-unknown and is never retried.
+  // Failure here is ambiguous — the host may have received the envelope —
+  // So it settles as delivery-unknown and is never retried.
   if (error instanceof SlashSubmitError) {
     return error.reasonCode === 'stale_catalog' ? 'stale' : 'denied';
   }

@@ -1,10 +1,13 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ASK QUESTION OPTION ROW STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { AskQuestionOption } from '@pi-remote/pi-rpc-protocol';
 
 import AskQuestionOptionRow from './ask-question-option-row.svelte';
 
-// Re-host one option verbatim from the frozen DEMO_ASK_QUESTION_DISPLAY in
-// $shared/data/demo.ts — nothing is invented.
+// Reuse one demo option so each row state exercises the real option shape.
 const DEMO_ASK_QUESTION_OPTION: AskQuestionOption = {
   id: 'demo-option-tests',
   label: 'Run the focused tests',

@@ -1,14 +1,13 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ASK QUESTION CARD STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { AskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
 
 import AskQuestionCard from './card-ask-question.svelte';
 
-// Re-host the demo ask-question display values (verbatim from the frozen
-// DEMO_ASK_QUESTION_DISPLAY in $shared/data/demo.ts) and the transcript block
-// shape used by tests/ask-question-card.svelte.test.ts — nothing is invented.
-// Note: the card resolves its display through fetchAskQuestionDisplay (relay),
-// which needs the live backend or demo mode, so Storybook shows the card's
-// loading shell; the block.status arg still drives the lifecycle phase class.
+// Reuse the demo transcript shape so lifecycle stories exercise the real loading and status paths.
 const DEMO_ASK_QUESTION_BLOCK: AskQuestionTranscriptMeta = {
   id: 'ask_block_001',
   revision: 1,

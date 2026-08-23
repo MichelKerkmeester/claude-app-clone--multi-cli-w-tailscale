@@ -1,13 +1,11 @@
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ATTACHMENT DRAFT STORY HOST
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: AttachmentDraftStoryHost — story-support scaffolding for the
-  // context-only attachment components (rail, preview dialog). Those components
-  // declare no props and read everything through getAttachmentDraft(); a bare
-  // provider renders nothing because the draft only fills via
-  // selectFiles(...), which is reachable from under the provider. This host
-  // sits under AttachmentDraftProvider, seeds the draft with two real 1x1
-  // transparent-pixel PNG Files on mount (the same bytes the AttachmentTile
-  // story uses — UI scaffolding, not fabricated app data), and optionally
-  // opens the preview of the first staged photo.
+  // Context-only attachment components (rail, preview dialog) read everything through getAttachmentDraft().
+  // This host supplies real staged files so those surfaces render without fabricated application data.
   import { onMount, type Snippet } from 'svelte';
   import { getAttachmentDraft } from './attachment-draft-provider.svelte';
 

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: TEXT ARTIFACT CARD STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -8,11 +12,7 @@ import {
   type NormalizedTextArtifactBlock,
 } from './normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so
-// every story args object is a real NormalizedTextArtifactBlock sourced from
-// the demo data — nothing is invented. The `rich-content-cards` surface
-// declares the `text-artifact` state; the fixtures yield two labels
-// (`document` and `long-text`), one story each.
+// Reuse normalized demo fixtures so both text-artifact labels stay grounded in real content.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

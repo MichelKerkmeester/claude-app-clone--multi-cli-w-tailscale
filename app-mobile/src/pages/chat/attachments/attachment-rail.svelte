@@ -1,4 +1,8 @@
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ATTACHMENT RAIL
+  // ───────────────────────────────────────────────────────────────────
+
   import { getAttachmentDraft } from './attachment-draft-provider.svelte';
   import AttachmentTile from './attachment-tile.svelte';
 

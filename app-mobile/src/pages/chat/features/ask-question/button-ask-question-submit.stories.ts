@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ASK QUESTION SUBMIT BUTTON STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import AskQuestionSubmitButton from './button-ask-question-submit.svelte';

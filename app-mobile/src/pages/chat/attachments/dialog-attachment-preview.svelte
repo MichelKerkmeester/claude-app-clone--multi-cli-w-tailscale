@@ -61,8 +61,7 @@
   // 5. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — the removal focus handoff moves focus to the adjacent tile
-  // (or the add-photo control) after the previewed item is removed and the dialog closes.
+  // @ds guardrail: do-not-edit — Removing the tile destroys the focused node, so focus moves to a live neighbor or the add-photo control before the dialog closes.
   function remove(): void {
     if (item === null) return;
     const index = draft.state.items.findIndex((candidate) => candidate.id === item.id);
@@ -82,8 +81,7 @@
     });
   }
 
-  // @ds guardrail: do-not-edit — Escape and underlay press dismiss (react-aria isDismissable);
-  // Tab is contained within the dialog.
+  // @ds guardrail: do-not-edit — Escape and underlay press dismiss through react-aria; Tab remains contained within the dialog.
   function onDialogKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       event.stopPropagation();

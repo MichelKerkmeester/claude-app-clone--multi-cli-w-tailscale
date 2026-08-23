@@ -2,12 +2,12 @@
 // MODULE: Non-Optimistic Runtime Control State Machine (Svelte runes)
 // ───────────────────────────────────────────────────────────────────
 // Runes port of the React `useRuntime` hook. The host-confirmed snapshot,
-// pending intent, and bounded issue state stay separate; every generation
-// guard, synchronous mutation lock, and coalescing branch is preserved
-// verbatim. `$state` writes are synchronous, so the React `runtimeRef`
-// shadow and `refreshRef` self-reference collapse: every `dispatch(action)`
-// becomes `runtime = runtimeReducer(runtime, action)` and the retry/reconcile
-// re-entry calls the stable `refresh` closure directly.
+// Pending intent, and bounded issue state stay separate; every generation
+// Guard, synchronous mutation lock, and coalescing branch is preserved
+// Verbatim. `$state` writes are synchronous, so the React `runtimeRef`
+// Shadow and `refreshRef` self-reference collapse: every `dispatch(action)`
+// Becomes `runtime = runtimeReducer(runtime, action)` and the retry/reconcile
+// Re-entry calls the stable `refresh` closure directly.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -42,7 +42,7 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
   let mutationController: AbortController | null = null;
   let authorityGeneration = 0;
   // Synchronous lock: set before dispatch, so a same-tick double tap can never
-  // reach the transport twice.
+  // Reach the transport twice.
   let mutationInFlight = false;
   let refreshInFlight = false;
   let refreshQueued: RefreshReason | null = null;
@@ -54,7 +54,7 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
 
   const refresh = async (reason: RefreshReason = 'manual'): Promise<void> => {
     // Concurrent triggers coalesce: one read-only hydrate at a time, latest
-    // reason wins.
+    // Reason wins.
     if (refreshInFlight) {
       refreshQueued = reason;
       return;
@@ -73,7 +73,7 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
     const checkingPhase =
       reason === 'initial' && runtime.models.length === 0 ? 'opening' : 'refreshing';
     // React may not commit this dispatch before a same-tick control event;
-    // keep the imperative mutation boundary fail-closed until that render.
+    // Keep the imperative mutation boundary fail-closed until that render.
     runtime = runtimeReducer(runtime, {
       type: 'checking',
       phase: checkingPhase,
@@ -98,7 +98,7 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
     } catch (error: unknown) {
       if (generation !== authorityGeneration) return;
       // An unmount or superseding refresh cancels silently; a deadline abort is
-      // a real failure and surfaces as host-unavailable.
+      // A real failure and surfaces as host-unavailable.
       if (controller.signal.aborted && !timedOut) return;
       const relayIssue = runtimeIssueFrom(error);
       const issueCode =
@@ -111,7 +111,7 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
       runtime = runtimeReducer(runtime, { type: 'hydrate-failed', issueCode, retryAfterMs });
       if (issueCode === 'rate-limited' && retryAfterMs !== null && retryAfterMs > 0) {
         // Honor the bounded Retry-After with one read-only reconcile; a new
-        // mutation still requires a fresh deliberate selection.
+        // Mutation still requires a fresh deliberate selection.
         if (retryTimer !== null) window.clearTimeout(retryTimer);
         retryTimer = window.setTimeout(() => {
           retryTimer = null;
@@ -143,7 +143,7 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
       return null;
     }
     // Streaming sends zero tickets and zero mutations; model switching stays
-    // gated by the host's advertised capability.
+    // Gated by the host's advertised capability.
     if (
       current.state.streaming &&
       (operation.type !== 'set_model' || !current.canSetModelWhileStreaming)
@@ -171,13 +171,13 @@ export function useRuntime(getSessionId: () => string): RuntimeControls {
     const controller = new AbortController();
     mutationController = controller;
     // Cross-browser delivery deadline: unresolved delivery becomes
-    // delivery-unknown — no ticket is replayed and nothing is retried.
+    // Delivery-unknown — no ticket is replayed and nothing is retried.
     const deadline = window.setTimeout(() => controller.abort(), MUTATION_DEADLINE_MS);
     runtime = runtimeReducer(runtime, { type: 'control-start', operation });
     try {
       // Mode switches ride the dedicated plan-control lane with their own
-      // one-use ticket and expected-runtime-revision guard; they never mix
-      // with prompt traffic or the generic runtime lane in production.
+      // One-use ticket and expected-runtime-revision guard; they never mix
+      // With prompt traffic or the generic runtime lane in production.
       const response =
         operation.type === 'set_mode'
           ? await relay.setMode(getSessionId(), expectedRevision, operation.mode, controller.signal)

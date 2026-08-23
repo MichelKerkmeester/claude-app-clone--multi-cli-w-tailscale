@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: SESSION COMPOSER STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type {
   CommandDescriptorDto,
@@ -20,18 +24,7 @@ import type {
 } from '$shared/commands/commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo runtime + command fixtures so every SessionComposer story
-// args object is sourced from demo.ts — nothing is invented. The runtime
-// hydrates to `ready-adjustable` via the real reducer; the command catalog uses
-// the demo `/api/commands/list` rows bound to the demo host epoch / catalog
-// revision. The remaining RuntimeControls / catalog methods are no-ops.
-//
-// SessionComposer reads the AttachmentDraft context via getAttachmentDraft, so
-// its story is wrapped in the self-providing AttachmentDraftProvider as a
-// Storybook decorator — exactly the committed ArtifactViewerProvider pattern in
-// rich-content/RichContentRouter.stories.ts. The provider defaults to
-// capability=null (no photos staged); the WithMedia story drives the media
-// affordance through the composer's own `mediaCapability` prop.
+// Reuse reducer, command, and attachment fixtures so composer stories exercise real authority and capability shapes.
 const DEMO_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -98,8 +91,7 @@ const setPrompt = (_updater: (current: string) => string): void => undefined;
 const onInsertCommand = (_name: string, _binding: SelectedCommandBinding): void => undefined;
 
 const baseArgs = {
-  // A story-local session id so draft-recovery sessionStorage keys never
-  // collide with a real demo session.
+  // Keep recovery state isolated from the real demo session.
   sessionId: 'storybook-composer',
   prompt: '',
   setPrompt,
@@ -140,8 +132,7 @@ export const Idle: Story = { args: { ...baseArgs } };
 export const WithMedia: Story = {
   args: {
     ...baseArgs,
-    // Real RuntimeMediaCapabilityDto shape (enabled + imageIn) — the composer's
-    // media affordance is gated on this; no copy invented.
+    // Enable the media affordance only in the story that supplies its capability.
     mediaCapability: { enabled: true, imageIn: true },
   },
 };

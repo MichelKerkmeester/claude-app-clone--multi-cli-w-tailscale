@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ENROLLMENT SCREEN
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ConnectionPhase } from '$shared/state/state.js';
   import type { DeviceIdentity } from '$shared/transport/auth.js';
 
@@ -36,7 +40,7 @@
 </script>
 
 <!-- @ds surface: enrollment-view — first-run device binding. States: idle · busy · error · authenticating. -->
-<!-- @ds guardrail: enrollment/auth wiring (enrollDevice · establishSession · scanQrImage · submit · onChange) — not designer-editable. -->
+<!-- @ds guardrail: enrollment/auth wiring (enrollDevice · establishSession · scanQrImage · submit · onChange) — Not designer-editable. -->
 <main class="enrollment-view">
   <section class="enrollment-card">
     <div class="surface-symbol" aria-hidden="true">

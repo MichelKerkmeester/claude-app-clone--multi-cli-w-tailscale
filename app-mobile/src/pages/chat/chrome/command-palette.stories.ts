@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: COMMAND PALETTE STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
@@ -9,13 +13,8 @@ import type {
 } from '$shared/commands/commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo `/api/commands/list` rows as a real HostCommandCatalogState
-// so every CommandPalette story's `catalog.commands` is sourced from demo.ts —
-// nothing is invented. The catalog snapshot carries the demo host epoch / catalog
-// revision the `demoSocket` envelope uses. The palette's bits-ui Combobox opens
-// its dropdown on input focus (internal state, no prop to force it open), so the
-// catalog shows the ready combobox — the input plus the "/" trigger — over the
-// real command rows.
+// Reuse the demo command catalog so ready/loading stories exercise the real snapshot shape.
+// The combobox opens from input focus, so the story leaves that interaction intact.
 const DEMO_COMMANDS = (
   demoPostJson('/api/commands/list', {}) as {
     commands: readonly CommandDescriptorDto[];

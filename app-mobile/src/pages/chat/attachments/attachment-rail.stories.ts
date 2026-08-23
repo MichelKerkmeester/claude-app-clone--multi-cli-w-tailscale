@@ -1,24 +1,20 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ATTACHMENT RAIL STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import AttachmentRail from './attachment-rail.svelte';
 import AttachmentDraftProvider from './attachment-draft-provider.svelte';
 import AttachmentDraftStoryHost from './attachment-draft-story-host.svelte';
 
-// Context-only smoke story: AttachmentRail declares no props — everything
-// arrives through getAttachmentDraft(), and the rail renders nothing unless a
-// provider above it reports mediaAvailable AND has staged items. The
-// decorator chain supplies both: AttachmentDraftProvider with a photos-enabled
-// capability ({ enabled, imageIn } — the fields capabilityAllowsPhotos checks)
-// wraps AttachmentDraftStoryHost, which seeds two real 1x1 transparent-pixel
-// PNG Files through draft.selectFiles on mount (SessionComposer.stories /
-// ArtifactCard.stories self-providing-provider pattern). The pixel bytes are
-// UI scaffolding, not fabricated app data.
+// Exercise the context-only rail with a real provider and staged files rather than fabricated props.
+// The decorator order keeps Provider > Host > rail, matching Storybook's outermost-last behavior.
 const meta: Meta<typeof AttachmentRail> = {
   title: 'Attachments/AttachmentRail',
   component: AttachmentRail,
   tags: ['autodocs'],
-  // Storybook wraps with the LAST decorator outermost, so the Provider is listed
-  // last: Provider > Host > rail.
+  // Storybook applies the last decorator outermost, so the provider must be listed last.
   decorators: [
     () => ({ Component: AttachmentDraftStoryHost }),
     () => ({

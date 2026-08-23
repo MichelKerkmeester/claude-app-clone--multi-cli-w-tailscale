@@ -46,7 +46,7 @@
   const authority = $derived(modeAuthority(runtime));
 
   // Host-confirmed open only; Bits Menu writes the next open flag, so a local
-  // copy is restored to the host value after every change (non-optimistic).
+  // Copy is restored to the host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
 
   // ───────────────────────────────────────────────────────────────────
@@ -73,8 +73,7 @@
   }
 
   function onMenuSelect(target: 'build' | 'plan'): void {
-    // @ds guardrail: do-not-edit — onSelect routes only an activated row: Plan is an
-    // immediate request, Build opens the leave confirmation rather than mutating.
+  // @ds guardrail: do-not-edit — onSelect routes only an activated row: Plan is an immediate request, Build opens the leave confirmation rather than mutating.
     if (target === 'plan') onSelectPlan();
     else onSelectBuild();
   }
@@ -83,7 +82,7 @@
     const el = node as HTMLButtonElement;
     buttonRef = el;
     // The ARIA keyboard-shortcuts hint is attached on the host button so it
-    // survives re-renders (react-aria filtered the attribute out of its prop list).
+    // Survives re-renders (react-aria filtered the attribute out of its prop list).
     el.setAttribute('aria-keyshortcuts', 'Shift+Tab Meta+Shift+M');
     const hoverAction = hover(el);
     const pressAction = press(el);
@@ -98,11 +97,9 @@
 </script>
 
 <!-- @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. -->
-<!-- @ds guardrail: do-not-edit — the aria-keyshortcuts effect and the MenuTrigger/Button
-     react-aria wiring (isDisabled, aria-label, onOpenChange, ref) are not designer-editable. -->
+<!-- @ds guardrail: do-not-edit — The aria-keyshortcuts effect and MenuTrigger/Button React-aria wiring (isDisabled, aria-label, onOpenChange, ref) are not designer-editable. -->
 <!-- @ds state: host presentation kind — the is-${kind} class drives the css seam. -->
-<!-- @ds guardrail: do-not-edit — MenuTrigger/Button react-aria wiring; opening the menu moves
-     focus only and never reports a mode. -->
+<!-- @ds guardrail: do-not-edit — MenuTrigger/Button React-aria wiring; opening the menu moves focus only and never reports a mode. -->
 <Menu bind:open={menuOpen} onOpenChange={onMenuOpenChange}>
   <MenuTrigger
     class={`plan-mode-button is-${presentation.kind}`}
@@ -127,8 +124,7 @@
     <!-- @ds slot: label — bounded visible label. -->
     <span class="plan-mode-label">{presentation.label}</span>
   </MenuTrigger>
-  <!-- @ds guardrail: do-not-edit — onSelect routes only an activated row: Plan is an
-      immediate request, Build opens the leave confirmation rather than mutating. -->
+  <!-- @ds guardrail: do-not-edit — onSelect routes only an activated row: Plan is an immediate request, Build opens the leave confirmation rather than mutating. -->
   <PlanModeMenu
     confirmedMode={authority.confirmedMode}
     rowsDisabled={presentation.rowsDisabledReason !== null}

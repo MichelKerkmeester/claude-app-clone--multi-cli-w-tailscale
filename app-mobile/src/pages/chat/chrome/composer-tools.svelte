@@ -13,7 +13,7 @@
     readonly onShiftTabPreferenceChange: (enabled: boolean) => void;
   }
 
-  // @ds guardrail: tools popover status hint — ported verbatim from SessionComposer.
+  // @ds guardrail: tools popover status hint — Ported verbatim from SessionComposer.
   function statusHint(status: RuntimeControls['runtime']['status'], hasPending: boolean): string {
     switch (status) {
       case 'checking':
@@ -67,7 +67,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   // Popover open state; bind:open keeps the local copy in sync while onOpenChange
-  // reports every transition to the host (non-optimistic, host-confirmed).
+  // Reports every transition to the host (non-optimistic, host-confirmed).
   let open = $state(false);
   let contentEl = $state<HTMLElement | null>(null);
   let toolsDialogEl = $state<HTMLElement | null>(null);
@@ -90,8 +90,8 @@
   }
 
   // Hand-rolled FileTrigger parity: a hidden input per action, clicked by its
-  // paired button; the input delivers the selection then resets value='' so a
-  // repeated pick of the same file still fires onchange.
+  // Paired button; the input delivers the selection then resets value='' so a
+  // Repeated pick of the same file still fires onchange.
   let photoLibraryInput = $state<HTMLInputElement | null>(null);
   let takePhotoInput = $state<HTMLInputElement | null>(null);
 
@@ -111,8 +111,8 @@
     }
   }
 
-  // data-focus-visible on the .tools-checkbox label mirrors react-aria's focus
-  // ring, bridged from the visually-hidden input that actually holds focus.
+  // Data-focus-visible on the .tools-checkbox label mirrors react-aria's focus
+  // Ring, bridged from the visually-hidden input that actually holds focus.
   let checkboxFocusVisible = $state(false);
 
   function onCheckboxFocus(event: FocusEvent): void {
@@ -142,7 +142,7 @@
   </svg>
 {/snippet}
 
-<!-- @ds guardrail: tools popover react-aria wiring (DialogTrigger / Popover / Dialog) — unchanged. -->
+<!-- @ds guardrail: tools popover react-aria wiring (DialogTrigger / Popover / Dialog) — Unchanged. -->
 <Popover.Root bind:open onOpenChange={handleOpenChange}>
   <!-- @ds slot: tools-trigger — the "+" popover trigger. -->
   <Popover.Trigger>

@@ -1,11 +1,13 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: REVIEW SCREEN STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 import Review from './screen-review.svelte';
 
-// Re-host the demo session ids through the relay's real /api/sessions shape so
-// the Review roster is sourced from demo.ts — nothing is invented. The view
-// loads approvals itself; with no live relay it renders its empty state.
+// Reuse the demo session roster so focus stories exercise the real approval lookup and empty state.
 const DEMO_SESSIONS = demoPostJson('/api/sessions', {}) as {
   sessions: readonly SessionCardDto[];
 };

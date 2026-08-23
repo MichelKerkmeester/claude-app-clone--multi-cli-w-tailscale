@@ -83,11 +83,9 @@
   let { block, onOpen }: RichContentRouterProps = $props();
 
   // @ds surface: rich-content-router — dispatches each normalized transcript block
-  // to its card/view. The block-kind dispatch, the viewer handoff, and the
-  // redaction handling below are guardrailed and not designer-editable.
-  // @ds guardrail: do-not-edit — the router's block-kind switch is the single
-  // dispatch point; isNormalizedRichContentBlock / isRichCardBlock are exported
-  // type guards used by security tests. Not designer-editable.
+  // To its card/view. The block-kind dispatch, the viewer handoff, and the
+  // Redaction handling below are guardrailed and not designer-editable.
+  // @ds guardrail: do-not-edit — The router's block-kind switch is the single dispatch point; exported type guards keep security boundaries explicit. Not designer-editable.
   const viewer = getOptionalArtifactViewer();
 
   // ───────────────────────────────────────────────────────────────────
@@ -100,8 +98,7 @@
   // 4. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — the viewer handoff keeps an in-memory doc current for
-  // hosted blocks; no fetch, endpoint, ticket, download, or host-file read is added.
+  // @ds guardrail: do-not-edit — The viewer handoff keeps an in-memory document current for hosted blocks; no fetch, endpoint, ticket, download, or host-file read is added.
   $effect(() => {
     if (onOpen !== undefined || viewer === null || !isRichCardBlock(block)) return;
     viewer.updateInMemory(createInMemoryArtifactDocument(block));
@@ -111,9 +108,7 @@
   // 5. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — the open-handoff delegates to the bound onOpen or falls
-  // back to the viewer's openInMemory with the same in-memory document; nothing is
-  // fetched, written, or read from the host.
+  // @ds guardrail: do-not-edit — The open handoff delegates to bound onOpen or the viewer's openInMemory with the same document; nothing is fetched, written, or read from the host.
   function open(richBlock: F6RichBlock, trigger: HTMLButtonElement | null = null): void {
     if (onOpen !== undefined) {
       onOpen(richBlock, trigger);
@@ -123,8 +118,7 @@
   }
 </script>
 
-<!-- @ds guardrail: do-not-edit — block-kind dispatch. Each case renders the matching
-     card; prose/diff/fallback stay redaction-bounded. -->
+<!-- @ds guardrail: do-not-edit — Block-kind dispatch renders the matching card; prose, diff, and fallback stay redaction-bounded. -->
 {#if block.kind === 'command'}
   <CommandOutputCard
     {block}
@@ -168,8 +162,7 @@
      stay with their own components. Values unchanged; the bidi-plaintext guardrail is preserved. -->
 <style>
   /* @ds slot: prose — bidirectional-safe plain-text read-out; capped to reading width. */
-  /* @ds guardrail: do-not-edit — unicode-bidi: plaintext keeps directional text stable and
-     un-clickable-into; do not weaken. */
+  /* @ds guardrail: do-not-edit — Unicode-bidi: plaintext keeps directional text stable and un-clickable-into; do not weaken. */
   .rich-prose-block {
     min-inline-size: 0;
     max-inline-size: var(--reading-width);

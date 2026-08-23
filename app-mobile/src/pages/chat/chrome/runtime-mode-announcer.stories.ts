@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: RUNTIME MODE ANNOUNCER STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type {
   RuntimeStateDto,
@@ -12,12 +16,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo runtime fixtures through the real reducer so every
-// RuntimeModeAnnouncer story's `runtime` is a real RuntimeUiState sourced from
-// demo.ts. The announcer is a pair of sr-only live regions (polite + alert);
-// it renders no visible chrome by design — the catalog shows the real component
-// over its real states, and the announced copy is the frozen vocabulary the
-// `planModePresentation` derivation selects.
+// Feed the announcer real reducer snapshots so its live-region vocabulary stays host-confirmed.
 const IDLE_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -59,8 +58,7 @@ export const Build: Story = {
 export const Plan: Story = {
   args: {
     ...Build.args,
-    // `mode` is a real RuntimeStateDto field; deriving 'plan' from the demo
-    // snapshot mirrors a host-confirmed plan transition (no copy invented).
+    // Derive the plan story from the host-shaped snapshot so no mode copy is invented.
     runtime: hydratedRuntime({ ...IDLE_STATE, mode: 'plan' }),
   },
 };

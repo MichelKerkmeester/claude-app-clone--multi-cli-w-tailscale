@@ -1,14 +1,13 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: PLAN READY CARD STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 
 import PlanReadyCard from './card-plan-ready.svelte';
 
-// No plan-artifact fixture exists in demo.ts yet, so this DTO literal follows
-// the exact PlanArtifactDto shape (planId · planRevision · title · summary ·
-// stepCount · approachCount · validity · occurredAt) and reuses real demo
-// values: the todo plan id (`plan_demo_todos`) and its demo timestamp from
-// demo.ts. `validity: 'valid'` + live + newest satisfies the component's own
-// isReviewablePlanArtifact gate so the card renders.
+// Keep the card's ready state grounded in the DTO shape and a real demo timestamp.
 const DEMO_PLAN_ARTIFACT = {
   planId: 'plan_demo_todos',
   planRevision: 1,
@@ -35,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 export const Ready: Story = {
   args: {
     artifact: DEMO_PLAN_ARTIFACT,
-    // A live host snapshot, never a cached value — the card only renders then.
+    // The card must stay tied to a live host snapshot, never a cached value.
     isLive: true,
     isNewest: true,
     canReview: true,
@@ -46,8 +45,7 @@ export const Ready: Story = {
 export const WaitingForLiveConfirmation: Story = {
   args: {
     ...Ready.args,
-    // False until the live session has an opaque binding in memory; the CTA
-    // reads "Waiting for live confirmation" and stays disabled.
+    // Without a live binding, the CTA fails closed and explains why review is unavailable.
     canReview: false,
   },
 };

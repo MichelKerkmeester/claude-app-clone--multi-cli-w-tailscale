@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: SAFE MARKDOWN STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -8,11 +12,7 @@ import {
   type NormalizedProseBlock,
 } from './normalize-transcript-blocks.js';
 
-// Re-host the frozen rich-content fixtures through the existing normalizer so
-// every story `source` arg is the canonicalSource of a real NormalizedProseBlock
-// sourced from the demo data — nothing is invented. The `rich-content-cards`
-// surface declares the `prose` state; the fixtures yield a plain prose block and
-// a bidirectional (RTL) prose block, one story each.
+// Reuse normalized prose fixtures so plain and bidirectional text exercise the real canonical source.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

@@ -56,12 +56,11 @@
   // ───────────────────────────────────────────────────────────────────
 
   // @ds surface: runtime-mode-announcer — dual polite/alert live regions for mode transitions.
-  // @ds guardrail: do-not-edit — the announce-once settle-key effect (primed/announcedKey) and the
-  // ALERT_KINDS routing; the regions are inert text nodes that never move focus. Not designer-editable.
+  // @ds guardrail: do-not-edit — The announce-once settle-key effect and ALERT_KINDS routing keep these inert text regions from moving focus. Not designer-editable.
   let polite = $state('');
   let alert = $state('');
   // The last announced settle key; the first settle is recorded without an
-  // announcement so only actual transitions are spoken.
+  // Announcement so only actual transitions are spoken.
   let announcedKey: string | null = null;
   let primed = false;
 

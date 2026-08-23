@@ -9,8 +9,8 @@
     readonly onRefresh?: () => void;
     /**
      * Called after the panel has rendered an announcement so the parent can
-     * clear the announcement slot on the next render pass. The reducer keeps
-     * the source-of-truth; the panel owns only the visual lifecycle.
+     * Clear the announcement slot on the next render pass. The reducer keeps
+     * The source-of-truth; the panel owns only the visual lifecycle.
      */
     readonly onAnnouncementConsumed?: () => void;
     /** Optional locale used for the relative timestamp. Defaults to the platform. */
@@ -92,8 +92,8 @@
   });
 
   // The live region speaks only the redacted title and the localized state. The
-  // region is removed from the DOM between announcements so screen readers do
-  // not re-announce stale text and the polite queue is never backlogged.
+  // Region is removed from the DOM between announcements so screen readers do
+  // Not re-announce stale text and the polite queue is never backlogged.
   let lastSeen = '';
   let primed = false;
 
@@ -120,7 +120,7 @@
   }
 
   // Collapsible.Trigger is the slot=trigger button; the wrapper does not forward
-  // trigger class/aria, and Bits does not emit data-hovered/pressed/focus-visible.
+  // Trigger class/aria, and Bits does not emit data-hovered/pressed/focus-visible.
   function attachSectionTrigger(label: string) {
     return (node: HTMLElement) => {
       const button = node.parentElement;
@@ -144,9 +144,7 @@
 </script>
 
 <!-- @ds surface: todos — the read-only todo projection panel (pi's plan). Slot seams below. -->
-<!-- @ds guardrail: READ-ONLY projection — the phone NEVER mutates pi's task list. Section
-     grouping and per-task states come from buildTodoDisplayModel over the projection, and
-     the react-aria Disclosure/Button wiring is owned by this component; none designer-editable. -->
+<!-- @ds guardrail: READ-ONLY projection — The phone NEVER mutates pi's task list; grouping and per-task states come from buildTodoDisplayModel over the projection, and the React-aria Disclosure/Button wiring remains component-owned. Not designer-editable. -->
 <section
   class="todo-panel"
   aria-label="pi's plan"
@@ -166,7 +164,7 @@
       {model.doneCount}/{model.totalCount}
     </span>
     <!-- @ds slot: refresh — the react-aria Button that refreshes the read-only projection. -->
-    <!-- @ds guardrail: react-aria Button wiring (type, aria-label, disabled, onPress) — not designer-editable. -->
+    <!-- @ds guardrail: react-aria Button wiring (type, aria-label, disabled, onPress) — Not designer-editable. -->
     <Button
       type="button"
       class="todo-refresh"
@@ -284,7 +282,7 @@
       Updated {relativeTimestamp(projection.updatedAt, locale, now)}
     </time>
   {/if}
-  <!-- @ds guardrail: literal sr-only polite live region — never layout space, focus, or scroll. -->
+  <!-- @ds guardrail: literal sr-only polite live region — Never layout space, focus, or scroll. -->
   {#if announcement !== ''}
     <div class="todo-live-region sr-only" role="status" aria-live="polite" aria-atomic="true">
       {announcement}
@@ -298,8 +296,7 @@
 <style>
   /* The todo projection is a transcript annotation, not an editable task surface. */
   /* @ds surface: todos — the read-only todo projection panel (pi's plan). */
-  /* @ds guardrail: READ-ONLY projection — the phone NEVER mutates pi's task list. The grouped
-     sections and per-task states come from the projection only; edit styling, never the model. */
+  /* @ds guardrail: READ-ONLY projection — The phone NEVER mutates pi's task list. Grouped sections and per-task states come from the projection only; edit styling, never the model. */
   .todo-panel {
     display: grid;
     min-inline-size: 0;
@@ -423,7 +420,7 @@
     background: var(--canvas-subtle);
   }
 
-  /* @ds guardrail: focus-visible — the shared AA focus ring across refresh + section triggers. */
+  /* @ds guardrail: focus-visible — The shared AA focus ring across refresh + section triggers. */
   :global(.todo-refresh[data-focus-visible]),
   :global(.todo-section-trigger[data-focus-visible]) {
     outline: 2px solid var(--focus);
@@ -619,7 +616,7 @@
     justify-self: end;
   }
 
-  /* @ds guardrail: sr-only polite live region — must never take layout space, move focus, or scroll. */
+  /* @ds guardrail: sr-only polite live region — Must never take layout space, move focus, or scroll. */
   .todo-live-region {
     /* The live region is purely a screen-reader polite queue; it must never
        take layout space, never move focus, and never cause a scroll. */

@@ -1,4 +1,8 @@
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: RICH BLOCK FRAME
+  // ───────────────────────────────────────────────────────────────────
+
   import type { Snippet } from 'svelte';
   import type { RedactionMetadata } from '@pi-remote/pi-rpc-protocol';
   import RedactionBadge from './redaction-badge.svelte';
@@ -41,9 +45,7 @@
       <!-- @ds slot: metadata — factual chips; the map wiring is guardrailed. -->
       {#if metadata.length > 0}
         <div class="rich-block-metadata">
-          <!-- @ds guardrail: do-not-edit — metadata is derived data mapped to
-               chips; a designer edits the chip list here only if it stays a
-               bounded derived read-out. -->
+          <!-- @ds guardrail: do-not-edit — Metadata is derived data mapped to chips; edit the list only while it remains a bounded read-out. -->
           {#each metadata as value (value)}<span>{value}</span>{/each}
         </div>
       {/if}
@@ -51,8 +53,7 @@
     <!-- @ds slot: status — lifecycle caption + redaction badge. -->
     <div class="rich-block-status">
       {#if status !== undefined}<span>{status}</span>{/if}
-      <!-- @ds guardrail: do-not-edit — RedactionBadge marks already-redacted,
-           read-only content; never remove it from the frame. -->
+      <!-- @ds guardrail: do-not-edit — RedactionBadge marks already-redacted, read-only content; never remove it from the frame. -->
       <RedactionBadge {redaction} />
     </div>
   </header>

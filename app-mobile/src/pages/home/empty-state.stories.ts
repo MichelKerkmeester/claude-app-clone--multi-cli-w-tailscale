@@ -1,8 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: EMPTY STATE STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import EmptyState from './empty-state.svelte';
 
-// The empty-state surface declares two states: empty (no error) and error.
-// Both are rendered over the component's real prop values — no invented copy.
+// Cover the empty and error states with the component's real prop contract and no invented copy.
 const meta = {
   title: 'Views/EmptyState',
   component: EmptyState,

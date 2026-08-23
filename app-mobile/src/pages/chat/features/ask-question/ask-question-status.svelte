@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ASK QUESTION STATUS
+  // ───────────────────────────────────────────────────────────────────
+
   import {
     safeAskQuestionStatusMessage,
     type AskQuestionFormState,

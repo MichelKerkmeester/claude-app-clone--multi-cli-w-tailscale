@@ -1,10 +1,13 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ASK QUESTION OPTION LIST STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import AskQuestionOptionList from './ask-question-option-list.svelte';
 import type { AskQuestionViewModel } from './ask-question-types.js';
 
-// Re-host the demo ask-question display values (verbatim from the frozen
-// DEMO_ASK_QUESTION_DISPLAY in $shared/data/demo.ts) — nothing is invented.
+// Reuse the demo display so list stories exercise the real option and selection shapes.
 const DEMO_ASK_QUESTION_VIEW: AskQuestionViewModel = {
   type: 'session.ask-question.display',
   sessionId: 'demo-session-refactor',
@@ -37,8 +40,7 @@ const DEMO_ASK_QUESTION_VIEW: AskQuestionViewModel = {
   requiresReadOnlyHint: true,
 };
 
-// Same derivation form tests/ask-question-card.svelte.test.ts uses for its
-// singleDisplay fixture.
+// Keep the single-choice story aligned with the card's selection derivation.
 const SINGLE_VIEW: AskQuestionViewModel = {
   ...DEMO_ASK_QUESTION_VIEW,
   selectionMode: 'single',

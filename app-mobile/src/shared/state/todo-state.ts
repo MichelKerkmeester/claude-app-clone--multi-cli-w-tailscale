@@ -35,9 +35,9 @@ export interface TodoProjectionState {
   readonly needsRefresh: boolean;
   /**
    * One concise polite announcement per change. The string is empty until the
-   * next applicable diff, and the live region only speaks when the value is
-   * non-empty. Timestamps, provenance, and group counts are exposed through
-   * the panel itself, never here.
+   * Next applicable diff, and the live region only speaks when the value is
+   * Non-empty. Timestamps, provenance, and group counts are exposed through
+   * The panel itself, never here.
    */
   readonly announcement: string;
 }
@@ -166,9 +166,9 @@ function applySnapshot(
   anchorSeq: number,
 ): TodoProjectionState {
   // A plan-identity change replaces the prior projection; a same-plan snapshot
-  // with a newer revision also replaces. A same-plan snapshot whose incoming
-  // revision is not strictly newer is stale and is discarded without mutating
-  // the rendered view.
+  // With a newer revision also replaces. A same-plan snapshot whose incoming
+  // Revision is not strictly newer is stale and is discarded without mutating
+  // The rendered view.
   const planChanged = state.projection === null || state.projection.planId !== projection.planId;
   if (!planChanged && state.projection !== null && state.projection.revision >= projection.revision) {
     return state;
@@ -189,8 +189,8 @@ function applySnapshot(
 function applyDelta(state: TodoProjectionState, delta: TodoProjectionDeltaV1): TodoProjectionState {
   const current = state.projection;
   // A delta that arrives before any snapshot, or against a different plan,
-  // cannot be applied safely. Surface a read-only refresh instead of inventing
-  // a delta chain.
+  // Cannot be applied safely. Surface a read-only refresh instead of inventing
+  // A delta chain.
   if (current === null || current.planId !== delta.planId) {
     return { ...state, refreshing: true, needsRefresh: true };
   }

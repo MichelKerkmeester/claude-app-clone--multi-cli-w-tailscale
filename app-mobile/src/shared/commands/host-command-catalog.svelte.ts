@@ -2,11 +2,11 @@
 // MODULE: Session-Scoped Command Catalog Lifecycle (web)
 // ───────────────────────────────────────────────────────────────────
 // One in-memory catalog lifecycle per session. Every committed snapshot is
-// scoped to the authenticated host epoch and session: responses that no
-// longer match the current scope are refused outright, so a reconnect,
-// foreground refresh, session switch, or host-epoch change can never
-// overwrite the current snapshot with a different session's rows. The
-// snapshot is intentionally never persisted to any browser storage.
+// Scoped to the authenticated host epoch and session: responses that no
+// Longer match the current scope are refused outright, so a reconnect,
+// Foreground refresh, session switch, or host-epoch change can never
+// Overwrite the current snapshot with a different session's rows. The
+// Snapshot is intentionally never persisted to any browser storage.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -56,7 +56,7 @@ function catalogReducer(current: CatalogState, action: CatalogAction): CatalogSt
     case 'begin':
       return {
         // A committed same-scope snapshot survives a refresh so the palette
-        // stays usable while the host is re-verified.
+        // Stays usable while the host is re-verified.
         status: current.snapshot === null ? 'loading' : 'refreshing',
         snapshot: current.snapshot,
       };
@@ -64,7 +64,7 @@ function catalogReducer(current: CatalogState, action: CatalogAction): CatalogSt
       return { status: 'ready', snapshot: action.snapshot };
     case 'failed':
       // A forbidden response clears authority immediately; other failures keep
-      // the same-scope snapshot visible with the failure state represented.
+      // The same-scope snapshot visible with the failure state represented.
       return {
         status: action.code,
         snapshot: action.code === 'forbidden' ? null : current.snapshot,
@@ -89,7 +89,7 @@ export function useHostCommandCatalog(
   let state = $state<CatalogState>(INITIAL_CATALOG_STATE);
   let stateRef: CatalogState = state;
   // Monotonic request identity: a settling response commits only when its own
-  // request is still the latest, so aborts and superseded refreshes are inert.
+  // Request is still the latest, so aborts and superseded refreshes are inert.
   let requestIdRef = 0;
   let controllerRef: AbortController | null = null;
   let inFlightRef = false;
@@ -103,7 +103,7 @@ export function useHostCommandCatalog(
 
   async function refresh(reason: CatalogRefreshReason = 'manual'): Promise<void> {
     // Foreground/online revalidation only matters when the snapshot is old
-    // enough to be suspect; a fresh one needs no network read.
+    // Enough to be suspect; a fresh one needs no network read.
     if (
       (reason === 'foreground' || reason === 'online') &&
       stateRef.status === 'ready' &&
@@ -113,7 +113,7 @@ export function useHostCommandCatalog(
       return;
     }
     // Concurrent triggers share one in-flight request; a later trigger
-    // re-runs after it settles so no refresh is ever lost.
+    // Re-runs after it settles so no refresh is ever lost.
     if (inFlightRef) {
       queuedReasonRef = reason;
       return;
@@ -129,8 +129,8 @@ export function useHostCommandCatalog(
       const catalog: CommandCatalogDto = await fetchCommands(controller.signal);
       if (controller.signal.aborted || requestId !== requestIdRef) return;
       // Commit only on match: the response must be for this session and for
-      // the same host epoch the scope already committed. A mismatched
-      // response fails closed and never touches the snapshot.
+      // The same host epoch the scope already committed. A mismatched
+      // Response fails closed and never touches the snapshot.
       if (catalog.sessionId !== getSessionId()) {
         dispatch({ type: 'scope-mismatch' });
         return;
@@ -160,7 +160,7 @@ export function useHostCommandCatalog(
       const queued = queuedReasonRef;
       queuedReasonRef = null;
       // Re-run through the latest callback: a queued trigger must observe
-      // the current session scope, never the closure that queued it.
+      // The current session scope, never the closure that queued it.
       if (queued !== null) void refresh(queued);
     }
   }
@@ -171,12 +171,12 @@ export function useHostCommandCatalog(
 
   $effect(() => {
     // A host-epoch or session transition invalidates every in-flight read and
-    // clears the snapshot so no other session's rows can be shown.
+    // Clears the snapshot so no other session's rows can be shown.
     getSessionId();
     requestIdRef += 1;
     controllerRef?.abort();
-    // dispatch reduces the catalog state (reads + writes it); untrack so this effect depends only
-    // on the session id and does not re-run on the state it just cleared → no self-invalidation.
+    // Dispatch reduces the catalog state (reads + writes it); untrack so this effect depends only
+    // On the session id and does not re-run on the state it just cleared → no self-invalidation.
     untrack(() => dispatch({ type: 'session-changed' }));
   });
 
@@ -184,7 +184,7 @@ export function useHostCommandCatalog(
     const connection = getConnection();
     getSessionId();
     // Reconnect is the moment authority changes: entering live refreshes the
-    // scope, while an already-live mount keeps the single prefetch.
+    // Scope, while an already-live mount keeps the single prefetch.
     if (connection === 'live' && previousConnectionRef !== 'live') {
       untrack(() => void refresh(previousConnectionRef === null ? 'initial' : 'reconnect'));
     }

@@ -2,10 +2,10 @@
 // MODULE: Leading-Slash Trigger Predicate (pure)
 // ───────────────────────────────────────────────────────────────────
 // Derives whether the composer draft is in a slash-command token. The
-// predicate is a pure function of draft, caret, selection, focus, IME
-// composition, and the Escape dismissal latch; it performs no transport,
-// filtering, or state mutation, so the inline surface can re-evaluate it
-// after every committed input without side effects.
+// Predicate is a pure function of draft, caret, selection, focus, IME
+// Composition, and the Escape dismissal latch; it performs no transport,
+// Filtering, or state mutation, so the inline surface can re-evaluate it
+// After every committed input without side effects.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. TYPE DEFINITIONS
@@ -20,7 +20,7 @@ export interface SlashTriggerInput {
   readonly isComposing: boolean;
   /**
    * The exact draft/caret signature dismissed with Escape, or null. Any
-   * change to the draft or caret reopens the panel.
+   * Change to the draft or caret reopens the panel.
    */
   readonly dismissedSignature: string | null;
 }

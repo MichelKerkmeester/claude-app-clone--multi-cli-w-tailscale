@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: COMMAND OPTION STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
@@ -5,11 +9,8 @@ import CommandOption from './command-option.svelte';
 import { rankHostCommands, type RankedHostCommand } from '$shared/commands/rank-host-commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Re-host the demo `/api/commands/list` rows through the real deterministic
-// ranker so every CommandOption story's `command` is a real RankedHostCommand
-// sourced from demo.ts — nothing is invented. The demo catalog rows are all
-// enabled, so a disabled-row story is intentionally omitted (no disabled
-// fixture exists in demo.ts; one is not invented).
+// Use the deterministic ranker and demo command rows so each story reflects real ranking output.
+// The demo catalog has no disabled command, so the disabled-row state is intentionally omitted.
 const DEMO_COMMANDS = (
   demoPostJson('/api/commands/list', {}) as {
     commands: readonly CommandDescriptorDto[];
@@ -60,8 +61,7 @@ export const Inactive: Story = {
 export const Matched: Story = {
   args: {
     ...Active.args,
-    // 'pl' matches `/plan` as a name-prefix; the ranker emphasizes the matched
-    // graphemes structurally — the row shown is the real ranked result.
+    // A name-prefix query keeps the matched graphemes and row order grounded in the real ranker.
     command: itemByQuery(FILTERED_BY_PL, 'plan'),
     active: true,
   },

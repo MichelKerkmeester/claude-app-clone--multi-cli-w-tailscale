@@ -63,7 +63,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   // Host-confirmed selection only; Bits UI single-type allows emptying, so a local
-  // copy is restored to hostMode after every change (non-optimistic, no empty).
+  // Copy is restored to hostMode after every change (non-optimistic, no empty).
   let modeValue = $state('');
 
   // ───────────────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@
   </span>
 
   <!-- @ds surface: effort-trigger — opens the shared model/effort sheet. -->
-  <!-- @ds guardrail: react-aria Button wiring (ref, aria-haspopup/expanded, onPress) — not designer-editable. -->
+  <!-- @ds guardrail: react-aria Button wiring (ref, aria-haspopup/expanded, onPress) — Not designer-editable. -->
   <Button
     class="runtime-effort-trigger"
     aria-label={effortTriggerName(effortText)}
@@ -125,7 +125,7 @@
   </Button>
 
   <!-- @ds surface: build-plan-toggle — Build / Plan segmented toggle. -->
-  <!-- @ds guardrail: react-aria ToggleButtonGroup wiring (selection + onChange + aria) — not designer-editable. -->
+  <!-- @ds guardrail: react-aria ToggleButtonGroup wiring (selection + onChange + aria) — Not designer-editable. -->
   <!-- @ds state: build · plan — selection is disabled while the authority is not ready; the
       label never precedes host confirmation (non-optimistic). -->
   <ToggleGroup

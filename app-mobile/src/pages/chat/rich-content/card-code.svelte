@@ -77,8 +77,7 @@
 
 {#snippet actionsSnippet()}
   <!-- @ds slot: actions — Copy source + full-screen Open handoff. -->
-  <!-- @ds guardrail: do-not-edit — the exact-copy clipboard boundary; Open is a
-       pass-through with no fetch/endpoint/ticket/download/host-file read. -->
+  <!-- @ds guardrail: do-not-edit — The exact-copy clipboard boundary; Open is a pass-through with no fetch/endpoint/ticket/download/host-file read. -->
   {#if feedback.canCopy}
     <button
       class="rich-block-action"
@@ -113,14 +112,13 @@
   <div class="rich-code-preview" data-code-pan="true">
     <!-- @ds state: code — plaintext-first; data-highlight-status (plain · pending ·
          highlighted) advances with the worker.
-         @ds guardrail: do-not-edit — the status attribute and token rendering are
-         behaviour owned by the highlight lifecycle. -->
+         @ds guardrail: do-not-edit — The status attribute and token rendering are behavior owned by the highlight lifecycle. -->
     <pre aria-label={`${block.languageLabel} code preview`}><code data-highlight-status={highlighted.current.status}>{#if previewTokens === null}{preview}{:else}{#each previewTokens as token, index (index)}<span class={`rich-code-token is-${token.kind}`}>{token.text}</span>{/each}{/if}</code></pre>
   </div>
   {#if lines.length > PREVIEW_LINES}
     <p class="rich-continuation">{lines.length - PREVIEW_LINES} more lines</p>
   {/if}
-  <!-- @ds guardrail: do-not-edit — polite live region announcing Copy outcomes. -->
+  <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
   <p class="rich-copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
 

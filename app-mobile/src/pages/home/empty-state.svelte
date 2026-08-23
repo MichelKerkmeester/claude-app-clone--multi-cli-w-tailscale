@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: EMPTY STATE
+  // ───────────────────────────────────────────────────────────────────
+
   export interface EmptyStateProps {
     readonly loading: boolean;
     readonly error: string | null;

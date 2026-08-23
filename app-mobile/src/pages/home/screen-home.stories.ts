@@ -1,13 +1,14 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: HOME SCREEN STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 import type { SessionListState, ConnectionPhase } from '$shared/state/state.js';
 import { demoPostJson, DEMO_IDENTITY } from '$shared/fixtures/demo.js';
 import Home from './screen-home.svelte';
 
-// Re-host the demo session roster through the relay's real /api/sessions shape
-// so every Home story's SessionListState.items is sourced from demo.ts — nothing
-// is invented. The four states vary phase / source / error exactly as the
-// sessionListReducer produces them; isStale derives from source === 'cache'.
+// Reuse the demo roster shape so each Home story exercises a real session-list state.
 const DEMO_SESSIONS = demoPostJson('/api/sessions', {}) as {
   sessions: readonly SessionCardDto[];
 };

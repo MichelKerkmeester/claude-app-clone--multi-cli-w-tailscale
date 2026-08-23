@@ -32,7 +32,7 @@
   let error = $state<string | null>(null);
   let opening = $state<string | null>(null);
 
-  // @ds guardrail: inbox fetch + open handlers — not designer-editable.
+  // @ds guardrail: inbox fetch + open handlers — Not designer-editable.
   onMount(() => {
     const controller = new AbortController();
     void fetchAttention(controller.signal)
@@ -64,7 +64,7 @@
 </script>
 
 <!-- @ds surface: inbox-view — attention signals. States: empty · error. -->
-<!-- @ds guardrail: inbox fetch + open handlers — not designer-editable. -->
+<!-- @ds guardrail: inbox fetch + open handlers — Not designer-editable. -->
 <main class="inbox-view">
   <div class="session-toolbar">
     <!-- @ds surface: back-button — quiet back arrow. react-aria Button wiring guarded. -->

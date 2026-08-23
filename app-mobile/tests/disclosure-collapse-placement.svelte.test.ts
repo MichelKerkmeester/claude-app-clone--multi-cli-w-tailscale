@@ -1,4 +1,4 @@
-// Port of app-mobile/tests/disclosure-persistence.test.tsx (React behavior oracle)
+// Port of the React behaviour oracle for this case.
 // to @testing-library/svelte. The React *.test.tsx oracle is NEVER modified. Only
 // the import lines, the two mocked modules, and the render call shape are adapted;
 // every assertion mirrors the React oracle.

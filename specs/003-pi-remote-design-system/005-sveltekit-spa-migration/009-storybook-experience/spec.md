@@ -10,13 +10,13 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience"
-    last_updated_at: "2026-08-22T00:00:00Z"
+    last_updated_at: "2026-08-23T03:00:00Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Spec authored (spec-only first, per user); execution deferred until after 007 cutover + WS-C reorg"
-    next_safe_action: "On 007 green + WS-C reorg complete: install the addon set, repoint preview to app.css, add the coverage gate + scaffold, then autodocs + docs"
+    recent_action: "Blocker RESOLVED (007 cutover done: preview.ts already imports app.css, all 49 stories already co-located in pages/+shared, 0 in lib/, so R6 is done). Shipped the self-maintaining machinery + dummy-proof launch (commit f6d74b5): story-coverage gate + reasoned 19-entry allowlist (R3), story:new CSF3 scaffold (R4), root `npm run storybook` auto-open + story:coverage/story:new scripts (R1), STORYBOOK.md quickstart+usage guide (R1/R5). Baseline build-storybook exit 0. Coverage gate correctly reports 27 genuine gaps."
+    next_safe_action: "Remaining 009: (R2) install addons @storybook/addon-themes + addon-designs (light) then addon-vitest (heavy — Vitest browser provider), register in main.ts, swap the hand-rolled theme decorator for addon-themes; re-verify board (build/token-identity/test:web) per R7. (R4) add the sk-code-mobile-cli AI-upkeep rule 'every component change creates/updates its story' — cross-repo Public worktree (see [[public-cross-repo-skill-landing-flow]]). (R3 fill) author the 27 missing stories with real demo fixtures + provider decorators — EXECUTOR-territory (app-mobile/src/**) per the ownership split; executor currently blocked. Then 009 completion docs + validate.sh --strict."
     blockers:
-      - "Blocked on 007 (cutover + C5 React delete) and WS-C page-centric reorg — preview.ts imports the soon-deleted style.css and all stories live in lib/ which WS-C moves to pages/"
-    completion_pct: 0
+      - "Story-coverage gate is red until the 27 missing stories are authored; those are executor-territory (real fixtures + provider decorators, app-mobile/src/**) and the cli-devin/executor is blocked in this environment. Machinery + scaffold + (pending) sk-code AI-upkeep rule are what make that fill efficient."
+    completion_pct: 45
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

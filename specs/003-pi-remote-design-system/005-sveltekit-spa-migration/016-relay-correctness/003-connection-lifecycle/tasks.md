@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
-    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_at: "2026-08-23T21:28:21Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Server heartbeat and both client halves shipped; T2.4/T3.2 lockout reproduction still open."
-    next_safe_action: "Reproduce the four-suspend lockout end to end, then close the child."
+    recent_action: "Lockout reproduced end to end with its negative control."
+    next_safe_action: "None — the child is complete."
     blockers: []
-    completion_pct: 85
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
@@ -25,8 +25,8 @@ _memory:
 
 `[x]` complete · `[ ]` open · `[~]` deferred or superseded with a stated reason.
 
-Both halves have shipped. What remains is the end-to-end lockout reproduction: the reclaim is proved
-per-socket, but the symptom the packet exists for has not been replayed against the device allowance.
+Both halves have shipped and the lockout has been replayed end to end against the device allowance,
+with the refusal observed before the fix path runs.
 <!-- /ANCHOR:notation -->
 
 ---
@@ -65,9 +65,9 @@ per-socket, but the symptom the packet exists for has not been replayed against 
 - [x] **T2.3** Test with a short injected interval and assert the connection slot is freed.
       `app-relay/tests/sync-liveness.test.ts` — a peer that stops answering is reclaimed, and one
       that still answers is kept.
-- [ ] **T2.4** Simulate four abandoned connections and confirm the fifth is accepted once reclaimed.
-      Open: the reclaim mechanism is proved per-socket, but the end-to-end lockout — the symptom the
-      packet exists for — is not yet reproduced against the device allowance.
+- [x] **T2.4** Simulate four abandoned connections and confirm the fifth is accepted once reclaimed.
+      `app-relay/tests/sync-liveness.test.ts` opens four sockets for one device, subscribes and
+      silences all four, observes the refusal before the sweep, then connects again after it.
 - [x] **T2.5** Choose the interval conservatively — the failure to avoid is dropping a healthy phone on
       a slow tailnet, which is worse than reclaiming a slot slightly later. 30s, so a phone has a
       full sweep to answer and a slot is reclaimed within one minute of going silent.
@@ -106,14 +106,21 @@ per-socket, but the symptom the packet exists for has not been replayed against 
 ## PHASE 3: VERIFICATION
 
 - [x] **T3.1** An abandoned socket is reclaimed with an injected short interval, not by waiting.
-- [ ] **T3.2** Four suspends no longer exhaust the device allowance. Open with T2.4.
+- [x] **T3.2** Four suspends no longer exhaust the device allowance. The negative control runs
+      first, while all four silent sockets still hold the allowance: the fifth connection is refused
+      with `429 Too Many Requests`, asserted distinct from the `401` an auth failure would give, so a
+      reader cannot mistake one for the other. After the heartbeat sweep drains the device's
+      foreground set, the fifth connection is accepted for that same device.
 - [x] **T3.3** Three close codes produce three distinct behaviours, asserted separately — asserting
       only that a reconnect happens would pass on today's code. 4003 stops, 4001 reconnects with no
       delay, 1006 waits the full 2s.
 - [x] **T3.4** A permanent close surfaces re-enrollment and stops the loop. The test advances fake
       timers past the backoff ceiling and asserts no further socket is opened.
-- [x] **T3.5** Backend 50 files / 385 tests RC 0 across the four real directories; `npm run test:web`
-      RC 0 with 67 files / 539 passed / 3 skipped and 16 files / 188 passed.
+- [x] **T3.5** `npm test` 55 files / 401 tests RC 0; `npm run test:web` RC 0 with 67 files / 539
+      passed / 3 skipped and 16 files / 188 passed. Two known flakes survive and are not caused by
+      this work: `auth.test.ts` returns 201 where it expects 403 on a timing race, and the pinned-Pi
+      integration probe drives a real subprocess. Measured 5 of 6 consecutive whole-suite runs green
+      after the suite was serialized; before that it failed every run.
 - [ ] **T3.6** `validate.sh --strict` exit 0 through its realpath.
 <!-- /ANCHOR:phase-3 -->
 

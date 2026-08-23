@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"
-    last_updated_at: "2026-08-23T20:18:35Z"
+    last_updated_at: "2026-08-23T21:21:55Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Epoch rotation, consumer resolution and ended-epoch collection shipped."
     next_safe_action: "Rehearse collection against a copy of a real database (T2.11)."

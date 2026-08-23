@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"
-    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_at: "2026-08-23T21:21:55Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Task ledger authored; all tasks open."
     next_safe_action: "Write T2.1 and watch it fail."
@@ -73,9 +73,14 @@ here is silent by construction, so an unobserved check proves nothing.
 
 **Collect and bound**
 - [x] **T2.10** Add cross-epoch collection for ended epochs behind an explicit retained count. [evidence: `collectEndedEpochEnvelopes` with `MAX_RETAINED_ENDED_EPOCHS = 10`, the operator's chosen retention; a named constant, not a runtime option]
-- [ ] **T2.11** Verify collection against a copy of a real database before running it against one, and
-      keep the before-and-after row counts. Open: the counts recorded so far come from a
-      test-constructed store, which proves the query but not its behaviour on real accumulated data.
+- [x] **T2.11** Verify collection against a copy of a real database before running it against one, and
+      keep the before-and-after row counts. [evidence: rehearsed on a `VACUUM INTO` copy of
+      `app-relay/pi-remote.db` — 1 epoch, 12 envelopes before and after, 0 epochs selected for
+      collection, no error against the shipped schema. A plain `cp` is not a valid copy here: the
+      database is in WAL mode and the first attempt reported 0 rows because the sidecar was left
+      behind. The retention path itself could not be exercised on real data — no deployed database has
+      ever held an ended epoch, because rotation only just shipped — so the deletion branch remains
+      proved by the test-constructed store alone]
 - [x] **T2.12** Bound the four unbounded attachment-service maps, matching the bound the prompt service
       already applies to its equivalent. [evidence: three ceilings with live-record-skipping eviction, proven by a bound test and its negative control]
 <!-- /ANCHOR:phase-2 -->

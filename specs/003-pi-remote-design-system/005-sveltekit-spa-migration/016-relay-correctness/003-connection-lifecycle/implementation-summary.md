@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
-    last_updated_at: "2026-08-23T18:54:06Z"
+    last_updated_at: "2026-08-23T21:28:21Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Server heartbeat shipped with an injectable interval and an observed control."
-    next_safe_action: "Answer the close-code harness question, then ship the client half."
-    blockers: ["client half awaits the operator's harness decision"]
-    completion_pct: 60
+    recent_action: "Client close classification, proactive refresh and the lockout reproduction all shipped."
+    next_safe_action: "None — the child is complete."
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `016-relay-correctness` |
 | Level | 2 |
-| Status | **Server half shipped; client half held for an operator decision** |
-| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+| Status | **Complete** — both halves shipped and the lockout reproduced end to end |
+| Requirements shipped | REQ-001 … REQ-007 |
 <!-- /ANCHOR:metadata -->
 
 ---

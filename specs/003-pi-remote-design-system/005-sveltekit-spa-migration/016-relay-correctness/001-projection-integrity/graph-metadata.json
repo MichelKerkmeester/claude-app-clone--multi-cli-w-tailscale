@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Make the deliberately-raised-but-unheard error audible, allocate projection sequences from the store that owns them, and rotate the stream epoch on host restart together with the garbage collection that rotation obliges.",
     "created_at": "2026-08-23T10:35:57.408Z",
-    "last_save_at": "2026-08-23T20:21:01.117Z",
+    "last_save_at": "2026-08-23T21:21:56.036Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:2a187e99b8c0f6045619f0c3d90e0ef89656ff1dc818fc28a989c1552bb24533",
+    "source_fingerprint": "sha256:6d5143168dafbd9f287f744d0b63121e66bb4060ba045940e33c508a8984eb44",
     "source_doc_hashes": {
-      "spec.md": "9038f979d2b5b866ff08440e75cc1ba626c6c79eb9fc89580110c48973ac0328",
-      "plan.md": "10ed71436e3e3979846f601066066bc66b17bbb91accbb031ddf124a7e352aac",
-      "tasks.md": "c06234efceae2395ba0cc133e245f6759a26ee5b52ac101b585d9013cd7f9ba6",
-      "checklist.md": "9ed351f3f09bb4a5c79b227d196f84e1b393d8b94b353ddc9a9fd5c874de1626",
-      "implementation-summary.md": "a7a785df1b30d4e456975e6a1160f4e01836164dc26ab34fe1d500f85fe0e0df"
+      "spec.md": "680ef827516ab42717141b91e4a37f1d4ac6ddf483127b7752f5c67b57270f92",
+      "plan.md": "28ba3358a89cad2d7cf55f4ad651f94c4500f4c53f6477b8f79ae82ace3a0864",
+      "tasks.md": "55ac5d817216c5c5300cf9ecfe873f502c9c01c0f255e048c6eb54a8e4e2ae32",
+      "checklist.md": "001262e531368be7c9e888828690e9e9aebef54dbc613a021c07420600f9b002",
+      "implementation-summary.md": "7a79f69df7b83600af085a6651bf7a971abb164cb5420c408e084034ee4a36e5"
     },
     "last_active_child_id": null,
     "last_active_at": null

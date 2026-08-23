@@ -286,6 +286,7 @@ export function useSyncSocket(deps: {
           noteRelayHeartbeat();
           openedSocket.addEventListener('close', (event) => {
             if (stopped) return;
+            // 4003 means the relay revoked authorization; retrying cannot restore it, so stop and surface re-enrollment.
             if (event.code === 4003) {
               stopForRevocation();
               return;
@@ -293,6 +294,7 @@ export function useSyncSocket(deps: {
             if (openedSocket !== socket) return;
             socket = null;
             clearSessionRefreshTimer();
+            // 4001 means the relay's session timer expired; reconnect now because backoff only delays the inevitable refresh.
             if (event.code === 4001) {
               connect('expired');
               return;

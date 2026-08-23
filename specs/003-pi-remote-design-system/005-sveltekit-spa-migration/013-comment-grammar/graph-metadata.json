@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
   "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
@@ -11,29 +11,30 @@
   },
   "derived": {
     "trigger_phrases": [
-      "ux affordance change",
-      "glass scroll to latest button",
-      "post migration visual change"
+      "inline comment quality why not what",
+      "section banner coverage svelte",
+      "comment grammar sk-code-opencode"
     ],
     "key_topics": [
-      "affordance",
-      "change",
-      "glass",
-      "scroll",
-      "latest",
-      "button",
-      "post",
-      "migration",
-      "visual",
-      "home",
-      "deliberate",
-      "operator-requested"
+      "inline",
+      "comment",
+      "quality",
+      "section",
+      "banner",
+      "coverage",
+      "svelte",
+      "grammar",
+      "sk-code-opencode",
+      "bring",
+      "every",
+      "source"
     ],
-    "importance_tier": "normal",
+    "importance_tier": "important",
     "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
+      "checklist.md",
       "tasks.md",
       "implementation-summary.md"
     ],
@@ -48,6 +49,12 @@
         "name": "plan.md",
         "kind": "doc",
         "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
         "source": "derived"
       },
       {
@@ -69,19 +76,13 @@
         "source": "derived"
       },
       {
-        "name": "In Progress",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "the",
+        "name": "four",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "zero",
+        "name": "a",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
@@ -99,101 +100,109 @@
         "source": "derived"
       },
       {
-        "name": "Done Confirm",
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Barrier Scans",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Done Append",
-        "kind": "proper_noun",
+        "name": "worked",
+        "kind": "key_phrase",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Done Run",
-        "kind": "proper_noun",
+        "name": "its",
+        "kind": "key_phrase",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Deferred Whether",
-        "kind": "proper_noun",
+        "name": "1. SUMMARY",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "The Svelte",
-        "kind": "proper_noun",
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Task Notation",
-        "kind": "proper_noun",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "Completion Criteria All",
-        "kind": "proper_noun",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "a",
+        "name": "evidence",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Phase 1: Setup",
+        "name": "TASK NOTATION",
         "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "What Was Built",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "How It Was Delivered",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Key Decisions",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "name": "PHASE 3: VERIFICATION",
+        "kind": "heading",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Known Limitations",
+        "name": "Verification Checklist",
         "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
-    "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-23T10:04:03.187Z",
+    "causal_summary": "Bring every source file up to the sk-code-opencode commenting standard: section banners on the 51 files that lack them, and a rewrite of in-section comments from WHAT-narration to durable WHY. No behaviour, token or a11y change.",
+    "created_at": "2026-08-23T09:57:25.106Z",
+    "last_save_at": "2026-08-23T10:02:33.132Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
+      "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:6dc08e9f35dd6f074dda3b4f04aa0b99a6113691f0b88d2fe78f4500e09b0f4f",
+    "source_fingerprint": "sha256:81525dbd00b7ff32c62989d71cb1fd363ab89dc9b6690b2e90552cf301f9bb64",
     "source_doc_hashes": {
-      "spec.md": "7bbb4ba69434210ece7b1e88fd9309d080316f7b57c73bb82c150248e0f1a515",
-      "plan.md": "574a68baf7b1dd8368a4fe5ff950db368c76e753d9552c14d1cdb4214cae88c4",
-      "tasks.md": "b6143e7bde79de080e763775e871d232ecc41e70761a60de12d4fb0f6e90ecfd",
-      "implementation-summary.md": "377d17c41dea767ca56d29ae7717a5deb9288aeac143f233e011eb79b77da68e"
+      "spec.md": "a47acabeeef68a0e6ecb08fb168b8cbc5755991d298c4bb1b460f6ecb27969e7",
+      "plan.md": "b9b2aaf1717c68aef39f7e5856059b77bfcba8209fb0dc7ea5d98ae06ce7795d",
+      "tasks.md": "850f6009981869849aeb28134d060df0d3a3db38639a393ba5afad8950feea41",
+      "checklist.md": "ba367ee06c2f44e3850ce07987b1498b4909f4f26f468369decd2e97e745d1be",
+      "implementation-summary.md": "e69a57ab63dc0772f39013e36a1072ca8f4329d8b11289904b9f790dada73460"
     },
     "last_active_child_id": null,
     "last_active_at": null

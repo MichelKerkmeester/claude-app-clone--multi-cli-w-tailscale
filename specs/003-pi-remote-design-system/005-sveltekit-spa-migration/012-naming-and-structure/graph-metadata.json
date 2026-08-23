@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
   "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
@@ -11,37 +11,39 @@
   },
   "derived": {
     "trigger_phrases": [
-      "ux affordance change",
-      "glass scroll to latest button",
-      "post migration visual change"
+      "kebab case file naming svelte",
+      "shared folder structure taxonomy",
+      "rename components kind prefix"
     ],
     "key_topics": [
-      "affordance",
-      "change",
-      "glass",
-      "scroll",
-      "latest",
-      "button",
-      "post",
-      "migration",
-      "visual",
-      "home",
-      "deliberate",
-      "operator-requested"
+      "kebab",
+      "case",
+      "file",
+      "naming",
+      "svelte",
+      "shared",
+      "folder",
+      "structure",
+      "taxonomy",
+      "rename",
+      "components",
+      "kind"
     ],
-    "importance_tier": "normal",
+    "importance_tier": "important",
     "status": "in_progress",
     "key_files": [
-      "spec.md",
+      "decision-record.md",
       "plan.md",
       "tasks.md",
+      "checklist.md",
+      "spec.md",
       "implementation-summary.md"
     ],
     "entities": [
       {
-        "name": "spec.md",
+        "name": "decision-record.md",
         "kind": "doc",
-        "path": "spec.md",
+        "path": "decision-record.md",
         "source": "derived"
       },
       {
@@ -57,6 +59,18 @@
         "source": "derived"
       },
       {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
         "name": "implementation-summary.md",
         "kind": "doc",
         "path": "implementation-summary.md",
@@ -69,20 +83,20 @@
         "source": "derived"
       },
       {
-        "name": "In Progress",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
         "name": "the",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "zero",
+        "name": "evidence",
         "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "EXECUTIVE SUMMARY",
+        "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
@@ -99,43 +113,43 @@
         "source": "derived"
       },
       {
-        "name": "Done Confirm",
+        "name": "Barrier Nine",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Done Append",
+        "name": "Task Checklist Before",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Done Run",
+        "name": "Execution Rules",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Deferred Whether",
+        "name": "Status Reporting Format Each",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "The Svelte",
+        "name": "Blocked Task Protocol Stop",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Task Notation",
-        "kind": "proper_noun",
-        "path": "tasks.md",
+        "name": "proposed",
+        "kind": "key_phrase",
+        "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Completion Criteria All",
+        "name": "Update Storybook",
         "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
@@ -147,53 +161,51 @@
         "source": "derived"
       },
       {
-        "name": "Phase 1: Setup",
+        "name": "T2.23",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
         "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "What Was Built",
+        "name": "Verification Checklist",
         "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "path": "checklist.md",
         "source": "derived"
       },
       {
-        "name": "How It Was Delivered",
+        "name": "Verification Protocol This",
         "kind": "proper_noun",
-        "path": "implementation-summary.md",
-        "source": "derived"
-      },
-      {
-        "name": "Key Decisions",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
-        "source": "derived"
-      },
-      {
-        "name": "Known Limitations",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "path": "checklist.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
-    "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-23T10:04:03.187Z",
+    "causal_summary": "One naming grammar for the whole app — kebab-case files and folders, kind-first component names — and a shared/ tree deep enough to say what each file is for, replacing the 28-file shared/data grab-bag. Pure rename and move: no rendered value, behaviour, route or a11y contract changes.",
+    "created_at": "2026-08-23T09:57:24.802Z",
+    "last_save_at": "2026-08-23T10:02:31.063Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
+      "checklist.md",
+      "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:6dc08e9f35dd6f074dda3b4f04aa0b99a6113691f0b88d2fe78f4500e09b0f4f",
+    "source_fingerprint": "sha256:6a8fbd394d458766770c0aaa0b67ba979cc263bc6d7883275f0e244fe5159ce2",
     "source_doc_hashes": {
-      "spec.md": "7bbb4ba69434210ece7b1e88fd9309d080316f7b57c73bb82c150248e0f1a515",
-      "plan.md": "574a68baf7b1dd8368a4fe5ff950db368c76e753d9552c14d1cdb4214cae88c4",
-      "tasks.md": "b6143e7bde79de080e763775e871d232ecc41e70761a60de12d4fb0f6e90ecfd",
-      "implementation-summary.md": "377d17c41dea767ca56d29ae7717a5deb9288aeac143f233e011eb79b77da68e"
+      "spec.md": "6825ed27ad1c7e7ae81815f5058f1ee5f20ce3d80e4f821bafaf9b0859b3fd3a",
+      "plan.md": "3afdbe3e899146ccb2bf60944ec66184887cae77a37b66d7875a0f169e89eb3b",
+      "tasks.md": "d350135ce4e29c6570def12aff6b3fa23db889218e9f016bc1da8420f7538639",
+      "checklist.md": "d1d50be087e609877fc5f8058c23859f2a72101610c5aac2d0c02a412d18d8b0",
+      "decision-record.md": "1d6c34ccb2de063d849410ac84980ba71f5d00b30250a4d1f84e9065add4a48a",
+      "implementation-summary.md": "07e214f7bd3f3887650da2ccabd89a31597b4f3f827ca665e07fa5c34ab79fbc"
     },
     "last_active_child_id": null,
     "last_active_at": null

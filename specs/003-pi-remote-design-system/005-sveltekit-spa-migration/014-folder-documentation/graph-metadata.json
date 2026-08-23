@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
   "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
@@ -11,29 +11,30 @@
   },
   "derived": {
     "trigger_phrases": [
-      "ux affordance change",
-      "glass scroll to latest button",
-      "post migration visual change"
+      "folder readme sk-doc template",
+      "code folder documentation svelte",
+      "feature readme structure logic"
     ],
     "key_topics": [
-      "affordance",
-      "change",
-      "glass",
-      "scroll",
-      "latest",
-      "button",
-      "post",
-      "migration",
-      "visual",
-      "home",
-      "deliberate",
-      "operator-requested"
+      "folder",
+      "readme",
+      "sk-doc",
+      "template",
+      "code",
+      "documentation",
+      "svelte",
+      "feature",
+      "structure",
+      "logic",
+      "rewrite",
+      "barebones"
     ],
-    "importance_tier": "normal",
+    "importance_tier": "important",
     "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
+      "checklist.md",
       "tasks.md",
       "implementation-summary.md"
     ],
@@ -48,6 +49,12 @@
         "name": "plan.md",
         "kind": "doc",
         "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
         "source": "derived"
       },
       {
@@ -69,8 +76,20 @@
         "source": "derived"
       },
       {
-        "name": "In Progress",
-        "kind": "proper_noun",
+        "name": "it",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "source",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "filler",
+        "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
@@ -81,63 +100,45 @@
         "source": "derived"
       },
       {
-        "name": "zero",
+        "name": "all",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "1. METADATA",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "2. PROBLEM & PURPOSE",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Done Confirm",
+        "name": "Key Statistics",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Done Append",
+        "name": "Quick Start",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Done Run",
+        "name": "Usage Examples",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Deferred Whether",
+        "name": "Related Resources",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "The Svelte",
+        "name": "Package Topology",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Task Notation",
+        "name": "Directory Tree",
         "kind": "proper_noun",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "Completion Criteria All",
-        "kind": "proper_noun",
-        "path": "tasks.md",
+        "path": "plan.md",
         "source": "derived"
       },
       {
@@ -147,53 +148,61 @@
         "source": "derived"
       },
       {
-        "name": "Phase 1: Setup",
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
         "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "What Was Built",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "How It Was Delivered",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Key Decisions",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "name": "PHASE 3: VERIFICATION",
+        "kind": "heading",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Known Limitations",
+        "name": "Verification Checklist",
         "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "path": "checklist.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
-    "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-23T10:04:03.187Z",
+    "causal_summary": "Rewrite the 16 barebones folder READMEs and 7 CODE files onto sk-doc's feature and code-folder templates, and add the ones that are missing, so each folder explains what the feature does and how its logic is arranged.",
+    "created_at": "2026-08-23T09:57:25.479Z",
+    "last_save_at": "2026-08-23T10:02:35.124Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
+      "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:6dc08e9f35dd6f074dda3b4f04aa0b99a6113691f0b88d2fe78f4500e09b0f4f",
+    "source_fingerprint": "sha256:0a9aa7633325d58060454d6f2f8bec9d918a1e80aa55605be761814225440459",
     "source_doc_hashes": {
-      "spec.md": "7bbb4ba69434210ece7b1e88fd9309d080316f7b57c73bb82c150248e0f1a515",
-      "plan.md": "574a68baf7b1dd8368a4fe5ff950db368c76e753d9552c14d1cdb4214cae88c4",
-      "tasks.md": "b6143e7bde79de080e763775e871d232ecc41e70761a60de12d4fb0f6e90ecfd",
-      "implementation-summary.md": "377d17c41dea767ca56d29ae7717a5deb9288aeac143f233e011eb79b77da68e"
+      "spec.md": "502695ffd52d328b8cd6d9ea4c8dffcb80013b0ba400c479c0b78d19deb75634",
+      "plan.md": "cd3114504e4bce0fba8e2aa77f3e0cb4e431c1bc03511aba0b35cd00b0a4f62d",
+      "tasks.md": "5e15a4cd1993c538cb74dc00d64aded15dbad577aa3d8ba323da11d38e7c0955",
+      "checklist.md": "2a3e73bd936cfbc1b69d420835faf4540a24dc1a0a6db2490305c0cb7b32587c",
+      "implementation-summary.md": "50159301d0d710ed980365940370d464a476944cf3f504d21b3e9b15f5a864bd"
     },
     "last_active_child_id": null,
     "last_active_at": null

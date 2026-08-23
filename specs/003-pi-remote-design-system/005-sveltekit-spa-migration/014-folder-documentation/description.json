@@ -1,0 +1,29 @@
+{
+  "level": "2",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation",
+  "description": "Rewrite the 16 barebones folder READMEs and 7 CODE files onto sk-doc's feature and code-folder templates, and add the ones that are missing, so each",
+  "keywords": [
+    "rewrite",
+    "barebones",
+    "folder",
+    "readmes",
+    "code",
+    "files",
+    "onto",
+    "sk-doc",
+    "feature",
+    "code-folder",
+    "templates",
+    "ones",
+    "missing"
+  ],
+  "lastUpdated": "2026-08-23T10:01:39.355Z",
+  "specId": "014",
+  "folderSlug": "folder-documentation",
+  "parentChain": [
+    "003-pi-remote-design-system",
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

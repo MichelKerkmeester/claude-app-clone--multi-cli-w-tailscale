@@ -1,0 +1,33 @@
+{
+  "level": "3",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
+  "description": "One naming grammar for the whole app — kebab-case files and folders, kind-first component names — and a shared/ tree deep enough to say what each file",
+  "keywords": [
+    "one",
+    "naming",
+    "grammar",
+    "whole",
+    "app",
+    "kebab-case",
+    "files",
+    "folders",
+    "kind-first",
+    "component",
+    "names",
+    "shared",
+    "tree",
+    "deep",
+    "enough",
+    "say",
+    "file"
+  ],
+  "lastUpdated": "2026-08-23T10:02:21.616Z",
+  "specId": "012",
+  "folderSlug": "naming-and-structure",
+  "parentChain": [
+    "003-pi-remote-design-system",
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

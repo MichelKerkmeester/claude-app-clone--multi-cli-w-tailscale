@@ -21,7 +21,10 @@
     "003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
     "003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience",
     "003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research",
-    "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances"
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation"
   ],
   "manual": {
     "depends_on": [],
@@ -106,7 +109,7 @@
     ],
     "causal_summary": "The Pi Remote mobile web app is hard to author as a designer",
     "created_at": "2026-08-19T17:23:39.714Z",
-    "last_save_at": "2026-08-23T07:17:08.481Z",
+    "last_save_at": "2026-08-23T10:02:46.236Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [

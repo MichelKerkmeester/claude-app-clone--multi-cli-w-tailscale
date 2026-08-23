@@ -12,9 +12,9 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped as the decision and proving-ground child."
-    next_safe_action: "Operator confirms the taxonomy and prefix list."
-    blockers: ["taxonomy and kind-prefix list await operator sign-off"]
+    recent_action: "Operator confirmed the taxonomy and the prefix list."
+    next_safe_action: "Build the rename manifest."
+    blockers: []
     completion_pct: 0
 ---
 
@@ -32,8 +32,9 @@ This child owns every decision the naming pass rests on, and then proves the mec
 files before the other two children put a hundred and twenty-five more in flight.
 
 The decisions are four: kebab-case for every file and folder, the kind first in a component's name,
-`shared/` split by reason to change, and `routes/**` left alone. Two of them need the operator's
-confirmation, because a tree is a design decision rather than a derivation.
+`shared/` split by reason to change, and `routes/**` left alone. Two of them needed the operator's
+confirmation, because a tree is a design decision rather than a derivation, and both are now settled
+— `transport/` and `state/` stay separate, and screens take a `screen-` prefix.
 
 The mechanics are one artefact: a rename manifest as data, with the specifier rewrite generated from
 it. Generated, not hand-written — a hand-edited rewrite is free to disagree with the moves, and that
@@ -86,7 +87,8 @@ mechanical failure mode is present and the diff is still readable.
 ## 3. SCOPE
 
 **In scope:**
-- Operator confirmation of the `shared/` taxonomy and the closed kind-prefix list.
+- The confirmed `shared/` taxonomy and the closed kind-prefix list, recorded rather than left in
+  conversation.
 - The rename manifest: one row per file, old path and new path, covering all 148 in-scope source files
   plus their stories and tests. The other two children consume it; they do not extend it by hand.
 - The specifier-rewrite script, generated from the manifest, dry-run and read before anything moves.
@@ -104,7 +106,8 @@ any module's contents; `routes/**`.
 ## 4. REQUIREMENTS
 
 - **REQ-001** — The taxonomy and the kind-prefix list are confirmed by the operator before any file
-  moves. Moving first and deciding later produces a fourth grammar.
+  moves, and written into `decision-record.md`. Moving first and deciding later produces a fourth
+  grammar; deciding in conversation and not recording it produces a relitigation.
 - **REQ-002** — The rename manifest exists as data and covers every in-scope file. A manifest that
   covers most of the tree is how a rename becomes partial.
 - **REQ-003** — The specifier rewrite is generated from the manifest. Hand-editing a specifier is a
@@ -230,12 +233,14 @@ both are load-bearing for everything after.
 <!-- ANCHOR:questions -->
 ## 12. OPEN QUESTIONS
 
-1. **Is `state/` plus `transport/` right, or is it one `session/` folder?** They change together more
-   often than not. Recommendation: keep them separate — `transport/` changes when the wire contract
-   changes and `state/` when a reducer does, and those are genuinely different triggers.
-2. **Do screen components stay bare or take a `screen-` prefix?** Recommendation: bare. There are five
-   of them, they already sit at the top of their folders, and a prefix on a set that small buys
-   grouping nobody needs.
+None remain. Both were answered by the operator and are recorded in `decision-record.md`.
+
+1. **`state/` plus `transport/`, or one `session/` folder?** Answered: keep them separate.
+   `transport/` changes when the wire contract changes and `state/` when a reducer does, and those
+   are genuinely different triggers.
+2. **Do screens stay bare or take a `screen-` prefix?** Answered: they take `screen-`. The argument
+   that won is search — a contributor looking for a screen types the same prefix they would type for
+   any other kind, instead of having to already know the five names.
 <!-- /ANCHOR:questions -->
 
 ---

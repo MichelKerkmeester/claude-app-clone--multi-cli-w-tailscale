@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Redistribute the 28-file shared/data grab-bag into seven folders grouped by reason to change, and rewrite the specifiers that reach it from nearly every page component.",
     "created_at": "2026-08-23T10:58:30.818Z",
-    "last_save_at": "2026-08-23T10:58:30.818Z",
+    "last_save_at": "2026-08-23T12:13:09.803Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:85d9977f8d05ef42a0b67dc699f20bb7137e33834d149e08c7bd461f168417ea",
+    "source_fingerprint": "sha256:9483e0dfef21326896913eeb8d7f9f82a16b6ad4a852cdd3f56e403a423262ff",
     "source_doc_hashes": {
       "spec.md": "423cb6f48fff4a5129e63391db5c5fd50f83ade36c55e35ef706025c3bd1e731",
       "plan.md": "d02a67a752e7670ad25c4206e0535cc18542112669b4be0b76bf237d07b70cbb",
       "tasks.md": "a839d4887db8cb206b997f4ccc71ab368a66ee4fd00f5ed570d835b81b906a2a",
       "checklist.md": "8b442998909af512e63e252142b1dd57e3fa28edb14c5b79ffc611dea2cf7fc3",
-      "implementation-summary.md": "5da4785264e2cae06e173ec726c75867b81d382a79d048d0a14578b44302579a"
+      "implementation-summary.md": "3ce45a64e5c1627516fbe2b71a13b43426f3393e5d8c5b7eeca400b61335aeb1"
     },
     "last_active_child_id": null,
     "last_active_at": null

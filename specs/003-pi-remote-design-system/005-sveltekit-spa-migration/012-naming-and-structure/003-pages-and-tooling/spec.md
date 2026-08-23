@@ -68,8 +68,9 @@ This child also closes the packet, so it carries the nine-gate barrier and the c
 - Kind-first renames per feature folder: `chat/artifacts` (24 files), `chat/transcript` (10),
   `chat/rich-content` (12), `chat/chrome` (17), `chat/attachments` (9),
   `chat/features/ask-question` (12), then the screen components.
-- Screen components stay bare — `chat.svelte`, `home.svelte`, `review.svelte`,
-  `attention-inbox.svelte`, `enrollment.svelte` — because their name already is the thing.
+- Screens take the `screen-` prefix — `screen-chat.svelte`, `screen-home.svelte`,
+  `screen-review.svelte`, `screen-attention-inbox.svelte`, `screen-enrollment.svelte` — so a prefix
+  search reaches them the same way it reaches every other kind.
 - The three `$shared` alias definitions, if any sub-path is hard-coded.
 - Storybook globs, re-baselined story ids, and the 009 coverage-gate allowlist.
 - The CSS-corpus builder's glob, and both vitest web configs including any cwd-relative
@@ -89,8 +90,8 @@ any module's contents; `routes/**`; anything already moved by children 001 and 0
 
 - **REQ-001** — Every in-scope path under `app-mobile/src/`, `routes/**` excluded, is kebab-case. The
   completeness scan returns zero.
-- **REQ-002** — Components that are an instance of a UI kind carry the kind first. Screen and feature
-  components carry no prefix.
+- **REQ-002** — Components that are an instance of a UI kind carry the kind first, screens included.
+  Feature components carry no prefix, because their name already is the thing.
 - **REQ-003** — The CSS-corpus glob resolves the renamed tree. A stale glob makes the token-identity
   gate pass on an empty corpus, which is a false green rather than a failure.
 - **REQ-004** — Story ids and the 009 coverage allowlist re-baseline in the same commit as the renames

@@ -7,9 +7,9 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped from the measured naming inventory; no files moved."
-    next_safe_action: "Operator confirms the taxonomy and prefix list."
-    blockers: ["taxonomy and kind-prefix list await operator sign-off"]
+    recent_action: "Taxonomy and prefix list confirmed; no files moved."
+    next_safe_action: "Build the rename manifest."
+    blockers: []
     completion_pct: 0
 ---
 
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `012-naming-and-structure` |
 | Level | 3 |
-| Status | **Scoped, not started** — blocked on operator sign-off |
-| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+| Status | **Scoped, not started** — grammar settled, manifest not yet built |
+| Requirements shipped | REQ-001 satisfied (decisions confirmed and recorded); REQ-002 … REQ-008 open |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -76,7 +76,13 @@ packet — case-only renames, folder creation, the kind-prefix grammar — and t
 enough to read line by line. Finding the case-rename trap on 148 files instead would be expensive.
 
 **The `shared/data/` taxonomy is decided here and executed in child 002.** The tree is one design
-decision, so the operator approves the whole shape once rather than twice.
+decision, so the operator approves the whole shape once rather than twice. Confirmed as proposed:
+`transport/` and `state/` stay separate.
+
+**Screens take a `screen-` prefix.** The first proposal left them bare, on the grounds that five
+files need no grouping. Overruled on search: a contributor looking for a screen should type the same
+prefix they would type for any other kind. The side effect is that every component in the tree now
+carries a kind, which removes the "is this a kind or a screen" judgement entirely.
 
 **The full conventions refresh is not in this packet.** It belongs to 019, after every convention has
 shipped. Child 003 lands only the minimal naming correction that covers the window.
@@ -89,7 +95,7 @@ shipped. Child 003 lands only the minimal naming correction that covers the wind
 
 | Check | Result |
 |---|---|
-| Operator sign-off on taxonomy and prefix list | not obtained |
+| Operator sign-off on taxonomy and prefix list | obtained; recorded as ADR-002 and ADR-003 |
 | Rename manifest exists | no |
 | Rewrite dry-run diff read | no |
 | `npm run build` | not run |

@@ -46,7 +46,7 @@ Nothing has moved. The measured surface this child acts on:
 | `app-mobile/src/pages/chat/features/ask-question/` | 12 |
 | `app-mobile/src/pages/chat/transcript/` | 10 |
 | `app-mobile/src/pages/chat/attachments/` | 9 |
-| Screen components, staying bare | 5 |
+| Screen components, taking the `screen-` prefix | 5 |
 
 Tooling still pointing at the pre-rename tree: the three `$shared` alias definitions, the Storybook
 globs, the 009 coverage allowlist, both vitest web configs, the cwd-relative `readFileSync` paths in
@@ -78,8 +78,10 @@ is transcription, and transcription is where a silent omission enters.
 list, the `routes/**` exemption with its reason. The full rewrite is 019's, after every convention has
 shipped. Two documents attempting the same rewrite is two places to disagree.
 
-**Screen components stay bare.** Five of them, already at the top of their folders; a prefix on a set
-that small buys grouping nobody needs.
+**Screens take the `screen-` prefix.** Leaving five files bare was the first proposal and was
+overruled on search: a contributor hunting for a screen types the same prefix they would type for any
+other kind. The side effect is that every component in the tree carries a kind, which removes the "is
+this a kind or a screen" judgement entirely.
 <!-- /ANCHOR:decisions -->
 
 ---

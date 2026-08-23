@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Checklist authored; all items open pending execution."
-    next_safe_action: "Close the taxonomy sign-off before any item can be worked."
+    recent_action: "Taxonomy sign-off closed; execution items still open."
+    next_safe_action: "Build the rename manifest."
     blockers: []
     completion_pct: 0
 ---
@@ -29,8 +29,8 @@ prove something new works, but to prove nothing old changed while paths moved un
 Two checks carry the weight. The type checker proves every specifier still resolves. `git log
 --follow` proves the filesystem did not swallow a case-only rename. Everything else corroborates.
 
-**Every item below is open.** The child is scoped and awaiting operator sign-off, so each marker names
-the check that will produce its evidence rather than asserting a result.
+**Every execution item below is open.** Only the sign-off item is closed; the rest name the check that
+will produce their evidence rather than asserting a result.
 <!-- /ANCHOR:protocol -->
 
 ---
@@ -38,7 +38,7 @@ the check that will produce its evidence rather than asserting a result.
 <!-- ANCHOR:pre-impl -->
 ## Pre-Implementation
 
-- [ ] **CHK-PRE-01** [P0] Operator has confirmed the `shared/` taxonomy and the kind-prefix list. [deferred: pending sign-off — the tree is a design decision, recorded as open question 1 in `spec.md`]
+- [x] **CHK-PRE-01** [P0] Operator has confirmed the `shared/` taxonomy and the kind-prefix list. [evidence: ADR-002 and ADR-003 in `decision-record.md` are both Accepted — `transport/` and `state/` separate, `screen-` added to the closed prefix list]
 - [ ] **CHK-PRE-02** [P0] The rename manifest exists as data and covers all 148 in-scope files. [deferred: pending execution — reconcile the row count against a fresh file count]
 - [ ] **CHK-PRE-03** [P0] The rewrite script is generated from the manifest, not hand-written. [deferred: pending execution — proof is a `git diff` dry-run read before any file moves]
 - [ ] **CHK-PRE-04** [P1] 011 has landed, so no rename collides with an open edit. [deferred: pending execution — check `git status` clean before Phase 3]

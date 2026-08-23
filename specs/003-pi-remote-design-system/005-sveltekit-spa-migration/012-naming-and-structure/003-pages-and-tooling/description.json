@@ -1,4 +1,5 @@
 {
+  "level": "2",
   "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling",
   "description": "Kind-first renames across every feature folder under pages/, then the configs, globs, story ids and coverage allowlist that make the renamed tree",
   "keywords": [
@@ -18,7 +19,7 @@
     "renamed",
     "tree"
   ],
-  "lastUpdated": "2026-08-23T10:58:13.800Z",
+  "lastUpdated": "2026-08-23T12:12:53.914Z",
   "specId": "003",
   "folderSlug": "pages-and-tooling",
   "parentChain": [
@@ -27,6 +28,5 @@
     "012-naming-and-structure"
   ],
   "memorySequence": 0,
-  "memoryNameHistory": [],
-  "level": "2"
+  "memoryNameHistory": []
 }

@@ -54,8 +54,9 @@ generated from the manifest, and a green build plus typecheck.
 - [ ] **T2.4** `pages/chat/features/ask-question/` — 12 files.
 - [ ] **T2.5** `pages/chat/transcript/` — 10 files.
 - [ ] **T2.6** `pages/chat/attachments/` — 9 files, including the dialog rename.
-- [ ] **T2.7** Screen components — `chat.svelte`, `home.svelte`, `review.svelte`,
-      `attention-inbox.svelte`, `enrollment.svelte` — bare, no kind prefix.
+- [ ] **T2.7** Screen components — `screen-chat.svelte`, `screen-home.svelte`,
+      `screen-review.svelte`, `screen-attention-inbox.svelte`, `screen-enrollment.svelte`. Screens
+      carry the kind prefix like every other kind, so a prefix search finds them.
 
 **Tooling**
 

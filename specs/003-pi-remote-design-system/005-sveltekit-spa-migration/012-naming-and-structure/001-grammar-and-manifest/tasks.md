@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Task ledger authored; all tasks open."
-    next_safe_action: "Answer T1.1, then build the manifest."
+    recent_action: "T1.1 answered; the remaining tasks are open."
+    next_safe_action: "Build the rename manifest."
     blockers: []
     completion_pct: 0
 ---
@@ -34,8 +34,10 @@ generated from the manifest, and a green build plus typecheck. A task is not don
 <!-- ANCHOR:phase-1 -->
 ## PHASE 1: SETUP
 
-- [ ] **T1.1** Operator confirms the `shared/` taxonomy and the closed kind-prefix list. Blocking —
-      the tree is a design decision and nothing should move before it is settled.
+- [x] **T1.1** Operator confirms the `shared/` taxonomy and the closed kind-prefix list. Blocking —
+      the tree is a design decision and nothing should move before it is settled. Answered:
+      `transport/` and `state/` stay separate, and screens take a `screen-` prefix.
+      [evidence: recorded as ADR-002 and ADR-003 in `decision-record.md`, both Accepted]
 - [ ] **T1.2** Build the rename manifest as data: one row per file, old path and new path, covering
       all 148 in-scope source files plus their stories and tests.
 - [ ] **T1.3** Reconcile the manifest's row count against a fresh file count. A manifest that covers

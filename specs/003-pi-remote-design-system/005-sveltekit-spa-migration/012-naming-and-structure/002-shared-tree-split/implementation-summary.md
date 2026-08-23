@@ -103,6 +103,7 @@ suites. Only the existence check and the specifier grep tell a finished split fr
 resolution has to be confirmed a different way.
 
 **The taxonomy is a prediction.** `state/` and `transport/` change together often enough that one
-`session/` folder is arguable; that alternative was weighed and left open rather than silently
-dismissed.
+`session/` folder was genuinely arguable. It was put to the operator and rejected: the wire contract
+and the reducers change for different reasons, and merging them would hide two triggers behind one
+name. That is a judgement about the future, and judgements about the future age.
 <!-- /ANCHOR:limitations -->

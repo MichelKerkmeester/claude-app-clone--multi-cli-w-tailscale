@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Four decisions recorded with alternatives weighed."
-    next_safe_action: "Operator confirms ADR-002 prefix list and ADR-003 taxonomy."
+    recent_action: "All four decisions accepted; operator confirmed 002 and 003."
+    next_safe_action: "Build the rename manifest against the confirmed tree."
     blockers: []
     completion_pct: 0
 ---
@@ -98,7 +98,7 @@ nothing. That is a mechanical trap, not a design question, and it is tracked as 
 <!-- ANCHOR:adr-002 -->
 ## ADR-002: The kind comes first in a component name
 
-**Status:** Proposed — prefix list awaiting operator confirmation.
+**Status:** Accepted — prefix list confirmed by the operator, with `screen-` added.
 
 <!-- ANCHOR:adr-002-context -->
 ### Context
@@ -116,8 +116,8 @@ name should say button.
 A component that is an instance of a UI kind carries the kind first: `sheet-leave-plan.svelte`,
 `menu-plan-mode.svelte`, `dialog-attachment-preview.svelte`, `card-plan-ready.svelte`.
 
-Screen and feature components carry no prefix, because their name already is the thing:
-`chat.svelte`, `home.svelte`, `review.svelte`.
+Screens are a kind too and take `screen-`: `screen-chat.svelte`, `screen-home.svelte`,
+`screen-review.svelte`. Feature components carry no prefix, because their name already is the thing.
 <!-- /ANCHOR:adr-002-decision -->
 
 <!-- ANCHOR:adr-002-alternatives -->
@@ -130,6 +130,12 @@ together on screen, which is the entire benefit being bought. Kind-last scatters
 **No prefix; rely on folders.** A `sheets/` folder would carry the same information. Rejected because
 these components live in feature folders by responsibility, and moving them into kind folders would
 scatter each feature instead — trading one problem for its mirror image.
+
+**Leave the five screens bare.** Proposed first, on the grounds that a screen's name already is the
+thing and five files need no grouping. Overruled by the operator on search: a contributor looking for
+a screen should type the same prefix they would type for any other kind, rather than having to
+already know the five names. That argument holds for a set of five as well as a set of fifty, and it
+is the same argument that justifies every other prefix on the list.
 <!-- /ANCHOR:adr-002-alternatives -->
 
 <!-- ANCHOR:adr-002-consequences -->
@@ -139,8 +145,9 @@ Names get slightly longer and read less like prose. In exchange, the directory l
 grouped index, and a newcomer can answer "what kinds of thing does this feature contain" without
 opening anything.
 
-The boundary between "is a UI kind" and "is a screen" is a judgement call, and judgement calls drift.
-The prefix list is therefore enumerated in the spec rather than left to taste.
+With screens on the list, every component in the tree carries a kind, which removes the boundary case
+entirely: there is no "is this a kind or a screen" judgement left to drift. The prefix list is
+enumerated in the spec rather than left to taste for the same reason.
 <!-- /ANCHOR:adr-002-consequences -->
 
 <!-- ANCHOR:adr-002-five-checks -->
@@ -159,8 +166,8 @@ The prefix list is therefore enumerated in the spec rather than left to taste.
 ### Implementation note
 
 The prefix list is closed, not open: `sheet-`, `menu-`, `dialog-`, `card-`, `button-`, `toggle-`,
-`radio-`. Adding a kind is a decision, not a convenience, because an open list degrades back into
-taste within a few contributions.
+`radio-`, `screen-`. Adding a kind is a decision, not a convenience, because an open list degrades
+back into taste within a few contributions.
 <!-- /ANCHOR:adr-002-impl -->
 <!-- /ANCHOR:adr-002 -->
 
@@ -169,7 +176,7 @@ taste within a few contributions.
 <!-- ANCHOR:adr-003 -->
 ## ADR-003: Split `shared/` by responsibility, one reason to change per folder
 
-**Status:** Proposed — taxonomy awaiting operator confirmation.
+**Status:** Accepted — taxonomy confirmed by the operator as proposed.
 
 <!-- ANCHOR:adr-003-context -->
 ### Context
@@ -203,7 +210,9 @@ kebab-case request. Rejected because the operator's complaint was explicitly tha
 flat, and renaming 28 files inside one undifferentiated folder does not address that.
 
 **One `session/` folder instead of `transport/` plus `state/`.** Genuinely arguable — they change
-together more often than not. Left as an open question rather than decided unilaterally.
+together more often than not. Put to the operator rather than decided unilaterally, and rejected:
+`transport/` changes when the wire contract changes and `state/` when a reducer does, and merging
+them would hide two triggers behind one name.
 <!-- /ANCHOR:adr-003-alternatives -->
 
 <!-- ANCHOR:adr-003-consequences -->

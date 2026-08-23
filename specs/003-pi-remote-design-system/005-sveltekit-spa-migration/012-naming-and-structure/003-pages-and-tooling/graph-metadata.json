@@ -112,6 +112,12 @@
         "source": "derived"
       },
       {
+        "name": "screens",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
         "name": "the",
         "kind": "key_phrase",
         "path": "plan.md",
@@ -131,12 +137,6 @@
       },
       {
         "name": "3. ARCHITECTURE",
-        "kind": "heading",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "4. IMPLEMENTATION PHASES",
         "kind": "heading",
         "path": "plan.md",
         "source": "derived"
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Kind-first renames across every feature folder under pages/, then the configs, globs, story ids and coverage allowlist that make the renamed tree testable, plus the minimal conventions correction and the nine-gate barrier.",
     "created_at": "2026-08-23T10:58:31.124Z",
-    "last_save_at": "2026-08-23T10:58:31.124Z",
+    "last_save_at": "2026-08-23T12:13:10.109Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b0779a052c6c5cb71d7ba8573bcb3f6614c18dcee7ece9b2f9c67ad82dd3287e",
+    "source_fingerprint": "sha256:5c2a605082103b3f0ebf6319f0e8df181513b607e649457c4b35ae55d4f28360",
     "source_doc_hashes": {
-      "spec.md": "5466087d11522e7b89ff7290d0e3349036f2b1ce92df31a45ed98a8e97dee200",
-      "plan.md": "550fcee8eb530eef1142c0fefe86cdff74625fe56cce152d76ed34de9b2c3f56",
-      "tasks.md": "9fec3789d8661e811b945216ab4b9ed33cf1f862cd0152b23c82d829c4916af2",
-      "checklist.md": "80961a9a37b5f705b2245a097402d3c13dfb8166ae14a937b5a6d3162438ecc5",
-      "implementation-summary.md": "c67030a96f7c879261a93cd27ac639733a641eda4568e62c78dcff2b3fc5e56b"
+      "spec.md": "a81ac1dd908ea706f6e1b7411ee40bdb964bcb5de7a846e05c847d38dd4f2fd0",
+      "plan.md": "ae4617961862eaefc2effadd78f615b90b5cc3c6b81be0c147c7330985c481a8",
+      "tasks.md": "76700cf11ec0c312779dbb73e8c6046b302d995d3a6f6985d06713e48b32b20b",
+      "checklist.md": "405599b0f9ccc0bc18bb3eb05e6090713c67688cbcceef33d96f5a03eacfb54a",
+      "implementation-summary.md": "9bd23c9c0f2895c933217051b289e48437a178fb4fb54ffa848851af49c9aec1"
     },
     "last_active_child_id": null,
     "last_active_at": null

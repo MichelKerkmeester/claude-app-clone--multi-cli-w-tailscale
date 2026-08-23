@@ -56,13 +56,15 @@ The component files inside them take the kind-first grammar. `LeavePlanSheet.sve
 `sheet-leave-plan.svelte`, `PlanModeMenu.svelte` becomes `menu-plan-mode.svelte`,
 `AttachmentPreviewDialog.svelte` becomes `dialog-attachment-preview.svelte`.
 
-Screen components stay bare — `chat.svelte`, `home.svelte`, `review.svelte`,
-`attention-inbox.svelte`, `enrollment.svelte` — because their name already is the thing, and a prefix
-on a set of five buys grouping nobody needs.
+Screens take the prefix too: `screen-chat.svelte`, `screen-home.svelte`, `screen-review.svelte`,
+`screen-attention-inbox.svelte`, `screen-enrollment.svelte`. Leaving five files bare was the first
+proposal and was overruled on search — a contributor hunting for a screen types the same prefix they
+would type for any other kind, instead of having to already know the five names.
 
-The prefix list is closed: `sheet-`, `menu-`, `dialog-`, `card-`, `button-`, `toggle-`, `radio-`.
-Adding a kind is a decision rather than a convenience, because an open list degrades back into taste
-within a few contributions.
+The prefix list is closed: `sheet-`, `menu-`, `dialog-`, `card-`, `button-`, `toggle-`, `radio-`,
+`screen-`. Adding a kind is a decision rather than a convenience, because an open list degrades back
+into taste within a few contributions. With screens on the list every component carries a kind, so
+there is no "is this a kind or a screen" boundary left to argue about.
 
 The tooling that has to follow the tree is a short, specific list, and each item fails differently:
 the Storybook globs (stories vanish from the catalog), the story ids and 009 allowlist (the coverage
@@ -84,7 +86,7 @@ One dispatch per folder, in descending size: `chat/artifacts` (24), `chat/chrome
 
 ### Phase 2: Screen components
 
-The five screens, bare names, one commit.
+The five screens, `screen-` prefixed, one commit.
 
 ### Phase 3: Tooling catch-up
 

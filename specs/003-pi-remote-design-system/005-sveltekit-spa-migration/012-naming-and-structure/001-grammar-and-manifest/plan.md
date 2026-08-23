@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Plan authored; manifest first, proving ground second."
-    next_safe_action: "Close the taxonomy sign-off, then build the manifest."
+    recent_action: "Taxonomy and prefix list confirmed; plan unblocked."
+    next_safe_action: "Build the rename manifest."
     blockers: []
     completion_pct: 0
 ---
@@ -99,8 +99,10 @@ distinction should be visible without opening the file.
 
 ### Phase 1: Decide
 
-Operator confirms the taxonomy and the closed kind-prefix list. Blocking: nothing moves before it is
-settled, because a rename executed against an unconfirmed tree is a rename that may run twice.
+Operator confirms the taxonomy and the closed kind-prefix list, and the answers are written into the
+decision record. Blocking: nothing moves before it is settled, because a rename executed against an
+unconfirmed tree is a rename that may run twice. Settled — `transport/` and `state/` stay separate,
+and screens take `screen-`.
 
 ### Phase 2: Manifest and rewrite script
 

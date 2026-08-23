@@ -52,7 +52,7 @@ zero.
 
 - [ ] **CHK-CQ-01** [P0] Every in-scope path is kebab-case. [deferred: pending execution — completeness scan for a capital letter under `app-mobile/src` excluding `routes/**` must return 0 hits]
 - [ ] **CHK-CQ-02** [P0] UI-kind components carry a kind-first prefix. [deferred: pending execution — spot-check `sheet-leave-plan.svelte`, `menu-plan-mode.svelte`, `dialog-attachment-preview.svelte`]
-- [ ] **CHK-CQ-03** [P1] Screen components stay bare. [deferred: pending execution — `chat.svelte`, `home.svelte`, `review.svelte`, `attention-inbox.svelte`, `enrollment.svelte`]
+- [ ] **CHK-CQ-03** [P1] Screens carry the `screen-` prefix. [deferred: pending execution — `screen-chat.svelte`, `screen-home.svelte`, `screen-review.svelte`, `screen-attention-inbox.svelte`, `screen-enrollment.svelte`]
 - [ ] **CHK-CQ-04** [P1] Specifiers were rewritten from the manifest, not by hand. [deferred: pending execution — a hand-edited rewrite can disagree with the moves]
 <!-- /ANCHOR:code-quality -->
 

@@ -12,9 +12,9 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Converted to a phase parent with three children."
-    next_safe_action: "Operator confirms the taxonomy, then start child 001."
-    blockers: ["taxonomy and kind-prefix list await operator sign-off"]
+    recent_action: "Operator confirmed both naming decisions."
+    next_safe_action: "Start child 001; the grammar is settled."
+    blockers: []
     completion_pct: 0
 ---
 
@@ -91,7 +91,8 @@ and that refresh.
 - **REQ-001** — Every file and folder under `app-mobile/src/`, excluding `routes/**`, is kebab-case.
   A completeness scan for a capital letter in any in-scope path returns zero.
 - **REQ-002** — A component that is an instance of a UI kind carries that kind first in its name.
-  Feature and screen components carry no prefix, because their name already is the thing.
+  Screens are a kind and take `screen-`, so a prefix search reaches them too. Feature components
+  carry no prefix, because their name already is the thing.
 - **REQ-003** — `shared/` is split by responsibility. No folder under `shared/` holds more than one
   reason to change, and `shared/data/` ceases to exist.
 - **REQ-004** — Nothing rendered moves. The token-identity gate stays at 0 CHANGED / 0 VANISHED /
@@ -156,13 +157,13 @@ Heavy documentation lives in the children. This parent documents root purpose on
 <!-- ANCHOR:questions -->
 ## 8. OPEN QUESTIONS
 
-Both are blocking, both are the operator's call, and both are settled inside child 001 — the tree is a
-design decision, not a derivation.
+None. Both blocking decisions were the operator's call and both are now settled; they are recorded in
+`001-grammar-and-manifest/decision-record.md` rather than left in conversation.
 
-1. **Confirm the `shared/` taxonomy.** The proposed split is in `001-grammar-and-manifest/plan.md`.
-   The judgement call is whether `state/` and `transport/` are genuinely separate or one `session/`
-   folder.
-2. **Confirm the kind-prefix list.** `sheet-`, `menu-`, `dialog-`, `card-`, `button-`, `toggle-`,
-   `radio-` is proposed. The open part is whether screen-level components stay bare, as proposed, or
-   take a `screen-` prefix.
+1. **`shared/` taxonomy — confirmed as proposed.** `transport/` and `state/` stay separate rather
+   than merging into one `session/` folder, because the wire contract and the reducers change for
+   different reasons.
+2. **Kind-prefix list — confirmed with `screen-` added.** The closed list is `sheet-`, `menu-`,
+   `dialog-`, `card-`, `button-`, `toggle-`, `radio-`, `screen-`. Screens take the prefix so that a
+   prefix search reaches them, which is the same reason every other kind carries one.
 <!-- /ANCHOR:questions -->

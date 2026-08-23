@@ -5,7 +5,8 @@
   // One bottom-anchored composer object. The four agent controls (model,
   // Effort, Build/Plan, and slash commands live in a "+" tools popover instead
   // Of stacked rows in the reading path, and the primary action is a single
-  // Circular button that morphs across send / steer / stop / sending —
+  // Circular button that morphs across send / steer / sending, with a separate
+  // interrupt control available while a turn runs —
   // Never a full-width bar. Every affordance is capability-gated: there is
   // No voice/mic control because speech capture is not implemented, and no
   // Decorative disabled actions. Runtime labels stay host-confirmed.
@@ -243,11 +244,6 @@
   );
 
   const activeRow = $derived(ranked.items.some((item) => item.name === activeName && item.enabled));
-
-  // Stop is the primary action only when a turn is running and the draft is empty;
-  // Any draft makes the primary Send (idle) or Steer (running). With the inline
-  // Surface open, the disc becomes the local Insert action — never Send.
-  const showStop = $derived(running && !hasText && !hasAttachments && !attachmentSubmission.busy);
 
   // Plan mode is conveyed redundantly: the dashed outline only ever comes
   // From the host-confirmed mode, never from a pending request.
@@ -573,7 +569,6 @@
     class={`composer-tray${trayOutlineClass}`}
     onsubmit={(event) => {
       event.preventDefault();
-      if (showStop) return;
       submit();
     }}
   >
@@ -680,7 +675,19 @@
         />
       </div>
       <div class="composer-right">
-        <!-- @ds slot: primary-action — the single morphing disc (send/steer/stop/sending). -->
+        <!-- @ds slot: interrupt-action — the stop control stays available without replacing the draft action. -->
+        {#if running && connection === 'live'}
+          <Button
+            type="button"
+            class="composer-primary is-stop"
+            aria-label="Stop the current turn"
+            onclick={stopRun}
+            disabled={stopping || connection !== 'live'}
+          >
+            {@render stopGlyph()}
+          </Button>
+        {/if}
+        <!-- @ds slot: primary-action — the draft action remains send / steer / sending. -->
         {#if running && (hasText || hasAttachments) && !slashDraft}
           <Button
             type="button"
@@ -694,17 +701,7 @@
             Later
           </Button>
         {/if}
-        {#if showStop}
-          <Button
-            type="button"
-            class="composer-primary is-stop"
-            aria-label="Stop the current turn"
-            onclick={stopRun}
-            disabled={stopping || connection !== 'live'}
-          >
-            {@render stopGlyph()}
-          </Button>
-        {:else if effectivePanelOpen}
+        {#if effectivePanelOpen}
           <Button
             type="button"
             class="composer-primary is-send"
@@ -726,7 +723,7 @@
           >
             {#if slashSubmitting}{@render spinnerGlyph()}{:else}{@render sendGlyph()}{/if}
           </Button>
-        {:else}
+        {:else if !running || hasText || hasAttachments}
           <Button
             type="submit"
             class="composer-primary is-send"
@@ -923,7 +920,7 @@
     line-height: 1.35;
   }
 
-  /* @ds slot: primary-action — the single circular morphing disc (send/steer/stop/sending).
+  /* @ds slot: primary-action — the single circular morphing disc (send/steer/sending).
      The class is passed to the Button primitive, so Svelte cannot hash it → :global. */
   :global(.composer-primary) {
     display: grid;
@@ -949,7 +946,7 @@
     background: var(--accent-strong);
   }
 
-  /* @ds state: stop — the primary disc on the stop form (running, empty draft). */
+  /* @ds state: stop — the interrupt disc for a running turn. */
   :global(.composer-primary.is-stop) {
     background: var(--action-bg);
     color: var(--action-fg);

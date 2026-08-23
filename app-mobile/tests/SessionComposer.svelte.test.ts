@@ -450,6 +450,44 @@ describe('explicit slash send gating', () => {
   });
 });
 
+describe('primary action availability', () => {
+  it('running with an empty draft exposes only Stop in the primary action slot', () => {
+    renderComposer({ status: 'running' });
+
+    expect(screen.getByRole('button', { name: 'Stop the current turn' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Steer the current turn' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Send message' })).not.toBeInTheDocument();
+
+    const primaryActions = [
+      screen.queryByRole('button', { name: 'Stop the current turn' }),
+      screen.queryByRole('button', { name: 'Steer the current turn' }),
+      screen.queryByRole('button', { name: 'Send message' }),
+    ].filter((button): button is HTMLElement => button !== null);
+    expect(primaryActions).toHaveLength(1);
+  });
+
+  it('running with a typed draft keeps Stop and Steer, preserving the draft after Stop', async () => {
+    const user = userEvent.setup();
+    renderComposer({ status: 'running' });
+    const composer = await typeDraft(user, 'hello');
+
+    const stop = screen.getByRole('button', { name: 'Stop the current turn' });
+    expect(screen.getByRole('button', { name: 'Steer the current turn' })).toBeInTheDocument();
+
+    await user.click(stop);
+    expect(composer).toHaveValue('hello');
+  });
+
+  it('not running exposes Send and no Stop control', () => {
+    renderComposer();
+
+    expect(screen.queryByRole('button', { name: 'Stop the current turn' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeInTheDocument();
+  });
+});
+
 describe('keyboard navigation', () => {
   it('ArrowDown/ArrowUp move virtual focus through enabled rows without wrapping', async () => {
     const user = userEvent.setup();

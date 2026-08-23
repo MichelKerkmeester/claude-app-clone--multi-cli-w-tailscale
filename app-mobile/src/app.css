@@ -773,8 +773,8 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds slot: frame — transcript region wrapper (positioning only). */
 
 /* ── Composer: one bottom-anchored input island (Claude-style). ─────────
-   The card position, left "+" and text baseline stay fixed; only the
-   right-hand primary action changes across send / steer / stop / sending. */
+   The card position, left "+" and text baseline stay fixed; the right-hand
+   primary action changes across send / steer / sending beside the interrupt control. */
 /* @ds state: idle — composer idle: send disc, editable input, live disclaimer. */
 /* @ds state: running — composer running: steer/stop disc, waiting disclaimer. */
 /* @ds state: interrupted — composer interrupted: wait for the host to settle before acting. */
@@ -2837,6 +2837,7 @@ body:has(.slash-panel) .scroll-to-latest {
 @media (prefers-contrast: more) {
   .composer-tray,
   .composer-plus,
+  .composer-primary.is-stop,
   .plan-mode-button,
   .plan-mode-popover,
   .leave-plan-sheet,
@@ -2858,6 +2859,7 @@ body:has(.slash-panel) .scroll-to-latest {
 @media (forced-colors: active) {
   .composer-tray,
   .composer-plus,
+  .composer-primary.is-stop,
   .plan-mode-button,
   .plan-mode-popover,
   .plan-mode-row,
@@ -2873,6 +2875,12 @@ body:has(.slash-panel) .scroll-to-latest {
 
   .slash-panel,
   .slash-option {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .composer-primary.is-stop {
+    border: 1px solid CanvasText;
     background: Canvas;
     color: CanvasText;
   }

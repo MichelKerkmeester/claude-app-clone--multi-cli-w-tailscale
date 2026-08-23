@@ -135,7 +135,9 @@
     "015",
     "011"
    ],
-   "gate": "three transcript affordances land; nine gates green"
+   "gate": "three transcript affordances land; nine gates green",
+   "held": true,
+   "heldReason": "All four affordances shipped and every gate is green. The three open items are operator confirmations under a thumb and on a device, which no gate can make."
   },
   {
    "id": "019",

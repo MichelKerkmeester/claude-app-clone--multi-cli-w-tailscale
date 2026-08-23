@@ -132,5 +132,20 @@ All five trace to REQ-001; the packet ships only when every one of them holds.
 1. Whether 88% is the right translucency at this size, or whether it should match the header bars'
    90–91% exactly. Resolvable only by the operator looking at it on a device.
 2. Whether future affordance requests should each become a requirement here, or whether this packet
-   should split once it accumulates several unrelated changes.
+   should split once it accumulates several unrelated changes. **Answered in practice:** the three
+   transcript affordances the cross-repo council surfaced went to their own packet, 018, rather than
+   accumulating here. This packet stays the home for one-off operator requests.
+
+Two candidates below came out of the council and need the operator's call before either becomes a
+requirement. Neither is scoped, and nothing is built until one is chosen.
+
+3. **Reword the two runtime strings that read as terminal but are recoverable?**
+   `foreground-required` and `host-unavailable` (`app-mobile/src/shared/data/runtime-issues.ts:16,18`)
+   describe states a retry clears, but the copy reads like a dead end. Recommendation: yes. A user who
+   reads "host unavailable" and stops trying has been misled by a string, and this is copy rather than
+   behaviour — small blast radius, no gate moves.
+4. **Allow aborting a turn without discarding the draft?** Today the choices are Steer (interrupt and
+   send the text), Later (queue it), or clear the draft to reveal Stop. Recommendation: no. The user
+   can already interrupt while typing; the residual buys back one keystroke, the current gating is
+   deliberate, and it would cost a requirement plus device sign-off to get there.
 <!-- /ANCHOR:questions -->

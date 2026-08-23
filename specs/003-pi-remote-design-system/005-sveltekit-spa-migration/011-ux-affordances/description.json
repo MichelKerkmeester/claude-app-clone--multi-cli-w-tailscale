@@ -1,5 +1,5 @@
 {
-  "level": "2",
+  "level": "1",
   "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances",
   "description": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a",
   "keywords": [
@@ -17,7 +17,7 @@
     "allowed",
     "change"
   ],
-  "lastUpdated": "2026-08-23T10:03:53.912Z",
+  "lastUpdated": "2026-08-23T12:22:22.165Z",
   "specId": "011",
   "folderSlug": "ux-affordances",
   "parentChain": [

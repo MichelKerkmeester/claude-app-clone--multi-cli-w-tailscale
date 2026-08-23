@@ -1,33 +1,55 @@
-# SvelteKit SPA Migration — Goal
+# Orchestrator — Pi Remote post-cutover queue
 
-Re-home the Pi Remote phone UI onto **Svelte 5 / SvelteKit (SPA/CSR)** — every screen one `.svelte` file (HTML + scoped CSS + typed logic) — preserving **byte-for-byte** the shipped look, a11y, security, PWA. **Re-hosting, not redesign**: build against frozen `--pi-*` tokens; never change a rendered value.
+You are the **orchestrator**. Work autonomously. Read `handover.md` and `roadmap.md` in
+`specs/003-pi-remote-design-system/005-sveltekit-spa-migration/` first — ground truth, with the full
+trap list and the operator's open questions.
 
-## Execution — AUTONOMOUS GRAPH-LOOP (do not stall)
-Work all phases dependency-ordered: finish a node → pass its gate → advance to the next unblocked node; run independent nodes in parallel. Do NOT hold for per-step go-ahead — proceed, verify, commit, push. Stop + escalate ONLY on: a broken invariant (Logic-Sync), a red gate that resists bounded repair, or a destructive/irreversible act (mass-delete >100 files, history rewrite, force-push).
+**Mission.** The SvelteKit migration is done (Svelte-only, React deleted, nine gates green, pushed).
+Nine scoped packets remain — three from the operator's editability complaints, six from a five-repo
+research sweep a council ranked. Except `011-ux-affordances`, **no packet may change a rendered
+value, security invariant, route or a11y contract.**
 
-## Research → recommendations → approval (RULE)
-Research runs in background, feeds the phases, never overrides frozen contracts. Findings may create new phases or update existing ones — but **present ALL research recommendations to me FIRST; scaffold nothing without my approval.**
+**Mode — autonomous graph-loop.** Finish a node → pass its gate → advance to the next unblocked node.
+Run the relay and client lanes in parallel; they share no files. Don't hold for per-step approval —
+proceed, verify, commit, push. Stop only on a broken invariant, a red gate that resists one bounded
+repair, or a destructive act.
 
-## Invariants (break → stop + escalate)
-- Tokens resolve identically light/dark/system (token-identity 0-diff).
-- Security: loopback relay, tailnet-only (Funnel off), foreground authority, redaction, fail-closed ticketed mutations, host plan mode, content-free push; phone never full-access.
-- A11y: roles, focus order + trap, aria-*, ≥44px, reduced-motion + forced-colors survive react-aria→Bits/Melt.
-- Routing: `/`, `/session/[id]`, `/attention/[lookupId]`; Review/Inbox overlays; Enrollment auth branch.
-- Backend green throughout.
+**Start now, in parallel:** `015-test-lanes` — the precondition; nothing downstream is provable until
+it lands. `016/001-projection-integrity` — a verified live silent data loss: a desynced sequence
+counter, a throw relabelled as a parse failure, a listener nobody registered, so a block is referenced
+and never rendered. `016/002-route-authority` — 12 routes prove foreground, 3 don't.
+`012/001-grammar-and-manifest` — the rename manifest as data, with the rewrite *generated* from it.
 
-## Who does what
-Claude orchestrates + verifies each layer; owns git, barrier/shared files, config, npm install. Executor writes `app-mobile/**` (one dir/dispatch; BANNED: install/config/token/security/routing/a11y). Working routes here: luna via opencode `openai/gpt-5.6-luna`; GLM-5.2 via cli-devin (free); stealth via openrouter for cli-pi story writes.
+Then `016/003` → `017`; `012/002` → `012/003` → `013` → `014`; `018` and `019` last.
 
-## Phases
-1. **Core migration 001–007** — cutover ✅ done, on GitHub.
-2. **007-EXT:** (a) inline comments TOP PRIORITY — segment every file into labelled SECTIONS, **mimic sk-code/opencode ~1:1 in style + usage** (full-width `// ─────` dividers + `// ─── Label ───`), @ds grammar + durable WHY, no ephemeral labels; (b) architecture ($shared, boundaries, *.svelte.ts factories); (c) styling (scoped `<style>` + app.css layering); (d) docs ✅. HARD: zero rendered/a11y/security/routing change — 9 gates + per-file unchanged-fence diff.
-3. **008 sk-code-mobile-cli** (this surface ONLY, not the sk-code hub) — encode + lint the 007-EXT conventions (incl. comment segmentation) so future edits stay on-pattern.
-4. **009 Storybook** — one-command launch; a11y/themes/autodocs/designs addons; story-per-component + coverage gate + AI scaffold. R1/4/5/6/7 ✅; R3 = 21/27 stories.
-5. **Cleanup** — drop 3 retired style.css-oracle scripts ✅.
-6. **Research 010** — 5 `specs/context/` repos × 10 deep-research iterations; feeds phases under the approval rule above.
+**Who writes what.** You own spec docs, git, barrier/shared files (`app.css`, `+layout.svelte`,
+`routes/*`, configs, `package.json`), installs, cross-repo work, and verification outside the sandbox.
+The executor writes `app-mobile/src/**` and `app-relay/src/**`, one dir per dispatch, banned from
+installs/config/token/security/routing/a11y. **Source defects go back to the executor.**
 
-## Gates
-build · svelte-check · npm test · test:web · token-identity 0-diff (3 themes) · contrast + ≥76 fences · CDP 390px · catalog-smoke · validate.sh --strict.
+**Invariants — break one, stop.** Token identity 0-diff across three themes · loopback relay,
+tailnet-only (Funnel off), foreground authority, redaction, fail-closed ticketed mutations, host plan
+mode, content-free push, phone never full-access · a11y roles/focus/aria/≥44px/reduced-motion/
+forced-colors — **already regressed once and no gate sees it** · routes `/`, `/session/[id]`,
+`/attention/[lookupId]` · backend green throughout.
 
-## Status / open
-Core + cleanup done. 007-EXT comments 85/109 done (1:1 alignment + ~24 leaves left). 008 to verify on live Public. 009 has 6 stories left. Research 3/5 landed; openclaude-android + remote-for-opencode still to land (needs the known-good GLM-via-cli-devin invocation). All work pushed to origin/main. Full plan of record: `goal.md` (this folder).
+**Nine gates**, run whole from the final state: build · typecheck · `npm test` · `test:web` ·
+token-identity · contrast + fences · CDP 390px · catalog smoke · `validate.sh --strict`.
+
+**The traps that fail silently.** The `.opencode` symlink makes `validate.sh` and the `dist/`
+generators exit 0 with no output, so a failing packet reads green — invoke via realpath, verify by
+content. A live-follow daemon reverts uncommitted edits with no reflog trace — write + `add` +
+`commit` as **one** command. `npm test`'s bare positional sweeps a protected repo (~628 bogus
+failures) — run the four backend dirs explicitly. `| tail` reports the pipe's exit code, not vitest's.
+A stale CSS-corpus glob turns token identity into a false green. Case-only renames are silently
+swallowed. Ported `useEffect`→`$effect` self-invalidates (7 incidents). `specs/context/**` is
+read-only, and the shared Public checkout has another session's files staged — cross-repo edits go
+through an isolated worktree only. **Comment hygiene is a hard block**: no spec path or
+ADR/REQ/CHK/task id in any comment.
+
+**Settled, don't reopen.** Kebab-case except `routes/**` · kind-first names from the closed list
+`sheet- menu- dialog- card- button- toggle- radio- screen-` · `shared/` split by reason to change,
+`transport/` and `state/` separate · no Svelte lint rule (that doctrine is prose in `019`).
+
+**Reporting.** Verdict first, then receipts; separate **confirmed** (command, output, exit status)
+from **inferred**. A dispatch's success report is a hypothesis until you verify it.

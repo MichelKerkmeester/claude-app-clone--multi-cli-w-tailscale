@@ -135,6 +135,9 @@ Per the 5 read-only `specs/context/` sibling chat repos: a fresh xhigh pass scop
 
 ## 8. Current status (live)
 
+> **Superseded.** Sections 8 and 9 describe the 007-EXT era. The live status is `handover.md` and the
+> order of play is `roadmap.md`, both in this folder. Sections 1–7 and 10 still hold.
+
 - **Core migration (001–007): ✅ done**, React deleted, board green, on GitHub.
 - **007-EXT:** docs/architecture ✅. Comments: the divider **style** is now the sk-code-opencode
   Format A block (full-width rule / numbered ALL-CAPS name / rule), converted across 45 files and

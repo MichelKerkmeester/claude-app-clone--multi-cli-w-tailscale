@@ -1,31 +1,165 @@
-# SvelteKit SPA Migration — Goal
+---
+title: "Orchestrator goal prompt — post-cutover queue"
+description: "The full dispatch prompt for a fresh agent taking over as orchestrator: mission, authority, the nine remaining packets, the invariants, the gates, and the traps that have each already cost a session."
+contextType: "planning"
+---
 
-Re-home the Pi Remote phone UI onto **Svelte 5 / SvelteKit (SPA/CSR)** — every screen one `.svelte` file (HTML + scoped CSS + typed logic) — preserving **byte-for-byte** the shipped look, a11y, security, PWA. **Re-hosting, not redesign**: build against frozen `--pi-*` tokens; never change a rendered value.
+# Orchestrator prompt — Pi Remote post-cutover queue
 
-## Execution mode — AUTONOMOUS GRAPH-LOOP (do not stall)
-Work **all phases + future phases autonomously**, dependency-ordered like a graph: finish a node → pass its gate → advance to the next unblocked node; run independent nodes in parallel (e.g. context research ‖ the comment pass). **Do NOT hold for per-step go-ahead** — proceed, verify, commit, push. Stop + escalate ONLY on: a broken invariant (Logic-Sync), a red gate that resists bounded repair, or a destructive/irreversible act (mass-delete >100 files, history rewrite, force-push). Research runs in the background and feeds the phases; never block a phase waiting on it.
+You are the **orchestrator** for the remaining work on the Pi Remote phone UI. Work autonomously.
+Read `handover.md` and `roadmap.md` in this folder before your first action; they are the ground truth
+and this prompt is the contract.
 
-## Invariants (break one → stop + escalate)
-- **Tokens** resolve identically light/dark/system (token-identity 0-diff).
-- **Security:** loopback relay, tailnet-only Serve (Funnel off), foreground authority, redaction, ticketed fail-closed mutations, host plan mode, content-free push; phone never full-access.
-- **A11y:** roles, focus order + trap, `aria-*`, ≥44px, reduced-motion + forced-colors survive react-aria → Bits/Melt.
-- **Routing:** `/`, `/session/[id]`, `/attention/[lookupId]`; Review/Inbox overlays; Enrollment an auth branch.
-- **Backend green throughout.**
+---
 
-## State — EPIC ONGOING
-Svelte is the only runtime (React fully deleted). 007 core cutover + Option B page-centric layout (`pages/{home,chat,review,inbox,enrollment}/` + `shared/{primitives,chrome,data}`) shipped; board green (9 gates). **007-EXT Phase A DONE + verified** (per-folder READMEs, onboarding docs, tsconfig prune, editor config). Now running: Phase B (comments) ‖ context research.
+## 1. MISSION
 
-## Phases (graph — advance autonomously)
-1. **007-EXT quality/DX pass:** (a) **inline comments TOP PRIORITY** — segment every file into labelled comment SECTIONS (sk-code/opencode style), `@ds` grammar + durable WHY, no ephemeral labels; (b) architecture (`$shared` alias, boundaries, `*.svelte.ts` factories); (c) styling structure (scoped-`<style>` + `app.css` token layering); (d) docs ✅. HARD: zero rendered-value/a11y/security/routing change — the 9 gates + a per-file unchanged-fence-TEXT diff prove it.
-2. **008-sk-code-svelte-refactor:** encode + lint the 007-ext conventions (incl. comment segmentation) in `sk-code` so edits stay on-pattern.
-3. **009-storybook-experience:** dummy-proof + self-maintaining Storybook — one-command launch; a11y/vitest/themes/autodocs addons; story-per-component + coverage gate + AI scaffold.
-4. Cleanup: drop the 3 retired `style.css`-oracle scripts.
+The SvelteKit migration is finished — Svelte is the only runtime, React is deleted, the cutover passed
+all nine gates and is on `origin/main`. Your job is the queue that follows it: **nine scoped packets
+that make the codebase legible to a designer and correct on the wire.** Three came from the operator's
+own complaints about editability; six came from a five-repo research sweep that an Opus-5 council
+ranked and synthesised. Every recommendation is already homed in a packet, and every packet already
+validates.
 
-## Research (background ‖ phases; feeds them)
-5 sibling chat repos in `specs/context/` (READ-ONLY, protected). Per repo: fresh Opus-5 xhigh scopes angles (ease-of-use · architecture · UX · logic) → **10 deep-research iterations**. Findings refine 007-ext/008/009, never override frozen contracts. Run via `NODE_PRESERVE_SYMLINKS=1 opencode /deep:research` (luna; GLM fallback).
+Nothing in this queue is a redesign. With one deliberate exception — `011-ux-affordances`, which
+exists precisely so rendered changes have a legal home — **no packet may change a rendered value, a
+security invariant, a routing behaviour or an accessibility contract.**
 
-## Execution
-Claude orchestrates + **verifies each layer**; owns git, barrier/shared files, config, `npm install`. Executor writes `app-mobile/**` source (a11y=gpt-5.6-luna, else cli-pi/cli-devin): WRITE=one dir; BANNED=install/config/token/security/routing/a11y changes; Claude diff-inspects (comment-only) + gates.
+---
 
-## Gates
-build · svelte-check · `npm test` · `test:web` · token-identity 0-diff (3 themes) · contrast + ≥76 fences · CDP 390px · catalog smoke · `validate.sh --strict`.
+## 2. YOUR AUTHORITY
+
+**You own:** every spec-folder document, all git, the barrier and shared files (`app.css`,
+`+layout.svelte`, `src/routes/*`, `svelte.config.js`, `vite.config.ts`, `package.json`, test configs),
+every `npm install`, all cross-repository work, and **independent verification of every dispatch,
+outside the executor's sandbox.**
+
+**The executor writes app source** under `app-mobile/src/**` and relay source under `app-relay/src/**`,
+one directory per dispatch. Its prompt carries the pre-approved spec folder, explicit ALLOWED WRITE
+PATHS, and the ban list: no `npm install`, no config or shared-file edits, no token, security, routing
+or a11y change, no deletes outside scope.
+
+**Source fixes go back to the executor.** When your verification catches a defect in executor-written
+source, the executor repairs it. You own barrier files and verification. Taking over source repair
+blurs that boundary and has caused rework before.
+
+**Model routes that work here:** `openai/gpt-5.6-luna` via opencode for a11y-sensitive work; GLM-5.2
+via `cli-devin` (free) for bulk generation; `cli-pi` with deepseek-v4-flash at xhigh plus a code
+persona for source fixes.
+
+---
+
+## 3. EXECUTION MODE — AUTONOMOUS GRAPH-LOOP
+
+Treat the queue as a dependency graph, not a list. **Finish a node → pass its gate → advance to the
+next unblocked node.** Run independent nodes in parallel; the relay lane and the client lane never
+touch the same files and are meant to run concurrently.
+
+**Do not hold for per-step approval.** Proceed, verify, commit, push. Report at barriers, not at every
+edit.
+
+**Stop and escalate only on:** a broken invariant, a red gate that resists one bounded repair attempt,
+or a destructive or irreversible act. Escalation carries the conflicting facts, a one-sentence root
+cause where you have one, and the decision needed — not a workaround that quietly changes scope.
+
+---
+
+## 4. THE QUEUE
+
+Full detail in `roadmap.md`. Start here:
+
+**Executable immediately, in parallel:**
+- `015-test-lanes` — the precondition. A hardcoded 15-path logic-test allowlist (four of the named
+  tests are already dead), a virtualizer mocked out of existence, ESLint with no Svelte parser, an
+  uncovered transcript reducer. Nothing downstream is provable until this lands.
+- `016/001-projection-integrity` — a **verified live silent data loss**. A cached sequence counter
+  desynchronises from a store that drops control-plane projections without consuming a sequence; the
+  resulting throw is relabelled as a parse failure and handed to an error listener nobody registered.
+  A block is referenced in the transcript and never rendered, with no error anywhere.
+- `016/002-route-authority` — twelve routes prove foreground, three do not. Every 429 gains the
+  `Retry-After` header the client already parses and never receives.
+- `012/001-grammar-and-manifest` — the rename manifest as data, with the specifier rewrite *generated*
+  from it, proven on 23 files before 125 more move.
+
+**Then:** `016/003` → `017`, and `012/002` → `012/003` → `013` → `014`, with `018` and `019` last.
+
+---
+
+## 5. INVARIANTS — BREAK ONE, STOP
+
+- **Tokens** resolve identically in all three theme states. Token identity reports 0 CHANGED /
+  0 VANISHED / 0 ADDED, or the work does not land.
+- **Security:** loopback relay, tailnet-only Serve with Funnel off, foreground authority, redaction,
+  fail-closed ticketed mutations, host plan mode, content-free push. The phone never gets full-access
+  mode.
+- **Accessibility:** roles, focus order and trap, `aria-*`, ≥44px targets, `prefers-reduced-motion`
+  and `forced-colors`. This contract already regressed once and **no gate can see it** — three P0 and
+  seven P1 findings sit in `007-verify-and-cutover/a11y-parity-findings.md`.
+- **Routing:** `/`, `/session/[id]`, `/attention/[lookupId]`. The route tree is the URL contract, which
+  is why `routes/**` is excluded from the rename.
+- **Backend green throughout** — it is framework-independent, so it is the leak detector.
+
+---
+
+## 6. THE NINE GATES
+
+Run whole from the final state, never as the subset that was failing.
+
+`npm run build` · `npm run typecheck` · `npm test` · `npm run test:web` · token identity 0-diff across
+three themes · contrast at threshold with the `@ds guardrail:` fence count preserved · CDP structural
+at 390px in both themes · catalog smoke in both themes · `validate.sh <spec-folder> --strict`.
+
+---
+
+## 7. TRAPS — EACH HAS ALREADY COST A SESSION
+
+1. **The `.opencode` symlink defeats the spec-kit scripts.** `validate.sh` and the `dist/` generators
+   exit 0 with no output through the symlink, so a failing packet reads as green. Invoke through the
+   realpath under `Code_Environment/Public/.opencode/skills/system-spec-kit/`, and verify by content.
+2. **A live-follow daemon reverts uncommitted edits** a minute or two after they land, with no reflog
+   trace. Staging does not protect. Write, `git add` and `git commit` in **one** command.
+3. **`npm test` sweeps a protected research repo** via its bare `tests` positional — ~628 failed files
+   that are not regressions. Run the four real backend test directories explicitly.
+4. **`| tail` reports the pipe's exit code**, not vitest's. Verify by content or capture `RC=$?`.
+5. **`specs/context/**` is read-only.** Five research repos. Never `git clean`, `stash -u`, `add -A`
+   or `git add .` against them.
+6. **The shared Public checkout holds another session's staged files.** Cross-repo edits land through
+   an isolated worktree only; branches come from the sk-git allocator under a lock; three pre-push
+   gates apply; `SPECKIT_ALLOW_REMOTE_PUSH=1` per push.
+7. **Case-only renames are silently swallowed.** Two-step through a temporary name; verify with
+   `git status` before the commit and `git log --follow` after.
+8. **A stale glob makes a gate pass by reading nothing.** After a rename, an un-updated CSS-corpus
+   glob turns token identity into a false green. Confirm the corpus is non-empty first.
+9. **Ported `useEffect` → `$effect` self-invalidates.** Seven incidents, nineteen hand-placed
+   `untrack()` calls across eleven files. Trace what an effect's API methods do; do not grep for a
+   literal `dispatch(`.
+10. **Known flakes, not regressions:** `PlanModeMenu` "Enter activates" (~62% at baseline),
+    `auth.test.ts` timing, a bits-ui body-scroll-lock teardown throw. Confirm with a scoped stash and
+    at least eight runs.
+11. **Comment hygiene is a hard block.** No spec path, ADR id, REQ id, CHK id or task id in any code
+    comment. Write the durable WHY. A pre-commit gate enforces it.
+
+---
+
+## 8. SETTLED — DO NOT REOPEN
+
+Kebab-case everywhere except `routes/**`. Kind first in component names, from the closed list `sheet-`,
+`menu-`, `dialog-`, `card-`, `button-`, `toggle-`, `radio-`, `screen-`. `shared/` splits by reason to
+change, with `transport/` and `state/` separate. No Svelte lint rule for the runes doctrine — it lives
+as prose in the conventions authority, which is packet `019`. No relay-side approval risk classifier.
+The full conventions refresh is `019`'s; `012` lands only a one-section naming stop-gap.
+
+Four questions remain the operator's and must not be decided unilaterally: whether to ship the client
+close-code classification without its harness, whether epoch rotation is worth its retention
+obligation, and the two `011` candidates (rewording two misleading runtime strings; allowing abort
+without discarding the draft). They are recorded in their packets with recommendations.
+
+---
+
+## 9. HOW TO REPORT
+
+Verdict first, then receipts. For every load-bearing claim, distinguish **confirmed** — with a command,
+its output and its exit status — from **inferred**, and say what would confirm the latter. A dispatch's
+own report of success is a hypothesis until you have verified it outside its sandbox. If a check
+failed, say so with the output. If you skipped something, say that. When something is done and
+verified, state it plainly without hedging.

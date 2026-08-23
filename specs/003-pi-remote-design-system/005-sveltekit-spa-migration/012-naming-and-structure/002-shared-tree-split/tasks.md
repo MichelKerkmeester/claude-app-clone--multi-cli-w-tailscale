@@ -34,10 +34,10 @@ half-emptied `shared/data/` is the one intermediate state this child must never 
 <!-- ANCHOR:phase-1 -->
 ## PHASE 1: SETUP
 
-- [ ] **T1.1** Confirm child 001's manifest exists and covers all 28 `shared/data/` files.
-- [ ] **T1.2** Confirm the working tree is clean, so the commit's diff is only this split.
-- [ ] **T1.3** Confirm 013 is not running concurrently.
-- [ ] **T1.4** Record the current `$shared/data/` specifier count, so the post-move zero is a delta
+- [x] **T1.1** Confirm child 001's manifest exists and covers all 28 `shared/data/` files.
+- [x] **T1.2** Confirm the working tree is clean, so the commit's diff is only this split.
+- [x] **T1.3** Confirm 013 is not running concurrently.
+- [x] **T1.4** Record the current `$shared/data/` specifier count, so the post-move zero is a delta
       against a measured number rather than an assertion.
 <!-- /ANCHOR:phase-1 -->
 
@@ -46,18 +46,18 @@ half-emptied `shared/data/` is the one intermediate state this child must never 
 <!-- ANCHOR:phase-2 -->
 ## PHASE 2: IMPLEMENTATION
 
-- [ ] **T2.1** Create `transport/`, `state/`, `commands/`, `catalog/`, `format/`, `viewport/`,
+- [x] **T2.1** Create `transport/`, `state/`, `commands/`, `catalog/`, `format/`, `viewport/`,
       `fixtures/` under `shared/`.
-- [ ] **T2.2** Redistribute the 28 files by responsibility, per the tree in `plan.md`.
-- [ ] **T2.3** Rename the ten camelCase modules to kebab-case in the same move, halving the specifier
+- [x] **T2.2** Redistribute the 28 files by responsibility, per the tree in `plan.md`.
+- [x] **T2.3** Rename the ten camelCase modules to kebab-case in the same move, halving the specifier
       churn on the most-imported folder in the app.
-- [ ] **T2.4** Run the generated rewrite for the `$shared/data/…` specifiers — the largest single
+- [x] **T2.4** Run the generated rewrite for the `$shared/data/…` specifiers — the largest single
       specifier impact in the packet.
-- [ ] **T2.5** Rewrite the two deep-relative (`../../`) specifiers. They are the only two the
+- [x] **T2.5** Rewrite the two deep-relative (`../../`) specifiers. They are the only two the
       `$shared` alias does not cover, so they are the easiest to miss.
-- [ ] **T2.6** Confirm the worker files are reachable: they are referenced by URL construction as well
+- [x] **T2.6** Confirm the worker files are reachable: they are referenced by URL construction as well
       as by import, so an import-only grep does not prove they resolve.
-- [ ] **T2.7** Commit moves, rewrite and green build atomically.
+- [x] **T2.7** Commit moves, rewrite and green build atomically.
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -65,13 +65,13 @@ half-emptied `shared/data/` is the one intermediate state this child must never 
 <!-- ANCHOR:phase-3 -->
 ## PHASE 3: VERIFICATION
 
-- [ ] **T3.1** `shared/data/` no longer exists.
-- [ ] **T3.2** A workspace grep for `$shared/data/` returns zero hits, tests and stories included.
-- [ ] **T3.3** `npm run build` exit 0.
-- [ ] **T3.4** `npm run typecheck` exit 0.
-- [ ] **T3.5** `npm run test:web` exit 0, verified by content rather than by a piped exit status.
-- [ ] **T3.6** The backend suite stays green, run against the four real test directories explicitly.
-- [ ] **T3.7** `validate.sh … --strict` exit 0 through the script's realpath.
+- [x] **T3.1** `shared/data/` no longer exists.
+- [x] **T3.2** A workspace grep for `$shared/data/` returns zero hits, tests and stories included.
+- [x] **T3.3** `npm run build` exit 0.
+- [x] **T3.4** `npm run typecheck` exit 0.
+- [x] **T3.5** `npm run test:web` exit 0, verified by content rather than by a piped exit status.
+- [x] **T3.6** The backend suite stays green, run against the four real test directories explicitly.
+- [x] **T3.7** `validate.sh … --strict` exit 0 through the script's realpath.
 <!-- /ANCHOR:phase-3 -->
 
 ---

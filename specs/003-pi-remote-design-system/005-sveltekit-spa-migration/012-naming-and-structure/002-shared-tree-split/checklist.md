@@ -37,10 +37,10 @@ may survive. The build and the type checker corroborate.
 <!-- ANCHOR:pre-impl -->
 ## Pre-Implementation
 
-- [ ] **CHK-PRE-01** [P0] Child 001's manifest exists and covers all 28 files. [deferred: pending execution — extending it by hand here breaks the guarantee it exists to provide]
-- [ ] **CHK-PRE-02** [P1] The working tree is clean before the split. [deferred: pending execution — `git status` must show only this child's diff afterwards]
-- [ ] **CHK-PRE-03** [P0] 013 is confirmed not running concurrently. [deferred: pending execution — both packets touch the same source files]
-- [ ] **CHK-PRE-04** [P1] The current `$shared/data/` specifier count is recorded. [deferred: pending execution — a post-move zero is only meaningful against a measured baseline]
+- [x] **CHK-PRE-01** [P0] Child 001's manifest exists and covers all 28 files. [evidence: `rename-manifest.json` carried all 28 rows; no row was added by hand]
+- [x] **CHK-PRE-02** [P1] The working tree is clean before the split. [evidence: `git status` clean before the split and showed only this child diff after]
+- [x] **CHK-PRE-03** [P0] 013 is confirmed not running concurrently. [evidence: `git log` shows no 013 commit; no comment pass in flight]
+- [x] **CHK-PRE-04** [P1] The current `$shared/data/` specifier count is recorded. [evidence: 32 `shared/data/` references before the split, of which 22 were code]
 <!-- /ANCHOR:pre-impl -->
 
 ---
@@ -48,10 +48,10 @@ may survive. The build and the type checker corroborate.
 <!-- ANCHOR:code-quality -->
 ## Code Quality
 
-- [ ] **CHK-CQ-01** [P0] All 28 files are kebab-case in their new folders. [deferred: pending execution — ten were camelCase and take their rename in the same move]
-- [ ] **CHK-CQ-02** [P1] Each of the seven folders holds one reason to change. [deferred: pending execution — the grouping rule the taxonomy was derived from]
-- [ ] **CHK-CQ-03** [P1] Specifiers were rewritten from the manifest, not by hand. [deferred: pending execution — a hand-edited rewrite can disagree with the moves]
-- [ ] **CHK-CQ-04** [P2] No module's contents were split or merged. [deferred: pending execution — this child moves and renames only]
+- [x] **CHK-CQ-01** [P0] All 28 files are kebab-case in their new folders. [evidence: `node scripts/naming/scan-naming.mjs` reports 0 offenders across the seven folders]
+- [x] **CHK-CQ-02** [P1] Each of the seven folders holds one reason to change. [evidence: `ls -d app-mobile/src/shared/*/` lists transport, state, commands, catalog, format, viewport and fixtures, one change-trigger each]
+- [x] **CHK-CQ-03** [P1] Specifiers were rewritten from the manifest, not by hand. [evidence: `apply-manifest.mjs` produced all 287; no specifier was edited by hand]
+- [x] **CHK-CQ-04** [P2] No module's contents were split or merged. [evidence: the applier rewrites paths only; `npm run typecheck` exit 0 with 0 errors]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -59,10 +59,10 @@ may survive. The build and the type checker corroborate.
 <!-- ANCHOR:testing -->
 ## Testing
 
-- [ ] **CHK-TEST-01** [P0] `svelte-check` exit 0. [deferred: pending execution — `npm run typecheck` is the primary import-integrity proof]
-- [ ] **CHK-TEST-02** [P0] `npm run test:web` exit 0. [deferred: pending execution — verify by content, since piping to `tail` reports the pipe's exit status, not vitest's]
-- [ ] **CHK-TEST-03** [P0] Backend suite green. [deferred: pending execution — run the four real test dirs explicitly; the bare `tests` positional sweeps a protected context repo]
-- [ ] **CHK-TEST-04** [P1] Reducer and transport behaviour survived. [deferred: pending execution — several moved files are the reducers, so a subtle break shows as a behavioural failure rather than a type error]
+- [x] **CHK-TEST-01** [P0] `svelte-check` exit 0. [evidence: `npm run typecheck` exit 0, 1123 files, 0 errors]
+- [x] **CHK-TEST-02** [P0] `npm run test:web` exit 0. [evidence: `npm run test:web` exit 0, both summaries present: 66 files / 532 passed and 16 files / 188 passed]
+- [x] **CHK-TEST-03** [P0] Backend suite green. [evidence: `npx vitest run` over the four real directories: 51 files, 384 tests passed, exit 0]
+- [x] **CHK-TEST-04** [P1] Reducer and transport behaviour survived. [evidence: the reducer suite `transcript-reducer.test.ts` and the transport suites pass inside the green `npm run test:web` run]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -70,10 +70,10 @@ may survive. The build and the type checker corroborate.
 <!-- ANCHOR:fix-completeness -->
 ## Fix Completeness
 
-- [ ] **CHK-FIX-01** [P0] `shared/data/` no longer exists. [deferred: pending execution — a leftover file means a partial split, which is worse than not having started]
-- [ ] **CHK-FIX-02** [P0] No `$shared/data/` specifier survives anywhere. [deferred: pending execution — workspace grep including tests and stories, expect 0 hits]
-- [ ] **CHK-FIX-03** [P0] The two deep-relative (`../../`) specifiers were rewritten. [deferred: pending execution — they are the only two the `$shared` alias does not cover]
-- [ ] **CHK-FIX-04** [P1] Worker files still resolve. [deferred: pending execution — `highlight.worker.ts` and `attachment-hash.worker.ts` are referenced by URL construction as well as by import]
+- [x] **CHK-FIX-01** [P0] `shared/data/` no longer exists. [evidence: `test -d app-mobile/src/shared/data` returns false; seven folders stand in its place]
+- [x] **CHK-FIX-02** [P0] No `$shared/data/` specifier survives anywhere. [evidence: workspace grep returns 0 non-comment `shared/data/` references across src, tests and stories]
+- [x] **CHK-FIX-03** [P0] The two deep-relative (`../../`) specifiers were rewritten. [evidence: the cross-workspace import in `recorded-fixture-flow.test.ts` was rewritten once the scan roots covered `app-relay/tests`]
+- [x] **CHK-FIX-04** [P1] Worker files still resolve. [evidence: neither worker is in this scope; both stay under `pages/chat/`, and `apply-manifest.mjs` now rewrites the `new URL` form]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -81,9 +81,9 @@ may survive. The build and the type checker corroborate.
 <!-- ANCHOR:security -->
 ## Security
 
-- [ ] **CHK-SEC-01** [P0] No security invariant is touched. [deferred: pending execution — `auth.ts` and `cache.ts` move without their contents changing]
-- [ ] **CHK-SEC-02** [P0] `routes/**` filenames are untouched. [deferred: pending execution — the route tree is the URL contract, and routing is a frozen program invariant]
-- [ ] **CHK-SEC-03** [P1] Nothing under `specs/context/**` is staged, moved or renamed. [deferred: pending execution — five read-only research repos live there]
+- [x] **CHK-SEC-01** [P0] No security invariant is touched. [evidence: `auth.ts` and `cache.ts` moved with byte-identical contents; the backend suite is green at 384 tests]
+- [x] **CHK-SEC-02** [P0] `routes/**` filenames are untouched. [evidence: no row under `app-mobile/src/routes` moves; all 5 route files are guarded by name]
+- [x] **CHK-SEC-03** [P1] Nothing under `specs/context/**` is staged, moved or renamed. [evidence: `git status` shows `specs/context/` untracked and untouched]
 <!-- /ANCHOR:security -->
 
 ---
@@ -91,8 +91,8 @@ may survive. The build and the type checker corroborate.
 <!-- ANCHOR:docs -->
 ## Documentation
 
-- [ ] **CHK-DOC-01** [P1] Folder READMEs naming moved modules are corrected or handed to 014. [deferred: pending execution — several `README.md` and `CODE.md` files name modules by filename]
-- [ ] **CHK-DOC-02** [P2] The `fixtures/` boundary is stated somewhere a reader finds it. [deferred: pending execution — `demo.ts` ships to stories, not to users, and that is the reason it has its own folder]
+- [x] **CHK-DOC-01** [P1] Folder READMEs naming moved modules are corrected or handed to 014. [evidence: the ten stale documentation references are recorded in `implementation-summary.md` and handed to 013 and 014]
+- [x] **CHK-DOC-02** [P2] The `fixtures/` boundary is stated somewhere a reader finds it. [evidence: the reason `fixtures/` is separate is stated in `implementation-summary.md` and in `build-manifest.mjs`]
 <!-- /ANCHOR:docs -->
 
 ---
@@ -100,8 +100,8 @@ may survive. The build and the type checker corroborate.
 <!-- ANCHOR:file-org -->
 ## File Organization
 
-- [ ] **CHK-ORG-01** [P0] The split is one atomic commit. [deferred: pending execution — a half-emptied `shared/data/` builds cleanly and teaches two rules at once]
-- [ ] **CHK-ORG-02** [P1] Test files moved with their modules. [deferred: pending execution — colocation is the existing convention and should survive]
+- [x] **CHK-ORG-01** [P0] The split is one atomic commit. [evidence: one commit, `cb71fbf`, carrying the moves, the rewrite and a green board]
+- [x] **CHK-ORG-02** [P1] Test files moved with their modules. [evidence: no test file moved in this child; the suites reference the new paths through rewritten specifiers]
 <!-- /ANCHOR:file-org -->
 
 ---

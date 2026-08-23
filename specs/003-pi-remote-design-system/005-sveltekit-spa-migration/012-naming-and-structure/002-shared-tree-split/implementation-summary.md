@@ -1,22 +1,22 @@
 ---
-title: "Child 002 implementation summary — shared tree split"
-description: "Continuity anchor. Nothing is implemented yet: this records the measured contents of shared/data and why the build is the wrong gate for this child."
+title: "Child 012/002 implementation summary — shared tree split"
+description: "Twenty-eight modules redistributed into seven folders from the manifest, and the four ways a specifier rewrite can be silently partial, each found by grep rather than by the build."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"
-    last_updated_at: "2026-08-23T14:00:00Z"
+    last_updated_at: "2026-08-23T17:40:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped from the shared/data inventory; no files moved."
-    next_safe_action: "Wait for child 001's manifest."
-    blockers: ["depends on the manifest from child 001"]
-    completion_pct: 0
+    recent_action: "shared/data dissolved into seven folders; 287 specifiers rewritten."
+    next_safe_action: "Run child 003 for the feature folders and the tooling catch-up."
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
 <!-- SPECKIT_LEVEL: 2 -->
 
-# Child 002 implementation summary
+# Child 012/002 implementation summary
 
 ---
 
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `012-naming-and-structure` |
 | Level | 2 |
-| Status | **Scoped, not started** — blocked on child 001's manifest |
-| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+| Status | **Shipped** |
+| Requirements shipped | REQ-001 … REQ-007 |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -36,16 +36,13 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing has moved. The measured starting state:
+`shared/data/` no longer exists. Its twenty-eight modules sit in seven folders named for what makes
+them change: `transport/` for the wire contract, `state/` for the reducers, `commands/` for slash
+handling, `catalog/` for the model catalog, `format/` for presentation helpers, `viewport/`, and
+`fixtures/` for the demo data that ships to stories rather than to users.
 
-| Measurement | Count |
-|---|---|
-| Source files in `app-mobile/src/shared/data/` | 28 |
-| Responsibilities they span | 6, plus fixtures |
-| camelCase modules among them, renaming in the same move | 10 |
-| Target folders | 7 — `transport/`, `state/`, `commands/`, `catalog/`, `format/`, `viewport/`, `fixtures/` |
-| Deep-relative (`../../`) specifiers outside the alias | 2 |
-| Worker files referenced by URL construction, not only by import | 2 — `highlight.worker.ts`, `attachment-hash.worker.ts` |
+Two hundred and eighty-seven specifiers across a hundred and sixty-one files were rewritten from the
+manifest built in child 001. Not one was edited by hand.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -53,8 +50,21 @@ Nothing has moved. The measured starting state:
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-One commit: the moves, the ten renames, the generated specifier rewrite and a green build. The
-executor performs the moves; Claude owns verification and git.
+One commit carrying the moves, the generated rewrite and a green board together.
+
+The first four runs were partial, and the packet predicted why: the gate here is the existence check
+and the specifier grep, not the build. Each gap was found by grepping for the old path, and each
+would have failed differently:
+
+| Gap | How it would have failed |
+|---|---|
+| `vi.mock('…')` names a module by path but is a call, not an import | The double stops replacing anything and the suite passes against the real module — silent |
+| `new URL('./x.worker.ts', import.meta.url)` addresses a worker | Nothing fails at build time; the worker is unreachable when constructed |
+| The logic suites are `.tsx`, which the scan's extension list omitted | Nine imports never visited |
+| A relay integration test imports a client reducer by deep-relative path | The suite fails to collect — the loud one, and the only one the build caught |
+
+All four are now encoded in the applier with the reason, because child 003 moves roughly a hundred
+more files and both workers.
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -62,15 +72,15 @@ executor performs the moves; Claude owns verification and git.
 <!-- ANCHOR:decisions -->
 ## KEY DECISIONS
 
-**One commit, not seven.** A half-emptied `shared/data/` compiles, runs and passes every suite, while
-teaching two naming rules at once. Putting the whole split in a single commit removes that state from
-the space of possible outcomes.
+**The scan roots are every tree that can name a module**, not the tree being renamed. Scoping the
+scan to the moving files is the mistake that looks like a shortcut; the relay test proved it.
 
-**The camelCase renames ride along.** Ten of the twenty-eight are camelCase today. Renaming them in
-the same move halves the specifier churn on the most-imported folder in the app.
+**The folder documentation moved up rather than being deleted.** `README.md` and `CODE.md` describe
+the shared layer and now sit at `shared/`. Packet 014 replaces them with per-folder documentation;
+deleting authored content to satisfy a folder-removal requirement would have been the wrong trade.
 
-**`fixtures/` is its own folder** even though it holds one file, because `demo.ts` ships to stories
-rather than to users, and that boundary should be visible without opening anything.
+**`fixtures/` is separate from every runtime folder.** `demo.ts` ships to stories, not to users, and
+that distinction should be visible from the directory listing rather than by opening the file.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -80,15 +90,15 @@ rather than to users, and that boundary should be visible without opening anythi
 
 | Check | Result |
 |---|---|
-| `shared/data/` removed | not done |
-| Workspace grep for `$shared/data/` | not run |
-| `npm run build` | not run |
-| `npm run typecheck` | not run |
-| `npm run test:web` | not run |
-| Backend suite against the four real test dirs | not run |
-| `validate.sh --strict` via realpath | not run |
-
-No completion claim is made or implied.
+| `shared/data/` removed | PASS — the directory does not exist; seven new folders in its place |
+| Old-path grep, code | PASS — zero non-comment references to `shared/data/` remain |
+| `npm run typecheck` | PASS — exit 0, 1123 files, 0 errors |
+| `npm run build` | PASS — exit 0 |
+| `npm run test:web` | PASS — exit 0, 66/532 and 16/188, both summaries present |
+| Backend, four real directories | PASS — exit 0, 51 files / 384 tests |
+| Token identity, three themes | PASS — 0 CHANGED / 0 VANISHED / 0 ADDED over 96 components plus `app.css` |
+| `@ds guardrail:` fences | PASS — 201 in source and 277 including documentation, identical before and after |
+| Worker resolution | PASS — neither worker is in this child's scope; both remain under `pages/chat/`, and the applier now rewrites their URL form |
 <!-- /ANCHOR:verification -->
 
 ---
@@ -96,14 +106,10 @@ No completion claim is made or implied.
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-**The build cannot detect this child's failure mode.** A partial split type-checks and passes the
-suites. Only the existence check and the specifier grep tell a finished split from an abandoned one.
+**Ten documentation files and eight story-file comments still name `$shared/data/…` in prose.** They
+are references in comments rather than specifiers, so nothing resolves them and nothing breaks — but
+they now point at a folder that does not exist. Packets 013 and 014 own that text.
 
-**A grep over imports says nothing about the workers.** They are constructed by URL, so their
-resolution has to be confirmed a different way.
-
-**The taxonomy is a prediction.** `state/` and `transport/` change together often enough that one
-`session/` folder was genuinely arguable. It was put to the operator and rejected: the wire contract
-and the reducers change for different reasons, and merging them would hide two triggers behind one
-name. That is a judgement about the future, and judgements about the future age.
+**The two folder documents at `shared/` describe a tree that has been split.** They are accurate
+about the layer and stale about its shape until 014 rewrites them per folder.
 <!-- /ANCHOR:limitations -->

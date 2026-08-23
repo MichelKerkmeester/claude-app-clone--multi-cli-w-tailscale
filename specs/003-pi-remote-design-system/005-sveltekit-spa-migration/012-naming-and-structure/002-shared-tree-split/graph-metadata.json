@@ -30,13 +30,13 @@
       "28-file"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
       "plan.md",
       "spec.md",
       "checklist.md",
-      "tasks.md",
-      "implementation-summary.md"
+      "implementation-summary.md",
+      "tasks.md"
     ],
     "entities": [
       {
@@ -58,15 +58,15 @@
         "source": "derived"
       },
       {
-        "name": "tasks.md",
-        "kind": "doc",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "implementation-summary.md",
         "kind": "doc",
         "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Redistribute the 28-file shared/data grab-bag into seven folders grouped by reason to change, and rewrite the specifiers that reach it from nearly every page component.",
     "created_at": "2026-08-23T10:58:30.818Z",
-    "last_save_at": "2026-08-23T12:13:09.803Z",
+    "last_save_at": "2026-08-23T14:34:05.118Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:9483e0dfef21326896913eeb8d7f9f82a16b6ad4a852cdd3f56e403a423262ff",
+    "source_fingerprint": "sha256:d584dc72526c3e774dbc2fc3450618ada0cd26d37fe58ab9d21c1e45a050251f",
     "source_doc_hashes": {
       "spec.md": "423cb6f48fff4a5129e63391db5c5fd50f83ade36c55e35ef706025c3bd1e731",
       "plan.md": "d02a67a752e7670ad25c4206e0535cc18542112669b4be0b76bf237d07b70cbb",
-      "tasks.md": "a839d4887db8cb206b997f4ccc71ab368a66ee4fd00f5ed570d835b81b906a2a",
-      "checklist.md": "8b442998909af512e63e252142b1dd57e3fa28edb14c5b79ffc611dea2cf7fc3",
-      "implementation-summary.md": "3ce45a64e5c1627516fbe2b71a13b43426f3393e5d8c5b7eeca400b61335aeb1"
+      "tasks.md": "7e1c3c94c91188c5cab46a41a219848f797d8d02d93b85fd7e05e2a514f9f9d4",
+      "checklist.md": "9ac3dfb84c0def9a5fc4843f891a467b8a1b0dd8540b6e96ad8b9fdebfcc18a4",
+      "implementation-summary.md": "86c93881fe233f9cb5640089a0bd8004fa6315d3763200564fbfb0fd367f2b65"
     },
     "last_active_child_id": null,
     "last_active_at": null

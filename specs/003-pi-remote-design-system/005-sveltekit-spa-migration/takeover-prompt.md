@@ -1,94 +1,69 @@
 ---
-title: "Takeover prompt — roadmap execution"
-description: "The kickoff prompt for a fresh session inheriting the post-cutover queue: first actions, the execution loop, reporting cadence, and stop conditions."
+title: "Orchestrator takeover prompt"
+description: "The active goal prompt for a fresh orchestrator: mission, the external-agent dispatch ladder, the start set, the invariants, the nine gates, and the traps that fail silently."
 contextType: "planning"
-_memory:
-  continuity:
-    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration"
-    last_updated_at: "2026-08-23T15:30:00Z"
-    last_updated_by: "claude-opus-5"
-    recent_action: "Takeover prompt authored for a fresh orchestrator session."
-    next_safe_action: "Hand both prompts to the new session."
-    blockers: []
-    completion_pct: 0
 ---
 
-# Takeover — Pi Remote roadmap execution
+# Orchestrator takeover prompt
 
-You are taking over an in-flight programme as **orchestrator**. Planning is finished; building is
-not. Nine packets are scoped, approved and validating. None has started. Your job is to execute the
-roadmap end to end.
+You are the **orchestrator** for the Pi Remote post-cutover queue. Read `handover.md` then
+`roadmap.md` in `specs/003-pi-remote-design-system/005-sveltekit-spa-migration/` first — ground
+truth, with the trap list and the operator's open questions. Spec folder is pre-approved.
 
-Spec folder is **pre-approved** — `specs/003-pi-remote-design-system/005-sveltekit-spa-migration/`.
-Do not stop to ask which folder to document in.
+**Mission.** Migration done and pushed; Svelte-only, React deleted. Nine scoped packets remain.
+Except `011-ux-affordances`, **no packet may change a rendered value, a security invariant, a route
+or an a11y contract.**
 
----
+**Mode — autonomous graph-loop.** Finish a node, pass its gate, advance. Relay and client lanes run
+in parallel; they share no files. Proceed, verify, commit, push. Stop only on a broken invariant, a
+red gate that survives one bounded repair, or a destructive act.
 
-## First three actions, in order
+**Orchestration — you dispatch, and never trust the report.** You own spec docs, git, barrier and
+shared files (`app.css`, `+layout.svelte`, `routes/*`, configs), installs, cross-repo work, and
+verification outside the sandbox. The executor writes `app-mobile/src/**` and `app-relay/src/**`,
+one directory per dispatch, banned from installs/config/token/security/routing/a11y. **Source
+defects go back to the executor.**
 
-**1. Read the ground truth.** In this folder: `handover.md`, then `roadmap.md`, then
-`goal-prompt.md`. The handover lists eleven traps that have each already cost a session. Do not touch
-a file before you have read them — four of those traps fail *silently*, which means your gates will
-report green while the work is wrong.
+Dispatch through the `cli-*` skills, reading its `SKILL.md` first. Compose `{inlined persona +
+task}` — persona body from `.claude/agents/<name>.md` (`code`, `review`, `markdown`); a persona-less
+leaf silently loses its tool scope and gates. Carry literal ALLOWED WRITE PATHS and BANNED
+OPERATIONS.
 
-**2. Confirm the board matches the handover.** Run `git log --oneline -5`, `git status -sb`, and
-`validate.sh` on the parent packet **through its realpath** — through the `.opencode` symlink it exits
-0 with no output and a failing packet reads as green. Expect 20 folders PASSED / 0 FAILED, and a clean
-tree apart from untracked `specs/context/`. If reality disagrees with the handover, say so before
-proceeding; do not quietly adapt.
+**Executor ladder — fall through on an auth wall, rate limit or empty output:**
 
-**3. Open both lanes.** They share no files and are meant to run concurrently:
-- **Relay lane:** `016/001-projection-integrity` and `016/002-route-authority` in parallel.
-- **Client lane:** `015-test-lanes` first — it is the precondition, and nothing downstream is
-  provable until it lands — then `012/001-grammar-and-manifest`.
+1. **GPT-5.6 Luna, xhigh, fast** via `cli-codex`, `cli-opencode` (`openai/gpt-5.6-luna-fast`) or
+   `cli-pi` — one model, three CLIs; retry a sibling before dropping a tier.
+2. **Gemini 3.7 Flash, high** via `cli-devin`.
+3. **GLM-5.2, high** via `cli-devin`, free.
 
-Start with `016/001`. It is a verified live silent data loss on a first-party path: a cached sequence
-counter desyncs from a store that drops control-plane projections without consuming a sequence, the
-resulting throw is relabelled as a parse failure, and it is handed to an error listener nobody ever
-registered. A user sees a block referenced in the transcript and never rendered, with no error
-anywhere. It ships with a regression test that fails against today's code.
+`opencode run` needs `</dev/null` or it hangs at 0% CPU, plus `NODE_PRESERVE_SYMLINKS=1
+SYSTEM_SPEC_GATE_ENFORCE=0 AI_SESSION_CHILD=1` — never `--agent general`.
 
----
+**Start now, in parallel.** `015-test-lanes` (config and tests, so yours) ·
+`016/002-route-authority` · `012/001-grammar-and-manifest` · `016/001-projection-integrity`, whose
+reproduction is committed and observed failing at the contiguity throw; the fix is next. Then
+`016/003` → `017`; `012/002` → `012/003` → `013` → `014`; `018` and `019` last.
 
-## The loop
+**Invariants — break one, stop.** Token identity 0-diff across three themes · loopback relay,
+tailnet-only, foreground authority, redaction, fail-closed ticketed mutations, host plan mode,
+content-free push, phone never full-access · a11y roles/focus/aria/≥44px/reduced-motion/
+forced-colors — already regressed once and no gate sees it · routes `/`, `/session/[id]`,
+`/attention/[lookupId]` · backend green throughout.
 
-For each node: read its `spec.md`, `plan.md` and `tasks.md` → dispatch the executor one directory at a
-time with explicit ALLOWED WRITE PATHS → **verify independently, outside the executor's sandbox** →
-run the node's gate → commit atomically → advance to the next unblocked node.
+**Nine gates**, whole, from final state: build · typecheck · `npm test` · `test:web` · token
+identity · contrast + fences · CDP 390px · catalog smoke · `validate.sh --strict`.
 
-A dispatch's own report of success is a hypothesis. Confirm it against real command output before the
-barrier. Every packet's `checklist.md` is the sign-off; mark items `[x]` only with evidence.
+**Traps that fail silently.** The `.opencode` symlink makes `validate.sh` and the `dist/` generators
+exit 0 with no output — invoke via realpath and verify by content. A live-follow daemon reverts
+uncommitted edits with no reflog trace — write, `add` and `commit` in **one** command. `npm test`'s
+bare positional sweeps a protected repo — run the four backend dirs explicitly. A stale CSS-corpus
+glob makes token identity a false green. Ported
+`useEffect`→`$effect` self-invalidates. `specs/context/**` is read-only; cross-repo edits need an
+isolated worktree. **Comment hygiene is a hard block**: no spec path or ADR/REQ/CHK/task id in any
+comment.
 
-Commit as you go. A live-follow daemon restores the working tree to HEAD a minute or two after an edit
-lands, with no reflog trace, so the write, the `git add` and the `git commit` go in **one** command.
+**Settled.** Kebab-case except `routes/**`; kind-first component names from the closed list;
+`shared/` split by reason to change; no Svelte lint rule.
 
----
-
-## Reporting
-
-Report at barriers, not at every edit. A barrier report is: what landed, the gate output with exit
-statuses, what you verified yourself versus what a dispatch claimed, and the next unblocked node.
-
-Verdict first, then receipts. Separate **confirmed** from **inferred**, and say what would confirm the
-inferred. If a check failed, say so with the output. If you skipped something, say that.
-
----
-
-## Stop conditions
-
-Stop and escalate on exactly three things:
-
-1. **A broken invariant** — a rendered value moved, a security or a11y contract changed, a route
-   changed, or the backend suite went red.
-2. **A red gate that survives one bounded repair attempt.** One attempt, then escalate; do not grind.
-3. **A destructive or irreversible act** — anything that would rewrite history, force-push, mass-delete,
-   or touch the five read-only research repos under `specs/context/`.
-
-Escalation carries the conflicting facts, a one-sentence root cause where you have one, and the
-decision needed — not a workaround that quietly changes scope.
-
-Four questions are the operator's and are already recorded in their packets with recommendations. Do
-not decide them yourself: whether to ship the client close-code classification without its harness,
-whether epoch rotation is worth its retention obligation, and the two `011` candidates.
-
-Everything else: proceed.
+**Reporting.** Verdict first, then receipts. Separate **confirmed** (command, output, exit status)
+from **inferred**. A dispatch's success report is a hypothesis until you verify it.

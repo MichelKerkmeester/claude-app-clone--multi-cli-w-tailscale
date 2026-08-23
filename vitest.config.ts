@@ -16,8 +16,19 @@ const RUNTIME_SYMLINKS = [
   '.devin/**',
 ];
 
+// Research repositories checked out under specs/context are read-only inputs, not
+// workspace code. They carry their own test suites, which the same bare positional
+// filter matches, so a plain `npm test` reports hundreds of failures that belong to
+// another project entirely.
+const RESEARCH_INPUTS = ['specs/context/**'];
+
 export default defineConfig({
   test: {
-    exclude: [...configDefaults.exclude, 'app-mobile/tests/**', ...RUNTIME_SYMLINKS],
+    exclude: [
+      ...configDefaults.exclude,
+      'app-mobile/tests/**',
+      ...RUNTIME_SYMLINKS,
+      ...RESEARCH_INPUTS,
+    ],
   },
 });

@@ -12,7 +12,7 @@ import { cleanup, render, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import TranscriptList from '../src/pages/chat/transcript/TranscriptList.svelte';
-import type { DisplayTranscriptBlock } from '../src/shared/data/state.js';
+import type { DisplayTranscriptBlock } from '../src/shared/state/state.js';
 
 const VIEWPORT_HEIGHT = 600;
 const ROW_HEIGHT = 180;

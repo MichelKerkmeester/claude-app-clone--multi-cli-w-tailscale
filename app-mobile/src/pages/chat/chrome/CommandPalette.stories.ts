@@ -6,8 +6,8 @@ import type {
   HostCommandCatalogState,
   ScopedCommandSnapshot,
   SelectedCommandBinding,
-} from '$shared/data/commands.js';
-import { demoPostJson } from '$shared/data/demo.js';
+} from '$shared/commands/commands.js';
+import { demoPostJson } from '$shared/fixtures/demo.js';
 
 // Re-host the demo `/api/commands/list` rows as a real HostCommandCatalogState
 // so every CommandPalette story's `catalog.commands` is sourced from demo.ts —

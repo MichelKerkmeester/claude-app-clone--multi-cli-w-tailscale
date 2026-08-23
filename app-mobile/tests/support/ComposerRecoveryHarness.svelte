@@ -8,8 +8,8 @@
 <script lang="ts">
   import SessionComposer from '../../src/pages/chat/chrome/SessionComposer.svelte';
   import { getAttachmentDraft } from '../../src/pages/chat/attachments/AttachmentDraftProvider.svelte';
-  import { INITIAL_RUNTIME_STATE, type RuntimeControls } from '../../src/shared/data/runtime.js';
-  import type { HostCommandCatalogState } from '../../src/shared/data/commands.js';
+  import { INITIAL_RUNTIME_STATE, type RuntimeControls } from '../../src/shared/state/runtime.js';
+  import type { HostCommandCatalogState } from '../../src/shared/commands/commands.js';
   import { vi } from 'vitest';
 
   let { sessionId, initialPrompt }: ComposerRecoveryHarnessProps = $props();

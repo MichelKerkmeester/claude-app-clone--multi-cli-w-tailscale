@@ -31,7 +31,7 @@ vi.mock('@tanstack/svelte-virtual', () => {
 vi.mock('../src/pages/chat/artifacts/useArtifactResource.svelte.js', () => resource);
 
 import TranscriptList from '../src/pages/chat/transcript/TranscriptList.svelte';
-import type { DisplayTranscriptBlock } from '../src/shared/data/state.js';
+import type { DisplayTranscriptBlock } from '../src/shared/state/state.js';
 
 function readyBlock(
   id: string,

@@ -1,7 +1,7 @@
 <script module lang="ts">
-  import type { SessionListState, ConnectionPhase } from '$shared/data/state.js';
-  import type { ReadOnlyCache } from '$shared/data/cache.js';
-  import type { DeviceIdentity } from '$shared/data/auth.js';
+  import type { SessionListState, ConnectionPhase } from '$shared/state/state.js';
+  import type { ReadOnlyCache } from '$shared/transport/cache.js';
+  import type { DeviceIdentity } from '$shared/transport/auth.js';
 
   export interface HomeProps {
     readonly sessions: SessionListState;
@@ -19,7 +19,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { sessionStatusLabel, compactId, relativeTime } from '$shared/data/view-helpers.js';
+  import { sessionStatusLabel, compactId, relativeTime } from '$shared/format/view-helpers.js';
   import Button from '$shared/primitives/button/button.svelte';
   import Freshness from './Freshness.svelte';
   import EmptyState from './EmptyState.svelte';

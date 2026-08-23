@@ -19,8 +19,8 @@ import { getContext, setContext } from 'svelte';
 
 import type { RuntimeMediaCapabilityDto } from '@pi-remote/pi-rpc-protocol';
 
-import type { DeviceIdentity } from './auth.js';
-import { loadCache, type ReadOnlyCache } from './cache.js';
+import type { DeviceIdentity } from '../transport/auth.js';
+import { loadCache, type ReadOnlyCache } from '../transport/cache.js';
 import {
   DEFAULT_MEDIA_CAPABILITY_OFF,
   EMPTY_TRANSCRIPT,
@@ -34,7 +34,7 @@ import {
   type TranscriptState,
   type TodoProjectionState,
 } from './state.js';
-import { readThemePreference, type ThemePreference } from './view-helpers.js';
+import { readThemePreference, type ThemePreference } from '../format/view-helpers.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. CONTEXT KEYS AND CONFIG TYPES

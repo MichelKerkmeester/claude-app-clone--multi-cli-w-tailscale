@@ -186,7 +186,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
+  import { useVisualViewportAnchor } from '$shared/viewport/use-visual-viewport-anchor.svelte.js';
   import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
   import {
     canCopyDisplayedArtifact,

@@ -25,13 +25,13 @@
     setAppState,
     setAppActions,
     type AppActions,
-  } from '$shared/data/app-state.svelte.js';
-  import { establishSession, revokeDevice, logoutDevice, type DeviceIdentity } from '$shared/data/auth.js';
-  import { fetchSessions } from '$shared/data/relay.js';
-  import { setPushForeground, unsubscribeFromPush } from '$shared/data/attention.js';
-  import { saveCache } from '$shared/data/cache.js';
-  import { messageFrom } from '$shared/data/view-helpers.js';
-  import type { ConnectionAction } from '$shared/data/state.js';
+  } from '$shared/state/app-state.svelte.js';
+  import { establishSession, revokeDevice, logoutDevice, type DeviceIdentity } from '$shared/transport/auth.js';
+  import { fetchSessions } from '$shared/transport/relay.js';
+  import { setPushForeground, unsubscribeFromPush } from '$shared/format/attention.js';
+  import { saveCache } from '$shared/transport/cache.js';
+  import { messageFrom } from '$shared/format/view-helpers.js';
+  import type { ConnectionAction } from '$shared/state/state.js';
   import type { AttentionResolutionDto } from '@pi-remote/pi-rpc-protocol';
 
   import RootErrorBoundary from '$shared/chrome/root-error-boundary.svelte';

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import TranscriptList from './TranscriptList.svelte';
-import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptProvenance } from '$shared/data/state.js';
-import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/data/demo.js';
+import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptProvenance } from '$shared/state/state.js';
+import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen rich-content fixtures through the existing parseDisplayBlock
 // parser so every story `blocks` arg is a real DisplayTranscriptBlock[] sourced from

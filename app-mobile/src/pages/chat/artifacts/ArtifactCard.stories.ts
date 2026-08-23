@@ -3,7 +3,7 @@ import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
 import ArtifactCard from './ArtifactCard.svelte';
 import ArtifactViewerProvider from './ArtifactViewerProvider.svelte';
-import { DEMO_DIFF_FIXTURE } from '$shared/data/demo.js';
+import { DEMO_DIFF_FIXTURE } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_DIFF_FIXTURE as a real FileDiffBlock so the story
 // `block` arg is sourced from the demo data — nothing is invented. The id,

@@ -1,6 +1,6 @@
 <script module lang="ts">
-  import type { RuntimeControls } from '$shared/data/runtime.js';
-  import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/data/commands.js';
+  import type { RuntimeControls } from '$shared/state/runtime.js';
+  import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/commands/commands.js';
 
   export interface ComposerToolsProps {
     readonly runtimeControls: RuntimeControls;

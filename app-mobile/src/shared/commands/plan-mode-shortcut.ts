@@ -12,7 +12,7 @@
 // 1. IMPORTS
 // ───────────────────────────────────────────────────────────────────
 
-import { modeAuthority, type RuntimeUiState } from './runtime.js';
+import { modeAuthority, type RuntimeUiState } from '../state/runtime.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. TYPE DEFINITIONS

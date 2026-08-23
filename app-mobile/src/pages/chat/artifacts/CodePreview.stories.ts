@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import CodePreview from './CodePreview.svelte';
-import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/data/demo.js';
+import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_TEXT_CODE_SHARE_BLOCKS code fixture so every story
 // `text`/`language` arg is sourced from the real inline-text demo block — nothing

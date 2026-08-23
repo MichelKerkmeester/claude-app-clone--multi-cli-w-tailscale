@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
 import TextArtifactCard from './TextArtifactCard.svelte';
-import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/data/demo.js';
+import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/fixtures/demo.js';
 import {
   normalizeTranscriptBlocks,
   type NormalizedTextArtifactBlock,

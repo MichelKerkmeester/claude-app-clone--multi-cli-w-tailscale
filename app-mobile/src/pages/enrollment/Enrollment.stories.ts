@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
-import type { DeviceIdentity } from '$shared/data/auth.js';
+import type { DeviceIdentity } from '$shared/transport/auth.js';
 import Enrollment from './Enrollment.svelte';
 
 const onEnrolled = (_device: DeviceIdentity): void => {};

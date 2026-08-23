@@ -9,7 +9,7 @@
 
 <script lang="ts">
   // @ds surface: InboundImageBlockView — inbound_image transcript block rendered as a card, or an unsupported-capability fallback.
-  import { demoInboundImageState, demoInboundMediaCapabilityOff } from '$shared/data/demo.js';
+  import { demoInboundImageState, demoInboundMediaCapabilityOff } from '$shared/fixtures/demo.js';
   import InboundImageCard from './InboundImageCard.svelte';
 
   let { block, sessionId }: InboundImageBlockViewProps = $props();

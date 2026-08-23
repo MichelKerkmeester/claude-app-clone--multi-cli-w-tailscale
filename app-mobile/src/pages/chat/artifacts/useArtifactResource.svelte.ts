@@ -22,8 +22,8 @@ import {
   type ArtifactReadVariant,
   type ArtifactResource,
   type ArtifactResourceBlock,
-} from '$shared/data/relay.js';
-import { demoInboundArtifactResource, isDemoMode } from '$shared/data/demo.js';
+} from '$shared/transport/relay.js';
+import { demoInboundArtifactResource, isDemoMode } from '$shared/fixtures/demo.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. RESOURCE LIMITS AND STATUS CONTRACT

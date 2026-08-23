@@ -15,7 +15,7 @@ import {
   type RuntimePhase,
   type RuntimeStatus,
   type RuntimeUiState,
-} from '../src/shared/data/runtime.js';
+} from '../src/shared/state/runtime.js';
 import type { RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 
 const HOST_STATE: RuntimeStateDto = {

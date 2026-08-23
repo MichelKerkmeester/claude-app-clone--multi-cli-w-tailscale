@@ -10,8 +10,8 @@ import {
   runtimeReducer,
   type RuntimeControls,
   type RuntimeUiState,
-} from '$shared/data/runtime.js';
-import { demoPostJson } from '$shared/data/demo.js';
+} from '$shared/state/runtime.js';
+import { demoPostJson } from '$shared/fixtures/demo.js';
 
 // Re-host the demo runtime fixtures through the real reducer so every
 // RuntimeStrip story's `controls.runtime` is a real RuntimeUiState sourced from

@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { planModePresentation, type ModePresentationKind } from './planModePresentation.js';
-  import type { RuntimeUiState } from '$shared/data/runtime.js';
+  import type { RuntimeUiState } from '$shared/state/runtime.js';
 
   // @ds state: alert — conflicts · permission loss · delivery uncertainty route to the alert region.
   const ALERT_KINDS: ReadonlySet<ModePresentationKind> = new Set([

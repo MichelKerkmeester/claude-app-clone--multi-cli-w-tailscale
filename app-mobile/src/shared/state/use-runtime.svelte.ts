@@ -16,7 +16,7 @@
 import type { RuntimeControlResponse, RuntimeOperation } from '@pi-remote/pi-rpc-protocol';
 
 import { untrack } from 'svelte';
-import * as relay from './relay.js';
+import * as relay from '../transport/relay.js';
 import {
   BLOCKED_MUTATION_PHASES,
   HYDRATE_TIMEOUT_MS,

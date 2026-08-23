@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { RuntimeControls } from '$shared/data/runtime.js';
+  import type { RuntimeControls } from '$shared/state/runtime.js';
 
   export type ThemePreference = 'system' | 'light' | 'dark';
 
@@ -51,8 +51,8 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { modelEffortTriggerName, effortTriggerText } from '$shared/data/effort.js';
-  import { modelSwitcherStrings } from '$shared/data/model-switcher-strings.js';
+  import { modelEffortTriggerName, effortTriggerText } from '$shared/catalog/effort.js';
+  import { modelSwitcherStrings } from '$shared/catalog/model-switcher-strings.js';
   import { Popover } from 'bits-ui';
   import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
   import Button from '$shared/primitives/button/button.svelte';

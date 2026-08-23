@@ -28,8 +28,8 @@ import {
   transcriptReducer,
   type ConnectionAction,
   type TodoProjectionAction,
-} from './state.js';
-import { messageFrom } from './view-helpers.js';
+} from '../state/state.js';
+import { messageFrom } from '../format/view-helpers.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. SYNC MESSAGE HELPERS

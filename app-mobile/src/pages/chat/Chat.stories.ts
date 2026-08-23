@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { SessionCardDto, TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
-import { demoPostJson } from '$shared/data/demo.js';
+import { demoPostJson } from '$shared/fixtures/demo.js';
 import {
   EMPTY_TRANSCRIPT,
   transcriptReducer,
@@ -8,7 +8,7 @@ import {
   type ConnectionPhase,
   type TranscriptAction,
   type TranscriptState,
-} from '$shared/data/state.js';
+} from '$shared/state/state.js';
 import Chat from './Chat.svelte';
 
 // Re-host the demo session and its transcript through the relay's real

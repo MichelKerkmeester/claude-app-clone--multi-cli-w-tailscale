@@ -6,7 +6,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { RuntimeControls, RuntimeUiState } from '../src/shared/data/runtime.js';
+import type { RuntimeControls, RuntimeUiState } from '../src/shared/state/runtime.js';
 import ModelEffortSheet, { SEARCH_THRESHOLD } from '../src/pages/chat/chrome/ModelEffortSheet.svelte';
 
 const CURRENT: AvailableModelDto = {

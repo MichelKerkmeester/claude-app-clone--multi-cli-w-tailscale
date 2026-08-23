@@ -3,7 +3,7 @@ import { webcrypto } from 'node:crypto';
 import { sha256, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ArtifactReadError, readArtifact } from '../src/shared/data/relay.js';
+import { ArtifactReadError, readArtifact } from '../src/shared/transport/relay.js';
 
 const BODY = 'safe exact revision bytes\n';
 const BLOCK: FilePreviewBlock = {

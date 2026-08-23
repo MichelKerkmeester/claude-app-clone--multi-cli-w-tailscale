@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { RuntimeControls } from '$shared/data/runtime.js';
+  import type { RuntimeControls } from '$shared/state/runtime.js';
 
   export interface RuntimeStripProps {
     readonly controls: RuntimeControls;
@@ -32,7 +32,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { effortTriggerName, effortTriggerText } from '$shared/data/effort.js';
+  import { effortTriggerName, effortTriggerText } from '$shared/catalog/effort.js';
   import Button from '$shared/primitives/button/button.svelte';
   import ToggleGroup from '$shared/primitives/choice/toggle-group.svelte';
   import ToggleGroupItem from '$shared/primitives/choice/toggle-group-item.svelte';

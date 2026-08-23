@@ -10,7 +10,7 @@
 import type { TextBlock } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { ScopedCommandSnapshot, SelectedCommandBinding } from '../src/shared/data/commands.js';
+import type { ScopedCommandSnapshot, SelectedCommandBinding } from '../src/shared/commands/commands.js';
 
 const relay = vi.hoisted(() => {
   class SlashSubmitError extends Error {
@@ -43,9 +43,9 @@ const relay = vi.hoisted(() => {
   };
 });
 
-vi.mock('../src/shared/data/relay.js', () => relay);
+vi.mock('../src/shared/transport/relay.js', () => relay);
 
-import { canonicalSlashMessage, submitSlashDraft } from '../src/shared/data/submitSlashDraft.js';
+import { canonicalSlashMessage, submitSlashDraft } from '../src/shared/commands/submit-slash-draft.js';
 
 const SESSION = 'session_submit';
 const EPOCH = 'epoch_submit';

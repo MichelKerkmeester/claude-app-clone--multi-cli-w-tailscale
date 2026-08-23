@@ -19,7 +19,7 @@ import {
   controlRuntime,
   fetchRuntimeSnapshot,
   parseBoundedRetryAfter,
-} from '../src/shared/data/relay.js';
+} from '../src/shared/transport/relay.js';
 
 const CURRENT_MODEL = { provider: 'deepseek', id: 'deepseek-v4-flash', label: 'DeepSeek Flash' };
 

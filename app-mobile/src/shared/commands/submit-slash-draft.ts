@@ -22,8 +22,8 @@ import {
   type ScopedCommandSnapshot,
   type SelectedCommandBinding,
 } from './commands.js';
-import { RelayRequestError, SlashSubmitError, requestTicket, submitSlashCommand } from './relay.js';
-import type { ConnectionPhase } from './state.js';
+import { RelayRequestError, SlashSubmitError, requestTicket, submitSlashCommand } from '../transport/relay.js';
+import type { ConnectionPhase } from '../state/state.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. OUTCOME AND INPUT TYPES

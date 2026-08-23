@@ -18,8 +18,8 @@ import {
   AskQuestionRelayError,
   requestAskQuestionAnswerTicket,
   submitAskQuestionAnswer,
-} from '$shared/data/relay.js';
-import { isDemoMode } from '$shared/data/demo.js';
+} from '$shared/transport/relay.js';
+import { isDemoMode } from '$shared/fixtures/demo.js';
 import type {
   AskQuestionSubmitIntent,
   AskQuestionViewModel,

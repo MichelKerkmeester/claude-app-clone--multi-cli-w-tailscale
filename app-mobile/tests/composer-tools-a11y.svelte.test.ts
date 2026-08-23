@@ -3,13 +3,13 @@ import { cleanup, render, screen, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { HostCommandCatalogState, SelectedCommandBinding } from '../src/shared/data/commands.js';
+import type { HostCommandCatalogState, SelectedCommandBinding } from '../src/shared/commands/commands.js';
 import ComposerTools from '../src/pages/chat/chrome/ComposerTools.svelte';
 import {
   INITIAL_RUNTIME_STATE,
   type RuntimeControls,
   type RuntimeUiState,
-} from '../src/shared/data/runtime.js';
+} from '../src/shared/state/runtime.js';
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',

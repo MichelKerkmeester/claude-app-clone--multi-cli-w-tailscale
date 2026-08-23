@@ -30,7 +30,7 @@
     effortRowDescription,
     effortRowName,
     effortStrings,
-  } from '$shared/data/effort.js';
+  } from '$shared/catalog/effort.js';
   import { focusVisible, focused, hover } from '$shared/primitives/a11y/interactions.js';
   import RadioGroup from '$shared/primitives/choice/radio-group.svelte';
   import RadioGroupItem from '$shared/primitives/choice/radio-group-item.svelte';

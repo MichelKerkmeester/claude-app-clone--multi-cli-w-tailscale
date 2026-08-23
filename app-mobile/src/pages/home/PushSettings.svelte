@@ -11,8 +11,8 @@
     unsubscribeFromPush,
     updatePushPreferences,
     type PushConfig,
-  } from '$shared/data/attention.js';
-  import { attentionLabel, messageFrom } from '$shared/data/view-helpers.js';
+  } from '$shared/format/attention.js';
+  import { attentionLabel, messageFrom } from '$shared/format/view-helpers.js';
   import Button from '$shared/primitives/button/button.svelte';
 
   // ───────────────────────────────────────────────────────────────────

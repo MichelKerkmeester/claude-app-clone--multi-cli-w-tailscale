@@ -13,7 +13,7 @@ import {
   normalizeCommandText,
   rankHostCommands,
   type RankedHostCommand,
-} from '../src/shared/data/rankHostCommands.js';
+} from '../src/shared/commands/rank-host-commands.js';
 
 function command(name: string, extra?: Partial<CommandDescriptorDto>): CommandDescriptorDto {
   return {

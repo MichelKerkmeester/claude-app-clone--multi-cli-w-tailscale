@@ -40,7 +40,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { buildTodoDisplayModel, TODO_STATE_LABELS } from '$shared/data/todo-model.js';
+  import { buildTodoDisplayModel, TODO_STATE_LABELS } from '$shared/state/todo-model.js';
   import Button from '$shared/primitives/button/button.svelte';
   import Collapsible from '$shared/primitives/disclosure/collapsible.svelte';
   import { focused, focusVisible, hover, press } from '$shared/primitives/a11y/interactions.js';

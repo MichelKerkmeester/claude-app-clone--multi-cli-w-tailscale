@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { ThemePreference } from '../data/view-helpers.js';
+  import type { ThemePreference } from '../format/view-helpers.js';
 
   export interface ThemeControlProps {
     readonly value: ThemePreference;

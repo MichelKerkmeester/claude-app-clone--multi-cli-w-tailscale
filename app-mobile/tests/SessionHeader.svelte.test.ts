@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import SessionHeader from '../src/pages/chat/chrome/SessionHeader.svelte';
-import { INITIAL_RUNTIME_STATE, type RuntimeControls, type RuntimeUiState } from '../src/shared/data/runtime.js';
+import { INITIAL_RUNTIME_STATE, type RuntimeControls, type RuntimeUiState } from '../src/shared/state/runtime.js';
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',

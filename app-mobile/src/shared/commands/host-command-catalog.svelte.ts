@@ -27,8 +27,8 @@ import {
   CatalogLifecycleError,
   fetchCommands,
   type CatalogLifecycleCode,
-} from './relay.js';
-import type { ConnectionPhase } from './state.js';
+} from '../transport/relay.js';
+import type { ConnectionPhase } from '../state/state.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. CATALOG STATE AND REDUCER

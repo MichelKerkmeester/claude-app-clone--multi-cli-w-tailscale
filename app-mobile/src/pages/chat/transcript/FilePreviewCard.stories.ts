@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import FilePreviewCard from './FilePreviewCard.svelte';
 import ArtifactViewerProvider from '../artifacts/ArtifactViewerProvider.svelte';
-import { DEMO_ARTIFACT_BLOCKS } from '$shared/data/demo.js';
+import { DEMO_ARTIFACT_BLOCKS } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_ARTIFACT_BLOCKS fixtures so every story `block` arg is a
 // real FilePreviewBlock sourced from the demo data — nothing is invented. The

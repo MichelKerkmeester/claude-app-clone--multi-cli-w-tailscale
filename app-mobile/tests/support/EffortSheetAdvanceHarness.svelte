@@ -7,7 +7,7 @@
   // `runtime` derivation changes — the open-effect (which depends on `isOpen`,
   // `initialSection`, `runtimeControls`) does not re-run, so the announcement
   // effect can observe the pending→settled transition and announce exactly once.
-  import type { RuntimeControls, RuntimeUiState } from '../../src/shared/data/runtime.js';
+  import type { RuntimeControls, RuntimeUiState } from '../../src/shared/state/runtime.js';
 
   export interface EffortSheetAdvanceHarnessProps {
     readonly initialRuntime: RuntimeUiState;

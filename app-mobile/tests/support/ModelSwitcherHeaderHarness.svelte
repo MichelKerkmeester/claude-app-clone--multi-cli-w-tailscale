@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { RuntimeControls } from '../../src/shared/data/runtime.js';
+  import type { RuntimeControls } from '../../src/shared/state/runtime.js';
 
   export interface ModelSwitcherHeaderHarnessProps {
     readonly controls: RuntimeControls;

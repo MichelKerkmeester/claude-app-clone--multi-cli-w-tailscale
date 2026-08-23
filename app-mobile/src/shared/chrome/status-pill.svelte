@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { ConnectionPhase } from '../data/state.js';
+  import type { ConnectionPhase } from '../state/state.js';
 
   export interface StatusPillProps {
     readonly phase: ConnectionPhase;

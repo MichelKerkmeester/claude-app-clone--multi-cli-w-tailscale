@@ -13,7 +13,7 @@ const relay = vi.hoisted(() => ({
   submitAskQuestionAnswer: vi.fn(),
 }));
 
-vi.mock('../src/shared/data/relay.js', () => relay);
+vi.mock('../src/shared/transport/relay.js', () => relay);
 vi.mock('@tanstack/svelte-virtual', () => {
   const store = (value: unknown) => ({ subscribe: (run: (v: unknown) => void) => { run(value); return () => {}; } });
   return {
@@ -30,11 +30,11 @@ vi.mock('@tanstack/svelte-virtual', () => {
   };
 });
 
-import { saveCache } from '../src/shared/data/cache.js';
+import { saveCache } from '../src/shared/transport/cache.js';
 import { clearAskQuestionEphemeralStore } from '../src/pages/chat/features/ask-question/askQuestionEphemeralStore.js';
 import AskQuestionCard from '../src/pages/chat/features/ask-question/AskQuestionCard.svelte';
 import TranscriptList from '../src/pages/chat/transcript/TranscriptList.svelte';
-import type { DisplayTranscriptBlock, TranscriptState } from '../src/shared/data/state.js';
+import type { DisplayTranscriptBlock, TranscriptState } from '../src/shared/state/state.js';
 
 const sessionId = 'session_card_001';
 const questionId = 'question_card_001';

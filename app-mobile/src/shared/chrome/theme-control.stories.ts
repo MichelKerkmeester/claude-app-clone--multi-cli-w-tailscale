@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
-import type { ThemePreference } from '../data/view-helpers.js';
+import type { ThemePreference } from '../format/view-helpers.js';
 import ThemeControl from './theme-control.svelte';
 
 // One story per real ThemePreference value — each shows the segmented selector

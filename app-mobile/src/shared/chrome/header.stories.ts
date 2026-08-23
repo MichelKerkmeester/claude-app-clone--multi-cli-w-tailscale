@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
-import type { ConnectionPhase } from '../data/state.js';
-import type { ThemePreference } from '../data/view-helpers.js';
+import type { ConnectionPhase } from '../state/state.js';
+import type { ThemePreference } from '../format/view-helpers.js';
 import Header from './header.svelte';
 
 // The topbar over the real StatusPill + ThemeControl children; connection and

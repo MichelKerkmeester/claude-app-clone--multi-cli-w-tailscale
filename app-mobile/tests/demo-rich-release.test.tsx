@@ -1,7 +1,7 @@
 import { isTranscriptBlock, isTranscriptPageDto } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { demoPostJson } from '../src/shared/data/demo.js';
+import { demoPostJson } from '../src/shared/fixtures/demo.js';
 
 const ORIGINAL_URL = window.location.href;
 

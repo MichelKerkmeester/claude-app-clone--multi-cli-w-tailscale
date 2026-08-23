@@ -13,7 +13,7 @@ import { cleanup, render, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sha256, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 
-import type { ArtifactResource } from '../src/shared/data/relay.js';
+import type { ArtifactResource } from '../src/shared/transport/relay.js';
 import type { ArtifactResourceSnapshot } from '../src/pages/chat/artifacts/useArtifactResource.svelte.js';
 
 import ArtifactResourceProbe from './support/ArtifactResourceProbe.svelte';

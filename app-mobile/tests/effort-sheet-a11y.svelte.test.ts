@@ -19,7 +19,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '../src/shared/data/runtime.js';
+import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '../src/shared/state/runtime.js';
 import EffortSheetAdvanceHarness, {
   type EffortSheetAdvanceHarnessApi,
 } from './support/EffortSheetAdvanceHarness.svelte';

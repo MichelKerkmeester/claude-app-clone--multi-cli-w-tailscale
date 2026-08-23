@@ -82,7 +82,7 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { establishSession } from './auth.js';
-import { demoArtifactBytes, demoPostJson, demoSocket, isDemoMode } from './demo.js';
+import { demoArtifactBytes, demoPostJson, demoSocket, isDemoMode } from '../fixtures/demo.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. CONSTANTS AND RELAY HEARTBEAT

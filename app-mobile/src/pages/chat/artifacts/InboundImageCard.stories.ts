@@ -4,7 +4,7 @@ import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 import InboundImageCard from './InboundImageCard.svelte';
 import ArtifactViewerProvider from './ArtifactViewerProvider.svelte';
 import type { InboundImageLifecycleState } from './ImageStatus.svelte';
-import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/data/demo.js';
+import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
 // Re-host the demo module's private DEMO_INBOUND_MEDIA_READY_BLOCK (in
 // $shared/data/demo.js) as a real InboundImageReadyBlock so every story arg is

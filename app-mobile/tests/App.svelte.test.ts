@@ -104,8 +104,8 @@ vi.mock('@tanstack/svelte-virtual', () => {
   };
 });
 
-vi.mock('../src/shared/data/relay.js', () => relay);
-vi.mock('../src/shared/data/attention.js', () => ({
+vi.mock('../src/shared/transport/relay.js', () => relay);
+vi.mock('../src/shared/format/attention.js', () => ({
   ...attention,
   setPushForeground: vi.fn(),
 }));
@@ -121,7 +121,7 @@ import {
   EMPTY_TRANSCRIPT,
   todoProjectionReducer,
   transcriptReducer,
-} from '../src/shared/data/state.js';
+} from '../src/shared/state/state.js';
 
 const occurredAt = '2026-08-13T10:00:00.000Z';
 const sessionId = 'session_web_001';
@@ -773,7 +773,7 @@ it('submits the compose box through the relay command path', async () => {
     )
     .mockResolvedValueOnce(jsonResponse({ accepted: true, block: accepted }, 202));
   vi.stubGlobal('fetch', fetchMock);
-  const actualRelay = await vi.importActual<typeof import('../src/shared/data/relay.js')>('../src/shared/data/relay.js');
+  const actualRelay = await vi.importActual<typeof import('../src/shared/transport/relay.js')>('../src/shared/transport/relay.js');
   relay.submitPrompt.mockImplementation(actualRelay.submitPrompt);
   const dispatchTranscript = vi.fn();
 

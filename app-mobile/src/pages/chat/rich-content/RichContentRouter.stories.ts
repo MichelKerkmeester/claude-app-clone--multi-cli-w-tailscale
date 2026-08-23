@@ -3,7 +3,7 @@ import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
 import RichContentRouter from './RichContentRouter.svelte';
 import ArtifactViewerProvider from '../artifacts/ArtifactViewerProvider.svelte';
-import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/data/demo.js';
+import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/fixtures/demo.js';
 import {
   normalizeTranscriptBlocks,
   type NormalizedCommandBlock,

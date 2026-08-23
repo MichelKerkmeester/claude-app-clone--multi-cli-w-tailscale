@@ -8,7 +8,7 @@
 import type { TextBlock } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
 
-import { EMPTY_TRANSCRIPT, transcriptReducer, type TranscriptState } from '../src/shared/data/state.js';
+import { EMPTY_TRANSCRIPT, transcriptReducer, type TranscriptState } from '../src/shared/state/state.js';
 
 const SESSION_A = 'session_scope_a';
 const SESSION_B = 'session_scope_b';

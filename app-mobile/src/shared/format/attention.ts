@@ -16,7 +16,7 @@ import {
   type PushPreferences,
 } from '@pi-remote/pi-rpc-protocol';
 
-import { establishSession } from './auth.js';
+import { establishSession } from '../transport/auth.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. PUSH CONFIG TYPE

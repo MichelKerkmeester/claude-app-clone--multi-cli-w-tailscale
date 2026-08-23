@@ -3,7 +3,7 @@ import type { InboundImageBlock } from '@pi-remote/pi-rpc-protocol';
 
 import InboundImageBlockView from './InboundImageBlockView.svelte';
 import ArtifactViewerProvider from './ArtifactViewerProvider.svelte';
-import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/data/demo.js';
+import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
 // Re-host the demo module's private inbound-image fixtures (DEMO_INBOUND_MEDIA_
 // READY_BLOCK / DEMO_INBOUND_MEDIA_PROCESSING_BLOCK in $shared/data/demo.js) as

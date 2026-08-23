@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
-import { demoPostJson } from '$shared/data/demo.js';
+import { demoPostJson } from '$shared/fixtures/demo.js';
 import Freshness from './Freshness.svelte';
 
 // The freshness `at` timestamp is sourced from the demo roster's real updatedAt

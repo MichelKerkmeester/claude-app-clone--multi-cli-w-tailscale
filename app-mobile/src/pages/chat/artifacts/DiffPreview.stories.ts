@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import DiffPreview from './DiffPreview.svelte';
-import { DEMO_DIFF_FIXTURE } from '$shared/data/demo.js';
+import { DEMO_DIFF_FIXTURE } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen DEMO_DIFF_FIXTURE patch so every story `patch` arg is the
 // real unified-diff fixture — nothing is invented. The `diff-preview` surface

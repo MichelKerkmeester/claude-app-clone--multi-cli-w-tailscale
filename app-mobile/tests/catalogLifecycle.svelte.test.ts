@@ -28,7 +28,7 @@ import {
   type HostCommandCatalogState,
   type SelectedCommandBinding,
   type ScopedCommandSnapshot,
-} from '../src/shared/data/commands.js';
+} from '../src/shared/commands/commands.js';
 import CatalogLifecycleHarness from './support/CatalogLifecycleHarness.svelte';
 
 const relay = vi.hoisted(() => {
@@ -47,7 +47,7 @@ const relay = vi.hoisted(() => {
   };
 });
 
-vi.mock('../src/shared/data/relay.js', () => relay);
+vi.mock('../src/shared/transport/relay.js', () => relay);
 
 const SESSION_A = 'session_a';
 const SESSION_B = 'session_b';

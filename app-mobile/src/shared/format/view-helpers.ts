@@ -13,7 +13,7 @@ import {
   type SessionCardDto,
 } from '@pi-remote/pi-rpc-protocol';
 
-import { fetchApprovals } from './relay.js';
+import { fetchApprovals } from '../transport/relay.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. TYPE DEFINITIONS

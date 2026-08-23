@@ -15,7 +15,7 @@
 // 1. IMPORTS
 // ───────────────────────────────────────────────────────────────────
 
-import type { DeviceIdentity } from './auth.js';
+import type { DeviceIdentity } from '../transport/auth.js';
 import {
   sha256,
   type AskQuestionAnswerResult,
@@ -29,7 +29,7 @@ import type {
   ArtifactReadVariant,
   ArtifactResource,
   ArtifactResourceBlock,
-} from './relay.js';
+} from '../transport/relay.js';
 import type { InboundImageLifecycleState } from '../../pages/chat/artifacts/ImageStatus.svelte';
 
 // ───────────────────────────────────────────────────────────────────

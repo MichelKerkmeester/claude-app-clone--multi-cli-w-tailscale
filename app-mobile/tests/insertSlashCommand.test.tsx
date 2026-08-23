@@ -8,11 +8,11 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { SelectedCommandBinding } from '../src/shared/data/commands.js';
+import type { SelectedCommandBinding } from '../src/shared/commands/commands.js';
 import {
   bindingAfterDraftChange,
   insertSlashCommand,
-} from '../src/shared/data/insertSlashCommand.js';
+} from '../src/shared/commands/insert-slash-command.js';
 
 const BINDING: SelectedCommandBinding = {
   hostEpoch: 'epoch-1',

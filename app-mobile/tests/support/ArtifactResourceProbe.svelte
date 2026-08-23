@@ -11,7 +11,7 @@
     ArtifactResource,
     ArtifactResourceBlock,
     ArtifactReadVariant,
-  } from '../../src/shared/data/relay.js';
+  } from '../../src/shared/transport/relay.js';
 
   let {
     sessionId,

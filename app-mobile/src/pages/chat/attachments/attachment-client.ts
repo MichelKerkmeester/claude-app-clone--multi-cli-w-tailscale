@@ -23,7 +23,7 @@ import {
   type AttachmentReservationResponse,
   type AttachmentReserveBinding,
   type AttachmentStatusResponse,
-} from '$shared/data/relay.js';
+} from '$shared/transport/relay.js';
 import type { AttachmentDraftItem } from './attachment-state.js';
 
 // ───────────────────────────────────────────────────────────────────

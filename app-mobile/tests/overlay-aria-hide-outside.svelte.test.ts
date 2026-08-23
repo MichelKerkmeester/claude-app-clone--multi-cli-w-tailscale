@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { RuntimeModelCatalogDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
-import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/shared/data/runtime.js';
-import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/data/commands.js';
+import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/shared/state/runtime.js';
+import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/commands/commands.js';
 import CommandPalette from '../src/pages/chat/chrome/CommandPalette.svelte';
 import PlanModeButton from '../src/pages/chat/chrome/PlanModeButton.svelte';
 import SessionComposerHarness from './support/SessionComposerHarness.svelte';

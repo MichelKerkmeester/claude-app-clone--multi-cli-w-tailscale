@@ -30,8 +30,8 @@ import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { controlRuntime } from '../src/shared/data/relay.js';
-import type { RuntimeControls, RuntimeUiState } from '../src/shared/data/runtime.js';
+import { controlRuntime } from '../src/shared/transport/relay.js';
+import type { RuntimeControls, RuntimeUiState } from '../src/shared/state/runtime.js';
 import ModelEffortSheet from '../src/pages/chat/chrome/ModelEffortSheet.svelte';
 import SessionHeader from '../src/pages/chat/chrome/SessionHeader.svelte';
 import ModelSwitcherHeaderHarness from './support/ModelSwitcherHeaderHarness.svelte';

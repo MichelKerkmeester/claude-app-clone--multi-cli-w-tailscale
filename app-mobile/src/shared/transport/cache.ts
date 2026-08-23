@@ -27,7 +27,7 @@ import {
   type SessionCardDto,
 } from '@pi-remote/pi-rpc-protocol';
 
-import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptState } from './state.js';
+import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptState } from '../state/state.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. CACHE LIMITS

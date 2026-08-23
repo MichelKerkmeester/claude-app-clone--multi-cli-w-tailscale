@@ -1,6 +1,6 @@
 <script module lang="ts">
-  import type { ConnectionPhase } from '../data/state.js';
-  import type { ThemePreference } from '../data/view-helpers.js';
+  import type { ConnectionPhase } from '../state/state.js';
+  import type { ThemePreference } from '../format/view-helpers.js';
 
   export interface HeaderProps {
     readonly connection: ConnectionPhase;

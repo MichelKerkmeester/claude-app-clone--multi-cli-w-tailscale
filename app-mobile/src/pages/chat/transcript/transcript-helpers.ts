@@ -7,8 +7,8 @@ import {
   type NormalizedFallbackBlock,
   type NormalizedTranscriptBlock,
 } from '../rich-content/normalizeTranscriptBlocks.js';
-import { type DisplayTranscriptBlock, type TodoProjectionState } from '$shared/data/state.js';
-import { groupBlocksIntoTurns } from '$shared/data/turns.js';
+import { type DisplayTranscriptBlock, type TodoProjectionState } from '$shared/state/state.js';
+import { groupBlocksIntoTurns } from '$shared/state/turns.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. RENDER ITEM MODEL

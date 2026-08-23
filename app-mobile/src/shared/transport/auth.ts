@@ -17,7 +17,7 @@ import {
   type EnrollmentQr,
 } from '@pi-remote/pi-rpc-protocol';
 
-import { DEMO_IDENTITY, isDemoMode } from './demo.js';
+import { DEMO_IDENTITY, isDemoMode } from '../fixtures/demo.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. CONSTANTS AND DEVICE TYPES

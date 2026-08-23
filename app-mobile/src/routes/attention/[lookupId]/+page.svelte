@@ -12,8 +12,8 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  import { getAppState } from '$shared/data/app-state.svelte.js';
-  import { openAttentionHint } from '$shared/data/attention.js';
+  import { getAppState } from '$shared/state/app-state.svelte.js';
+  import { openAttentionHint } from '$shared/format/attention.js';
 
   const app = getAppState();
 

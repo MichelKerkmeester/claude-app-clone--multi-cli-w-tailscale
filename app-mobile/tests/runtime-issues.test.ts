@@ -8,7 +8,7 @@
 import { RUNTIME_ISSUE_CODES } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
 
-import { RUNTIME_ISSUE_COPY, runtimeIssueMessage } from '../src/shared/data/runtime-issues.js';
+import { RUNTIME_ISSUE_COPY, runtimeIssueMessage } from '../src/shared/state/runtime-issues.js';
 
 describe('runtime issue copy allowlist', () => {
   it('covers every protocol issue code with non-empty local copy', () => {

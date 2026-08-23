@@ -1,7 +1,7 @@
 <script module lang="ts">
-  import { applyingEffortMessage, effortStrings } from '$shared/data/effort.js';
-  import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '$shared/data/runtime.js';
-  import { runtimeIssueMessage } from '$shared/data/runtime-issues.js';
+  import { applyingEffortMessage, effortStrings } from '$shared/catalog/effort.js';
+  import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '$shared/state/runtime.js';
+  import { runtimeIssueMessage } from '$shared/state/runtime-issues.js';
 
   export const SEARCH_THRESHOLD = 8;
   export const SWIPE_DISMISS_RATIO = 0.3;
@@ -81,7 +81,7 @@
 
   import type { AvailableModelDto, RuntimeControlResponse } from '@pi-remote/pi-rpc-protocol';
   import { untrack } from 'svelte';
-  import { effortConfirmedMessage } from '$shared/data/effort.js';
+  import { effortConfirmedMessage } from '$shared/catalog/effort.js';
   import {
     displayModelText as displayModel,
     filterAndRankModels,
@@ -91,7 +91,7 @@
     modelCapabilities,
     modelKey,
     organizeModelCatalog as organizeCatalog,
-  } from '$shared/data/model-catalog.js';
+  } from '$shared/catalog/model-catalog.js';
   import {
     modelCountMessage,
     modelRowName,
@@ -100,7 +100,7 @@
     modelSwitchedMessage,
     noModelMatchMessage,
     runtimeOutcomeMessage,
-  } from '$shared/data/model-switcher-strings.js';
+  } from '$shared/catalog/model-switcher-strings.js';
   import { focusVisible, focused, hover, press } from '$shared/primitives/a11y/interactions.js';
   import Button from '$shared/primitives/button/button.svelte';
   import Sheet from '$shared/primitives/sheet/sheet.svelte';

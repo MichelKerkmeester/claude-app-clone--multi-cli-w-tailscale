@@ -18,7 +18,7 @@ import {
   type TranscriptTerminalCheckpoint,
 } from '@pi-remote/pi-rpc-protocol';
 
-import type { DisplayTranscriptBlock, TranscriptProvenance } from '$shared/data/state.js';
+import type { DisplayTranscriptBlock, TranscriptProvenance } from '$shared/state/state.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. SAFE LANGUAGES AND NORMALIZED BLOCK TYPES

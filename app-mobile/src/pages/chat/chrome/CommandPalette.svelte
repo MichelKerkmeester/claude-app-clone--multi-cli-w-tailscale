@@ -9,7 +9,7 @@
   // binding — it NEVER submits, and only relay-filtered (non-privileged)
   // commands are ever offered.
 
-  import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/data/commands.js';
+  import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/commands/commands.js';
 
   export interface CommandPaletteProps {
     readonly catalog: HostCommandCatalogState;
@@ -26,8 +26,8 @@
   import { Combobox } from 'bits-ui';
 
   import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
-  import { bindingFor } from '$shared/data/commands.js';
-  import { rankHostCommands } from '$shared/data/rankHostCommands.js';
+  import { bindingFor } from '$shared/commands/commands.js';
+  import { rankHostCommands } from '$shared/commands/rank-host-commands.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

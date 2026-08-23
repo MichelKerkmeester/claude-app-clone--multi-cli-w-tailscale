@@ -11,7 +11,7 @@
   // bidi-override character that somehow reaches the client is replaced for
   // display only; insertion always uses the canonical DTO string.
 
-  import type { RankedHostCommand } from '$shared/data/rankHostCommands.js';
+  import type { RankedHostCommand } from '$shared/commands/rank-host-commands.js';
 
   /** The stable option id the composer's aria-activedescendant references. */
   export function optionId(name: string): string {
@@ -55,7 +55,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { commandGraphemes } from '$shared/data/rankHostCommands.js';
+  import { commandGraphemes } from '$shared/commands/rank-host-commands.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

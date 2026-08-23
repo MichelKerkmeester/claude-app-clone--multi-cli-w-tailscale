@@ -42,8 +42,8 @@ import ComposerCommandAutocomplete, {
   type SlashPanelOpenState,
 } from '../src/pages/chat/chrome/ComposerCommandAutocomplete.svelte';
 import CommandOption, { escapeUnsafeName, optionId } from '../src/pages/chat/chrome/CommandOption.svelte';
-import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/data/commands.js';
-import type { RankedHostCommand } from '../src/shared/data/rankHostCommands.js';
+import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/commands/commands.js';
+import type { RankedHostCommand } from '../src/shared/commands/rank-host-commands.js';
 import VisualViewportAnchorProbe from './support/VisualViewportAnchorProbe.svelte';
 
 afterEach(() => {

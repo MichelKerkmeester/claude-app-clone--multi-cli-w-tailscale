@@ -24,7 +24,7 @@ import {
   type PlanArtifactDto,
 } from '@pi-remote/pi-rpc-protocol';
 
-import * as relay from './relay.js';
+import * as relay from '../transport/relay.js';
 import { runtimeIssueMessage, type RuntimeIssueCode } from './runtime-issues.js';
 
 // ───────────────────────────────────────────────────────────────────

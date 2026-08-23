@@ -8,8 +8,8 @@
 // 1. IMPORTS
 // ───────────────────────────────────────────────────────────────────
 
-import { modeAuthority, type RuntimeUiState } from '$shared/data/runtime.js';
-import { runtimeIssueMessage } from '$shared/data/runtime-issues.js';
+import { modeAuthority, type RuntimeUiState } from '$shared/state/runtime.js';
+import { runtimeIssueMessage } from '$shared/state/runtime-issues.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. TYPE DEFINITIONS

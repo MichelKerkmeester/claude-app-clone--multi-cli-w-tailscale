@@ -11,7 +11,7 @@ import {
   EMPTY_TRANSCRIPT,
   transcriptReducer,
   type TranscriptState,
-} from '../src/shared/data/state.js';
+} from '../src/shared/state/state.js';
 
 const SESSION_ID = 'session_reducer_001';
 const EPOCH = 'epoch_reducer_001';

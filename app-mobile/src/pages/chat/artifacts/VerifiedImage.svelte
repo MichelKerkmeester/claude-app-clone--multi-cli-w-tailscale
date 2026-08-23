@@ -52,7 +52,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { demoInboundArtifactResource, isDemoMode } from '$shared/data/demo.js';
+  import { demoInboundArtifactResource, isDemoMode } from '$shared/fixtures/demo.js';
   import { useArtifactResource } from './useArtifactResource.svelte.js';
 
   let {

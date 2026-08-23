@@ -13,7 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
-import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/data/commands.js';
+import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/commands/commands.js';
 import CommandPalette from '../src/pages/chat/chrome/CommandPalette.svelte';
 
 beforeEach(() => {

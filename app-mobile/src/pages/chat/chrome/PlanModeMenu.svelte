@@ -1,5 +1,5 @@
 <script module lang="ts">
-  import type { ConfirmedMode } from '$shared/data/runtime.js';
+  import type { ConfirmedMode } from '$shared/state/runtime.js';
 
   export interface PlanModeMenuProps {
     readonly confirmedMode: ConfirmedMode;

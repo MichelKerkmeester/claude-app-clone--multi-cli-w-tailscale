@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import ArtifactStatus from './ArtifactStatus.svelte';
 import type { ArtifactResourceStatus } from './useArtifactResource.svelte.js';
 import type { ArtifactViewerPhase } from './types.js';
-import { catalogSurfaceById } from '$shared/data/catalog-registry.js';
-import { DEMO_DIFF_FIXTURE, DEMO_ARTIFACT_STATES_FIXTURE } from '$shared/data/demo.js';
+import { catalogSurfaceById } from '$shared/catalog/catalog-registry.js';
+import { DEMO_DIFF_FIXTURE, DEMO_ARTIFACT_STATES_FIXTURE } from '$shared/fixtures/demo.js';
 
 // Re-host the frozen artifact-status vocabulary so every story `status` arg is
 // sourced from real catalog data — nothing is invented. The status values are

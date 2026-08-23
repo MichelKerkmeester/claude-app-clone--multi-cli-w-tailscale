@@ -12,7 +12,7 @@
 </script>
 
 <script lang="ts">
-  import { useVisualViewportAnchor } from '../../src/shared/data/useVisualViewportAnchor.svelte.js';
+  import { useVisualViewportAnchor } from '../../src/shared/viewport/use-visual-viewport-anchor.svelte.js';
 
   let { getAnchor = () => null }: VisualViewportAnchorProbeProps = $props();
 

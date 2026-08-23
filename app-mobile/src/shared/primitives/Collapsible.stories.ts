@@ -30,7 +30,7 @@ const meta: Meta<typeof Collapsible> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Collapsible>;
 
 export const Collapsed: Story = {
   args: { open: false, trigger: TRIGGER, children: BODY },

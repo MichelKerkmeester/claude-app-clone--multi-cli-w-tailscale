@@ -13,7 +13,7 @@ import AttachmentDraftStoryHost from './AttachmentDraftStoryHost.svelte';
 // PNG Files through draft.selectFiles on mount (SessionComposer.stories /
 // ArtifactCard.stories self-providing-provider pattern). The pixel bytes are
 // UI scaffolding, not fabricated app data.
-const meta = {
+const meta: Meta<typeof AttachmentRail> = {
   title: 'Attachments/AttachmentRail',
   component: AttachmentRail,
   tags: ['autodocs'],
@@ -26,9 +26,9 @@ const meta = {
       props: { capability: { enabled: true, imageIn: true }, modelCanViewPhotos: true },
     }),
   ],
-} satisfies Meta<typeof AttachmentRail>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof AttachmentRail>;
 
 export const Default: Story = { args: {} };

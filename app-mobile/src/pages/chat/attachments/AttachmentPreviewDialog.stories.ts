@@ -14,7 +14,7 @@ import AttachmentDraftStoryHost from './AttachmentDraftStoryHost.svelte';
 // draft.selectFiles and then opens the first item's preview (the
 // SessionComposer.stories / ArtifactCard.stories self-providing-provider
 // pattern). The pixel bytes are UI scaffolding, not fabricated app data.
-const meta = {
+const meta: Meta<typeof AttachmentPreviewDialog> = {
   title: 'Attachments/AttachmentPreviewDialog',
   component: AttachmentPreviewDialog,
   tags: ['autodocs'],
@@ -27,9 +27,9 @@ const meta = {
       props: { capability: { enabled: true, imageIn: true }, modelCanViewPhotos: true },
     }),
   ],
-} satisfies Meta<typeof AttachmentPreviewDialog>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof AttachmentPreviewDialog>;
 
 export const Open: Story = { args: {} };

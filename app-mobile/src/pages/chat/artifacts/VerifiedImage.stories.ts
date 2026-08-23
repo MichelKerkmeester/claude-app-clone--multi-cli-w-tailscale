@@ -34,7 +34,8 @@ function requireImageBytes(): {
 
 const IMAGE = requireImageBytes();
 
-const DEMO_INBOUND_IMAGE_READY_BLOCK: InboundImageReadyBlock = Object.freeze({
+const DEMO_INBOUND_IMAGE_READY_BLOCK: InboundImageReadyBlock =
+  Object.freeze<InboundImageReadyBlock>({
   kind: 'inbound_image',
   schemaVersion: 1,
   id: 'blk-inbound-card',
@@ -68,7 +69,7 @@ const DEMO_INBOUND_IMAGE_READY_BLOCK: InboundImageReadyBlock = Object.freeze({
   redaction: { status: 'applied' },
   shareAllowed: false,
   content: { kind: 'artifact-ref' },
-});
+  });
 
 const ASPECT_RATIO = 160 / 100;
 

@@ -35,7 +35,7 @@ function requireImageBytes(): {
 
 const IMAGE = requireImageBytes();
 
-const READY_BLOCK: InboundImageBlock = Object.freeze({
+const READY_BLOCK: InboundImageBlock = Object.freeze<InboundImageBlock>({
   kind: 'inbound_image',
   schemaVersion: 1,
   id: 'blk-inbound-card',
@@ -71,7 +71,7 @@ const READY_BLOCK: InboundImageBlock = Object.freeze({
   content: { kind: 'artifact-ref' },
 });
 
-const PROCESSING_BLOCK: InboundImageBlock = Object.freeze({
+const PROCESSING_BLOCK: InboundImageBlock = Object.freeze<InboundImageBlock>({
   kind: 'inbound_image',
   schemaVersion: 1,
   id: 'blk-inbound-processing',

@@ -39,9 +39,14 @@ function walk(dir, out = []) {
   return out;
 }
 
-/** Strip the suffix chain so './foo.js', './foo.ts' and './foo' share one key. */
+/**
+ * Strip the suffix chain so every spelling of one module shares a key. A runes
+ * module is `foo.svelte.ts` on disk but its specifier reads `foo.svelte.js`,
+ * so both must reduce to `foo` — otherwise the rewrite silently skips exactly
+ * the files that carry the double extension.
+ */
 function moduleKey(repoRelativePath) {
-  return repoRelativePath.replace(/\.(svelte\.ts|svelte|ts|js)$/, '');
+  return repoRelativePath.replace(/\.(svelte\.ts|svelte\.js|svelte|ts|js)$/, '');
 }
 
 function buildMoveMap(rows) {
@@ -53,13 +58,20 @@ function buildMoveMap(rows) {
   return map;
 }
 
-/** Resolve an import specifier to a repo-relative module key, or null. */
-function resolveSpecifier(specifier, fromFile) {
+/**
+ * Resolve an import specifier to a repo-relative module key, or null. A
+ * relative specifier is relative to where its file was written, so a file that
+ * has itself just moved is resolved from its original location — otherwise
+ * every relative import inside a moved file points into its new folder and
+ * matches nothing.
+ */
+function resolveSpecifier(specifier, fromFile, originOf) {
   if (specifier.startsWith(ALIAS_PREFIX)) {
     return moduleKey(ALIAS_ROOT + specifier.slice(ALIAS_PREFIX.length));
   }
   if (specifier.startsWith('.')) {
-    const absolute = resolve(dirname(join(REPO_ROOT, fromFile)), specifier);
+    const origin = originOf.get(fromFile) ?? fromFile;
+    const absolute = resolve(dirname(join(REPO_ROOT, origin)), specifier);
     return moduleKey(relative(REPO_ROOT, absolute).split('\\').join('/'));
   }
   return null;
@@ -67,7 +79,7 @@ function resolveSpecifier(specifier, fromFile) {
 
 /** Re-emit a resolved module key in the same form the original specifier used. */
 function emitSpecifier(originalSpecifier, newKey, fromFile) {
-  const suffix = originalSpecifier.match(/\.(svelte\.ts|svelte|ts|js)$/)?.[0] ?? '';
+  const suffix = originalSpecifier.match(/\.(svelte\.ts|svelte\.js|svelte|ts|js)$/)?.[0] ?? '';
   if (originalSpecifier.startsWith(ALIAS_PREFIX)) {
     return ALIAS_PREFIX + newKey.slice(ALIAS_ROOT.length) + suffix;
   }
@@ -79,11 +91,11 @@ function emitSpecifier(originalSpecifier, newKey, fromFile) {
 
 const SPECIFIER_PATTERN = /(from\s+|import\s+|import\(\s*)(['"])([^'"]+)\2/g;
 
-function rewriteFile(filePath, moveMap) {
+function rewriteFile(filePath, moveMap, originOf) {
   const original = readFileSync(join(REPO_ROOT, filePath), 'utf8');
   let changes = 0;
   const updated = original.replace(SPECIFIER_PATTERN, (match, lead, quote, specifier) => {
-    const key = resolveSpecifier(specifier, filePath);
+    const key = resolveSpecifier(specifier, filePath, originOf);
     if (key === null) return match;
     const moved = moveMap.get(key);
     if (moved === undefined) return match;
@@ -128,6 +140,9 @@ function main() {
   }
 
   const moveMap = buildMoveMap(rows);
+  // Where each moved file came from, so a relative specifier inside it resolves
+  // against the folder it was written in rather than the folder it landed in.
+  const originOf = new Map(rows.map((row) => [row.to, row.from]));
   console.log(apply ? 'apply-manifest APPLY' : 'apply-manifest DRY RUN');
   console.log('  scope :', scope ?? '(all)');
   console.log('  moves :', rows.length, `(${rows.filter((r) => r.caseOnly).length} case-only)`);
@@ -141,7 +156,7 @@ function main() {
   let touched = 0;
   let rewritten = 0;
   for (const file of candidates) {
-    const { updated, changes, original } = rewriteFile(file, moveMap);
+    const { updated, changes, original } = rewriteFile(file, moveMap, originOf);
     if (changes === 0) continue;
     touched += 1;
     rewritten += changes;

@@ -98,7 +98,8 @@ const URL_SPECIFIER_PATTERN = /(new URL\(\s*)(['"])([^'"]+)\2(\s*,\s*import\.met
 // A test double names its target by module path too. A vi.mock left pointing at
 // a path nothing occupies no longer replaces anything, and the suite keeps
 // passing against the real module — the quietest way for a rename to lie.
-const MOCK_SPECIFIER_PATTERN = /(vi\.(?:mock|doMock|unmock|importActual|importMock)\(\s*)(['"])([^'"]+)\2/g;
+const MOCK_SPECIFIER_PATTERN =
+  /(vi\.(?:mock|doMock|unmock|importActual|importMock)(?:<[^>]*>)?\(\s*)(['"])([^'"]+)\2/g;
 
 function rewriteFile(filePath, moveMap, originOf) {
   const original = readFileSync(join(REPO_ROOT, filePath), 'utf8');

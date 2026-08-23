@@ -1,5 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
+  "level": "2",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
   "description": "Build the CSS-corpus builder, commit the token-identity resolver gate (0 diffs across 3 themes = the pixel-identity proof), rewrite the 75 tests to",
   "keywords": [
     "css-corpus",
@@ -16,15 +17,13 @@
     "rewrite",
     "tests"
   ],
-  "lastUpdated": "2026-08-19T17:19:32.114Z",
+  "lastUpdated": "2026-08-23T06:41:53.817Z",
   "specId": "007",
   "folderSlug": "verify-and-cutover",
   "parentChain": [
-    "app-mobile-cli",
     "003-pi-remote-design-system",
     "005-sveltekit-spa-migration"
   ],
   "memorySequence": 0,
-  "memoryNameHistory": [],
-  "level": "2"
+  "memoryNameHistory": []
 }

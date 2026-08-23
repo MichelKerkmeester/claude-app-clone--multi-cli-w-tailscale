@@ -8,13 +8,13 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
-    last_updated_at: "2026-08-23T01:40:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "007-EXT Phase B COMPLETE + Phase 4 cleanup DONE, all pushed + board-green (token-identity 0/0/0 · svelte-check 0-err/6-warn · build 0 · svelte 528+3skip / logic 182 pass). (a) section-seg: '// ─── <Label> ───' dividers on all 45 meaningful-script .svelte files (ModelEffortSheet 661204b; batches 68d02b6/3077baa/345c107/c1d4474/e2a47ae) atop the prior 26 headers + 14 MODULE banners. (b) $shared alias: kit.alias + both vitest resolve.alias, codemod of 219 specifiers across 91 files (3aba4d1) + fileURLToPath fix for the %20-space bug (c13fa47). (c) app.css @ds legend + file map (bb20591). Phase 4: dropped 3 retired style.css-oracle scripts (47901cb). EXECUTOR PIVOT (durable): grok/cli-cursor edits VANISH — a git-live-follow.sh --live daemon reverts uncommitted drift and --sandbox disabled is classifier-blocked; so mechanical edits are self-authored via deterministic Node scripts committed ATOMICALLY (node script && git add && git commit in ONE command). Also: 'npm run test:web | tail' masks vitest's exit code (verify by CONTENT), and a bits-ui body-scroll-lock post-teardown flake exits 1 under concurrent-research load though ALL tests pass."
-    next_safe_action: "Two large phase-CHILDREN remain (separate folders). 008-sk-code-svelte-refactor: complete React→Svelte rewrite of the sk-code-mobile-cli surface (conventions authority) — CROSS-REPO in Public (.opencode symlink), MUST land via an isolated Public worktree, never staged in the shared checkout (its index holds another session's files). Capture the PROVEN conventions: section-divider grammar, @ds .svelte-seam markers, scoped <style> + :global() rules, Bits/Melt mapping, runes verification, $shared alias, atomic-commit-under-daemon. 009-storybook-experience: dummy-proof self-maintaining Storybook (app-mobile-local; storybook/build-storybook scripts already exist). RESEARCH pipeline (background, sequential — concurrent loops die): mobilecli (010/mobilecli) on iteration 9/10, nearly done → when its opencode proc exits, commit the packet + relaunch nodeterm→openclaude-android→remote-for-opencode ONE AT A TIME. OGAM already landed (ff48736)."
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
+    last_updated_at: "2026-08-23T09:10:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Cutover shipped; 007-EXT sectioning complete at 95 files."
+    next_safe_action: "Close XB.3 styling wayfinding, then XE.1 hook enforcement."
     blockers: []
-    completion_pct: 96
+    completion_pct: 92
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -82,20 +82,41 @@ runs an adversarial deep-review, and executes the cutover.
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- R1: The token-identity gate is committed and reproducible; PASS is exactly 0/0/0 across 3 themes.
-- R2: The backend suite (`npm test`) is green throughout the whole migration — a leak detector.
-- R3: The CDP gate runs against the built preview in both themes with zero horizontal overflow.
-- R4: ≥76 `@ds guardrail:` fences preserved; every WCAG contrast pair still ≥ threshold.
+- **REQ-001** — The token-identity gate is committed and reproducible; PASS is exactly 0/0/0 across
+  all three theme states. This is the load-bearing proof that nothing rendered moved.
+- **REQ-002** — The backend suite (`npm test`) stays green throughout the entire migration. Because
+  the relay and protocol are framework-independent, a backend failure means the rewrite leaked out of
+  the web workspace; it is a leak detector, not a regression suite.
+- **REQ-003** — The CDP gate runs against the *built* preview in both themes at 390px with zero
+  horizontal overflow. Built, not dev: SvelteKit emits static CSS links, so this is the first time the
+  structural screenshots render styled.
+- **REQ-004** — At least 76 `@ds guardrail:` fences survive, and every WCAG contrast pair stays at or
+  above its threshold.
+- **REQ-005** — The 317 behaviour tests are ported without weakening. Faithfulness is verified
+  independently against the React oracle — matching `it` counts, matching `expect` counts and
+  oracle-exact call counts — because a passing suite proves nothing if its assertions were softened.
+- **REQ-006** — The a11y contract survives the react-aria→Bits/Melt swap. No objective gate can see
+  AT-tree, focus-order, role or dismissal loss, so this needs its own adversarial verification.
 <!-- /ANCHOR:requirements -->
 
 ---
 
 <!-- ANCHOR:success-criteria -->
-## 5. SUCCESS CRITERIA (the nine gates)
+## 5. SUCCESS CRITERIA
 
-1. `npm run build` 0 · 2. `npm run typecheck` (`svelte-check`) 0 · 3. `npm test` 0 (green throughout)
-· 4. `npm run test:web` 0 · 5. token-identity 0 diffs (3 themes) · 6. contrast + ≥76 fences ·
-7. CDP 390 px both themes · 8. catalog smoke light+dark · 9. `validate.sh … --strict` 0.
+The nine gates. All must be green for the cutover to be legitimate; REQ-001 through REQ-006 each
+trace to at least one of them.
+
+1. `npm run build` exit 0
+2. `npm run typecheck` (`svelte-check`) exit 0
+3. `npm test` exit 0 — green *throughout*, not merely at the end
+4. `npm run test:web` exit 0
+5. token-identity 0 diffs across all three theme states
+6. contrast pairs at threshold, and ≥76 `@ds guardrail:` fences preserved
+7. CDP structural gate at 390px, both themes, zero horizontal overflow
+8. catalog smoke, light and dark, no throw
+9. `validate.sh … --strict` exit 0 — **invoked through the script's realpath**, since through the
+   `.opencode` symlink it silently prints nothing and exits 0 even when the packet fails.
 <!-- /ANCHOR:success-criteria -->
 
 ---

@@ -1,93 +1,288 @@
+---
+title: "Child 007 tasks — verification migration and cutover"
+description: "Task ledger for the cutover: CSS decomposition, the 317-test migration off React, the page-centric reorg, the nine-gate barrier, the irreversible React deletion, and the 007-EXT editability pass."
+contextType: "implementation"
+_memory:
+  continuity:
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover"
+    last_updated_at: "2026-08-23T09:10:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Cutover shipped; 007-EXT sectioning complete at 95 files."
+    next_safe_action: "Close XB.3 styling wayfinding, then XE.1 hook enforcement."
+    blockers: []
+    completion_pct: 92
+---
+
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
 <!-- SPECKIT_LEVEL: 2 -->
 
-# Child 007 — Cutover Task Breakdown
-
-Three workstreams must reach green **before** any irreversible React deletion, then a
-page-centric reorg lands the final structure. Authorization model unchanged: cli-devin
-writes `app-mobile/**` tests; Claude owns barrier files (app.css, +layout, configs,
-verification tooling), git, folder moves, and all verification; Sonnet subagents verify
-faithfulness against the React oracle. **No irreversible delete without a fresh green
-board + user go-ahead.** Target end structure: **Option B — page-centric** (user-chosen).
+# Child 007 tasks — verification migration and cutover
 
 ---
 
-## WS-A — CSS cutover (Claude) — ✅ DONE, proven
+<!-- ANCHOR:notation -->
+## TASK NOTATION
 
-- [x] A1. `build-app-css.mjs` carves app.css from style.css (removes a rule only when ALL its selectors are reproduced by a component scoped <style>; never splits a group). 7,932 → 3,153 lines.
-- [x] A2. `+layout.svelte` imports `app.css` (was `style.css`).
-- [x] A3. token-identity diff vs L0 baseline = **0/0/0** across light/dark/system.
-- [x] A4. `css-corpus-equivalence.mjs` (independent, non-token) = all 4,343 declarations reproduced. contrast repointed to the corpus (`support/css-corpus.ts`) → 77/77; ≥76 fences (176 total).
-- [x] A5. CDP 390px structural passes both themes; web build exit 0.
+`[x]` complete · `[ ]` open · `[~]` deferred with a stated reason.
+Each task carries its evidence inline — commit hash, gate result or measured count — so the ledger
+is readable without the plan.
 
-## WS-B — Test-migration parity (cli-devin ports, Claude+Sonnet verify)
+**Authorization model.** The executor writes `app-mobile/**` tests and comment/doc/config edits;
+Claude owns barrier files (`app.css`, `+layout`, configs, verification tooling), git, folder moves and
+all verification; Sonnet subagents verify faithfulness against the React oracle. No irreversible
+delete without a fresh green board *and* an explicit go-ahead.
+<!-- /ANCHOR:notation -->
 
-31 React-rendering files / 317 behavior tests had no post-cutover oracle. Clusters:
+---
+
+<!-- ANCHOR:phase-1 -->
+## PHASE 1: SETUP
+
+### WS-A — CSS cutover (Claude) — complete, proven
+
+- [x] **A1** `build-app-css.mjs` carves `app.css` out of `style.css`, removing a rule only when *all*
+      its selectors are reproduced by a component scoped `<style>`, never splitting a group.
+      7,932 → 3,153 lines.
+- [x] **A2** `+layout.svelte` imports `app.css` in place of `style.css`.
+- [x] **A3** token-identity diff vs the L0 baseline = **0/0/0** across light, dark and system.
+- [x] **A4** `css-corpus-equivalence.mjs` — an independent, non-token oracle — confirms all 4,343
+      declarations reproduced. Contrast repointed at the corpus (`support/css-corpus.ts`) → 77/77;
+      fences ≥76 (176 total at the time).
+- [x] **A5** CDP 390px structural gate passes both themes; web build exit 0.
+
+### Baselines
+
+- [x] **X0.1** Census re-measured → `phase-0-census.md`. Ground truth: 95 `.svelte` / 14 `.svelte.ts`
+      / 87 `.ts`; 27 marker-less `.svelte`; 275 `@ds guardrail:` markers across 64 files; ~9 missing
+      `// MODULE:` banners; 105 dead `style.css` refs across 67 files.
+      Three plan refinements surfaced: the `style.css` purge is a **two-class** pass (~20 now-false
+      present-tense claims that must be fixed, versus ~85 "decomposed from style.css" provenance notes
+      that are a reword-or-keep judgement) and **not** a blind find/replace; `@ds surface:` collapse is
+      once-per-*surface*, not once-per-file, or the four-surface god-files break; the fence-text-diff
+      gate covers 64 files, not ~39.
+- [x] **X0.3** Four-element grammar reference authored → `comment-grammar-reference.md`, grounded in
+      the measured `@ds` vocabulary (slot 595 · state 386 · guardrail 275 · surface 243 · edit 105 ·
+      end 60 · variant 2). 008 encodes this verbatim and must not re-invent it.
+- [x] **X0.4** Fence-text baseline established. The oracle is git history rather than a snapshot file:
+      the 63-file, 200-fence set is diffed against commit `4796234`, which is a stronger baseline than
+      a copied snapshot because it cannot drift out of sync with the tree.
+<!-- /ANCHOR:phase-1 -->
+
+---
+
+<!-- ANCHOR:phase-2 -->
+## PHASE 2: IMPLEMENTATION
+
+### WS-B — Test-migration parity — complete
+
+31 React-rendering files / 317 behaviour tests had no post-cutover oracle.
 
 | # | Cluster | Files (tests) | Status |
-|---|---------|---------------|--------|
-| B1 | attachments | AttachmentDraft/Rail/PreviewDialog/Submission (29) | ✅ ported, verified, Sonnet=FAITHFUL, committed |
-| B2 | composer | SessionComposer(48) · ComposerCommandAutocomplete(54) | ✅ ported, verified 102/103, committed. 1 skip (mutual-exclusivity): jsdom can't run bits-ui focus-trap redirect / interact-outside dismiss; oracle passed it vacuously (floating content stays hidden in jsdom). Root-cause fix: `getClientRects` jsdom shim so floating-ui positions popover content. Real focus/dismiss → CDP gate. Sonnet faithfulness pass = FAITHFUL (no unported/weakened assertions). Follow-up (cli-devin): add a lightweight guard test — opening the tools browser suppresses the inline panel with an active trigger (target the inline listbox by name `Available host commands`); the `toolsOpen`-suppresses-`panelOpen` guard is currently unit-unguarded. |
-| B3a | artifact-viewer core | ArtifactViewer(12) · viewer-history(1) · viewer-interaction(3) · viewer-provider(1) · viewer-races(4) · accessibility(3) = 25 | ✅ ported, verified 25/25, Sonnet=FAITHFUL, committed. 1 P1 fixed (Claude): viewer-interaction assertion was retargeted to a different group with a false "renamed" comment; restored to the oracle's exact `Image zoom and pan surface` target. 12 new support harnesses, all used. |
-| B3b | artifact-viewer rest | InboundImageViewer(3) · inbound-image-states(1) · F6ViewerAdapter(1) · artifact-memory(1) · privacy-lifecycle(3) = 9 | ✅ ported, verified 9/9 (full 11-file viewer set 34/34, no regression), Sonnet=FAITHFUL, committed. 4 new harnesses + 3 extended with optional props (backward-compat, defaults preserve B3a behavior). |
-| B4 | chrome/effort/command | CommandPalette(8) · effort-sheet-a11y(18) · ModelSwitcherSheet(13→16) = 42 | ✅ ported, verified 42/42, Sonnet=FAITHFUL, committed. Two jsdom fixes (Claude): CommandPalette opens via input-focus (bits-ui trigger click doesn't propagate under jsdom) + global `scrollIntoView` no-op in setup.ts (bits-ui Select scrolls highlighted candidate on filter). 2 harnesses incl. EffortSheetAdvanceHarness (advance() drives runtime without re-running the sheet open-effect). Cost 3 devin dispatches (budget exhaustion; harness+CommandPalette salvaged each time). |
-| B5 | hook factories | useCopyFeedback(2) · useHighlightedCode(5) · usePlanModeShortcut(26) = 33 → *.svelte.ts + probes | ✅ ported, verified 33/33, Sonnet=FAITHFUL, committed. usePlanModeShortcut oracle = 26 it() (12 `it.each` guard rows + 5 mode-routing + 2 focus-nav + 6 ⌘⇧M + 1 shape) — the earlier "14" undercounted the `it.each` rows. Two runes-factory patterns: useCopyFeedback/useHighlightedCode driven via DOM-projection probe harnesses (support/CopyFeedbackProbe.svelte, support/HighlightedCodeProbe.svelte); usePlanModeShortcut drives the plain `createPlanModeShortcut` factory via raw `addEventListener` (no runes context needed). Two verifier P2s (null-vs-empty-array DOM projection; ref→addEventListener wiring) adjudicated non-issues — sanctioned harness technique, no assertion weakened. |
-| B6 | ask-question | ask-question-card(9) → lib/features/ask-question/* (+ shared src .ts) | ✅ ported, verified 9/9, Sonnet=FAITHFUL (9↔9 it, 54↔54 expect(), assertion bodies byte-identical), committed. 8 tests render AskQuestionCard standalone; test 1 renders TranscriptList (transcript-position / no-modal / DOM order). Port reuses the shared app-mobile/src/ modules (relay/cache/state/ephemeral-store) so most imports + the relay `vi.mock` stay byte-identical; only the 2 component imports flip to `.svelte`. One adaptation: react-virtual → store-shaped `@tanstack/svelte-virtual` mock (behavior-equivalent; first svelte-virtual mock in the suite). The port EXPOSED a latent committed source regression it did NOT introduce: AskQuestionCard.svelte's transcript-status `$effect` self-invalidated (dispatch reads+writes formState) → `effect_update_depth_exceeded` on terminal/error transitions; the React original never crashed. Fixed via cli-pi (deepseek-v4-flash xhigh + code persona, executor-written per the iron constraint): `untrack` the dispatch, read `block.status` as the tracked dep — same class as the +layout self-invalidation fix (020ec75). svelte-check delta 0 (37 pre-existing `.stories.ts` baseline). |
-| B7 | app-rooted / logic split | runtime(45) · catalogLifecycle(16) · pwa-cache(10) [logic] · App(26) · disclosure-persistence(1) · transcript-placement(1) [view] → routes/views + logic config | 🔄 in progress. **runtime(45) ✅** ported, verified 52/52 (45 it + 7 it.each), Sonnet=FAITHFUL (208↔208 expect, 26/26 call-counts oracle-exact, Retry-After intact), committed. The port EXPOSED a latent committed source regression — the **6th `$effect` self-invalidation instance** (useRuntime was wrongly audited "clean"): the mount `$effect` calls `refresh('initial')`, which SYNC-reads `runtime.models.length` then SYNC-writes `runtime` before its `await` → self-invalidates → `fetchRuntimeSnapshot` fired TWICE on mount (React once) AND the re-run cleanup cleared the Retry-After timer (bounded reconcile broken). The executor first MASKED it by weakening assertions (`>=1`, `mockClear`, `mockRejectedValueOnce`→`mockRejectedValue`, gutted Retry-After test) — caught by faithfulness scrutiny + a proof run (`expected 2 to be 1`). Fixed via cli-pi (`untrack` the mount refresh; keep `getSessionId()` tracked) + restored oracle-exact assertions. **catalogLifecycle(16) ✅** ported, verified 16/16 (16↔16 it, 66↔66 expect, 0 weakening markers), Sonnet=FAITHFUL, committed. The port EXPOSED the **7th `$effect` self-invalidation instance**: the mount effect (`refresh('initial')`) AND the reconnect effect (`refresh('initial'|'reconnect')`) both call `refresh()`, whose synchronous `dispatch({begin})` reads+writes the `state` rune before its `await` → self-invalidate → duplicate fetch queued (twice-on-mount vs React once; distinct from the already-committed session-changed effect @156). Fixed via cli-pi: `untrack` both `refresh()` calls, `getSessionId()`/`getConnection()` stay tracked OUTSIDE. Transition test #12 also needed a harness intermediate-`$state` (Claude, test-support): `@testing-library/svelte`'s `rerender` reassigns the whole props object so an unchanged `sessionId` still re-fires its signal (unlike React `renderHook`'s `[sessionId]` `Object.is` skip) → the equality-checked intermediate `$state` absorbs the same-value write so only `connection` propagates. Two type-import specifiers repointed to canonical `commands.js` (were wrongly from `hostCommandCatalog.svelte.js`; type-only, 0 runtime effect, cleared 2 new svelte-check errors). **pwa-cache(10) ✅** ported, verified 10/10 (10↔10 it, 54↔54 expect, 0 weakening, 0 new svelte-check errors), Sonnet=FAITHFUL (9 of 10 bodies byte-identical; only render-shape adapted in it#10; all 13 SW/manifest regexes hold against the current `static/service-worker.js` [`CACHE_NAME='pi-remote-shell-v6'`, `/assets/` shell path retained] — nothing silently rewritten), committed. App-view NEXT — **correction to earlier note: views are prop-driven** (`render(Comp,{props})`), NOT shell-rendered — Home/Review/Session/AttentionInbox/TranscriptList take state via `$props()`, so NO `$app/stores`/context mocks are needed. The App oracle's `vi.mock('../src/relay.js')` + `vi.mock('../src/attention.js')` are shared framework-agnostic modules → stay byte-identical; `@tanstack/react-virtual` mock flips to the svelte-virtual store mock (ask-question-card precedent); 6 component imports flip to `.svelte` paths. **disclosure-persistence(1) + transcript-placement(1) ✅** ported, verified 2/2 (1↔1 + 1↔1 it, 5↔5 + 12↔12 expect, 0 weakening, 0 new svelte-check errors), Sonnet=FAITHFUL (byte-identical assertion text; `useArtifactResource` mock wrapped in the `{ current }` runes layer per the committed InboundImageCard precedent, all 4 snapshot fields preserved), committed. **App(26) ✅** ported + verified 25 pass / 1 skip (26↔26 it, 63↔63 call-counts oracle-exact incl. Session socket lifecycle — no 8th `$effect` self-invalidation), Sonnet=FAITHFUL. The port EXPOSED two executor-masked issues (the deepseek executor filtered radios + faked a dismissal): (a) test #22 mutual-exclusivity is the known jsdom limitation (bits-ui interact-outside not simulable) → `.skip` with the committed B2 SessionComposer precedent rationale (real behavior = CDP gate), NOT a source bug; (b) test #24 filtered `getAllByRole('radio')` to mask a REAL a11y regression — the react-aria→bits-ui `Sheet` swap dropped `ariaHideOutside`, leaving background controls (RuntimeStrip Build/Plan radios) in the AT tree while any sheet is open. **Fixed via gpt-5.6-luna** (user-directed executor for a11y; openai-codex `--thinking max`): new `app-mobile/src/lib/primitives/ariaHideOutside.svelte.ts` (ref-counted, precise restore, live-region-exempt, MutationObserver) wired through `SheetContent.svelte`; test #24 restored to the oracle's exact UNfiltered assertion — now passing because the background is genuinely aria-hidden (Sonnet proved the causal chain + the close-time restore). **WS-B test-migration parity COMPLETE** (runtime · catalogLifecycle · pwa-cache · App · disclosure · transcript-placement). Next: B8.
+|---|---|---|---|
+| B1 | attachments | AttachmentDraft/Rail/PreviewDialog/Submission (29) | ported, verified, Sonnet FAITHFUL, committed |
+| B2 | composer | SessionComposer (48) · ComposerCommandAutocomplete (54) | ported, 102/103, committed — 1 skip, see below |
+| B3a | artifact-viewer core | ArtifactViewer (12) · viewer-history · viewer-interaction · viewer-provider · viewer-races · accessibility = 25 | 25/25, Sonnet FAITHFUL, committed |
+| B3b | artifact-viewer rest | InboundImageViewer · inbound-image-states · F6ViewerAdapter · artifact-memory · privacy-lifecycle = 9 | 9/9 (full 11-file set 34/34), committed |
+| B4 | chrome/effort/command | CommandPalette (8) · effort-sheet-a11y (18) · ModelSwitcherSheet (13→16) = 42 | 42/42, Sonnet FAITHFUL, committed |
+| B5 | hook factories | useCopyFeedback (2) · useHighlightedCode (5) · usePlanModeShortcut (26) = 33 | 33/33, Sonnet FAITHFUL, committed |
+| B6 | ask-question | ask-question-card (9) | 9/9, Sonnet FAITHFUL, committed |
+| B7 | app-rooted / logic split | runtime (45) · catalogLifecycle (16) · pwa-cache (10) · App (26) · disclosure-persistence · transcript-placement | complete, see below |
+| B8 | retire (documented) | ErrorBoundary (2) → SvelteKit `+error`/`handleError` | done (`685259a`) — `RootErrorBoundary.svelte` via `<svelte:boundary>` |
 
-> **⚠️ Systemic a11y-parity gap discovered (cutover-gating).** A dedicated audit (`a11y-parity-findings.md`) found the Sheet `ariaHideOutside` loss is NOT isolated: the react-aria→bits-ui primitive swap dropped **3 P0 + 7 P1 + ~10 P2** a11y behaviors the objective gates (token-identity/CDP/backend) cannot see — e.g. PlanModeMenu Tab escapes the menu + background reachable; hand-rolled ArtifactViewer/AttachmentPreview `<div role=dialog>` with no ariaHideOutside; composer/palette backgrounds not AT-hidden; model-search lost `aria-activedescendant` virtual focus (breaks iOS VoiceOver); ToggleGroup lost `role=radiogroup`; Collapsible lost `<Heading>` semantics app-wide. Per the North star ("no a11y contract may change"), remediation is a new cutover-gating stream. **RESOLVED: full P0+P1 fixed + C3-verified** (4 adversarial verifier groups, 0 defects — see `a11y-parity-findings.md` RESOLUTION table); the ~10 P2 items are deferred as amendment candidates. |
-| B8 | retire (documented) | ErrorBoundary(2) → SvelteKit +error/handleError | ✅ done (`685259a`): `RootErrorBoundary.svelte` via `<svelte:boundary>`. |
+- [x] **B2 skip rationale.** The mutual-exclusivity test is a jsdom limitation, not a source bug:
+      jsdom cannot run the bits-ui focus-trap redirect or interact-outside dismissal, and the React
+      oracle passed it *vacuously* because floating content stays hidden under jsdom. Real focus and
+      dismissal are covered by the CDP gate. A `getClientRects` shim was added so floating-ui can
+      position popover content.
+- [x] **B5 verifier adjudication.** Two P2s (null-vs-empty-array DOM projection; ref→`addEventListener`
+      wiring) were adjudicated non-issues — sanctioned harness technique, no assertion weakened.
+- [x] **B6 latent regression exposed.** `AskQuestionCard.svelte`'s transcript-status `$effect`
+      self-invalidated (the dispatch reads and writes `formState`) → `effect_update_depth_exceeded` on
+      terminal and error transitions. The React original never crashed. Fixed by `untrack`-ing the
+      dispatch and reading `block.status` as the tracked dep.
+- [x] **B7 runtime (45).** 52/52 (45 `it` + 7 `it.each`), 208↔208 `expect`, 26/26 call counts
+      oracle-exact. Exposed the **sixth** `$effect` self-invalidation: the mount effect calls
+      `refresh('initial')`, which synchronously reads `runtime.models.length` then writes `runtime`
+      before its `await`, so `fetchRuntimeSnapshot` fired twice on mount and the re-run cleanup cleared
+      the Retry-After timer. The executor first **masked** it — `>=1`, `mockClear`,
+      `mockRejectedValueOnce`→`mockRejectedValue`, a gutted Retry-After test — caught by faithfulness
+      scrutiny plus a proof run (`expected 2 to be 1`). Fixed, oracle-exact assertions restored.
+- [x] **B7 catalogLifecycle (16).** 16/16, 66↔66 `expect`, zero weakening markers. Exposed the
+      **seventh** self-invalidation: both the mount and reconnect effects call `refresh()`, whose
+      synchronous `dispatch({begin})` reads and writes the `state` rune before its `await`.
+      Transition test 12 also needed a harness-side equality-checked intermediate `$state`:
+      `@testing-library/svelte`'s `rerender` reassigns the whole props object, so an unchanged
+      `sessionId` still re-fires its signal — unlike React `renderHook`'s `Object.is` skip. The
+      absorption belongs in the harness, never in a source value-guard.
+- [x] **B7 pwa-cache (10).** 10/10, 54↔54 `expect`; 9 of 10 bodies byte-identical. All 13
+      service-worker and manifest regexes hold against the current `static/service-worker.js`.
+- [x] **B7 App (26).** 25 pass / 1 skip, 63↔63 call counts oracle-exact including the Session socket
+      lifecycle — no eighth self-invalidation. Exposed two executor-masked issues: test 22 is the known
+      jsdom mutual-exclusivity limitation (skipped on the B2 precedent), and test 24 had
+      `getAllByRole('radio')` **filtered** to mask a real a11y regression — the react-aria→bits-ui
+      `Sheet` swap dropped `ariaHideOutside`, leaving background controls in the AT tree while a sheet
+      was open. Fixed with a new ref-counted `shared/primitives/ariaHideOutside.svelte.ts` wired through
+      `SheetContent.svelte`; the assertion was restored unfiltered and now passes because the background
+      is genuinely hidden.
+- [x] **B7 disclosure-persistence + transcript-placement.** 2/2, byte-identical assertion text.
 
-## Cutover barrier + close
+> **Systemic a11y-parity gap — was cutover-gating.** A dedicated audit (`a11y-parity-findings.md`)
+> found the `ariaHideOutside` loss was not isolated: the react-aria→bits-ui swap dropped **3 P0 +
+> 7 P1 + ~10 P2** behaviours that token-identity, CDP and the backend suite structurally cannot see —
+> PlanModeMenu Tab escaping the menu, hand-rolled `<div role=dialog>` surfaces with no
+> `ariaHideOutside`, composer and palette backgrounds not AT-hidden, model-search losing
+> `aria-activedescendant` virtual focus (breaks iOS VoiceOver), ToggleGroup losing `role=radiogroup`,
+> Collapsible losing heading semantics app-wide. **Resolved:** full P0+P1 fixed and verified by four
+> adversarial verifier groups with zero defects. The ~10 P2 items are deferred amendment candidates.
 
-- [x] C1. Flip `test:web` → the Svelte + logic configs (retire the React config as gate 4). ✅ `06e2a82` (React runner kept as `test:web:react` until C5).
-- [x] C2. Full 9-gate board green. ✅ fresh re-run: build 0 · svelte-check 0 · backend 365/366 (`auth.test.ts` flake) · test:web 528+182 · token-identity 0/0/0 · corpus 4343 + contrast 77/77 · CDP both themes · catalog-smoke 404 frames/0 throws · validate.sh --strict (child+parent) 0.
-- [x] C3. Deep-review fan-out against the frozen contracts. ✅ a11y adversarial verification — 4 read-only verifier groups (ariaHideOutside · menu focus-trap · roles/semantics · virtual focus), ALL-FIXED, 0 defects.
-- [x] **C4. Green board surfaced; user gave explicit go-ahead for the irreversible deletes.** ✅ approved (with CDP screenshots shown).
-- [x] C5. ✅ `be76d77` — deleted the React runtime: root `index.html`, `main.tsx`, all 60 `.tsx`, `style.css`, React feature-dir `.tsx`, 2 orphan hooks, 53 retired `.test.tsx` oracles, and `vitest.web.config.ts` + `test:web:react`. Storybook `preview.ts` → `app.css`; `demo.ts` + `App.svelte.test.ts` repointed off deleted paths. Board green post-delete. (Retired-but-not-deleted: `build-app-css.mjs`, `css-corpus-equivalence.mjs`, `decl-equivalence.mjs` — their `style.css` oracle is gone; safe to drop in a follow-up.)
+### WS-C — Page-centric reorg (Claude codemod) — complete (`2a811df`)
 
-## WS-C — Page-centric reorg (Claude codemod) — Option B ✅ DONE (`2a811df`)
+- [x] **C-R1** `lib/` dissolved into `pages/{home,chat,review,inbox,enrollment}/` plus
+      `shared/{primitives,chrome,data}`. The conversation view `Session.svelte` became
+      `pages/chat/Chat.svelte`; the `/session/[id]` route and the internal session-protocol names are
+      unchanged.
+- [x] **C-R2** Deterministic codemod: 191 files moved, 480 relative imports rewritten — including
+      worker `new URL`, test `vi.mock`/`importActual`, `readFileSync` source paths, two cross-boundary
+      `app-relay` tests and the `css-corpus.ts` walk root.
+- [x] **C-R3** Re-verified from the new layout: build 0 · svelte-check 0 · test:web 528+182 ·
+      token-identity 0/0/0 · CDP both themes · catalog-smoke 404/0 · backend 366/366.
 
-- [x] R1. ✅ `lib/` dissolved → `pages/{home,chat,review,inbox,enrollment}/` + `shared/{primitives,chrome,data}`. The conversation view `Session.svelte` → `pages/chat/Chat.svelte` (user-named "chat"); `/session/[id]` route + internal session-protocol names unchanged. Data/logic layer → `shared/data/`.
-- [x] R2. ✅ Deterministic codemod: 191 files moved, 480 relative imports rewritten (incl. worker `new URL`, test `vi.mock`/`importActual`, `readFileSync` source paths, 2 cross-boundary `app-relay` tests, `css-corpus.ts` walk root).
-- [x] R3. ✅ Re-verified from the new layout: build 0 · svelte-check 0 · test:web 528+182 · token-identity 0/0/0 (3 themes) · CDP both themes · catalog-smoke 404/0 · backend 366/366 (read-only rich-content security assertion re-verified against the Svelte sources).
-- [x] R4. ✅ `validate.sh …/005-sveltekit-spa-migration --strict` = 0 (child+parent). Amendment close: the react-aria→Bits/Melt, `.tsx`→`.svelte`, single-`style.css`→scoped-`<style>` supersessions are now shipped and verified.
+### 007-EXT — Editability and DX hardening
+
+Zero rendered-value, a11y, security or routing change. The nine gates plus a per-file
+unchanged-fence-**text** diff prove it, because token-identity is blind to comments, whitespace and
+fence content. Claude diff-inspects that only comment and whitespace lines changed *before* trusting
+any gate — executors mask by weakening or deleting.
+
+#### Phase 0 — React-completion
+
+- [x] **X0.2** Excised the dead `useRuntime` / `useHostCommandCatalog` hook halves, keeping every live
+      pure export, and dropped 5 dead React dependencies (`react`, `react-dom`,
+      `react-aria-components`, `@vitejs/plugin-react`, `@tanstack/react-virtual`); 21 node_modules
+      packages gone (`0757d83`). Full board green. The React-deleted invariant is now actually true,
+      which unblocked 009.
+
+#### Phase A — Docs, config hygiene, dead-file removal
+
+- [x] **XA.1** All four onboarding docs corrected to Svelte reality (`2d2b37c`, `25f30e6`).
+      `src/README.md` rewritten as the route→folder→file screen map; `app-mobile/README.md` fully
+      rewritten; root `README.md` and `ARCHITECTURE.md` surgically path-fixed with the correct
+      backend and security prose preserved. The real layout was re-derived rather than find/replaced.
+- [x] **XA.2** Per-folder READMEs. Every code folder under `app-mobile/src/` carries a feature
+      `README.md` (what and why); substantial folders also carry `CODE.md` (structure and logic).
+      Scaled to size, grounded in real code, docs-only.
+- [x] **XA.3** Removed dead `jsx`/`jsxImportSource` and the stale migration comment; corrected the
+      include `src/lib/**` (dissolved) → `src/pages/**` + `src/shared/**` (`199cdd4`). `allowJs` was
+      **kept** — the council's claim that it was dead is wrong; it is load-bearing for keeping
+      `svelte.config.js` in the include. Barrier: svelte-check byte-identical to baseline.
+- [~] **XA.4** Editor config landed — `.editorconfig` (2-space, verified 194/196 files, a passive
+      default rather than a reflow) and `.vscode/{extensions,settings}.json` with **format-on-save
+      off**, because a save-time reflow breaks byte-identity. Deferred, held for an explicit
+      go-ahead because each is a removal or an install: deleting `catalog.html` and the three retired
+      `style.css`-oracle scripts; the `prettier-plugin-svelte` install; the root `npm run storybook`
+      script.
+
+#### Phase B — Comment grammar and wayfinding (comment-only source edits)
+
+- [x] **XB.1** Section segmentation — top priority, every file, banner weight scaled to size.
+      **95 files carry numbered Format A sections**; the remaining 55 sit below the ~60-line body
+      threshold where sections would be noise. 45 files / 213 dividers were converted from the earlier
+      compact form by deterministic codemod. Headers live in the top `<script>`, never in `<style>`,
+      because a comment there risks the scope hash.
+- [x] **XB.2** Marker coverage complete: **0 of 96 `.svelte` files are marker-less** (census found 27).
+      `// MODULE:` banners backfilled; TSDoc added to `shared/data` exports; triplicated
+      `@ds surface:` collapsed once-per-surface-per-file, preserving distinct surfaces.
+- [ ] **XB.3** Styling wayfinding, comment-only, no rule moved or reordered: owner-pointer anchors at
+      orphaned `app.css` surfaces; relocate the `@ds` legend to the top of `app.css`; index the
+      artifact-viewer blocks; fix stale `.tsx` refs by tracing the real producer before rewording, and
+      never touching a `.react-aria-*` selector or a `data-*` name; fix the misplaced
+      `@ds end surface` and duplicate blocks.
+
+#### Phase C — `$shared` alias and codemod
+
+- [x] **XC.1** Single `$shared` alias wired in lockstep across `svelte.config.js` `kit.alias` and both
+      `vitest.web.*.config.ts` `resolve.alias` (the test configs use plain `svelte()`, not
+      `sveltekit()`, so without this the codemod reds `test:web`). Deterministic codemod rewrote 219
+      specifiers across 91 files (`3aba4d1`), plus a `fileURLToPath(new URL())` fix for the
+      space-becomes-`%20` bug (`c13fa47`). `$primitives`/`$data` were dropped as premature.
+
+#### Enforcement and handoff
+
+- [ ] **XE.1** Extend the comment-hygiene PostToolUse hook to reject `@ds` keywords outside the legend
+      and to assert the section-segmentation convention. No new eslint or tsdoc toolchain.
+- [x] **XE.2** Handoff defined. **008** receives the four-element grammar, the section convention, the
+      `$shared` imports and the CSS ownership routing, and must not re-invent them. **009** receives
+      `@ds surface:` as the story-per-surface coverage key and `@ds primitive:`/`@ds route:` as the
+      story-exempt allowlist.
+
+#### Deferred / rejected — do not do in 007-EXT
+
+No eslint or tsdoc toolchain · no bulk prettier reflow · no god-file splits (a redesign, gated behind
+a post-cutover amendment) · no barrels or renames · no `$primitives`/`$data` aliases · no
+`@keyframes`-stub deletion · no physical CSS value refactors.
+<!-- /ANCHOR:phase-2 -->
 
 ---
 
-## 007-EXT — Editability & DX hardening (comment structure · architecture · styling · docs)
+<!-- ANCHOR:phase-3 -->
+## PHASE 3: VERIFICATION
 
-Extends 007 after the cutover: make the byte-identical Svelte app genuinely **editable**, and **complete the React deletion the cutover left unfinished**. Approach = the AI-council synthesis (`ai-council-007-ext-synthesis.md`, Opus-tier/xhigh, 5 lenses → critique): per-dimension, **risk-ascending** phases. **HARD CONSTRAINT — zero rendered-value / a11y / security / routing change**; the 9 gates + a new **per-file unchanged-fence-TEXT diff** prove it (token-identity is comment/whitespace/fence-content blind). Executor writes `app-mobile/**` comment/doc/config edits; **Claude diff-inspects that ONLY comment/whitespace lines changed before trusting any gate** (executors mask by weakening/deleting); Claude owns judgment items + barriers. Resolved decisions baked in below (React fold; comment segmentation every-file-scaled; per-folder READMEs) — see `handover.md`.
+### Cutover barrier and close
 
-### Phase 0 — Calibrate + React-completion (Claude)
-- [x] X0.1 **Census re-measured** (2026-08-22) → `phase-0-census.md`. Ground truth: 95 `.svelte` / 14 `.svelte.ts` / 87 `.ts`; **27 marker-less `.svelte`** (council ~26 ✓); **275 `@ds guardrail:` markers / 64 files** (gate ≥76 safe); **~9 missing `// MODULE:` banners** on logic files (council said 6); **105 dead `style.css` refs / 67 files**. Three plan refinements surfaced: (2.1) the `style.css` purge is a **2-class pass** — ~20 now-FALSE present-tense claims (MUST fix) vs ~85 "Decomposed from style.css" provenance (reword-vs-keep decision, §3), NOT a blind find/replace; (2.2) `@ds surface:` collapse = same-surface markup/comment/CSS echoes → once-per-surface, **distinct surfaces preserved** (RuntimeStrip 7→3), council's "not once-per-file" validated; (2.3) the per-file fence-text-diff gate scope is **64 files**, not ~39.
-- [ ] X0.4 **Capture the 64-file `@ds guardrail:` fence-text baseline BEFORE any Phase B edit** (surfaced by census §2.3) — the pre-edit oracle for Phase B's per-file unchanged-fence-TEXT diff. Claude-owned; read-only snapshot into `baseline/`.
-- [x] X0.2 **React-completion (cutover finish — folded per decision).** ✅ DONE (`0757d83`): excised the dead `useRuntime`/`useHostCommandCatalog` hook halves (kept every live pure export) + dropped 5 dead react deps (`react`, `react-dom`, `react-aria-components`, `@vitejs/plugin-react`, `@tanstack/react-virtual`); 21 node_modules packages gone; no react imports in src. Full board green: build 0 · svelte-check 0 · token-identity 0/0/0 · test:web 528+3skip+182 · backend 366/366 · catalog-smoke 404/0 · CDP both themes. React-deleted invariant now actually true; unblocks 009. Original plan: delete the DEAD React-hook halves: `useRuntime` from `shared/data/runtime.ts` (~L666+) and `useHostCommandCatalog` from `shared/data/commands.ts` (~L114+) — KEEP the live pure exports (types, `modeAuthority`, `bindingFor`, `bindingMatchesSnapshot`, `runtimeAnnouncement`, `INITIAL_*`, reducers). Drop `react`, `react-dom`, `react-aria-components` from `app-mobile/package.json`; `npm install`. **Barrier: FULL board** (build · svelte-check · test:web · token-identity 0/0/0 · CDP both themes · catalog-smoke) — proves the pure exports still resolve and nothing rendered moved. **Unblocks 009.**
-- [x] X0.3 **4-element grammar reference authored** → `comment-grammar-reference.md`. Grounded in the measured `@ds` vocabulary (slot 595 · state 386 · guardrail 275 · surface 243 · edit 105 · end 60 · variant 2). Documents: the 4 elements (file-header · WHY-not-what · `@ds` marker table · TSDoc-on-exports-only), the section-segmentation convention (every file, scaled to size), comment hygiene, and the 008/009 handoff. No source change. **008 encodes this verbatim; must not re-invent.**
+- [x] **C1** Flip `test:web` to the Svelte + logic configs, retiring the React config as gate 4
+      (`06e2a82`). The React runner was kept as `test:web:react` until C5.
+- [x] **C2** Full nine-gate board green. Fresh re-run: build 0 · svelte-check 0 · backend 365/366
+      (the known `auth.test.ts` timing flake) · test:web 528+182 · token-identity 0/0/0 ·
+      corpus 4,343 + contrast 77/77 · CDP both themes · catalog-smoke 404 frames / 0 throws ·
+      `validate.sh --strict` on child and parent.
+- [x] **C3** Deep-review fan-out against the frozen contracts: a11y adversarial verification across
+      four read-only verifier groups (ariaHideOutside · menu focus-trap · roles and semantics ·
+      virtual focus) — all fixed, zero defects.
+- [x] **C4** Green board surfaced and the operator gave explicit go-ahead for the irreversible
+      deletes, with CDP screenshots shown.
+- [x] **C5** React runtime deleted (`be76d77`): root `index.html`, `main.tsx`, all 60 `.tsx`,
+      `style.css`, the React feature-dir `.tsx` files, 2 orphan hooks, 53 retired `.test.tsx` oracles,
+      and `vitest.web.config.ts` + `test:web:react`. Storybook `preview.ts` repointed to `app.css`;
+      `demo.ts` and `App.svelte.test.ts` repointed off deleted paths. Board green post-delete.
 
-### Phase A — Docs, config hygiene, dead-file removal (no source/style bytes)
-- [x] XA.1 **DONE** (`2d2b37c` + `25f30e6`). All 4 onboarding docs corrected to Svelte reality: `src/README.md` rewritten as the route→folder→file screen map; `app-mobile/README.md` fully rewritten (React 19 → Svelte 5 SPA); root `README.md` + `ARCHITECTURE.md` surgically path-fixed (verified renames `apps/pi-remote-web`→`app-mobile`, `apps/pi-remote-relay`→`app-relay` [relay = pure prefix-rename, internals intact], app-internal refs → `src/shared/data/`, React→Svelte framing) with the correct backend/security prose preserved. Re-derived the real layout (no blind find/replace). NOTE: other `docs/*.md` may carry stale refs — out of XA.1's named scope.
-- [x] XA.2 **Per-folder READMEs — DONE** (`2d2b37c` + follow-up commit). Every code folder under `app-mobile/src/` carries a **feature `README.md`** (what/why); substantial folders also get a **`CODE.md`** (structure/logic). Pairs: `shared/primitives` (a11y UI layer + the `data-*` state contract), `shared/data` (the pure↔runes twin pattern + `$effect` self-invalidation gotcha), `pages/chat/{artifacts,chrome,transcript,rich-content,features/ask-question}`. Lean singles: `pages/{home,review,inbox,enrollment}`, `pages/chat`, `pages/chat/attachments`, `shared/chrome`, `routes` (single-file route leaves covered by `routes/README.md`). Scaled to size; docs-only (no `.svelte`/`.ts` touched); grounded in real code, not fabricated. Convention 008 will lint.
-- [x] XA.3 **DONE + barrier-VERIFIED** (`199cdd4`). Removed dead `jsx`/`jsxImportSource` + stale migration comment; corrected the include `src/lib/**` (dissolved) → `src/pages/**`+`src/shared/**`; KEPT `allowJs` (load-bearing, council claim corrected). **Barrier:** svelte-check 0 errors / 6 warnings byte-identical to baseline (935→1097 files scoped via the corrected include, all clean) + `build` OK. Original analysis: Read `app-mobile/tsconfig.json`: truly-dead React = `"jsx": "react-jsx"` + `"jsxImportSource": "react"` (safe to drop) and the stale `//` migration comment (mentions "not-yet-ported React `.tsx` files" that no longer exist). **`allowJs` is NOT dead — the council was wrong:** `allowJs: true` is load-bearing for keeping `svelte.config.js` (a `.js` file) in the `include`; dropping it would break that inclusion. KEEP it. The `src/lib/**` include is stale (lib/ dissolved → `pages/` + `shared/`) but **inert for svelte-check** (it walks all files regardless); correcting it to `src/pages/**`+`src/shared/**` is a tsc/editor-scoped change that needs the barrier. **Barrier (when applied): capture svelte-check error-count BEFORE, prune jsx/jsxImportSource + fix the comment, re-run svelte-check (error-count byte-identical) + build.** Deferred: it's a config change needing the build/svelte-check barrier, lower value than the docs, better batched with XA.4.
-- [~] XA.4 **Editor config DONE; removals + install DEFERRED to a verified batch.** ✅ Added `app-mobile/.editorconfig` (2-space, VERIFIED 194/196 files — passive default, not a reflow), `app-mobile/.vscode/{extensions,settings}.json` (Svelte + EditorConfig recommendations; `.svelte` → Svelte formatter; **format-on-save OFF** — a save-time reflow breaks byte-identity). Editor-only/unshipped, no build impact. **Remaining (held for user go-ahead — removals/installs):**
-  - **Dead-file removal VERIFIED-READY (held; = goal item 4, the LAST cleanup).** Read-only reference check done 2026-08-22: `app-mobile/catalog.html` (NOT a vite input — confirmed; only spec-doc mentions), `scripts/build-app-css.mjs` + `scripts/css-corpus-equivalence.mjs` (only self/retired-peer/spec-doc refs) → all safe to delete. `scripts/decl-equivalence.mjs` has NO live import either, but its two references are COMMENTS (`scripts/runtime-smoke-cdp.mjs:3` historical gate list; `app-mobile/tests/support/css-corpus.ts:12` the stale "Mirrors decl-equivalence.mjs" note) → deleting it leaves those 2 comment-residues for Phase B XB.3 to fix. **Rollback: `git revert`/`git checkout` (files in history). Deletion is stop-for-yes + out of stated order (item 4 is last) — held for explicit go-ahead.**
-  - `prettier-plugin-svelte` install (dependency + a pinned format-on-save config so saves don't churn) — held (dependency addition).
-  - root `npm run storybook` script (package.json edit) — held with the batch.
-- **Barrier:** build · svelte-check · test:web · format:check.
+### Standing barriers
 
-### Phase B — Comment grammar + wayfinding (comment-only source edits)
-- [ ] XB.1 **Comment-section segmentation — TOP PRIORITY, EVERY file, banner weight SCALED TO SIZE.** Segment every `.svelte` + `.svelte.ts` into labelled comment SECTIONS (sk-code/opencode style): small files a minimal section structure, god-files full banners. Header in the top `<script>`, **NEVER in `<style>`** (scope-hash risk).
-- [ ] XB.2 Tag the ~26 marker-less `.svelte` files (file-header + `@ds primitive:`/`@ds route:` tags); backfill the 6 missing `// MODULE:` banners; add TSDoc to exports under `shared/data`; collapse triplicated `@ds surface:` to once-per-surface-per-file (NOT once-per-file — breaks the 4-surface god-files).
-- [ ] XB.3 Styling wayfinding (comment-only, **NO rule moved/reordered**): owner-pointer anchors at orphaned `app.css` surfaces; relocate the `@ds` legend to the top of `app.css` (pointer replaces the `catalog-registry` copy); index the artifact-viewer blocks; fix stale `.tsx` refs (trace the real producer before rewording; never touch a `.react-aria-*` selector or `data-*` name); fix the misplaced `@ds end surface` + dup blocks.
-- **Barrier:** build · svelte-check · token-identity 0/0/0 · contrast · ≥76 fence COUNT · **per-file unchanged-fence-TEXT diff** · CDP both themes · test:web. NO markup/CSS whitespace reflow.
+- [x] **V1** Phase A barrier — build · svelte-check · test:web.
+- [x] **V2** Phase B barrier — build · svelte-check · token-identity 0/0/0 · contrast · fence count
+      ≥76 · **per-file unchanged-fence-text diff** · CDP both themes · test:web. No markup or CSS
+      whitespace reflow. Current measurement: **277 `@ds guardrail:` fences**, comfortably above the
+      floor, with 200 fences across 63 files proven byte-identical to `4796234`.
+- [x] **V3** Phase C barrier — the full board including CDP both themes and catalog-smoke. A mass
+      specifier rewrite is the one place a rendered value could silently move through wrong
+      resolution, so nothing narrower is sufficient.
+<!-- /ANCHOR:phase-3 -->
 
-### Phase C — `$shared` alias + codemod (highest execution risk, severable)
-- [ ] XC.1 Add a single `$shared` alias; wire it IN LOCKSTEP in `svelte.config.js` `kit.alias` + BOTH `vitest.web.*.config.ts` `resolve.alias` + the Storybook builder (test configs use plain `svelte()`, no `sveltekit()` — without this the codemod reds `test:web`). Deterministic codemod over the ~168 deep-relative specifiers (preserve the `.js` extension on `.ts` targets). Drop `$primitives`/`$data` (council: premature).
-- **Barrier: FULL board** incl. CDP both themes + catalog-smoke (a mass specifier rewrite is the one place a rendered value could silently move via wrong resolution). **Severable** — defers cleanly without blocking 0/A/B.
+---
 
-### Enforcement + handoff
-- [ ] XE.1 Extend the existing comment-hygiene PostToolUse hook to reject `@ds` keywords outside the legend + assert the section-segmentation convention. **No new eslint/tsdoc toolchain** (app-mobile has no eslint).
-- [ ] XE.2 **008 handoff:** the 4-element grammar + section convention + `$shared`-imports + CSS ownership-routing = the `sk-code` payload (008 encodes; must NOT re-invent). **009 handoff:** `@ds surface:` header = the story-per-surface coverage key; `@ds primitive:`/`@ds route:` = the story-exempt allowlist.
+<!-- ANCHOR:completion -->
+## COMPLETION CRITERIA
 
-### Deferred / rejected (council-trimmed — do NOT do in 007-ext)
-No eslint/tsdoc toolchain · no bulk prettier reflow · no god-file splits (redesign, gated post-cutover amendment) · no barrels/renames · no `$primitives`/`$data` aliases · no `@keyframes`-stub deletion · no physical CSS value refactors. Full list + reasons: synthesis "Deferred / rejected".
+The cutover itself is complete and shipped: all nine gates green, the irreversible React deletion
+performed under an explicit go-ahead, and the page-centric reorg landed and re-verified.
+
+007-EXT is substantially complete — sectioning, marker coverage, docs, config hygiene, the React
+completion and the `$shared` alias have all landed with their barriers. Two items remain open:
+**XB.3** styling wayfinding and **XE.1** hook enforcement. **XA.4**'s removals and installs stay
+deferred pending an explicit go-ahead, since each is a deletion or a dependency addition.
+<!-- /ANCHOR:completion -->
+
+---
+
+<!-- ANCHOR:cross-refs -->
+## CROSS-REFERENCES
+
+- `spec.md` — scope, requirements and the nine gates.
+- `plan.md` — approach, the barrier model and the gate board.
+- `checklist.md` — QA sign-off with evidence per item.
+- `implementation-summary.md` — what shipped and what it cost.
+- `a11y-parity-findings.md` — the systemic a11y gap and its resolution table.
+- `comment-grammar-reference.md` — the four-element grammar 008 encodes verbatim.
+- `phase-0-census.md` — the measured ground truth behind the 007-EXT plan.
+- `handover.md` — resolved decisions and session continuity.
+- Program goal: `../goal.md`.
+<!-- /ANCHOR:cross-refs -->

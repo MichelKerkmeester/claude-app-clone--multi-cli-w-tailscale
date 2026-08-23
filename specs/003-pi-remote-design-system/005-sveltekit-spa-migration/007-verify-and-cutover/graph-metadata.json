@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
-  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
-  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -29,11 +29,29 @@
       "repoint"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
-      "spec.md"
+      "tasks.md",
+      "handover.md",
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "baseline/token-identity-baseline.json"
     ],
     "entities": [
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "handover.md",
+        "kind": "doc",
+        "path": "handover.md",
+        "source": "derived"
+      },
       {
         "name": "spec.md",
         "kind": "doc",
@@ -41,8 +59,38 @@
         "source": "derived"
       },
       {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "token-identity-baseline.json",
+        "kind": "config",
+        "path": "baseline/token-identity-baseline.json",
+        "source": "derived"
+      },
+      {
         "name": "Verification Migration",
         "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
@@ -71,23 +119,93 @@
         "source": "derived"
       },
       {
-        "name": "4. REQUIREMENTS",
-        "kind": "heading",
-        "path": "spec.md",
+        "name": "Done Carve",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Port",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Dissolve",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Full",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "The React",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "CDP",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol Every",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
         "source": "derived"
       }
     ],
     "causal_summary": "Build the CSS-corpus builder, commit the token-identity resolver gate (0 diffs across 3 themes = the pixel-identity proof), rewrite the 75 tests to @testing-library/svelte, repoint CDP at the built preview, run a deep-review fan-out against the frozen contracts, then cut over: all nine objective gates green + validate.sh --strict, and close the spec amendment.",
     "created_at": "2026-08-19T17:24:04.291Z",
-    "last_save_at": "2026-08-19T17:24:04.291Z",
+    "last_save_at": "2026-08-23T06:41:54.195Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "handover.md"
     ],
-    "source_fingerprint": "sha256:3abcc19d8a217b243379ec408975f537076dc02f8ca8e9b3468ed554bc115639",
+    "source_fingerprint": "sha256:a47ba1f97a8f1027ced52788e7d89c15dd29e7fff7b4bcbf28a2b352c5bcc72d",
     "source_doc_hashes": {
-      "spec.md": "3b20d0b5caa7b73bb7955a5ec14ec6bf138d6a184749f890ed32b97a2286d869"
+      "spec.md": "cbaec74c8b859e8562d569193447fe62812002158de2ee8fa43fe2f37dc52074",
+      "plan.md": "a45fc97cd8dca1b37ffb33f4b15b5c78152428f81e1dcd782d75b885fc7d4879",
+      "tasks.md": "8d31d26a7cda206893c0eb30fd8b28c6d9c3ec2c1ddcc306a84d0b994e9e06c3",
+      "checklist.md": "69bb3c607f118790aecc7a76901f30b5ccbf49ad808a2b54de74f39aaf52561d",
+      "implementation-summary.md": "16a04a22582641ac753b6b5cd1cb4d76381046f97f8ae95e8ce7c30c9b4bf84d",
+      "handover.md": "2d1c6e7efbdfe664b238e95a666022f296528e5f843082d79fe9d2da91ef6ea1"
     },
     "last_active_child_id": null,
     "last_active_at": null

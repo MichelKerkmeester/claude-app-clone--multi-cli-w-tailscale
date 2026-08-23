@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "websocket heartbeat relay terminate",
+      "close code classification reconnect",
+      "connection slot lockout device"
+    ],
+    "key_topics": [
+      "websocket",
+      "heartbeat",
+      "relay",
+      "terminate",
+      "close",
+      "code",
+      "classification",
+      "reconnect",
+      "connection",
+      "slot",
+      "lockout",
+      "device"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "tasks.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "or",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "backoff",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "exponential",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "neither",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "one-miss",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checking",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol Timing",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Fix Completeness",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "File Organization",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Summary Not",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "A server heartbeat with an injectable interval so a suspended phone stops locking itself out of its own relay, and a client that classifies a socket close by the recovery it implies rather than backing off from all of them.",
+    "created_at": "2026-08-23T10:35:57.997Z",
+    "last_save_at": "2026-08-23T10:36:38.366Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:db196b089cadf1226b0a8de9e696deb1ac4c38fb6f8fa8aebbf4fffcb7a3addc",
+    "source_doc_hashes": {
+      "spec.md": "f85c2c7aa12c1a236d3d0aa703c197f05bc5d2fd27176d2b949f8c524b077276",
+      "plan.md": "fb59e83d522959b28ca47714d774256519013cd1f01316e693fff30fea7ab8a2",
+      "tasks.md": "12a91339cfc16d81822060a36268bef3a6aa8b4eb84ff5324815125f3c861bd0",
+      "checklist.md": "739b7c1702a1e5cce9a18d463d5705ed5073d62b2646e4cc0e06fa8903ee1c05",
+      "implementation-summary.md": "ee56086723e02b77a5bd0bd23aeddf3a6b2dd0152bb627901c9e485e0ab6a6bd"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

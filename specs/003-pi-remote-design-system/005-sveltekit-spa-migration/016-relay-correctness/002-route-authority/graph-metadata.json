@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/002-route-authority",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/002-route-authority",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "foreground gate approval decide route",
+      "retry after header 429 relay",
+      "foreground naming push asserted"
+    ],
+    "key_topics": [
+      "foreground",
+      "gate",
+      "approval",
+      "decide",
+      "route",
+      "retry",
+      "header",
+      "relay",
+      "naming",
+      "push",
+      "asserted",
+      "invariant"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "tasks.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "whether",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Harness Build",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Phase 1: Harness",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 3: VERIFICATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol Two",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Make the foreground invariant universal across mutation-exercising routes, send the retry hint the client already parses, and give foreground one meaning computed in one place.",
+    "created_at": "2026-08-23T10:35:57.712Z",
+    "last_save_at": "2026-08-23T10:36:38.052Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:8b5fed04f04aa123b21e0b70f32fa168b5290b8688ab83393f3b3eee3569ad4f",
+    "source_doc_hashes": {
+      "spec.md": "3e106b5005103366fb0b1ead60bf38528b576b36a5695b18b572c089b696fb16",
+      "plan.md": "82f3d98ff1c74720f63c02c97fa90a88cb2b93cbd27f3443d41a134736c66168",
+      "tasks.md": "4376e901e0c87de40729c4c2b1d760cbd16ad4bd46a7aee03dee21657b471baf",
+      "checklist.md": "1e91a1163963710dc2cbde6eb788f5d996193e8a9302f7f7d11bfdb6664d5ebf",
+      "implementation-summary.md": "b371571ac9159a5141369c81257c69b442eedac61e90e9fdd16473553c94475a"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

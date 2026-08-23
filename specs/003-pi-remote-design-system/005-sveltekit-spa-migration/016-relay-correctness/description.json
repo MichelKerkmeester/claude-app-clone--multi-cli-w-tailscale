@@ -1,0 +1,32 @@
+{
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness",
+  "description": "Phase parent for the relay-side defects the cross-repo council surfaced: a silent projection data loss, an epoch that never rotates on host restart,",
+  "keywords": [
+    "phase",
+    "parent",
+    "relay-side",
+    "defects",
+    "cross-repo",
+    "council",
+    "surfaced",
+    "silent",
+    "projection",
+    "data",
+    "loss",
+    "epoch",
+    "never",
+    "rotates",
+    "host",
+    "restart"
+  ],
+  "lastUpdated": "2026-08-23T10:27:50.288Z",
+  "specId": "016",
+  "folderSlug": "relay-correctness",
+  "parentChain": [
+    "003-pi-remote-design-system",
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "3"
+}

@@ -1,0 +1,31 @@
+{
+  "level": "2",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle",
+  "description": "A server heartbeat with an injectable interval so a suspended phone stops locking itself out of its own relay, and a client that classifies a socket",
+  "keywords": [
+    "server",
+    "heartbeat",
+    "injectable",
+    "interval",
+    "suspended",
+    "phone",
+    "stops",
+    "locking",
+    "itself",
+    "own",
+    "relay",
+    "client",
+    "classifies",
+    "socket"
+  ],
+  "lastUpdated": "2026-08-23T10:36:27.870Z",
+  "specId": "003",
+  "folderSlug": "connection-lifecycle",
+  "parentChain": [
+    "003-pi-remote-design-system",
+    "005-sveltekit-spa-migration",
+    "016-relay-correctness"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

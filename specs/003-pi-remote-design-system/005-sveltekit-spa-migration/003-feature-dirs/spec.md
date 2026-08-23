@@ -8,13 +8,13 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs"
-    last_updated_at: "2026-08-19T00:00:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Spec authored (L2 child)"
-    next_safe_action: "Dispatch 4 parallel cli-devin units after L1 barrier"
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs"
+    last_updated_at: "2026-08-23T10:00:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Packet documentation completed retrospectively."
+    next_safe_action: "None; child shipped and superseded by later layers."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -73,16 +73,20 @@ that chrome/views reuse.
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- R1: Each directory is disjoint — the four dispatches never share a file.
-- R2: Rendered output is visually identical to the React version (design-preserving).
-- R3: Every moved CSS block is scope-audited; no `:global()` leak and no lost containment.
-- R4: Guardrail fences preserved; the `@ds surface:` marker collapses to once-per-file.
+- **REQ-001** — Each directory is disjoint — the four dispatches never share a file.
+- **REQ-002** — Rendered output is visually identical to the React version (design-preserving).
+- **REQ-003** — Every moved CSS block is scope-audited; no `:global()` leak and no lost containment.
+- **REQ-004** — Guardrail fences preserved; the `@ds surface:` marker collapses to once-per-file.
+  **Superseded by the 007 census:** once-per-file erases genuinely distinct surfaces in
+  multi-surface files, so the rule is once-per-*surface*-per-file.
+- **REQ-005** — Value preservation is proven by resolving the CSS, never by screenshot. Under the
+  app's CSP a headless render comes out unstyled, so a visual diff would compare two broken pages.
 <!-- /ANCHOR:requirements -->
 
 ---
 
 <!-- ANCHOR:success-criteria -->
-## 5. SUCCESS CRITERIA (barrier gate)
+## 5. SUCCESS CRITERIA
 
 - Each of the four directories renders in the Storybook catalog (light + dark) without throw.
 - `svelte-check` clean; Claude re-verifies token-identity on the four touched surfaces (0 diffs).

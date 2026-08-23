@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs",
-  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs",
-  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -29,15 +29,43 @@
       "directories"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "tasks.md"
     ],
     "entities": [
       {
         "name": "spec.md",
         "kind": "doc",
         "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -48,12 +76,6 @@
       },
       {
         "name": "React Context",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "GLM-5.2 High",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
@@ -75,19 +97,111 @@
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Every",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Catalog",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "three",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol Two",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "Rewrite the four already-well-decomposed feature directories to Svelte 5 — rich-content/, artifacts/, attachments/, features/ask-question/ — each as one parallel dispatch. React Context→setContext runes store; hooks→*.svelte.ts factories; workers port verbatim; each surface's style.css block folds into the component's scoped <style>.",
     "created_at": "2026-08-19T17:24:03.005Z",
-    "last_save_at": "2026-08-19T17:24:03.005Z",
+    "last_save_at": "2026-08-23T06:53:59.320Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:5aedb16c9e68881e96a18415e96c67a673da13595681c7c7ed5ce7ff1f1c34a4",
+    "source_fingerprint": "sha256:377831403422d3776b4e83084a65ccac62febef0164535ad22276074ab536450",
     "source_doc_hashes": {
-      "spec.md": "e8d469145ad271f33eb1be934ed6406dfe96bb80ef1978397c181b937b979508"
+      "spec.md": "cb2efc9dc69257afeffccb7e09487818d9dbc5d430225bcda5a64d3e68dabc66",
+      "plan.md": "d6716005474c2b9922575587603eef49eaf9a463492098d06fc6539275ad9522",
+      "tasks.md": "513f62993535f0d279bbe7a919a5ab2ee33e249c35e1b5248d68a9d3dba8fff7",
+      "checklist.md": "674db8451833633ceaff0abb30c93cdf0e08a0edb68848f9e08cbad0ae49c9e4",
+      "implementation-summary.md": "6f2ee99f82a35662fe1b11d731c62754380d196f123e449baff50dfe9094426e"
     },
     "last_active_child_id": null,
     "last_active_at": null

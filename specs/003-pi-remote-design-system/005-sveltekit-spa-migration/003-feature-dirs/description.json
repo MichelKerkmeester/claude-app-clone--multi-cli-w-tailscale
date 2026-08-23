@@ -1,5 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs",
+  "level": "2",
+  "specFolder": "003-pi-remote-design-system/005-sveltekit-spa-migration/003-feature-dirs",
   "description": "Rewrite the four already-well-decomposed feature directories to Svelte 5 — rich-content/, artifacts/, attachments/, features/ask-question/ — each as",
   "keywords": [
     "rewrite",
@@ -14,15 +15,13 @@
     "features",
     "ask-question"
   ],
-  "lastUpdated": "2026-08-19T17:17:51.755Z",
+  "lastUpdated": "2026-08-23T06:53:58.946Z",
   "specId": "003",
   "folderSlug": "feature-dirs",
   "parentChain": [
-    "app-mobile-cli",
     "003-pi-remote-design-system",
     "005-sveltekit-spa-migration"
   ],
   "memorySequence": 0,
-  "memoryNameHistory": [],
-  "level": "2"
+  "memoryNameHistory": []
 }

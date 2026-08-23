@@ -37,41 +37,42 @@ function requireImageBytes(): {
 
 const IMAGE = requireImageBytes();
 
-const DEMO_INBOUND_IMAGE_READY_BLOCK: InboundImageReadyBlock = Object.freeze({
-  kind: 'inbound_image',
-  schemaVersion: 1,
-  id: 'blk-inbound-card',
-  revision: 2,
-  seq: 5,
-  occurredAt: '1970-01-01T00:00:00.000Z',
-  mediaClass: 'screenshot',
-  displayName: 'Screenshot',
-  source: 'extension',
-  availability: 'ready',
-  artifact: {
-    id: 'artifact_inbound_image_demo_001',
-    revision: 'rev_inbound_image_demo_001',
-    expiresAt: '2099-01-01T00:00:00.000Z',
-    full: {
-      digest: IMAGE.digest,
-      mediaType: IMAGE.mediaType,
-      width: 320,
-      height: 200,
-      byteLength: IMAGE.byteLength,
+const DEMO_INBOUND_IMAGE_READY_BLOCK: InboundImageReadyBlock =
+  Object.freeze<InboundImageReadyBlock>({
+    kind: 'inbound_image',
+    schemaVersion: 1,
+    id: 'blk-inbound-card',
+    revision: 2,
+    seq: 5,
+    occurredAt: '1970-01-01T00:00:00.000Z',
+    mediaClass: 'screenshot',
+    displayName: 'Screenshot',
+    source: 'extension',
+    availability: 'ready',
+    artifact: {
+      id: 'artifact_inbound_image_demo_001',
+      revision: 'rev_inbound_image_demo_001',
+      expiresAt: '2099-01-01T00:00:00.000Z',
+      full: {
+        digest: IMAGE.digest,
+        mediaType: IMAGE.mediaType,
+        width: 320,
+        height: 200,
+        byteLength: IMAGE.byteLength,
+      },
+      thumbnail: {
+        digest: IMAGE.digest,
+        mediaType: IMAGE.mediaType,
+        width: 160,
+        height: 100,
+        byteLength: IMAGE.byteLength,
+      },
     },
-    thumbnail: {
-      digest: IMAGE.digest,
-      mediaType: IMAGE.mediaType,
-      width: 160,
-      height: 100,
-      byteLength: IMAGE.byteLength,
-    },
-  },
-  presentation: { safeAlt: 'Shared screenshot preview' },
-  redaction: { status: 'applied' },
-  shareAllowed: false,
-  content: { kind: 'artifact-ref' },
-});
+    presentation: { safeAlt: 'Shared screenshot preview' },
+    redaction: { status: 'applied' },
+    shareAllowed: false,
+    content: { kind: 'artifact-ref' },
+  });
 
 function stateStory(state: InboundImageLifecycleState): StoryObj<typeof meta> {
   return {

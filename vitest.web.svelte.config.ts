@@ -33,7 +33,11 @@ export default defineConfig({
       // bits-ui-backed component (Dialog/DropdownMenu/RadioGroup/...) fails to
       // mount. Inlining bits-ui (and its @internationalized deps) routes those
       // files through vite-plugin-svelte so the components render under jsdom.
-      deps: { inline: [/bits-ui/, /runed/, /svelte-toolbelt/, /@internationalized/] },
+      // @storybook/svelte ships raw *.svelte internals too, so the story-render
+      // assertions need it inlined for the same reason bits-ui does.
+      deps: {
+        inline: [/bits-ui/, /runed/, /svelte-toolbelt/, /@internationalized/, /@storybook\/svelte/],
+      },
     },
   },
 });

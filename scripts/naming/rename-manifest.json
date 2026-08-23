@@ -1,0 +1,1325 @@
+{
+  "sourceRoot": "app-mobile/src",
+  "excludedDirs": [
+    "routes"
+  ],
+  "total": 219,
+  "moving": 209,
+  "caseOnly": 14,
+  "rows": [
+    {
+      "from": "app-mobile/src/app.d.ts",
+      "to": "app-mobile/src/app.d.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/Chat.stories.ts",
+      "to": "app-mobile/src/pages/chat/chat.stories.ts",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/chat/Chat.svelte",
+      "to": "app-mobile/src/pages/chat/chat.svelte",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactCard.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-card.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactCard.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-card.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactDetails.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-details.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactDetails.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-details.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactHeader.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-header.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactHeader.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-header.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactStatus.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-status.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactStatus.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-status.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactViewerHost.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-viewer-host.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ArtifactViewerProvider.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-viewer-provider.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/CodePreview.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/code-preview.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/CodePreview.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/code-preview.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/DiffPreview.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/diff-preview.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/DiffPreview.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/diff-preview.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ImagePlaceholder.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/image-placeholder.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ImagePlaceholder.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/image-placeholder.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ImagePreview.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/image-preview.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ImagePreview.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/image-preview.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ImageStatus.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/image-status.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/ImageStatus.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/image-status.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/InboundImageBlockView.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/inbound-image-block-view.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/InboundImageBlockView.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/inbound-image-block-view.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/InboundImageCard.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/inbound-image-card.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/InboundImageCard.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/inbound-image-card.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/MarkdownPreview.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/markdown-preview.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/MarkdownPreview.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/markdown-preview.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/PdfPage.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/pdf-page.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/PdfPreview.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/pdf-preview.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/PdfPreview.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/pdf-preview.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/PreviewControls.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/preview-controls.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/PreviewControls.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/preview-controls.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/SecureImagePreview.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/secure-image-preview.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/SecureImagePreview.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/secure-image-preview.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/TextPreview.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/text-preview.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/TextPreview.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/text-preview.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/UnsupportedPreview.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/unsupported-preview.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/UnsupportedPreview.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/unsupported-preview.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/VerifiedImage.stories.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/verified-image.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/VerifiedImage.svelte",
+      "to": "app-mobile/src/pages/chat/artifacts/verified-image.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/artifact-share.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/artifact-share.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/pdf-preview-shared.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/pdf-preview-shared.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/types.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/types.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/useArtifactHistory.svelte.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/use-artifact-history.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/artifacts/useArtifactResource.svelte.ts",
+      "to": "app-mobile/src/pages/chat/artifacts/use-artifact-resource.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/AttachmentDraftProvider.svelte",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-draft-provider.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/AttachmentDraftStoryHost.svelte",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-draft-story-host.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/AttachmentPreviewDialog.stories.ts",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-preview-dialog.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/AttachmentPreviewDialog.svelte",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-preview-dialog.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/AttachmentRail.stories.ts",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-rail.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/AttachmentRail.svelte",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-rail.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/AttachmentTile.stories.ts",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-tile.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/AttachmentTile.svelte",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-tile.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/attachment-client.ts",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-client.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/attachment-hash.worker.ts",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-hash.worker.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/attachment-state.ts",
+      "to": "app-mobile/src/pages/chat/attachments/attachment-state.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/attachments/useAttachmentSubmission.svelte.ts",
+      "to": "app-mobile/src/pages/chat/attachments/use-attachment-submission.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/CommandOption.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/command-option.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/CommandOption.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/command-option.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/CommandPalette.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/command-palette.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/CommandPalette.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/command-palette.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/ComposerCommandAutocomplete.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/composer-command-autocomplete.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/ComposerCommandAutocomplete.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/composer-command-autocomplete.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/ComposerTools.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/composer-tools.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/ComposerTools.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/composer-tools.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/EffortRadioGroup.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/effort-radio-group.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/EffortRadioGroup.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/effort-radio-group.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/LeavePlanSheet.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/leave-plan-sheet.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/LeavePlanSheet.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/leave-plan-sheet.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/ModelEffortSheet.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/model-effort-sheet.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/ModelEffortSheet.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/model-effort-sheet.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/PlanModeButton.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/plan-mode-button.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/PlanModeButton.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/plan-mode-button.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/PlanModeMenu.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/plan-mode-menu.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/PlanReadyCard.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/plan-ready-card.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/PlanReadyCard.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/plan-ready-card.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/PlanReviewSheet.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/plan-review-sheet.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/PlanReviewSheet.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/plan-review-sheet.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/RuntimeModeAnnouncer.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/runtime-mode-announcer.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/RuntimeModeAnnouncer.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/runtime-mode-announcer.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/RuntimeStrip.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/runtime-strip.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/RuntimeStrip.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/runtime-strip.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/SessionComposer.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/session-composer.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/SessionComposer.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/session-composer.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/SessionHeader.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/session-header.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/SessionHeader.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/session-header.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/TodoPanel.stories.ts",
+      "to": "app-mobile/src/pages/chat/chrome/todo-panel.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/TodoPanel.svelte",
+      "to": "app-mobile/src/pages/chat/chrome/todo-panel.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/chrome/planModePresentation.ts",
+      "to": "app-mobile/src/pages/chat/chrome/plan-mode-presentation.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionCard.stories.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-card.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionCard.svelte",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-card.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionFreeText.stories.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-free-text.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionFreeText.svelte",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-free-text.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionOptionList.stories.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-option-list.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionOptionList.svelte",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-option-list.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionOptionRow.stories.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-option-row.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionOptionRow.svelte",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-option-row.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionPrompt.stories.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-prompt.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionPrompt.svelte",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-prompt.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionStatus.stories.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-status.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionStatus.svelte",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-status.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionSubmitButton.stories.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-submit-button.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/AskQuestionSubmitButton.svelte",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-submit-button.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/askQuestionEphemeralStore.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-ephemeral-store.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/askQuestionTypes.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/ask-question-types.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/useAskQuestionKeyboardNavigation.svelte.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/use-ask-question-keyboard-navigation.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/useAskQuestionMutation.svelte.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/use-ask-question-mutation.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/features/ask-question/useAskQuestionState.svelte.ts",
+      "to": "app-mobile/src/pages/chat/features/ask-question/use-ask-question-state.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/CodeCard.stories.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/code-card.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/CodeCard.svelte",
+      "to": "app-mobile/src/pages/chat/rich-content/code-card.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/CommandOutputCard.stories.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/command-output-card.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/CommandOutputCard.svelte",
+      "to": "app-mobile/src/pages/chat/rich-content/command-output-card.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/F6ViewerAdapter.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/f6-viewer-adapter.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/RedactionBadge.stories.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/redaction-badge.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/RedactionBadge.svelte",
+      "to": "app-mobile/src/pages/chat/rich-content/redaction-badge.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/RichBlockFrame.stories.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/rich-block-frame.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/RichBlockFrame.svelte",
+      "to": "app-mobile/src/pages/chat/rich-content/rich-block-frame.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/RichContentRouter.stories.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/rich-content-router.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/RichContentRouter.svelte",
+      "to": "app-mobile/src/pages/chat/rich-content/rich-content-router.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/SafeMarkdown.stories.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/safe-markdown.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/SafeMarkdown.svelte",
+      "to": "app-mobile/src/pages/chat/rich-content/safe-markdown.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/TextArtifactCard.stories.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/text-artifact-card.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/TextArtifactCard.svelte",
+      "to": "app-mobile/src/pages/chat/rich-content/text-artifact-card.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/highlight.worker.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/highlight.worker.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/normalizeTranscriptBlocks.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/normalize-transcript-blocks.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/useCopyFeedback.svelte.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/use-copy-feedback.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/rich-content/useHighlightedCode.svelte.ts",
+      "to": "app-mobile/src/pages/chat/rich-content/use-highlighted-code.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/AssistantActions.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/assistant-actions.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/AssistantActions.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/assistant-actions.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/Block.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/block.stories.ts",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/Block.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/block.svelte",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/CollapsedEvidence.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/collapsed-evidence.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/CollapsedEvidence.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/collapsed-evidence.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/FilePreviewCard.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/file-preview-card.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/FilePreviewCard.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/file-preview-card.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/NormalizedActivityGroup.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/normalized-activity-group.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/NormalizedActivityGroup.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/normalized-activity-group.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/NormalizedTranscriptBlockView.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/normalized-transcript-block-view.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/NormalizedTranscriptBlockView.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/normalized-transcript-block-view.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/RuntimeStatusRegion.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/runtime-status-region.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/RuntimeStatusRegion.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/runtime-status-region.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/TodoProjectionBlock.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/todo-projection-block.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/TodoProjectionBlock.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/todo-projection-block.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/TranscriptList.stories.ts",
+      "to": "app-mobile/src/pages/chat/transcript/transcript-list.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/TranscriptList.svelte",
+      "to": "app-mobile/src/pages/chat/transcript/transcript-list.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/chat/transcript/transcript-helpers.ts",
+      "to": "app-mobile/src/pages/chat/transcript/transcript-helpers.ts",
+      "moves": false,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/enrollment/Enrollment.stories.ts",
+      "to": "app-mobile/src/pages/enrollment/enrollment.stories.ts",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/enrollment/Enrollment.svelte",
+      "to": "app-mobile/src/pages/enrollment/enrollment.svelte",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/home/EmptyState.stories.ts",
+      "to": "app-mobile/src/pages/home/empty-state.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/home/EmptyState.svelte",
+      "to": "app-mobile/src/pages/home/empty-state.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/home/Freshness.stories.ts",
+      "to": "app-mobile/src/pages/home/freshness.stories.ts",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/home/Freshness.svelte",
+      "to": "app-mobile/src/pages/home/freshness.svelte",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/home/Home.stories.ts",
+      "to": "app-mobile/src/pages/home/home.stories.ts",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/home/Home.svelte",
+      "to": "app-mobile/src/pages/home/home.svelte",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/home/PushSettings.stories.ts",
+      "to": "app-mobile/src/pages/home/push-settings.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/home/PushSettings.svelte",
+      "to": "app-mobile/src/pages/home/push-settings.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/inbox/AttentionInbox.stories.ts",
+      "to": "app-mobile/src/pages/inbox/attention-inbox.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/inbox/AttentionInbox.svelte",
+      "to": "app-mobile/src/pages/inbox/attention-inbox.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/pages/review/Review.stories.ts",
+      "to": "app-mobile/src/pages/review/review.stories.ts",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/pages/review/Review.svelte",
+      "to": "app-mobile/src/pages/review/review.svelte",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/Header.stories.ts",
+      "to": "app-mobile/src/shared/chrome/header.stories.ts",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/Header.svelte",
+      "to": "app-mobile/src/shared/chrome/header.svelte",
+      "moves": true,
+      "caseOnly": true
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/RootErrorBoundary.stories.ts",
+      "to": "app-mobile/src/shared/chrome/root-error-boundary.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/RootErrorBoundary.svelte",
+      "to": "app-mobile/src/shared/chrome/root-error-boundary.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/SessionStateIcon.stories.ts",
+      "to": "app-mobile/src/shared/chrome/session-state-icon.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/SessionStateIcon.svelte",
+      "to": "app-mobile/src/shared/chrome/session-state-icon.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/StatusPill.stories.ts",
+      "to": "app-mobile/src/shared/chrome/status-pill.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/StatusPill.svelte",
+      "to": "app-mobile/src/shared/chrome/status-pill.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/ThemeControl.stories.ts",
+      "to": "app-mobile/src/shared/chrome/theme-control.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/chrome/ThemeControl.svelte",
+      "to": "app-mobile/src/shared/chrome/theme-control.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/app-state.svelte.ts",
+      "to": "app-mobile/src/shared/state/app-state.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/attention.ts",
+      "to": "app-mobile/src/shared/format/attention.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/auth.ts",
+      "to": "app-mobile/src/shared/transport/auth.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/cache.ts",
+      "to": "app-mobile/src/shared/transport/cache.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/catalog-registry.ts",
+      "to": "app-mobile/src/shared/catalog/catalog-registry.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/commands.ts",
+      "to": "app-mobile/src/shared/commands/commands.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/demo.ts",
+      "to": "app-mobile/src/shared/fixtures/demo.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/effort.ts",
+      "to": "app-mobile/src/shared/catalog/effort.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/format.ts",
+      "to": "app-mobile/src/shared/format/format.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/hostCommandCatalog.svelte.ts",
+      "to": "app-mobile/src/shared/commands/host-command-catalog.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/insertSlashCommand.ts",
+      "to": "app-mobile/src/shared/commands/insert-slash-command.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/model-catalog.ts",
+      "to": "app-mobile/src/shared/catalog/model-catalog.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/model-switcher-strings.ts",
+      "to": "app-mobile/src/shared/catalog/model-switcher-strings.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/planModeShortcut.ts",
+      "to": "app-mobile/src/shared/commands/plan-mode-shortcut.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/rankHostCommands.ts",
+      "to": "app-mobile/src/shared/commands/rank-host-commands.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/relay.ts",
+      "to": "app-mobile/src/shared/transport/relay.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/runtime-issues.ts",
+      "to": "app-mobile/src/shared/state/runtime-issues.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/runtime.ts",
+      "to": "app-mobile/src/shared/state/runtime.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/state.ts",
+      "to": "app-mobile/src/shared/state/state.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/submitSlashDraft.ts",
+      "to": "app-mobile/src/shared/commands/submit-slash-draft.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/todo-model.ts",
+      "to": "app-mobile/src/shared/state/todo-model.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/todo-state.ts",
+      "to": "app-mobile/src/shared/state/todo-state.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/turns.ts",
+      "to": "app-mobile/src/shared/state/turns.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/useRuntime.svelte.ts",
+      "to": "app-mobile/src/shared/state/use-runtime.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/useSlashTrigger.ts",
+      "to": "app-mobile/src/shared/commands/use-slash-trigger.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/useSyncSocket.svelte.ts",
+      "to": "app-mobile/src/shared/transport/use-sync-socket.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/useVisualViewportAnchor.svelte.ts",
+      "to": "app-mobile/src/shared/viewport/use-visual-viewport-anchor.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/data/view-helpers.ts",
+      "to": "app-mobile/src/shared/format/view-helpers.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/Button.stories.ts",
+      "to": "app-mobile/src/shared/primitives/button/button.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/Button.svelte",
+      "to": "app-mobile/src/shared/primitives/button/button.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/Collapsible.stories.ts",
+      "to": "app-mobile/src/shared/primitives/disclosure/collapsible.stories.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/Collapsible.svelte",
+      "to": "app-mobile/src/shared/primitives/disclosure/collapsible.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/Menu.svelte",
+      "to": "app-mobile/src/shared/primitives/menu/menu.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/MenuContent.svelte",
+      "to": "app-mobile/src/shared/primitives/menu/menu-content.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/MenuItem.svelte",
+      "to": "app-mobile/src/shared/primitives/menu/menu-item.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/MenuTrigger.svelte",
+      "to": "app-mobile/src/shared/primitives/menu/menu-trigger.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/RadioGroup.svelte",
+      "to": "app-mobile/src/shared/primitives/choice/radio-group.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/RadioGroupItem.svelte",
+      "to": "app-mobile/src/shared/primitives/choice/radio-group-item.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/Sheet.svelte",
+      "to": "app-mobile/src/shared/primitives/sheet/sheet.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/SheetClose.svelte",
+      "to": "app-mobile/src/shared/primitives/sheet/sheet-close.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/SheetContent.svelte",
+      "to": "app-mobile/src/shared/primitives/sheet/sheet-content.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/SheetTitle.svelte",
+      "to": "app-mobile/src/shared/primitives/sheet/sheet-title.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/ToggleGroup.svelte",
+      "to": "app-mobile/src/shared/primitives/choice/toggle-group.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/ToggleGroupItem.svelte",
+      "to": "app-mobile/src/shared/primitives/choice/toggle-group-item.svelte",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/ariaHideOutside.svelte.ts",
+      "to": "app-mobile/src/shared/primitives/a11y/aria-hide-outside.svelte.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/shared/primitives/interactions.ts",
+      "to": "app-mobile/src/shared/primitives/a11y/interactions.ts",
+      "moves": true,
+      "caseOnly": false
+    },
+    {
+      "from": "app-mobile/src/vite-env.d.ts",
+      "to": "app-mobile/src/vite-env.d.ts",
+      "moves": false,
+      "caseOnly": false
+    }
+  ]
+}

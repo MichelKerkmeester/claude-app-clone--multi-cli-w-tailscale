@@ -228,7 +228,7 @@ export async function startReadOnlyServer(
       return;
     }
     const rateKey = `${ingress.principal}\0${request.socket.remoteAddress ?? 'unknown'}`;
-    if (!requestLimiter.consume(rateKey)) {
+    if (!requestLimiter.consume(rateKey).allowed) {
       auth.metrics.rateLimited += 1;
       rejectUpgrade(socket, 429);
       return;
@@ -389,7 +389,7 @@ async function handleHttp(
     return;
   }
   const rateKey = `${ingress.principal}\0${request.socket.remoteAddress ?? 'unknown'}`;
-  if (!requestLimiter.consume(rateKey)) {
+  if (!requestLimiter.consume(rateKey).allowed) {
     auth.metrics.rateLimited += 1;
     discardRequest(request);
     sendJson(response, 429, { error: 'rate_limited' });
@@ -415,7 +415,7 @@ async function handleHttp(
   }
 
   if (ingress.path === '/api/auth/enroll') {
-    if (!enrollmentLimiter.consume(rateKey)) {
+    if (!enrollmentLimiter.consume(rateKey).allowed) {
       auth.metrics.rateLimited += 1;
       discardRequest(request);
       sendJson(response, 429, { error: 'rate_limited' });
@@ -534,7 +534,7 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!askQuestionTicketLimiter.consume(session.deviceId)) {
+    if (!askQuestionTicketLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       sendJson(response, 429, { error: 'rate_limited' });
       return;
@@ -560,7 +560,7 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!askQuestionAnswerLimiter.consume(session.deviceId)) {
+    if (!askQuestionAnswerLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       sendJson(response, 429, { error: 'rate_limited' });
       return;
@@ -592,7 +592,7 @@ async function handleHttp(
       sendArtifactFailure(response, 405);
       return;
     }
-    if (!artifactReadLimiter.consume(session.deviceId)) {
+    if (!artifactReadLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       discardRequest(request);
       sendArtifactFailure(response, 429);
@@ -827,7 +827,7 @@ async function handleHttp(
       sendJson(response, 503, { error: 'delivery_unknown' });
       return;
     }
-    if (!promptLimiter.consume(session.deviceId)) {
+    if (!promptLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       sendJson(response, 429, { error: 'rate_limited' });
       return;
@@ -880,7 +880,7 @@ async function handleHttp(
       sendRuntimeIssue(response, 'host-unavailable');
       return;
     }
-    if (!runtimeReconcileLimiter.consume(session.deviceId)) {
+    if (!runtimeReconcileLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       discardRequest(request);
       sendJson(
@@ -930,7 +930,7 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!runtimeTicketLimiter.consume(session.deviceId)) {
+    if (!runtimeTicketLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       sendJson(response, 429, { error: 'rate_limited' });
       return;
@@ -1007,7 +1007,7 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!runtimeControlLimiter.consume(session.deviceId)) {
+    if (!runtimeControlLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       sendJson(response, 429, { error: 'rate_limited' });
       return;
@@ -1040,7 +1040,7 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!planControlLimiter.consume(session.deviceId)) {
+    if (!planControlLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       sendJson(response, 429, { error: 'rate_limited' });
       return;
@@ -1070,7 +1070,7 @@ async function handleHttp(
       sendJson(response, 403, { error: 'foreground_required' });
       return;
     }
-    if (!planBindingLimiter.consume(session.deviceId)) {
+    if (!planBindingLimiter.consume(session.deviceId).allowed) {
       auth.metrics.rateLimited += 1;
       sendJson(response, 429, { error: 'rate_limited' });
       return;

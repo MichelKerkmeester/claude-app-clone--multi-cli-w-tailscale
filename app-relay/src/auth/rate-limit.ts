@@ -26,6 +26,11 @@ export interface ArtifactReadAdmission {
   readonly retryAfterSeconds: number;
 }
 
+export interface RateLimitAdmission {
+  readonly allowed: boolean;
+  readonly retryAfterSeconds: number;
+}
+
 interface ArtifactReadActive {
   thumbnail: number;
   full: number;
@@ -41,16 +46,21 @@ export class FixedWindowRateLimiter {
     private readonly now: () => number = Date.now,
   ) {}
 
-  public consume(key: string): boolean {
+  public consume(key: string): RateLimitAdmission {
     const now = this.now();
     const bucket = this.buckets.get(key);
     if (bucket === undefined || bucket.resetAt <= now) {
       this.buckets.set(key, { count: 1, resetAt: now + this.windowMs });
-      return true;
+      return { allowed: true, retryAfterSeconds: 0 };
     }
-    if (bucket.count >= this.maximum) return false;
+    if (bucket.count >= this.maximum) {
+      return {
+        allowed: false,
+        retryAfterSeconds: retryAfterSeconds(bucket.resetAt, now),
+      };
+    }
     bucket.count += 1;
-    return true;
+    return { allowed: true, retryAfterSeconds: 0 };
   }
 }
 

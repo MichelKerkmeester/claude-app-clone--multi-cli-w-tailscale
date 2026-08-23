@@ -13,6 +13,7 @@
 
   import Collapsible from '$shared/primitives/disclosure/collapsible.svelte';
   import { hover } from '$shared/primitives/a11y/interactions.js';
+  import { createTranscriptDisclosureBinding } from '$shared/state/transcript-disclosure.svelte.js';
   import { normalizedActivitySummary } from './transcript-helpers.js';
   import RichContentRouter from '../rich-content/rich-content-router.svelte';
 
@@ -26,8 +27,14 @@
   // 3. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // The primitive's defaultExpanded={false} keeps Collapsible closed until the reader opens it.
-  let open = $state(false);
+  const disclosure = createTranscriptDisclosureBinding(() => {
+    const firstBlock = blocks[0];
+    if (firstBlock === undefined) {
+      // An empty group has no stable protocol key, so the binding intentionally falls back to local state.
+      return undefined;
+    }
+    return firstBlock.blockId;
+  });
 
   // The wrapper does not forward trigger class/aria, and Bits does not emit react-aria's data-expanded/data-hovered.
   // The button therefore sets both attributes explicitly from its state.
@@ -57,7 +64,7 @@
   $effect(() => {
     const button = triggerButton;
     if (button === null) return;
-    if (open) button.setAttribute('data-expanded', 'true');
+    if (disclosure.open) button.setAttribute('data-expanded', 'true');
     else button.removeAttribute('data-expanded');
   });
 </script>
@@ -66,7 +73,7 @@
 <!-- @ds surface: evidence-disclosure — grouped activity disclosure. -->
 <div class="activity-group">
   <!-- @ds guardrail: react-aria Disclosure wiring — not designer-editable. -->
-  <Collapsible bind:open>
+  <Collapsible bind:open={disclosure.open}>
     {#snippet trigger()}
       <span class="evidence-chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>
       <span class="evidence-summary">{normalizedActivitySummary(blocks)}</span>

@@ -1,6 +1,9 @@
 <script module lang="ts">
   import type { DisplayTranscriptBlock, TodoProjectionState } from '$shared/state/state.js';
 
+  // Two minutes leaves room for normal long-running reasoning while surfacing a sleeping or wedged host.
+  export const TRANSCRIPT_STALL_THRESHOLD_MS = 120_000;
+
   export interface TranscriptListProps {
     readonly sessionId?: string;
     readonly blocks: readonly DisplayTranscriptBlock[];
@@ -41,6 +44,7 @@
   import { get } from 'svelte/store';
   import { createVirtualizer } from '@tanstack/svelte-virtual';
   import { EMPTY_TODO_PROJECTION_STATE } from '$shared/state/state.js';
+  import { pruneTranscriptDisclosureState } from '$shared/state/transcript-disclosure.svelte.js';
   import { normalizeTranscriptBlocks } from '../rich-content/normalize-transcript-blocks.js';
   import { groupBlocksIntoTurns } from '$shared/state/turns.js';
   import { groupNormalizedTranscript, insertTodoProjectionItem } from './transcript-helpers.js';
@@ -75,6 +79,7 @@
   let announcement = $state('');
   let atLiveEdge = $state(true);
   let newAway = $state(0);
+  let stallClock = $state(Date.now());
 
   // ───────────────────────────────────────────────────────────────────
   // 4. HANDLERS
@@ -117,6 +122,20 @@
     const turns = groupBlocksIntoTurns(blocks);
     return new Set(turns.slice(1).map((turn) => turn.blocks[0]?.id));
   });
+  const mostRecentBlockAt = $derived.by(() => {
+    let latest = Number.NEGATIVE_INFINITY;
+    for (const block of blocks) {
+      const occurredAt = Date.parse(block.occurredAt);
+      if (Number.isFinite(occurredAt)) latest = Math.max(latest, occurredAt);
+    }
+    return Number.isFinite(latest) ? latest : undefined;
+  });
+  const isStalled = $derived.by(
+    () =>
+      running &&
+      mostRecentBlockAt !== undefined &&
+      stallClock - mostRecentBlockAt >= TRANSCRIPT_STALL_THRESHOLD_MS,
+  );
 
   // @ds guardrail: virtualization — Count/estimateSize/measureElement/overscan; rows are measured.
   const virtualizer = createVirtualizer<HTMLDivElement, HTMLDivElement>({
@@ -129,6 +148,24 @@
   // ───────────────────────────────────────────────────────────────────
   // 6. EFFECTS
   // ───────────────────────────────────────────────────────────────────
+
+  $effect(() => {
+    if (!running || mostRecentBlockAt === undefined) return;
+    stallClock = Date.now();
+    const timer = setInterval(() => {
+      stallClock = Date.now();
+    }, 1_000);
+    return () => clearInterval(timer);
+  });
+
+  $effect(() => {
+    const disclosureBlockIds = new Set([
+      ...blocks.map((block) => block.id),
+      ...normalizedBlocks.map((block) => block.blockId),
+    ]);
+    // The full transcript owns block lifetime; virtual rows may disappear without losing it.
+    pruneTranscriptDisclosureState(disclosureBlockIds);
+  });
 
   // Reapply options because the store captures them at creation. Untracked `get()` prevents store emissions from setOptions from retriggering this effect.
   // Svelte's safe_not_equal treats object values as changed, so tracking `$virtualizer` here would loop.
@@ -242,14 +279,17 @@
         {#if running}
           <div
             class="streaming-marker"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
             style="transform: translateY({$virtualizer.getTotalSize()}px)"
           >
-            <span class="streaming-glyph" aria-hidden="true">
+            <span class={isStalled ? 'streaming-glyph is-stalled' : 'streaming-glyph'} aria-hidden="true">
               <i></i>
               <i></i>
               <i></i>
             </span>
-            <span class="streaming-label">Working…</span>
+            <span class="streaming-label">{isStalled ? 'No new activity for a while' : 'Working…'}</span>
           </div>
         {/if}
       </div>
@@ -449,6 +489,11 @@
 
   .streaming-glyph i:nth-child(3) {
     animation-delay: 240ms;
+  }
+
+  /* @ds state: stalled — static dots avoid suggesting active progress after a long silence. */
+  .streaming-glyph.is-stalled i {
+    animation: none;
   }
 
   /* @ds slot: streaming-label */

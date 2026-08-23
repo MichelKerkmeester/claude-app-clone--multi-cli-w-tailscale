@@ -181,7 +181,9 @@
     </header>
   {/if}
   {#if renderAsDisclosure}
-    <CollapsedEvidence summary={blockDisplay.label}>{@render blockContent()}</CollapsedEvidence>
+    <CollapsedEvidence blockId={block.id} summary={blockDisplay.label}>
+      {@render blockContent()}
+    </CollapsedEvidence>
   {:else}
     {@render blockContent()}
   {/if}

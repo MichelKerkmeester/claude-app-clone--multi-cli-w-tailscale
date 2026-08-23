@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte';
 
   export interface CollapsedEvidenceProps {
+    readonly blockId?: string;
     readonly summary: string;
     readonly children: Snippet;
   }
@@ -14,19 +15,19 @@
 
   import Collapsible from '$shared/primitives/disclosure/collapsible.svelte';
   import { hover } from '$shared/primitives/a11y/interactions.js';
+  import { createTranscriptDisclosureBinding } from '$shared/state/transcript-disclosure.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
   // ───────────────────────────────────────────────────────────────────
 
-  let { summary, children }: CollapsedEvidenceProps = $props();
+  let { blockId, summary, children }: CollapsedEvidenceProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
   // 3. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // The primitive's defaultExpanded={false} keeps Collapsible closed until the reader opens it.
-  let open = $state(false);
+  const disclosure = createTranscriptDisclosureBinding(() => blockId);
 
   // The wrapper does not forward trigger class/aria, and Bits does not emit react-aria's data-expanded/data-hovered.
   // The button therefore sets both attributes explicitly from its state.
@@ -56,7 +57,7 @@
   $effect(() => {
     const button = triggerButton;
     if (button === null) return;
-    if (open) button.setAttribute('data-expanded', 'true');
+    if (disclosure.open) button.setAttribute('data-expanded', 'true');
     else button.removeAttribute('data-expanded');
   });
 </script>
@@ -64,7 +65,7 @@
 <!-- The trigger names what it reveals (e.g. "Tool call · grep") instead of a generic "Show",
      so routine evidence reads as a quiet, truthful disclosure beside the assistant's prose. -->
 <!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. -->
-<Collapsible bind:open>
+<Collapsible bind:open={disclosure.open}>
   {#snippet trigger()}
     <!-- @ds guardrail: react-aria Disclosure wiring (expansion + trigger slot + aria) — not designer-editable. -->
     <span class="evidence-chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>

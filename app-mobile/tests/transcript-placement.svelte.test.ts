@@ -30,7 +30,7 @@ vi.mock('@tanstack/svelte-virtual', () => {
 });
 vi.mock('../src/pages/chat/artifacts/use-artifact-resource.svelte.js', () => resource);
 
-import TranscriptList from '../src/pages/chat/transcript/transcript-list.svelte';
+import TranscriptList, { TRANSCRIPT_STALL_THRESHOLD_MS } from '../src/pages/chat/transcript/transcript-list.svelte';
 import type { DisplayTranscriptBlock } from '../src/shared/state/state.js';
 
 function readyBlock(
@@ -138,6 +138,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
   vi.clearAllMocks();
 });
 
@@ -172,5 +173,35 @@ describe('transcript inline image placement', () => {
     expect(
       toolImage?.compareDocumentPosition(activity as Node) & Node.DOCUMENT_POSITION_PRECEDING,
     ).toBeTruthy();
+  });
+
+  it('changes the streaming label after a long silence', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(
+      Date.parse('2026-08-17T10:00:03.000Z') + TRANSCRIPT_STALL_THRESHOLD_MS - 1_000,
+    );
+    const rendered = render(TranscriptList, {
+      props: {
+        sessionId: 'session_stall_001',
+        blocks: transcriptBlocks().slice(0, 6),
+        running: true,
+      },
+    });
+    const { container } = rendered;
+
+    const marker = container.querySelector('.streaming-marker');
+    const label = container.querySelector('.streaming-label');
+    expect(marker).toHaveAttribute('role', 'status');
+    expect(marker).toHaveAttribute('aria-live', 'polite');
+    expect(marker).toHaveAttribute('aria-atomic', 'true');
+    expect(label).toHaveTextContent('Working…');
+    expect(container.querySelector('.streaming-glyph')).not.toHaveClass('is-stalled');
+
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(label?.textContent).not.toBe('Working…');
+    expect(container.querySelector('.streaming-glyph')).toHaveClass('is-stalled');
+    rendered.unmount();
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

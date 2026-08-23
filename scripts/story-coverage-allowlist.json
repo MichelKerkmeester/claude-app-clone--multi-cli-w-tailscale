@@ -8,6 +8,7 @@
     { "path": "pages/chat/artifacts/ArtifactViewerHost.svelte", "reason": "Full-screen viewer host — driven entirely by ArtifactViewer context; exercised via the artifact cards' stories." },
     { "path": "pages/chat/artifacts/ArtifactViewerProvider.svelte", "reason": "Context provider — renders no visual of its own; used AS a decorator in other stories." },
     { "path": "pages/chat/attachments/AttachmentDraftProvider.svelte", "reason": "Context provider — no isolated visual; supplies attachment-draft context to consuming surfaces." },
+    { "path": "pages/chat/chrome/PlanModeMenu.svelte", "reason": "Compositional Bits Menu content — renders Menu.Content/Sub internals that require a Menu.Root ancestor; throws \"Context Menu.Root not found\" when rendered standalone. Exercised via the plan-mode menu surface (PlanModeButton), same class as the shared Menu sub-parts." },
     { "path": "shared/primitives/Menu.svelte", "reason": "Compositional Bits primitive — renders nothing without MenuTrigger/MenuContent/MenuItem children; exercised via consuming surfaces (Header, Plan menus)." },
     { "path": "shared/primitives/MenuTrigger.svelte", "reason": "Compositional sub-part of Menu — no standalone render." },
     { "path": "shared/primitives/MenuContent.svelte", "reason": "Compositional sub-part of Menu — no standalone render." },

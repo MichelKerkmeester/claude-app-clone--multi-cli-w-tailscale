@@ -1,153 +1,157 @@
 {
-  "comment": "The post-cutover queue as data. A node advances only when every gate command exits 0 and every dependency has advanced. Held nodes carry an operator decision and never advance autonomously.",
-  "lanes": {
-    "relay": [
-      "016/001",
-      "016/002",
-      "016/003",
-      "017"
-    ],
-    "client": [
-      "015",
-      "012/001",
-      "012/002",
-      "012/003",
-      "013",
-      "014",
-      "018",
-      "019"
-    ],
-    "note": "A lane is a write territory, not a schedule. Two nodes run in parallel only when their write paths are disjoint."
-  },
-  "writes": {
-    "015": [
-      "configs",
-      "app-mobile/tests"
-    ],
-    "016/001": [
-      "app-relay/src"
-    ],
-    "016/002": [
-      "app-relay/src"
-    ],
-    "016/003": [
-      "app-relay/src"
-    ],
-    "017": [
-      "app-relay/src"
-    ],
-    "012/001": [
-      "app-mobile/src"
-    ],
-    "012/002": [
-      "app-mobile/src"
-    ],
-    "012/003": [
-      "app-mobile/src"
-    ],
-    "013": [
-      "app-mobile/src"
-    ],
-    "014": [
-      "app-mobile/src"
-    ],
-    "018": [
-      "app-mobile/src"
-    ],
-    "019": [
-      "public-repo"
-    ]
-  },
-  "nodes": [
-    {
-      "id": "015",
-      "deps": [],
-      "gate": "logic lane resolves by glob and test:web is green"
-    },
-    {
-      "id": "016/001",
-      "deps": [],
-      "gate": "reproduction observed red then green; backend green"
-    },
-    {
-      "id": "016/002",
-      "deps": [],
-      "gate": "background refused on three routes, listing still answers"
-    },
-    {
-      "id": "016/003",
-      "deps": [
-        "016/002"
-      ],
-      "gate": "abandoned socket reclaimed with an injected interval"
-    },
-    {
-      "id": "017",
-      "deps": [
-        "016/001",
-        "016/002",
-        "016/003"
-      ],
-      "gate": "routes answer from a constructed service; round trip red before green"
-    },
-    {
-      "id": "012/001",
-      "deps": [
-        "011"
-      ],
-      "gate": "manifest reconciles; case-only renames recorded by git"
-    },
-    {
-      "id": "012/002",
-      "deps": [
-        "012/001"
-      ],
-      "gate": "shared/data gone; zero old-path references in code"
-    },
-    {
-      "id": "012/003",
-      "deps": [
-        "012/002"
-      ],
-      "gate": "naming scan reports zero offenders"
-    },
-    {
-      "id": "013",
-      "deps": [
-        "012/003"
-      ],
-      "gate": "diff is comment-only; fence count unchanged"
-    },
-    {
-      "id": "014",
-      "deps": [
-        "012/003",
-        "013"
-      ],
-      "gate": "folder-documentation scan reports zero gaps"
-    },
-    {
-      "id": "018",
-      "deps": [
-        "012/003",
-        "015",
-        "011"
-      ],
-      "gate": "three transcript affordances land; nine gates green"
-    },
-    {
-      "id": "019",
-      "deps": [
-        "012/003",
-        "013",
-        "014"
-      ],
-      "gate": "conventions surface teaches the shipped tree; stranded branch merged"
-    },
-    {
-      "id": "011",
-      "deps": [],
-      "gate": "operator confirms the affordance on a device"
-    }
+ "comment": "The post-cutover queue as data. A node advances only when every gate command exits 0 and every dependency has advanced. Held nodes carry an operator decision and never advance autonomously.",
+ "lanes": {
+  "relay": [
+   "016/001",
+   "016/002",
+   "016/003",
+   "017"
+  ],
+  "client": [
+   "015",
+   "012/001",
+   "012/002",
+   "012/003",
+   "013",
+   "014",
+   "018",
+   "019"
+  ],
+  "note": "A lane is a write territory, not a schedule. Two nodes run in parallel only when their write paths are disjoint."
+ },
+ "writes": {
+  "015": [
+   "configs",
+   "app-mobile/tests"
+  ],
+  "016/001": [
+   "app-relay/src"
+  ],
+  "016/002": [
+   "app-relay/src"
+  ],
+  "016/003": [
+   "app-relay/src"
+  ],
+  "017": [
+   "app-relay/src"
+  ],
+  "012/001": [
+   "app-mobile/src"
+  ],
+  "012/002": [
+   "app-mobile/src"
+  ],
+  "012/003": [
+   "app-mobile/src"
+  ],
+  "013": [
+   "app-mobile/src"
+  ],
+  "014": [
+   "app-mobile/src"
+  ],
+  "018": [
+   "app-mobile/src"
+  ],
+  "019": [
+   "public-repo"
   ]
+ },
+ "nodes": [
+  {
+   "id": "015",
+   "deps": [],
+   "gate": "logic lane resolves by glob and test:web is green"
+  },
+  {
+   "id": "016/001",
+   "deps": [],
+   "gate": "reproduction observed red then green; backend green"
+  },
+  {
+   "id": "016/002",
+   "deps": [],
+   "gate": "background refused on three routes, listing still answers"
+  },
+  {
+   "id": "016/003",
+   "deps": [
+    "016/002"
+   ],
+   "gate": "abandoned socket reclaimed with an injected interval"
+  },
+  {
+   "id": "017",
+   "deps": [
+    "016/001",
+    "016/002",
+    "016/003"
+   ],
+   "gate": "routes answer from a constructed service; round trip red before green"
+  },
+  {
+   "id": "012/001",
+   "deps": [
+    "011"
+   ],
+   "gate": "manifest reconciles; case-only renames recorded by git"
+  },
+  {
+   "id": "012/002",
+   "deps": [
+    "012/001"
+   ],
+   "gate": "shared/data gone; zero old-path references in code"
+  },
+  {
+   "id": "012/003",
+   "deps": [
+    "012/002"
+   ],
+   "gate": "naming scan reports zero offenders"
+  },
+  {
+   "id": "013",
+   "deps": [
+    "012/003"
+   ],
+   "gate": "diff is comment-only; fence count unchanged"
+  },
+  {
+   "id": "014",
+   "deps": [
+    "012/003",
+    "013"
+   ],
+   "gate": "folder-documentation scan reports zero gaps",
+   "held": true,
+   "heldReason": "All 59 documents are written and the coverage, reference, hygiene and security scans report zero gaps. What remains is the operator's one-file-versus-two answer and their read of the exemplar pair."
+  },
+  {
+   "id": "018",
+   "deps": [
+    "012/003",
+    "015",
+    "011"
+   ],
+   "gate": "three transcript affordances land; nine gates green"
+  },
+  {
+   "id": "019",
+   "deps": [
+    "012/003",
+    "013",
+    "014"
+   ],
+   "gate": "conventions surface teaches the shipped tree; stranded branch merged"
+  },
+  {
+   "id": "011",
+   "deps": [],
+   "gate": "operator confirms the affordance on a device",
+   "held": true,
+   "heldReason": "Every machine-checkable criterion is met and the affordance shipped; what remains is whether the control reads as glass on a real device, which no gate can decide. Downstream work does not build on that judgement."
+  }
+ ]
 }

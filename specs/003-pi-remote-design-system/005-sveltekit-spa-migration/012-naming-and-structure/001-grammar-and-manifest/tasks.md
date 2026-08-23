@@ -38,18 +38,18 @@ generated from the manifest, and a green build plus typecheck. A task is not don
       the tree is a design decision and nothing should move before it is settled. Answered:
       `transport/` and `state/` stay separate, and screens take a `screen-` prefix.
       [evidence: recorded as ADR-002 and ADR-003 in `decision-record.md`, both Accepted]
-- [ ] **T1.2** Build the rename manifest as data: one row per file, old path and new path, covering
+- [x] **T1.2** Build the rename manifest as data: one row per file, old path and new path, covering
       all 148 in-scope source files plus their stories and tests.
-- [ ] **T1.3** Reconcile the manifest's row count against a fresh file count. A manifest that covers
+- [x] **T1.3** Reconcile the manifest's row count against a fresh file count. A manifest that covers
       most of the tree is how a rename becomes partial.
-- [ ] **T1.4** Generate the specifier-rewrite script from the manifest. Generated, not hand-written —
+- [x] **T1.4** Generate the specifier-rewrite script from the manifest. Generated, not hand-written —
       a hand-edited rewrite is free to disagree with the moves, and that disagreement is the failure
       this packet exists to avoid.
-- [ ] **T1.5** Dry-run the rewrite and read the diff. Confirm the `.js`-suffix convention on `.ts`
+- [x] **T1.5** Dry-run the rewrite and read the diff. Confirm the `.js`-suffix convention on `.ts`
       imports survives the stem change, and that `.svelte.ts` double extensions are not truncated.
-- [ ] **T1.6** Confirm the completeness-scan command excludes SvelteKit reserved names explicitly
+- [x] **T1.6** Confirm the completeness-scan command excludes SvelteKit reserved names explicitly
       (`+page`, `+layout`, `+error`, `[param]` segments), not by accident of the pattern.
-- [ ] **T1.7** Confirm 011 has landed and 013 is not running concurrently.
+- [x] **T1.7** Confirm 011 has landed and 013 is not running concurrently.
 <!-- /ANCHOR:phase-1 -->
 
 ---
@@ -59,23 +59,23 @@ generated from the manifest, and a green build plus typecheck. A task is not don
 
 **Shared primitives**
 
-- [ ] **T2.1** Create the six primitive sub-folders: `button/`, `menu/`, `sheet/`, `choice/`,
+- [x] **T2.1** Create the six primitive sub-folders: `button/`, `menu/`, `sheet/`, `choice/`,
       `disclosure/`, `a11y/`.
-- [ ] **T2.2** Move and rename the 18 primitive files into them, kind-first.
-- [ ] **T2.3** Perform every case-only rename as a two-step through a temporary name, and verify with
+- [x] **T2.2** Move and rename the 18 primitive files into them, kind-first.
+- [x] **T2.3** Perform every case-only rename as a two-step through a temporary name, and verify with
       `git status` that a rename was staged rather than silently swallowed.
-- [ ] **T2.4** Confirm no file remains directly under `shared/primitives/`. A leftover is the visible
+- [x] **T2.4** Confirm no file remains directly under `shared/primitives/`. A leftover is the visible
       symptom of a batch that stopped early.
-- [ ] **T2.5** Run the generated rewrite for this batch and commit moves, rewrite and build together.
+- [x] **T2.5** Run the generated rewrite for this batch and commit moves, rewrite and build together.
 
 **Shared chrome**
 
-- [ ] **T2.6** Rename the five `shared/chrome/` components in place, case-only, two-step each.
-- [ ] **T2.7** Run the generated rewrite for this batch and commit atomically.
+- [x] **T2.6** Rename the five `shared/chrome/` components in place, case-only, two-step each.
+- [x] **T2.7** Run the generated rewrite for this batch and commit atomically.
 
 **Hand-off**
 
-- [ ] **T2.8** Confirm the manifest, rewrite script and scan command are in a state children 002 and
+- [x] **T2.8** Confirm the manifest, rewrite script and scan command are in a state children 002 and
       003 consume without extending by hand.
 <!-- /ANCHOR:phase-2 -->
 
@@ -84,13 +84,13 @@ generated from the manifest, and a green build plus typecheck. A task is not don
 <!-- ANCHOR:phase-3 -->
 ## PHASE 3: VERIFICATION
 
-- [ ] **T3.1** `npm run build` exit 0.
-- [ ] **T3.2** `npm run typecheck` exit 0 — the primary import-integrity proof.
-- [ ] **T3.3** `npm run test:web` exit 0, verified by content rather than by a piped exit status.
-- [ ] **T3.4** `git log --follow` spot-check on three case-only renames confirms git recorded renames,
+- [x] **T3.1** `npm run build` exit 0.
+- [x] **T3.2** `npm run typecheck` exit 0 — the primary import-integrity proof.
+- [x] **T3.3** `npm run test:web` exit 0, verified by content rather than by a piped exit status.
+- [x] **T3.4** `git log --follow` spot-check on three case-only renames confirms git recorded renames,
       not delete-and-add pairs.
-- [ ] **T3.5** The backend suite stays green, run against the four real test directories explicitly.
-- [ ] **T3.6** `validate.sh … --strict` exit 0 through the script's realpath.
+- [x] **T3.5** The backend suite stays green, run against the four real test directories explicitly.
+- [x] **T3.6** `validate.sh … --strict` exit 0 through the script's realpath.
 <!-- /ANCHOR:phase-3 -->
 
 ---

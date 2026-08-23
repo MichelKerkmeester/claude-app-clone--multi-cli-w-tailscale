@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Settle the naming grammar, build the rename manifest as data, generate the specifier rewrite from it, and prove the mechanics on shared/primitives and shared/chrome before 148 files are in flight.",
     "created_at": "2026-08-23T10:58:30.521Z",
-    "last_save_at": "2026-08-23T12:13:09.512Z",
+    "last_save_at": "2026-08-23T14:20:49.929Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,14 +198,14 @@
       "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:202a59479b86645c4951094168c5b102390788b83875cde2a435c0be335f60e9",
+    "source_fingerprint": "sha256:554d4049db0107a16471a2b130a28deb8397ce6b3b8d8378228f6a5c89b5c6f2",
     "source_doc_hashes": {
       "spec.md": "d7ad17ffdfb9e9747d79ecb52f414a5332e4d7c6321dbe6ec5a9c1dd890a551a",
       "plan.md": "213238d63834de319568bd1c2681958b36911278296debc92441dfeed51a1ad8",
-      "tasks.md": "5aea2242b0719ad17528ebad1ab2198d9f4a2896d5530b9aa47433f617f1f755",
-      "checklist.md": "d21c817f39271379ec1e89821be1586003db9ecb18e33cb83f0e0062b9ed738a",
+      "tasks.md": "816eeacf6a23a01855f78b47284e1571935637dfe4346031aadfcf708a305909",
+      "checklist.md": "3fe46441b29f77b0187c3bb4f2fc691b99b2a3096cf1fe6b396864b4e39b7842",
       "decision-record.md": "52851d1b627a1c029200ba30f533547dfbc297c35ff29555d23d66b444ad3f21",
-      "implementation-summary.md": "c345b3bdfdef4b604803c67dc05064816233fe693eb043042ebeb7ad7eb8b299"
+      "implementation-summary.md": "68fb67b604d1ea227c960da8deb1741df36359aa767ca0eaa96247e24bd1c2f7"
     },
     "last_active_child_id": null,
     "last_active_at": null

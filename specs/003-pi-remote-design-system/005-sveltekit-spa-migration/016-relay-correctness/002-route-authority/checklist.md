@@ -35,9 +35,9 @@ pass, on a phone that is the only client this system has.
 <!-- ANCHOR:pre-impl -->
 ## Pre-Implementation
 
-- [ ] **CHK-PRE-01** [P0] Every route classified as exercising authority or observing state. [deferred: pending execution — that distinction decides gating, not data sensitivity]
-- [ ] **CHK-PRE-02** [P0] The route-level harness exists and is route-agnostic. [deferred: pending execution — roughly three quarters of this child's effort; no such test exists today]
-- [ ] **CHK-PRE-03** [P1] Backend baseline captured. [deferred: pending execution — four real test dirs explicitly, since the bare positional sweeps a protected repo]
+- [x] **CHK-PRE-01** [P0] Every route classified as exercising authority or observing state. [evidence: fifteen routes read; three exercised authority without proving it — `/api/approval/decide`, `/api/accept-edits`, `/api/prompt/submit`]
+- [x] **CHK-PRE-02** [P0] The route-level harness exists and is route-agnostic. [evidence: `app-relay/tests/route-authority.test.ts` stands up a server, mints a session and connects a socket, reusable per route]
+- [x] **CHK-PRE-03** [P1] Backend baseline captured. [evidence: `npx vitest run` over the four real directories: 51 files, 385 tests, exit 0 before the change]
 <!-- /ANCHOR:pre-impl -->
 
 ---
@@ -45,10 +45,10 @@ pass, on a phone that is the only client this system has.
 <!-- ANCHOR:code-quality -->
 ## Code Quality
 
-- [ ] **CHK-CQ-01** [P0] The gates copy the adjacent route's pattern. [deferred: pending execution — a second idiom for the same check is a future inconsistency]
-- [ ] **CHK-CQ-02** [P0] The prompt gate no longer depends on payload shape. [deferred: pending execution — whether a prompt carries an image is unrelated to whether the device may steer]
-- [ ] **CHK-CQ-03** [P1] The authority predicate itself is unchanged. [deferred: pending execution — this child changes callers, not the rule]
-- [ ] **CHK-CQ-04** [P1] The asserted foreground flag is named as asserted. [deferred: pending execution — two facts under one name is the reasoning error being removed]
+- [x] **CHK-CQ-01** [P0] The gates copy the adjacent route's pattern. [evidence: both gates copy the `/api/ask-question/ticket` shape: foreground proof, then limiter, then act]
+- [x] **CHK-CQ-02** [P0] The prompt gate no longer depends on payload shape. [evidence: `app-relay/src/http/server.ts` drops the `hasAttachments &&` condition; the media-disabled check is untouched]
+- [x] **CHK-CQ-03** [P1] The authority predicate itself is unchanged. [evidence: `isForegroundDevice` is unchanged; only its call sites grew]
+- [x] **CHK-CQ-04** [P1] The asserted foreground flag is named as asserted. [evidence: `assertedForegroundDevices` in `app-relay/src/push/push-service.ts` names the client claim as a claim]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -56,11 +56,11 @@ pass, on a phone that is the only client this system has.
 <!-- ANCHOR:testing -->
 ## Testing
 
-- [ ] **CHK-TEST-01** [P0] Background device refused on all three mutation routes. [deferred: pending execution — approval-decide, accept-edits, prompt-submit]
-- [ ] **CHK-TEST-02** [P0] Foreground device unchanged on all three. [deferred: pending execution — the assertion that protects the only client this system has]
-- [ ] **CHK-TEST-03** [P0] Listing route still answers a background device. [deferred: pending execution — a permanent guard against a future over-correction]
-- [ ] **CHK-TEST-04** [P1] Plain and attachment-carrying prompts gated identically. [deferred: pending execution — the erosion this child repairs]
-- [ ] **CHK-TEST-05** [P0] `npm test` exit 0. [deferred: pending execution — four real directories explicitly]
+- [x] **CHK-TEST-01** [P0] Background device refused on all three mutation routes. [evidence: `npx vitest run app-relay/tests/route-authority.test.ts` and the prompt suite assert 403 `foreground_required` on all three]
+- [x] **CHK-TEST-02** [P0] Foreground device unchanged on all three. [evidence: no route answers `foreground_required` to a socket-holding device; asserted on all three]
+- [x] **CHK-TEST-03** [P0] Listing route still answers a background device. [evidence: `route-authority.test.ts` pins `/api/approvals` as answering a background device]
+- [x] **CHK-TEST-04** [P1] Plain and attachment-carrying prompts gated identically. [evidence: the prompt-submit gate no longer reads `hasAttachments`; the background case covers both shapes]
+- [x] **CHK-TEST-05** [P0] `npm test` exit 0. [evidence: `npx vitest run` over the four real directories: 52 files, 390 tests passed, exit 0]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -68,9 +68,9 @@ pass, on a phone that is the only client this system has.
 <!-- ANCHOR:fix-completeness -->
 ## Fix Completeness
 
-- [ ] **CHK-FIX-01** [P0] No bare rate-limited response remains. [deferred: pending execution — verified by grep over the response sites; nine send no hint today]
-- [ ] **CHK-FIX-02** [P1] The client receives a real value. [deferred: pending execution — its parser, clamp and consumer are already shipped and currently fed nothing]
-- [ ] **CHK-FIX-03** [P1] The rate limiter's window does not fire during a normal approval burst. [deferred: pending execution — a limiter that fires wrongly is a bug, one that never fires costs nothing]
+- [x] **CHK-FIX-01** [P0] No bare rate-limited response remains. [evidence: `grep -c retryAfterHeaders(admission.retryAfterSeconds)` returns 11, one per limiter-backed refusal]
+- [x] **CHK-FIX-02** [P1] The client receives a real value. [evidence: the hint carries the limiter reported seconds, clamped once in `retryAfterHeaders`]
+- [x] **CHK-FIX-03** [P1] The rate limiter's window does not fire during a normal approval burst. [evidence: both use `new FixedWindowRateLimiter(30, 60_000, ...)`, matching the adjacent mutation route]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -78,10 +78,10 @@ pass, on a phone that is the only client this system has.
 <!-- ANCHOR:security -->
 ## Security
 
-- [ ] **CHK-SEC-01** [P0] The foreground invariant is universal across mutation routes. [deferred: pending execution — twelve of fifteen honour it today, which makes it a convention]
-- [ ] **CHK-SEC-02** [P0] Reads remain ungated. [deferred: pending execution — gating a read regresses a phone whose socket is still re-opening]
-- [ ] **CHK-SEC-03** [P1] The claim made is consistency, not new security. [deferred: pending execution — the surface is already principal-scoped and revocation-aware]
-- [ ] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [deferred: pending execution — five read-only research repos live there]
+- [x] **CHK-SEC-01** [P0] The foreground invariant is universal across mutation routes. [evidence: every mutation route in `app-relay/src/http/server.ts` now calls `isForegroundDevice` before acting]
+- [x] **CHK-SEC-02** [P0] Reads remain ungated. [evidence: `/api/approvals` stays ungated and `npx vitest run app-relay/tests/route-authority.test.ts` asserts it]
+- [x] **CHK-SEC-03** [P1] The claim made is consistency, not new security. [evidence: the newly refused caller is a background device that already held an enrolled key; recorded as consistency in `spec.md`]
+- [x] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [evidence: `git status` shows `specs/context/` untracked and untouched]
 <!-- /ANCHOR:security -->
 
 ---
@@ -89,8 +89,8 @@ pass, on a phone that is the only client this system has.
 <!-- ANCHOR:docs -->
 ## Documentation
 
-- [ ] **CHK-DOC-01** [P1] The exercises-versus-observes rule is written where the next route author will read it. [deferred: pending execution — durable WHY only, since comment hygiene is a hard block]
-- [ ] **CHK-DOC-02** [P2] The listing route's deliberate exemption is stated. [deferred: pending execution — an unexplained exception invites someone to remove it]
+- [x] **CHK-DOC-01** [P1] The exercises-versus-observes rule is written where the next route author will read it. [evidence: the exercises-versus-observes rule sits in `implementation-summary.md` beside the listing exemption]
+- [x] **CHK-DOC-02** [P2] The listing route's deliberate exemption is stated. [evidence: stated in `implementation-summary.md` and pinned by a test rather than only by prose]
 <!-- /ANCHOR:docs -->
 
 ---
@@ -98,8 +98,8 @@ pass, on a phone that is the only client this system has.
 <!-- ANCHOR:file-org -->
 ## File Organization
 
-- [ ] **CHK-ORG-01** [P1] Per-phase commits. [deferred: pending execution — the live-follow daemon reverts uncommitted edits]
-- [ ] **CHK-ORG-02** [P2] The harness lives where the next route test will find it. [deferred: pending execution — its value is that it outlasts this child]
+- [x] **CHK-ORG-01** [P1] Per-phase commits. [evidence: five commits: `96ec438`, `a8fb5c8`, `f59fc28`, `d61ee3f`, `ae9f97f`]
+- [x] **CHK-ORG-02** [P2] The harness lives where the next route test will find it. [evidence: `app-relay/tests/route-authority.test.ts` sits with the relay suites and runs in the backend lane]
 <!-- /ANCHOR:file-org -->
 
 ---

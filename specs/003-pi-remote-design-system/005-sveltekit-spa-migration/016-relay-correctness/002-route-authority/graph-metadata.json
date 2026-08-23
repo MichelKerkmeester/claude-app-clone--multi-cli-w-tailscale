@@ -30,13 +30,13 @@
       "invariant"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "checklist.md",
-      "tasks.md",
-      "implementation-summary.md"
+      "implementation-summary.md",
+      "tasks.md"
     ],
     "entities": [
       {
@@ -58,15 +58,15 @@
         "source": "derived"
       },
       {
-        "name": "tasks.md",
-        "kind": "doc",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "implementation-summary.md",
         "kind": "doc",
         "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Make the foreground invariant universal across mutation-exercising routes, send the retry hint the client already parses, and give foreground one meaning computed in one place.",
     "created_at": "2026-08-23T10:35:57.712Z",
-    "last_save_at": "2026-08-23T10:36:38.052Z",
+    "last_save_at": "2026-08-23T15:07:39.835Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8b5fed04f04aa123b21e0b70f32fa168b5290b8688ab83393f3b3eee3569ad4f",
+    "source_fingerprint": "sha256:b6ca3856abfbad70e8512bb64a06da7b33d0a8917c0d0c7d2e96a6acf9fd6630",
     "source_doc_hashes": {
       "spec.md": "3e106b5005103366fb0b1ead60bf38528b576b36a5695b18b572c089b696fb16",
       "plan.md": "82f3d98ff1c74720f63c02c97fa90a88cb2b93cbd27f3443d41a134736c66168",
-      "tasks.md": "4376e901e0c87de40729c4c2b1d760cbd16ad4bd46a7aee03dee21657b471baf",
-      "checklist.md": "1e91a1163963710dc2cbde6eb788f5d996193e8a9302f7f7d11bfdb6664d5ebf",
-      "implementation-summary.md": "b371571ac9159a5141369c81257c69b442eedac61e90e9fdd16473553c94475a"
+      "tasks.md": "41ead668d96a66a7aaaa6eb6f57a085d91935559216b76abe291a75c7d23634c",
+      "checklist.md": "f04b3794204b7627fc1213c7713d7945dd1c7d0f290a164792f8416150b78d1c",
+      "implementation-summary.md": "013629e1979744594f69f4af10e0307b5cc7d2e179bf58f212e14e3c626fc6ac"
     },
     "last_active_child_id": null,
     "last_active_at": null

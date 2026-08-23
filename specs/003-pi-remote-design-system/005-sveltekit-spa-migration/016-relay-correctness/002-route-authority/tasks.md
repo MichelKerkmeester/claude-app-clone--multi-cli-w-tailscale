@@ -34,15 +34,15 @@ device unchanged.
 <!-- ANCHOR:phase-1 -->
 ## PHASE 1: SETUP
 
-- [ ] **T1.1** Inventory every route and mark whether it exercises mutation authority or observes
+- [x] **T1.1** Inventory every route and mark whether it exercises mutation authority or observes
       state. That distinction, not data sensitivity, decides gating.
-- [ ] **T1.2** Confirm the twelve already-gated routes to establish the pattern being matched.
-- [ ] **T1.3** Build the route-level test harness by merging glue from the two suites that already
+- [x] **T1.2** Confirm the twelve already-gated routes to establish the pattern being matched.
+- [x] **T1.3** Build the route-level test harness by merging glue from the two suites that already
       stand up a server. Roughly three quarters of this child's effort lives here.
-- [ ] **T1.4** Keep the harness route-agnostic — stand up a server, mint a session for a device in a
+- [x] **T1.4** Keep the harness route-agnostic — stand up a server, mint a session for a device in a
       chosen foreground state, issue a request. A harness that knows about approvals will not be
       reused by the next route.
-- [ ] **T1.5** Capture the backend baseline against the four real test directories explicitly.
+- [x] **T1.5** Capture the backend baseline against the four real test directories explicitly.
 <!-- /ANCHOR:phase-1 -->
 
 ---
@@ -50,20 +50,20 @@ device unchanged.
 <!-- ANCHOR:phase-2 -->
 ## PHASE 2: IMPLEMENTATION
 
-- [ ] **T2.1** Add foreground proof and a rate limiter to the approval-decide route, copying the
+- [x] **T2.1** Add foreground proof and a rate limiter to the approval-decide route, copying the
       adjacent route's pattern rather than inventing a second one.
-- [ ] **T2.2** Same for the accept-edits route.
-- [ ] **T2.3** Assert both directions on each: background refused, foreground unchanged.
-- [ ] **T2.4** Remove the payload-shape condition from the prompt-submit gate, so a plain prompt and an
+- [x] **T2.2** Same for the accept-edits route.
+- [x] **T2.3** Assert both directions on each: background refused, foreground unchanged.
+- [x] **T2.4** Remove the payload-shape condition from the prompt-submit gate, so a plain prompt and an
       attachment-carrying prompt are gated identically.
-- [ ] **T2.5** Add a permanent assertion that the approval **listing** route still answers a background
+- [x] **T2.5** Add a permanent assertion that the approval **listing** route still answers a background
       device. This is the guard against a future pass "finishing the job" and regressing a phone
       mid-reconnect.
-- [ ] **T2.6** Send the retry hint at every rate-limited response site, matching the one path that
+- [x] **T2.6** Send the retry hint at every rate-limited response site, matching the one path that
       already does.
-- [ ] **T2.7** Verify by grep that no bare rate-limited response remains.
-- [ ] **T2.8** Rename the push service's client-asserted foreground flag to say it is asserted.
-- [ ] **T2.9** Prefer the socket-derived foreground set where push already receives it, leaving the
+- [x] **T2.7** Verify by grep that no bare rate-limited response remains.
+- [x] **T2.8** Rename the push service's client-asserted foreground flag to say it is asserted.
+- [x] **T2.9** Prefer the socket-derived foreground set where push already receives it, leaving the
       authority predicate itself untouched.
 <!-- /ANCHOR:phase-2 -->
 
@@ -72,13 +72,13 @@ device unchanged.
 <!-- ANCHOR:phase-3 -->
 ## PHASE 3: VERIFICATION
 
-- [ ] **T3.1** Background device refused by all three mutation routes.
-- [ ] **T3.2** Foreground device accepted by all three, behaviour unchanged.
-- [ ] **T3.3** Listing route still answers a background device.
-- [ ] **T3.4** Plain and attachment-carrying prompts gated identically.
-- [ ] **T3.5** Every rate-limited site carries the hint.
-- [ ] **T3.6** `npm test` exit 0 against the four real directories; `npm run build` exit 0.
-- [ ] **T3.7** `validate.sh --strict` exit 0 through its realpath.
+- [x] **T3.1** Background device refused by all three mutation routes.
+- [x] **T3.2** Foreground device accepted by all three, behaviour unchanged.
+- [x] **T3.3** Listing route still answers a background device.
+- [x] **T3.4** Plain and attachment-carrying prompts gated identically.
+- [x] **T3.5** Every rate-limited site carries the hint.
+- [x] **T3.6** `npm test` exit 0 against the four real directories; `npm run build` exit 0.
+- [x] **T3.7** `validate.sh --strict` exit 0 through its realpath.
 <!-- /ANCHOR:phase-3 -->
 
 ---

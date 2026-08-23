@@ -94,6 +94,10 @@ const SPECIFIER_PATTERN = /(from\s+|import\s+|import\(\s*)(['"])([^'"]+)\2/g;
 // rewrite that only understands import syntax moves the file and leaves the
 // worker unreachable at runtime — with nothing failing at build time.
 const URL_SPECIFIER_PATTERN = /(new URL\(\s*)(['"])([^'"]+)\2(\s*,\s*import\.meta\.url)/g;
+// A test double names its target by module path too. A vi.mock left pointing at
+// a path nothing occupies no longer replaces anything, and the suite keeps
+// passing against the real module — the quietest way for a rename to lie.
+const MOCK_SPECIFIER_PATTERN = /(vi\.(?:mock|doMock|unmock|importActual|importMock)\(\s*)(['"])([^'"]+)\2/g;
 
 function rewriteFile(filePath, moveMap, originOf) {
   const original = readFileSync(join(REPO_ROOT, filePath), 'utf8');
@@ -108,6 +112,7 @@ function rewriteFile(filePath, moveMap, originOf) {
   };
   const updated = original
     .replace(SPECIFIER_PATTERN, rewriteImport)
+    .replace(MOCK_SPECIFIER_PATTERN, rewriteImport)
     .replace(URL_SPECIFIER_PATTERN, (match, lead, quote, specifier, tail) => {
       const key = resolveSpecifier(specifier, filePath, originOf);
       if (key === null) return match;

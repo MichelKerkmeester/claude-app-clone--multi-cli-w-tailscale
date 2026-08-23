@@ -68,11 +68,22 @@ export class StrictJsonlDecoder {
       this.options.onError(new Error('RPC JSONL requires LF delimiters without carriage returns.'));
       return;
     }
+    let record: unknown;
     try {
-      this.options.onRecord(JSON.parse(line) as unknown);
+      record = JSON.parse(line) as unknown;
+    } catch {
+      this.options.onError(
+        new Error(
+          `RPC JSONL framing failed for a record of ${Buffer.byteLength(line, 'utf8')} bytes.`,
+        ),
+      );
+      return;
+    }
+    try {
+      this.options.onRecord(record);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
-      this.options.onError(new Error(`RPC JSONL parse failed: ${message}`));
+      this.options.onError(new Error(`RPC JSONL record handling failed: ${message}`));
     }
   }
 }

@@ -152,6 +152,9 @@ export async function runRelay(): Promise<() => Promise<void>> {
       void attachmentReaper.onEpochChange(epoch);
     }
   });
+  supervisor.onError((error) => {
+    process.stderr.write(`${error.message}\n`);
+  });
   supervisor.onTodoProjection((source) => {
     const update = todoProjector.project(source);
     if (update !== null) publishTodoProjection(store, syncHub, update, epoch);
@@ -298,12 +301,14 @@ export function publishPiEvent(
     nextSequence: () => nextProjectedSequence++,
     sessionId: identity.sessionId,
   })) {
+    // The store may decline a projection without consuming a sequence, so it owns the counter.
+    const seq = store.nextSequence(identity, epoch);
     syncHub.publish({
       ...envelope,
       eventId: `event_${randomUUID()}`,
       kind: 'transcript.block',
-      seq: block.seq,
-      payload: block,
+      seq,
+      payload: { ...block, seq },
     });
   }
   const attentionClass = attentionClassFor(event);

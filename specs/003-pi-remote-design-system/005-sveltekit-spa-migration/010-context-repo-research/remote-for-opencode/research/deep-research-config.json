@@ -1,0 +1,12 @@
+{
+  "mode": "research",
+  "topic": "Mine remote-for-opencode-master for adoptable patterns for the Pi Remote SvelteKit mobile chat and remote-agent PWA.",
+  "specFolder": "specs/003-pi-remote-design-system/005-sveltekit-spa-migration/010-context-repo-research/remote-for-opencode",
+  "target": "specs/context/remote-for-opencode-master",
+  "targetReadOnly": true,
+  "maxIterations": 10,
+  "convergenceThreshold": 0.05,
+  "status": "complete",
+  "stopReason": "converged",
+  "iterations": 5
+}

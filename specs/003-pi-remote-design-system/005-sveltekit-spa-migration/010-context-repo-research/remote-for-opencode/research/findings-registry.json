@@ -1,0 +1,21 @@
+{
+  "openQuestions": [],
+  "resolvedQuestions": [
+    "turn resume and cursor semantics",
+    "typed protocol and adapter compatibility",
+    "risk-scaled approval UX",
+    "working and transcript UX",
+    "composer and attachment policy",
+    "background recovery and push trust",
+    "policy/test seam and UI harness"
+  ],
+  "keyFindings": [
+    "Replayable cursor plus stable part IDs makes resume idempotent.",
+    "Capability negotiation and an adapter isolate upstream event/API churn.",
+    "Risk-aware approvals need steering, explicit scope, and authenticated grants.",
+    "Pure policy modules and real-view harnesses make mobile behavior testable."
+  ],
+  "ruledOutDirections": [
+    "Native-only CloudKit, biometric, SwiftUI, and transport implementation details"
+  ]
+}

@@ -5,14 +5,27 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { isOpaqueId } from '@pi-remote/pi-rpc-protocol';
-import type { Envelope, JsonValue, PiRpcEvent } from '@pi-remote/pi-rpc-protocol';
+import { isAskQuestionPresentedEvent, isOpaqueId } from '@pi-remote/pi-rpc-protocol';
+import type {
+  AskQuestionAnswer,
+  AskQuestionPresentedEvent,
+  AskQuestionResultReason,
+  Envelope,
+  JsonValue,
+  PiRpcCommand,
+  PiRpcEvent,
+} from '@pi-remote/pi-rpc-protocol';
 
 import { startReadOnlyServer } from './http/server.js';
 import { ApprovalService } from './approval/approval-service.js';
 import { AttachmentReaper } from './attachments/attachment-reaper.js';
 import { AttachmentService } from './attachments/attachment-service.js';
 import { PiImageBridge } from './attachments/pi-image-bridge.js';
+import {
+  AskQuestionService,
+  type AskQuestionHandoffInput,
+  type AskQuestionHandoffOutcome,
+} from './ask-question/ask-question-service.js';
 import { CommandService } from './commands/command-service.js';
 import { isMediaFeatureEnabled } from './auth/policy.js';
 import { MutationPolicy } from './policy/mutation-policy.js';
@@ -20,6 +33,7 @@ import { PushService, createAttentionPayload } from './push/push-service.js';
 import { PromptService } from './prompt/prompt-service.js';
 import { PromptRevisionCoordinator } from './prompt/prompt-revision-coordinator.js';
 import { SyncHub } from './replay/sync.js';
+import type { AskQuestionCallbackOutcome } from './rpc/demux.js';
 import { RpcSupervisor } from './rpc/supervisor.js';
 import { RuntimeService } from './runtime/runtime-service.js';
 import { SessionCatalog } from './sessions/catalog.js';
@@ -36,6 +50,17 @@ const HOST_ID = 'host_local';
 const WORKSPACE_REF = 'workspace_default';
 const SESSION_ID = 'session_local';
 const DEFAULT_PORT = 4_310;
+const ASK_QUESTION_HANDOFF_TIMEOUT_MS = 15_000;
+
+interface HostAskQuestionBinding {
+  readonly requestId: string;
+}
+
+interface PendingAskQuestionHandoff {
+  readonly resolve: (outcome: AskQuestionCallbackOutcome) => void;
+  readonly timer: NodeJS.Timeout;
+  settled: boolean;
+}
 
 /** Start the durable relay, loopback API and one supervised Pi RPC source. */
 export async function runRelay(): Promise<() => Promise<void>> {
@@ -104,6 +129,10 @@ export async function runRelay(): Promise<() => Promise<void>> {
 
   const supervisor = new RpcSupervisor({
     fixtureOnly: process.env.PI_REMOTE_USE_FIXTURE === '1',
+    askQuestionCallback: {
+      matches: isAskQuestionCallbackRecord,
+      map: mapAskQuestionCallbackOutcome,
+    },
     ...(fullAccess
       ? { args: fullAccessPiArguments() }
       : mutationChildEnvironment !== null && mutationFamily !== null
@@ -143,6 +172,31 @@ export async function runRelay(): Promise<() => Promise<void>> {
         ? null
         : attachmentService.getOwnerForDevice(attachmentSetId, deviceId),
   });
+  const hostAskQuestionBindings = new Map<string, HostAskQuestionBinding>();
+  const pendingAskQuestionHandoffs: PendingAskQuestionHandoff[] = [];
+  const askQuestions = new AskQuestionService({
+    store,
+    syncHub,
+    hostId: HOST_ID,
+    workspaceRef: WORKSPACE_REF,
+    sessionId: SESSION_ID,
+    epoch,
+    now: Date.now,
+    handoff: {
+      submit: (input) =>
+        submitAskQuestionAnswer(
+          supervisor,
+          hostAskQuestionBindings,
+          pendingAskQuestionHandoffs,
+          input,
+        ),
+    },
+    canAnswer: () => runtime.getState()?.mode === 'build',
+  });
+  supervisor.onAskQuestionCallback((outcome) => {
+    const pending = pendingAskQuestionHandoffs.shift();
+    if (pending !== undefined) completeAskQuestionHandoff(pending, outcome);
+  });
   // A restarted host gets a new epoch: every prior catalog snapshot and binding
   // dies with it, so nothing from the old generation can authorize a submission.
   supervisor.onLifecycle((event) => {
@@ -150,6 +204,10 @@ export async function runRelay(): Promise<() => Promise<void>> {
       commands.invalidate();
       todoProjector.reset();
       void attachmentReaper.onEpochChange(epoch);
+      hostAskQuestionBindings.clear();
+      for (const pending of pendingAskQuestionHandoffs.splice(0)) {
+        completeAskQuestionHandoff(pending, { status: 'delivery-unknown' });
+      }
     }
   });
   supervisor.onError((error) => {
@@ -161,6 +219,12 @@ export async function runRelay(): Promise<() => Promise<void>> {
   });
   supervisor.onEvent((event) => {
     if (isAuthoritativeTodoProjectionEvent(event)) return;
+    const askQuestion = askQuestionPresentationFor(event);
+    if (askQuestion !== null) {
+      hostAskQuestionBindings.set(askQuestion.presentation.questionId, askQuestion.binding);
+      askQuestions.present(askQuestion.presentation);
+      return;
+    }
     publishPiEvent(store, syncHub, transcriptProjector, event, epoch);
     if (event.type === 'agent_start') {
       catalog.register(SESSION_ID, 'running', 0);
@@ -193,6 +257,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
       : {}),
     prompts,
     runtime,
+    askQuestions,
     commands,
     ...(push === undefined ? {} : { push }),
     mediaEnabled,
@@ -224,6 +289,143 @@ export async function runRelay(): Promise<() => Promise<void>> {
     await server.stop();
     store.close();
   };
+}
+
+function askQuestionPresentationFor(event: PiRpcEvent): {
+  readonly presentation: AskQuestionPresentedEvent;
+  readonly binding: HostAskQuestionBinding;
+} | null {
+  const direct = event as unknown;
+  if (isAskQuestionPresentedEvent(direct)) {
+    return {
+      presentation: direct,
+      binding: {
+        requestId: direct.answerCapability.ticketRef,
+      },
+    };
+  }
+  if (!isRecordValue(event) || event.type !== 'extension_ui_request') return null;
+  if (event['method'] !== 'ask-question' && event['method'] !== 'askQuestion') return null;
+  const candidate = event['presentation'] ?? event['question'] ?? event['askQuestion'];
+  if (!isAskQuestionPresentedEvent(candidate)) return null;
+  const requestId =
+    typeof event['id'] === 'string' && event['id'].length > 0
+      ? event['id']
+      : candidate.answerCapability.ticketRef;
+  return {
+    presentation: candidate,
+    binding: { requestId },
+  };
+}
+
+function submitAskQuestionAnswer(
+  supervisor: RpcSupervisor,
+  bindings: ReadonlyMap<string, HostAskQuestionBinding>,
+  pendingHandoffs: PendingAskQuestionHandoff[],
+  input: AskQuestionHandoffInput,
+): Promise<AskQuestionHandoffOutcome> {
+  const binding = bindings.get(input.questionId);
+  if (binding === undefined) return Promise.resolve({ status: 'delivery-unknown' });
+
+  let pending: PendingAskQuestionHandoff | null = null;
+  const outcome = new Promise<AskQuestionCallbackOutcome>((resolve) => {
+    const timer = setTimeout(() => {
+      if (pending !== null) {
+        settlePendingAskQuestionHandoff(pendingHandoffs, pending, {
+          status: 'delivery-unknown',
+        });
+      }
+    }, ASK_QUESTION_HANDOFF_TIMEOUT_MS);
+    pending = { resolve, timer, settled: false };
+    pendingHandoffs.push(pending);
+  });
+  void supervisor
+    .sendSettled(extensionUiResponseFor(binding, input.answer) as unknown as PiRpcCommand)
+    .then((response) => {
+      if (response.success !== true && pending !== null) {
+        settlePendingAskQuestionHandoff(pendingHandoffs, pending, {
+          status: 'delivery-unknown',
+        });
+      }
+    })
+    .catch(() => {
+      if (pending !== null) {
+        settlePendingAskQuestionHandoff(pendingHandoffs, pending, {
+          status: 'delivery-unknown',
+        });
+      }
+    });
+  return outcome;
+}
+
+function extensionUiResponseFor(
+  binding: HostAskQuestionBinding,
+  answer: AskQuestionAnswer,
+): Record<string, JsonValue> {
+  return {
+    type: 'extension_ui_response',
+    id: binding.requestId,
+    value: JSON.stringify(answer),
+  };
+}
+
+function settlePendingAskQuestionHandoff(
+  pendingHandoffs: PendingAskQuestionHandoff[],
+  pending: PendingAskQuestionHandoff,
+  outcome: AskQuestionCallbackOutcome,
+): void {
+  const index = pendingHandoffs.indexOf(pending);
+  if (index >= 0) pendingHandoffs.splice(index, 1);
+  completeAskQuestionHandoff(pending, outcome);
+}
+
+function completeAskQuestionHandoff(
+  pending: PendingAskQuestionHandoff,
+  outcome: AskQuestionCallbackOutcome,
+): void {
+  if (pending.settled) return;
+  pending.settled = true;
+  clearTimeout(pending.timer);
+  pending.resolve(outcome);
+}
+
+function isAskQuestionCallbackRecord(record: unknown): boolean {
+  return askQuestionCallbackPayload(record) !== null;
+}
+
+function mapAskQuestionCallbackOutcome(record: unknown): AskQuestionCallbackOutcome {
+  const callback = askQuestionCallbackPayload(record);
+  if (callback === null) return { status: 'delivery-unknown' };
+  if (callback['status'] === 'accepted') return { status: 'accepted' };
+  if (callback['status'] === 'delivery-unknown') return { status: 'delivery-unknown' };
+  const reason = callback['reason'];
+  return isAskQuestionResultReason(reason)
+    ? { status: 'rejected', reason }
+    : { status: 'delivery-unknown' };
+}
+
+function askQuestionCallbackPayload(record: unknown): Record<string, unknown> | null {
+  if (!isRecordValue(record)) return null;
+  const callback = record['questionCallback'] ?? record['askQuestionCallback'];
+  return isRecordValue(callback) ? callback : null;
+}
+
+function isAskQuestionResultReason(value: unknown): value is AskQuestionResultReason {
+  return (
+    value === 'invalid-ticket' ||
+    value === 'revision-mismatch' ||
+    value === 'question-withdrawn' ||
+    value === 'question-already-answered' ||
+    value === 'plan-mode-blocked' ||
+    value === 'redaction-policy-blocked' ||
+    value === 'validation-failed' ||
+    value === 'host-unavailable' ||
+    value === 'delivery-unknown'
+  );
+}
+
+function isRecordValue(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function approvalIdFrom(payload: JsonValue): string | null {

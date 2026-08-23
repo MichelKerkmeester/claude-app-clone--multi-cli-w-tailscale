@@ -8,13 +8,13 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/004-chrome-and-composer"
-    last_updated_at: "2026-08-19T00:00:00Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Spec authored (L3 child)"
-    next_safe_action: "Parallel chrome dispatches, then K=1 composer + LeavePlanSheet after L2 barrier"
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/004-chrome-and-composer"
+    last_updated_at: "2026-08-23T10:00:00Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Packet documentation completed retrospectively."
+    next_safe_action: "None; child shipped and superseded by later layers."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -71,16 +71,20 @@ that assert the exact focus/`activeElement` behavior.
 <!-- ANCHOR:requirements -->
 ## 4. REQUIREMENTS
 
-- R1: Chrome dispatches are disjoint; the composer/LeavePlanSheet run alone (no concurrent dispatch).
-- R2: LeavePlanSheet focus parity is asserted by a regression test (`activeElement === stay`).
-- R3: The composer never steals focus from the textarea; slash/IME behavior matches React exactly.
-- R4: Every moved CSS block is scope-audited; guardrail fences preserved.
+- **REQ-001** — Chrome dispatches are disjoint; the composer/LeavePlanSheet run alone (no concurrent dispatch).
+- **REQ-002** — LeavePlanSheet focus parity is asserted by a regression test (`activeElement === stay`).
+- **REQ-003** — The composer never steals focus from the textarea; slash/IME behavior matches React exactly.
+- **REQ-004** — Every moved CSS block is scope-audited; guardrail fences preserved.
+- **REQ-005** — Focus parity is proven by assertion, not by inspection. react-aria and Bits UI both
+  open a dialog successfully and differ only in what ends up focused, which no screenshot and few
+  reviewers can see — so each focus-sensitive unit ships with a test that names the expected
+  `activeElement`.
 <!-- /ANCHOR:requirements -->
 
 ---
 
 <!-- ANCHOR:success-criteria -->
-## 5. SUCCESS CRITERIA (barrier gate)
+## 5. SUCCESS CRITERIA
 
 - Chrome renders in the catalog (light + dark) without throw.
 - Focus/a11y regression tests pass: LeavePlanSheet `activeElement`, composer focus-retention +

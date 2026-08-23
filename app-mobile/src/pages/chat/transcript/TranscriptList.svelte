@@ -330,6 +330,35 @@
     background: var(--surface-muted);
   }
 
+  /* @ds edit: surface — glass treatment for the floating control, composing the same
+     color-mix + blur(12px) idiom the header bars already use. Guarded on @supports because
+     without a real backdrop blur a translucent button would sit over unblurred transcript
+     text, hurting the legibility of both. */
+  @supports (backdrop-filter: blur(12px)) {
+    .scroll-to-latest {
+      background: color-mix(in oklch, var(--surface-raised) 88%, transparent);
+      backdrop-filter: blur(12px);
+    }
+
+    .scroll-to-latest:hover {
+      background: color-mix(in oklch, var(--surface-muted) 88%, transparent);
+    }
+  }
+
+  /* @ds edit: contrast — the high-contrast reader gives up the glass: translucency lowers the
+     chevron's effective contrast against whatever scrolls behind it, so the control returns to
+     an opaque surface and carries the stronger border the app's other raised surfaces use. */
+  /* @ds guardrail: do-not-edit — the opaque high-contrast fallback is an accessibility
+     guarantee; never let the translucent surface survive prefers-contrast: more. */
+  @media (prefers-contrast: more) {
+    .scroll-to-latest,
+    .scroll-to-latest:hover {
+      border-color: var(--line-strong);
+      background: var(--surface-raised);
+      backdrop-filter: none;
+    }
+  }
+
   /* @ds slot: scroll-badge — new-message count pill. */
   .scroll-badge {
     position: absolute;

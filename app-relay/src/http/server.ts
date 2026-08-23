@@ -131,7 +131,7 @@ export interface ReadOnlyServerOptions {
     readonly secret: string;
     readonly principal: string;
     readonly sessionId: string;
-    readonly epoch: string;
+    readonly epoch: string | (() => string);
     readonly policyVersion: number;
     readonly hostExtension?: string;
     readonly deviceId?: string;
@@ -1834,7 +1834,7 @@ async function handleExtensionAuthority(
   const result = options.approvals.consume({
     approvalId: body.approvalId,
     action: body.action,
-    currentEpoch: authority.epoch,
+    currentEpoch: resolveEpoch(authority.epoch),
   });
   sendJson(
     response,
@@ -1935,7 +1935,7 @@ async function handleInboundPublishRoute(
         workspaceRef: options.workspaceRef,
         sessionId: consumed.binding.sessionId,
       },
-      epoch: authority.epoch,
+      epoch: resolveEpoch(authority.epoch),
       expectedTranscriptRevision: consumed.binding.expectedTranscriptRevision,
       blockId: consumed.binding.blockId,
       submissionId: consumed.binding.submissionId,
@@ -2064,7 +2064,8 @@ function safePrincipal(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0 && value.length <= 320 && !/[\u0000-\u001f]/u.test(value);
 }
 
-function matchesAuthorityAction(
+/** Compare an extension action with the authority values active for this host. */
+export function matchesAuthorityAction(
   action: {
     readonly principal: string;
     readonly sessionId: string;
@@ -2073,12 +2074,17 @@ function matchesAuthorityAction(
   },
   authority: NonNullable<ReadOnlyServerOptions['extensionAuthority']>,
 ): boolean {
+  const currentEpoch = resolveEpoch(authority.epoch);
   return (
     action.principal === authority.principal &&
     action.sessionId === authority.sessionId &&
-    action.epoch === authority.epoch &&
+    action.epoch === currentEpoch &&
     action.policyVersion === authority.policyVersion
   );
+}
+
+function resolveEpoch(epoch: string | (() => string)): string {
+  return typeof epoch === 'function' ? epoch() : epoch;
 }
 
 function matchesSecret(authorization: string | null, secret: string): boolean {

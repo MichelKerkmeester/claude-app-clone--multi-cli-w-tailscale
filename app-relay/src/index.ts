@@ -90,9 +90,9 @@ export async function runRelay(): Promise<() => Promise<void>> {
     policy: mutationPolicy,
     identity: { hostId: HOST_ID, workspaceRef: WORKSPACE_REF },
   });
-  const epoch = `epoch_${randomUUID()}`;
+  let epoch = `epoch_${randomUUID()}`;
   const attachmentService = new AttachmentService({
-    currentEpoch: epoch,
+    currentEpoch: () => epoch,
     now: Date.now,
     ...(process.env.PI_REMOTE_ATTACHMENT_QUARANTINE === undefined
       ? {}
@@ -109,6 +109,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
     ? requiredEnvironment('PI_REMOTE_OPERATOR_PRINCIPAL')
     : null;
   const relayPort = parsePort(process.env.PI_REMOTE_PORT);
+  let mutationChildRelayUrl = '';
   const mutationChildEnvironment =
     mutationEnabled &&
     mutationFamily !== null &&
@@ -116,11 +117,9 @@ export async function runRelay(): Promise<() => Promise<void>> {
     operatorPrincipal !== null
       ? {
           ...process.env,
-          PI_REMOTE_APPROVAL_RELAY_URL: '',
           PI_REMOTE_APPROVAL_SECRET: extensionSecret,
           PI_REMOTE_APPROVAL_PRINCIPAL: operatorPrincipal,
           PI_REMOTE_APPROVAL_SESSION_ID: SESSION_ID,
-          PI_REMOTE_APPROVAL_EPOCH: epoch,
         }
       : null;
   const transcriptProjector = new TranscriptProjector(store.artifactStore);
@@ -138,7 +137,11 @@ export async function runRelay(): Promise<() => Promise<void>> {
       : mutationChildEnvironment !== null && mutationFamily !== null
         ? {
             args: mutationPiArguments(mutationFamily),
-            env: mutationChildEnvironment,
+            env: () => ({
+              ...mutationChildEnvironment,
+              PI_REMOTE_APPROVAL_RELAY_URL: mutationChildRelayUrl,
+              PI_REMOTE_APPROVAL_EPOCH: epoch,
+            }),
           }
         : {}),
   });
@@ -163,7 +166,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
     hostId: HOST_ID,
     workspaceRef: WORKSPACE_REF,
     sessionId: SESSION_ID,
-    epoch,
+    epoch: () => epoch,
     commands,
     imageBridge,
     revisionCoordinator,
@@ -180,7 +183,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
     hostId: HOST_ID,
     workspaceRef: WORKSPACE_REF,
     sessionId: SESSION_ID,
-    epoch,
+    epoch: () => epoch,
     now: Date.now,
     handoff: {
       submit: (input) =>
@@ -201,9 +204,11 @@ export async function runRelay(): Promise<() => Promise<void>> {
   // dies with it, so nothing from the old generation can authorize a submission.
   supervisor.onLifecycle((event) => {
     if (event.reason === 'exit' || event.reason === 'restart' || event.reason === 'failed') {
+      const endedEpoch = epoch;
+      epoch = `epoch_${randomUUID()}`;
       commands.invalidate();
       todoProjector.reset();
-      void attachmentReaper.onEpochChange(epoch);
+      void attachmentReaper.onEpochChange(endedEpoch);
       hostAskQuestionBindings.clear();
       for (const pending of pendingAskQuestionHandoffs.splice(0)) {
         completeAskQuestionHandoff(pending, { status: 'delivery-unknown' });
@@ -250,7 +255,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
             secret: extensionSecret,
             principal: operatorPrincipal,
             sessionId: SESSION_ID,
-            epoch,
+            epoch: () => epoch,
             policyVersion: 1,
           },
         }
@@ -267,7 +272,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
     port: relayPort,
   });
   if (mutationChildEnvironment !== null) {
-    mutationChildEnvironment.PI_REMOTE_APPROVAL_RELAY_URL = `http://${server.host}:${server.port}`;
+    mutationChildRelayUrl = `http://${server.host}:${server.port}`;
   }
   const stopPushListener =
     push === undefined

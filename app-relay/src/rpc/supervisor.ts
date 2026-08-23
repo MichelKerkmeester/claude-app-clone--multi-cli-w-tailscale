@@ -42,7 +42,7 @@ export interface RpcSupervisorOptions {
   readonly fixturePath?: URL;
   readonly fixtureOnly?: boolean;
   readonly spawn?: typeof spawn;
-  readonly env?: NodeJS.ProcessEnv;
+  readonly env?: NodeJS.ProcessEnv | (() => NodeJS.ProcessEnv);
   /**
    * Integration-time verification must bind this route to Pi's exact
    * ask-question callback/event names before enabling the capability.
@@ -254,7 +254,11 @@ export class RpcSupervisor {
       ],
       {
         stdio: ['pipe', 'pipe', 'pipe'],
-        ...(this.options.env === undefined ? {} : { env: this.options.env }),
+        ...(this.options.env === undefined
+          ? {}
+          : {
+              env: typeof this.options.env === 'function' ? this.options.env() : this.options.env,
+            }),
       },
     );
     this.child = child;

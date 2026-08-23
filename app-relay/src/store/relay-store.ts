@@ -61,6 +61,8 @@ const DEFAULT_RETENTION_EVENTS = 1_000;
 const MAX_RETENTION_EVENTS = 10_000;
 const DEFAULT_TRANSCRIPT_PAGE_SIZE = 50;
 const MAX_TRANSCRIPT_PAGE_SIZE = 100;
+// Keep recent restart history inspectable while bounding transcript storage across epochs.
+const MAX_RETAINED_ENDED_EPOCHS = 10;
 
 export interface StreamIdentity {
   readonly hostId: string;
@@ -76,6 +78,10 @@ interface StreamRow {
 
 interface StoredEnvelopeRow {
   readonly envelopeJson: string;
+}
+
+interface EndedEpochRow {
+  readonly epoch: string;
 }
 
 interface SessionCardRow {
@@ -1016,6 +1022,45 @@ export class RelayStore {
     `,
       )
       .run(envelope.epoch, envelope.hostId, envelope.workspaceRef, envelope.sessionId);
+    this.collectEndedEpochEnvelopes(envelope, envelope.epoch);
+  }
+
+  private collectEndedEpochEnvelopes(identity: StreamIdentity, currentEpoch: string): void {
+    const endedEpochs = this.database
+      .prepare(
+        `
+      SELECT epoch
+      FROM stream_epochs
+      WHERE host_id = ? AND workspace_ref = ? AND session_id = ?
+        AND status = 'ended' AND epoch <> ?
+      ORDER BY ended_at DESC, epoch DESC
+      LIMIT -1 OFFSET ?
+    `,
+      )
+      .all(
+        identity.hostId,
+        identity.workspaceRef,
+        identity.sessionId,
+        currentEpoch,
+        MAX_RETAINED_ENDED_EPOCHS,
+      ) as EndedEpochRow[];
+    if (endedEpochs.length === 0) return;
+
+    // Keep epoch tombstones so a collected epoch can never be reused.
+    const deleteEnvelopes = this.database.prepare(
+      `
+      DELETE FROM envelopes
+      WHERE host_id = ? AND workspace_ref = ? AND session_id = ? AND epoch = ?
+    `,
+    );
+    for (const endedEpoch of endedEpochs) {
+      deleteEnvelopes.run(
+        identity.hostId,
+        identity.workspaceRef,
+        identity.sessionId,
+        endedEpoch.epoch,
+      );
+    }
   }
 
   private getStream(identity: StreamIdentity): StreamRow | null {

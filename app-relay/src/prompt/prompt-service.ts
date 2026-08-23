@@ -30,7 +30,7 @@ interface PromptServiceOptions {
   readonly hostId: string;
   readonly workspaceRef: string;
   readonly sessionId: string;
-  readonly epoch: string;
+  readonly epoch: string | (() => string);
   readonly commands?: CommandService;
   readonly now?: () => Date;
   readonly imageBridge?: PiImageBridge;
@@ -213,7 +213,8 @@ export class PromptService {
     const occurredAt = (this.options.now?.() ?? new Date()).toISOString();
     const context = {
       occurredAt,
-      nextSequence: () => this.options.store.nextSequence(identity, this.options.epoch),
+      nextSequence: () =>
+        this.options.store.nextSequence(identity, resolveEpoch(this.options.epoch)),
     };
     let block: TextBlock;
     try {
@@ -288,7 +289,7 @@ export class PromptService {
       eventId: `event_${randomUUID()}`,
       kind: 'transcript.block',
       ...identity,
-      epoch: this.options.epoch,
+      epoch: resolveEpoch(this.options.epoch),
       seq: block.seq,
       occurredAt,
       causedBy: submissionId,
@@ -325,6 +326,10 @@ export class PromptService {
       this.submissions.delete(removable[0]);
     }
   }
+}
+
+function resolveEpoch(epoch: string | (() => string)): string {
+  return typeof epoch === 'function' ? epoch() : epoch;
 }
 
 /** The forwarded body must be exactly the bound command, with or without arguments. */

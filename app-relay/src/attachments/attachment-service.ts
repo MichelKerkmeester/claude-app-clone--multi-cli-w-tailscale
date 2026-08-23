@@ -75,7 +75,7 @@ interface SubmissionRecord {
 export interface AttachmentServiceOptions {
   readonly now?: () => number;
   readonly quarantineRoot?: string;
-  readonly currentEpoch?: string;
+  readonly currentEpoch?: string | (() => string);
   readonly currentModelId?: string;
   readonly policyVersion?: number;
   readonly rateLimiter?: AttachmentRateLimiter;
@@ -111,7 +111,7 @@ export interface AttachmentServiceStats {
 export class AttachmentService {
   private readonly now: () => number;
   private readonly root: string;
-  private readonly currentEpoch: string | undefined;
+  private readonly currentEpoch: string | (() => string) | undefined;
   private readonly currentModelId: string;
   private readonly policyVersion: number;
   private readonly rateLimiter: AttachmentRateLimiter;
@@ -172,7 +172,8 @@ export class AttachmentService {
     if (
       owner.sessionId !== manifest.sessionId ||
       owner.sessionEpoch !== manifest.sessionEpoch ||
-      (this.currentEpoch !== undefined && this.currentEpoch !== manifest.sessionEpoch) ||
+      (this.currentEpoch !== undefined &&
+        resolveEpoch(this.currentEpoch) !== manifest.sessionEpoch) ||
       (ticketBinding !== undefined && !this.reserveBindingMatches(ticketBinding, manifest))
     ) {
       throw new AttachmentServiceError('invalid_binding');
@@ -781,6 +782,10 @@ async function readQuarantineFile(path: string): Promise<Uint8Array> {
 async function unlinkIfPresent(path: string | null): Promise<void> {
   if (path === null) return;
   await rm(path, { force: true }).catch(() => undefined);
+}
+
+function resolveEpoch(epoch: string | (() => string)): string {
+  return typeof epoch === 'function' ? epoch() : epoch;
 }
 
 function normalizeServiceError(error: unknown): AttachmentServiceError {

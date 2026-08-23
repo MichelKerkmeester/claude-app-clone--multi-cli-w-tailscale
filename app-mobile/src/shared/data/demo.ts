@@ -11,6 +11,10 @@
 // never speaks to the relay — the fake data lives only in this tab, so
 // the real deployment's authority and redaction are untouched.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { DeviceIdentity } from './auth.js';
 import {
   sha256,
@@ -28,6 +32,10 @@ import type {
 } from './relay.js';
 import type { InboundImageLifecycleState } from '../../pages/chat/artifacts/ImageStatus.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 // Opaque ids must match the protocol guard pattern ^[A-Za-z0-9][A-Za-z0-9_-]{2,127}$.
 const SESSION_IDLE = 'demo-session-refactor';
 const SESSION_RUNNING = 'demo-session-triage';
@@ -40,6 +48,10 @@ const DEMO_IMAGE_DIGEST = '431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe09
 const DEMO_PDF_BASE64 =
   'JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXSAvQ29udGVudHMgNCAwIFIgL1Jlc291cmNlcyA8PCAvRm9udCA8PCAvRjEgNSAwIFIgPj4gPj4gPj4KZW5kb2JqCjQgMCBvYmoKPDwgL0xlbmd0aCA0NCA+PgpzdHJlYW0KQlQKL0YxIDI0IFRmCjcyIDcyMCBUZAooU2FmZSBQREYgcHJldmlldykgVGoKRVQKZW5kc3RyZWFtCmVuZG9iago1IDAgb2JqCjw8IC9UeXBlIC9Gb250IC9TdWJ0eXBlIC9UeXBlMSAvQmFzZUZvbnQgL0hlbHZldGljYSA+PgplbmRvYmoKeHJlZgowIDYKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDAwIDAwMDAwIG4gCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDAxNyAwMDAwMCBuIAowMDAwMDAwMDUxIDAwMDAwIG4gCjAwMDAwMDAwNTggMDAwMDAgbiAKdHJhaWxlcgo8PCAvU2l6ZSA2IC9Sb290IDEgMCBSID4+CnN0YXJ0eHJlZgo0MDgKJSVFT0YK';
 const DEMO_PDF_DIGEST = '8b624fb6d7b45c2778c2dec0ff0db37dc64b401f03247f49cdaf756a67916ae8';
+
+// ───────────────────────────────────────────────────────────────────
+// 3. FIXTURE QUERY DESCRIPTORS
+// ───────────────────────────────────────────────────────────────────
 
 export const DEMO_DIFF_FIXTURE = Object.freeze({
   sessionId: SESSION_IDLE,
@@ -175,6 +187,10 @@ const DEMO_TODO_TASKS: TodoProjectionV1['tasks'] = [
   },
 ];
 
+// ───────────────────────────────────────────────────────────────────
+// 4. DEMO MODE GATING
+// ───────────────────────────────────────────────────────────────────
+
 let cachedEnabled: boolean | null = null;
 
 /**
@@ -206,6 +222,10 @@ export const DEMO_IDENTITY: DeviceIdentity = {
   hostFingerprint: 'demo-host-fingerprint',
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 5. SHARED BLOCK HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function isoAgo(minutes: number): string {
   return new Date(Date.now() - minutes * 60_000).toISOString();
 }
@@ -217,6 +237,10 @@ function base(id: string, seq: number, minutesAgo: number) {
 function artifactBase(id: string, revision: string, seq: number, minutesAgo: number) {
   return { id, revision, seq, occurredAt: isoAgo(minutesAgo) };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. TRANSCRIPT BLOCK FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const DEMO_INBOUND_MEDIA_PROCESSING_BLOCK = {
   ...base('blk-inbound-processing', 8, 6),
@@ -312,6 +336,10 @@ const TRIAGE_BLOCKS = [
     inputSummary: 'src/mobile-app/src/App.tsx:958-1020',
   },
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// 7. RICH CONTENT FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const RICH_REDACTION = {
   policyVersion: 1,
@@ -468,6 +496,10 @@ export const DEMO_RICH_RELEASE_BLOCKS: readonly Record<string, unknown>[] = [
   },
 ];
 
+// ───────────────────────────────────────────────────────────────────
+// 8. ARTIFACT PREVIEW FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 export const DEMO_ARTIFACT_BLOCKS: readonly FilePreviewBlock[] = [
   {
     ...artifactBase('blk-artifact-ready', 'rev_ready_001', 8, 5),
@@ -617,6 +649,10 @@ export const DEMO_TEXT_CODE_SHARE_BLOCKS: readonly FilePreviewBlock[] = [
     'typescript',
   ),
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// 9. BINARY MEDIA FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 function binaryFromBase64(value: string): Uint8Array {
   const binary = atob(value);
@@ -812,6 +848,10 @@ export const DEMO_IMAGE_PDF_BLOCKS: readonly FilePreviewBlock[] = [
   ),
 ];
 
+// ───────────────────────────────────────────────────────────────────
+// 10. SESSIONS AND ASK-QUESTION DISPLAY
+// ───────────────────────────────────────────────────────────────────
+
 interface DemoSession {
   readonly id: string;
   readonly status: 'idle' | 'running';
@@ -899,6 +939,10 @@ function demoAskQuestionBlock(): Record<string, unknown> {
     status: demoAskQuestionStatus(demoAskQuestionState()),
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 11. FIXTURE SELECTION AND ROUTING
+// ───────────────────────────────────────────────────────────────────
 
 function fixtureName(): string | null {
   try {
@@ -1057,6 +1101,10 @@ function blocksFor(sessionId: string): readonly Record<string, unknown>[] {
   return session.blocks;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 12. MODEL CATALOG AND COMMANDS
+// ───────────────────────────────────────────────────────────────────
+
 const DEFAULT_MODEL: AvailableModelDto = {
   provider: 'anthropic',
   id: 'claude-opus-4-8',
@@ -1189,6 +1237,10 @@ const COMMANDS = [
 // advances with every accepted control mutation.
 const CATALOG_REVISION = 1;
 
+// ───────────────────────────────────────────────────────────────────
+// 13. RUNTIME CONTROL SIMULATION
+// ───────────────────────────────────────────────────────────────────
+
 // Mutable per-session runtime so the Model/Effort/Build·Plan controls actually
 // move and stick under the non-optimistic reducer (revision advances on commit).
 interface DemoRuntime {
@@ -1297,6 +1349,10 @@ function applyControl(
   state.revision += 1;
   return { outcome: { status: 'accepted', state: runtimeStateDto(sessionId) } };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 14. TRANSPORT STUBS
+// ───────────────────────────────────────────────────────────────────
 
 const TRANSCRIPT_PATH = /^\/api\/sessions\/([^/]+)\/transcript$/;
 

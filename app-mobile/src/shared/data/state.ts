@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Web Display State Reducers
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS AND RE-EXPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isOpaqueId,
   isRedactedAttachmentBlock,
@@ -28,6 +32,10 @@ export {
   type TodoProjectionState,
 } from './todo-state.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. MEDIA CAPABILITY
+// ───────────────────────────────────────────────────────────────────
+
 export function parseRuntimeMediaCapability(value: unknown): RuntimeMediaCapabilityDto | null {
   return isRuntimeMediaCapabilityDto(value) ? value : null;
 }
@@ -38,7 +46,9 @@ export const DEFAULT_MEDIA_CAPABILITY_OFF: Pick<RuntimeMediaCapabilityDto, 'enab
     imageIn: false,
   };
 
-// ── Composer keyboard preference ──────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────────
+// 3. COMPOSER KEYBOARD PREFERENCE
+// ───────────────────────────────────────────────────────────────────
 // A preference, not a mode state: it only gates whether the composer
 // intercepts Shift+Tab. It never changes host authority and cannot enable
 // any mutation by itself.
@@ -61,6 +71,10 @@ export function writeComposerShiftTabPreference(enabled: boolean): void {
     // The preference applies for this session when storage is unavailable.
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CONNECTION STATE
+// ───────────────────────────────────────────────────────────────────
 
 export type ConnectionPhase =
   'unenrolled' | 'authenticating' | 'offline' | 'connecting' | 'live' | 'reconnecting' | 'error';
@@ -105,6 +119,10 @@ export function connectionReducer(
       return { ...state, phase: 'error', changedAt, detail: action.detail };
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. SESSION LIST STATE
+// ───────────────────────────────────────────────────────────────────
 
 export interface SessionListState {
   readonly items: readonly SessionCardDto[];
@@ -151,6 +169,10 @@ export function sessionListReducer(
       return { ...state, phase: 'error', error: action.error };
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. TRANSCRIPT DISPLAY TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export interface UnknownTranscriptBlock {
   readonly id: string;
@@ -227,6 +249,10 @@ export type TranscriptAction =
     }
   | { readonly type: 'promptRejected'; readonly sessionId: string; readonly optimisticId: string }
   | { readonly type: 'error'; readonly error: string };
+
+// ───────────────────────────────────────────────────────────────────
+// 7. TRANSCRIPT REDUCER
+// ───────────────────────────────────────────────────────────────────
 
 export const EMPTY_TRANSCRIPT: TranscriptState = {
   sessionId: null,
@@ -376,6 +402,10 @@ export function transcriptReducer(
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 8. DISPLAY BLOCK PARSING
+// ───────────────────────────────────────────────────────────────────
+
 export function parseDisplayBlock(
   value: unknown,
   provenance: TranscriptProvenance = 'relay',
@@ -418,6 +448,10 @@ export function filePreviewAvailability(block: FilePreviewBlock): FilePreviewAva
   if (block.content.kind !== 'none') return 'ready';
   return block.redaction === 'withheld' ? 'withheld' : 'missing';
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 9. BLOCK NORMALIZATION HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function blocksFromEnvelopes(
   envelopes: readonly Envelope[],

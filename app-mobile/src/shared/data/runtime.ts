@@ -9,6 +9,10 @@
 // state table lives in `phase`; `status` is the coarse projection the
 // legacy control surfaces already understand.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   RUNTIME_ISSUE_CODES,
   type AvailableModelDto,
@@ -22,6 +26,10 @@ import {
 
 import * as relay from './relay.js';
 import { runtimeIssueMessage, type RuntimeIssueCode } from './runtime-issues.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type RuntimeStatus = 'checking' | 'ready' | 'pending' | 'stale' | 'error';
 
@@ -143,6 +151,10 @@ export const INITIAL_RUNTIME_STATE: RuntimeUiState = {
   executionError: null,
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. REDUCER ACTIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type RuntimeAction =
   | { readonly type: 'checking'; readonly phase: 'opening' | 'refreshing' }
   | {
@@ -168,6 +180,10 @@ export type RuntimeAction =
   | { readonly type: 'review-open' }
   | { readonly type: 'review-dismiss' }
   | { readonly type: 'execute-start' };
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE REDUCER
+// ───────────────────────────────────────────────────────────────────
 
 export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): RuntimeUiState {
   switch (action.type) {
@@ -346,6 +362,10 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
       return current;
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. PLAN LIFECYCLE HANDLERS
+// ───────────────────────────────────────────────────────────────────
 
 function hydratePlan(
   current: RuntimeUiState,
@@ -540,6 +560,10 @@ function appendPlanHistory(
   return [...withoutDuplicate, artifact].slice(-20);
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 6. PHASE AND AUTHORITY PROJECTION
+// ───────────────────────────────────────────────────────────────────
+
 /** The ready refinement derived from a host-confirmed snapshot. */
 function derivedReadyPhase(state: RuntimeStateDto, models: RuntimeModelCatalogDto): RuntimePhase {
   if (state.streaming) return 'streaming';
@@ -625,6 +649,10 @@ export function modeAuthority(runtime: RuntimeUiState): ModeAuthority {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 7. CONTROL SURFACE CONTRACT
+// ───────────────────────────────────────────────────────────────────
+
 export type RefreshReason =
   'initial' | 'open' | 'foreground' | 'manual' | 'online' | 'live' | 'reconcile';
 
@@ -700,6 +728,10 @@ export function runtimeAnnouncement(runtime: RuntimeUiState): string {
       return '';
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 8. HYDRATION AND TRANSPORT ADAPTERS
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * Prefer the bounded reconcile snapshot; compose it from the two read-only
@@ -821,6 +853,10 @@ function snapshotTransport(): ((signal: AbortSignal) => Promise<RuntimeSnapshotD
     return null;
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 9. ISSUE NORMALIZATION
+// ───────────────────────────────────────────────────────────────────
 
 interface RelayIssueShape {
   readonly code: RuntimeIssueCode;

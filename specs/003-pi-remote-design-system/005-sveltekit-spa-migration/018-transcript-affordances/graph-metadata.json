@@ -130,6 +130,18 @@
         "source": "derived"
       },
       {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "T2.11",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
         "name": "evidence",
         "kind": "key_phrase",
         "path": "tasks.md",
@@ -143,18 +155,6 @@
       },
       {
         "name": "PHASE 1: SETUP",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "PHASE 2: IMPLEMENTATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "PHASE 3: VERIFICATION",
         "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Three client changes the virtualizer and the copy catalog make necessary: disclosure state that survives scrolling, an approval row where the blanket grant is not a twin of the single one, and a transcript that can say stalled rather than working forever.",
     "created_at": "2026-08-23T10:47:21.093Z",
-    "last_save_at": "2026-08-23T10:48:24.154Z",
+    "last_save_at": "2026-08-23T22:20:01.806Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:0fd4343ea9b52f057c1b534b89477c226c2840d7b8a98a4658968bb49b3abef4",
+    "source_fingerprint": "sha256:1405573d28dde73e35a6e1746e37881466e625cc5c8ab6c0cc2c6775b9c374ee",
     "source_doc_hashes": {
-      "spec.md": "e79dcd95c1d5d1c4a32834aaee97aa885e2eb0065c06996dfa075277f3c8a4bc",
-      "plan.md": "9234d474469013e7aeb529646f3c5474d0b8ccddcc90748d9451badb2f8647f1",
-      "tasks.md": "b92fbc3d48301ec86eaa42475cd8b10f33b28a60026f8850de1ce73caf95746b",
-      "checklist.md": "d056edbc78fa723bb24458532e591edef17651b8399ce23184fee380b49c23d3",
-      "implementation-summary.md": "aa526349c4c1744c9853941356373783788f51ab13dde4f1be8ea595807cf25e"
+      "spec.md": "28e809667783a892c7a325ba6ac93897025dcdc9d0f6bb85f93ac1a6cae008c6",
+      "plan.md": "765730f82afbc40abd38e27bb6ab618c5e72ef80f544be823319397573cc60d4",
+      "tasks.md": "c28672212936d8b4ae1a231e8df84cfc6ebbe5722a342d5e81b92c449684c5dc",
+      "checklist.md": "961955cda416fbf716d2525926e47daace0dbbda2d49bbbea08d4144a5f65e88",
+      "implementation-summary.md": "9c70e5b5f69499dd93a050853558f1fa1193e04a1021e9a5848f19cea566dec5"
     },
     "last_active_child_id": null,
     "last_active_at": null

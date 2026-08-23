@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/018-transcript-affordances"
-    last_updated_at: "2026-08-23T13:00:00Z"
+    last_updated_at: "2026-08-23T22:19:33Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped three client affordances; no code changed."
-    next_safe_action: "Land the repairability type change; it needs no sign-off."
-    blockers: ["needs 011 requirements; runs after 012 and 015"]
-    completion_pct: 0
+    recent_action: "All four affordances shipped; three operator confirmations remain."
+    next_safe_action: "Operator confirms the approval row and the stall copy on a device."
+    blockers: []
+    completion_pct: 88
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | **Scoped, not started** — blocked on 012, 015 and 011 sign-off |
-| Requirements shipped | none yet; REQ-001 … REQ-007 all open |
+| Status | **In Progress** — every change shipped and gated; three operator confirmations open |
+| Requirements shipped | REQ-001 … REQ-007 |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -36,16 +36,16 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing. No client source has been edited.
+Four defects, every one of them invisible to the nine program gates, and all four now closed.
 
-The three defects, all invisible to the nine program gates:
+| Defect | Mechanism | Fix |
+|---|---|---|
+| Disclosure state dies on scroll | `transcript-list.svelte` virtualizes with a six-row overscan, so component-local open state is destroyed with the unmounted row | open state moved to a `SvelteMap` keyed by the protocol block id, pruned by the full transcript |
+| Blanket grant looks like the single approval | `screen-review.svelte` rendered both as plain buttons — same row, same size, same thumb distance | two labelled groups separated by a rule, so reaching the grant takes a different motion |
+| A wedged host reads as a working one | the transcript rendered a fixed working label while the run flag was true; nothing there was a function of time | a two-minute threshold against the newest block's time flips the label and stops the animation |
+| Repairability is unmodelled | `runtime-issues.ts` mapped a code to a bare string, so nothing downstream could branch on recoverability | the value carries copy plus a repairable flag, and the effort sheet withholds a reconcile that cannot help |
 
-| Defect | Mechanism |
-|---|---|
-| Disclosure state dies on scroll | `app-mobile/src/pages/chat/transcript/TranscriptList.svelte` virtualizes with a six-row overscan; component-local open state is destroyed with the unmounted row |
-| Blanket grant looks like the single approval | `app-mobile/src/pages/review/Review.svelte` renders both as plain buttons, same row, same size, same thumb distance |
-| A wedged host reads as a working one | The transcript renders a fixed working label while the run flag is true; nothing there is a function of time |
-| Repairability is unmodelled | `app-mobile/src/shared/data/runtime-issues.ts` maps a code to a bare string, so nothing downstream can branch on recoverability |
+The paths above are the shipped ones; the packet was scoped before 012 renamed them.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -53,10 +53,20 @@ The three defects, all invisible to the nine program gates:
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-Ordered by approval cost, not by importance: the type-safe change first, then the state fix, then the
-two that change what the user sees. That way something lands while the sign-off conversation runs.
+Ordered by approval cost, not by importance, so something lands while the sign-off conversation runs.
+The four items were written concurrently by separate executors on disjoint write paths, then reviewed
+together in one fence pass.
 
 The executor writes `app-mobile/src/**`. Claude reviews every fence crossing in one pass and owns git.
+That review mattered here: the repairability draft also narrowed `BLOCKED_MUTATION_PHASES` to terminal
+phases only, which would have allowed a mutation while `foreground-required` — an authority barrier,
+not a transient fault. It was reverted and the invariant is now pinned by a test. The same draft
+reworded the two runtime strings whose rewording the operator had already declined; that was reverted
+too.
+
+Per-item commits were intended so the four would bisect apart. Three of them landed: disclosure and the
+stall threshold share `transcript-list.svelte`, and splitting them afterwards would have invented a
+history that did not happen.
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -89,15 +99,24 @@ it from becoming an assumption that the gates covered it.
 
 | Check | Result |
 |---|---|
-| Repairability modelled | not done |
-| Disclosure hoisted and state-layer test | not done |
-| Fence review | not run |
-| Approval differentiation | not done |
-| Stall threshold | not done |
-| Token identity and fence count (`npm run test:web`) | not run |
-| `validate.sh --strict` via realpath | not run |
+| Repairability modelled | catalog carries `{ copy, repairable }`; the effort sheet branches on it |
+| Disclosure hoisted and state-layer test | `transcript-disclosure.test.ts` — expand, drop the holder, still open |
+| Fence review | one pass; `guardrailFences : 277` unchanged, no fence text edited |
+| Approval differentiation | two labelled groups separated by a rule, asserted in `App.svelte.test.ts` |
+| Stall threshold | 120s against the newest block time, asserted with fake timers |
+| Build | RC 0 |
+| Typecheck | 1124 files, 0 errors |
+| `npm test` | 55 files / 401 tests, RC 0 |
+| `npm run test:web` | 68 files / 545 passed / 3 skipped and 17 files / 189 passed, RC 0 |
+| Token identity | 0 changed, 0 vanished, 0 added across light, dark and system |
+| Catalog smoke | 267 stories x 2 themes = 534 frames, 0 throws |
+| Runtime smoke | 4 of 4 surfaces, 0 runtime errors |
+| Design system | 390 CSS-pixel width, no horizontal overflow, both themes |
+| `validate.sh --strict` via realpath | exit 0 |
 
-No completion claim is made or implied.
+Three operator confirmations stay open: whether the approval separation reads as separation under a
+thumb, whether the stall copy reads as stalled rather than as working harder, and the device
+verification that covers both.
 <!-- /ANCHOR:verification -->
 
 ---

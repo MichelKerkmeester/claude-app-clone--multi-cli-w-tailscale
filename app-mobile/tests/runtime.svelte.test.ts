@@ -32,6 +32,7 @@ import type {
 
 import { runtimeIssueMessage } from '../src/shared/state/runtime-issues.js';
 import {
+  BLOCKED_MUTATION_PHASES,
   INITIAL_RUNTIME_STATE,
   modeAuthority,
   runtimeAnnouncement,
@@ -350,6 +351,23 @@ describe('runtime state table', () => {
       runtimeReducer(checking, { type: 'hydrated', state: HOST_STATE, models: MODELS })
         .deliveryUnknown,
     ).toBe(false);
+  });
+
+  it('blocks every issue phase, whether or not it can repair itself', () => {
+    // Repairability decides which recovery affordance is offered, never whether a
+    // Mutation is allowed: a phase that may clear on its own has not cleared yet,
+    // And foreground-required in particular is an authority barrier.
+    for (const phase of [
+      'unsupported',
+      'delivery-unknown',
+      'offline',
+      'foreground-required',
+      'rate-limited',
+      'host-unavailable',
+      'inconsistent-state',
+    ] as const) {
+      expect(BLOCKED_MUTATION_PHASES.has(phase)).toBe(true);
+    }
   });
 
   it('maps hydrate failures to bounded issue phases without losing confirmed state', () => {

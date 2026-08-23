@@ -15,7 +15,7 @@ describe('runtime issue copy allowlist', () => {
     for (const code of RUNTIME_ISSUE_CODES) {
       const message = runtimeIssueMessage(code);
       expect(message.length).toBeGreaterThan(0);
-      expect(message).toBe(RUNTIME_ISSUE_COPY[code]);
+      expect(message).toBe(RUNTIME_ISSUE_COPY[code].copy);
     }
   });
 

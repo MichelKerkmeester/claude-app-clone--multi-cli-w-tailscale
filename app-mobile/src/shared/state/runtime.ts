@@ -25,7 +25,11 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import * as relay from '../transport/relay.js';
-import { runtimeIssueMessage, type RuntimeIssueCode } from './runtime-issues.js';
+import {
+  runtimeIssueMessage,
+  runtimeIssueRepairable,
+  type RuntimeIssueCode,
+} from './runtime-issues.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. TYPE DEFINITIONS
@@ -620,6 +624,33 @@ function phaseForIssue(issueCode: RuntimeIssueCode): RuntimePhase {
   }
 }
 
+function runtimeIssueCodeForPhase(phase: RuntimePhase): RuntimeIssueCode | null {
+  switch (phase) {
+    case 'offline':
+      return 'offline';
+    case 'foreground-required':
+      return 'foreground-required';
+    case 'rate-limited':
+      return 'rate-limited';
+    case 'host-unavailable':
+      return 'host-unavailable';
+    case 'delivery-unknown':
+      return 'delivery-unknown';
+    case 'inconsistent-state':
+      return 'invalid-response';
+    case 'unsupported':
+      return 'unsupported';
+    default:
+      return null;
+  }
+}
+
+export function runtimePhaseIsRepairable(phase: RuntimePhase): boolean {
+  if (phase === 'ready-empty') return true;
+  const issueCode = runtimeIssueCodeForPhase(phase);
+  return issueCode !== null && runtimeIssueRepairable(issueCode);
+}
+
 /**
  * The one authority projection every mode surface reads. Everything is
  * Derived straight from the committed host snapshot and the pending intent;
@@ -670,7 +701,9 @@ export interface RuntimeControls {
 
 // The mutation lane fails closed outside settled ready authority. Streaming is
 // Deliberately absent: the host-gated model switch stays legal while streaming,
-// And the streaming capability check below blocks everything else.
+// And the streaming capability check below blocks everything else. Repairability
+// Governs which recovery affordances are offered, never whether a mutation is
+// Allowed: a phase that may clear on its own has not cleared yet.
 export const BLOCKED_MUTATION_PHASES: ReadonlySet<RuntimePhase> = new Set([
   'checking',
   'pending',

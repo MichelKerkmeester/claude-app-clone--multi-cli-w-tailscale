@@ -295,7 +295,7 @@ describe('ModelEffortSheet', () => {
     ['ready-off-only', 'ready', 'This model does not expose adjustable reasoning.', false],
     ['ready-empty', 'ready', 'Pi reported no effort controls.', true],
     ['stale', 'stale', 'The host runtime changed. Refreshed.', false],
-    ['unsupported', 'error', 'This host does not support this change.', true],
+    ['unsupported', 'error', 'This host does not support this change.', false],
     ['offline', 'error', 'You’re offline. Reconcile when connectivity returns.', true],
     ['foreground-required', 'error', 'Another device is controlling Pi.', true],
     ['rate-limited', 'error', 'Too many changes — try again shortly.', true],

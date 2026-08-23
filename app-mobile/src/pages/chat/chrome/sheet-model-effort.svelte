@@ -1,6 +1,11 @@
 <script module lang="ts">
   import { applyingEffortMessage, effortStrings } from '$shared/catalog/effort.js';
-  import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '$shared/state/runtime.js';
+  import {
+    runtimePhaseIsRepairable,
+    type RuntimeControls,
+    type RuntimePhase,
+    type RuntimeUiState,
+  } from '$shared/state/runtime.js';
   import { runtimeIssueMessage } from '$shared/state/runtime-issues.js';
 
   export const SEARCH_THRESHOLD = 8;
@@ -225,7 +230,10 @@
   );
   const levels = $derived(runtime.state?.availableThinkingLevels ?? EMPTY_LEVELS);
   const effortStatus = $derived(effortSectionStatus(runtime, levels));
-  const showReconcile = $derived(RECONCILE_PHASES.has(runtime.phase ?? 'checking'));
+  const showReconcile = $derived(
+    RECONCILE_PHASES.has(runtime.phase ?? 'checking') &&
+      runtimePhaseIsRepairable(runtime.phase ?? 'checking'),
+  );
 
   // ───────────────────────────────────────────────────────────────────
   // 5. EFFECTS

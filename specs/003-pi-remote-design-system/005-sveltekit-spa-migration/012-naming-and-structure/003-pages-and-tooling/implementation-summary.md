@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"
-    last_updated_at: "2026-08-23T19:30:00Z"
+    last_updated_at: "2026-08-23T18:54:06Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Pages renamed kind-first; scan reports zero offenders across 219 files."
     next_safe_action: "Land the naming stop-gap in the conventions authority through an isolated worktree."

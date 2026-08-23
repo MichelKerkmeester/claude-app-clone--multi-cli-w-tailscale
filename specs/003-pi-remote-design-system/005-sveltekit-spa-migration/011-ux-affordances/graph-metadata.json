@@ -179,7 +179,7 @@
     ],
     "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
     "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-23T18:52:16.126Z",
+    "last_save_at": "2026-08-23T18:54:07.483Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -193,7 +193,7 @@
       "spec.md": "a101790ecf0497eec9244c79f47e00183c0baf7cc084d68049dc70c1aea9e819",
       "plan.md": "574a68baf7b1dd8368a4fe5ff950db368c76e753d9552c14d1cdb4214cae88c4",
       "tasks.md": "b6143e7bde79de080e763775e871d232ecc41e70761a60de12d4fb0f6e90ecfd",
-      "implementation-summary.md": "377d17c41dea767ca56d29ae7717a5deb9288aeac143f233e011eb79b77da68e"
+      "implementation-summary.md": "11e2948dbbd754574d27decc85a02dcdc05784dd7935e98e2c8ba5475fa105c2"
     },
     "last_active_child_id": null,
     "last_active_at": null

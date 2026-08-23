@@ -1,4 +1,8 @@
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   interface Props {
     kind: 'diff' | 'text' | 'markdown' | 'code' | 'image';
     readOnly?: boolean;
@@ -41,6 +45,10 @@
     detailsOpen = false,
   }: Props = $props();
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   const KIND_LABELS: Record<Props['kind'], string> = {
     diff: 'Diff',
     text: 'Text',
@@ -50,6 +58,10 @@
   };
 
   const PAN_DIRECTIONS = ['up', 'left', 'right', 'down'] as const;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function panGlyph(direction: 'up' | 'down' | 'left' | 'right'): string {
     return direction === 'up' ? '↑' : direction === 'down' ? '↓' : direction === 'left' ? '←' : '→';

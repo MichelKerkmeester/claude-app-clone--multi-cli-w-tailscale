@@ -2,7 +2,15 @@
 // MODULE: Derived Conversational Turns
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface BlockLike {
   readonly kind: string;
@@ -18,6 +26,10 @@ export interface Turn<T extends BlockLike = TranscriptBlock> {
   /** Every block in the turn, in original order (including the prompt). */
   readonly blocks: readonly T[];
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TURN GROUPING
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * Group an ordered, already-normalized block list into conversational turns without

@@ -7,6 +7,10 @@
 // filtering, or state mutation, so the inline surface can re-evaluate it
 // after every committed input without side effects.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export interface SlashTriggerInput {
   readonly draft: string;
   readonly selectionStart: number;
@@ -30,6 +34,10 @@ export interface SlashTriggerState {
   /** End of the token range (exclusive). */
   readonly tokenEnd: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TRIGGER PREDICATE
+// ───────────────────────────────────────────────────────────────────
 
 const INACTIVE: SlashTriggerState = { active: false, query: '', tokenStart: 0, tokenEnd: 0 };
 
@@ -60,6 +68,10 @@ export function deriveSlashTrigger(input: SlashTriggerInput): SlashTriggerState 
 function isTokenWhitespace(character: string): boolean {
   return character === ' ' || character === '\t' || character === '\n' || character === '\r';
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HOOK WRAPPER
+// ───────────────────────────────────────────────────────────────────
 
 /** Stateless wrapper so callers can use the predicate as a hook. */
 export function useSlashTrigger(input: SlashTriggerInput): SlashTriggerState {

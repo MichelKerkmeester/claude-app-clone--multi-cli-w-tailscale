@@ -8,7 +8,15 @@
 // changing mode. The returned handler reports whether it consumed the
 // key; the caller runs it before its own key handling.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { modeAuthority, type RuntimeUiState } from './runtime.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface PlanModeShortcutOptions {
   /** The `CLI-style Shift+Tab in composer` preference. */
@@ -28,6 +36,10 @@ export interface PlanModeShortcutOptions {
   /** Bounded local copy for guarded no-ops (e.g. executing-plan). */
   readonly onAnnounce: (message: string) => void;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. PLAN MODE SHORTCUT HANDLER
+// ───────────────────────────────────────────────────────────────────
 
 export function createPlanModeShortcut(
   options: PlanModeShortcutOptions,

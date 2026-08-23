@@ -2,6 +2,11 @@
 // adapter/security tests. Ported from the React rich-content/F6ViewerAdapter.tsx: the
 // render-prop component and the useF6ViewerAdapter / useReconcileF6Viewer hooks were dead
 // (no importer) and are dropped; RichContentRouter carries the open/reconcile handoff inline.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { InMemoryArtifactDocument } from '../artifacts/types.js';
 import type {
   NormalizedCodeBlock,
@@ -9,8 +14,16 @@ import type {
   NormalizedTextArtifactBlock,
 } from './normalizeTranscriptBlocks.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type F6RichBlock =
   NormalizedCommandBlock | NormalizedCodeBlock | NormalizedTextArtifactBlock;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 export function createInMemoryArtifactDocument(block: F6RichBlock): InMemoryArtifactDocument {
   if (block.kind === 'command') {
@@ -63,6 +76,10 @@ export function createInMemoryArtifactDocument(block: F6RichBlock): InMemoryArti
     sourceState: block.source === 'cache' ? 'stale-cache' : 'current',
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function lifecycleLabel(value: NormalizedCommandBlock['lifecycle']): string {
   return value.charAt(0).toLocaleUpperCase() + value.slice(1);

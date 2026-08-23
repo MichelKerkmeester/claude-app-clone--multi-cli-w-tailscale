@@ -2,7 +2,15 @@
 // MODULE: Copy-to-Clipboard Feedback
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 export const COPY_FAILURE_MESSAGE = 'Copy failed. Touch and hold to select the text.';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface CopyFeedback {
   readonly canCopy: boolean;
@@ -11,6 +19,10 @@ export interface CopyFeedback {
   readonly copy: (unit: string, canonicalSource: string) => void;
   readonly actionLabel: (unit: string) => string;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. PUBLIC API
+// ───────────────────────────────────────────────────────────────────
 
 export function useCopyFeedback(): CopyFeedback {
   let copiedUnit = $state<string | null>(null);

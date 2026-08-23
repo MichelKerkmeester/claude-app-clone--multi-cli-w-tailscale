@@ -2,6 +2,10 @@
 // MODULE: Attachment Transfer Hash Worker
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export interface AttachmentHashRequest {
   readonly requestId: string;
   readonly bytes: ArrayBuffer;
@@ -23,6 +27,10 @@ interface HashWorkerScope {
   postMessage: (message: AttachmentHashResponse | AttachmentHashFailure) => void;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 2. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function isRequest(value: unknown): value is AttachmentHashRequest {
   if (typeof value !== 'object' || value === null) return false;
   const candidate = value as Partial<AttachmentHashRequest>;
@@ -38,6 +46,10 @@ function toBase64Url(bytes: Uint8Array): string {
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/u, '');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. MESSAGE DISPATCH
+// ───────────────────────────────────────────────────────────────────
 
 const workerScope = globalThis as unknown as HashWorkerScope;
 workerScope.onmessage = (event) => {

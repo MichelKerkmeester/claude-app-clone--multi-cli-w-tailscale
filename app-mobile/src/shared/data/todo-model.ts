@@ -2,11 +2,19 @@
 // MODULE: Todo Display Model
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   TodoProjectionV1,
   TodoTaskProjectionV1,
   TodoTaskState,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 export const TODO_STATE_ORDER = ['pending', 'active', 'done', 'blocked'] as const;
 
@@ -16,6 +24,10 @@ export const TODO_STATE_LABELS: Readonly<Record<TodoTaskState, string>> = {
   done: 'Done',
   blocked: 'Blocked',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. DISPLAY MODEL TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export interface TodoGroupRun {
   readonly group: string | null;
@@ -36,6 +48,10 @@ export interface TodoDisplayModel {
   readonly allDone: boolean;
   readonly sections: readonly TodoDisplaySection[];
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. DISPLAY MODEL BUILDER
+// ───────────────────────────────────────────────────────────────────
 
 export function buildTodoDisplayModel(projection: TodoProjectionV1): TodoDisplayModel {
   const tasks = projection.tasks

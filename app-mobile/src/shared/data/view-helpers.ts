@@ -2,6 +2,10 @@
 // MODULE: View Display Helpers
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isOpaqueId,
   type ApprovalCardDto,
@@ -11,7 +15,15 @@ import {
 
 import { fetchApprovals } from './relay.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type ThemePreference = 'system' | 'light' | 'dark';
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function loadApprovals(
   sessions: readonly { readonly id: string }[],
@@ -90,5 +102,9 @@ function countdown(expiresAt: string, now: number): string {
   const minutes = Math.floor(seconds / 60);
   return `${String(minutes).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')} remaining`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. EXPORTS
+// ───────────────────────────────────────────────────────────────────
 
 export { loadApprovals, readSessionIdFromLocation, readAttentionIdFromLocation, attentionLabel, attentionIcon, sessionStatusLabel, readThemePreference, compactId, relativeTime, messageFrom, countdown };

@@ -7,7 +7,15 @@
 // placement, focus restoration, and the "Not sent" announcement follow the
 // returned offsets. The function performs no network work.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { SelectedCommandBinding } from './commands.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface InsertSlashCommandInput {
   readonly draft: string;
@@ -29,6 +37,10 @@ export interface InsertSlashCommandResult {
   readonly announcement: string;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SLASH COMMAND INSERTION
+// ───────────────────────────────────────────────────────────────────
+
 export function insertSlashCommand(input: InsertSlashCommandInput): InsertSlashCommandResult {
   const start = input.replaceRange?.start ?? Math.min(input.selectionStart, input.selectionEnd);
   const end = input.replaceRange?.end ?? Math.max(input.selectionStart, input.selectionEnd);
@@ -41,6 +53,10 @@ export function insertSlashCommand(input: InsertSlashCommandInput): InsertSlashC
     announcement: `Inserted slash command ${input.commandName}. Not sent.`,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. BINDING RETENTION
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * Retain a binding only while the command-name token is untouched. Editing

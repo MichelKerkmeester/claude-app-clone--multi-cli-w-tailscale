@@ -18,10 +18,10 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import Button from '$shared/primitives/Button.svelte';
-  import Sheet from '$shared/primitives/Sheet.svelte';
-  import SheetContent from '$shared/primitives/SheetContent.svelte';
-  import SheetTitle from '$shared/primitives/SheetTitle.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
+  import Sheet from '$shared/primitives/sheet/sheet.svelte';
+  import SheetContent from '$shared/primitives/sheet/sheet-content.svelte';
+  import SheetTitle from '$shared/primitives/sheet/sheet-title.svelte';
 
   let {
     isOpen,

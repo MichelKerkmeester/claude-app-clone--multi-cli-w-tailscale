@@ -31,9 +31,9 @@
     effortRowName,
     effortStrings,
   } from '$shared/data/effort.js';
-  import { focusVisible, focused, hover } from '$shared/primitives/interactions.js';
-  import RadioGroup from '$shared/primitives/RadioGroup.svelte';
-  import RadioGroupItem from '$shared/primitives/RadioGroupItem.svelte';
+  import { focusVisible, focused, hover } from '$shared/primitives/a11y/interactions.js';
+  import RadioGroup from '$shared/primitives/choice/radio-group.svelte';
+  import RadioGroupItem from '$shared/primitives/choice/radio-group-item.svelte';
 
   let {
     levels,

@@ -7,8 +7,8 @@
 
   import { DropdownMenu } from 'bits-ui';
   import { getContext } from 'svelte';
-  import { hideOutside } from './ariaHideOutside.svelte.js';
-  import { MENU_DISMISS_KEY } from './Menu.svelte';
+  import { hideOutside } from '../a11y/aria-hide-outside.svelte.js';
+  import { MENU_DISMISS_KEY } from './menu.svelte';
   import type { Snippet } from 'svelte';
 
   interface Props extends Omit<DropdownMenu.ContentProps, 'child' | 'children'> {

@@ -23,9 +23,9 @@
 
   import { modeAuthority } from '$shared/data/runtime.js';
   import { planModePresentation } from './planModePresentation.js';
-  import { focusVisible, hover, press } from '$shared/primitives/interactions.js';
-  import Menu from '$shared/primitives/Menu.svelte';
-  import MenuTrigger from '$shared/primitives/MenuTrigger.svelte';
+  import { focusVisible, hover, press } from '$shared/primitives/a11y/interactions.js';
+  import Menu from '$shared/primitives/menu/menu.svelte';
+  import MenuTrigger from '$shared/primitives/menu/menu-trigger.svelte';
   import PlanModeMenu from './PlanModeMenu.svelte';
 
   let {

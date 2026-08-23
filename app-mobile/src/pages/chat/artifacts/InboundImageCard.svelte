@@ -81,7 +81,7 @@
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
   import { getOptionalArtifactViewer } from './ArtifactViewerProvider.svelte';
-  import { hover, press, focusVisible } from '$shared/primitives/interactions.js';
+  import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
   import ImagePlaceholder from './ImagePlaceholder.svelte';
   import ImageStatus from './ImageStatus.svelte';
   import VerifiedImage from './VerifiedImage.svelte';

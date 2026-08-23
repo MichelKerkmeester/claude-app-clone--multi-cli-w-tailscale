@@ -11,7 +11,7 @@
 <script lang="ts">
   import { enrollDevice, establishSession, scanQrImage } from '$shared/data/auth.js';
   import { messageFrom } from '$shared/data/view-helpers.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
 
   let { phase, onEnrolled }: EnrollmentProps = $props();
 

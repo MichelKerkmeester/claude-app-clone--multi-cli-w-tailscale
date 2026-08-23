@@ -21,9 +21,9 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { focusVisible, focused } from '$shared/primitives/interactions.js';
-  import MenuContent from '$shared/primitives/MenuContent.svelte';
-  import MenuItem from '$shared/primitives/MenuItem.svelte';
+  import { focusVisible, focused } from '$shared/primitives/a11y/interactions.js';
+  import MenuContent from '$shared/primitives/menu/menu-content.svelte';
+  import MenuItem from '$shared/primitives/menu/menu-item.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

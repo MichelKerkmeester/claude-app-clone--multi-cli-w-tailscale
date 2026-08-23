@@ -54,8 +54,8 @@
   import { modelEffortTriggerName, effortTriggerText } from '$shared/data/effort.js';
   import { modelSwitcherStrings } from '$shared/data/model-switcher-strings.js';
   import { Popover } from 'bits-ui';
-  import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
+  import Button from '$shared/primitives/button/button.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

@@ -222,7 +222,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
   import CommandOption from './CommandOption.svelte';
 
   // ───────────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import { createRawSnippet } from 'svelte';
 
-import Collapsible from './Collapsible.svelte';
+import Collapsible from './collapsible.svelte';
 
 // Collapsible's `trigger` and `children` are Snippets; build them inline via
 // createRawSnippet (the Svelte 5 API for authoring a snippet from a .ts story

@@ -101,12 +101,12 @@
     noModelMatchMessage,
     runtimeOutcomeMessage,
   } from '$shared/data/model-switcher-strings.js';
-  import { focusVisible, focused, hover, press } from '$shared/primitives/interactions.js';
-  import Button from '$shared/primitives/Button.svelte';
-  import Sheet from '$shared/primitives/Sheet.svelte';
-  import SheetClose from '$shared/primitives/SheetClose.svelte';
-  import SheetContent from '$shared/primitives/SheetContent.svelte';
-  import SheetTitle from '$shared/primitives/SheetTitle.svelte';
+  import { focusVisible, focused, hover, press } from '$shared/primitives/a11y/interactions.js';
+  import Button from '$shared/primitives/button/button.svelte';
+  import Sheet from '$shared/primitives/sheet/sheet.svelte';
+  import SheetClose from '$shared/primitives/sheet/sheet-close.svelte';
+  import SheetContent from '$shared/primitives/sheet/sheet-content.svelte';
+  import SheetTitle from '$shared/primitives/sheet/sheet-title.svelte';
   import EffortRadioGroup from './EffortRadioGroup.svelte';
 
   // ───────────────────────────────────────────────────────────────────

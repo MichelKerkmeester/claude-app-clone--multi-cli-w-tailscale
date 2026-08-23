@@ -86,7 +86,7 @@
   import { modeAuthority } from '$shared/data/runtime.js';
   import { readComposerShiftTabPreference, writeComposerShiftTabPreference } from '$shared/data/state.js';
   import { createPlanModeShortcut } from '$shared/data/planModeShortcut.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

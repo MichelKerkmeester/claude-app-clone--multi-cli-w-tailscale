@@ -13,7 +13,7 @@
     type PushConfig,
   } from '$shared/data/attention.js';
   import { attentionLabel, messageFrom } from '$shared/data/view-helpers.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. LOCAL STATE

@@ -14,7 +14,7 @@
   import type { ApprovalCardDto } from '@pi-remote/pi-rpc-protocol';
   import { loadApprovals, messageFrom, relativeTime, countdown } from '$shared/data/view-helpers.js';
   import { decideApproval, createAcceptEditsGrant } from '$shared/data/relay.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

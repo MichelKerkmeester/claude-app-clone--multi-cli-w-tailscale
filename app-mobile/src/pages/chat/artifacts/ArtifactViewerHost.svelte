@@ -187,7 +187,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
-  import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
+  import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
   import {
     canCopyDisplayedArtifact,
     canShareDisplayedArtifact,

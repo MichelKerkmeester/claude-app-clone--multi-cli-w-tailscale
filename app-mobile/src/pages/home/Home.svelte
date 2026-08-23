@@ -20,7 +20,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { sessionStatusLabel, compactId, relativeTime } from '$shared/data/view-helpers.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
   import Freshness from './Freshness.svelte';
   import EmptyState from './EmptyState.svelte';
   import SessionStateIcon from '$shared/chrome/SessionStateIcon.svelte';

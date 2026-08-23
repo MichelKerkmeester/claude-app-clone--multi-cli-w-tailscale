@@ -1,7 +1,7 @@
 <script lang="ts">
   // @ds primitive: SheetContent — Bits UI Dialog portal with overlay and content that hides outside elements and renders a children snippet.
   import { Dialog } from 'bits-ui';
-  import { getSheetContext, hideOutside } from './ariaHideOutside.svelte.js';
+  import { getSheetContext, hideOutside } from '../a11y/aria-hide-outside.svelte.js';
   import type { Snippet } from 'svelte';
 
   interface Props extends Omit<Dialog.ContentProps, 'child' | 'children'> {

@@ -16,7 +16,7 @@
   import { onMount } from 'svelte';
   import { fetchAttention } from '$shared/data/attention.js';
   import { attentionIcon, attentionLabel, messageFrom, relativeTime } from '$shared/data/view-helpers.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

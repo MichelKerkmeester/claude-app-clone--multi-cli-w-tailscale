@@ -9,8 +9,8 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
-  import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
-  import { hover, press, focusVisible } from '$shared/primitives/interactions.js';
+  import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
+  import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
   import { getAttachmentDraft } from './AttachmentDraftProvider.svelte';
 
   const draft = getAttachmentDraft();

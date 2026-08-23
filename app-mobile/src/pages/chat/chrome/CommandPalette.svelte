@@ -25,7 +25,7 @@
 
   import { Combobox } from 'bits-ui';
 
-  import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
+  import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
   import { bindingFor } from '$shared/data/commands.js';
   import { rankHostCommands } from '$shared/data/rankHostCommands.js';
 

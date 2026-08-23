@@ -8,7 +8,7 @@
 </script>
 
 <script lang="ts">
-  import { focusVisible, focused, hover } from '../primitives/interactions.js';
+  import { focusVisible, focused, hover } from '../primitives/a11y/interactions.js';
 
   let {
     value,

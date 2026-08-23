@@ -1,7 +1,7 @@
 <script lang="ts">
   // @ds primitive: Sheet — Bits UI Dialog.Root wrapper that publishes sheet-open context and renders a children snippet.
   import { Dialog } from 'bits-ui';
-  import { setSheetContext } from './ariaHideOutside.svelte.js';
+  import { setSheetContext } from '../a11y/aria-hide-outside.svelte.js';
   import type { Snippet } from 'svelte';
 
   interface Props extends Omit<Dialog.RootProps, 'open' | 'child' | 'children'> {

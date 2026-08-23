@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import { createRawSnippet } from 'svelte';
 
-import Button from './Button.svelte';
+import Button from './button.svelte';
 
 // Button's `children` is a Snippet; build it inline via createRawSnippet (the
 // Svelte 5 API for authoring a snippet from a .ts story file) so no .svelte

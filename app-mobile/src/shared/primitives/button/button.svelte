@@ -2,7 +2,7 @@
 	// @ds primitive: Button — Native button element with hover, press, and focus interaction actions that renders a children snippet.
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
-	import { hover, press, focusVisible, focused } from './interactions.js';
+	import { hover, press, focusVisible, focused } from '../a11y/interactions.js';
 
 	interface Props extends Omit<HTMLButtonAttributes, 'class' | 'type' | 'disabled' | 'onclick'> {
 		class?: string;

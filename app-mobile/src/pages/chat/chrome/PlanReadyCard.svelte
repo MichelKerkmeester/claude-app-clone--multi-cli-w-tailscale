@@ -43,7 +43,7 @@
 </script>
 
 <script lang="ts">
-  import Button from '$shared/primitives/Button.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
 
   let {
     artifact,

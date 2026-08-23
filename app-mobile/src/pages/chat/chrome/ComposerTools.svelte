@@ -36,8 +36,8 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { Popover } from 'bits-ui';
-  import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
-  import Button from '$shared/primitives/Button.svelte';
+  import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
+  import Button from '$shared/primitives/button/button.svelte';
   import CommandPalette from './CommandPalette.svelte';
   import { ATTACHMENT_ACCEPT } from '../attachments/attachment-state.js';
 

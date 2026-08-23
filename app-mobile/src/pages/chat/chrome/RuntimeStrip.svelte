@@ -33,9 +33,9 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { effortTriggerName, effortTriggerText } from '$shared/data/effort.js';
-  import Button from '$shared/primitives/Button.svelte';
-  import ToggleGroup from '$shared/primitives/ToggleGroup.svelte';
-  import ToggleGroupItem from '$shared/primitives/ToggleGroupItem.svelte';
+  import Button from '$shared/primitives/button/button.svelte';
+  import ToggleGroup from '$shared/primitives/choice/toggle-group.svelte';
+  import ToggleGroupItem from '$shared/primitives/choice/toggle-group-item.svelte';
 
   let {
     controls,

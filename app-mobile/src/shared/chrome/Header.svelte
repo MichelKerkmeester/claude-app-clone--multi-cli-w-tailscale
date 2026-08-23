@@ -14,7 +14,7 @@
 </script>
 
 <script lang="ts">
-  import Button from '../primitives/Button.svelte';
+  import Button from '../primitives/button/button.svelte';
   import StatusPill from './StatusPill.svelte';
   import ThemeControl from './ThemeControl.svelte';
 

@@ -7,7 +7,7 @@
   import RichBlockFrame from './RichBlockFrame.svelte';
   import { useCopyFeedback } from './useCopyFeedback.svelte.js';
   import { useHighlightedCode, type HighlightToken } from './useHighlightedCode.svelte.js';
-  import { hover } from '$shared/primitives/interactions.js';
+  import { hover } from '$shared/primitives/a11y/interactions.js';
 
   interface Props {
     block: NormalizedCodeBlock;

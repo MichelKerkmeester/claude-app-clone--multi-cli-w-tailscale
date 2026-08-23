@@ -10,7 +10,7 @@
 
 <script lang="ts">
   import { getOptionalArtifactViewer } from './ArtifactViewerProvider.svelte';
-  import { hover, press, focusVisible } from '$shared/primitives/interactions.js';
+  import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
 
   let { block }: ArtifactCardProps = $props();
 

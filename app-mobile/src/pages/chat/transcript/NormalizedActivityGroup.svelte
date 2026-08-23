@@ -11,8 +11,8 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import Collapsible from '$shared/primitives/Collapsible.svelte';
-  import { hover } from '$shared/primitives/interactions.js';
+  import Collapsible from '$shared/primitives/disclosure/collapsible.svelte';
+  import { hover } from '$shared/primitives/a11y/interactions.js';
   import { normalizedActivitySummary } from './transcript-helpers.js';
   import RichContentRouter from '../rich-content/RichContentRouter.svelte';
 

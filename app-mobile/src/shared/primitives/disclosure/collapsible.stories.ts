@@ -1,11 +1,13 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: COLLAPSIBLE STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import { createRawSnippet } from 'svelte';
 
 import Collapsible from './collapsible.svelte';
 
-// Collapsible's `trigger` and `children` are Snippets; build them inline via
-// createRawSnippet (the Svelte 5 API for authoring a snippet from a .ts story
-// file) so no .svelte wrapper file is added.
+// Build both Snippets inline with `createRawSnippet` so the story needs no .svelte wrapper.
 function triggerSnippet(text: string) {
   return createRawSnippet(() => ({
     render: () => text,

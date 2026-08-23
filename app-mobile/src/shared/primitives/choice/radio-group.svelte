@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: RadioGroup — Bits UI RadioGroup.Root wrapper with a bindable value that renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: RADIO GROUP
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: RadioGroup — Expose a bindable selection while leaving group behavior to Bits UI.
   import { RadioGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

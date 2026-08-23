@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: ToggleGroupItem — Bits UI ToggleGroup.Item re-export that renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: TOGGLE GROUP ITEM
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: ToggleGroupItem — Preserve Bits UI's toggle semantics while consumers own the option presentation.
   import { ToggleGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

@@ -1,4 +1,8 @@
 // ───────────────────────────────────────────────────────────────────
+// MODULE: INTERACTION ACTIONS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
 // ───────────────────────────────────────────────────────────────────
 
@@ -8,11 +12,7 @@ import type { Action } from 'svelte/action';
 // 2. HOVER ACTION
 // ───────────────────────────────────────────────────────────────────
 
-/**
- * react-aria useHover parity. Sets data-hovered only for non-touch pointers, so a
- * hover state never sticks after a tap on a touchscreen — the reason plain :hover
- * cannot substitute on this mobile surface.
- */
+// Keep hover state pointer-aware so touch taps never leave CSS :hover stuck.
 export const hover: Action<HTMLElement> = (node) => {
   const onPointerEnter = (event: PointerEvent) => {
     if (event.pointerType === 'touch') return;
@@ -35,11 +35,7 @@ export const hover: Action<HTMLElement> = (node) => {
 // 3. PRESS ACTION
 // ───────────────────────────────────────────────────────────────────
 
-/**
- * react-aria usePress parity for the data-pressed visual state. Pressed while a
- * primary pointer is held down on the element — cleared if the pointer leaves and
- * restored if it returns — and while Enter/Space is held for keyboard activation.
- */
+// Track press state across pointer and keyboard activation for consistent feedback.
 export const press: Action<HTMLElement> = (node) => {
   let pointerHeld = false;
   const setPressed = (value: boolean): void => {
@@ -91,11 +87,7 @@ export const press: Action<HTMLElement> = (node) => {
 // 4. FOCUS ACTIONS
 // ───────────────────────────────────────────────────────────────────
 
-/**
- * react-aria useFocusRing parity. Sets data-focus-visible when the element is
- * focused and the browser's :focus-visible heuristic applies (keyboard focus),
- * matching react-aria's keyboard-modality focus ring.
- */
+// Preserve keyboard-only focus indication through the data-focus-visible state.
 export const focusVisible: Action<HTMLElement> = (node) => {
   const onFocus = (): void => {
     if (node.matches(':focus-visible')) node.setAttribute('data-focus-visible', 'true');
@@ -112,10 +104,7 @@ export const focusVisible: Action<HTMLElement> = (node) => {
   };
 };
 
-/**
- * react-aria data-focused parity. Set while the element holds focus, regardless of
- * modality (keyboard or pointer).
- */
+// Expose focus state regardless of input modality for consumer styling.
 export const focused: Action<HTMLElement> = (node) => {
   const onFocus = (): void => node.setAttribute('data-focused', 'true');
   const onBlur = (): void => node.removeAttribute('data-focused');

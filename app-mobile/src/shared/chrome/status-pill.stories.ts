@@ -1,8 +1,12 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: STATUS PILL STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import StatusPill from './status-pill.svelte';
 
-// Smoke story: a context-free connection-phase pill, one variant per phase.
+// Keep this story context-free so each connection phase can be inspected independently.
 const meta = {
   title: 'Views/StatusPill',
   component: StatusPill,

@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: THEME CONTROL
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ThemePreference } from '../format/view-helpers.js';
 
   export interface ThemeControlProps {

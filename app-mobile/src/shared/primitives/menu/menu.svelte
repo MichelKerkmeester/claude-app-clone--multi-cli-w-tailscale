@@ -3,7 +3,10 @@
 </script>
 
 <script lang="ts">
-  // @ds primitive: Menu — Bits UI DropdownMenu.Root wrapper that provides a dismiss context and renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: MENU ROOT
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: Menu — Keep dismissal in shared context so nested actions can close the menu without prop drilling.
   import { DropdownMenu } from 'bits-ui';
   import { setContext } from 'svelte';
   import type { Snippet } from 'svelte';

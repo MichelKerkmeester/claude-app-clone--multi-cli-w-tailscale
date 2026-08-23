@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: SheetClose — Bits UI Dialog.Close re-export that renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: SHEET CLOSE
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: SheetClose — Preserve Bits UI's dialog-close semantics while consumers own the control markup.
   import { Dialog } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

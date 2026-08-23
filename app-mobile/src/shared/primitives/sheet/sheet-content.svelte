@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: SheetContent — Bits UI Dialog portal with overlay and content that hides outside elements and renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: SHEET CONTENT
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: SheetContent — Keep assistive technology within the open sheet by hiding unrelated outside content.
   import { Dialog } from 'bits-ui';
   import { getSheetContext, hideOutside } from '../a11y/aria-hide-outside.svelte.js';
   import type { Snippet } from 'svelte';

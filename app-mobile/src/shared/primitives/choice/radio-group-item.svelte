@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: RadioGroupItem — Bits UI RadioGroup.Item re-export that renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: RADIO GROUP ITEM
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: RadioGroupItem — Preserve Bits UI's group semantics while consumers own the option presentation.
   import { RadioGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: SESSION STATE ICON
+  // ───────────────────────────────────────────────────────────────────
+
   import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
   export interface SessionStateIconProps {

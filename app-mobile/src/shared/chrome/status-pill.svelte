@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: STATUS PILL
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ConnectionPhase } from '../state/state.js';
 
   export interface StatusPillProps {

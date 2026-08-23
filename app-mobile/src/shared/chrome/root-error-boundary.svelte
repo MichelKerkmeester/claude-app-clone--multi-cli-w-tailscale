@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds surface: RootErrorBoundary — top-level error boundary that catches render failures and offers reload or reset recovery.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ROOT ERROR BOUNDARY
+  // ───────────────────────────────────────────────────────────────────
+  // @ds surface: RootErrorBoundary — Keep render failures inside an app-level recovery surface so reload and reset stay available.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
@@ -19,7 +22,7 @@
 
   function onerror(error: unknown): void {
     // Surface the throwing error so the test can spy on it. The component stack
-    // is valuable for diagnosis but not embedded in durable comments.
+    // Is valuable for diagnosis but does not belong in durable comments.
     console.error('Pi Remote failed to render.', error);
   }
 
@@ -27,8 +30,7 @@
     window.location.reload();
   }
 
-  // Best-effort recovery from a corrupted or stale installed bundle: drop the
-  // service worker and its caches, then reload from the network.
+  // Best-effort recovery clears a stale bundle's service worker and caches before reloading.
   function resetApp(): void {
     const done = () => window.location.reload();
     const tasks: Promise<unknown>[] = [];

@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: MenuContent — Bits UI DropdownMenu.Content portal that hides outside content, traps Tab, and renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: MENU CONTENT
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: MenuContent — Keep keyboard and assistive-technology focus within the open menu.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS

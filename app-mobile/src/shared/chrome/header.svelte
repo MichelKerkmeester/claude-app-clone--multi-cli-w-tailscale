@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: HEADER
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ConnectionPhase } from '../state/state.js';
   import type { ThemePreference } from '../format/view-helpers.js';
 

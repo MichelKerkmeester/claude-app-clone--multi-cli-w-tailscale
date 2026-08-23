@@ -1,11 +1,15 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: HEADER STORIES
+// ───────────────────────────────────────────────────────────────────
+
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { ConnectionPhase } from '../state/state.js';
 import type { ThemePreference } from '../format/view-helpers.js';
 import Header from './header.svelte';
 
-// The topbar over the real StatusPill + ThemeControl children; connection and
-// theme are real state values, handlers are no-op arrows. The two stories vary
-// only reviewAvailable, which gates the Inbox / Review nav buttons.
+// The topbar uses real StatusPill and ThemeControl children; connection and theme are real state values,
+// Handlers are no-op arrows. The stories vary only `reviewAvailable`, which gates the Inbox / Review
+// Nav buttons.
 const noop = (): void => {};
 const onThemeChange = (_theme: ThemePreference): void => {};
 

@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: SheetTitle — Bits UI Dialog.Title re-export that renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: SHEET TITLE
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: SheetTitle — Preserve Bits UI's accessible dialog-title semantics while consumers own the markup.
   import { Dialog } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

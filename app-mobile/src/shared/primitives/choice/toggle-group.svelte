@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: ToggleGroup — Bits UI ToggleGroup.Root (single-select) wrapper that renders children inside a radiogroup.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: TOGGLE GROUP
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: ToggleGroup — Expose a bindable single-select group without duplicating Bits UI state handling.
   import { ToggleGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

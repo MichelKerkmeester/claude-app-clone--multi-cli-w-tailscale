@@ -1,5 +1,8 @@
 <script lang="ts">
-	// @ds primitive: Button — Native button element with hover, press, and focus interaction actions that renders a children snippet.
+	// ───────────────────────────────────────────────────────────────────
+	// MODULE: BUTTON PRIMITIVE
+	// ───────────────────────────────────────────────────────────────────
+	// @ds primitive: Button — Keep interaction state in actions so touch input never leaves CSS :hover stuck.
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { hover, press, focusVisible, focused } from '../a11y/interactions.js';

@@ -1,5 +1,8 @@
 <script lang="ts">
-  // @ds primitive: MenuItem — Bits UI DropdownMenu.Item re-export that renders a children snippet.
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: MENU ITEM
+  // ───────────────────────────────────────────────────────────────────
+  // @ds primitive: MenuItem — Preserve Bits UI's menu-item semantics while consumers own the item presentation.
   import { DropdownMenu } from 'bits-ui';
   import type { Snippet } from 'svelte';
 

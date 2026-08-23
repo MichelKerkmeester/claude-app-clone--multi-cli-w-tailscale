@@ -8,22 +8,35 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { getOptionalArtifactViewer } from '../artifacts/ArtifactViewerProvider.svelte';
   import { filePreviewAvailability } from '$shared/data/state.js';
   import { formatArtifactSize } from '$shared/data/format.js';
   import Button from '$shared/primitives/Button.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { block, sessionId }: FilePreviewCardProps = $props();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: file-preview-card — read-only preview card; states read from
   //   data-preview-state (ready · withheld · missing · denied · unsupported).
   // @ds guardrail: react-aria Button press, aria-label, and viewer open (onPress) — not designer-editable.
   let buttonEl = $state<HTMLButtonElement | null>(null);
   const viewer = getOptionalArtifactViewer();
-  // ─── Derived state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const availability = $derived(filePreviewAvailability(block));
   const stateLabel = $derived({
     ready: 'Ready',

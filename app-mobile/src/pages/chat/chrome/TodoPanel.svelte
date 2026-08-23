@@ -36,13 +36,19 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { buildTodoDisplayModel, TODO_STATE_LABELS } from '$shared/data/todo-model.js';
   import Button from '$shared/primitives/Button.svelte';
   import Collapsible from '$shared/primitives/Collapsible.svelte';
   import { focused, focusVisible, hover, press } from '$shared/primitives/interactions.js';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     projection,
     refreshing = false,
@@ -54,10 +60,16 @@
     now,
   }: TodoPanelProps = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const model = $derived(buildTodoDisplayModel(projection));
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // Host-confirmed projection only; section disclosure is local UI (defaultExpanded).
   let openByState = $state({
     pending: true,
@@ -67,7 +79,10 @@
   });
   let lastPlanId = $state('');
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     const planId = projection.planId;
     if (lastPlanId !== '' && lastPlanId !== planId) {
@@ -96,7 +111,10 @@
     }
   });
 
-  // ─── Helpers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
   function destroyAction(act: ReturnType<typeof hover>): void {
     if (typeof act === 'object' && act !== null) act.destroy?.();
   }

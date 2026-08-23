@@ -182,7 +182,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
   import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
   import {
@@ -205,7 +208,10 @@
   import UnsupportedPreview from './UnsupportedPreview.svelte';
   import { useArtifactResource } from './useArtifactResource.svelte.js';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { phase, preview, onClose }: ArtifactViewerHostProps = $props();
 
   // @ds surface: artifact-viewer — the modal reader chrome: header, status, controls, preview body.
@@ -215,7 +221,10 @@
   //   no-fetch-on-open exact-tuple reader; do not rework their wiring.
   useVisualViewportAnchor();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let dialogEl = $state<HTMLElement | null>(null);
   let headingRef = $state<HTMLHeadingElement | null>(null);
   let edgeStart: { readonly x: number; readonly y: number } | null = null;
@@ -228,7 +237,10 @@
   let imagePan = $state<ImagePan>({ x: 0, y: 0 });
   let detailsOpen = $state(false);
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     if (preview === null || phase === 'closed' || dialogEl === null) return;
     return hideOutside([dialogEl]);
@@ -244,7 +256,10 @@
     imagePan = value;
   };
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const sourceValue = $derived<unknown>(preview?.source);
   const legacyDiff = $derived<FileDiffBlock | null>(
     sourceValue !== undefined && isLegacyDiffSource(sourceValue) ? sourceValue : null,
@@ -385,7 +400,10 @@
     return () => document.removeEventListener('focusin', onFocusIn, true);
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds state: edge-back · voiceover-scrub — swipe-from-edge and focus-scrub dismissal reasons.
   // @ds guardrail: do-not-edit — gesture thresholds and the pointer/touch wiring are frozen.
   function startEdgeBack(x: number, y: number): void {

@@ -1,12 +1,22 @@
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
   // @ds surface: RootErrorBoundary — top-level error boundary that catches render failures and offers reload or reset recovery.
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { Snippet } from 'svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { children }: { children: Snippet } = $props();
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function onerror(error: unknown): void {
     // Surface the throwing error so the test can spy on it. The component stack
     // is valuable for diagnosis but not embedded in durable comments.

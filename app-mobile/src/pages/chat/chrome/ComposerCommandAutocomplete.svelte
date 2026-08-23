@@ -217,12 +217,18 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
   import Button from '$shared/primitives/Button.svelte';
   import CommandOption from './CommandOption.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     prompt,
     open,
@@ -244,7 +250,10 @@
   // the panel's max height and is frozen wiring.
   // @ds guardrail: anchor — visual-viewport anchor for the popover max height.
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const viewportHeightPx = $derived(viewportAnchor.viewportHeightPx);
   const anchorTopPx = $derived(viewportAnchor.anchorTopPx);
 
@@ -262,7 +271,10 @@
   // frozen; restyling never changes which surface state renders.
   // @ds guardrail: trigger-predicate — leading-slash open condition and state mapping.
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   // Keep the active row visible: virtual focus must follow arrows without
   // scrolling the page.
   // @ds guardrail: virtual-focus — keep the active row in view on arrow nav.

@@ -379,10 +379,16 @@
     ariaLabel?: string;
   }
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { source, class: className = '', ariaLabel = 'Formatted text' }: Props = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const ast = $derived(parseSafeMarkdown(source));
   const classes = $derived(`safe-markdown${className.length > 0 ? ` ${className}` : ''}`);
   const controlPresentation = $derived.by(() =>

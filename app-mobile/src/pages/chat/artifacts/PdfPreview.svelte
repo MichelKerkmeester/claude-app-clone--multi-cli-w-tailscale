@@ -14,7 +14,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist';
 
   import PdfPage from './PdfPage.svelte';
@@ -32,10 +35,16 @@
     type PdfPreviewState,
   } from './pdf-preview-shared.js';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { block, bytes, findTerm = '', onFindTermChange, onStateChange }: PdfPreviewProps = $props();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let pdfState = $state<PdfPreviewState>('loading');
   let pdfDocument = $state<PDFDocumentProxy | null>(null);
   let pageCount = $state(0);
@@ -46,7 +55,10 @@
   let pageWidth = $state(0);
   let scrollEl = $state<HTMLDivElement | null>(null);
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     void block.digest;
     let active = true;
@@ -147,7 +159,10 @@
     return () => observer.disconnect();
   });
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const scale = $derived(
     !fitWidth || containerWidth <= 0 || pageWidth <= 0
       ? clampZoom(zoom)
@@ -156,7 +171,10 @@
 
   const visiblePages = $derived(pdfDocument === null ? [] : pagesAround(currentPage, pageCount));
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function onPageState(nextState: PdfPreviewState): void {
     if (nextState !== 'ready') pdfState = nextState;
   }

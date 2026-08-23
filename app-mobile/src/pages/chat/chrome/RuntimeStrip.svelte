@@ -28,7 +28,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { effortTriggerName, effortTriggerText } from '$shared/data/effort.js';
   import Button from '$shared/primitives/Button.svelte';
   import ToggleGroup from '$shared/primitives/ToggleGroup.svelte';
@@ -41,7 +44,10 @@
     effortTriggerRef = $bindable(null),
   }: RuntimeStripProps = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const runtime = $derived(controls.runtime);
   const snapshot = $derived(runtime.state);
   const disabled = $derived(runtime.status !== 'ready' || snapshot === null);
@@ -52,17 +58,26 @@
   const planActive = $derived(snapshot?.mode === 'plan' || snapshot?.mode === 'executing-plan');
   const hostMode = $derived(snapshot === null ? '' : planActive ? 'plan' : 'build');
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // Host-confirmed selection only; Bits UI single-type allows emptying, so a local
   // copy is restored to hostMode after every change (non-optimistic, no empty).
   let modeValue = $state('');
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     modeValue = hostMode;
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function onModeChange(next: string): void {
     if (next === 'build' || next === 'plan') void controls.setMode(next);
     modeValue = hostMode;

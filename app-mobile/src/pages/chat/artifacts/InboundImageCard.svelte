@@ -74,7 +74,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
   import { getOptionalArtifactViewer } from './ArtifactViewerProvider.svelte';
@@ -83,7 +86,10 @@
   import ImageStatus from './ImageStatus.svelte';
   import VerifiedImage from './VerifiedImage.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     block,
     sessionId,
@@ -97,7 +103,11 @@
   // viewer open handoff are behavioural; do not change them.
   const viewer = getOptionalArtifactViewer();
   const controlled = $derived(fixtureState !== undefined);
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // svelte-ignore state_referenced_locally
   let currentState = $state<InboundImageLifecycleState>(initialState(block, deferReady));
   let buttonRef = $state<HTMLButtonElement | null>(null);
@@ -106,7 +116,10 @@
   let pointerOrigin: { readonly x: number; readonly y: number } | null = null;
   let pressCancelled = false;
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     const identity = `${block.id}:${block.revision}:${deferReady ? 'deferred' : 'direct'}`;
     if (identityRef === identity) return;
@@ -114,7 +127,10 @@
     currentState = initialState(block, deferReady);
   });
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const imageState = $derived(fixtureState ?? currentState);
   const definition = $derived(imageStatusDefinition(imageState));
   const aspectRatio = $derived(aspectRatioFor(block));
@@ -132,7 +148,10 @@
     block.availability === 'ready' && !definition.noPixels && imageState !== 'processing',
   );
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   const handleStateChange = (next: InboundImageLifecycleState): void => {
     if (!controlled) currentState = next;
   };

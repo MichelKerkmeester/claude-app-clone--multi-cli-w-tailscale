@@ -9,16 +9,25 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { onMount } from 'svelte';
   import { fetchAttention } from '$shared/data/attention.js';
   import { attentionIcon, attentionLabel, messageFrom, relativeTime } from '$shared/data/view-helpers.js';
   import Button from '$shared/primitives/Button.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { onBack, onOpen }: AttentionInboxProps = $props();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let items = $state<readonly AttentionItemDto[]>([]);
   let error = $state<string | null>(null);
   let opening = $state<string | null>(null);
@@ -36,7 +45,10 @@
     return () => controller.abort();
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function openItem(item: AttentionItemDto): void {
     opening = item.lookupId;
     error = null;

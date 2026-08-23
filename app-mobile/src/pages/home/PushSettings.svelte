@@ -1,5 +1,8 @@
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { onMount } from 'svelte';
   import type { PushPreferences } from '@pi-remote/pi-rpc-protocol';
   import {
@@ -12,7 +15,10 @@
   import { attentionLabel, messageFrom } from '$shared/data/view-helpers.js';
   import Button from '$shared/primitives/Button.svelte';
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: push-settings — device notification preferences. States: loading · disabled · off · on.
   // @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — not designer-editable.
   let config = $state<PushConfig | null>(null);
@@ -24,7 +30,10 @@
       .catch((cause: unknown) => (error = messageFrom(cause)));
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function setPreferences(preferences: PushPreferences): void {
     config = config === null ? config : { ...config, preferences };
     void updatePushPreferences(preferences).catch((cause: unknown) => (error = messageFrom(cause)));

@@ -1,5 +1,8 @@
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { NormalizedTextArtifactBlock } from './normalizeTranscriptBlocks.js';
   import RichBlockFrame from './RichBlockFrame.svelte';
   import { useCopyFeedback } from './useCopyFeedback.svelte.js';
@@ -10,23 +13,37 @@
     onOpen?: (trigger?: HTMLButtonElement | null) => void;
   }
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { block, onOpen }: Props = $props();
 
   const PREVIEW_LINES = 6;
 
   const feedback = useCopyFeedback();
-  // ─── Derived state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const lines = $derived(displayLines(block.canonicalSource));
   const preview = $derived(lines.slice(0, PREVIEW_LINES).join('\n'));
   const trustedLabel = $derived(textArtifactLabel(block.label));
   const canOpen = $derived(
     block.settled && block.canonicalSource.length > 0 && onOpen !== undefined,
   );
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let openButton = $state<HTMLButtonElement | null>(null);
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function textArtifactLabel(value: NormalizedTextArtifactBlock['label']): string {
     switch (value) {
       case 'prompt':

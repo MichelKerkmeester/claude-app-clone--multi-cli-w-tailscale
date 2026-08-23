@@ -12,7 +12,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import ArtifactCard from '../artifacts/ArtifactCard.svelte';
   import InboundImageBlockView from '../artifacts/InboundImageBlockView.svelte';
   import AskQuestionCard from '../features/ask-question/AskQuestionCard.svelte';
@@ -20,7 +23,10 @@
   import CollapsedEvidence from './CollapsedEvidence.svelte';
   import FilePreviewCard from './FilePreviewCard.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     block,
     bare = false,
@@ -29,7 +35,10 @@
     askQuestionPrincipal,
   }: BlockProps = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: transcript-block — one message block; each kind is its own state seam below.
   // @ds guardrail: the kind switch, collapsibility, role and header decisions are presentation
   //   logic that must stay in lockstep with the block model; not designer-editable.

@@ -4,18 +4,29 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { useVisualViewportAnchor } from '$shared/data/useVisualViewportAnchor.svelte.js';
   import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
   import { hover, press, focusVisible } from '$shared/primitives/interactions.js';
   import { getAttachmentDraft } from './AttachmentDraftProvider.svelte';
 
   const draft = getAttachmentDraft();
-  // ─── Derived state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const item = $derived(
     draft.state.items.find((candidate) => candidate.id === draft.state.previewId) ?? null,
   );
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let dialogEl = $state<HTMLElement | null>(null);
   let headingEl = $state<HTMLHeadingElement | null>(null);
   let previewFailed = $state(false);
@@ -23,7 +34,10 @@
 
   useVisualViewportAnchor(() => dialogEl);
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     if (item === null || dialogEl === null) return;
     return hideOutside([dialogEl]);
@@ -43,7 +57,10 @@
     item !== null && (item.preview === 'unavailable' || previewUrl === null || previewFailed),
   );
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds guardrail: do-not-edit — the removal focus handoff moves focus to the adjacent tile
   // (or the add-photo control) after the previewed item is removed and the dialog closes.
   function remove(): void {

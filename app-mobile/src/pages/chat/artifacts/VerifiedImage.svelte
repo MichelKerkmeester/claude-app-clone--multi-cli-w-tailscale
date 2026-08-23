@@ -48,7 +48,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { demoInboundArtifactResource, isDemoMode } from '$shared/data/demo.js';
   import { useArtifactResource } from './useArtifactResource.svelte.js';
 
@@ -62,7 +65,10 @@
     onStateChange,
   }: VerifiedImageProps = $props();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // svelte-ignore state_referenced_locally
   let nearViewport = $state(forceLoad || typeof IntersectionObserver === 'undefined');
   let imageFailed = $state(false);
@@ -80,7 +86,10 @@
     }),
   );
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     void block.id;
     void block.revision;
@@ -128,7 +137,10 @@
     if (next !== null) onStateChange(next);
   });
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const showPixels = $derived(
     !imageFailed &&
       resource.current.status === 'ready' &&

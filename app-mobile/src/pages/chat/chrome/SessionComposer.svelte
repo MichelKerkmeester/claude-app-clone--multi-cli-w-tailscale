@@ -59,7 +59,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { untrack } from 'svelte';
 
   import ComposerCommandAutocomplete, {
@@ -85,7 +88,10 @@
   import { createPlanModeShortcut } from '$shared/data/planModeShortcut.js';
   import Button from '$shared/primitives/Button.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     sessionId = 'session_local',
     sessionEpoch = null,
@@ -115,7 +121,10 @@
     onAttachmentSubmitted,
   }: SessionComposerProps = $props();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // The textarea is the ONLY editing field; the refs below own DOM nodes.
   let textareaEl = $state<HTMLTextAreaElement | null>(null);
   let trayEl = $state<HTMLFormElement | null>(null);
@@ -162,7 +171,10 @@
     },
   }));
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // A turn is running when either the relay session card or the host-
   // confirmed runtime snapshot says so; both are authoritative sources and
   // the OR is deliberately conservative for the slash gate.
@@ -300,7 +312,10 @@
     });
   });
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   // Draft recovery (sessionStorage); media bytes are never placed in storage.
   $effect(() => {
     if (prompt.length !== 0) return;
@@ -396,7 +411,10 @@
     commitPending = false;
   });
 
-  // ─── Helpers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
   function grow(): void {
     const element = textareaEl;
     if (element === null) return;
@@ -404,7 +422,10 @@
     element.style.height = `${Math.min(element.scrollHeight, MAX_TRAY_HEIGHT_PX)}px`;
   }
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 7. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   // Explicit send routing: a slash draft goes through the ticketed slash
   // lane (or fails closed with a disclosed reason); ordinary drafts keep
   // the unchanged send/steer behavior. A slash draft is never converted to

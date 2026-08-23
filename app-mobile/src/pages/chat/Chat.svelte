@@ -70,7 +70,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { untrack } from 'svelte';
 
   import { messageFrom, relativeTime, sessionStatusLabel } from '$shared/data/view-helpers.js';
@@ -100,7 +103,10 @@
   import ArtifactViewerProvider from './artifacts/ArtifactViewerProvider.svelte';
   import AttachmentDraftProvider from './attachments/AttachmentDraftProvider.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     connection,
     sessionId,
@@ -120,7 +126,10 @@
     askQuestionPrincipal,
   }: SessionProps = $props();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let prompt = $state('');
   let sendingPrompt = $state(false);
   let promptError = $state<string | null>(null);
@@ -153,7 +162,10 @@
     runtimeControls,
   });
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const modelCanViewPhotos = $derived(runtimeModelCanViewPhotos(runtimeControls.runtime));
   const isStale = $derived(
     connection !== 'live' || transcript.source === 'cache' || transcript.awaitingSnapshot,
@@ -172,7 +184,10 @@
       !slashSubmitting,
   );
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   // Visibility/online listeners: reconcile runtime + catalog when the tab
   // returns to the foreground or the network comes back online. The refresh
   // handles are stable plain closures, so this effect runs once on mount.
@@ -235,7 +250,10 @@
     }),
   );
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   // One shared sheet per session view: the header opens the model section,
   // RuntimeStrip the effort section, and focus returns to whichever trigger
   // opened it. The sheet holds no committed runtime state itself.

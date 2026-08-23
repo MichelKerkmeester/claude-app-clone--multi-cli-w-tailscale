@@ -7,23 +7,35 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ApprovalCardDto } from '@pi-remote/pi-rpc-protocol';
   import { loadApprovals, messageFrom, relativeTime, countdown } from '$shared/data/view-helpers.js';
   import { decideApproval, createAcceptEditsGrant } from '$shared/data/relay.js';
   import Button from '$shared/primitives/Button.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { sessions, onBack, focusId }: ReviewProps = $props();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let approvals = $state<readonly ApprovalCardDto[]>([]);
   let pendingId = $state<string | null>(null);
   let grant = $state<{ readonly remainingActions: number; readonly expiresAt: string } | null>(null);
   let error = $state<string | null>(null);
   let now = $state(Date.now());
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     const controller = new AbortController();
     void loadApprovals(sessions, controller.signal)
@@ -53,7 +65,10 @@
     }
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function decide(approval: ApprovalCardDto, decision: 'approve' | 'deny'): void {
     pendingId = approval.approvalId;
     error = null;
@@ -69,7 +84,10 @@
       });
   }
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const pending = $derived(approvals.filter((approval) => approval.status === 'pending'));
 </script>
 

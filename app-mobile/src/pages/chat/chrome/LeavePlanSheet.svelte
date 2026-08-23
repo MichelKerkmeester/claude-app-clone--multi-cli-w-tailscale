@@ -14,7 +14,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import Button from '$shared/primitives/Button.svelte';
   import Sheet from '$shared/primitives/Sheet.svelte';
   import SheetContent from '$shared/primitives/SheetContent.svelte';
@@ -30,17 +33,27 @@
     triggerRef = $bindable(null),
   }: LeavePlanSheetProps = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const isPlanReady = $derived(variant === 'plan-ready' || planReady);
 
   // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
   // copy is restored to the host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let sheetOpen = $state(false);
   let stayEl = $state<HTMLButtonElement | null>(null);
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     sheetOpen = hostOpen;
   });
@@ -57,7 +70,10 @@
     restoreTriggerFocus();
   };
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function onSheetOpenChange(next: boolean): void {
     if (!next) close();
     else onOpenChange(true);

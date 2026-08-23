@@ -24,13 +24,19 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import Button from '$shared/primitives/Button.svelte';
   import Sheet from '$shared/primitives/Sheet.svelte';
   import SheetContent from '$shared/primitives/SheetContent.svelte';
   import SheetTitle from '$shared/primitives/SheetTitle.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     isOpen,
     onOpenChange,
@@ -46,7 +52,11 @@
   // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
   // copy is restored to the host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let sheetOpen = $state(false);
   let safeActionEl = $state<HTMLButtonElement | null>(null);
   let sheetEl = $state<HTMLElement | null>(null);
@@ -56,7 +66,10 @@
     sheetOpen = hostOpen;
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   const restoreFocus = () => {
     window.setTimeout(() => triggerRef?.focus({ preventScroll: true }), 0);
   };
@@ -144,7 +157,10 @@
     if (event.target === event.currentTarget) dismissSafely();
   }
 
-  // ─── Helpers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
   function attachSheet(node: Element): () => void {
     const el = node as HTMLElement;
     const overlay = el.closest('.plan-review-overlay') as HTMLElement | null;

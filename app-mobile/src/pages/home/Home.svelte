@@ -15,7 +15,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { sessionStatusLabel, compactId, relativeTime } from '$shared/data/view-helpers.js';
   import Button from '$shared/primitives/Button.svelte';
   import Freshness from './Freshness.svelte';
@@ -23,7 +26,10 @@
   import SessionStateIcon from '$shared/chrome/SessionStateIcon.svelte';
   import PushSettings from './PushSettings.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     sessions,
     connection,
@@ -34,7 +40,10 @@
     onLogout,
   }: HomeProps = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds guardrail: staleness derivation — not designer-editable.
   const isStale = $derived(sessions.source === 'cache' || connection !== 'live');
 </script>

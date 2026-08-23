@@ -12,7 +12,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { untrack } from 'svelte';
   import { fetchAskQuestionDisplay } from '$shared/data/relay.js';
   import {
@@ -34,7 +37,10 @@
   import { useAskQuestionMutation } from './useAskQuestionMutation.svelte.js';
   import { useAskQuestionState } from './useAskQuestionState.svelte.js';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { block, canAnswer = true, principal }: AskQuestionCardProps = $props();
 
   // @ds surface: ask-question — the one-use interactive question card; slot seams below.
@@ -42,7 +48,11 @@
   //   revision binding, non-optimistic submit, and keyboard/a11y wiring live in the hooks
   //   (useAskQuestionState / useAskQuestionMutation / useAskQuestionKeyboardNavigation) and are
   //   NOT designer-editable. Only the @ds surface: ask-question CSS is editable.
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let viewModel = $state<AskQuestionViewModel | null>(null);
   let cardEl = $state<HTMLElement | null>(null);
 
@@ -63,7 +73,10 @@
   const statusId = `${uid}-status`;
   const errorId = `${uid}-error`;
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const lifecyclePhase = $derived(transcriptStatusToUiState(block.status));
   const lifecycleLocks = $derived(
     lifecyclePhase === 'submitting' || isAskQuestionTerminalState(lifecyclePhase),
@@ -84,7 +97,10 @@
       (effectivePhase === 'selecting' || effectivePhase === 'error'),
   );
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function submitAnswer(): void {
     if (terminal || submitting) return;
     const intent = stateApi.beginSubmit();
@@ -109,7 +125,10 @@
     }),
   );
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     const sessionId = block.sessionId;
     const questionId = block.questionId;

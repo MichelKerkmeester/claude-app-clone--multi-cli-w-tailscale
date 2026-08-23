@@ -31,14 +31,20 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { Popover } from 'bits-ui';
   import { hideOutside } from '$shared/primitives/ariaHideOutside.svelte.js';
   import Button from '$shared/primitives/Button.svelte';
   import CommandPalette from './CommandPalette.svelte';
   import { ATTACHMENT_ACCEPT } from '../attachments/attachment-state.js';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     runtimeControls,
     catalog,
@@ -50,23 +56,35 @@
     onShiftTabPreferenceChange,
   }: ComposerToolsProps = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const runtime = $derived(runtimeControls.runtime);
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // Popover open state; bind:open keeps the local copy in sync while onOpenChange
   // reports every transition to the host (non-optimistic, host-confirmed).
   let open = $state(false);
   let contentEl = $state<HTMLElement | null>(null);
   let toolsDialogEl = $state<HTMLElement | null>(null);
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     if (contentEl === null) return;
     return hideOutside([contentEl]);
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function handleOpenChange(next: boolean): void {
     onOpenChange(next);
   }

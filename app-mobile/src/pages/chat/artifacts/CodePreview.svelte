@@ -24,7 +24,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import {
     normalizeHighlightLanguage,
     useHighlightedCode,
@@ -52,7 +55,10 @@
     followTail = false,
   }: Props = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const safeLanguage = $derived(normalizeHighlightLanguage(language));
   const highlighted = useHighlightedCode(() => ({
     source: text,
@@ -65,12 +71,18 @@
   const tokens = $derived(highlighted.current.tokens);
   const lines = $derived(text.split('\n'));
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let scrollEl = $state<HTMLDivElement | null>(null);
   let atLiveEdgeRef = true;
   let atLiveEdge = $state(true);
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function updateLiveEdge(): void {
     const scroll = scrollEl;
     if (scroll === null) return;
@@ -87,7 +99,10 @@
     atLiveEdge = true;
   }
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     void followTail;
     void revision;

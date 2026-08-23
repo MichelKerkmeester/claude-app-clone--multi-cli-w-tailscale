@@ -43,7 +43,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import RichBlockFrame from './RichBlockFrame.svelte';
   import { useCopyFeedback } from './useCopyFeedback.svelte.js';
   import { hover } from '$shared/primitives/interactions.js';
@@ -53,7 +56,10 @@
     onOpen?: (trigger?: HTMLButtonElement | null) => void;
   }
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { block, onOpen }: Props = $props();
 
   const OUTPUT_PREVIEW_LINES = 8;
@@ -61,7 +67,11 @@
   const feedback = useCopyFeedback();
 
   let previousSnapshot: CommandSnapshot | null = null;
-  // ─── Derived state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const snapshot = $derived.by(() => {
     const next = reconcileCommandSnapshot(previousSnapshot, block);
     previousSnapshot = next;
@@ -89,10 +99,17 @@
       showingLastTrustworthySnapshot ? 'Last trustworthy snapshot' : null,
     ].filter((label): label is string => label !== null),
   );
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let openButton = $state<HTMLButtonElement | null>(null);
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function lifecycleText(value: NormalizedCommandBlock['lifecycle']): string {
     switch (value) {
       case 'queued':

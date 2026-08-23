@@ -45,10 +45,16 @@
 </script>
 
 <script lang="ts">
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { runtime, connection }: RuntimeModeAnnouncerProps = $props();
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: runtime-mode-announcer — dual polite/alert live regions for mode transitions.
   // @ds guardrail: do-not-edit — the announce-once settle-key effect (primed/announcedKey) and the
   // ALERT_KINDS routing; the regions are inert text nodes that never move focus. Not designer-editable.
@@ -59,10 +65,16 @@
   let announcedKey: string | null = null;
   let primed = false;
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const presentation = $derived(planModePresentation(runtime, connection));
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     const key = presentation.kind;
     if (!primed) {

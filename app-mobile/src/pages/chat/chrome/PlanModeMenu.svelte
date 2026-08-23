@@ -17,27 +17,46 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { focusVisible, focused } from '$shared/primitives/interactions.js';
   import MenuContent from '$shared/primitives/MenuContent.svelte';
   import MenuItem from '$shared/primitives/MenuItem.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { confirmedMode, rowsDisabled, rowsDisabledReason, onSelect }: PlanModeMenuProps = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // Host-confirmed mode only; Bits MenuItem has no selection to bind, so a local
   // copy is restored to the host value after every activation (non-optimistic).
   const hostMode = $derived(confirmedMode);
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let localMode = $state<ConfirmedMode>('unknown');
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     localMode = hostMode;
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function onRowSelect(target: 'build' | 'plan'): void {
     // @ds guardrail: do-not-edit — a row activation here is the only request path,
     // never a commit; the read-only guard keeps a stale event from firing.

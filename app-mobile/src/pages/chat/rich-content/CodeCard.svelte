@@ -1,5 +1,8 @@
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { NormalizedCodeBlock } from './normalizeTranscriptBlocks.js';
   import RichBlockFrame from './RichBlockFrame.svelte';
   import { useCopyFeedback } from './useCopyFeedback.svelte.js';
@@ -11,17 +14,28 @@
     onOpen?: (trigger?: HTMLButtonElement | null) => void;
   }
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { block, onOpen }: Props = $props();
 
   const PREVIEW_LINES = 12;
 
   const feedback = useCopyFeedback();
-  // ─── Derived state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const lines = $derived(displayLines(block.canonicalSource));
   const preview = $derived(lines.slice(0, PREVIEW_LINES).join('\n'));
   const canOpen = $derived(block.canonicalSource.length > 0 && onOpen !== undefined);
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let openButton = $state<HTMLButtonElement | null>(null);
   const highlighted = useHighlightedCode(() => ({
     source: block.canonicalSource,
@@ -34,7 +48,10 @@
       : clipTokens(highlighted.current.tokens, preview.length),
   );
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function displayLines(value: string): string[] {
     const result = value.split(/\r?\n/u);
     if (result.at(-1) === '') result.pop();

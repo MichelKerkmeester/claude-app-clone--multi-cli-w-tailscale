@@ -64,7 +64,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { getOptionalArtifactViewer } from '../artifacts/ArtifactViewerProvider.svelte';
   import CodeCard from './CodeCard.svelte';
   import CommandOutputCard from './CommandOutputCard.svelte';
@@ -73,7 +76,10 @@
   import SafeMarkdown from './SafeMarkdown.svelte';
   import TextArtifactCard from './TextArtifactCard.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { block, onOpen }: RichContentRouterProps = $props();
 
   // @ds surface: rich-content-router — dispatches each normalized transcript block
@@ -83,10 +89,17 @@
   // dispatch point; isNormalizedRichContentBlock / isRichCardBlock are exported
   // type guards used by security tests. Not designer-editable.
   const viewer = getOptionalArtifactViewer();
-  // ─── Derived state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const canOpen = $derived(onOpen !== undefined || viewer !== null);
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds guardrail: do-not-edit — the viewer handoff keeps an in-memory doc current for
   // hosted blocks; no fetch, endpoint, ticket, download, or host-file read is added.
   $effect(() => {
@@ -94,7 +107,10 @@
     viewer.updateInMemory(createInMemoryArtifactDocument(block));
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds guardrail: do-not-edit — the open-handoff delegates to the bound onOpen or falls
   // back to the viewer's openInMemory with the same in-memory document; nothing is
   // fetched, written, or read from the host.

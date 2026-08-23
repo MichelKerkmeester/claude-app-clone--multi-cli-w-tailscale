@@ -75,7 +75,10 @@
 </script>
 
 <script lang="ts">
-  // ─── Imports ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { AvailableModelDto, RuntimeControlResponse } from '@pi-remote/pi-rpc-protocol';
   import { untrack } from 'svelte';
   import { effortConfirmedMessage } from '$shared/data/effort.js';
@@ -106,7 +109,10 @@
   import SheetTitle from '$shared/primitives/SheetTitle.svelte';
   import EffortRadioGroup from './EffortRadioGroup.svelte';
 
-  // ─── Props ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     isOpen,
     onOpenChange,
@@ -126,7 +132,10 @@
     sheetOpen = hostOpen;
   });
 
-  // ─── Local state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let section = $state<EffortSheetSection>('model');
   let query = $state('');
   const deferredQuery = $derived(query);
@@ -154,7 +163,10 @@
   // region so a settled outcome is announced exactly once per transition.
   let prevEffortPending: string | null = null;
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const current = $derived(runtime.state?.model ?? null);
   const currentKey = $derived(current === null ? null : modelKey(current));
   const confirmedEffort = $derived(runtime.state?.thinkingLevel ?? null);
@@ -215,7 +227,10 @@
   const effortStatus = $derived(effortSectionStatus(runtime, levels));
   const showReconcile = $derived(RECONCILE_PHASES.has(runtime.phase ?? 'checking'));
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     if (!isOpen) return;
     section = initialSection;
@@ -337,7 +352,10 @@
     }
   });
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   const restoreTriggerFocus = () => {
     window.setTimeout(() => triggerRef?.focus({ preventScroll: true }), 0);
   };
@@ -594,7 +612,10 @@
     rows[next]?.focus({ preventScroll: true });
   }
 
-  // ─── Helpers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 7. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
   function attachRowInteractions(node: Element): () => void {
     const el = node as HTMLElement;
     const hoverAction = hover(el);

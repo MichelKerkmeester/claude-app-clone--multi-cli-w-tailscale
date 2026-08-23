@@ -89,9 +89,16 @@
     modelCanViewPhotos = true,
   }: AttachmentDraftProviderProps = $props();
 
-  // ─── Derived state ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 1. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const mediaAvailable = $derived(capabilityAllowsPhotos(capability));
-  // ─── Local state ───────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   // svelte-ignore state_referenced_locally
   let draftState = $state<AttachmentDraftState>({
     ...EMPTY_ATTACHMENT_DRAFT,
@@ -106,7 +113,10 @@
   const stored = new Map<string, StoredAttachment>();
   let previewTrigger: HTMLElement | null = null;
 
-  // ─── Handlers ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
   function dispatch(action: AttachmentDraftAction): void {
     draftState = attachmentDraftReducer(draftState, action);
   }
@@ -134,7 +144,10 @@
     dispatch({ type: 'lifecycle-clear', message, phase });
   }
 
-  // ─── Effects ───────────────────────────────
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     if (previousSession !== sessionId) {
       previousSession = sessionId;

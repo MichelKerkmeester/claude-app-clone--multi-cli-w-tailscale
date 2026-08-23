@@ -4,11 +4,11 @@ Renders the artifacts an agent produces or receives — code, diffs, markdown, P
 
 ## What lives here
 
-- **Host + provider:** `ArtifactViewerHost.svelte` (the viewer shell) and `ArtifactViewerProvider.svelte` (shares viewer state to descendants via context).
+- **Host + provider:** `artifact-viewer-host.svelte` (the viewer shell) and `artifact-viewer-provider.svelte` (shares viewer state to descendants via context).
 - **Card frame:** `ArtifactCard`, `ArtifactHeader`, `ArtifactDetails`, `ArtifactStatus`, `PreviewControls`.
 - **Per-type previews:** `CodePreview`, `DiffPreview`, `MarkdownPreview`, `TextPreview`, `PdfPreview` (+ `PdfPage`), `UnsupportedPreview`.
 - **Image handling:** `ImagePreview`, `ImagePlaceholder`, `ImageStatus`, `InboundImageCard`, `InboundImageBlockView`, `SecureImagePreview`, `VerifiedImage`.
-- **Logic:** `useArtifactResource.svelte.ts` + `useArtifactHistory.svelte.ts` (runes lifecycles), `artifact-share.ts`, `pdf-preview-shared.ts`, `types.ts`.
+- **Logic:** `use-artifact-resource.svelte.ts` + `use-artifact-history.svelte.ts` (runes lifecycles), `artifact-share.ts`, `pdf-preview-shared.ts`, `types.ts`.
 
 ## Why it's shaped this way
 

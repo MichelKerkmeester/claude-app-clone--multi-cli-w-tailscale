@@ -4,12 +4,12 @@ Renders the rich payload *inside* a transcript block — markdown, code, and com
 
 ## What lives here
 
-- **`RichContentRouter.svelte`** — the entry point: inspects a block and picks the renderer. Exports pure guards used by transcript projection **and security tests**.
-- **`RichBlockFrame.svelte`** — the shared frame around a rich block.
-- **`SafeMarkdown.svelte`** — markdown rendering with the safety constraints (no arbitrary HTML/script). Security-relevant.
-- **`RedactionBadge.svelte`** — marks redacted content. Redaction is a frozen security invariant.
+- **`rich-content-router.svelte`** — the entry point: inspects a block and picks the renderer. Exports pure guards used by transcript projection **and security tests**.
+- **`rich-block-frame.svelte`** — the shared frame around a rich block.
+- **`safe-markdown.svelte`** — markdown rendering with the safety constraints (no arbitrary HTML/script). Security-relevant.
+- **`redaction-badge.svelte`** — marks redacted content. Redaction is a frozen security invariant.
 - **`CodeCard` / `CommandOutputCard` / `TextArtifactCard`** — the concrete rich renderers.
-- **Logic:** `normalizeTranscriptBlocks.ts`, `F6ViewerAdapter.ts`, `highlight.worker.ts` (syntax highlighting, off-main-thread), `useCopyFeedback.svelte.ts` + `useHighlightedCode.svelte.ts` (runes lifecycles).
+- **Logic:** `normalize-transcript-blocks.ts`, `f6-viewer-adapter.ts`, `highlight.worker.ts` (syntax highlighting, off-main-thread), `use-copy-feedback.svelte.ts` + `use-highlighted-code.svelte.ts` (runes lifecycles).
 
 ## Why it's shaped this way
 

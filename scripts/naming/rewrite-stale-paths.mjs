@@ -28,7 +28,7 @@ const SEARCH_ROOTS = [
   'scripts',
   'tests',
 ];
-const SEARCH_EXTENSIONS = ['.svelte', '.ts', '.tsx', '.js', '.mjs', '.cjs'];
+const SEARCH_EXTENSIONS = ['.svelte', '.ts', '.tsx', '.js', '.mjs', '.cjs', '.md'];
 
 function walk(dir, out = []) {
   let entries;
@@ -68,6 +68,10 @@ function renameChain(sinceRef) {
 }
 
 const QUOTED = /(['"])([^'"\n]+)\1/g;
+// Documentation names files in backticks rather than quotes, and a document
+// naming a file that has been renamed is worse than no document, because it is
+// believed.
+const BACKTICKED = /(`)([^`\n]+)\1/g;
 
 function main() {
   const sinceRef = process.argv[2];
@@ -87,12 +91,16 @@ function main() {
   for (const file of files) {
     const original = readFileSync(join(REPO_ROOT, file), 'utf8');
     let changes = 0;
-    const updated = original.replace(QUOTED, (match, quote, literal) => {
+    const rewriteLiteral = (match, quote, literal) => {
       // Only a literal that resolves to a file git actually moved is rewritten,
       // which is what makes a sweep this broad safe.
+      // A document names its siblings by bare filename, so resolve those against
+      // the folder the document sits in as well as against the repository root.
       const candidates = literal.startsWith('.')
         ? [relative(REPO_ROOT, resolve(dirname(join(REPO_ROOT, file)), literal)).split('\\').join('/')]
-        : [literal];
+        : literal.includes('/')
+          ? [literal, `app-mobile/src/${literal}`]
+          : [literal, `${dirname(file)}/${literal}`];
       for (const candidate of candidates) {
         const moved = chain.get(candidate);
         if (moved === undefined) continue;
@@ -104,11 +112,20 @@ function main() {
                 .join('/');
               return rel.startsWith('.') ? rel : `./${rel}`;
             })()
-          : moved;
+          : candidate === literal
+            ? moved
+            : literal.includes('/')
+              ? // The document wrote a source-root-relative path; keep that shape.
+                moved.replace(/^app-mobile\/src\//, '')
+              : // The document wrote a bare filename; keep it bare.
+                moved.slice(moved.lastIndexOf('/') + 1);
         return `${quote}${replacement}${quote}`;
       }
       return match;
-    });
+    };
+    const updated = original
+      .replace(QUOTED, rewriteLiteral)
+      .replace(BACKTICKED, rewriteLiteral);
     if (changes === 0) continue;
     touched += 1;
     rewritten += changes;

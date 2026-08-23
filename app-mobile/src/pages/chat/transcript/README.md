@@ -4,14 +4,14 @@ The scrolling conversation itself — the virtualized list of transcript blocks 
 
 ## What lives here
 
-- **`TranscriptList.svelte`** — the virtualized list (via `@tanstack/svelte-virtual`) that renders only on-screen blocks.
-- **`Block.svelte`** — one transcript block; delegates rich payloads to `rich-content/`.
-- **`NormalizedActivityGroup.svelte` / `NormalizedTranscriptBlockView.svelte`** — grouping + view for normalized activity.
-- **`AssistantActions.svelte`** — the action row on an assistant block.
-- **`CollapsedEvidence.svelte`** — collapsed tool/evidence disclosure.
-- **`FilePreviewCard.svelte`** — inline file preview card.
-- **`RuntimeStatusRegion.svelte`** — inline runtime status inside the transcript.
-- **`TodoProjectionBlock.svelte`** — the todo projection rendered as a block.
+- **`transcript-list.svelte`** — the virtualized list (via `@tanstack/svelte-virtual`) that renders only on-screen blocks.
+- **`block.svelte`** — one transcript block; delegates rich payloads to `rich-content/`.
+- **`normalized-activity-group.svelte` / `normalized-transcript-block-view.svelte`** — grouping + view for normalized activity.
+- **`assistant-actions.svelte`** — the action row on an assistant block.
+- **`collapsed-evidence.svelte`** — collapsed tool/evidence disclosure.
+- **`card-file-preview.svelte`** — inline file preview card.
+- **`runtime-status-region.svelte`** — inline runtime status inside the transcript.
+- **`todo-projection-block.svelte`** — the todo projection rendered as a block.
 - **Logic:** `transcript-helpers.ts`.
 
 ## Why it's shaped this way

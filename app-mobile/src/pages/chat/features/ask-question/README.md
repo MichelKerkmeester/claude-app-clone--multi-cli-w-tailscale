@@ -4,9 +4,9 @@ The interactive **ask-question card**: when the agent needs a decision, this ren
 
 ## What lives here
 
-- **`AskQuestionCard.svelte`** — the card shell that composes the parts below.
+- **`card-ask-question.svelte`** — the card shell that composes the parts below.
 - **Parts:** `AskQuestionPrompt`, `AskQuestionOptionList`, `AskQuestionOptionRow`, `AskQuestionFreeText`, `AskQuestionStatus`, `AskQuestionSubmitButton`.
-- **Logic:** `askQuestionTypes.ts` (types), `askQuestionEphemeralStore.ts` (ephemeral per-question state), `useAskQuestionState.svelte.ts`, `useAskQuestionMutation.svelte.ts`, `useAskQuestionKeyboardNavigation.svelte.ts` (runes lifecycles).
+- **Logic:** `ask-question-types.ts` (types), `ask-question-ephemeral-store.ts` (ephemeral per-question state), `use-ask-question-state.svelte.ts`, `use-ask-question-mutation.svelte.ts`, `use-ask-question-keyboard-navigation.svelte.ts` (runes lifecycles).
 
 ## Why it's shaped this way
 

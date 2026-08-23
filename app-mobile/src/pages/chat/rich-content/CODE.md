@@ -4,10 +4,10 @@ Editor map. For *what/why*, see `README.md`.
 
 ## Shape
 
-- **`RichContentRouter.svelte`** — routes a `DisplayTranscriptBlock` to a renderer; its block-type guards are **pure, exported** functions (consumed by transcript projection + security tests).
-- **`RichBlockFrame.svelte`** — shared wrapper.
-- **Renderers** — `SafeMarkdown.svelte`, `CodeCard.svelte`, `CommandOutputCard.svelte`, `TextArtifactCard.svelte`, `RedactionBadge.svelte`.
-- **Logic** — `normalizeTranscriptBlocks.ts` (pure), `F6ViewerAdapter.ts`, `highlight.worker.ts` (Web Worker), `useCopyFeedback.svelte.ts` + `useHighlightedCode.svelte.ts` (runes lifecycles, driven in tests via DOM-projection probe harnesses).
+- **`rich-content-router.svelte`** — routes a `DisplayTranscriptBlock` to a renderer; its block-type guards are **pure, exported** functions (consumed by transcript projection + security tests).
+- **`rich-block-frame.svelte`** — shared wrapper.
+- **Renderers** — `safe-markdown.svelte`, `card-code.svelte`, `card-command-output.svelte`, `card-text-artifact.svelte`, `redaction-badge.svelte`.
+- **Logic** — `normalize-transcript-blocks.ts` (pure), `f6-viewer-adapter.ts`, `highlight.worker.ts` (Web Worker), `use-copy-feedback.svelte.ts` + `use-highlighted-code.svelte.ts` (runes lifecycles, driven in tests via DOM-projection probe harnesses).
 
 ## Do-not (security-weighted)
 

@@ -9,7 +9,7 @@ The interactive controls that frame the conversation: the message composer, the 
 - **Runtime & mode:** `RuntimeStrip` (host-backed readout + controls), `RuntimeModeAnnouncer` (live-region announcements), `PlanModeButton`, `PlanModeMenu`, `ModelEffortSheet`, `EffortRadioGroup`.
 - **Plan flow:** `PlanReadyCard`, `PlanReviewSheet`, `LeavePlanSheet`.
 - **Header & todos:** `SessionHeader`, `TodoPanel`.
-- **Logic:** `planModePresentation.ts`.
+- **Logic:** `plan-mode-presentation.ts`.
 
 ## Why it's shaped this way
 

@@ -9,7 +9,7 @@ Two families:
 - **`Button`** — the one hand-rolled primitive: a native `<button>` plus four interaction-state actions. It backs the great majority of tappable controls in the app.
 - **Bits UI wrappers** — thin adapters over [`bits-ui`](https://bits-ui.com) that give each interactive pattern a small, app-shaped API: `Sheet` (Dialog), `Menu` (DropdownMenu), `RadioGroup`, `ToggleGroup`, `Collapsible`.
 
-Plus two support modules: `interactions.ts` (the Button's actions) and `ariaHideOutside.svelte.ts` (hides background content from assistive tech while an overlay is open).
+Plus two support modules: `interactions.ts` (the Button's actions) and `aria-hide-outside.svelte.ts` (hides background content from assistive tech while an overlay is open).
 
 ## Why it exists
 

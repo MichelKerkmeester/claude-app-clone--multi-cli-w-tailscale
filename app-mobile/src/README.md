@@ -19,15 +19,15 @@ Only **three URLs** exist; Review and Inbox are overlays, and Enrollment is an a
 
 | URL | Route file | Renders |
 |-----|-----------|---------|
-| `/` | `routes/+page.svelte` | `pages/home/Home.svelte` (session roster) |
-| `/session/[id]` | `routes/session/[id]/+page.svelte` | `pages/chat/Chat.svelte` (the conversation) |
+| `/` | `routes/+page.svelte` | `pages/home/screen-home.svelte` (session roster) |
+| `/session/[id]` | `routes/session/[id]/+page.svelte` | `pages/chat/screen-chat.svelte` (the conversation) |
 | `/attention/[lookupId]` | `routes/attention/[lookupId]/+page.svelte` | resolves the lookup, then redirects to the Review overlay or the target session |
 
 - `routes/+layout.svelte` is the **app shell**: it mounts the context providers, theme, and service-worker registration, and hosts the **Review / Inbox overlays** above the routed page.
 - `routes/+layout.ts` pins `ssr = false; prerender = false`.
-- Pages read state + actions from the shell via context (`getAppState` / `getAppActions` from `shared/data/app-state.svelte.ts`); they don't fetch directly.
+- Pages read state + actions from the shell via context (`getAppState` / `getAppActions` from `shared/state/app-state.svelte.ts`); they don't fetch directly.
 
-> The conversation view's file is `pages/chat/Chat.svelte`. The `/session/[id]` route and the internal session-protocol names are unchanged — the route still imports it as `Session`.
+> The conversation view's file is `pages/chat/screen-chat.svelte`. The `/session/[id]` route and the internal session-protocol names are unchanged — the route still imports it as `Session`.
 
 ## Folder layout
 
@@ -59,7 +59,7 @@ Each folder carries its own `README.md` (what/why) and, where it earns one, a `C
 ## Boundaries
 
 - **Screens are thin.** A page renders; it takes state/actions via `$props()` or shell context. Behaviour lives in `shared/data/`.
-- **One socket, one cache, one auth store.** All relay traffic is in `shared/data/relay.ts`; storage in `cache.ts` (read-only snapshot) and `auth.ts` (device key). Don't open sockets or touch storage from a component.
+- **One socket, one cache, one auth store.** All relay traffic is in `shared/transport/relay.ts`; storage in `cache.ts` (read-only snapshot) and `auth.ts` (device key). Don't open sockets or touch storage from a component.
 - **Styling is co-located.** A component's CSS is in its own scoped `<style>`; only genuinely shared/global rules live in `app.css`.
 
 ## Validate (from repo root)
@@ -72,4 +72,4 @@ npm run test:web
 
 ## Related
 
-- [Package README](../README.md) · [`shared/primitives/README.md`](./shared/primitives/README.md) · [`shared/data/README.md`](./shared/data/README.md)
+- [Package README](../README.md) · [`shared/primitives/README.md`](./shared/primitives/README.md) · [`shared/README.md`](./shared/data/README.md)

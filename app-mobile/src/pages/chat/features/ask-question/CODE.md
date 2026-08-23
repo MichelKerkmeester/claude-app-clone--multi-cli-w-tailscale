@@ -4,9 +4,9 @@ Editor map. For *what/why*, see `README.md`.
 
 ## Shape
 
-- **`AskQuestionCard.svelte`** — composes prompt + options + submit; owns the transcript-status effect.
+- **`card-ask-question.svelte`** — composes prompt + options + submit; owns the transcript-status effect.
 - **Parts** — `AskQuestionPrompt`, `AskQuestionOptionList` → `AskQuestionOptionRow`, `AskQuestionFreeText`, `AskQuestionStatus`, `AskQuestionSubmitButton`.
-- **Logic** — `askQuestionTypes.ts`; `askQuestionEphemeralStore.ts` (ephemeral selection state); `useAskQuestionState.svelte.ts`, `useAskQuestionMutation.svelte.ts` (send + fail-closed), `useAskQuestionKeyboardNavigation.svelte.ts` (arrow-key nav + roles).
+- **Logic** — `ask-question-types.ts`; `ask-question-ephemeral-store.ts` (ephemeral selection state); `use-ask-question-state.svelte.ts`, `use-ask-question-mutation.svelte.ts` (send + fail-closed), `use-ask-question-keyboard-navigation.svelte.ts` (arrow-key nav + roles).
 
 ## Do-not
 

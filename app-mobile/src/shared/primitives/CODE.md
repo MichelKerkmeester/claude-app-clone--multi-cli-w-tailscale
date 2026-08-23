@@ -6,18 +6,18 @@ Editor-facing map of this folder. For *what it's for and why*, see `README.md`.
 
 | File | Wraps | Role |
 |------|-------|------|
-| `Button.svelte` | — (native `<button>`) | The hand-rolled primitive; applies the four interaction actions. |
+| `button.svelte` | — (native `<button>`) | The hand-rolled primitive; applies the four interaction actions. |
 | `interactions.ts` | — | The `hover` / `press` / `focusVisible` / `focused` Svelte actions. |
-| `Sheet.svelte` · `SheetContent.svelte` · `SheetTitle.svelte` · `SheetClose.svelte` | `bits-ui` `Dialog` | Modal sheet family. `SheetContent` wires `ariaHideOutside`. |
-| `Menu.svelte` · `MenuTrigger.svelte` · `MenuContent.svelte` · `MenuItem.svelte` | `bits-ui` `DropdownMenu` | Dropdown menu family. `Menu` exports `MENU_DISMISS_KEY`. |
-| `RadioGroup.svelte` · `RadioGroupItem.svelte` | `bits-ui` `RadioGroup` | Single-select group. |
-| `ToggleGroup.svelte` · `ToggleGroupItem.svelte` | `bits-ui` `ToggleGroup` | Segmented toggle. |
-| `Collapsible.svelte` | `bits-ui` `Collapsible` | Disclosure. |
-| `ariaHideOutside.svelte.ts` | — | Ref-counted AT-tree hider for open overlays. |
+| `sheet.svelte` · `sheet-content.svelte` · `sheet-title.svelte` · `sheet-close.svelte` | `bits-ui` `Dialog` | Modal sheet family. `SheetContent` wires `ariaHideOutside`. |
+| `menu.svelte` · `menu-trigger.svelte` · `menu-content.svelte` · `menu-item.svelte` | `bits-ui` `DropdownMenu` | Dropdown menu family. `Menu` exports `MENU_DISMISS_KEY`. |
+| `radio-group.svelte` · `radio-group-item.svelte` | `bits-ui` `RadioGroup` | Single-select group. |
+| `toggle-group.svelte` · `toggle-group-item.svelte` | `bits-ui` `ToggleGroup` | Segmented toggle. |
+| `collapsible.svelte` | `bits-ui` `Collapsible` | Disclosure. |
+| `aria-hide-outside.svelte.ts` | — | Ref-counted AT-tree hider for open overlays. |
 
 ## Two patterns
 
-**A. Native button + actions (`Button.svelte`).** A plain `<button>` that spreads `...rest`, forwards `class`/`type`/`disabled`/`onclick`, and applies `use:hover use:press use:focusVisible use:focused`. Each action (in `interactions.ts`) sets a `data-*` attribute on the element; the button itself ships **no CSS**. `data-disabled` is emitted directly from the `disabled` prop.
+**A. Native button + actions (`button.svelte`).** A plain `<button>` that spreads `...rest`, forwards `class`/`type`/`disabled`/`onclick`, and applies `use:hover use:press use:focusVisible use:focused`. Each action (in `interactions.ts`) sets a `data-*` attribute on the element; the button itself ships **no CSS**. `data-disabled` is emitted directly from the `disabled` prop.
 
 **B. Bits UI wrapper (all the rest).** A thin `.svelte` that imports one symbol from `bits-ui`, exposes an app-shaped `Props`, threads `open`/`value` via `$bindable(...)`, spreads `...rest` to the underlying part, and renders `{@render children()}`. No behaviour is re-implemented — the wrapper only narrows the surface and names it for this app. Cross-component coordination uses `Symbol` context keys (e.g. `MENU_DISMISS_KEY`) so a consumer can dismiss without prop-drilling.
 

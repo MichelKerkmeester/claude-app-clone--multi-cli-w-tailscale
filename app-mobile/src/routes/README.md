@@ -8,8 +8,8 @@ The SvelteKit route files. This app is a **client-side SPA** (`+layout.ts` sets 
 |------|------|
 | `+layout.svelte` | The **app shell**: context providers, theme, service-worker registration, and the Review/Inbox overlays hosted above the routed page. |
 | `+layout.ts` | `ssr = false; prerender = false` — pure client render. |
-| `+page.svelte` | `/` → renders `pages/home/Home.svelte`. |
-| `session/[id]/+page.svelte` | `/session/[id]` → renders `pages/chat/Chat.svelte`. |
+| `+page.svelte` | `/` → renders `pages/home/screen-home.svelte`. |
+| `session/[id]/+page.svelte` | `/session/[id]` → renders `pages/chat/screen-chat.svelte`. |
 | `attention/[lookupId]/+page.svelte` | `/attention/[lookupId]` → resolves the lookup, then redirects to the Review overlay or the target session. |
 
 ## Rules

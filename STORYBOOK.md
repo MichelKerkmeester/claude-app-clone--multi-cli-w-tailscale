@@ -62,9 +62,9 @@ node scripts/catalog-smoke-cdp.mjs          # every story renders, light + dark,
 
 ### The addons
 
-Active today: **a11y** (automatic accessibility checks, in `main.ts`), **autodocs** (per-component
-docs pages, via each story's `autodocs` tag), and the **system/light/dark** toolbar (a `preview.ts`
-decorator driving `data-theme`). Planned per the 009 spec: the **themes** addon (replacing the
-hand-rolled toolbar), the **designs** addon (a Figma frame beside each surface), and the **test**
-addon (running the stories as interaction tests). Visual-regression via Chromatic is intentionally
+Active today (in `main.ts` / `preview.ts`): **a11y** (automatic accessibility checks), **themes**
+(the system/light/dark toolbar, via `withThemeByDataAttribute` on `data-theme`), **designs** (a Figma
+frame beside each surface), and **autodocs** (per-component docs pages, via each story's `autodocs`
+tag). Planned per the 009 spec: the **test** addon (`@storybook/addon-vitest`, running the stories as
+interaction tests via the Vitest browser provider). Visual-regression via Chromatic is intentionally
 not adopted (hosted/paid) — the local `catalog-smoke-cdp.mjs` render gate is the visual check.

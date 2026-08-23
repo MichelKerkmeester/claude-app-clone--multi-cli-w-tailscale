@@ -23,6 +23,8 @@
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^9.1.20",
+    "@storybook/addon-designs": "^10.0.2",
+    "@storybook/addon-themes": "^9.1.20",
     "@storybook/sveltekit": "^9.1.20",
     "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.70.3",

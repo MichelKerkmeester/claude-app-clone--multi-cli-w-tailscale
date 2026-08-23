@@ -15,8 +15,8 @@
 
 <script lang="ts">
   import Button from '../primitives/button/button.svelte';
-  import StatusPill from './StatusPill.svelte';
-  import ThemeControl from './ThemeControl.svelte';
+  import StatusPill from './status-pill.svelte';
+  import ThemeControl from './theme-control.svelte';
 
   let {
     connection,

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import StatusPill from './StatusPill.svelte';
+import StatusPill from './status-pill.svelte';
 
 // Smoke story: a context-free connection-phase pill, one variant per phase.
 const meta = {

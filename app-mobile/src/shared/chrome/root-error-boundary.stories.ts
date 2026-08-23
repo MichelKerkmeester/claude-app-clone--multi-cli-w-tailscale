@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import { createRawSnippet } from 'svelte';
 
-import RootErrorBoundary from './RootErrorBoundary.svelte';
+import RootErrorBoundary from './root-error-boundary.svelte';
 
 // RootErrorBoundary wraps the app shell in an <svelte:boundary>; the children
 // Snippet is built with createRawSnippet so no wrapper .svelte file is needed.

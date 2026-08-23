@@ -23,7 +23,7 @@
   import Button from '$shared/primitives/button/button.svelte';
   import Freshness from './Freshness.svelte';
   import EmptyState from './EmptyState.svelte';
-  import SessionStateIcon from '$shared/chrome/SessionStateIcon.svelte';
+  import SessionStateIcon from '$shared/chrome/session-state-icon.svelte';
   import PushSettings from './PushSettings.svelte';
 
   // ───────────────────────────────────────────────────────────────────

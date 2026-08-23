@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
-import SessionStateIcon from './SessionStateIcon.svelte';
+import SessionStateIcon from './session-state-icon.svelte';
 
 // The session-state-icon surface declares two states: idle and running. Each
 // story renders the real glyph over the real SessionCardDto['status'] value.

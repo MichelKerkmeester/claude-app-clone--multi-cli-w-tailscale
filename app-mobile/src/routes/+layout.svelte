@@ -34,9 +34,9 @@
   import type { ConnectionAction } from '$shared/data/state.js';
   import type { AttentionResolutionDto } from '@pi-remote/pi-rpc-protocol';
 
-  import RootErrorBoundary from '$shared/chrome/RootErrorBoundary.svelte';
+  import RootErrorBoundary from '$shared/chrome/root-error-boundary.svelte';
   import Enrollment from '../pages/enrollment/Enrollment.svelte';
-  import Header from '$shared/chrome/Header.svelte';
+  import Header from '$shared/chrome/header.svelte';
   import Review from '../pages/review/Review.svelte';
   import AttentionInbox from '../pages/inbox/AttentionInbox.svelte';
 

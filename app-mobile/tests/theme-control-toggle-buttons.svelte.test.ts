@@ -2,7 +2,7 @@ import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import ThemeControl from '../src/shared/chrome/ThemeControl.svelte';
+import ThemeControl from '../src/shared/chrome/theme-control.svelte';
 
 afterEach(() => {
   cleanup();

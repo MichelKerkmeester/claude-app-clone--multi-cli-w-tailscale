@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { ThemePreference } from '../data/view-helpers.js';
-import ThemeControl from './ThemeControl.svelte';
+import ThemeControl from './theme-control.svelte';
 
 // One story per real ThemePreference value — each shows the segmented selector
 // with that option in its selected state. The theme values are the frozen

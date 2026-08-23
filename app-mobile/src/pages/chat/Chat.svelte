@@ -99,7 +99,7 @@
   import PlanReviewSheet from './chrome/PlanReviewSheet.svelte';
   import LeavePlanSheet from './chrome/LeavePlanSheet.svelte';
   import ModelEffortSheet from './chrome/ModelEffortSheet.svelte';
-  import SessionStateIcon from '$shared/chrome/SessionStateIcon.svelte';
+  import SessionStateIcon from '$shared/chrome/session-state-icon.svelte';
   import ArtifactViewerProvider from './artifacts/ArtifactViewerProvider.svelte';
   import AttachmentDraftProvider from './attachments/AttachmentDraftProvider.svelte';
 

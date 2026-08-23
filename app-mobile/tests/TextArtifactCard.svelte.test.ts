@@ -2,7 +2,7 @@ import type { TextArtifactBlock } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import TextArtifactCard from '../src/pages/chat/rich-content/text-artifact-card.svelte';
+import TextArtifactCard from '../src/pages/chat/rich-content/card-text-artifact.svelte';
 import {
   normalizeTranscriptBlocks,
   type NormalizedTextArtifactBlock,

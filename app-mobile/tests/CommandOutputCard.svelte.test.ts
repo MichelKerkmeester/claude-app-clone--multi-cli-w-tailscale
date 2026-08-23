@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import CommandOutputCard, {
   reconcileCommandSnapshot,
-} from '../src/pages/chat/rich-content/command-output-card.svelte';
+} from '../src/pages/chat/rich-content/card-command-output.svelte';
 import {
   normalizeTranscriptBlocks,
   type NormalizedCommandBlock,

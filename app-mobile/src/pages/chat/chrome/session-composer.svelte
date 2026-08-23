@@ -72,10 +72,10 @@
     type SlashPanelDerivation,
   } from './composer-command-autocomplete.svelte';
   import ComposerTools from './composer-tools.svelte';
-  import PlanModeButton from './plan-mode-button.svelte';
-  import LeavePlanSheet from './leave-plan-sheet.svelte';
+  import PlanModeButton from './button-plan-mode.svelte';
+  import LeavePlanSheet from './sheet-leave-plan.svelte';
   import AttachmentRail from '../attachments/attachment-rail.svelte';
-  import AttachmentPreviewDialog from '../attachments/attachment-preview-dialog.svelte';
+  import AttachmentPreviewDialog from '../attachments/dialog-attachment-preview.svelte';
   import { getAttachmentDraft } from '../attachments/attachment-draft-provider.svelte';
   import { capabilityAllowsPhotos } from '../attachments/attachment-state.js';
   import { useAttachmentSubmission } from '../attachments/use-attachment-submission.svelte.js';

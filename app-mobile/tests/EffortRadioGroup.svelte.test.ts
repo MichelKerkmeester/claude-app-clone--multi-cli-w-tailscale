@@ -8,7 +8,7 @@ import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import EffortRadioGroup from '../src/pages/chat/chrome/effort-radio-group.svelte';
+import EffortRadioGroup from '../src/pages/chat/chrome/radio-effort.svelte';
 
 const THREE_LEVELS = ['off', 'high', 'max'] as const;
 const FIVE_LEVELS = ['off', 'low', 'medium', 'high', 'max'] as const;

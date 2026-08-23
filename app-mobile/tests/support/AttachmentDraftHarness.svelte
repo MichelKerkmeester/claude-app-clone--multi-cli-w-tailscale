@@ -8,7 +8,7 @@
 <script lang="ts">
   import { getAttachmentDraft } from '../../src/pages/chat/attachments/attachment-draft-provider.svelte';
   import AttachmentRail from '../../src/pages/chat/attachments/attachment-rail.svelte';
-  import AttachmentPreviewDialog from '../../src/pages/chat/attachments/attachment-preview-dialog.svelte';
+  import AttachmentPreviewDialog from '../../src/pages/chat/attachments/dialog-attachment-preview.svelte';
 
   let { mode = 'rail', fileType = 'image/jpeg' }: AttachmentDraftHarnessProps = $props();
 

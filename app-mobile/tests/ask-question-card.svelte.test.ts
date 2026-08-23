@@ -31,8 +31,8 @@ vi.mock('@tanstack/svelte-virtual', () => {
 });
 
 import { saveCache } from '../src/shared/transport/cache.js';
-import { clearAskQuestionEphemeralStore } from '../src/pages/chat/features/ask-question/askQuestionEphemeralStore.js';
-import AskQuestionCard from '../src/pages/chat/features/ask-question/AskQuestionCard.svelte';
+import { clearAskQuestionEphemeralStore } from '../src/pages/chat/features/ask-question/ask-question-ephemeral-store.js';
+import AskQuestionCard from '../src/pages/chat/features/ask-question/card-ask-question.svelte';
 import TranscriptList from '../src/pages/chat/transcript/transcript-list.svelte';
 import type { DisplayTranscriptBlock, TranscriptState } from '../src/shared/state/state.js';
 

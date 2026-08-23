@@ -11,8 +11,8 @@ import type {
 
 import { loadCache, saveCache } from '../src/shared/transport/cache.js';
 import { EMPTY_TRANSCRIPT } from '../src/shared/state/state.js';
-import PlanReadyCard from '../src/pages/chat/chrome/plan-ready-card.svelte';
-import PlanReviewSheet from '../src/pages/chat/chrome/plan-review-sheet.svelte';
+import PlanReadyCard from '../src/pages/chat/chrome/card-plan-ready.svelte';
+import PlanReviewSheet from '../src/pages/chat/chrome/sheet-plan-review.svelte';
 
 const SERVICE_WORKER = readFileSync('app-mobile/static/service-worker.js', 'utf8');
 const MANIFEST = JSON.parse(

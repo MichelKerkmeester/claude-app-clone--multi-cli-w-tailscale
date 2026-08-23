@@ -69,12 +69,12 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { getOptionalArtifactViewer } from '../artifacts/artifact-viewer-provider.svelte';
-  import CodeCard from './code-card.svelte';
-  import CommandOutputCard from './command-output-card.svelte';
+  import CodeCard from './card-code.svelte';
+  import CommandOutputCard from './card-command-output.svelte';
   import { createInMemoryArtifactDocument } from './f6-viewer-adapter.js';
   import RichBlockFrame from './rich-block-frame.svelte';
   import SafeMarkdown from './safe-markdown.svelte';
-  import TextArtifactCard from './text-artifact-card.svelte';
+  import TextArtifactCard from './card-text-artifact.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

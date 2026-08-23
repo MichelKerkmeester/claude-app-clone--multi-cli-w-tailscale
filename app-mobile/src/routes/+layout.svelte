@@ -35,10 +35,10 @@
   import type { AttentionResolutionDto } from '@pi-remote/pi-rpc-protocol';
 
   import RootErrorBoundary from '$shared/chrome/root-error-boundary.svelte';
-  import Enrollment from '../pages/enrollment/Enrollment.svelte';
+  import Enrollment from '../pages/enrollment/screen-enrollment.svelte';
   import Header from '$shared/chrome/header.svelte';
-  import Review from '../pages/review/Review.svelte';
-  import AttentionInbox from '../pages/inbox/AttentionInbox.svelte';
+  import Review from '../pages/review/screen-review.svelte';
+  import AttentionInbox from '../pages/inbox/screen-attention-inbox.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS

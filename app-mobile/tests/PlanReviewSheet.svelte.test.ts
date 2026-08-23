@@ -25,7 +25,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import PlanReviewSheet from '../src/pages/chat/chrome/plan-review-sheet.svelte';
+import PlanReviewSheet from '../src/pages/chat/chrome/sheet-plan-review.svelte';
 
 const ARTIFACT: PlanArtifactDto = {
   planId: 'plan_001',

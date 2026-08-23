@@ -78,7 +78,7 @@ describe('AttachmentRail', () => {
       /\.attachment-rail\s*\{[\s\S]*?max-inline-size: 100%;[\s\S]*?overflow-x: auto;/u,
     );
     expect(
-      readFileSync('app-mobile/src/pages/chat/attachments/attachment-preview-dialog.svelte', 'utf8'),
+      readFileSync('app-mobile/src/pages/chat/attachments/dialog-attachment-preview.svelte', 'utf8'),
     ).toMatch(/@media \(max-width: 20rem\)[\s\S]*?\.attachment-preview-dialog/u);
   });
 

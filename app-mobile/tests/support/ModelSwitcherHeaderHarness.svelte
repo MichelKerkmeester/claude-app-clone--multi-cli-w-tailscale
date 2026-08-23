@@ -9,7 +9,7 @@
 <script lang="ts">
   import { vi } from 'vitest';
   import SessionHeader from '../../src/pages/chat/chrome/session-header.svelte';
-  import ModelEffortSheet from '../../src/pages/chat/chrome/model-effort-sheet.svelte';
+  import ModelEffortSheet from '../../src/pages/chat/chrome/sheet-model-effort.svelte';
 
   let { controls }: ModelSwitcherHeaderHarnessProps = $props();
 

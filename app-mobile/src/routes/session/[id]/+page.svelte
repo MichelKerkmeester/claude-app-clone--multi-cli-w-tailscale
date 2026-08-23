@@ -6,7 +6,7 @@
   import { page } from '$app/stores';
 
   import { getAppState, getAppActions } from '$shared/state/app-state.svelte.js';
-  import Session from '../../../pages/chat/Chat.svelte';
+  import Session from '../../../pages/chat/screen-chat.svelte';
 
   const app = getAppState();
   const actions = getAppActions();

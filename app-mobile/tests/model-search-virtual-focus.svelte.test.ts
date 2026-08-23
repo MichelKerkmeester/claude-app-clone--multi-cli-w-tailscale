@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { RuntimeControls, RuntimeUiState } from '../src/shared/state/runtime.js';
-import ModelEffortSheet, { SEARCH_THRESHOLD } from '../src/pages/chat/chrome/model-effort-sheet.svelte';
+import ModelEffortSheet, { SEARCH_THRESHOLD } from '../src/pages/chat/chrome/sheet-model-effort.svelte';
 
 const CURRENT: AvailableModelDto = {
   provider: 'alpha',

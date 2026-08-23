@@ -3,7 +3,7 @@ import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import PlanReadyCard from '../src/pages/chat/chrome/plan-ready-card.svelte';
+import PlanReadyCard from '../src/pages/chat/chrome/card-plan-ready.svelte';
 
 const ARTIFACT: PlanArtifactDto = {
   planId: 'plan_001',

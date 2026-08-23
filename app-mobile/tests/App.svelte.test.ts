@@ -110,12 +110,12 @@ vi.mock('../src/shared/format/attention.js', () => ({
   setPushForeground: vi.fn(),
 }));
 
-import Home from '../src/pages/home/Home.svelte';
-import Review from '../src/pages/review/Review.svelte';
-import Session from '../src/pages/chat/Chat.svelte';
-import AttentionInbox from '../src/pages/inbox/AttentionInbox.svelte';
+import Home from '../src/pages/home/screen-home.svelte';
+import Review from '../src/pages/review/screen-review.svelte';
+import Session from '../src/pages/chat/screen-chat.svelte';
+import AttentionInbox from '../src/pages/inbox/screen-attention-inbox.svelte';
 import TranscriptList from '../src/pages/chat/transcript/transcript-list.svelte';
-import AskQuestionCard from '../src/pages/chat/features/ask-question/AskQuestionCard.svelte';
+import AskQuestionCard from '../src/pages/chat/features/ask-question/card-ask-question.svelte';
 import {
   EMPTY_TODO_PROJECTION_STATE,
   EMPTY_TRANSCRIPT,

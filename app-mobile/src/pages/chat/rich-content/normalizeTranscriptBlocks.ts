@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isRichToolCallBlock,
   isRichToolResultBlock,
@@ -15,6 +19,10 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import type { DisplayTranscriptBlock, TranscriptProvenance } from '$shared/data/state.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SAFE LANGUAGES AND NORMALIZED BLOCK TYPES
+// ───────────────────────────────────────────────────────────────────
 
 export type RichContentSource = TranscriptProvenance;
 
@@ -139,6 +147,10 @@ export interface NormalizedTranscript {
   readonly pendingResultCallIds: readonly string[];
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. INTERNAL RECORD TYPES
+// ───────────────────────────────────────────────────────────────────
+
 interface NormalizedArgs {
   readonly sessionId: string;
   readonly blocks: readonly TranscriptInputBlock[];
@@ -170,8 +182,16 @@ interface FenceSegment {
   readonly incomplete: boolean;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const SHELL_KINDS = new Set<TranscriptShellKind>(['bash', 'shell']);
 const FENCE_START = /^ {0,3}(`{3,}|~{3,})[ \t]*([^\r\n]*)\r?$/u;
+
+// ───────────────────────────────────────────────────────────────────
+// 5. PUBLIC TRANSCRIPT ENTRY POINTS
+// ───────────────────────────────────────────────────────────────────
 
 export function normalizeTranscriptBlocks(
   options: NormalizeTranscriptBlocksOptions,
@@ -254,6 +274,10 @@ export function normalizeTranscript(
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 6. FENCE LANGUAGE HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 export function normalizeFenceLanguage(value: string | undefined): SafeCodeLanguage | null {
   if (value === undefined) return null;
   const normalized = value.trim().toLocaleLowerCase();
@@ -295,6 +319,10 @@ export function normalizeFenceLanguage(value: string | undefined): SafeCodeLangu
 export function fenceBlockIdentity(sourceBlockId: string, ordinal: number): string {
   return `${sourceBlockId}-fence-${ordinal}`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. ARGUMENT PARSING AND BLOCK ORDERING
+// ───────────────────────────────────────────────────────────────────
 
 function readArgs(
   first: NormalizeTranscriptBlocksOptions | readonly TranscriptInputBlock[],
@@ -356,6 +384,10 @@ function isLaterRevision(left: TranscriptInputBlock, right: TranscriptInputBlock
   const rightRevision = readRevision(right);
   return leftRevision > rightRevision;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 8. BLOCK NORMALIZATION
+// ───────────────────────────────────────────────────────────────────
 
 function normalizeNonShellBlock(
   sessionId: string,
@@ -596,6 +628,10 @@ function baseFields(
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 9. FENCED CODE SEGMENTATION
+// ───────────────────────────────────────────────────────────────────
+
 function splitFencedCode(text: string): readonly FenceSegment[] {
   const lines = text.split(/\r?\n/u);
   const segments: FenceSegment[] = [];
@@ -662,6 +698,10 @@ function splitFencedCode(text: string): readonly FenceSegment[] {
     ? [{ kind: 'prose', source: text, language: null, ordinal: -1, incomplete: false }]
     : segments;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 10. BLOCK PREDICATES AND FIELD READERS
+// ───────────────────────────────────────────────────────────────────
 
 function isLongText(value: string): boolean {
   return value.length >= 1_200 || value.split(/\r?\n/u).length >= 16;

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// 1. SUPPORTED LANGUAGES AND TOKEN TYPES
+// ───────────────────────────────────────────────────────────────────
+
 export const HIGHLIGHT_LANGUAGES = [
   'bash',
   'javascript',
@@ -54,6 +58,10 @@ export interface HighlightResponse {
   readonly requestId: string;
   readonly revisionId: string;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 2. KEYWORD TABLES
+// ───────────────────────────────────────────────────────────────────
 
 const KEYWORDS: Readonly<Record<HighlightLanguage, ReadonlySet<string>>> = {
   bash: new Set([
@@ -343,6 +351,10 @@ const KEYWORDS: Readonly<Record<HighlightLanguage, ReadonlySet<string>>> = {
   plaintext: new Set([]),
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. TOKENIZER PATTERNS
+// ───────────────────────────────────────────────────────────────────
+
 const ANSI_ESCAPE = String.fromCharCode(0x1b);
 const ANSI_SEQUENCE_PATTERN = new RegExp(String.raw`${ANSI_ESCAPE}\[[0-?]*[ -/]*[@-~]`, 'gu');
 const TOKEN_PATTERN = new RegExp(
@@ -351,6 +363,10 @@ const TOKEN_PATTERN = new RegExp(
 );
 const DIFF_LINE_PATTERN = /^(\+{1,3}|-{1,3})(?!\1)/u;
 const ANSI_PATTERN = new RegExp(String.raw`^${ANSI_ESCAPE}\[`, 'u');
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TOKENIZATION
+// ───────────────────────────────────────────────────────────────────
 
 export function tokenizeSource(
   source: string,
@@ -404,6 +420,10 @@ function tokenizeDiff(source: string): readonly HighlightToken[] {
   return tokens.length === 0 ? [{ text: source, kind: 'plain' }] : tokens;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. TOKEN CLASSIFICATION
+// ───────────────────────────────────────────────────────────────────
+
 function classifyToken(value: string, language: HighlightLanguage): HighlightTokenKind {
   if (ANSI_PATTERN.test(value)) return 'ansi';
   if (
@@ -436,6 +456,10 @@ function appendToken(tokens: HighlightToken[], text: string, kind: HighlightToke
   tokens.push({ text, kind });
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 6. MESSAGE VALIDATION
+// ───────────────────────────────────────────────────────────────────
+
 interface WorkerScope {
   onmessage: ((event: MessageEvent<unknown>) => void) | null;
   postMessage: (message: HighlightResponse) => void;
@@ -461,6 +485,10 @@ function isRequest(value: unknown): value is HighlightRequest {
     typeof candidate.revisionId === 'string'
   );
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. WORKER MESSAGE HANDLER
+// ───────────────────────────────────────────────────────────────────
 
 const workerScope = globalThis as unknown as WorkerScope;
 workerScope.onmessage = (event) => {

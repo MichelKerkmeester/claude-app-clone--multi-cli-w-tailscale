@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Web Relay Client
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isAcceptEditsGrantDto,
   isApprovalCardDto,
@@ -80,6 +84,10 @@ import {
 import { establishSession } from './auth.js';
 import { demoArtifactBytes, demoPostJson, demoSocket, isDemoMode } from './demo.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS AND RELAY HEARTBEAT
+// ───────────────────────────────────────────────────────────────────
+
 const PAGE_LIMIT = 100;
 const MAX_PAGES = 100;
 
@@ -111,6 +119,10 @@ export function getRelayHeartbeat(now = Date.now()): RelayHeartbeat {
         : 'stale';
   return { state, lastSeenAt: lastRelayHeartbeatAt, navigatorOnline };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. ERROR TYPES AND RETRY PARSING
+// ───────────────────────────────────────────────────────────────────
 
 export class RelayRequestError extends Error {
   readonly code: 'access_denied' | 'request_failed';
@@ -251,6 +263,10 @@ export function parseBoundedRetryAfter(value: string | null): number | null {
   return Math.min(seconds * 1_000, MAX_RETRY_AFTER_MS);
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SHARED RESULT TYPES
+// ───────────────────────────────────────────────────────────────────
+
 export interface TranscriptLoad {
   readonly items: readonly RelayTranscriptBlock[];
   readonly coversThrough: number;
@@ -282,6 +298,10 @@ export interface PlanBindingResponse {
   readonly runtimeRevision: number;
   readonly planToken: string;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. SESSIONS, TICKETS, AND ATTACHMENTS
+// ───────────────────────────────────────────────────────────────────
 
 export async function fetchSessions(signal: AbortSignal): Promise<readonly SessionCardDto[]> {
   const payload = await postJson('/api/sessions', undefined, signal);
@@ -544,6 +564,10 @@ export async function submitPromptWithAttachmentRefs(
   return payload.block;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 6. PROMPT SUBMISSION
+// ───────────────────────────────────────────────────────────────────
+
 export async function submitPrompt(
   sessionId: string,
   submissionId: string,
@@ -604,6 +628,10 @@ export async function submitSlashCommand(
   if (isSlashSubmitIssueResponse(payload)) throw new SlashSubmitError(payload.error);
   throw new Error('Relay returned an invalid slash submission response.');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. RUNTIME STATE, MODELS, AND PLAN BINDING READS
+// ───────────────────────────────────────────────────────────────────
 
 export async function fetchRuntimeState(signal?: AbortSignal): Promise<RuntimeStateDto> {
   const payload = await postJson('/api/runtime/state', undefined, signal);
@@ -722,6 +750,10 @@ function isAbortError(error: unknown): boolean {
     (error as { readonly name?: unknown }).name === 'AbortError'
   );
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 8. COMMAND CATALOG AND RUNTIME CONTROL
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * Read the relay-filtered command catalog for the current host epoch and
@@ -1000,6 +1032,10 @@ function isPlanBindingResponse(value: unknown): value is PlanBindingResponse {
   );
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 9. PROMPT ABORT AND APPROVALS
+// ───────────────────────────────────────────────────────────────────
+
 /** Interrupt the running agent. A fresh one-use ticket is obtained immediately before. */
 export async function abortPrompt(signal?: AbortSignal): Promise<PromptAbortResponse> {
   const ticket = await requestTicket(signal);
@@ -1069,6 +1105,10 @@ export async function createAcceptEditsGrant(
     throw new Error('Relay returned an invalid accept-edits grant.');
   return payload;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 10. TRANSCRIPT AND ASK-QUESTION FLOW
+// ───────────────────────────────────────────────────────────────────
 
 export async function fetchTranscript(
   sessionId: string,
@@ -1239,6 +1279,10 @@ function annotateRelayBlock(block: TranscriptBlock): RelayTranscriptBlock {
     richEligible: isRichTranscriptBlock(block),
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 11. ARTIFACT READS
+// ───────────────────────────────────────────────────────────────────
 
 /** Read one relay-authored artifact revision without routing bytes through JSON transport. */
 export async function readArtifact(
@@ -1561,6 +1605,10 @@ function parseContentDigest(value: string | null): string | null {
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 12. SYNC SOCKET
+// ───────────────────────────────────────────────────────────────────
+
 export async function openSyncSocket(
   sessionId: string,
   cursor: SyncCursor | null,
@@ -1609,6 +1657,10 @@ export function isReadOnlySyncMessage(value: unknown, sessionId: string): value 
       isTodoProjectionEnvelopePayload(envelope.kind, envelope.payload),
   );
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 13. HTTP TRANSPORT
+// ───────────────────────────────────────────────────────────────────
 
 async function postJson(
   path: string,
@@ -1665,6 +1717,10 @@ async function postJsonWithHeaders(
   }
   return response.status === 204 ? null : (response.json() as Promise<unknown>);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 14. PAYLOAD VALIDATION HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function sameAttachmentBinding(
   manifest: AttachmentSetManifest,

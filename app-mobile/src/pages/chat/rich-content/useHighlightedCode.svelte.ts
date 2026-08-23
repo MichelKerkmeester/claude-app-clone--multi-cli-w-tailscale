@@ -2,6 +2,10 @@
 // MODULE: Code Syntax Highlighting
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. HIGHLIGHT LIMITS AND LANGUAGE ALLOWLIST
+// ───────────────────────────────────────────────────────────────────
+
 export const HIGHLIGHT_MAX_CHARS = 20_000;
 export const HIGHLIGHT_MAX_LINES = 1_000;
 
@@ -24,6 +28,10 @@ export const HIGHLIGHT_LANGUAGE_ALLOWLIST = [
   'ansi',
   'plaintext',
 ] as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type HighlightLanguage = (typeof HIGHLIGHT_LANGUAGE_ALLOWLIST)[number];
 export type HighlightTheme = 'light' | 'dark';
@@ -90,6 +98,10 @@ interface HighlightResponse {
   readonly revisionId: string;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. MODULE STATE AND RESOURCE STATS
+// ───────────────────────────────────────────────────────────────────
+
 let requestSequence = 0;
 let activeWorkers = 0;
 const pendingRequests = new Set<string>();
@@ -106,6 +118,10 @@ export function getHighlightResourceStats(): HighlightResourceStats {
     retainedHighlightSets: 0,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HASHING AND LANGUAGE NORMALIZATION
+// ───────────────────────────────────────────────────────────────────
 
 export function hashCanonicalSource(source: string): string {
   let hash = 2_166_136_261;
@@ -160,6 +176,10 @@ export function lineCount(source: string): number {
   return source.length === 0 ? 1 : source.split(/\r?\n/u).length;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 5. ELIGIBILITY POLICY
+// ───────────────────────────────────────────────────────────────────
+
 export function highlightEligibility(
   source: string,
   language: string | null | undefined,
@@ -179,6 +199,10 @@ export function shouldDispatchHighlight(
 ): boolean {
   return enabled && highlightEligibility(source, language) === 'eligible';
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 6. THEME RESOLUTION AND RESPONSE VALIDATION
+// ───────────────────────────────────────────────────────────────────
 
 function resolveTheme(): HighlightTheme {
   if (typeof document !== 'undefined') {
@@ -246,6 +270,10 @@ function initialState(
     language,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 7. RUNES HOOK FACTORY
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * Svelte 5 runes port of the React hook. Call it once during component init and pass a getter thunk that reads

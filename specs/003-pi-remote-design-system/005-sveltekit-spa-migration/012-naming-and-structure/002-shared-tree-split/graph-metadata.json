@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
-  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -11,44 +11,44 @@
   },
   "derived": {
     "trigger_phrases": [
-      "inline comment quality why not what",
-      "section banner coverage svelte",
-      "comment grammar sk-code-opencode"
+      "shared data folder split",
+      "transport state commands catalog",
+      "shared specifier rewrite"
     ],
     "key_topics": [
-      "inline",
-      "comment",
-      "quality",
-      "section",
-      "banner",
-      "coverage",
-      "svelte",
-      "grammar",
-      "sk-code-opencode",
-      "bring",
-      "every",
-      "source"
+      "shared",
+      "data",
+      "folder",
+      "split",
+      "transport",
+      "state",
+      "commands",
+      "catalog",
+      "specifier",
+      "rewrite",
+      "redistribute",
+      "28-file"
     ],
     "importance_tier": "important",
     "status": "in_progress",
     "key_files": [
-      "spec.md",
       "plan.md",
+      "spec.md",
       "checklist.md",
       "tasks.md",
       "implementation-summary.md"
     ],
     "entities": [
       {
-        "name": "spec.md",
-        "kind": "doc",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
         "name": "plan.md",
         "kind": "doc",
         "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
         "source": "derived"
       },
       {
@@ -76,18 +76,6 @@
         "source": "derived"
       },
       {
-        "name": "four",
-        "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "a",
-        "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
         "name": "1. METADATA",
         "kind": "heading",
         "path": "spec.md",
@@ -106,19 +94,19 @@
         "source": "derived"
       },
       {
-        "name": "Barrier Scans",
-        "kind": "proper_noun",
-        "path": "plan.md",
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "worked",
-        "kind": "key_phrase",
-        "path": "plan.md",
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "its",
+        "name": "the",
         "kind": "key_phrase",
         "path": "plan.md",
         "source": "derived"
@@ -133,6 +121,36 @@
         "name": "2. QUALITY GATES",
         "kind": "heading",
         "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Phase 1: Create and move",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "one",
+        "kind": "key_phrase",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -160,33 +178,15 @@
         "source": "derived"
       },
       {
-        "name": "PHASE 3: VERIFICATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "Verification Checklist",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
-      },
-      {
-        "name": "Verification Protocol",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
-      },
-      {
-        "name": "Code Quality",
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "Bring every source file up to the sk-code-opencode commenting standard: section banners on the 51 files that lack them, and a rewrite of in-section comments from WHAT-narration to durable WHY. No behaviour, token or a11y change.",
-    "created_at": "2026-08-23T09:57:25.106Z",
-    "last_save_at": "2026-08-23T10:59:41.823Z",
+    "causal_summary": "Redistribute the 28-file shared/data grab-bag into seven folders grouped by reason to change, and rewrite the specifiers that reach it from nearly every page component.",
+    "created_at": "2026-08-23T10:58:30.818Z",
+    "last_save_at": "2026-08-23T10:58:30.818Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:beb4f04ec909a203be33414b0d0a8251241c00ca8a6e283563ae17209f359d92",
+    "source_fingerprint": "sha256:85d9977f8d05ef42a0b67dc699f20bb7137e33834d149e08c7bd461f168417ea",
     "source_doc_hashes": {
-      "spec.md": "a47acabeeef68a0e6ecb08fb168b8cbc5755991d298c4bb1b460f6ecb27969e7",
-      "plan.md": "b9b2aaf1717c68aef39f7e5856059b77bfcba8209fb0dc7ea5d98ae06ce7795d",
-      "tasks.md": "0f30651b09fe2c59ca0dc08d543c83ebd8e6ad4affe4d78671cd26031ce5a56c",
-      "checklist.md": "ba367ee06c2f44e3850ce07987b1498b4909f4f26f468369decd2e97e745d1be",
-      "implementation-summary.md": "e69a57ab63dc0772f39013e36a1072ca8f4329d8b11289904b9f790dada73460"
+      "spec.md": "423cb6f48fff4a5129e63391db5c5fd50f83ade36c55e35ef706025c3bd1e731",
+      "plan.md": "d02a67a752e7670ad25c4206e0535cc18542112669b4be0b76bf237d07b70cbb",
+      "tasks.md": "a839d4887db8cb206b997f4ccc71ab368a66ee4fd00f5ed570d835b81b906a2a",
+      "checklist.md": "8b442998909af512e63e252142b1dd57e3fa28edb14c5b79ffc611dea2cf7fc3",
+      "implementation-summary.md": "5da4785264e2cae06e173ec726c75867b81d382a79d048d0a14578b44302579a"
     },
     "last_active_child_id": null,
     "last_active_at": null

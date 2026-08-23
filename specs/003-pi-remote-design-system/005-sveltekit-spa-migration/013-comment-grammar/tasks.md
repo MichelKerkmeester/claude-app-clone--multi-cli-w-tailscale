@@ -126,7 +126,7 @@ sample size belongs in the summary rather than being left implicit.
 - `spec.md` — measured baselines, requirements and the fence-text tension.
 - `plan.md` — the grammar with a worked before-and-after, and the batch order.
 - `checklist.md` — barrier sign-off with evidence.
-- `../012-naming-and-structure/tasks.md` — same 148 files; must land first, must not run concurrently.
+- `../012-naming-and-structure/spec.md` — same 148 files; must land first, must not run concurrently.
 - `../014-folder-documentation/tasks.md` — runs after.
 - Program goal: `../goal.md`.
 <!-- /ANCHOR:cross-refs -->

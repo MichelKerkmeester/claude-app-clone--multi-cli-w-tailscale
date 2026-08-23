@@ -1,11 +1,11 @@
 ---
-title: "Child 012 decision record — naming grammar and shared-tree structure"
+title: "Child 001 decision record — naming grammar and shared-tree structure"
 description: "Why kebab-case wins over Svelte's PascalCase convention, why the kind comes first in a component name, how shared/ was split, and why routes/ is excluded from the rename."
 contextType: "decision"
 _memory:
   continuity:
-    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure"
-    last_updated_at: "2026-08-23T12:00:00Z"
+    packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
+    last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Four decisions recorded with alternatives weighed."
     next_safe_action: "Operator confirms ADR-002 prefix list and ADR-003 taxonomy."
@@ -16,7 +16,7 @@ _memory:
 <!-- SPECKIT_TEMPLATE_SOURCE: decision-record | v2.2 -->
 <!-- SPECKIT_LEVEL: 3 -->
 
-# Child 012 decision record
+# Child 001 decision record
 
 ---
 
@@ -68,8 +68,9 @@ disagree with this tree: Storybook's automatic title derivation changes, some ed
 component-scaffolding defaults will produce the wrong case, and any contributor arriving from another
 Svelte codebase will find this unfamiliar.
 
-The mitigation is that the conventions authority must teach the rule, which is why REQ-006 blocks the
-packet from closing. An unwritten deviation is a trap; a written one is a convention.
+The mitigation is that the conventions authority must teach the rule. A minimal naming correction
+lands with the rename in child 003; the full refresh is 019's packet. An unwritten deviation is a
+trap; a written one is a convention.
 <!-- /ANCHOR:adr-001-consequences -->
 
 <!-- ANCHOR:adr-001-five-checks -->
@@ -80,7 +81,7 @@ packet from closing. An unwritten deviation is a trap; a written one is a conven
 | Is it the simplest option? | Yes — one rule, no exceptions inside the app tree |
 | What does it touch? | Every source file; no runtime behaviour |
 | Is it solving a real problem? | Yes — three grammars measured in one tree |
-| Will a future maintainer understand it? | Only if the conventions file says so, hence REQ-006 |
+| Will a future maintainer understand it? | Only if the conventions file says so, hence the stop-gap |
 | Does the complexity match the problem? | Yes — a rename is the whole implementation |
 <!-- /ANCHOR:adr-001-five-checks -->
 
@@ -231,9 +232,9 @@ taxonomy needs a folder, not evidence it needs a `misc/`.
 <!-- ANCHOR:adr-003-impl -->
 ### Implementation note
 
-This phase runs on the critical path because its specifier impact is the widest. It is also the phase
-where a partial application is most likely to still compile, so the completeness check matters more
-here than the build does.
+The taxonomy is decided here and executed in child 002, which sits on the critical path because its
+specifier impact is the widest. It is also where a partial application is most likely to still
+compile, so there the completeness check matters more than the build does.
 <!-- /ANCHOR:adr-003-impl -->
 <!-- /ANCHOR:adr-003 -->
 

@@ -105,6 +105,17 @@ the security posture, and the PWA behavior are held **byte-for-byte** (see [`goa
 | [`006-catalog`](006-catalog/) | Storybook 8 + mock-context decorator → ~60/64 surfaces live | yes — stories per surface | catalog smoke (light + dark) |
 | [`007-verify-and-cutover`](007-verify-and-cutover/) | CSS-corpus builder, token-identity gate, test rewrite, CDP repoint, deep-review, amendment close | yes → barrier | all 9 objective gates green |
 | [`008-sk-code-svelte-refactor`](008-sk-code-svelte-refactor/) | completely refactor the `sk-code-mobile-cli` skill (React→Svelte conventions) so every dispatch loads correct guidance | spans the run | draft correct before L1; finalized + `package_skill.py --check` clean at cutover |
+| [`009-storybook-experience`](009-storybook-experience/) | Storybook from render catalog to first-class component surface: addons, autodocs, a story-per-component coverage gate | after 007 | coverage gate green; one-command launch a non-technical user can run |
+| [`010-context-repo-research`](010-context-repo-research/) | research sweep over five reference codebases → a decision-ready recommendation list | read-only, parallel | recommendations presented; nothing scaffolded without approval |
+| [`011-ux-affordances`](011-ux-affordances/) | the home for deliberate operator-requested rendered changes — the one packet allowed to move a pixel | opt-in, per change | each change individually scoped; frozen tokens and a11y contracts still honoured |
+| [`012-naming-and-structure`](012-naming-and-structure/) | **phase parent** — one kebab-case grammar, kind-first component names, `shared/` split by responsibility | no — same 148 files as 013 | all three children green; nine gates from the final state |
+| [`013-comment-grammar`](013-comment-grammar/) | section banners on the 51 files lacking them; in-section comments rewritten from WHAT to WHY | no — same files as 012 | nine gates green; no rendered change |
+| [`014-folder-documentation`](014-folder-documentation/) | 16 READMEs and 7 CODE files onto the `sk-doc` templates, plus the ones missing | after 012 and 013 | every folder explains its feature and its logic |
+| [`015-test-lanes`](015-test-lanes/) | glob the logic-test allowlist, stop mocking the virtualizer away, give ESLint a Svelte parser | precondition, runs early | later fixes become provable |
+| [`016-relay-correctness`](016-relay-correctness/) | **phase parent** — projection integrity, route authority, connection lifecycle | yes — relay-side, independent of the client queue | all three children green; backend suite green throughout |
+| [`017-ask-question-activation`](017-ask-question-activation/) | wire the one relay service never constructed; today every route answers 503 | after 016 | the feature answers from a real service, not a stub |
+| [`018-transcript-affordances`](018-transcript-affordances/) | disclosure state that survives scrolling, a distinguishable blanket grant, a transcript that can say stalled | client-side | three affordances land with tests |
+| [`019-surface-skill-refresh`](019-surface-skill-refresh/) | re-open `sk-code-mobile-cli` once the conventions have shipped, and merge the branch stranded since 008 | last — describes what shipped | skill teaches the shipped tree; branch merged |
 
 CSS decomposition is **folded into every component dispatch** (each moves its surface's `style.css`
 block into that component's scoped `<style>`), not a separate child.

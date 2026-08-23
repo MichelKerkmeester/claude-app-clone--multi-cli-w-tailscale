@@ -3,7 +3,11 @@
   "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
   "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
   "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
-  "children_ids": [],
+  "children_ids": [
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split",
+    "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"
+  ],
   "manual": {
     "depends_on": [],
     "supersedes": [],
@@ -32,48 +36,14 @@
     "importance_tier": "important",
     "status": "in_progress",
     "key_files": [
-      "decision-record.md",
-      "plan.md",
-      "tasks.md",
-      "checklist.md",
-      "spec.md",
-      "implementation-summary.md"
+      "001-grammar-and-manifest/plan.md",
+      "spec.md"
     ],
     "entities": [
-      {
-        "name": "decision-record.md",
-        "kind": "doc",
-        "path": "decision-record.md",
-        "source": "derived"
-      },
-      {
-        "name": "plan.md",
-        "kind": "doc",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "tasks.md",
-        "kind": "doc",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "checklist.md",
-        "kind": "doc",
-        "path": "checklist.md",
-        "source": "derived"
-      },
       {
         "name": "spec.md",
         "kind": "doc",
         "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "implementation-summary.md",
-        "kind": "doc",
-        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -83,20 +53,8 @@
         "source": "derived"
       },
       {
-        "name": "the",
+        "name": "three",
         "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "evidence",
-        "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "EXECUTIVE SUMMARY",
-        "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
@@ -113,101 +71,31 @@
         "source": "derived"
       },
       {
-        "name": "Barrier Nine",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Task Checklist Before",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Execution Rules",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Status Reporting Format Each",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Blocked Task Protocol Stop",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "proposed",
-        "kind": "key_phrase",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Update Storybook",
-        "kind": "proper_noun",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "a",
-        "kind": "key_phrase",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "T2.23",
-        "kind": "key_phrase",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "TASK NOTATION",
+        "name": "3. SCOPE",
         "kind": "heading",
-        "path": "tasks.md",
+        "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Verification Checklist",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
-      },
-      {
-        "name": "Verification Protocol This",
-        "kind": "proper_noun",
-        "path": "checklist.md",
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "One naming grammar for the whole app — kebab-case files and folders, kind-first component names — and a shared/ tree deep enough to say what each file is for, replacing the 28-file shared/data grab-bag. Pure rename and move: no rendered value, behaviour, route or a11y contract changes.",
+    "causal_summary": "Phase parent for the naming pass: one kebab-case grammar for every file and folder, kind-first component names, and a shared/ tree split by responsibility to replace the 28-file grab-bag. Pure rename and move — no rendered value, behaviour, route or a11y contract changes.",
     "created_at": "2026-08-23T09:57:24.802Z",
-    "last_save_at": "2026-08-23T10:02:31.063Z",
+    "last_save_at": "2026-08-23T10:58:31.433Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md",
-      "plan.md",
-      "tasks.md",
-      "checklist.md",
-      "decision-record.md",
-      "implementation-summary.md"
+      "spec.md"
     ],
-    "source_fingerprint": "sha256:6a8fbd394d458766770c0aaa0b67ba979cc263bc6d7883275f0e244fe5159ce2",
+    "source_fingerprint": "sha256:2824665a9017643009ba9de75df3b0192758cba304e84eb7b95e0085006a09b1",
     "source_doc_hashes": {
-      "spec.md": "6825ed27ad1c7e7ae81815f5058f1ee5f20ce3d80e4f821bafaf9b0859b3fd3a",
-      "plan.md": "3afdbe3e899146ccb2bf60944ec66184887cae77a37b66d7875a0f169e89eb3b",
-      "tasks.md": "d350135ce4e29c6570def12aff6b3fa23db889218e9f016bc1da8420f7538639",
-      "checklist.md": "d1d50be087e609877fc5f8058c23859f2a72101610c5aac2d0c02a412d18d8b0",
-      "decision-record.md": "1d6c34ccb2de063d849410ac84980ba71f5d00b30250a4d1f84e9065add4a48a",
-      "implementation-summary.md": "07e214f7bd3f3887650da2ccabd89a31597b4f3f827ca665e07fa5c34ab79fbc"
+      "spec.md": "68fb12bf810dd54da312b42de2deb19d53097020e6b0ed1be901ae519ad6b066"
     },
-    "last_active_child_id": null,
+    "last_active_child_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling",
     "last_active_at": null
   }
 }

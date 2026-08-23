@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
-  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -11,23 +11,23 @@
   },
   "derived": {
     "trigger_phrases": [
-      "inline comment quality why not what",
-      "section banner coverage svelte",
-      "comment grammar sk-code-opencode"
+      "pages kind first rename",
+      "storybook glob rebaseline",
+      "css corpus glob rename"
     ],
     "key_topics": [
-      "inline",
-      "comment",
-      "quality",
-      "section",
-      "banner",
-      "coverage",
-      "svelte",
-      "grammar",
-      "sk-code-opencode",
-      "bring",
-      "every",
-      "source"
+      "pages",
+      "kind",
+      "first",
+      "rename",
+      "storybook",
+      "glob",
+      "rebaseline",
+      "css",
+      "corpus",
+      "kind-first",
+      "renames",
+      "across"
     ],
     "importance_tier": "important",
     "status": "in_progress",
@@ -76,13 +76,7 @@
         "source": "derived"
       },
       {
-        "name": "four",
-        "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "a",
+        "name": "its",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
@@ -106,19 +100,19 @@
         "source": "derived"
       },
       {
-        "name": "Barrier Scans",
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Barrier Nine",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "worked",
-        "kind": "key_phrase",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "its",
+        "name": "the",
         "kind": "key_phrase",
         "path": "plan.md",
         "source": "derived"
@@ -136,6 +130,30 @@
         "source": "derived"
       },
       {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Update Storybook",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
         "name": "evidence",
         "kind": "key_phrase",
         "path": "tasks.md",
@@ -148,31 +166,13 @@
         "source": "derived"
       },
       {
-        "name": "PHASE 1: SETUP",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "PHASE 2: IMPLEMENTATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "PHASE 3: VERIFICATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "Verification Checklist",
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
       },
       {
-        "name": "Verification Protocol",
+        "name": "Verification Protocol This",
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
@@ -184,9 +184,9 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Bring every source file up to the sk-code-opencode commenting standard: section banners on the 51 files that lack them, and a rewrite of in-section comments from WHAT-narration to durable WHY. No behaviour, token or a11y change.",
-    "created_at": "2026-08-23T09:57:25.106Z",
-    "last_save_at": "2026-08-23T10:59:41.823Z",
+    "causal_summary": "Kind-first renames across every feature folder under pages/, then the configs, globs, story ids and coverage allowlist that make the renamed tree testable, plus the minimal conventions correction and the nine-gate barrier.",
+    "created_at": "2026-08-23T10:58:31.124Z",
+    "last_save_at": "2026-08-23T10:58:31.124Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:beb4f04ec909a203be33414b0d0a8251241c00ca8a6e283563ae17209f359d92",
+    "source_fingerprint": "sha256:b0779a052c6c5cb71d7ba8573bcb3f6614c18dcee7ece9b2f9c67ad82dd3287e",
     "source_doc_hashes": {
-      "spec.md": "a47acabeeef68a0e6ecb08fb168b8cbc5755991d298c4bb1b460f6ecb27969e7",
-      "plan.md": "b9b2aaf1717c68aef39f7e5856059b77bfcba8209fb0dc7ea5d98ae06ce7795d",
-      "tasks.md": "0f30651b09fe2c59ca0dc08d543c83ebd8e6ad4affe4d78671cd26031ce5a56c",
-      "checklist.md": "ba367ee06c2f44e3850ce07987b1498b4909f4f26f468369decd2e97e745d1be",
-      "implementation-summary.md": "e69a57ab63dc0772f39013e36a1072ca8f4329d8b11289904b9f790dada73460"
+      "spec.md": "5466087d11522e7b89ff7290d0e3349036f2b1ce92df31a45ed98a8e97dee200",
+      "plan.md": "550fcee8eb530eef1142c0fefe86cdff74625fe56cce152d76ed34de9b2c3f56",
+      "tasks.md": "9fec3789d8661e811b945216ab4b9ed33cf1f862cd0152b23c82d829c4916af2",
+      "checklist.md": "80961a9a37b5f705b2245a097402d3c13dfb8166ae14a937b5a6d3162438ecc5",
+      "implementation-summary.md": "c67030a96f7c879261a93cd27ac639733a641eda4568e62c78dcff2b3fc5e56b"
     },
     "last_active_child_id": null,
     "last_active_at": null

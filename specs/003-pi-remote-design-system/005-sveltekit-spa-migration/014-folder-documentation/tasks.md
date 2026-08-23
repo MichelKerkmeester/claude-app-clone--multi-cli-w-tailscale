@@ -116,7 +116,7 @@ source first. Section counts are a floor, not the goal.
 - `spec.md` — measured inventory, requirements and the two open questions.
 - `plan.md` — template mapping, folder order and the reference-integrity approach.
 - `checklist.md` — barrier sign-off with evidence.
-- `../012-naming-and-structure/plan.md` — the tree this documentation describes.
+- `../012-naming-and-structure/001-grammar-and-manifest/plan.md` — the tree this documentation describes.
 - `../013-comment-grammar/plan.md` — the comment grammar this documentation should agree with.
 - Program goal: `../goal.md`.
 <!-- /ANCHOR:cross-refs -->

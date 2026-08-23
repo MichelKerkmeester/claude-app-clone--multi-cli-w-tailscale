@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
-  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/013-comment-grammar",
-  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/012-naming-and-structure",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -11,38 +11,39 @@
   },
   "derived": {
     "trigger_phrases": [
-      "inline comment quality why not what",
-      "section banner coverage svelte",
-      "comment grammar sk-code-opencode"
+      "rename manifest kebab case",
+      "kind prefix list confirm",
+      "shared primitives sub folders"
     ],
     "key_topics": [
-      "inline",
-      "comment",
-      "quality",
-      "section",
-      "banner",
-      "coverage",
-      "svelte",
-      "grammar",
-      "sk-code-opencode",
-      "bring",
-      "every",
-      "source"
+      "rename",
+      "manifest",
+      "kebab",
+      "case",
+      "kind",
+      "prefix",
+      "list",
+      "confirm",
+      "shared",
+      "primitives",
+      "sub",
+      "folders"
     ],
     "importance_tier": "important",
     "status": "in_progress",
     "key_files": [
-      "spec.md",
+      "decision-record.md",
       "plan.md",
-      "checklist.md",
       "tasks.md",
+      "checklist.md",
+      "spec.md",
       "implementation-summary.md"
     ],
     "entities": [
       {
-        "name": "spec.md",
+        "name": "decision-record.md",
         "kind": "doc",
-        "path": "spec.md",
+        "path": "decision-record.md",
         "source": "derived"
       },
       {
@@ -52,15 +53,21 @@
         "source": "derived"
       },
       {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
         "source": "derived"
       },
       {
-        "name": "tasks.md",
+        "name": "spec.md",
         "kind": "doc",
-        "path": "tasks.md",
+        "path": "spec.md",
         "source": "derived"
       },
       {
@@ -76,67 +83,79 @@
         "source": "derived"
       },
       {
-        "name": "four",
+        "name": "the",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "a",
+        "name": "SvelteKit",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "1. METADATA",
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "EXECUTIVE SUMMARY",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "2. PROBLEM & PURPOSE",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "3. SCOPE",
-        "kind": "heading",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Barrier Scans",
+        "name": "Decide Operator",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "worked",
+        "name": "Task Checklist Before",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Execution Rules",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Status Reporting Format Each",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Blocked Task Protocol Stop",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "one",
         "kind": "key_phrase",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "its",
+        "name": "a",
         "kind": "key_phrase",
-        "path": "plan.md",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "1. SUMMARY",
-        "kind": "heading",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "2. QUALITY GATES",
-        "kind": "heading",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "evidence",
+        "name": "git",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
@@ -154,39 +173,21 @@
         "source": "derived"
       },
       {
-        "name": "PHASE 2: IMPLEMENTATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "PHASE 3: VERIFICATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "Verification Checklist",
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
       },
       {
-        "name": "Verification Protocol",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
-      },
-      {
-        "name": "Code Quality",
+        "name": "Verification Protocol This",
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "Bring every source file up to the sk-code-opencode commenting standard: section banners on the 51 files that lack them, and a rewrite of in-section comments from WHAT-narration to durable WHY. No behaviour, token or a11y change.",
-    "created_at": "2026-08-23T09:57:25.106Z",
-    "last_save_at": "2026-08-23T10:59:41.823Z",
+    "causal_summary": "Settle the naming grammar, build the rename manifest as data, generate the specifier rewrite from it, and prove the mechanics on shared/primitives and shared/chrome before 148 files are in flight.",
+    "created_at": "2026-08-23T10:58:30.521Z",
+    "last_save_at": "2026-08-23T10:59:05.134Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -194,15 +195,17 @@
       "plan.md",
       "tasks.md",
       "checklist.md",
+      "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:beb4f04ec909a203be33414b0d0a8251241c00ca8a6e283563ae17209f359d92",
+    "source_fingerprint": "sha256:478c3800a5ffbd5f8517ea579b18a643a863680cd496421fbf3dc4d51ff35839",
     "source_doc_hashes": {
-      "spec.md": "a47acabeeef68a0e6ecb08fb168b8cbc5755991d298c4bb1b460f6ecb27969e7",
-      "plan.md": "b9b2aaf1717c68aef39f7e5856059b77bfcba8209fb0dc7ea5d98ae06ce7795d",
-      "tasks.md": "0f30651b09fe2c59ca0dc08d543c83ebd8e6ad4affe4d78671cd26031ce5a56c",
-      "checklist.md": "ba367ee06c2f44e3850ce07987b1498b4909f4f26f468369decd2e97e745d1be",
-      "implementation-summary.md": "e69a57ab63dc0772f39013e36a1072ca8f4329d8b11289904b9f790dada73460"
+      "spec.md": "8119596fb4bbf77f699eddd6a8e8c32c5d85d48fa8b6d97ae274afede473e68f",
+      "plan.md": "64aba62f2a15a9e782025ea187b9ac9b111c83296dfaf28003f04f8450047332",
+      "tasks.md": "46c6bf8eb8fc022fa8a5ff31d5c02617a1e42b874fc96366b3297cfb2c43def1",
+      "checklist.md": "6794c01645c01d84447e5618b824035029731aca4a462775fd004d0831f210dd",
+      "decision-record.md": "307d8c5dc3f83d4921dc0c38a09343070287cd19980f6f8cd4d72d00891ea771",
+      "implementation-summary.md": "66daf7caaf8c104e7b5deda4aaafcfc8d28f70c19a8d11966182588fa8007fdb"
     },
     "last_active_child_id": null,
     "last_active_at": null

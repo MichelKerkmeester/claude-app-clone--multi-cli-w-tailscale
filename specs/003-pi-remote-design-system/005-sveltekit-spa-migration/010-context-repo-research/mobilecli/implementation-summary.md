@@ -19,6 +19,8 @@ _memory:
 
 # Implementation Summary — mobilecli Pattern Mining Research
 
+<!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary | v2.2 -->
+
 ## Final State
 
 - **Loop:** 10/10 successful iterations (`research/iterations/iteration-001..010.md`), ratios 0.82 → 0.82 (mean ≈ 0.74); stop reason `maxIterationsReached`; convergence floor (3) cleared.

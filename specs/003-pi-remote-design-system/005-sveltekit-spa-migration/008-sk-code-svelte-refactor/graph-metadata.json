@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
-  "spec_folder": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
-  "parent_id": "app-mobile-cli/003-pi-remote-design-system/005-sveltekit-spa-migration",
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -29,15 +29,22 @@
       "teaches"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
-      "spec.md"
+      "spec.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
         "name": "spec.md",
         "kind": "doc",
         "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -75,19 +82,57 @@
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "count-fresh",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "sk-git",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. OUTCOME",
+        "kind": "heading",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. WHAT SHIPPED",
+        "kind": "heading",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "Completely refactor the sk-code-mobile-cli surface skill so it teaches the SvelteKit 5 / Svelte 5 stack instead of React — SMART ROUTING + surface-detection markers, the @ds grammar's .svelte seam form, the per-component scoped <style> model, the Bits UI / Melt UI mapping, runes verification, and setup/standards. It is the conventions authority every cli-devin dispatch loads, so it drafts before the first code dispatch and finalizes at cutover. The skill lives in the Public monorepo (symlinked); it lands via an isolated Public worktree.",
     "created_at": "2026-08-19T17:24:04.580Z",
-    "last_save_at": "2026-08-19T17:24:04.580Z",
+    "last_save_at": "2026-08-23T00:26:32.247Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:e5654b04a1734c626d20946e9a666e7a496391202b2f1d515afdf95ab1aea3bd",
+    "source_fingerprint": "sha256:4b668dcdbafa14b511bdca3831157d0790bead1b01fb9bf5291df201baef4635",
     "source_doc_hashes": {
-      "spec.md": "480afb8ef12fc9a0f6754b9a051ac8c8a1de72b899112898cd3add04ec41d35b"
+      "spec.md": "88977d05b3aeca9d8c7d06af38b8f754e731bfc2121124a95ad97b67d99b2e89",
+      "implementation-summary.md": "e6c97b02439f886cd8f2055f6724e16f0fb8d6b63eb68df27a2f1f39fcea821d"
     },
     "last_active_child_id": null,
     "last_active_at": null

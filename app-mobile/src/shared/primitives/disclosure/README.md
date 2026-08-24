@@ -62,11 +62,32 @@ The primitive is for secondary information such as transcript evidence or detail
 |---|---|
 | [`collapsible.svelte`](./collapsible.svelte) | Bindable root, fixed heading boundary, trigger and content composition. |
 | [`collapsible.stories.ts`](./collapsible.stories.ts) | Collapsed and expanded Storybook examples. |
-| [`CODE.md`](./CODE.md) | Source flow and ownership boundaries. |
 
 ---
 
-## 5. CONFIGURATION
+## 5. IMPLEMENTATION BOUNDARIES
+
+`collapsible.svelte` keeps the trigger and content in one Bits UI root. The caller supplies the snippets and owns presentation.
+
+| Boundary | Rule |
+|---|---|
+| Root | `collapsible.svelte` binds `open` once, places the trigger inside `h3` and connects `Collapsible.Trigger` with `Collapsible.Content`. |
+| Bits UI | The root context owns expanded state, trigger semantics and content visibility. Do not create a second open-state controller. |
+| Caller | The caller supplies meaningful trigger and body content plus spacing, hit target, state styling, transitions and forced-color rules. |
+| Stories | `collapsible.stories.ts` uses raw snippets to verify the closed and open states. It does not define runtime behavior. |
+
+Put composition and heading changes in `collapsible.svelte`. Put state examples in `collapsible.stories.ts`. Put motion and visual accessibility in the consuming surface. Keep trigger and content under one root.
+
+Run the folder scan and the web typecheck from the repository root:
+
+```bash
+node scripts/naming/scan-folder-docs.mjs
+npm run typecheck -w @pi-remote/web
+```
+
+---
+
+## 6. CONFIGURATION
 
 | Prop | Default | Purpose |
 |---|---|---|
@@ -77,7 +98,7 @@ The primitive is for secondary information such as transcript evidence or detail
 
 ---
 
-## 6. USAGE EXAMPLES
+## 7. USAGE EXAMPLES
 
 Bind the open state when another part of the surface needs to observe it:
 
@@ -100,7 +121,7 @@ Keep the trigger text meaningful. The wrapper supplies the heading boundary, whi
 
 ---
 
-## 7. TROUBLESHOOTING
+## 8. TROUBLESHOOTING
 
 | What You See | Cause | Fix |
 |---|---|---|
@@ -113,7 +134,7 @@ Keep the trigger text meaningful. The wrapper supplies the heading boundary, whi
 
 ---
 
-## 8. FAQ
+## 9. FAQ
 
 **Q: Does opening a disclosure move focus into the body?**
 
@@ -129,11 +150,10 @@ A: No. The caller owns transitions and the reduced-motion rule.
 
 ---
 
-## 9. RELATED RESOURCES
+## 10. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Disclosure source map and flow. |
 | [Accessibility helpers README](../a11y/README.md) | Shared interaction state used by disclosure surfaces. |
 | [Button README](../button/README.md) | Native action primitive often used inside disclosure content. |
 | [Shared primitives README](../README.md) | Family-wide unstyled and accessibility rules. |

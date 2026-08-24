@@ -63,11 +63,32 @@ The folder is flat. The two source modules have separate responsibilities:
 |---|---|
 | [`aria-hide-outside.svelte.ts`](./aria-hide-outside.svelte.ts) | Runs nested visibility sessions, observes body mutations, preserves live regions and restores owned `aria-hidden` values. |
 | [`interactions.ts`](./interactions.ts) | Exports the four Svelte actions that publish interaction state attributes. |
-| [`CODE.md`](./CODE.md) | Maps the implementation flow, boundaries and entrypoints. |
 
 ---
 
-## 5. CONFIGURATION
+## 5. IMPLEMENTATION BOUNDARIES
+
+The two helpers share a low-level DOM boundary but keep separate responsibilities.
+
+| Boundary | Rule |
+|---|---|
+| Visibility helper | `aria-hide-outside.svelte.ts` owns active sessions, target and live-region exemptions, the body observer and restoration of values it changed. |
+| Interaction actions | `interactions.ts` owns pointer, keyboard and focus listeners and publishes `data-hovered`, `data-pressed`, `data-focus-visible` and `data-focused`. |
+| Caller input | Overlay owners pass mounted target elements. Controls attach an action to their own `HTMLElement`. |
+| Accessibility scope | These helpers do not add roles, move or trap focus, dismiss overlays, size controls, define motion or style forced colors. |
+
+Put overlay isolation and session changes in `aria-hide-outside.svelte.ts`. Put event-to-attribute changes in `interactions.ts`. Put widget semantics, focus policy, dismissal and visual accessibility in the owning menu, sheet, button or feature surface.
+
+Run the folder scan and the web typecheck from the repository root:
+
+```bash
+node scripts/naming/scan-folder-docs.mjs
+npm run typecheck -w @pi-remote/web
+```
+
+---
+
+## 6. CONFIGURATION
 
 | API or state | Default | Purpose |
 |---|---|---|
@@ -78,7 +99,7 @@ The folder is flat. The two source modules have separate responsibilities:
 
 ---
 
-## 6. USAGE EXAMPLES
+## 7. USAGE EXAMPLES
 
 An overlay owner keeps the release function attached to the open session:
 
@@ -101,7 +122,7 @@ Use the primitive wrappers for widget semantics. Use these helpers directly only
 
 ---
 
-## 7. TROUBLESHOOTING
+## 8. TROUBLESHOOTING
 
 | What You See | Cause | Fix |
 |---|---|---|
@@ -114,7 +135,7 @@ Use the primitive wrappers for widget semantics. Use these helpers directly only
 
 ---
 
-## 8. FAQ
+## 9. FAQ
 
 **Q: Does `hideOutside` close an overlay?**
 
@@ -130,11 +151,10 @@ A: No. They are styling state. The control still needs its native or Bits UI sem
 
 ---
 
-## 9. RELATED RESOURCES
+## 10. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Source layout, state bookkeeping and helper flow. |
 | [Shared primitives README](../README.md) | Family-level rules for the shared control layer. |
 | [Button README](../button/README.md) | Native control that consumes the interaction actions. |
 | [Menu README](../menu/README.md) | Dropdown content that uses outside hiding and a focus guard. |

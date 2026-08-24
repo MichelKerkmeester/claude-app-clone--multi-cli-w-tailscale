@@ -147,6 +147,6 @@ The scan must keep this folder covered with both documents and no unresolved ref
 ## 9. RELATED
 
 - [`README.md`](./README.md)
-- [Accessibility helper CODE map](../a11y/CODE.md)
+- [Accessibility helpers](../a11y/README.md)
 - [Menu CODE map](../menu/CODE.md)
 - [Shared primitives CODE map](../CODE.md)

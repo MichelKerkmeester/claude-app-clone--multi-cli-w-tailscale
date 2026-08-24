@@ -141,5 +141,5 @@ The folder is healthy when both documents exist and the scan reports no broken r
 
 - [`README.md`](./README.md)
 - [State documentation](../state/CODE.md)
-- [Fixtures documentation](../fixtures/CODE.md)
+- [Fixtures documentation](../fixtures/README.md)
 - [Format documentation](../format/CODE.md)

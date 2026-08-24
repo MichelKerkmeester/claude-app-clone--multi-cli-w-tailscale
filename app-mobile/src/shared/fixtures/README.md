@@ -52,11 +52,27 @@ The separation matters because a fixture can simulate an accepted control or a l
 | File | Role |
 |---|---|
 | [`demo.ts`](./demo.ts) | Holds descriptors, block data, fake responses, artifact bytes, runtime simulation and the demo socket. |
-| [`CODE.md`](./CODE.md) | Explains fixture selection, fake transport boundaries and entrypoints. |
 
 ---
 
-## 5. USAGE EXAMPLES
+## 5. IMPLEMENTATION BOUNDARIES
+
+`demo.ts` is the complete preview boundary. It gates activation, selects fixture data and supplies the fake transport behavior while consumers keep their normal interfaces.
+
+| Boundary | Rule |
+|---|---|
+| Activation | `isDemoMode` requires `VITE_PI_DEMO=1` and the client opt-in. A query alone cannot enable the fixture. |
+| Local responses | `demoPostJson`, `demoArtifactBytes` and `demoSocket` return in-memory protocol-shaped values. They do not contact the relay or create host credentials. |
+| Consumer boundary | Auth and relay consumers switch to these helpers only after `isDemoMode` passes. Reducers and Svelte surfaces receive the same shapes as the normal paths. |
+| Runtime state | Model, effort and mode changes stay in the current tab. The fake socket emits read-only state and ignores upstream sends. |
+
+Put preview data, query cases and fake endpoint changes in `demo.ts`. Put the runtime branch that checks `isDemoMode` in its owning auth or relay consumer. Do not use fixtures as evidence of host behavior.
+
+Run `node scripts/naming/scan-folder-docs.mjs` from the repository root to verify folder coverage and local references.
+
+---
+
+## 6. USAGE EXAMPLES
 
 | Situation | Query or behavior |
 |---|---|
@@ -69,7 +85,7 @@ The separation matters because a fixture can simulate an accepted control or a l
 
 ---
 
-## 6. TROUBLESHOOTING
+## 7. TROUBLESHOOTING
 
 | What You See | Cause | Fix |
 |---|---|---|
@@ -81,7 +97,7 @@ The separation matters because a fixture can simulate an accepted control or a l
 
 ---
 
-## 7. FAQ
+## 8. FAQ
 
 **Q: Does demo mode contact the real relay?**
 
@@ -93,11 +109,10 @@ A: The preview must render the same Svelte surfaces and validation paths as the 
 
 ---
 
-## 8. RELATED RESOURCES
+## 9. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Fixture module structure and fake transport flow. |
 | [Transport documentation](../transport/README.md) | Auth, relay calls, artifact reads and sync socket consumers. |
 | [State documentation](../state/README.md) | Reducers that consume fixture pages and sync messages. |
 | [Catalog documentation](../catalog/README.md) | Model and surface data used by the demo controls. |

@@ -150,6 +150,6 @@ The folder is healthy when both documents exist and the scan reports no broken r
 ## 9. RELATED
 
 - [`README.md`](./README.md)
-- [Button primitive](../primitives/button/CODE.md)
-- [Accessibility helpers](../primitives/a11y/CODE.md)
+- [Button primitive](../primitives/button/README.md)
+- [Accessibility helpers](../primitives/a11y/README.md)
 - [State documentation](../state/CODE.md)

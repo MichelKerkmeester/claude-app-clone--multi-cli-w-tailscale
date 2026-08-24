@@ -62,11 +62,26 @@ underlying session route.
 | [routes/+layout.svelte](../../routes/+layout.svelte) | Owns the overlay flag, session context and back behavior. |
 | [routes/attention/[lookupId]/+page.svelte](../../routes/attention/[lookupId]/+page.svelte) | Resolves attention links that target Review. |
 
-The component arrangement and ownership boundaries are in [`CODE.md`](./CODE.md).
+---
+
+## 5. IMPLEMENTATION BOUNDARIES
+
+The shell owns the overlay and the route beneath it. Review owns the approval presentation and decision handoff.
+
+| Boundary | Rule |
+|---|---|
+| Shell | [`routes/+layout.svelte`](../../routes/+layout.svelte) supplies `sessions`, `onBack` and optional `focusId`, then renders Review above the current route. |
+| Screen | `screen-review.svelte` owns approval loading, one-second polling, card presentation, pending state and decision or grant handlers. It does not execute a host action or navigate. |
+| Relay | `loadApprovals`, `decideApproval` and `createAcceptEditsGrant` return the current exact-action state. The relay and host remain responsible for verification. |
+| Focus handoff | The attention resolver supplies `focusId`. Review scrolls to the matching card after its first load and does not own the deep-link URL. |
+
+Put card, timer and pending-state changes in `screen-review.svelte`. Put overlay visibility and route coordination in `routes/+layout.svelte`. Put approval policy and exact-action verification in the relay boundary.
+
+Run `node scripts/naming/scan-folder-docs.mjs` from the repository root to verify folder coverage and local references.
 
 ---
 
-## 5. CONFIGURATION
+## 6. CONFIGURATION
 
 The folder has no local configuration file. The shell provides the review inputs.
 
@@ -78,7 +93,7 @@ The folder has no local configuration file. The shell provides the review inputs
 
 ---
 
-## 6. USAGE EXAMPLES
+## 7. USAGE EXAMPLES
 
 | Situation | What the person sees or does |
 |---|---|
@@ -91,7 +106,7 @@ The folder has no local configuration file. The shell provides the review inputs
 
 ---
 
-## 7. TROUBLESHOOTING
+## 8. TROUBLESHOOTING
 
 | What You See | Cause | Fix |
 |---|---|---|
@@ -104,11 +119,10 @@ The folder has no local configuration file. The shell provides the review inputs
 
 ---
 
-## 8. RELATED RESOURCES
+## 9. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Polling, approval flow, overlay ownership and grant boundaries. |
 | [Inbox README](../inbox/README.md) | Explains the signal surface that can hand off into Review. |
 | [Routes layout](../../routes/+layout.svelte) | Shows Review's position above routed Home and Chat pages. |
 | [Attention deep-link](../../routes/attention/[lookupId]/+page.svelte) | Resolves a lookup id into Review or a session route. |

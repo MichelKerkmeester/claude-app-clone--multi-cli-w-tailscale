@@ -61,11 +61,33 @@ The component is visually neutral. A consuming surface passes its class and owns
 |---|---|
 | [`button.svelte`](./button.svelte) | Native button adapter, prop forwarding and interaction action attachment. |
 | [`button.stories.ts`](./button.stories.ts) | Storybook examples for default, disabled and submit behavior. |
-| [`CODE.md`](./CODE.md) | Implementation flow and ownership boundaries. |
 
 ---
 
-## 5. CONFIGURATION
+## 5. IMPLEMENTATION BOUNDARIES
+
+`button.svelte` is the only runtime layer. It preserves the native button contract and delegates interaction state to the shared accessibility actions.
+
+| Boundary | Rule |
+|---|---|
+| Inputs | The caller supplies `children`, `class`, `type`, `disabled`, `onclick` and remaining native button attributes. |
+| Native behavior | `button.svelte` defaults `type` to `button`, forwards the remaining attributes and renders the child snippet inside `<button>`. |
+| Interaction state | [`../a11y/interactions.ts`](../a11y/interactions.ts) owns event listeners. The component exposes its state through the four action attributes and `data-disabled`. |
+| Presentation | The caller owns dimensions, focus indicators, colors, motion and forced-color rules. The primitive has no CSS. |
+| Stories | `button.stories.ts` exercises default, disabled and submit forwarding without adding runtime behavior. |
+
+Put prop and native-element changes in `button.svelte`. Put shared pointer or focus behavior in `../a11y/interactions.ts`. Put visual treatment in the consuming surface and state examples in `button.stories.ts`.
+
+Run the folder scan and the web typecheck from the repository root:
+
+```bash
+node scripts/naming/scan-folder-docs.mjs
+npm run typecheck -w @pi-remote/web
+```
+
+---
+
+## 6. CONFIGURATION
 
 | Prop | Default | Purpose |
 |---|---|---|
@@ -77,7 +99,7 @@ The component is visually neutral. A consuming surface passes its class and owns
 
 ---
 
-## 6. USAGE EXAMPLES
+## 7. USAGE EXAMPLES
 
 Use an explicit type for a form action and style the primitive from the caller:
 
@@ -101,7 +123,7 @@ For an icon-only control, supply an accessible name and a caller-owned hit targe
 
 ---
 
-## 7. TROUBLESHOOTING
+## 8. TROUBLESHOOTING
 
 | What You See | Cause | Fix |
 |---|---|---|
@@ -114,7 +136,7 @@ For an icon-only control, supply an accessible name and a caller-owned hit targe
 
 ---
 
-## 8. FAQ
+## 9. FAQ
 
 **Q: Why use this instead of writing a native button directly?**
 
@@ -130,11 +152,10 @@ A: No. The native attribute controls behavior. `data-disabled` gives consumer CS
 
 ---
 
-## 9. RELATED RESOURCES
+## 10. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Button source flow and entrypoints. |
 | [Accessibility helpers README](../a11y/README.md) | Interaction action behavior and caller limits. |
 | [Shared primitives README](../README.md) | Rules for all shared controls. |
 | [Disclosure README](../disclosure/README.md) | A stateful Bits UI control that uses a different semantic contract. |

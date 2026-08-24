@@ -46,7 +46,29 @@ This folder has one source file:
 
 ---
 
-## 5. USAGE EXAMPLES
+## 5. IMPLEMENTATION BOUNDARIES
+
+This route is an adapter between the URL, app context and the chat screen.
+
+| Boundary | Rule |
+|---|---|
+| URL | `+page.svelte` reads `$page.params.id` and keeps that value as the source of truth for the active session. |
+| App context | `getAppState` supplies roster, connection, transcript, todo, media, question and theme state. `getAppActions` supplies shell navigation and overlay callbacks. |
+| Chat screen | [`pages/chat/screen-chat.svelte`](../../../pages/chat/screen-chat.svelte) receives the complete page input contract and owns socket, composer and transcript presentation. |
+| Fallback | The route derives `unknown` when the roster has no status for the URL id. It still passes the URL id to the chat screen. |
+
+Put URL and prop-wiring changes in `+page.svelte`. Put session rendering changes in `pages/chat/screen-chat.svelte`. Put socket, reducer and relay changes in the shared state and transport modules.
+
+Run the folder scan and the web typecheck from the repository root:
+
+```bash
+node scripts/naming/scan-folder-docs.mjs
+npm run typecheck -w @pi-remote/web
+```
+
+---
+
+## 6. USAGE EXAMPLES
 
 | Situation | Result |
 |---|---|
@@ -57,7 +79,7 @@ This folder has one source file:
 
 ---
 
-## 6. TROUBLESHOOTING
+## 7. TROUBLESHOOTING
 
 | What you see | Cause | Fix |
 |---|---|---|
@@ -67,11 +89,10 @@ This folder has one source file:
 
 ---
 
-## 7. RELATED RESOURCES
+## 8. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Route data flow and ownership boundaries. |
 | [`Routes README`](../../README.md) | URL surface and app shell behavior. |
 | [`Chat README`](../../../pages/chat/README.md) | Session screen behavior and sub-areas. |
 | [`pages/chat/screen-chat.svelte`](../../../pages/chat/screen-chat.svelte) | Page component receiving the route props. |

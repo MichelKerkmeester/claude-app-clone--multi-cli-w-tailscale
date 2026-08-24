@@ -46,7 +46,30 @@ This folder has one source file:
 
 ---
 
-## 5. USAGE EXAMPLES
+## 5. IMPLEMENTATION BOUNDARIES
+
+This adapter owns the URL-to-surface handoff. It does not render a second attention view.
+
+| Boundary | Rule |
+|---|---|
+| Parameter | `+page.svelte` reads `$page.params.lookupId` and waits for `authReady` before starting the lookup. |
+| Relay lookup | `openAttentionHint` in `shared/format/attention.ts` owns the request and returns the current review or session target. |
+| Review handoff | A review target sets the focus id, opens Review and replaces the resolver URL with `/`. |
+| Session handoff | A session target is encoded and replaces the resolver URL with `/session/[id]`. |
+| Cleanup | The route aborts an in-flight lookup when navigation unmounts it. A failed lookup leaves Inbox open. |
+
+Put parameter and redirect changes in `+page.svelte`. Put lookup and response-shape changes in `shared/format/attention.ts`. Put overlay state changes in the app shell.
+
+Run the folder scan and the web typecheck from the repository root:
+
+```bash
+node scripts/naming/scan-folder-docs.mjs
+npm run typecheck -w @pi-remote/web
+```
+
+---
+
+## 6. USAGE EXAMPLES
 
 | Situation | Result |
 |---|---|
@@ -57,7 +80,7 @@ This folder has one source file:
 
 ---
 
-## 6. TROUBLESHOOTING
+## 7. TROUBLESHOOTING
 
 | What you see | Cause | Fix |
 |---|---|---|
@@ -67,11 +90,10 @@ This folder has one source file:
 
 ---
 
-## 7. RELATED RESOURCES
+## 8. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Parameter flow, boundaries and redirect behavior. |
 | [`Routes README`](../../README.md) | All URL adapters and the app shell. |
 | [`shared/format/attention.ts`](../../../shared/format/attention.ts) | Attention lookup and push helpers. |
 | [`session/[id]/README.md`](../../session/[id]/README.md) | The target session route. |

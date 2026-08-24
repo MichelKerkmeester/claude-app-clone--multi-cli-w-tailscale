@@ -49,11 +49,29 @@
 | File | Role |
 |---|---|
 | [`use-visual-viewport-anchor.svelte.ts`](./use-visual-viewport-anchor.svelte.ts) | Exports the CSS variable name, result type and measurement hook. |
-| [`CODE.md`](./CODE.md) | Explains event ownership, measurement flow and cleanup. |
 
 ---
 
-## 5. USAGE EXAMPLES
+## 5. IMPLEMENTATION BOUNDARIES
+
+The hook reports a layout budget. It does not own the surface that uses it.
+
+| Boundary | Rule |
+|---|---|
+| Input | `useVisualViewportAnchor` accepts an optional `getAnchor` getter and reads the current anchor element when a frame runs. |
+| Measurement | The visual viewport is preferred, with `window.innerHeight` as the fallback. The hook returns `viewportHeightPx` and `anchorTopPx`. |
+| Scheduling | Resize, scroll, orientation, focus, visibility and pageshow events share one pending `requestAnimationFrame`. |
+| Outputs | The hook updates state and `--visual-viewport-height` only when a measured value changes. |
+| Cleanup | Effect cleanup cancels the pending frame and removes every listener installed by the hook. |
+| Layout | The caller positions the inline surface. This folder never scrolls or repositions the page. |
+
+Put event and measurement changes in `use-visual-viewport-anchor.svelte.ts`. Put surface positioning and keyboard layout decisions in the consuming component.
+
+Run `node scripts/naming/scan-folder-docs.mjs` from the repository root to verify folder coverage and local references.
+
+---
+
+## 6. USAGE EXAMPLES
 
 | Situation | What the consumer does |
 |---|---|
@@ -65,7 +83,7 @@
 
 ---
 
-## 6. TROUBLESHOOTING
+## 7. TROUBLESHOOTING
 
 | What You See | Cause | Fix |
 |---|---|---|
@@ -76,7 +94,7 @@
 
 ---
 
-## 7. FAQ
+## 8. FAQ
 
 **Q: Why not use `window.innerHeight` everywhere?**
 
@@ -88,11 +106,10 @@ A: No. It only reports measurements and writes the shared CSS height variable. T
 
 ---
 
-## 8. RELATED RESOURCES
+## 9. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Hook topology, event flow and cleanup rules. |
 | [Chrome documentation](../chrome/README.md) | Shared chrome that consumes viewport-safe layout space. |
 | [Chat screen documentation](../../pages/chat/README.md) | The screen that owns transcript and composer layout. |
 | [Shared layer documentation](../README.md) | The broader shared data and logic boundary. |

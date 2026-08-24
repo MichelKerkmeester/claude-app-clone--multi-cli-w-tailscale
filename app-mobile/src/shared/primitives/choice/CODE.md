@@ -150,5 +150,5 @@ The scan must keep this folder covered with both documents and no unresolved ref
 
 - [`README.md`](./README.md)
 - [Shared primitives CODE map](../CODE.md)
-- [Disclosure CODE map](../disclosure/CODE.md)
+- [Disclosure documentation](../disclosure/README.md)
 - [Menu CODE map](../menu/CODE.md)

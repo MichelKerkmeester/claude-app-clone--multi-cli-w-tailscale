@@ -64,11 +64,26 @@ is fixed: loopback relay access, tailnet-only Serve and no path for the phone to
 | [shared/transport/auth.ts](../../shared/transport/auth.ts) | Owns enrollment proof, session proof, device storage, logout and revocation. |
 | [routes/+layout.svelte](../../routes/+layout.svelte) | Chooses the Enrollment branch and receives the enrolled identity. |
 
-The component boundaries and auth handoff are in [`CODE.md`](./CODE.md).
+---
+
+## 5. IMPLEMENTATION BOUNDARIES
+
+The shell, screen and auth module each own a separate part of the enrollment handoff.
+
+| Boundary | Rule |
+|---|---|
+| Shell | [`routes/+layout.svelte`](../../routes/+layout.svelte) chooses this branch until `authReady` and receives the identity through `onEnrolled`. |
+| Screen | `screen-enrollment.svelte` owns QR input, scan state, busy state and user-facing errors. It passes the serialized challenge to the auth module. |
+| Auth module | [`shared/transport/auth.ts`](../../shared/transport/auth.ts) validates origin and expiry, creates the non-extractable key, proves enrollment and stores the device record. `establishSession` signs the relay challenge. |
+| Access posture | This folder does not generate proofs, store keys or enable full-access actions. The enrolled phone remains read-only. |
+
+Put input and scan changes in `screen-enrollment.svelte`. Put cryptographic, relay and device-storage changes in `shared/transport/auth.ts`. Put auth-branch ordering in `routes/+layout.svelte`.
+
+Run `node scripts/naming/scan-folder-docs.mjs` from the repository root to verify folder coverage and local references.
 
 ---
 
-## 5. CONFIGURATION
+## 6. CONFIGURATION
 
 The screen has no local configuration file. Its behavior is controlled by the auth phase and two
 callbacks.
@@ -81,7 +96,7 @@ callbacks.
 
 ---
 
-## 6. USAGE EXAMPLES
+## 7. USAGE EXAMPLES
 
 | Situation | What the person sees or does |
 |---|---|
@@ -94,7 +109,7 @@ callbacks.
 
 ---
 
-## 7. TROUBLESHOOTING
+## 8. TROUBLESHOOTING
 
 | What You See | Cause | Fix |
 |---|---|---|
@@ -107,11 +122,10 @@ callbacks.
 
 ---
 
-## 8. RELATED RESOURCES
+## 9. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Auth branch flow and ownership boundary between the screen and auth module. |
 | [Routes layout](../../routes/+layout.svelte) | Shows Enrollment before routed pages and overlays. |
 | [Home README](../home/README.md) | Describes the authenticated root surface reached after enrollment. |
 | [Shared auth module](../../shared/transport/auth.ts) | Documents the cryptographic and storage implementation used by the screen. |

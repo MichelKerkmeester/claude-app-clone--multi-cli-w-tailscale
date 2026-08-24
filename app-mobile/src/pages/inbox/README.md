@@ -60,11 +60,26 @@ overlay or a session route.
 | [routes/+layout.svelte](../../routes/+layout.svelte) | Owns the overlay flag and resolution destination. |
 | [routes/attention/[lookupId]/+page.svelte](../../routes/attention/[lookupId]/+page.svelte) | Resolves an attention deep-link and replaces it with the final destination. |
 
-The code flow is in [`CODE.md`](./CODE.md).
+---
+
+## 5. IMPLEMENTATION BOUNDARIES
+
+The shell owns overlay visibility and the destination. The screen owns the signal list and the resolver handoff.
+
+| Boundary | Rule |
+|---|---|
+| Shell | [`routes/+layout.svelte`](../../routes/+layout.svelte) renders Inbox when `inboxOpen` is true, supplies `onBack` and `onOpen` and chooses Review or session navigation. |
+| Screen | `screen-attention-inbox.svelte` owns the fetch, AbortController cleanup, selected-row state and visible errors. It does not render session content or build a URL. |
+| Resolver | [`routes/attention/[lookupId]/+page.svelte`](../../routes/attention/[lookupId]/+page.svelte) opens Inbox while a deep-link is pending and replaces the temporary URL after `openAttentionHint` returns a target. |
+| Callback | `onOpen` receives the current resolver result. The shell decides how that result becomes an overlay or route. |
+
+Put list, row and fetch-state changes in `screen-attention-inbox.svelte`. Put destination and overlay changes in `routes/+layout.svelte`. Put deep-link waiting and URL replacement in the attention route adapter.
+
+Run `node scripts/naming/scan-folder-docs.mjs` from the repository root to verify folder coverage and local references.
 
 ---
 
-## 5. CONFIGURATION
+## 6. CONFIGURATION
 
 The screen has no local configuration file. Its behavior is defined by two callbacks.
 
@@ -75,7 +90,7 @@ The screen has no local configuration file. Its behavior is defined by two callb
 
 ---
 
-## 6. USAGE EXAMPLES
+## 7. USAGE EXAMPLES
 
 | Situation | What the person sees or does |
 |---|---|
@@ -88,7 +103,7 @@ The screen has no local configuration file. Its behavior is defined by two callb
 
 ---
 
-## 7. TROUBLESHOOTING
+## 8. TROUBLESHOOTING
 
 | What You See | Cause | Fix |
 |---|---|---|
@@ -100,11 +115,10 @@ The screen has no local configuration file. Its behavior is defined by two callb
 
 ---
 
-## 8. RELATED RESOURCES
+## 9. RELATED RESOURCES
 
 | Document | Purpose |
 |---|---|
-| [`CODE.md`](./CODE.md) | Overlay ownership, fetch lifecycle and resolution flow. |
 | [Review README](../review/README.md) | Describes the overlay that receives review-targeting signals. |
 | [Routes layout](../../routes/+layout.svelte) | Shows the shell branch order for Enrollment, Review, Inbox and routed pages. |
 | [Attention deep-link](../../routes/attention/[lookupId]/+page.svelte) | Documents the URL resolver with no view of its own. |

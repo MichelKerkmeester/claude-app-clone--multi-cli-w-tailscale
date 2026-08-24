@@ -55,7 +55,7 @@ Pi Remote/
 | Web package | [`app-mobile/README.md`](app-mobile/README.md) | [`app-mobile/src/README.md`](app-mobile/src/README.md) |
 | Web source | [`app-mobile/src/README.md`](app-mobile/src/README.md) | [`app-mobile/src/CODE.md`](app-mobile/src/CODE.md) |
 | URL surface | [`app-mobile/src/routes/README.md`](app-mobile/src/routes/README.md) | [`app-mobile/src/routes/CODE.md`](app-mobile/src/routes/CODE.md) |
-| Attention route | [`app-mobile/src/routes/attention/[lookupId]/README.md`](app-mobile/src/routes/attention/[lookupId]/README.md) | [`app-mobile/src/routes/attention/[lookupId]/CODE.md`](app-mobile/src/routes/attention/[lookupId]/CODE.md) |
-| Session route | [`app-mobile/src/routes/session/[id]/README.md`](app-mobile/src/routes/session/[id]/README.md) | [`app-mobile/src/routes/session/[id]/CODE.md`](app-mobile/src/routes/session/[id]/CODE.md) |
+| Attention route | [`app-mobile/src/routes/attention/[lookupId]/README.md`](app-mobile/src/routes/attention/[lookupId]/README.md) | Implementation notes are integrated in the README |
+| Session route | [`app-mobile/src/routes/session/[id]/README.md`](app-mobile/src/routes/session/[id]/README.md) | Implementation notes are integrated in the README |
 | Protocol package | [`packages/pi-rpc-protocol/README.md`](packages/pi-rpc-protocol/README.md) | [`packages/pi-rpc-protocol/src/README.md`](packages/pi-rpc-protocol/src/README.md) |
 | Operations | [`deploy/README.md`](deploy/README.md) | [`scripts/README.md`](scripts/README.md) |

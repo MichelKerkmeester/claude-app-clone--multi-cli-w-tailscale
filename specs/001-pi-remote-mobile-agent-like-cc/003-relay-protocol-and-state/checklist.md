@@ -9,7 +9,7 @@ importance_tier: "critical"
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/003-relay-protocol-and-state"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/003-relay-protocol-and-state"
     last_updated_at: "2026-08-13T16:35:13Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled checklist status with the implemented relay and command path"

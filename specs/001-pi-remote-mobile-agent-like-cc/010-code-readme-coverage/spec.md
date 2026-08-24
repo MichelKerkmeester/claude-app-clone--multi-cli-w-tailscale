@@ -9,7 +9,7 @@ importance_tier: "important"
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/010-code-readme-coverage"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/010-code-readme-coverage"
     last_updated_at: "2026-08-13T17:22:43Z"
     last_updated_by: "deepseek-v4-flash"
     recent_action: "Authored 32 code READMEs to the sk-create-readme template"

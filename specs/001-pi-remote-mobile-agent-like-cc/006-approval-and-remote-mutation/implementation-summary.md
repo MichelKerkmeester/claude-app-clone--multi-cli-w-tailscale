@@ -9,8 +9,8 @@ importance_tier: "critical"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/006-approval-and-remote-mutation"
-    last_updated_at: "2026-08-13T16:35:13Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/006-approval-and-remote-mutation"
+    last_updated_at: "2026-08-24T17:58:11.087Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the implemented authority loop and lifecycle hardening"
     next_safe_action: "Verify live Pi extension and protected runner under macOS containment before enabling mutation"

@@ -9,8 +9,8 @@ importance_tier: "critical"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/005-mobile-pwa-and-reconciliation"
-    last_updated_at: "2026-08-13T16:35:13Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/005-mobile-pwa-and-reconciliation"
+    last_updated_at: "2026-08-24T17:58:11.084Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the implemented PWA, transcript, command UI, and cache"
     next_safe_action: "Use phase 009 for physical-device and accessibility release evidence"

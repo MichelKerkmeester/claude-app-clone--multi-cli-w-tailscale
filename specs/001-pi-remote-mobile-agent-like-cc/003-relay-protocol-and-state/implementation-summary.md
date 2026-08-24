@@ -9,8 +9,8 @@ importance_tier: "critical"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/003-relay-protocol-and-state"
-    last_updated_at: "2026-08-13T16:35:13Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/003-relay-protocol-and-state"
+    last_updated_at: "2026-08-24T17:58:11.087Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the implemented relay, transcript projection, and command transport"
     next_safe_action: "Use phase 004 for command authentication and phase 009 for live operator evidence"

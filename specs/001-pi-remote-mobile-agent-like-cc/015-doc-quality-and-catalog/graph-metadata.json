@@ -174,7 +174,7 @@
     ],
     "causal_summary": "The app documentation produced across phases 010-014 has no single quality measurement and no inventory that maps the app's live capabilities to their source and test anchors",
     "created_at": "2026-08-13T15:52:26.724Z",
-    "last_save_at": "2026-08-24T16:38:15.046Z",
+    "last_save_at": "2026-08-24T17:58:11.285Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -184,13 +184,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:de80ddc50a54259595ca3b2aa9b0bde804b885964630f6862b55a15c984d316a",
+    "source_fingerprint": "sha256:26b8912a9a41580c99ac600345f11bdcb9227e3f3aa11a8184265bbbb5b5fa73",
     "source_doc_hashes": {
-      "spec.md": "c70c8348c9441ea09006aa015712df4a927b3a5c85962105117b30d054c2f555",
-      "plan.md": "1a8b1295fbb6849910abfeab6e4e611c59ec0622bd8945d2c45b1b7804f81d5e",
-      "tasks.md": "7e9eb56872f6fc5b564834602c47d58881f530256a52de72db8aaf7cfbd92c74",
-      "checklist.md": "68f94b1138ca566ea26c1f30cbd65ba337c5133918c7a607c7b02e0ac71b13e4",
-      "implementation-summary.md": "17f30dbf89cd064628abb7e355919fa99bbb7bc2ed6ed702ca097e4b91464745"
+      "spec.md": "5f7aa7e08a1814b2b25ad6a57ebf73388d7a3136e7317478dc443abdc6583ce4",
+      "plan.md": "000969a557a5168a7609e7fcfd51f729466112de4144991b6aaf55ad0f46b627",
+      "tasks.md": "4c310e1373ea743875a4e99bf55489e07c5b40d33a7af7f00cc8a0566ab4fcda",
+      "checklist.md": "9579bf90492bc1b78be3a4380eb84c51047a700c2ff0211c07bd2b6ee8fb8b6a",
+      "implementation-summary.md": "0aa993be38f71d878bc78e797b79c6cc5d282ef0c209d61c90d6619907c78bfc"
     },
     "last_active_child_id": null,
     "last_active_at": null

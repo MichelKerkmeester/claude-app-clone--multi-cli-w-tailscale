@@ -1,6 +1,6 @@
 {
   "level": "3+",
-  "specFolder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/006-approval-and-remote-mutation",
+  "specFolder": "001-pi-remote-mobile-agent-like-cc/006-approval-and-remote-mutation",
   "description": "Introduces the final-boundary Pi approval extension, containment, shared redaction, and evidence-gated remote mutation",
   "keywords": [
     "introduces",

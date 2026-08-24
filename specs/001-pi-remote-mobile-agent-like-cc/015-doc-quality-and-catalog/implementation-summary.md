@@ -9,8 +9,8 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/015-doc-quality-and-catalog"
-    last_updated_at: "2026-08-14T04:14:59Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/015-doc-quality-and-catalog"
+    last_updated_at: "2026-08-24T17:58:11.285Z"
     last_updated_by: "deepseek-v4-flash"
     recent_action: "Added the DQI quality gate baseline and the feature catalog"
     next_safe_action: "Documentation and standards program complete"

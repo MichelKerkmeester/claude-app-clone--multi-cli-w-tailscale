@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Adds private HTTPS/WSS ingress, application authentication, default-deny authorization, revocation, and a read-only remote API",
     "created_at": "2026-08-10T18:28:40Z",
-    "last_save_at": "2026-08-24T16:38:15.000Z",
+    "last_save_at": "2026-08-24T17:58:11.090Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,14 +198,14 @@
       "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:6de9ba0ccc3181ad390c3e8864136ff0088171bf1da23ca402b70eef02eafa38",
+    "source_fingerprint": "sha256:94fa0ed97ea99a2733037e162f88d7656293a03275f1941ab99f06148ecd2ac3",
     "source_doc_hashes": {
-      "spec.md": "7ae8df3b249149254fd678271b3959d8771d1b699f056e627d8be1dd7abf10a2",
-      "plan.md": "81007c6b50d4784490153dc62c19e92e635d5c8a039fc2a1484720a26ea76489",
-      "tasks.md": "388b456b08f5db692f49668f521cae75680c13dcc81a85cb811dead929eda980",
-      "checklist.md": "84657fddbbf0903f80fe78065a91eea7f2ddf4c566101e8ec10a5a0d92f61f8b",
-      "decision-record.md": "10104476a8be36d0243786c6554411fa89293c7be9ddad46cdda0175dc08f4d9",
-      "implementation-summary.md": "d8ac3ce256bfbddccca9387ef04fa2a4fd75bd769fb8668a85a0518ac76a7800"
+      "spec.md": "1ef67f5a6aa5a089d9ac19c6dd09c368f31bef079473a88669fe89df868fafe6",
+      "plan.md": "cf4e6ab19745474fd954da5afd4a31b4359af44784438dc59d9eb119f5d93f41",
+      "tasks.md": "c6374d20264c500796c129f5301f072fd23380735df195deaabd4da78568835a",
+      "checklist.md": "286149f4104a2f5fbd6368acbb68f6c7af59462f975fea686e2bd7c09bebf9c5",
+      "decision-record.md": "83a8381d03b4c7ffc48b8d48e2aa2f6cea1f0c988d894b2f331b873b0620b8d5",
+      "implementation-summary.md": "a7893eb97716d97b4172c31bd480124df62082c6d7adda48e37db172303f47d8"
     },
     "last_active_child_id": null,
     "last_active_at": null

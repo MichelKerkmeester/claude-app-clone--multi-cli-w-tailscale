@@ -1,6 +1,6 @@
 {
   "level": "2",
-  "specFolder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/012-docs-as-skill-references",
+  "specFolder": "001-pi-remote-mobile-agent-like-cc/012-docs-as-skill-references",
   "description": "The `docs/.md` runbooks in `Apps/Pi Mobile/` are prose documents without a consistent reference structure",
   "keywords": [
     "docs",

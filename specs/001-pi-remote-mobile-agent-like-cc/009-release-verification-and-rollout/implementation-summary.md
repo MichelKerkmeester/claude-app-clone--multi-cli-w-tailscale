@@ -9,8 +9,8 @@ importance_tier: "critical"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/009-release-verification-and-rollout"
-    last_updated_at: "2026-08-13T16:35:13Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/009-release-verification-and-rollout"
+    last_updated_at: "2026-08-24T17:58:11.285Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the passing machine release gate and fail-closed rollout state"
     next_safe_action: "Collect operator evidence and require each intended rollout stage explicitly"

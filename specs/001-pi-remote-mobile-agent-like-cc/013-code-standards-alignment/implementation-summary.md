@@ -9,8 +9,8 @@ importance_tier: "important"
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/013-code-standards-alignment"
-    last_updated_at: "2026-08-13T17:48:24Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/013-code-standards-alignment"
+    last_updated_at: "2026-08-24T17:58:11.289Z"
     last_updated_by: "deepseek-v4-flash"
     recent_action: "Audited code to sk-code-opencode; comment-only alignment, gate green"
     next_safe_action: "Proceed to phase 014 onboarding and root readme"

@@ -9,7 +9,7 @@ importance_tier: "critical"
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/009-release-verification-and-rollout"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/009-release-verification-and-rollout"
     last_updated_at: "2026-08-13T16:35:13Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the passing machine release gate and fail-closed rollout state"
@@ -28,6 +28,9 @@ _memory:
 ---
 
 # Feature Specification: Release Verification and Rollout
+
+> **Phase links** — Parent: [`../spec.md`](../spec.md) · Predecessor: `008-documentation-and-runbooks` · Successor: `010-code-readme-coverage`
+
 
 <!-- SPECKIT_LEVEL: 3+ -->
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core + level2-verify + level3-arch + level3-plus-govern | v2.2 -->

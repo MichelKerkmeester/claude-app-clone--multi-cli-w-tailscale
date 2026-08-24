@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Builds the installable foreground mobile experience for sessions, streaming work, reconnect reconciliation, explicit controls, and offline read-only state",
     "created_at": "2026-08-10T18:28:41Z",
-    "last_save_at": "2026-08-24T16:38:15.004Z",
+    "last_save_at": "2026-08-24T17:58:11.084Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,14 +198,14 @@
       "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8315c6a3503c6441f0febf211441ab5f4daa7e86b7073e0d4a3fbe8f0af10ed9",
+    "source_fingerprint": "sha256:26b3b00e36028933249070481a563726c2f5e41fed3dfb6c9dd06b20b22ab7f3",
     "source_doc_hashes": {
-      "spec.md": "38f4c97ba9efb2fd2f80431e144b2b4ee78b307e4e2cea679648182ae73378df",
-      "plan.md": "16d9396a36f6e7602048a935cde7e2cfc5bf8a2e712abe87a000d587f49bb57c",
-      "tasks.md": "7210c2c04974292a6a3136986b0eb03b2beac475f125b40bb989a75e10dab4ec",
-      "checklist.md": "452549f56c43c9cc14cdc85af5f540ff2135cf2bc3326d038816523421ad971c",
-      "decision-record.md": "8495d7b9783052d9eee9632f69526b33a2cc82b410e2f7c2194a69df9d729f3b",
-      "implementation-summary.md": "538e131c50c5db925a075753a24b85ec07e35dd1f7a08dce31a61eabd8f49869"
+      "spec.md": "1a07975baeff53d4778f7b2a089da4aedfcaabca9ad6f91f66b804574436921e",
+      "plan.md": "161a722a50d2d2d4ef7f772a6a5a5cf341733349d3347ac21da3f3054a3d69ab",
+      "tasks.md": "c8ee52f94c0cb528f6fbe07ea3a54f10349ee80aecd4357ef734f04f147f9483",
+      "checklist.md": "13bb5183344338db784f11b57b5d548c6c684822bc22effe8f7d8510b80e8f25",
+      "decision-record.md": "481e62ea03b88dfad9711c2d8e87fb1bbcef4fad5f6079ead31c96d2a9b0a43f",
+      "implementation-summary.md": "13e5c7e29de76e109cee9057d20716fc6bd16cd0d8aa8b1d25d44585bd695660"
     },
     "last_active_child_id": null,
     "last_active_at": null

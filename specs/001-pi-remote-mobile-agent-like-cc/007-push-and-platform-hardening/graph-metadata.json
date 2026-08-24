@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Adds privacy-minimized Web Push hints and hardens installation, lifecycle, revocation, and stale-state behavior across supported mobile platforms",
     "created_at": "2026-08-10T18:28:42Z",
-    "last_save_at": "2026-08-24T16:38:15.012Z",
+    "last_save_at": "2026-08-24T17:58:11.087Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,14 +198,14 @@
       "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:d7cd90b1c351d41d8ff1d9ce7f51dd4533a769efa83d3b7650e935686ee25ba8",
+    "source_fingerprint": "sha256:0c2c6a491366052159574ec4f7259776fc057a7db0924a58127fe4511e641fe7",
     "source_doc_hashes": {
-      "spec.md": "afb06816fc8ef997d0dd50077132741057285e7ad2fb2309afde29082c776386",
-      "plan.md": "2d094c404c4956fc4b1d2171e41f18e90ad2ce5827aca7a5da676e0ae11512c8",
-      "tasks.md": "d782b2e008d599192f7ccbe83f92a3a157d36e79d0b3888335ff5efed5692bab",
-      "checklist.md": "feffaca8091d412c32a3e8c446502737f877511e173356dc2c1de16e711e9eb4",
-      "decision-record.md": "e66b655dce7bc14c89ab18ee124a3ebe439653cb12fad1082b7144d14a191b27",
-      "implementation-summary.md": "493afb84607fdb9fa2eb98c872bcf8e9bd99f5e6cc864a349d37d3adc218d3b1"
+      "spec.md": "df7e926f604bf76c1ccd2804b05b24593f566076ea2db3236d3f9fb12b4674c7",
+      "plan.md": "94e06919d2994877bbbe1b99ea6ec366d1aa0914393049d6a9b472f10297685a",
+      "tasks.md": "fbc6b19b6c9cfe5afca60022ef5568fff7a1d41d8b566dd23a5dbddbef5935e1",
+      "checklist.md": "ab05f4a0bb298b3a454d455ffb1bd59061c42f2e2b8190e32386597141f872fc",
+      "decision-record.md": "eac22320a0e5f8780e5836a0bc9677b54975bbfb7ce3047626ce307cfe8fdbbd",
+      "implementation-summary.md": "fa0bbde5ba02e0a5c714e115f8b3d10cb0f46a39c8baefee38e96c6328b628d9"
     },
     "last_active_child_id": null,
     "last_active_at": null

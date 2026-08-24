@@ -9,8 +9,8 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/012-docs-as-skill-references"
-    last_updated_at: "2026-08-13T17:34:34Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/012-docs-as-skill-references"
+    last_updated_at: "2026-08-24T17:58:11.289Z"
     last_updated_by: "deepseek-v4-flash"
     recent_action: "Converted 7 operator runbooks to the reference template"
     next_safe_action: "Proceed to phase 013 code standards alignment"

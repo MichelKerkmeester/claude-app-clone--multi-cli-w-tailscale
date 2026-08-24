@@ -10,35 +10,37 @@
     "related_to": []
   },
   "derived": {
-    "trigger_phrases": [
-      "pi remote chat ux",
-      "pi remote chat parity",
-      "model switching pi",
-      "effort reasoning switching",
-      "tab to plan mode",
-      "typed commands slash",
-      "pi remote desktop parity chat"
-    ],
+    "trigger_phrases": [],
     "key_topics": [
       "remote",
+      "desktop-parity",
       "chat",
-      "parity",
-      "model",
-      "switching",
-      "effort",
-      "reasoning",
-      "tab",
       "plan",
-      "mode",
-      "typed",
-      "commands"
+      "delivery",
+      "tasks",
+      "task",
+      "ledger"
     ],
-    "importance_tier": "normal",
+    "importance_tier": "important",
     "status": "planned",
     "key_files": [
+      "plan.md",
+      "tasks.md",
       "spec.md"
     ],
     "entities": [
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
       {
         "name": "spec.md",
         "kind": "doc",
@@ -58,41 +60,93 @@
         "source": "derived"
       },
       {
-        "name": "Pi Remote",
+        "name": "The Pi Remote Desktop",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "In Research",
-        "kind": "proper_noun",
+        "name": "no",
+        "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Problem Statement The Pi Remote",
-        "kind": "proper_noun",
+        "name": "1. METADATA",
+        "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "React Aria",
-        "kind": "proper_noun",
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
         "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Run",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Every Phase",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "The Pi Remote mobile PWA (installable iPhone PWA, Vite + React 19 + Tailwind 4 + React Aria) remote-controls the Pi coding agent over a Tailscale tailnet",
+    "causal_summary": "Pi Remote Desktop-Parity Chat UX",
     "created_at": "2026-08-15T11:08:23.046Z",
-    "last_save_at": "2026-08-24T16:38:15.055Z",
+    "last_save_at": "2026-08-24T17:54:40.171Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "tasks.md"
     ],
-    "source_fingerprint": "sha256:f3bd799b0429b826d107256bdadf754628990e8e52d6cb9683d251466e2ccba9",
+    "source_fingerprint": "sha256:403b184df85f9f53c12063a80b4fcfabb1b7c4015f1deafdaacb5f4fe609c411",
     "source_doc_hashes": {
-      "spec.md": "2887fad67378e3c911f55b4955b2fccb3171aee29fc583e997bf1b258f02b0cf"
+      "spec.md": "247c9882f7c8201b22dc0b7b426f9f4327ac18847a557c10bcd89b6ec54ee8e7",
+      "plan.md": "8614e7c7a6c6a57dd6be4226c4a02305e186441a17cbb8834783be12c1c9f54d",
+      "tasks.md": "dd1de11de9cbc1f08d58bb769effcfc66bf3188149f1dbe54b372db66cc99fba"
     },
     "last_active_child_id": null,
     "last_active_at": null

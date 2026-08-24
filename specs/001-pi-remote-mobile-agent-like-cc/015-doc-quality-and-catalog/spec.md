@@ -9,7 +9,7 @@ importance_tier: "important"
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/015-doc-quality-and-catalog"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/015-doc-quality-and-catalog"
     last_updated_at: "2026-08-14T04:14:59Z"
     last_updated_by: "deepseek-v4-flash"
     recent_action: "Added the DQI quality gate baseline and the feature catalog"
@@ -26,6 +26,9 @@ _memory:
 ---
 
 # Feature Specification: Doc Quality and Feature Catalog
+
+> **Phase links** — Parent: [`../spec.md`](../spec.md) · Predecessor: `014-onboarding-and-root-readme` · Successor: `016-ai-deploy-and-onboarding`
+
 
 <!-- SPECKIT_LEVEL: 2 -->
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core + level2-verify | v2.2 -->

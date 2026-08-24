@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Builds the recorded, live, integration, security, browser, and crash harness that proves the remote control plane fails closed",
     "created_at": "2026-08-10T18:28:39Z",
-    "last_save_at": "2026-08-24T16:38:14.992Z",
+    "last_save_at": "2026-08-24T17:58:11.085Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,14 +198,14 @@
       "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:fdf1faf6e7e46748d810d93ffc0d5c3f09e0afa3273c918d184ac0e43f8d8bf9",
+    "source_fingerprint": "sha256:653f909d83b56315ba4b5c59f37d8fb1622bdee5bdd6e2a150fbfab90a0659f1",
     "source_doc_hashes": {
-      "spec.md": "40c0611966f1a00787651eac39300aa580ec0ad7409144e94eaee3e982740db1",
-      "plan.md": "6421939eccc9881765be707f84c18715c02cb0a47ed940ae422c466f70b8e0e5",
-      "tasks.md": "9e3f5991ee487b73b2d1f0aeb2166cc9cae930231a74d44bff5f7765321ce1f6",
-      "checklist.md": "4f3c4b7c66e9b053448dcd3e3a557f8ee652c2b06d2b709df49c8fa203af193c",
-      "decision-record.md": "09c10763af8458af38252e0e16da667850dd4b005708175f2e2fc0ebfc307eab",
-      "implementation-summary.md": "1029975f49107a7ed3f292a534a6e672a7bacdb08eb693e3952c5348a3f4a428"
+      "spec.md": "f7df1ae9502787bd9a0f686ac9ec7040890218db23a5567d77e097eb0dea51c2",
+      "plan.md": "71317cf6e40463a89bcf55a793560456fcc0ad51b85b27ea881861d293bd1f49",
+      "tasks.md": "aed70eb1a956cc0e89bf1b54fc89f38a8756d7e729ed6d12b301ad9e29bcae8d",
+      "checklist.md": "145fe026c5912b0ae29d2055aa330f78d57c21a2274640153836be57cee90a41",
+      "decision-record.md": "db210093254663416bc72fae3ae625d4063976054a485ecf18de92d4c0bcced5",
+      "implementation-summary.md": "96e2a37d2db1269b6b9ddc583068cbe511c16f425b5c332b32524ea6db3555c7"
     },
     "last_active_child_id": null,
     "last_active_at": null

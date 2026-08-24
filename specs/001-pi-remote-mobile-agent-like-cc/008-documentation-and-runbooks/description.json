@@ -1,6 +1,6 @@
 {
   "level": "2",
-  "specFolder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/008-documentation-and-runbooks",
+  "specFolder": "001-pi-remote-mobile-agent-like-cc/008-documentation-and-runbooks",
   "description": "Turns the implemented contracts and observed operations into accurate API, security, setup, maintenance, incident, and rollback documentation",
   "keywords": [
     "turns",

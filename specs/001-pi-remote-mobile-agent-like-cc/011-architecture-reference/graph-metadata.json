@@ -180,7 +180,7 @@
     ],
     "causal_summary": "The current `Apps/Pi Mobile/docs/architecture.md` is a prose narrative with runtime-shape and protocol sections",
     "created_at": "2026-08-13T15:52:25.070Z",
-    "last_save_at": "2026-08-24T16:38:15.029Z",
+    "last_save_at": "2026-08-24T17:58:11.286Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -190,13 +190,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:4fdb7fba2ac3f1b12234c1947a92f7912c7856f2bff335a5365340d45b425c91",
+    "source_fingerprint": "sha256:299e121033b75bb769816bea35129a5772b1148e6d4260a58d6681239f4d4236",
     "source_doc_hashes": {
-      "spec.md": "b7c405cf2cce58d07f26f4052b7330d8c175da9e0fc67d18209592e73039f95c",
-      "plan.md": "19ff891309c6dff616b9d7d5c4e1befc8a788d46456af11591a4f71b21221607",
-      "tasks.md": "463ce8c7a1fdd82db0840af7c9a4a2e948e44f36ecc866b7a765421bb0153e7b",
-      "checklist.md": "b9cb34aeee888e09d3d1f43178e0f3d0e591afa120ed6afd46d0da1d189c565e",
-      "implementation-summary.md": "d7cbd106f9dc1b137e465db0a7f3d45ba3911dcdf2e4dc8f7f5e28ab64921b80"
+      "spec.md": "2d75a5f1f61485c5ded1a9b9973d85e87caf193779daf2222a858ecb38f27679",
+      "plan.md": "7006f90e16215226708402bed077e567a666d6e87e941e6f2acc3f3bf61f038d",
+      "tasks.md": "98300b94efc56c693cb4ebcb07c6c3cd38a80ca12462c732dc978904cc104a11",
+      "checklist.md": "06aa548bed605c70557be70a93d6f78064e90cf9c332797065bb892878157cfe",
+      "implementation-summary.md": "35034a2388e103f00bdb2413f4d22a2d2d767ab0688f1585565d245fd33a3060"
     },
     "last_active_child_id": null,
     "last_active_at": null

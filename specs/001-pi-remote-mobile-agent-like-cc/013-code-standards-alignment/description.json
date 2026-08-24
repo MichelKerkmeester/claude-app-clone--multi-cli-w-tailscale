@@ -1,6 +1,6 @@
 {
   "level": "2",
-  "specFolder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/013-code-standards-alignment",
+  "specFolder": "001-pi-remote-mobile-agent-like-cc/013-code-standards-alignment",
   "description": "The built Pi Remote app does not document which `sk-code-opencode` standards it follows, and no audit has measured drift in structure, naming, module",
   "keywords": [
     "remote",

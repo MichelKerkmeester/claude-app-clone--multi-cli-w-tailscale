@@ -186,7 +186,7 @@
     ],
     "causal_summary": "The root `Apps/Pi Mobile/README.md` is informative but does not follow the `sk-create-readme` general README shape (no numbered ALL-CAPS H2 sections, no blockquote tagline, no install-guide separation)",
     "created_at": "2026-08-13T15:52:26.257Z",
-    "last_save_at": "2026-08-24T16:38:15.041Z",
+    "last_save_at": "2026-08-24T17:58:11.283Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:2f39e088f3bb81f8a1320b198c8c4542b25092926e4dbef33fd3acc43cae011f",
+    "source_fingerprint": "sha256:601c756c5325b1e41cf1f7603f5752b9db108e53d8cc59e7a66b0e520e32ff3a",
     "source_doc_hashes": {
-      "spec.md": "c4058c87979d688645cc6c0e2a59f485326acd69b1fbd7eae958ef2da2f54223",
-      "plan.md": "146de1f5761c8be1abfdea7a3d43af336502054ee7886266df5ba1ec0eb98569",
-      "tasks.md": "46e83b48d89630d19981552ac2336a82cf89c2eaf54cfc28d179f23eaf23077d",
-      "checklist.md": "83b0455168199a6a970b0513667d8e04599c7d2c1d733f11260c24c831d80ca1",
-      "implementation-summary.md": "384ed3d75d58610eebf93673dd59da671d298843c43ca5dc857c116d4fbc7fbd"
+      "spec.md": "9262e793c41292f4b97dcf7a8551f0be1f021265e7f4e6bbb34496690f319884",
+      "plan.md": "c31ffeedcfd3ae10c29ce697aca80bd9961a2dead6f839247ba298c7ab7ce5f6",
+      "tasks.md": "ecf240e59ee7f2148af6fa423605de18f7d1f7b91e348c456c3542353d475f93",
+      "checklist.md": "9b98481c1980fa41e7bb2633e6b6c3fed0b5f75590aa9403f3d13efa77080ba1",
+      "implementation-summary.md": "7dcd4044c9e9a82cf601219850eb14da59b24a2b24332569e45a7fdb3a6508e2"
     },
     "last_active_child_id": null,
     "last_active_at": null

@@ -1,6 +1,6 @@
 {
   "level": "phase",
-  "specFolder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc",
+  "specFolder": "001-pi-remote-mobile-agent-like-cc",
   "description": "Pi CLI exposes a persistent local RPC subprocess, not a secure mobile product",
   "keywords": [
     "cli",

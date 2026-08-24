@@ -180,7 +180,7 @@
     ],
     "causal_summary": "The built Pi Remote app does not document which `sk-code-opencode` standards it follows, and no audit has measured drift in structure, naming, module boundaries, or the opencode code-surface conventions",
     "created_at": "2026-08-13T15:52:25.823Z",
-    "last_save_at": "2026-08-24T16:38:15.037Z",
+    "last_save_at": "2026-08-24T17:58:11.289Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -190,13 +190,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:3b4fddbc394fe5bd821b0b4814abf2ab4eb84aad69f85ab77e9a8c06ce6b8361",
+    "source_fingerprint": "sha256:cb6fa7e62000c63260fc04d37d22671fd344acd851274c6d8f6fa2e712ca572d",
     "source_doc_hashes": {
-      "spec.md": "c12cb6dc49193b57fcec931885d90f81cb8495811953774d93675f214035fbb3",
-      "plan.md": "270d2c71fc86fca00f1827423c4c8dd6285fbe0c29fef5103b570e4b0f258a42",
-      "tasks.md": "a0a4f07a83b1c1f3fb76611775e885cfd914bf01158fdb153a1bc258d645ad89",
-      "checklist.md": "e001def851ab3453ab60a9b5a2dddc3f20535a07ec8bd87b65cad5c70118d4e9",
-      "implementation-summary.md": "20a180606691aa937d916d6d601908296321e77b173be8da213434496c2c821c"
+      "spec.md": "b2223b4c0e31a354da04a29fbcd224e95e44c29475a948768233616188645776",
+      "plan.md": "0bf661d9bfa8ca2a86a90dc27f2d864e3ce115cba41227a9f52ddebaa0b06717",
+      "tasks.md": "71f597f2f8e526911195bcb6efc3263188c18e3b15ea4271aaa45bc3d7f06cb7",
+      "checklist.md": "30613085bbcd6e9221230e74d30a80c2cd7ab3e59569f010e40e2803d67d0be0",
+      "implementation-summary.md": "2c66f5a9c69baeaa8f2bc99b230f3b4e07635ab396f821919b1feba545707f0e"
     },
     "last_active_child_id": null,
     "last_active_at": null

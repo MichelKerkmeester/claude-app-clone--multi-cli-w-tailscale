@@ -11,7 +11,7 @@ importance_tier: "critical"
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc"
     last_updated_at: "2026-08-14T04:44:41Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the nine built phases with the latest passing machine evidence"

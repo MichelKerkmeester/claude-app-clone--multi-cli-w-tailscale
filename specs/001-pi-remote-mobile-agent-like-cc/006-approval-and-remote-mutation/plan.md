@@ -9,7 +9,7 @@ importance_tier: "critical"
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/006-approval-and-remote-mutation"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/006-approval-and-remote-mutation"
     last_updated_at: "2026-08-13T16:35:13Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the plan with the implemented authority loop"

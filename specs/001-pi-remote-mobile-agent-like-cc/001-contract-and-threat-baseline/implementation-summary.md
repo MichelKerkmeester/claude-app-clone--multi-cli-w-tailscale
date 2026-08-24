@@ -9,8 +9,8 @@ importance_tier: "critical"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/001-contract-and-threat-baseline"
-    last_updated_at: "2026-08-13T16:35:13Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/001-contract-and-threat-baseline"
+    last_updated_at: "2026-08-24T17:40:47.768Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the implemented contracts and supported baseline"
     next_safe_action: "Use phase 009 for the remaining operator-only release evidence"

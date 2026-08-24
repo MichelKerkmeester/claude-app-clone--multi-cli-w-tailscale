@@ -1,6 +1,6 @@
 {
   "level": "3",
-  "specFolder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/005-mobile-pwa-and-reconciliation",
+  "specFolder": "001-pi-remote-mobile-agent-like-cc/005-mobile-pwa-and-reconciliation",
   "description": "Builds the installable foreground mobile experience for sessions, streaming work, reconnect reconciliation, explicit controls, and offline read-only",
   "keywords": [
     "installable",

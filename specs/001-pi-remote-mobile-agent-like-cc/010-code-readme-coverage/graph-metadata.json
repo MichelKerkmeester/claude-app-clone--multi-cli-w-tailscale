@@ -186,7 +186,7 @@
     ],
     "causal_summary": "The built Pi Remote monorepo has code folders with no developer orientation: a new agent or contributor landing in `apps/pi-remote-relay/src/store/` or `packages/pi-rpc-protocol/tests/` cannot tell what the folder owns, what it may import, or which validation commands apply",
     "created_at": "2026-08-13T15:51:59.840Z",
-    "last_save_at": "2026-08-24T16:38:15.025Z",
+    "last_save_at": "2026-08-24T17:58:11.282Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:89c270f94c73481560cb68910a48653b33ca45839423ef8d881d13816ea17de9",
+    "source_fingerprint": "sha256:aa8ce40f79eba82e2aa79d266b7292b52ad0faafb85bd67b7f395be9dad87bfc",
     "source_doc_hashes": {
-      "spec.md": "9facdf1f7ae99fd0b10ef506a4ede4419fa51fdb7c6d6b744b807bb2ad6c0767",
-      "plan.md": "45a276b8644a4417a2b69085d80810b8da026b9daec433a2c9bca9de9bcd6b30",
-      "tasks.md": "402f4969e6c6bb115eac925a2b6f260cf5c546342769262e6bbfc897e861abb5",
-      "checklist.md": "8e843c040321d7e88efd66325aba9526fe1723d022c228076a3f0071bd392a22",
-      "implementation-summary.md": "f33fc43fe58ff9b6b4d7da76bb01af7a5503a76b9820775fd9d3a9948e2c25c0"
+      "spec.md": "f401795830577750a286f7c54e2bdde9a852cec9bb51f9c136ac919594179c28",
+      "plan.md": "e383d80180ceb1b8ade5ee31d38118756c8b90a06112b52816b13ad8ac536a10",
+      "tasks.md": "2e7b656d2f68d8bb58b4a76ee9f4a1a45c28257143c114e40f4ec8957c886f25",
+      "checklist.md": "3eee2f46144e9940587d7907a8db82447892b7ee954f2b6aea7c842cf9fe2cd1",
+      "implementation-summary.md": "564b0843785f0fc5ab44aba38d96663c0ceac4b99b5b175cb5c0e3ce352147fb"
     },
     "last_active_child_id": null,
     "last_active_at": null

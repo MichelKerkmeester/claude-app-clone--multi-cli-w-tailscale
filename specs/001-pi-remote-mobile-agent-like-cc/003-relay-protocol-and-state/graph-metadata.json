@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Implements the host-local Pi RPC supervisor, durable replay, session catalog, mutation ledger, and crash-safe reconciliation core",
     "created_at": "2026-08-10T18:28:40Z",
-    "last_save_at": "2026-08-24T16:38:14.996Z",
+    "last_save_at": "2026-08-24T17:58:11.087Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,14 +198,14 @@
       "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:ec63f9ff4637a872ebc6af388e9c865c92b5e35c095ba8979859ee59ac70ff11",
+    "source_fingerprint": "sha256:e8e11251b7c25c20ce4dbb9d2624c13a18b056d4c959d1a79529fe04177541dd",
     "source_doc_hashes": {
-      "spec.md": "666e3a05719ba65596a8c3b694a432135f50f50891c3a0ffc78eb0daf82c89c5",
-      "plan.md": "2a55462cd171dfb310dfee111bfd616d364323bfa33ebfdd06ab3cd71f97f847",
-      "tasks.md": "bbf540ed2aa0ad0511fc5e16836422be4c0e7dbf6797f4fd6d18604cdb2a6660",
-      "checklist.md": "8694c4e44e11c3e6b04072337888d3ce0f221d19bb5bc6ac2156f4a4953f3105",
-      "decision-record.md": "6292de98e761fe5948d79b33f664cdafcd2693426a94007ae7b54124fb3e3677",
-      "implementation-summary.md": "d4489ce9288124f8dc42fcfba3d8c5190866462a147741f53044a5c51e72e13a"
+      "spec.md": "77197a95dd4bf3207ed0ff68ab6e6a469eeed623023d976016a24a7ef60ffd45",
+      "plan.md": "e7523bc5e88156ab9a4fc1dad8a5340eabd695571659ccdd036af5df3a4aea2a",
+      "tasks.md": "20d438620f0d7ec22b2e373544d17be7e2fc5a26dd102a368259e04f05b7eafd",
+      "checklist.md": "23abc250f08a78fa4bfdd89ef5982db2b4affaac7bd841d8cd91ef7dca5e7128",
+      "decision-record.md": "9d633c9d87022602a46d4f1ad9aa085279ea00d57042464dd1437da882f21906",
+      "implementation-summary.md": "a67163df999733ab26c30c96d0dc94a64b458bced04fa7521e40782320a0dbb2"
     },
     "last_active_child_id": null,
     "last_active_at": null

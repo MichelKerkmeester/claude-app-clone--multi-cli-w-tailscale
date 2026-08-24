@@ -162,16 +162,16 @@
     ],
     "causal_summary": "Pi CLI exposes a persistent local RPC subprocess, not a secure mobile product",
     "created_at": "2026-08-10T17:46:19.156Z",
-    "last_save_at": "2026-08-24T16:38:14.978Z",
+    "last_save_at": "2026-08-24T17:58:11.087Z",
     "save_lineage": "same_pass",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "handover.md"
     ],
-    "source_fingerprint": "sha256:1b7b60541ef0bff534644c9632992189e67e112653a443b73c0985a56ea66b35",
+    "source_fingerprint": "sha256:5e6406990beafc6cab83bb06dfc33218e1a4e899625aba97c9fcc43513b0ba01",
     "source_doc_hashes": {
-      "spec.md": "86aec4f8c269707d6a034b6d57167b6e99ac908ec4a3ddbdcd361256360e4eb8",
+      "spec.md": "f092d735553b94e2e71e47ce87b3ccd91066c5457ba8cd4ce43599e3404305ba",
       "handover.md": "bec9519616aa20bc0496af667a476f82fd70a6bbcb55b0792d20562074d02d3d"
     },
     "last_active_child_id": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/017-chat-ux-and-restyle",

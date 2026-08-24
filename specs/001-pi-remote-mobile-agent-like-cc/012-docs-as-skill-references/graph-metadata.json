@@ -180,7 +180,7 @@
     ],
     "causal_summary": "The `docs/.md` runbooks in `Apps/Pi Mobile/` are prose documents without a consistent reference structure",
     "created_at": "2026-08-13T15:52:25.431Z",
-    "last_save_at": "2026-08-24T16:38:15.033Z",
+    "last_save_at": "2026-08-24T17:58:11.289Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -190,13 +190,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:7d44ded6457066f8b5ba4d03286fadc08f1846fe80a24a6b74f27cb9295f02d5",
+    "source_fingerprint": "sha256:a0fa212d025cb5490b6b603a927da5fe75f3a6788565fee745b7981eb92e0450",
     "source_doc_hashes": {
-      "spec.md": "ab6634ca784516959e722d54b51676589716010b4318db53e2b42b4137585b12",
-      "plan.md": "cff2c3e671e73c3df0909662d9aea00bfe8917f187235ad4df19040c2c7c2e79",
-      "tasks.md": "5ca17c595555a7a0a45d91b354a6912f21aaf29cbda5c7d10b5869f08a5bb613",
-      "checklist.md": "df0d334689f9c95883c91e75dd4cffa1ab43f6ac1efbdba21999ce414d63308c",
-      "implementation-summary.md": "05970c5369ad74645aa7332daad3754ec9ac3cb5c4ca47f52198802fd43692bd"
+      "spec.md": "c40be2e770b19b4a96b708b9bffe24852074d181aaab9ab10da3c963c2d55c3c",
+      "plan.md": "d59d31f392c768f78a14f6d1567e4fc1c9c68e9279fc04ce9580401676091dd6",
+      "tasks.md": "e2870b725997b427d2481d1b20284adf3198d19e2df4faac4ebbca4773a84b59",
+      "checklist.md": "8662dc4961c0361d3ea490fcac67f528f59cd31c2b526b937b4bb83a5e082556",
+      "implementation-summary.md": "17eb3e17a327e3f511e40ddafc483eacb2233ec2379d011703885725c6ecd58f"
     },
     "last_active_child_id": null,
     "last_active_at": null

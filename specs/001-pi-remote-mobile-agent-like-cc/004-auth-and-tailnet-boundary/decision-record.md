@@ -9,7 +9,7 @@ importance_tier: "critical"
 contextType: "decision"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/004-auth-and-tailnet-boundary"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/004-auth-and-tailnet-boundary"
     last_updated_at: "2026-08-13T16:35:13Z"
     last_updated_by: "gpt-5.6-sol"
     recent_action: "Reconciled the auth decision with the implemented loopback boundary"

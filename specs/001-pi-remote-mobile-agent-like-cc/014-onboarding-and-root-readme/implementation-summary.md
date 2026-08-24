@@ -9,8 +9,8 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "apps/pi-remote/001-pi-remote-mobile-agent-like-cc/014-onboarding-and-root-readme"
-    last_updated_at: "2026-08-13T17:52:43Z"
+    packet_pointer: "specs/001-pi-remote-mobile-agent-like-cc/014-onboarding-and-root-readme"
+    last_updated_at: "2026-08-24T17:58:11.283Z"
     last_updated_by: "deepseek-v4-flash"
     recent_action: "Realigned root README and authored the install and onboarding guide"
     next_safe_action: "Proceed to phase 015 doc quality and catalog"

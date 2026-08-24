@@ -1,6 +1,6 @@
 {
   "level": "3+",
-  "specFolder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/001-contract-and-threat-baseline",
+  "specFolder": "001-pi-remote-mobile-agent-like-cc/001-contract-and-threat-baseline",
   "description": "Pins the live Pi, host, ingress, browser, storage, and extension contracts and freezes the threat model before production implementation",
   "keywords": [
     "pins",

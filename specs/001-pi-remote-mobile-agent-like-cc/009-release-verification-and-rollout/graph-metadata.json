@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Runs the independent whole-system, security, performance, device, accessibility, rollback, and sign-off gates for staged release",
     "created_at": "2026-08-10T18:28:44Z",
-    "last_save_at": "2026-08-24T16:38:15.021Z",
+    "last_save_at": "2026-08-24T17:58:11.285Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,14 +198,14 @@
       "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:3dd82ea6530c4a628489350883a69f1644f9a73e7eca72251610eb02183c14e0",
+    "source_fingerprint": "sha256:f564b993b0637fde11437e6a2726a5467d02623969f94d9882a84af8a230fa61",
     "source_doc_hashes": {
-      "spec.md": "e3046a7891b4c775cc60b252b5c183a4abd1e90297be1b1c3cc1887527f26d0f",
-      "plan.md": "679eec25ac10f7ec92c7034e28b7300d7ca830af43a30e39c0be18e5b2ef628a",
-      "tasks.md": "4d7946d36f4e0b22b04cd4330bc4d047ee1d1ce7ccbfedd5b55b1be6e9865ade",
-      "checklist.md": "b8603e9a19178f6a24b65650373b976222c7da91987dfb8bab4e2b026b48ea17",
-      "decision-record.md": "71c637ea576cb3ae70088078d33c0e0ad94fd0c9e35bd21467982f3d9d1c1dff",
-      "implementation-summary.md": "11fac3591f5af187eb9967c8ab2e732c53b8fc16cc3392f3ea0a4fcb698022fc"
+      "spec.md": "6c09f3360f0c97aa09fdb1645d3ac2aa523528a24b410bdd0dc33fa16098fc80",
+      "plan.md": "99832147b4387fc2b618cefcdb919d220e05b6fcab6c115ac0e3f2fb939c8dd1",
+      "tasks.md": "a854bf753b849e20825b61b462a9304b6438774a1f57125ebe8e9f559f60721f",
+      "checklist.md": "19058b2e04392a2ee13993a21388a1412d620fc0a1e86598f655cbe4dcfcb8d9",
+      "decision-record.md": "26b5527a8003b97f9c543153402fa6f1853ae73015d605765545eabfcd234fe6",
+      "implementation-summary.md": "418a7fee6087f7d56ca4398b19457ced6619ad983522d0bf86a5f41d8b3d319a"
     },
     "last_active_child_id": null,
     "last_active_at": null

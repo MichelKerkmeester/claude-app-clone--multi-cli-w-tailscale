@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Pins the live Pi, host, ingress, browser, storage, and extension contracts and freezes the threat model before production implementation",
     "created_at": "2026-08-10T18:28:38Z",
-    "last_save_at": "2026-08-24T16:38:14.985Z",
+    "last_save_at": "2026-08-24T17:40:47.768Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,14 +198,14 @@
       "decision-record.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b5944e84a72794c9de7d68f42e8db11e11c83121665fe8cd1264f50aaace7d09",
+    "source_fingerprint": "sha256:214f46ed4f226d3e1b45d197b390f32a055eeaee4cf6740d7ba4069388dd77fa",
     "source_doc_hashes": {
-      "spec.md": "55e85949938afba91b3b9ef5548df75549b687e435b170aca40ccbbeeb26225d",
-      "plan.md": "d3ab793faa879d2bf5d4fe4ed3e91e389452eb3e1ddc13285f15e4d4b42f4d29",
-      "tasks.md": "99f55b17b68e8b711889ef6ad8a3e55bef8e313fb6492cd070e5a12c85f83994",
-      "checklist.md": "34484c994dd0744002078e80a58ac8e1179701711ae846928fe55433cb645d29",
-      "decision-record.md": "3455180a44e858d2232c013a1282143ebf0a06a3366b39425de79d66276fd432",
-      "implementation-summary.md": "aace78b1f30967bf9a3bd84f886cf2e6445c68cdbbeeea055dc9e67fed0b4512"
+      "spec.md": "6a3208cc5d74f93a2cd89576a7a732c4467f900b2c03a430805a71fec9c54ec2",
+      "plan.md": "ab52622300baab61cb8bf762c641a2540331d6403b7d8b11cf31dcdd9e0dbb66",
+      "tasks.md": "515a879e46c4e46f363867e81d3daa093c70a76a3c4639cf58ea3a880f2a8f0e",
+      "checklist.md": "7c55f2df9bdaef9135784de1427461ec5ff0b51b73f5a2ad049a146756b8f60a",
+      "decision-record.md": "51a9ccaa8f38d5862362e3f157d4cb2d844421dc1cb0489fc655a1801762fa5b",
+      "implementation-summary.md": "5d1863fa6f22de6ac04ceb0a6baee5573a864fa01a5649b7fc26939ad2aee0ad"
     },
     "last_active_child_id": null,
     "last_active_at": null

@@ -186,7 +186,7 @@
     ],
     "causal_summary": "The app has a setup runbook (phase 008) and an install and onboarding guide (phase 014), but deploying still requires an operator to run many ordered commands by hand: preflight, install, build, relay start, Tailscale Serve setup, enrollment, and instruction handoff",
     "created_at": "2026-08-14T04:44:41.561Z",
-    "last_save_at": "2026-08-24T16:38:15.051Z",
+    "last_save_at": "2026-08-24T17:58:11.491Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:634cd12de1a7b368950b9958a4d419e3ffcac01d3e216bd4033dd0ea05dd1a9c",
+    "source_fingerprint": "sha256:5333529ef9cc785f088ee7eb66709a2b05877bfe745e50643c107981b5791c8a",
     "source_doc_hashes": {
-      "spec.md": "b2d38d7a149df82b6201147438bfcf9b8be07649d13a0b6aa87c41e0379dd0eb",
-      "plan.md": "854c0ffe849743c68637f491b6673917518f2e34d12621843f797080b57a69cc",
-      "tasks.md": "b9dfaaaffa626921b26177ecad8097e221228ca04901c44865ca2f4c41418ca4",
-      "checklist.md": "fa8d0655470894999de85fc7ddf37962cd6610fa6212e9acd17285786179be97",
-      "implementation-summary.md": "3e51d61abf4b719e75d32f2650cdd052d34b88410a0ccfde100b09347056b998"
+      "spec.md": "effabd2fe5ee056a055a9f2ba81f438f5536acd8681431712563b225d6606abc",
+      "plan.md": "22ab36abbd9e9b32bc5eba2b764bbce34364ed94823f6bd7eec08e4551df6eb3",
+      "tasks.md": "459c2a7e2794133b4627481cc1efdc8fbbbed006e4bf806a76dab1aad0c2cd7e",
+      "checklist.md": "0310c14db2f253b95d9f141e466f2a72a9e7f40bc23795f8598c32e95dd24f54",
+      "implementation-summary.md": "ae9ac1e23b1f64b592b44849cd34f687c2328df653d787813094e75fa8f430f2"
     },
     "last_active_child_id": null,
     "last_active_at": null

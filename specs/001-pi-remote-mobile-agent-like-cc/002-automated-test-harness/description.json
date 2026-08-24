@@ -1,6 +1,6 @@
 {
   "level": "3",
-  "specFolder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/002-automated-test-harness",
+  "specFolder": "001-pi-remote-mobile-agent-like-cc/002-automated-test-harness",
   "description": "Builds the recorded, live, integration, security, browser, and crash harness that proves the remote control plane fails closed",
   "keywords": [
     "recorded",

@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   MARKDOWN PREVIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. MARKDOWN WELL
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: markdown-well — the bounded safe-Markdown render surface. */
 /* @ds guardrail: do-not-edit — Bounded reading well; selectable; links/images render inert. */
 .artifact-markdown-preview {
@@ -13,6 +21,10 @@
   unicode-bidi: plaintext;
   padding: 0.25rem 0.1rem;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. MARKDOWN BLOCKS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: markdown-block — shared block spacing for rendered prose blocks (dynamic elements). */
 .artifact-markdown-preview p,
@@ -30,6 +42,10 @@
   overflow-wrap: anywhere;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. MARKDOWN QUOTE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: markdown-quote — blockquote inset rule. */
 .artifact-markdown-preview blockquote {
   margin-inline: 0;
@@ -38,12 +54,20 @@
   color: #6c6a65;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. MARKDOWN ANCHOR
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: markdown-anchor — defensive anchor styling (links render as inert spans; kept faithful). */
 .artifact-markdown-preview a {
   color: #8a452f;
   text-decoration: underline;
   text-decoration-style: dotted;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. MARKDOWN CODE
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: markdown-code — fenced code block. */
 .artifact-markdown-code {
@@ -64,6 +88,10 @@
   white-space: pre;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   6. MARKDOWN LINK
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: markdown-link — inert link span. */
 .artifact-markdown-link {
   color: #8a452f;
@@ -71,11 +99,19 @@
   text-decoration-style: dotted;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   7. MARKDOWN IMAGE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: markdown-image — inert image placeholder. */
 .artifact-markdown-image {
   color: #6c6a65;
   font-style: italic;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   8. DARK THEME
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
 :root[data-theme='dark'] .artifact-markdown-image {

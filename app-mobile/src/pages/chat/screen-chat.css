@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   SESSION VIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
 /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
 .session-view {
@@ -15,6 +23,10 @@
   padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
   padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. STATUS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds surface: session-view — in-session composition root (header · statusline · transcript · composer). */
 /* @ds state: active · stale — reconnecting readout; error via inline-alert. */

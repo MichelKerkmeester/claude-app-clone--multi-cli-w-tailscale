@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   TODO PANEL
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. PANEL LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* The todo projection is a transcript annotation, not an editable task surface. */
 /* @ds surface: todos — the read-only todo projection panel (pi's plan). */
 /* @ds guardrail: READ-ONLY projection — The phone NEVER mutates pi's task list. Grouped sections and per-task states come from the projection only; edit styling, never the model. */
@@ -22,6 +30,10 @@
   /* The all-done rendering is quiet: no progress hairline replaces the row list. */
   gap: var(--space-2);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. HEADER
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: header — sticky panel header; heading + progress-count + refresh control. */
 .todo-panel-header {
@@ -81,6 +93,10 @@
   font-weight: 700;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. CONTROLS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: refresh · @ds slot: section-trigger — the shared 44px interactive base. */
 .todo-refresh,
 .todo-section-trigger {
@@ -137,6 +153,10 @@
   opacity: 0.65;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. PROGRESS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: progress-hairline — the done/total progress bar (aria progressbar is guarded). */
 .todo-progress-hairline {
   block-size: 3px;
@@ -152,6 +172,10 @@
   background: var(--accent);
   transform-origin: inline-start;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. SECTIONS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: body — the panel content area; all-done / empty / sectioned-rows states below. */
 .todo-panel-body {
@@ -223,6 +247,10 @@
   font-weight: 700;
   letter-spacing: 0.035em;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   6. TASK ROWS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: rows — the task row list. */
 .todo-task-list {
@@ -320,6 +348,10 @@
   justify-self: end;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   7. LIVE REGION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds guardrail: sr-only polite live region — Must never take layout space, move focus, or scroll. */
 .todo-live-region {
   /* The live region is purely a screen-reader polite queue; it must never
@@ -334,6 +366,10 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   8. RESPONSIVE LAYOUT
+─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 24rem) {
   .todo-panel {
@@ -387,6 +423,10 @@
 [dir='rtl'] .todo-progress-hairline > span {
   transform-origin: inline-end;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   9. REDUCED MOTION
+─────────────────────────────────────────────────────────────────── */
 
 /* Under reduced motion the row pulse is suppressed and no layout animation
    runs. Background updates must not auto-scroll the transcript or move

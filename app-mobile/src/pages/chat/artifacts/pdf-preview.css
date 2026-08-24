@@ -1,9 +1,21 @@
+/* ───────────────────────────────────────────────────────────────────
+   PDF PREVIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. PDF PREVIEW
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: pdf-preview — the reader shell. */
 .pdf-preview {
   display: grid;
   min-inline-size: 0;
   gap: var(--space-3);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. PDF CONTROLS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: pdf-controls — the PDF toolbar row. */
 .pdf-preview-controls {
@@ -13,6 +25,10 @@
   align-items: center;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. PAGE INDICATOR
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: page-indicator — the "Page N of M" read-out. */
 .pdf-page-indicator {
   min-block-size: 2.75rem;
@@ -20,6 +36,10 @@
   color: var(--ink-secondary);
   font-variant-numeric: tabular-nums;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. PAGE SCROLL
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: page-scroll — the bounded, contained page scroll column. */
 /* @ds guardrail: do-not-edit — Bounded reading well; overscroll contained so panning never chains. */

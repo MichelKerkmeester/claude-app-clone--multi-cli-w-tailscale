@@ -1,3 +1,10 @@
+/* ───────────────────────────────────────────────────────────────────
+   ASK QUESTION FREE TEXT
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. FIELD
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: free-text — the response textarea + optional character count. */
 .ask-question-free-text {
   display: grid;
@@ -25,11 +32,17 @@
   scroll-margin-block: var(--space-8);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. VALIDATION
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: error (aria-invalid) — invalid free-text input. */
 .ask-question-free-text textarea[aria-invalid='true'] {
   border-color: var(--accent-ink);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. FOCUS
+─────────────────────────────────────────────────────────────────── */
 /* @ds guardrail: focus-visible — The shared AA focus ring across option rows, free text, and submit. */
 .ask-question-free-text textarea:focus-visible {
   outline: 3px solid var(--accent-ink);
@@ -37,12 +50,18 @@
   box-shadow: 0 0 0 1px var(--surface-raised);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. DISABLED
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: disabled — free text fails-closed to reduced emphasis. */
 .ask-question-free-text textarea:disabled {
   cursor: default;
   opacity: 0.58;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   5. CHARACTER COUNT
+─────────────────────────────────────────────────────────────────── */
 .ask-question-free-text-count {
   justify-self: end;
   color: var(--ink-muted);

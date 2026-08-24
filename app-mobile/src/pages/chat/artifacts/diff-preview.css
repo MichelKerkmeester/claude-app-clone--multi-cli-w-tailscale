@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   DIFF PREVIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. DIFF WELL
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: diff-well — the unified-diff read-out. */
 /* @ds guardrail: do-not-edit — Fixed reading well; selectable and pan-scoped; never overflow the page. */
 .artifact-diff-preview {
@@ -21,10 +29,18 @@
   -webkit-user-select: text;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. WRAPPED STATE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: wrapped — soft-wrap toggle. */
 .artifact-diff-preview.is-wrapped {
   white-space: pre-wrap;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. DIFF ROW
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: diff-line — one diff row. */
 .artifact-diff-line {
@@ -32,6 +48,10 @@
   padding-inline: var(--space-4);
   display: block;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. DIFF STATES
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: add — inserted line tint (token; system-dark remaps --diff-add). */
 .artifact-diff-add {
@@ -47,6 +67,10 @@
 .artifact-diff-line.is-find-match {
   background: #f3e4de;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. DARK THEME
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: dark — explicit dark-theme tints (foreign ancestor via :global). */
 :root[data-theme='dark'] .artifact-diff-add {

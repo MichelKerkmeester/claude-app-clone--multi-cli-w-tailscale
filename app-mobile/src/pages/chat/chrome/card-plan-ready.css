@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   PLAN READY CARD
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. CARD LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: plan-ready-card — live validated plan summary + review entry. */
 /* @ds state: reviewable — renders only when the artifact is live, newest and valid. */
 .plan-ready-card {
@@ -49,6 +57,10 @@
   font-weight: 700;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. DETAILS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: summary — plain prose; shared with plan-review-sheet. */
 .plan-ready-summary {
   margin: 0;
@@ -92,6 +104,10 @@
   overflow-wrap: anywhere;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. ACTIONS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: review CTA — shared pill chrome for the ready card and review sheet. */
 .plan-ready-review {
   min-block-size: 44px;
@@ -123,6 +139,10 @@
 }
 
 /* @ds end surface: plan-ready-card */
+
+/* ───────────────────────────────────────────────────────────────────
+   4. RESPONSIVE LAYOUT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: layout — wrap handling for the card/sheet headers. */
 .plan-ready-header {

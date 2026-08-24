@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   COMMAND PALETTE
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. PALETTE STRUCTURE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: slash-autocomplete — the inline autocomplete card and the
    command palette share this surface name. */
 /* `.command-palette`, `.command-empty`, `.command-name`, and `.command-desc`

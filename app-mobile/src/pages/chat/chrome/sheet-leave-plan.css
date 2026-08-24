@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   LEAVE PLAN SHEET
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. OVERLAY
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: leave-plan-sheet — confirmation before Plan → Build expands host authority. */
 /* @ds surface: overlay — leave-plan-sheet is an INSTANCE of the shared overlay
    primitive (backdrop → raised panel → header/body/actions). Physical unification
@@ -13,6 +21,10 @@
   justify-content: center;
   background: rgb(0 0 0 / 35%);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. SHEET LAYOUT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: sheet — constraint + raised sheet + entry. */
 /* @ds slot: panel — the raised bottom-sheet surface. */
@@ -30,6 +42,10 @@
   box-shadow: var(--shadow-raised);
   transition: transform 180ms var(--ease-out, ease);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. CONTENT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: dialog — content column + focus seam. */
 .leave-plan-dialog {
@@ -56,6 +72,10 @@
   font-size: 0.95rem;
   line-height: 1.45;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. ACTIONS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: actions — the two-choice rail. */
 .leave-plan-actions {
@@ -98,6 +118,10 @@
   outline-offset: 2px;
 }
 /* @ds end surface: leave-plan-sheet */
+
+/* ───────────────────────────────────────────────────────────────────
+   5. SAFE AREA
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: layout — safe-area gutters for the leave sheet. */
 .leave-plan-sheet {

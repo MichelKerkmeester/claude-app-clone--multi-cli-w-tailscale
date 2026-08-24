@@ -1,3 +1,10 @@
+/* ───────────────────────────────────────────────────────────────────
+   ASK QUESTION OPTION ROW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. OPTION ROW
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: option-row · @ds state: idle — one answer option; hover/pressed/selected/disabled follow. */
 .ask-question-option-row {
   display: flex;
@@ -16,6 +23,9 @@
   touch-action: manipulation;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. INTERACTION STATES
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: hover — the option row under pointer hover. */
 .ask-question-option-row:hover:not(:disabled) {
   border-color: var(--accent-ink);
@@ -42,6 +52,9 @@
   opacity: 0.58;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. INDICATOR
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: option-indicator — single (circle) / multiple (square) selection glyph. */
 .ask-question-option-indicator {
   display: grid;
@@ -61,6 +74,9 @@
   border-radius: 999px;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. OPTION COPY
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: option-copy — the option label + optional description. */
 .ask-question-option-copy {
   display: grid;
@@ -84,12 +100,18 @@
   line-height: 1.4;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   5. SELECTED COPY
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: selected · description — re-ink the description inside a selected row. */
 .ask-question-option-row[aria-pressed='true'] .ask-question-option-description {
   color: inherit;
   opacity: 0.82;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   6. REDUCED MOTION
+─────────────────────────────────────────────────────────────────── */
 /* @ds guardrail: do-not-edit — Reduced-motion collapses option-row animation/transition. */
 @media (prefers-reduced-motion: reduce) {
   .ask-question-option-row {
@@ -98,6 +120,9 @@
   }
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   7. THEME OVERRIDES
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: selected · dark — dark-theme selected row re-inks to base ink. */
 :root[data-theme='dark'] .ask-question-option-row[aria-pressed='true'] {
   color: var(--ink);

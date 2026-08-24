@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   IMAGE STATUS
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. STATUS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: status — the lifecycle status read-out (loading · ready · corrupt · revoked · …). */
 .inbound-image-status {
   display: grid;
@@ -9,10 +17,18 @@
   line-height: 1.333;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. STATUS COPY
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: status-copy — the human-readable state description. */
 .inbound-image-status-copy {
   overflow-wrap: anywhere;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. STATUS ACTIONS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: status-actions — the action button row (retry · reveal · …). */
 .inbound-image-status-actions {
@@ -34,6 +50,10 @@
   font-weight: 650;
   cursor: pointer;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. ACTION STATES
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: hover — the action under pointer hover. */
 .inbound-image-status-action:hover:not(:disabled) {

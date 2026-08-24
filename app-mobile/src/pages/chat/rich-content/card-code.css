@@ -1,3 +1,10 @@
+/* ───────────────────────────────────────────────────────────────────
+   CODE CARD
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. CODE PREVIEW
+─────────────────────────────────────────────────────────────────── */
 /* @ds surface: code-card — fenced source preview with optional progressive
    highlighting and a full-screen Open handoff. */
 /* @ds slot: code-preview — horizontally panning code viewport. */
@@ -27,6 +34,9 @@
   white-space: pre;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. CONTINUATION
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: labels — code continuation caption (muted small type). */
 .rich-continuation {
   margin: var(--space-2) 0 0;
@@ -34,6 +44,9 @@
   font-size: 0.75rem;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. COPY STATUS
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
    polite live region whose text carries the outcome; the presence styles are this. */
 /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */

@@ -1,8 +1,20 @@
+/* ───────────────────────────────────────────────────────────────────
+   ATTENTION INBOX
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
 /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
 .inbox-view {
   padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. HEADING
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
 /* @ds slot: heading — surface title + description. */
@@ -29,6 +41,10 @@
   font-size: 1rem;
   line-height: 1.65;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. ATTENTION LIST
+─────────────────────────────────────────────────────────────────── */
 
 .attention-list {
   display: grid;
@@ -102,6 +118,10 @@
   color: var(--danger);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. RESPONSIVE
+─────────────────────────────────────────────────────────────────── */
+
 @media (max-width: 39rem) {
   .inbox-view {
     padding-top: var(--space-6);
@@ -119,6 +139,10 @@
     grid-column: 2;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. SAFE GUTTERS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: layout — safe inline gutters for the routed surfaces. */
 .inbox-view {

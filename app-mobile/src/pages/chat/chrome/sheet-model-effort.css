@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   MODEL EFFORT SHEET
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. OVERLAY
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: model-effort-sheet — the model picker + effort sheet overlay. */
 /* @ds surface: overlay — model-effort-sheet is an INSTANCE of the shared overlay
    primitive (backdrop → raised panel → grabber → header/body/footer).
@@ -60,6 +68,10 @@
 }
 
 /* @ds end surface: model-effort-sheet */
+
+/* ───────────────────────────────────────────────────────────────────
+   2. SHEET LAYOUT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: layout — sheet stacking, sizing, and the live drag-offset pull. */
 /* @ds slot: panel — the Modal raised surface; the --model-sheet-drag-offset var
@@ -173,6 +185,10 @@
   background: var(--model-sheet-selection);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. STATUS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: status-lines — policy, catalog state, mutation, and empty copy. */
 /* @ds state: model-open — the model picker panel. */
 .model-sheet-policy,
@@ -209,6 +225,10 @@
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. SEARCH
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: search — rendered only when the catalog reaches the search threshold. */
 /* @ds state: search-shown — the ≥8-model finder seam. */
@@ -261,6 +281,10 @@
   color: var(--model-sheet-accent);
   font-weight: 620;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. MODEL LIST
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: model-list — catalog rows, on the model-open section. */
 .model-sheet-list {
@@ -421,6 +445,10 @@
   min-block-size: 2.5rem;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   6. SHEET FOOTER
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: footer */
 .model-sheet-footer {
   display: grid;
@@ -462,6 +490,10 @@
   cursor: default;
   opacity: 0.5;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   7. MOTION
+─────────────────────────────────────────────────────────────────── */
 
 @keyframes model-sheet-in {
   from {
@@ -528,6 +560,10 @@
   }
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   8. EFFORT SECTION
+─────────────────────────────────────────────────────────────────── */
+
 /* ── Effort section: one full-width radio row per host-advertised level ── */
 /* @ds state: effort-open — the sheet draws its effort section. */
 .effort-sheet-section {
@@ -587,6 +623,10 @@
   color: var(--model-sheet-ink);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   9. SECTION NAVIGATION
+─────────────────────────────────────────────────────────────────── */
+
 /* Section navigation between the model picker and the effort radio group. */
 .model-sheet-nav,
 .effort-sheet-nav {
@@ -629,6 +669,10 @@
 [dir='rtl'] .effort-sheet-nav-button svg {
   transform: scaleX(-1);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   10. RESPONSIVE LAYOUT
+─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 360px) {
   .model-sheet-header,

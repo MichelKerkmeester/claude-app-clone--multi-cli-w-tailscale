@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   ARTIFACT HEADER
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. REVISION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: revision — the exact-revision provenance line (LTR-isolated). */
 .artifact-viewer-revision {
   max-inline-size: 100%;
@@ -9,6 +17,10 @@
   direction: ltr;
   unicode-bidi: isolate;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. DARK THEME
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: dark — dark-theme re-ink (foreign ancestor via :global). */
 :root[data-theme='dark'] .artifact-viewer-revision {

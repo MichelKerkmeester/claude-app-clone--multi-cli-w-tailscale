@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   COMPOSER COMMAND AUTOCOMPLETE
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. SURFACE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: closed · drafted — surface-level open conditions. The state
    attribute drives which presentation the surface renders. */
 .slash-surface {
@@ -35,6 +43,10 @@
   font-family: var(--font-sans);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. THEME
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds edit: tokens — theme remap, dark. The same component tokens resolve to their
    dark semantic roles here. The ui-accent points at --accent-ink, not --accent-strong,
    because --accent-strong carries no dark override and would not match the dark
@@ -64,6 +76,10 @@
 
 /* @ds end surface: slash-autocomplete */
 
+/* ───────────────────────────────────────────────────────────────────
+   3. STATUS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: status — slash-panel header states map loading · ready..empty · ready..stale-offline ·
    error..denied onto the shared families. */
 /* @ds slot: header — the panel's status / error / empty-catalog copy line. */
@@ -86,6 +102,10 @@
 
 /* @ds state: committing — transient post-insertion panel frame: no rows and no
    copy, closed by the composer on the next commit resolution. */
+
+/* ───────────────────────────────────────────────────────────────────
+   4. OPTIONS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: option-list — the scrollable listbox of command rows. */
 /* @ds state: ready.unfiltered · ready.filtered · refreshing.current ·
@@ -113,6 +133,10 @@
   border-radius: 10px;
   background: color-mix(in srgb, var(--slash-ink) 7%, transparent);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. FOOTER
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: footer-hint — the footer with the running hint and retry affordance. */
 .slash-footer {
@@ -156,6 +180,10 @@
   opacity: 0.55;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   6. RESPONSIVE LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds edit: layout — installed-PWA popover bounds clear the device insets. */
 .slash-panel {
   inline-size: var(
@@ -164,6 +192,10 @@
   );
   max-inline-size: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   7. ACCESSIBILITY
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: contrast — system-wide forced-colors primitive: the scoped palettes yield to the user's
    system scheme (Canvas / CanvasText / Highlight). */

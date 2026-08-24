@@ -1,3 +1,10 @@
+/* ───────────────────────────────────────────────────────────────────
+   ASK QUESTION STATUS
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. STATUS
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: status — the live form-state line. */
 .ask-question-status {
   display: flex;
@@ -9,6 +16,9 @@
   line-height: 1.4;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. STATUS MARK
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: status-mark — the per-phase glyph (sent ✓ · error ! · idle •). */
 .ask-question-status-mark {
   display: inline-grid;
@@ -22,11 +32,17 @@
   font-weight: 750;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. SENT STATE
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: sent — answered-and-immutable; the status tints to accent (the card sets the state class). */
 .ask-question-card-answered-immutable .ask-question-status {
   color: var(--accent-ink);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. ERROR STATE
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: error — the status line signals a failed state. */
 .ask-question-status-error {
   color: var(--accent-ink);

@@ -1,9 +1,21 @@
+/* ───────────────────────────────────────────────────────────────────
+   PDF PAGE
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. PAGE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: page — one PDF page, centered in the scroll column. */
 .pdf-preview-page {
   display: grid;
   min-inline-size: 0;
   place-items: start center;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. CANVAS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: canvas-wrap — the raised canvas frame that the text layer overlays. */
 .pdf-preview-canvas-wrap {
@@ -18,6 +30,10 @@
   max-inline-size: 100%;
   block-size: auto;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. TEXT LAYER
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: text-layer — the invisible selectable text overlay aligned to the canvas. */
 /* @ds guardrail: do-not-edit — transparent text keeps selection/find working without repainting glyphs. */
@@ -36,6 +52,10 @@
   color: transparent;
   font-size: 1rem;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. FIND MATCH
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: find-match — a matched text run tints under the transparent layer. */
 .pdf-text-layer .pdf-text-match {

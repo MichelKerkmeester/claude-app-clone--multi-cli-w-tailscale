@@ -1,9 +1,21 @@
+/* ───────────────────────────────────────────────────────────────────
+   NORMALIZED ACTIVITY GROUP
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. GROUP SURFACE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: activity-group — grouped bare evidence blocks in one quiet disclosure. */
 .activity-group {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. PANEL BODY
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: panel-body — the DisclosurePanel content stack of an evidence disclosure. */
 .activity-stack {

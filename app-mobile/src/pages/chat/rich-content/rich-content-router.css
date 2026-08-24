@@ -1,3 +1,10 @@
+/* ───────────────────────────────────────────────────────────────────
+   RICH CONTENT ROUTER
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. PROSE
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: prose — bidirectional-safe plain-text read-out; capped to reading width. */
 /* @ds guardrail: do-not-edit — Unicode-bidi: plaintext keeps directional text stable and un-clickable-into; do not weaken. */
 .rich-prose-block {
@@ -9,6 +16,9 @@
   margin-block: var(--space-3);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. FALLBACKS
+─────────────────────────────────────────────────────────────────── */
 /* @ds surface: fallback/activity cards — quiet presentation for non-card blocks. */
 /* @ds state: malformed-fallback — unsupported/undisplayable blocks present as a
    quiet card without card chrome. */

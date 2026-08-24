@@ -1,3 +1,10 @@
+/* ───────────────────────────────────────────────────────────────────
+   COMMAND OUTPUT CARD
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. OUTPUT REGIONS
+─────────────────────────────────────────────────────────────────── */
 /* @ds surface: command-output-card — Bash command + output preview with unit
    Copy and a full-screen Open handoff. */
 /* @ds slot: output — vertical spacing between the command and output regions. */
@@ -22,6 +29,9 @@
   contain: content;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. OUTPUT METADATA
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: labels — clipped-count and output-meta share muted small type. */
 .rich-clipped-count {
   color: var(--ink-muted);
@@ -34,6 +44,9 @@
   font-size: 0.75rem;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. COPY STATUS
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
    polite live region whose text carries the outcome; the presence styles are this. */
 /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */

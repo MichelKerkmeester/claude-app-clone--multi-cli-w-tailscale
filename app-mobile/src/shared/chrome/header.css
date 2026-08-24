@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   TOPBAR
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: topbar — global chrome header for the non-session surfaces. */
 /* @ds edit: layout — sticky-bar geometry + safe top gutter. */
 .topbar {
@@ -14,6 +22,10 @@
   background: color-mix(in oklch, var(--canvas) 91%, transparent);
   backdrop-filter: blur(12px);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. WORDMARK
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: wordmark — Pi Remote wordmark block. */
 .wordmark {
@@ -64,6 +76,10 @@
   font-weight: 550;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. NAVIGATION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: nav — Inbox · Review actions; theme-toggle and status slots are shared surfaces below. */
 .topbar-actions {
   display: flex;
@@ -72,6 +88,10 @@
 }
 
 /* @ds end surface: topbar */
+
+/* ───────────────────────────────────────────────────────────────────
+   4. RESPONSIVE
+─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 52rem) {
   .topbar {

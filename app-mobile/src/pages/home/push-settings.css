@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   PUSH SETTINGS
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: push-settings — device notification preferences. */
 /* @ds state: loading · disabled · off · on — support check, relay-off, enable CTA, preference grid. */
 .push-settings {
@@ -38,6 +46,10 @@
   line-height: 1.55;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. ACTIONS
+─────────────────────────────────────────────────────────────────── */
+
 /* Button primitive outputs (subscribe / disable) — :global so Svelte scoping cannot
    drop the child-component element. The shared grouped hover override
    stays global. */
@@ -65,6 +77,10 @@
   background: transparent;
   color: var(--danger);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. PREFERENCES
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: preferences — per-class alert switches. */
 .preference-grid {
@@ -113,6 +129,10 @@
   transform: translateX(0.95rem);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. FOCUS
+─────────────────────────────────────────────────────────────────── */
+
 /* [role='switch']:focus-visible — solo occurrence extracted from the shared focus-visible
    group; the shared group stays global. A native <button> supplies
    the :focus-visible the CSS keys on (no [data-hovered] on the switch). */
@@ -120,6 +140,10 @@
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. RESPONSIVE
+─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 39rem) {
   .push-settings {
@@ -134,6 +158,10 @@
     justify-self: start;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   6. REDUCED MOTION
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: motion — reduced-motion switch knob zeroing. Solo occurrence extracted from
    the shared reduced-motion group; the shared group stays global. */

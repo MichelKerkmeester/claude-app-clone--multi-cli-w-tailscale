@@ -1,8 +1,20 @@
+/* ───────────────────────────────────────────────────────────────────
+   CODE PREVIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. CODE VIEWER
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: code-viewer — the relative frame owning the follow-tail control. */
 .artifact-code-viewer {
   position: relative;
   min-inline-size: 0;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. CODE WELL
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: code-well — the scrollable highlighted code surface. */
 /* @ds guardrail: do-not-edit — Bounded reading well; selectable and pan-scoped; never overflow the page. */
@@ -31,6 +43,10 @@
   unicode-bidi: isolate;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. GUTTER
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: gutter — the line-number rail. */
 .artifact-code-gutter {
   display: grid;
@@ -47,6 +63,10 @@
   min-block-size: 1.65em;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. SOURCE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: source — the highlighted code column. */
 .artifact-code-source {
   min-inline-size: max-content;
@@ -58,12 +78,20 @@
   user-select: text;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   5. WRAPPED STATE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: wrapped — soft-wrap toggle rewraps the source column. */
 .artifact-code-preview.is-wrapped .artifact-code-source {
   min-inline-size: 0;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   6. TOKENS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: token — syntax tokens (kind suffix is dynamic; :global keeps the compounds live). */
 .artifact-code-token.is-keyword,
@@ -85,6 +113,10 @@
   color: #9f998f;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   7. JUMP CONTROL
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: jump-latest — the follow-tail live-edge control; ships native :hover/:focus-visible. */
 .artifact-jump-latest {
   min-block-size: 44px;
@@ -104,6 +136,10 @@
   font-size: 0.8125rem;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   8. JUMP STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds guardrail: focus-visible — The AA focus ring on jump-to-latest. */
 .artifact-jump-latest:focus-visible {
   outline: 3px solid var(--focus);
@@ -116,6 +152,10 @@
   background: var(--accent-strong);
   color: var(--ink-inverse);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   9. DARK THEME
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
 :root[data-theme='dark'] .artifact-code-gutter {
@@ -130,6 +170,10 @@
   color: #f0b19a;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   10. REDUCED MOTION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds guardrail: do-not-edit — Reduced motion bounds the well + jump-to-latest transitions. */
 @media (prefers-reduced-motion: reduce) {
   .artifact-code-preview {
@@ -142,6 +186,10 @@
     scroll-behavior: auto;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   11. NARROW REFLOW
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: layout — narrow reflow: full-width jump-to-latest at <=20rem. */
 @media (max-width: 20rem) {

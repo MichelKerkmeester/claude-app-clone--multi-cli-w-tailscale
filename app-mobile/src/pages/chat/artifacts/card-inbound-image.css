@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   INBOUND IMAGE CARD
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. CARD
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: inbound-image-card — the inbound-image card frame; fades in on mount. */
 .inbound-image-card {
   min-inline-size: 0;
@@ -8,6 +16,10 @@
   color: var(--ink);
   animation: inbound-image-card-in 120ms var(--ease-out) both;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. OPEN BUTTON
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: open-button — the full-card open affordance; pan-y keeps vertical scroll, and the
    drag/callout suppression keeps the image un-liftable. */
@@ -32,6 +44,10 @@
     transform 100ms var(--ease-out);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: hover — react-aria data-hovered accent tint (via use:hover). */
 .inbound-image-card-button[data-hovered] {
   background: var(--accent-soft);
@@ -48,6 +64,10 @@
   outline-offset: -3px;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. BODY
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: body — the padded card interior. */
 .inbound-image-card-body {
   display: grid;
@@ -56,6 +76,10 @@
   padding: var(--space-3);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   5. IDENTITY
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: identity — the title + metadata header row. */
 .inbound-image-identity {
   display: flex;
@@ -63,6 +87,10 @@
   min-inline-size: 0;
   align-items: center;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   6. TITLE
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: title-wrap — the stacked title + metadata column. */
 .inbound-image-title-wrap {
@@ -80,6 +108,10 @@
   line-height: 1.333;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   7. METADATA
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: metadata — the fact chips (revision · size · …). */
 .inbound-image-metadata {
   display: flex;
@@ -96,6 +128,10 @@
   overflow-wrap: anywhere;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   8. PRIVACY STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: privacy-covered · revoked — the card re-inks its (child-rendered) well to the opaque
    privacy cover. The well is rendered by VerifiedImage/ImagePlaceholder, so it is matched globally. */
 .inbound-image-card[data-image-state='privacy-covered'] .inbound-image-well,
@@ -110,6 +146,10 @@
   display: none;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   9. KEYFRAMES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds guardrail: keyframes — the card mount fade; not designer-editable. */
 @keyframes inbound-image-card-in {
   from {
@@ -120,6 +160,10 @@
     opacity: 1;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   10. REDUCED MOTION
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds guardrail: do-not-edit — Reduced motion bounds the card fade to a short linear step and removes press scaling. */
 @media (prefers-reduced-motion: reduce) {

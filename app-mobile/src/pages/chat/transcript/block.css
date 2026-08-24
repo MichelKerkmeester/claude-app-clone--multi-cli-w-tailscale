@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   BLOCK
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. REDACTED ATTACHMENT
+─────────────────────────────────────────────────────────────────── */
+
 /* Ask-question answers stay in the transcript; the host remains the only authority. */
 .block-ask-question {
   overflow: visible;
@@ -49,6 +57,10 @@
   white-space: nowrap;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. ATTACHMENT REFLOW
+─────────────────────────────────────────────────────────────────── */
+
 @media (max-width: 40rem) {
   .redacted-attachment-card {
     grid-template-columns: auto minmax(0, 1fr);
@@ -58,6 +70,10 @@
     grid-column: 2;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. TRANSCRIPT BLOCK
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds surface: transcript-block — one message block; each kind is a state seam below. */
 .transcript-block {
@@ -119,6 +135,10 @@
   background: transparent;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. PLAN CHECKLIST
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: plan-todo — the plan-block ✓/○ checklist. States: pending (○) · done (✓). */
 /* @ds state: plan — checklist items. */
 /* @ds guardrail: the item `done` state comes from the plan block model; done derivation and
@@ -158,6 +178,10 @@
 
 /* @ds end surface: plan-todo */
 
+/* ───────────────────────────────────────────────────────────────────
+   5. TOOL OUTPUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: tool_call · tool_result — monospace output (danger variant below). */
 .transcript-block pre {
   max-height: 26rem;
@@ -178,6 +202,10 @@
   color: oklch(0.82 0.1 25);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   6. ARTIFACT CARD
+─────────────────────────────────────────────────────────────────── */
+
 /* ── Read-only artifact card and viewer ──────────────────────────────── */
 /* @ds state: file_diff — diff card (the rich-content card seam slots here). */
 .transcript-block.block-file_diff {
@@ -185,6 +213,10 @@
   border: 0;
   background: transparent;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   7. USAGE SUMMARY
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: usage — input/output/cost grid. */
 .usage-grid {
@@ -213,6 +245,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   8. BARE BLOCK
+─────────────────────────────────────────────────────────────────── */
+
 .transcript-block.block-bare {
   border: none;
   border-radius: 0;
@@ -222,6 +258,10 @@
 .block-bare > header {
   padding-inline: 0;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   9. USAGE REFLOW
+─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 39rem) {
   .usage-grid {

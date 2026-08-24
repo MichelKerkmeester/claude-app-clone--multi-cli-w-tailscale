@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   ARTIFACT STATUS
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. STATUS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: status — the polite status live region. */
 .artifact-viewer-status {
   min-block-size: 2.75rem;
@@ -6,6 +14,10 @@
   font-size: 0.78rem;
   line-height: 1.4;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. TERMINAL ALERT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: terminal-alert — the visually-hidden assertive alert live region. */
 /* @ds guardrail: do-not-edit — Visually hidden but present for assistive tech; this is the announcement contract. */

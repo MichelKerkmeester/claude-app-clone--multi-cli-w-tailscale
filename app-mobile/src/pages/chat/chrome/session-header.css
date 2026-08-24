@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   SESSION HEADER
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. HEADER LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
 /* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
 .session-sheet-popover {
@@ -23,6 +31,10 @@
   background: color-mix(in oklch, var(--canvas) 90%, transparent);
   backdrop-filter: blur(12px);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. ICON CONTROLS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: icon — back and overflow icon buttons. */
 .session-header-icon {
@@ -50,6 +62,10 @@
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. MODEL READOUT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: model — host-confirmed model/effort readout trigger. */
 .session-model-trigger {
@@ -134,6 +150,10 @@
 }
 /* @ds end surface: session-header */
 
+/* ───────────────────────────────────────────────────────────────────
+   4. HEADER MOTION
+─────────────────────────────────────────────────────────────────── */
+
 @keyframes model-header-accepted {
   from {
     opacity: 0;
@@ -152,6 +172,10 @@
     display: none;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. OVERFLOW NAV
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: nav — Inbox · Review overflow items. */
 .overflow-nav {

@@ -1,3 +1,10 @@
+/* ───────────────────────────────────────────────────────────────────
+   TEXT ARTIFACT CARD
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. TEXT PREVIEW
+─────────────────────────────────────────────────────────────────── */
 /* @ds surface: text-artifact-card — substantial text artifact preview with a
    full-screen Open handoff. */
 /* @ds slot: preview — clipped text-artifact preview column. */
@@ -17,6 +24,9 @@
   overflow-wrap: anywhere;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. CONTINUATION
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: labels — text continuation caption (muted small type). */
 .rich-continuation {
   margin: var(--space-2) 0 0;
@@ -24,6 +34,9 @@
   font-size: 0.75rem;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. COPY STATUS
+─────────────────────────────────────────────────────────────────── */
 /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
    polite live region whose text carries the outcome; the presence styles are this. */
 /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */

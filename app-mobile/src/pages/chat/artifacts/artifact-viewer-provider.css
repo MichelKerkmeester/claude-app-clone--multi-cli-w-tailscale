@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   ARTIFACT VIEWER PROVIDER
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. PRIVACY CURTAIN
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: privacy-curtain — opaque cover shown on dismissal while content unmounts. */
 /* @ds state: privacy-covered — the curtain is fully opaque and pointer-blocking. */
 /* @ds guardrail: do-not-edit — z-index 10000 opaque cover; the privacy invariant. */

@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   SESSION COMPOSER
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. COMPOSER REGION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: promptError — inline-alert rendered above the tray (shared error surface). */
 /* @ds edit: layout — sticky bottom-anchor + canvas fade; the keyboard-anchor
    --visual-viewport-height var feeds the anchor and stays the layout input. */
@@ -14,6 +22,10 @@
   padding-inline-end: max(var(--space-3), env(safe-area-inset-right, 0px));
   background: linear-gradient(to top, var(--canvas) 66%, transparent);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. TRAY
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds surface: composer — the input island. */
 /* @ds edit: layout — tray geometry; safe gutters are token-driven. */
@@ -59,6 +71,10 @@
   text-align: center;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. INPUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: input — the single editing field; colour/type stay token-driven. */
 .composer-input {
   width: 100%;
@@ -89,6 +105,10 @@
   color: var(--ink-muted);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. INPUT TOOLBAR
+─────────────────────────────────────────────────────────────────── */
+
 .composer-bar {
   display: flex;
   align-items: center;
@@ -111,6 +131,10 @@
   font-size: 0.84rem;
   line-height: 1.35;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. PRIMARY ACTIONS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: primary-action — the single circular morphing disc (send/steer/sending).
    The class is passed to the Button primitive, so Svelte cannot hash it → :global. */
@@ -173,6 +197,10 @@
   opacity: 0.4;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   6. BUSY STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: spinner — shared inline pending/busy indicator. */
 /* @ds state: sending · slashSubmitting — the disc's busy form.
    The SpinnerGlyph <svg> is rendered by this component → normally scoped. */
@@ -186,6 +214,10 @@
     animation: none;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   7. RESPONSIVE LAYOUT
+─────────────────────────────────────────────────────────────────── */
 
 /* Narrow widths give the mode control its own toolbar row above the
    textarea: the left group wraps so the label never truncates Plan ·

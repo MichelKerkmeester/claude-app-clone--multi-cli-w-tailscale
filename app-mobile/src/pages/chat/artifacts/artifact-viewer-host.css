@@ -1,9 +1,21 @@
+/* ───────────────────────────────────────────────────────────────────
+   ARTIFACT VIEWER HOST
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. PREVIEW REGION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: preview-region — the bounded body that hosts the active preview. */
 .artifact-preview-region {
   min-inline-size: 0;
   max-inline-size: 100%;
   unicode-bidi: plaintext;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. LOADING PREVIEW
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: loading-preview — the three-bar skeleton shown while a preview resolves. */
 .artifact-loading-preview {
@@ -32,6 +44,10 @@
   inline-size: 60%;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. STALE ACTION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: stale-action — the "View latest" control for a stale exact revision; native pseudo-states. */
 .artifact-stale-action {
   min-block-size: 44px;
@@ -47,6 +63,10 @@
   cursor: pointer;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: hover — stale action under pointer hover. */
 .artifact-stale-action:hover {
   border-color: #b85f42;
@@ -59,6 +79,10 @@
   outline-offset: 2px;
   box-shadow: 0 0 0 5px var(--accent);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. DARK THEME
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
 :root[data-theme='dark'] .artifact-stale-action {
@@ -74,6 +98,10 @@
 :root[data-theme='dark'] .artifact-stale-action:focus-visible {
   outline-color: #f8f8f6;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   6. REDUCED MOTION
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds guardrail: do-not-edit — reduced-motion bounds the stale-action transition. */
 @media (prefers-reduced-motion: reduce) {

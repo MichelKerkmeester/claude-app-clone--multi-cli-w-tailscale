@@ -1,3 +1,10 @@
+/* ───────────────────────────────────────────────────────────────────
+   SAFE MARKDOWN
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. FALLBACK
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: safe-markdown-fallback — the fail-closed verbatim read-out. */
 .safe-markdown-fallback[data-control-presentation='readonly'] {
   border-inline-start: 3px solid var(--accent-strong);
@@ -5,6 +12,9 @@
   overflow-wrap: anywhere;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. PROSE
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: safe-markdown — the safe-Markdown renderer's prose output. */
 /* @ds guardrail: do-not-edit — This is presentation for already-sanitized Markdown; allowlisting and scheme filtering remain in the module script. */
 .safe-markdown,
@@ -41,6 +51,9 @@
   padding-inline-start: 1.4rem;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. INLINE CODE
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: prose-inline-code — inline code chip. */
 .safe-markdown code {
   padding: 0.1rem 0.25rem;
@@ -50,6 +63,9 @@
   font-size: 0.88em;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. CODE BLOCK
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: safe-markdown-code — fenced code block rendered by SafeMarkdown. */
 .safe-markdown-code {
   max-inline-size: 100%;
@@ -71,6 +87,9 @@
   background: transparent;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   5. TABLE
+─────────────────────────────────────────────────────────────────── */
 /* @ds slot: prose-table — table rhythm, borders, and start-aligned cells. */
 .safe-markdown table {
   inline-size: 100%;

@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   PLAN MODE MENU
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. MENU LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* The two-row mode menu: focus movement only, activation alone reports. */
 /* @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. */
 /* @ds slot: popover — floating placement chrome + raised elevation. */
@@ -39,6 +47,10 @@
   cursor: pointer;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. ROW STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: row · focused — move-only, never a selection. */
 .plan-mode-row[data-focused] {
   background: var(--surface-muted);
@@ -57,6 +69,10 @@
   opacity: 0.55;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. ROW CONTENT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: row-description — bounded local copy under the row label. */
 .plan-mode-row .react-aria-Text[slot='description'] {
   grid-column: 1;
@@ -73,6 +89,10 @@
   align-self: center;
   color: var(--accent-ink);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. MENU NOTE
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: note — bounded reason when a row cannot be chosen. */
 .plan-mode-menu-note {

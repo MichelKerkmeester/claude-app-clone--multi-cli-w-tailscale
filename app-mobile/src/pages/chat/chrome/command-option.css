@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   COMMAND OPTION
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. OPTION ROW
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: label — the option row and its name/match/argument-hint lines. */
 /* @ds state: enabled — an insertable row; default row presentation. */
 .slash-option {
@@ -15,6 +23,10 @@
   transition: background-color 80ms linear;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: active — the virtual-focus row (aria-activedescendant). Not
    colour-only: it keeps its ink rail plus outline. */
 .slash-option[data-focused] {
@@ -28,6 +40,10 @@
 .slash-option[aria-disabled='true'] {
   cursor: default;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. LABELS
+─────────────────────────────────────────────────────────────────── */
 
 .slash-name-line {
   display: flex;
@@ -60,6 +76,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   4. METADATA
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: label · disabled-reason — the row's secondary line: a description
    on enabled rows, the disclosed reason on disabled rows. */
 .slash-desc,
@@ -85,6 +105,10 @@
   color: var(--slash-accent);
   font-weight: 650;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. ACCESSIBILITY
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: contrast — system-wide prefers-contrast primitive: borders carry the hierarchy the palette
    otherwise implies with fill, using the frozen tokens unchanged. */

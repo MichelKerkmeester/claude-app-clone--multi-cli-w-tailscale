@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   UNSUPPORTED PREVIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. UNSUPPORTED PREVIEW
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: unsupported-preview — the unavailable/unsupported read notice card. */
 /* @ds guardrail: do-not-edit — theme-invariant light literal; stays fixed. */
 .artifact-unsupported-preview {
@@ -15,6 +23,10 @@
 .artifact-unsupported-preview p {
   margin: 0.5rem 0 0;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. DARK THEME
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: dark — dark-theme re-ink (a shared group in app.css; only the unsupported slice here). */
 :root[data-theme='dark'] .artifact-unsupported-preview {

@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   PLAN MODE BUTTON
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. CONTROL
+─────────────────────────────────────────────────────────────────── */
+
 /* ── Persistent Plan mode control (immediately after "+") ────────────
    One 44px tab stop with a host-confirmed label. Plan is conveyed
    redundantly (lock glyph + words), never by clay alone. */
@@ -29,6 +37,10 @@
     color var(--duration-fast, 120ms) var(--ease-out, ease),
     border-color var(--duration-fast, 120ms) var(--ease-out, ease);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. STATES
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: hover · pressed */
 .plan-mode-button[data-hovered],
@@ -72,6 +84,10 @@
   color: var(--ink-muted);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. LABEL
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: label — bounded, ellipsis-capped visible label. */
 .plan-mode-label {
   max-inline-size: 11rem;
@@ -80,6 +96,10 @@
   white-space: nowrap;
 }
 /* @ds end surface: plan-mode-button */
+
+/* ───────────────────────────────────────────────────────────────────
+   4. RESPONSIVE LAYOUT
+─────────────────────────────────────────────────────────────────── */
 
 /* Narrow widths give the mode control its own toolbar row above the
    textarea: the left group wraps so the label never truncates Plan ·

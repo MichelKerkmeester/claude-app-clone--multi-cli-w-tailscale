@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   ARTIFACT CARD
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. CARD
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: card — the read-only artifact card button; glyph · body · open grid. */
 .artifact-card {
   display: grid;
@@ -16,6 +24,10 @@
   cursor: pointer;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: hover — react-aria data-hovered accent tint (via use:hover). */
 .artifact-card[data-hovered] {
   border-color: var(--accent-strong);
@@ -32,6 +44,10 @@
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. GLYPH
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: glyph — the artifact-type glyph chip. */
 .artifact-card-glyph {
@@ -54,6 +70,10 @@
   stroke-linejoin: round;
   stroke-width: 1.8;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. BODY
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: body — meta · summary · peek column. */
 .artifact-card-body {
@@ -90,6 +110,10 @@
   line-height: 1.35;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   5. PEEK
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: peek — the clipped 6-line diff preview (mayReorder content only). */
 /* @ds guardrail: do-not-edit — Peek is clipped and bidi-stable; never expand in the card. */
 .artifact-card-peek {
@@ -117,6 +141,10 @@
   text-overflow: ellipsis;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   6. OPEN AFFORDANCE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: open — the trailing "Open" handoff affordance. */
 .artifact-card-open {
   min-block-size: 2.75rem;
@@ -126,6 +154,10 @@
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   7. NARROW REFLOW
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: layout — narrow reflow at <=24rem: drop the trailing Open, tighten glyph + grid. */
 @media (max-width: 24rem) {
@@ -143,6 +175,10 @@
     display: none;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   8. REDUCED MOTION
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds guardrail: do-not-edit — Reduced motion must never re-enable transform motion. */
 @media (prefers-reduced-motion: reduce) {

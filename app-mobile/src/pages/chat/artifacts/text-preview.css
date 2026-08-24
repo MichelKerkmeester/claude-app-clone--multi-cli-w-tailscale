@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   TEXT PREVIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. TEXT WELL
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: text-well — plain-text read-out. */
 /* @ds guardrail: do-not-edit — Bounded reading well; selectable and pan-scoped. */
 .artifact-text-preview {
@@ -22,16 +30,28 @@
   overflow-wrap: normal;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. WRAPPED STATE
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: wrapped — soft-wrap toggle. */
 .artifact-text-preview.is-wrapped {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. TEXT CHUNK
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: text-chunk — one bounded render chunk. */
 .artifact-text-chunk {
   display: inline;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. DARK THEME
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: dark — dark-theme re-ink (foreign ancestor via :global). */
 :root[data-theme='dark'] .artifact-text-preview {

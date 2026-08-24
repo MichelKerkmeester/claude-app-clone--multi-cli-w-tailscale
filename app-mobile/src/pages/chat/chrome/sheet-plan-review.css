@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   PLAN REVIEW SHEET
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. OVERLAY
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. */
 /* @ds surface: overlay — plan-review-sheet is an INSTANCE of the shared overlay
    primitive (backdrop → raised panel → grabber → header/body/footer).
@@ -14,6 +22,10 @@
   justify-content: center;
   background: color-mix(in srgb, var(--ink) 58%, transparent);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. SHEET STRUCTURE
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: modal — bottom-docked sheet + entry motion. */
 /* @ds slot: panel — the Modal raised surface. */
@@ -87,6 +99,10 @@
   font-weight: 650;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. PLAN DETAILS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: content — summary + details. */
 .plan-review-content {
   display: grid;
@@ -138,6 +154,10 @@
   font-weight: 650;
   overflow-wrap: anywhere;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. ACTIONS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: actions — keep · revise · leave · execute rail. */
 .plan-review-actions {
@@ -195,6 +215,10 @@
 
 /* @ds end surface: plan-review-sheet */
 
+/* ───────────────────────────────────────────────────────────────────
+   5. MOTION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds edit: motion — review-sheet entry. */
 @keyframes plan-review-in {
   from {
@@ -206,6 +230,10 @@
     transform: translateY(0);
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   6. RESPONSIVE LAYOUT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: layout — narrow reflow of the ready card and review sheet. */
 @media (max-width: 24rem) {

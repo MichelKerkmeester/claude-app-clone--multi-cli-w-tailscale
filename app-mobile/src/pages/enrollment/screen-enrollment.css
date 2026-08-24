@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   ENROLLMENT VIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: enrollment-view — first-run device binding. */
 /* @ds edit: layout — full-frame centring + safe gutters. */
 /* @ds state: idle · busy · error · authenticating — binding lifecycle. */
@@ -15,6 +23,10 @@
   background: var(--surface-raised);
   box-shadow: var(--shadow-raised);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. CONTENT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: symbol — the π mark. */
 .surface-symbol {
@@ -69,6 +81,10 @@
   line-height: 1.55;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. ACTIONS
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: actions — scan + enroll controls. */
 .enrollment-actions {
   display: flex;
@@ -104,6 +120,10 @@
   overflow: hidden;
   clip: rect(0 0 0 0);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. RESPONSIVE
+─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 39rem) {
   .enrollment-actions {

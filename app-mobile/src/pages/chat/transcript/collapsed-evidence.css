@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   COLLAPSED EVIDENCE
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. DISCLOSURE TRIGGER
+─────────────────────────────────────────────────────────────────── */
+
 /* Routine evidence: a quiet, self-describing disclosure that sits calmly beside prose. */
 /* @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. */
 .evidence-trigger {
@@ -14,10 +22,18 @@
   cursor: pointer;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   2. TRIGGER STATES
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds state: hover */
 .evidence-trigger[data-hovered] .evidence-summary {
   color: var(--ink-secondary);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. CHEVRON
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: chevron */
 .evidence-chevron {
@@ -26,6 +42,10 @@
   line-height: 1;
   transition: transform var(--duration-state) var(--ease-out);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   4. EXPANDED STATE
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: expanded */
 .evidence-trigger[data-expanded] .evidence-chevron {

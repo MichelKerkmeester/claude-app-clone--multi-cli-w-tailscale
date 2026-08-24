@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   THEME CONTROL
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. CONTROL
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds slot: theme-toggle — segmented theme control (shared theme-switcher surface below). */
 /* @ds surface: theme-switcher — segmented theme selector (ToggleButton group). */
 .theme-control {
@@ -7,6 +15,10 @@
   border-radius: var(--radius-md);
   background: var(--surface);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. STATES
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: default */
 .theme-option {
@@ -21,6 +33,10 @@
   color: var(--ink-inverse);
 }
 /* @ds end surface: theme-switcher */
+
+/* ───────────────────────────────────────────────────────────────────
+   3. RESPONSIVE
+─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 52rem) {
   .theme-option {

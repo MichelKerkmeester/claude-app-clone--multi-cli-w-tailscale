@@ -1,8 +1,20 @@
+/* ───────────────────────────────────────────────────────────────────
+   REVIEW VIEW
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
 /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
 .review-view {
   padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. HEADING
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds surface: home-view — hero, session roster, device footer, push settings. */
 /* @ds state: loading · empty · error · stale — via shared empty-state, inline-alert and freshness surfaces. */
@@ -17,6 +29,10 @@
   text-wrap: balance;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   3. BACK NAVIGATION
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: back-button — quiet back arrow, built on the shared chrome-button base. */
 .back-button {
   position: relative;
@@ -30,6 +46,10 @@
   content: '←';
 }
 /* @ds end surface: back-button */
+
+/* ───────────────────────────────────────────────────────────────────
+   4. REVIEW INTRO
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds surface: review-heading — review surface intro (states below via approval-card / inline-alert). */
 /* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
@@ -51,6 +71,10 @@
   font-size: 1rem;
   line-height: 1.65;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   5. APPROVAL STATES
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds state: info — grant-banner (active accept-edits lease). */
 /* @ds state: error — inline-alert (surface error). */
@@ -218,6 +242,10 @@
   color: var(--danger);
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   6. RESPONSIVE
+─────────────────────────────────────────────────────────────────── */
+
 @media (max-width: 39rem) {
   .review-view {
     padding-top: var(--space-6);
@@ -233,6 +261,10 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   7. SAFE GUTTERS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds edit: layout — safe inline gutters for the routed surfaces. */
 .review-view {

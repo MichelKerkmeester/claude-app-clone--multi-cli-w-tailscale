@@ -1,3 +1,11 @@
+/* ───────────────────────────────────────────────────────────────────
+   RUNTIME STRIP
+─────────────────────────────────────────────────────────────────── */
+
+/* ───────────────────────────────────────────────────────────────────
+   1. STRIP LAYOUT
+─────────────────────────────────────────────────────────────────── */
+
 /* @ds surface: runtime-strip — host-backed readout + controls strip. */
 .runtime-strip {
   display: flex;
@@ -11,6 +19,10 @@
   color: var(--ink-muted);
   font-size: 0.75rem;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   2. READOUT
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: readout — confirmed model / effort readout. */
 .runtime-readout {
@@ -34,6 +46,10 @@
   color: var(--ink-secondary);
   font-weight: 620;
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   3. EFFORT CONTROL
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds surface: effort-trigger — opens the shared model/effort sheet. */
 /* @ds state: default */
@@ -62,6 +78,10 @@
   outline-offset: 2px;
 }
 /* @ds end surface: effort-trigger */
+
+/* ───────────────────────────────────────────────────────────────────
+   4. MODE CONTROL
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds surface: build-plan-toggle — the Build / Plan segmented toggle. */
 .runtime-control.runtime-mode {
@@ -97,6 +117,10 @@
   opacity: 0.5;
 }
 /* @ds end surface: build-plan-toggle */
+
+/* ───────────────────────────────────────────────────────────────────
+   5. STATUS
+─────────────────────────────────────────────────────────────────── */
 
 /* @ds slot: status — applied runtime status hint. */
 .runtime-status {

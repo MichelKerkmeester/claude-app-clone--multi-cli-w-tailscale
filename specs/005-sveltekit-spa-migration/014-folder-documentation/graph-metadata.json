@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Rewrite the 16 barebones folder READMEs and 7 CODE files onto sk-doc's feature and code-folder templates, and add the ones that are missing, so each folder explains what the feature does and how its logic is arranged.",
     "created_at": "2026-08-23T09:57:25.479Z",
-    "last_save_at": "2026-08-24T16:38:15.529Z",
+    "last_save_at": "2026-08-24T17:58:13.728Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:229804073ee525e967ebf710c9cb85b968d15193977f8f47616b699a0eb80131",
+    "source_fingerprint": "sha256:73bfc3510500dae1ae7266cc25a04a955e8e610c293dcee9403334832a5e6252",
     "source_doc_hashes": {
-      "spec.md": "5a83e36501285f33cd16f0fe01a6b766ee865eb1475c88c5c4e756abc77fd3f4",
-      "plan.md": "5ade80bb264a4d38126432b5d473f410a0d2abf712b08085c63aba8ebf589ed7",
-      "tasks.md": "d9bd3da6ae5efff003245c19bffb7680f5c6adf7ded01d8a495f1b801d254cee",
-      "checklist.md": "e654d068a85ff1cdde1beaaae6d336bfde4d401fb32cc3a04892d7b95a21b243",
-      "implementation-summary.md": "d86d2469b34c3ba05e13a47199a56e696da7e1739bcffa8a29f9106f9bf26a34"
+      "spec.md": "5ff6601952c3b8de160b598c490a2e65c7df0040e95d9acfd4ef92b21e6434c9",
+      "plan.md": "29192926e39ebf0672a0db1884dbdd59b2ab8c517551a562c118cc438ede831b",
+      "tasks.md": "8a9c3d642d7d651ab45652b20081983349d4106ff5b3dcb04ae173edd15aa357",
+      "checklist.md": "a4b3bf79056c46a55f5826f68a95693889891dc3e6f688ce003f338a1006805b",
+      "implementation-summary.md": "87330a346f4e18490ac924a08d629994ab8f5d4499cfee8c6137784773e65b46"
     },
     "last_active_child_id": null,
     "last_active_at": null

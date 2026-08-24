@@ -4,7 +4,7 @@ description: "Task ledger for the cutover: CSS decomposition, the 317-test migra
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/007-verify-and-cutover"
+    packet_pointer: "specs/005-sveltekit-spa-migration/007-verify-and-cutover"
     last_updated_at: "2026-08-23T09:10:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Cutover shipped; 007-EXT sectioning complete at 95 files."

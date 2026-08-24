@@ -4,7 +4,7 @@ description: "Which template answers which question, the reference-pair-first ap
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/014-folder-documentation"
+    packet_pointer: "specs/005-sveltekit-spa-migration/014-folder-documentation"
     last_updated_at: "2026-08-24T03:42:43Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Plan authored with template mapping and folder order."

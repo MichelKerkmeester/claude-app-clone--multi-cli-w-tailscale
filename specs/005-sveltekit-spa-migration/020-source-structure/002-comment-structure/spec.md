@@ -4,7 +4,7 @@ description: "Harmonize the section-banner comments the migration already uses s
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/020-source-structure/002-comment-structure"
+    packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/002-comment-structure"
     last_updated_at: "2026-08-24T11:01:11Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Phase B complete; 55 files harmonized; fences 277; whole gate green."
@@ -17,6 +17,9 @@ _memory:
 <!-- SPECKIT_LEVEL: 2 -->
 
 # Phase B — Comment structure
+
+> **Phase links** — Parent: [`../spec.md`](../spec.md) · Predecessor: `001-css-ownership` · Successor: `003-css-files`
+
 
 ---
 

@@ -4,8 +4,8 @@ description: "Continuity anchor. Nothing is implemented yet: this records the wi
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/017-ask-question-activation"
-    last_updated_at: "2026-08-23T17:48:05Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/017-ask-question-activation"
+    last_updated_at: "2026-08-24T17:58:13.883Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Service constructed and both ends wired; round-trip test red before green."
     next_safe_action: "Nothing outstanding; 018 no longer waits on this node."

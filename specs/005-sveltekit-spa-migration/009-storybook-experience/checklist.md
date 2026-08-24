@@ -4,7 +4,7 @@ description: "Sign-off for the enforcing coverage gate, the render test and the 
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/009-storybook-experience"
+    packet_pointer: "specs/005-sveltekit-spa-migration/009-storybook-experience"
     last_updated_at: "2026-08-24T05:55:17Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed; coverage at 74/74."

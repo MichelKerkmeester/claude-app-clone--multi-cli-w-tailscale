@@ -4,7 +4,7 @@ description: "Task ledger for operator-requested visual affordances on the shipp
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/011-ux-affordances"
+    packet_pointer: "specs/005-sveltekit-spa-migration/011-ux-affordances"
     last_updated_at: "2026-08-24T03:25:13Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Operator confirmed the glass on a device; the packet is complete."

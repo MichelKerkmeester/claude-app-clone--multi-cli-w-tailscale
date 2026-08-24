@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Wire the one relay service that was never constructed. The client ships the whole feature and every route answers 503, because the service is instantiated only inside its own test and nothing ever calls its presenter.",
     "created_at": "2026-08-23T10:47:20.810Z",
-    "last_save_at": "2026-08-24T16:38:15.559Z",
+    "last_save_at": "2026-08-24T17:58:13.883Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:2190506b3024e16b9dc4d11c686d1438edc2720390a71f11b13c1c68586c8ffc",
+    "source_fingerprint": "sha256:f99503e10f342791e02003f40989c8a60c947235ca2106191ed80a72c6d05cb7",
     "source_doc_hashes": {
-      "spec.md": "9401457331d63e96cd6984edd944f69f2bdd94d0f0c5e6a66a28ea5d40b1ff15",
-      "plan.md": "5717b33b185577772c10dcc4f67baef1cf3e89049a49beed2a625e2199e3dce5",
-      "tasks.md": "4f7404647fe0eb0f5888b137369b3bbbc4f2009d8a51302e05be05ea1225d0a4",
-      "checklist.md": "bf0ccc7adfb5720dd3334d3d9d916e326bb93ba2ceccdbf6518c69a56cb38fe9",
-      "implementation-summary.md": "26b98532f74b92e33bba68c20313647dc7411d241de1a79c5167307a378386c4"
+      "spec.md": "d5bbdc42c05734c880a4c4c4d59a112015d39dec33c13c65ceb4168bd52132e8",
+      "plan.md": "5e538de261b96085f6b264f09ff11d2b8f042c2f4352bc743bb78c77b6df1ab5",
+      "tasks.md": "a28873038fe485fd1c84a4c6bfcaa25fe2df8a6d640294445b4d7652bf8ff22a",
+      "checklist.md": "54c718d2496cfb0a0c12af78d24f3460199eb13857787dd6b398aa08ff2969af",
+      "implementation-summary.md": "dd2ec7ad39699663bc8007ccc6c4c047c705a8b0f9ce83560a103e03503708a6"
     },
     "last_active_child_id": null,
     "last_active_at": null

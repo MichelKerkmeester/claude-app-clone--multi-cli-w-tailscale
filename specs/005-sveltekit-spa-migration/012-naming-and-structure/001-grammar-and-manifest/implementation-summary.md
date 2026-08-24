@@ -4,8 +4,8 @@ description: "The manifest and its applier exist as tooling, and the grammar is 
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
-    last_updated_at: "2026-08-23T17:00:00Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
+    last_updated_at: "2026-08-24T17:58:13.698Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Manifest, applier and scan built; primitives and chrome moved and green."
     next_safe_action: "Run child 002 against the manifest for the shared data tree."

@@ -2,7 +2,7 @@
 
 > The north-star that spans every child of this phase parent. When a child's local plan disagrees
 > with this file, this file wins. It is scoped to the migration; the product goal remains the root
-> [`goal.md`](../../../goal.md). This document is the durable plan of record — the structured
+> product `goal.md`. This document is the durable plan of record — the structured
 > overview, the execution rules, and the live status of every phase.
 
 ---

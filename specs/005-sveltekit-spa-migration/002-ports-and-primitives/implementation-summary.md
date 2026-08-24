@@ -4,8 +4,8 @@ description: "What landed at L1, the patterns it established for every later chi
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/002-ports-and-primitives"
-    last_updated_at: "2026-08-23T09:50:00Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/002-ports-and-primitives"
+    last_updated_at: "2026-08-24T17:58:13.498Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed retrospectively."
     next_safe_action: "None; child shipped and superseded by later layers."

@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Three client changes the virtualizer and the copy catalog make necessary: disclosure state that survives scrolling, an approval row where the blanket grant is not a twin of the single one, and a transcript that can say stalled rather than working forever.",
     "created_at": "2026-08-23T10:47:21.093Z",
-    "last_save_at": "2026-08-24T16:38:15.563Z",
+    "last_save_at": "2026-08-24T17:58:13.900Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b391261dded8f9fead427a7e493596f2a2b40bdcf4106766d4905ab9dfa80a01",
+    "source_fingerprint": "sha256:e6a761bf4be85fecf19f80d5957b1a343cafb1494d7e78517c2ff95a99446202",
     "source_doc_hashes": {
-      "spec.md": "42e5699aa0447d973d6e4b6d686ac798bd8c7b6a9944c38529425e5da71f3bfd",
-      "plan.md": "8c6f3cce9c417784ebab423fed8ad6bf22fb3959abc29144010006938e733ed5",
-      "tasks.md": "264f923a964ae94becc3ed99722c12716b299bce2bc28dda370f42f215e01b4a",
-      "checklist.md": "c76dd5d8cc1416e427526e768e073e5cdbaf9148489c301100d970b96f5eb49e",
-      "implementation-summary.md": "8404d0877ad62e064fa1b4d8e45510e223968a715fcf58c10ea4878bb08fe124"
+      "spec.md": "b0ce171e272f4c9bf21629bae05bd4d6df78436f8867abebf39c97e126b0f371",
+      "plan.md": "f1189fcbf58f7729b23582d436d0645fdee64c4a1fd242fb4149d59522e554ab",
+      "tasks.md": "41cfb4456d49f5cfe74a5ad1f93933872591463266fc69275b8b64a13be446cb",
+      "checklist.md": "4d6d68b7623d4669ba518679169d917729dab8b3490d0beb88832f8780181b8f",
+      "implementation-summary.md": "05c5d307a908206d8bd9d47ca3708dd14f590dd25421d104d2ff1a6eb9f45e29"
     },
     "last_active_child_id": null,
     "last_active_at": null

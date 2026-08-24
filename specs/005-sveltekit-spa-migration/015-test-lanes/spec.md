@@ -9,7 +9,7 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/015-test-lanes"
+    packet_pointer: "specs/005-sveltekit-spa-migration/015-test-lanes"
     last_updated_at: "2026-08-23T13:00:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet scoped from verified test-infrastructure measurements."

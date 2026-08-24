@@ -4,8 +4,8 @@ description: "Twenty-eight modules redistributed into seven folders from the man
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"
-    last_updated_at: "2026-08-23T17:40:00Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"
+    last_updated_at: "2026-08-24T17:58:13.702Z"
     last_updated_by: "claude-opus-5"
     recent_action: "shared/data dissolved into seven folders; 287 specifiers rewritten."
     next_safe_action: "Run child 003 for the feature folders and the tooling catch-up."

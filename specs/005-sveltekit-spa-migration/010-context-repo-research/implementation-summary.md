@@ -4,8 +4,8 @@ description: "What the five-repo sweep produced, what it deliberately did not pr
 contextType: "research"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/010-context-repo-research"
-    last_updated_at: "2026-08-24T06:03:41Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/010-context-repo-research"
+    last_updated_at: "2026-08-24T17:58:13.686Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Recommendations audited against shipped code; 5 done, 4 out of scope, a handful open."
     next_safe_action: "Operator approves, declines or defers each recommendation by ID."

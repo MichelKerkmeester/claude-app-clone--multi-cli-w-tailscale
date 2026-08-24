@@ -4,8 +4,8 @@ description: "55 .svelte files converged on one section-banner vocabulary and or
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/020-source-structure/002-comment-structure"
-    last_updated_at: "2026-08-24T11:01:11Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/002-comment-structure"
+    last_updated_at: "2026-08-24T17:58:14.037Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "55 files harmonized; fences 277; @ds 1030; whole gate green."
     next_safe_action: "Proceed to Phase C (update the sk-code-mobile-cli skill)."

@@ -4,7 +4,7 @@ description: "The house grammar restated with a worked before-and-after, the bat
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/013-comment-grammar"
+    packet_pointer: "specs/005-sveltekit-spa-migration/013-comment-grammar"
     last_updated_at: "2026-08-24T04:43:05Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Plan authored with worked rewrite example and batch order."

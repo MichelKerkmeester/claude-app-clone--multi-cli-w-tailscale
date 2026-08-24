@@ -4,7 +4,7 @@ description: "Barrier sign-off for the comment pass. Every item is open: the pac
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/013-comment-grammar"
+    packet_pointer: "specs/005-sveltekit-spa-migration/013-comment-grammar"
     last_updated_at: "2026-08-24T04:43:05Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Checklist authored; all items open pending execution."

@@ -4,7 +4,7 @@ description: "Barrier sign-off for the chrome ports and the two focus-sensitive 
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/004-chrome-and-composer"
+    packet_pointer: "specs/005-sveltekit-spa-migration/004-chrome-and-composer"
     last_updated_at: "2026-08-23T10:20:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed retrospectively."

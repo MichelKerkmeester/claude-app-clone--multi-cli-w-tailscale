@@ -4,7 +4,7 @@ description: "Extract every component's scoped <style> block into a co-located .
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/020-source-structure/003-css-files"
+    packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/003-css-files"
     last_updated_at: "2026-08-24T12:29:51Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "65 components extracted to co-located .css; every gate green."
@@ -17,6 +17,9 @@ _memory:
 <!-- SPECKIT_LEVEL: 2 -->
 
 # Phase C — CSS files
+
+> **Phase links** — Parent: [`../spec.md`](../spec.md) · Predecessor: `002-comment-structure`
+
 
 ---
 

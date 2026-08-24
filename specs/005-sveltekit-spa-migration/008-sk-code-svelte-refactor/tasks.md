@@ -4,7 +4,7 @@ description: "Task ledger for the surface-skill refactor, its verification, its 
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
+    packet_pointer: "specs/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
     last_updated_at: "2026-08-24T05:55:14Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Superseded by 019; the one salvageable deliverable (R4) landed at v1.4.0.0."

@@ -4,7 +4,7 @@ description: "Barrier sign-off for the ask-question wiring. Every item is open: 
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/017-ask-question-activation"
+    packet_pointer: "specs/005-sveltekit-spa-migration/017-ask-question-activation"
     last_updated_at: "2026-08-23T13:00:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Checklist authored; all items open pending execution."

@@ -4,8 +4,8 @@ description: "What moved and what stayed: 47 single-owner classes relocated into
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/020-source-structure/001-css-ownership"
-    last_updated_at: "2026-08-24T08:49:19Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/001-css-ownership"
+    last_updated_at: "2026-08-24T17:58:14.036Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "48 relocated; app.css 3,197->2,895; remainder shared guardrails; gates green."
     next_safe_action: "Proceed to Phase B (comment structure)."

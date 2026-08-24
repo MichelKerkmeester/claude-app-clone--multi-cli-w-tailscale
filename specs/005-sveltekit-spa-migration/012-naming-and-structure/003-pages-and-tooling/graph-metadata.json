@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Kind-first renames across every feature folder under pages/, then the configs, globs, story ids and coverage allowlist that make the renamed tree testable, plus the minimal conventions correction and the nine-gate barrier.",
     "created_at": "2026-08-23T10:58:31.124Z",
-    "last_save_at": "2026-08-24T16:38:15.517Z",
+    "last_save_at": "2026-08-24T17:58:13.705Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:9e90d7e1d1dc8b3fd886a63ba67cebb2f400cecf6982aa9705dc213a46c3f033",
+    "source_fingerprint": "sha256:2ffd8c5ae05afc6b694bbde9e942db57715842df0bbdd69697a00d280e36147c",
     "source_doc_hashes": {
-      "spec.md": "f0eb90d82e1f971001d4730c6591328321645288a9a792c22fa7ecf36355416a",
-      "plan.md": "210b60980f880c353e917c6f604728d6f1606ebb6c8918efa2c841a70fb5cb3e",
-      "tasks.md": "4c03dfd747183aaae97055226246ff07861bc4a1d3e282ef1bb0d59a6ce3ec6d",
-      "checklist.md": "9e00f583ea9b797e041a9c44fa117c73e095cb6eea01c653ad3c5ed75e6e6442",
-      "implementation-summary.md": "c36b91c5fe37e719fc059094cf71d8532f933b0205a1f93327bf283cbf547236"
+      "spec.md": "beadc8860b543d09fbf3249a988ee8bb156b2daf4cb272a7faa337a84e1d8dd7",
+      "plan.md": "b2f788e1bf5485b76f623e1840948f3de7133994d453665f94da2828741eba36",
+      "tasks.md": "a052e02e96afa5875d81af11ddab9d005b20810ad7508433d750eeb774d352fd",
+      "checklist.md": "6ef8e2f8655f13e2c53439fe7e7d9d65d0f0afeef21b51352f1297e8d3c297da",
+      "implementation-summary.md": "5ab74c61234ad322b4b93befde941b6f42a98525d8283bd4ba37317142fbd114"
     },
     "last_active_child_id": null,
     "last_active_at": null

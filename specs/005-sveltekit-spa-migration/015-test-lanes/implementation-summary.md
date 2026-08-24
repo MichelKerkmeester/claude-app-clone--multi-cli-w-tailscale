@@ -4,8 +4,8 @@ description: "The logic lane resolves by glob, the real virtualizer is exercised
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/015-test-lanes"
-    last_updated_at: "2026-08-23T16:30:00Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/015-test-lanes"
+    last_updated_at: "2026-08-24T17:58:13.879Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Glob lane, real-virtualizer suite, Svelte lint scope and reducer coverage landed."
     next_safe_action: "Start 012/001, which this packet unblocks."

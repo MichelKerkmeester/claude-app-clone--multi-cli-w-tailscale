@@ -4,7 +4,7 @@ description: "How four self-contained feature areas were ported in parallel, why
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/003-feature-dirs"
+    packet_pointer: "specs/005-sveltekit-spa-migration/003-feature-dirs"
     last_updated_at: "2026-08-23T10:10:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed retrospectively."

@@ -4,7 +4,7 @@ description: "Barrier sign-off for the conventions authority refresh and the mer
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/019-surface-skill-refresh"
+    packet_pointer: "specs/005-sveltekit-spa-migration/019-surface-skill-refresh"
     last_updated_at: "2026-08-24T03:23:45Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Checklist authored; all items open pending execution."

@@ -185,7 +185,7 @@
     ],
     "causal_summary": "Completely refactor the sk-code-mobile-cli surface skill so it teaches the SvelteKit 5 / Svelte 5 stack instead of React — SMART ROUTING + surface-detection markers, the @ds grammar's .svelte seam form, the per-component scoped <style> model, the Bits UI / Melt UI mapping, runes verification, and setup/standards. It is the conventions authority every cli-devin dispatch loads, so it drafts before the first code dispatch and finalizes at cutover. The skill lives in the Public monorepo (symlinked); it lands via an isolated Public worktree.",
     "created_at": "2026-08-19T17:24:04.580Z",
-    "last_save_at": "2026-08-24T16:38:15.489Z",
+    "last_save_at": "2026-08-24T17:58:13.536Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -195,13 +195,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b432e17791d6364d0abffac91e1ff78fdf476724907de98a7fff52a973f8cce5",
+    "source_fingerprint": "sha256:d57e77793cb7ef12bb496668144fc3a13411eff820225f0759928a75fa497ed6",
     "source_doc_hashes": {
-      "spec.md": "fe3968fba600f9cb9b57e4ce34ffea4f80fa4179edabaf18f9b15afdc8238333",
-      "plan.md": "dfcecafcea542b0cf9aa35e6412b5a7392c67fe2470327ea9cfb976575c0d543",
-      "tasks.md": "fb122ff3419ca229b726b4bd429438d74ad783e9c7bcf7dbec1e08682d537685",
-      "checklist.md": "033bb02fe635f5c641c4f34239cbc8f570a67a649e375f702a3ee5551c40c6a1",
-      "implementation-summary.md": "622ae211ef26f9d487ee58e45e4ec43af223812ce6863e281e7c16221207b1cf"
+      "spec.md": "8f0e0dbf4b7150595d039d75d1d7b9da17d52bfc0e5b1fa3e6f89b48adaf987b",
+      "plan.md": "0ae799227d48fbaa84d9884b30a1fb6a6c80bef4979a2c751559fed7f66f0c31",
+      "tasks.md": "7ecde75380c0865e969baa1fd1f667abace01fe9abd417cfd819a77df6cc3586",
+      "checklist.md": "2dcae8bb0e95ad83001f8fe7326f449dc3313666072eea4a881e630113bc22ea",
+      "implementation-summary.md": "b03eb28562252acbbbb1c1924f7f3fd02127f5f5916f44b2839e1185e55d7c49"
     },
     "last_active_child_id": null,
     "last_active_at": null

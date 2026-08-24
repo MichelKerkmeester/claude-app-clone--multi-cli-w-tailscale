@@ -4,7 +4,7 @@ description: "Why the framework-agnostic TypeScript and the react-aria replaceme
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/002-ports-and-primitives"
+    packet_pointer: "specs/005-sveltekit-spa-migration/002-ports-and-primitives"
     last_updated_at: "2026-08-23T09:50:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed retrospectively."

@@ -185,7 +185,7 @@
     ],
     "causal_summary": "Stand up @storybook/sveltekit, seed stories from registry.ts's pure-data index, and add a mock-context decorator that injects a runtime over demo.ts fixtures so socket-coupled surfaces render — targeting ~60 of 64 surfaces live (vs 6 today). @storybook/addon-a11y + a data-theme toggle decorator replace the bespoke catalog affordances.",
     "created_at": "2026-08-19T17:24:03.985Z",
-    "last_save_at": "2026-08-24T16:38:15.480Z",
+    "last_save_at": "2026-08-24T17:58:13.524Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -195,13 +195,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:9b956d4228fae2a08d8048cf6300c3a41f01a08db54cd1a0832c20c038b4fe7c",
+    "source_fingerprint": "sha256:8a886197274731106a90ec1e9e39ee7421c8c180aa11b0e4417b8347925dbaa6",
     "source_doc_hashes": {
-      "spec.md": "6ba455c369d0632743580e5f46f493e2a344b4e8d170e23f4641bba6f2720c56",
-      "plan.md": "67640b7c81eb11481c99e7c51656312a2fa22a6e6c54c84a52aec38973a2ec85",
-      "tasks.md": "364564cc2c0c8904d2aef3c2b224a23350fd12b866bf9f0f8941105912300be3",
-      "checklist.md": "958883422d0c3cd02274e944a9fb52ca847f566a26d2952c3084d3b23a12167b",
-      "implementation-summary.md": "e5071b5fb0fadc0ac8b3c676959276869bea2921abf54c8ece12033d1cfe7a65"
+      "spec.md": "f70bad04f74170a7f48d5066135d544ecd1a1cbc6f85a24bf7675be009e2a0bb",
+      "plan.md": "d2b90de6f9a4fc9febb26a6d7267aeedbc059caa574ca29a603954b6707ae710",
+      "tasks.md": "d757ea6b8649df2d99bbfca1ff70796c856fcf77f86e15ce95d644c08059c705",
+      "checklist.md": "13deb7c27f1efe3363120ee15511c1439a38d674afb57c785393289bb12b212d",
+      "implementation-summary.md": "d8045bff31ffa79b6b07154e644e62602214c26989766e1fabf12a78693dd583"
     },
     "last_active_child_id": null,
     "last_active_at": null

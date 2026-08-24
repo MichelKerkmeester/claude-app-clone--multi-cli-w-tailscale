@@ -4,7 +4,7 @@ description: "Sign-off for the sk-code-mobile-cli refactor, including the two it
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
+    packet_pointer: "specs/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
     last_updated_at: "2026-08-24T05:55:14Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed; two open items recorded."

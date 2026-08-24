@@ -4,7 +4,7 @@ description: "Harmonize section banners across the .svelte tree in disjoint dire
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/020-source-structure/002-comment-structure"
+    packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/002-comment-structure"
     last_updated_at: "2026-08-24T11:01:11Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Seven batches landed; fences 277; whole gate green."

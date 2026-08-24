@@ -81,15 +81,15 @@
     ],
     "causal_summary": "Phase parent for finishing the migration's one-file-per-component intent: move single-owner CSS into its component's scoped style, standardise the section-comment vocabulary, and teach both in the surface skill.",
     "created_at": "2026-08-24T06:38:17.258Z",
-    "last_save_at": "2026-08-24T16:40:11.972Z",
+    "last_save_at": "2026-08-24T17:58:14.032Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:72bbca535ae6629f3cd39f81c75ec649748e04d0e98a900cf7b40eabd9d08e68",
+    "source_fingerprint": "sha256:2b29944f6ba3bec3cbab6bae9c5d98339dd49c6b78ab48b81842346d48ff3f77",
     "source_doc_hashes": {
-      "spec.md": "af9a1d1899b13c5964870ea5e93239548e6f45ca232b2f150f3465185c2f5b51"
+      "spec.md": "debf7e10ac45d2b319e6a6d2d878a7010495b77887e63b636d6d4a19f398078d"
     },
     "last_active_child_id": "005-sveltekit-spa-migration/020-source-structure/001-css-ownership",
     "last_active_at": null

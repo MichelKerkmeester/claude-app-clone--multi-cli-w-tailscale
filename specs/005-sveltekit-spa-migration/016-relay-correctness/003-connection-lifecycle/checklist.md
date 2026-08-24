@@ -4,7 +4,7 @@ description: "Barrier sign-off for the heartbeat and close classification. Every
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
+    packet_pointer: "specs/005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
     last_updated_at: "2026-08-23T21:28:21Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Every checklist item signed with evidence; the child is complete."

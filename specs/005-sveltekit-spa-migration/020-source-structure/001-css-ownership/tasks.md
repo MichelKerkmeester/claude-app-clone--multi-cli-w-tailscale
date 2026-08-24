@@ -4,7 +4,7 @@ description: "One task per component batch, plus setup and the barrier. Each bat
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/020-source-structure/001-css-ownership"
+    packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/001-css-ownership"
     last_updated_at: "2026-08-24T08:15:46Z"
     last_updated_by: "claude-opus-5"
     recent_action: "47 single-owner classes moved; 35 retained as shared guardrails; all gates green."

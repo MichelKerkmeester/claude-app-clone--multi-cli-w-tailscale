@@ -4,8 +4,8 @@ description: "What shipped in the UX-affordances packet, how it was verified, an
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/011-ux-affordances"
-    last_updated_at: "2026-08-24T03:25:13Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/011-ux-affordances"
+    last_updated_at: "2026-08-24T17:58:13.688Z"
     last_updated_by: "claude-opus-5"
     recent_action: "REQ-001 glass scroll-to-latest shipped; board green."
     next_safe_action: "Operator confirms the glass on a device (T3.4)."

@@ -9,7 +9,7 @@ trigger_phrases:
 importance_tier: "important"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration"
+    packet_pointer: "specs/005-sveltekit-spa-migration"
     last_updated_at: "2026-08-19T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Post-cutover queue complete; all thirteen nodes at 100%."

@@ -4,7 +4,7 @@ description: "Task ledger for the five-repo research sweep and the consolidation
 contextType: "research"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/010-context-repo-research"
+    packet_pointer: "specs/005-sveltekit-spa-migration/010-context-repo-research"
     last_updated_at: "2026-08-23T08:40:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "All 5 research legs landed; R-01..R-13 consolidated for operator decision."

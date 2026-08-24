@@ -4,8 +4,8 @@ description: "What the four parallel feature ports delivered, why folding CSS de
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/003-feature-dirs"
-    last_updated_at: "2026-08-23T10:10:00Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/003-feature-dirs"
+    last_updated_at: "2026-08-24T17:58:13.509Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed retrospectively."
     next_safe_action: "None; child shipped and superseded by later layers."

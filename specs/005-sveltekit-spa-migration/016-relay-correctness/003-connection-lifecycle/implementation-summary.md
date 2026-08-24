@@ -4,8 +4,8 @@ description: "Continuity anchor. Nothing is implemented yet: this records the lo
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
-    last_updated_at: "2026-08-23T21:28:21Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
+    last_updated_at: "2026-08-24T17:58:13.879Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Client close classification, proactive refresh and the lockout reproduction all shipped."
     next_safe_action: "None — the child is complete."

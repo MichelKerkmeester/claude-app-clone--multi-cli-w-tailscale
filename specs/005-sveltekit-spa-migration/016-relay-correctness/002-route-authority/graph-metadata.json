@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Make the foreground invariant universal across mutation-exercising routes, send the retry hint the client already parses, and give foreground one meaning computed in one place.",
     "created_at": "2026-08-23T10:35:57.712Z",
-    "last_save_at": "2026-08-24T16:38:15.547Z",
+    "last_save_at": "2026-08-24T17:58:13.878Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8fae25dd5cc614849854aff840393b44f36cf26ca8db76de18a53029973db7de",
+    "source_fingerprint": "sha256:9528646a2267a6d08c4b7cdf38e180509b7d6b757c902c306073cd29292adb79",
     "source_doc_hashes": {
-      "spec.md": "692f70de499bd964d1b896526682f7ff5d99a070e4fa855ee45f108d8514934a",
-      "plan.md": "264e4b704935c441e59237d33fb9df18332747157b6a60b2b46ec6e50805102c",
-      "tasks.md": "809f227eb94cefacd103c9bba3aa918a7bdc5f4961c3f32b917b94962a677697",
-      "checklist.md": "531828462395f7b23e01006b3788ede35e23995dce0486e5d7dccd04c2b110a6",
-      "implementation-summary.md": "e3fe21b62ff6a4fbb9860c91252da74d0a21d3d1fee6d986e0c10e54452e5850"
+      "spec.md": "63f605388350b74138d6a1dfb749fea9be1db0552c6df79a85a8a13694438e41",
+      "plan.md": "2c40f086ac71074d9305d32d6954e853fb5b89309eb821b960c5bf6e32bd004f",
+      "tasks.md": "d1604f69571dff8ac3c34d8f5c53a8c8f08bb50639ea94f51b2c70937d9fe6ad",
+      "checklist.md": "f848e50e8bb3fccaef4226922317759133e6bcb871a72fb3f92676fe325e64ca",
+      "implementation-summary.md": "25f1b6728419538bf93c0c5fd5d5fc499078ba1051659c0a616e70237c769822"
     },
     "last_active_child_id": null,
     "last_active_at": null

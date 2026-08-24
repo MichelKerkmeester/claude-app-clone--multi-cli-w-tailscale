@@ -4,7 +4,7 @@ description: "Task ledger for the route-level harness, the mutation-route gates,
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/016-relay-correctness/002-route-authority"
+    packet_pointer: "specs/005-sveltekit-spa-migration/016-relay-correctness/002-route-authority"
     last_updated_at: "2026-08-23T13:00:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Task ledger authored; all tasks open."

@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Re-open the sk-code-mobile-cli surface skill once the naming, comment and documentation packets have landed, teach it what actually shipped, and merge the branch that has been stranded since the framework refactor.",
     "created_at": "2026-08-23T10:47:21.393Z",
-    "last_save_at": "2026-08-24T16:38:15.567Z",
+    "last_save_at": "2026-08-24T17:58:13.902Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:e16d3e7741c77b2b59f91ce47512a186b0ff4f4f6f3e8d66c5f7bc0b57451f03",
+    "source_fingerprint": "sha256:dc2e236fec5fb94b74f7496fa297882e418327bb6ed274778770fd25bab2c60d",
     "source_doc_hashes": {
-      "spec.md": "0a3321845b7e677d7fa22e128226d5d20a8473cce8a8bda97d707f387e93246a",
-      "plan.md": "1edff89233a4438d47c008b7ec16b9791ff60d753238521f0cfd066194119c54",
-      "tasks.md": "511b5c7e685be3a5bbf1506f2f9e3684e390c47d85a9d2c854beeaac96a811e2",
-      "checklist.md": "60e3167ebe3f016db49e612f9e3ab07270598a4b32f55a3a201b1221922f8937",
-      "implementation-summary.md": "5a015d235db322f2c2c5d7b2696a2cc35d03810dd9c490b5e4e1d5b814923a16"
+      "spec.md": "d7e3121b9c03923e8253ef3642e69ee13a5742a09d04325b57d0f5833793bfc7",
+      "plan.md": "20e8797cc923c11ddbcfad58495755562775a757244fe103eeb11bac82530499",
+      "tasks.md": "3568998795cc90d4dae9b91708d90864f71e9fae9aec50394569d54658c2c86d",
+      "checklist.md": "df341022a1a5b98dd7bd5e1fe19b3231d4354053cbfea133b66f130234d159ad",
+      "implementation-summary.md": "d1b7eca3297cbf4ce0c9e76489db51df83946184360a165f72922dc29501838f"
     },
     "last_active_child_id": null,
     "last_active_at": null

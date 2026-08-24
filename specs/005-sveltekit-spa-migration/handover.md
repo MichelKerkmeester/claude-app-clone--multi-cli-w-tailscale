@@ -4,7 +4,7 @@ description: "Everything a fresh agent needs to take over the post-cutover queue
 contextType: "handover"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration"
+    packet_pointer: "specs/005-sveltekit-spa-migration"
     last_updated_at: "2026-08-23T15:00:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Post-cutover queue complete; all thirteen nodes at 100% and pushed."

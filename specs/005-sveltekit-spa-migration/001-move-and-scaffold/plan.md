@@ -4,7 +4,7 @@ description: "How the two highest-blast-radius infra steps were sequenced so the
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/001-move-and-scaffold"
+    packet_pointer: "specs/005-sveltekit-spa-migration/001-move-and-scaffold"
     last_updated_at: "2026-08-23T09:40:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed retrospectively."

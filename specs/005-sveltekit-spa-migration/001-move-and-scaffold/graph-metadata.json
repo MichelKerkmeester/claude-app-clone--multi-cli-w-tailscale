@@ -185,7 +185,7 @@
     ],
     "causal_summary": "Relocate apps/pi-remote-web→src/mobile-app and apps/pi-remote-relay→src/relay (folder-rename only, @pi-remote/* names kept), fix the finite set of filesystem-path refs, npm install; then stand up the SvelteKit 5 SPA skeleton at src/mobile-app with app.css foundation. The React suite stays the correctness oracle through the move; an empty Svelte page renders after scaffold.",
     "created_at": "2026-08-19T17:24:02.340Z",
-    "last_save_at": "2026-08-24T16:38:15.460Z",
+    "last_save_at": "2026-08-24T17:58:13.362Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -195,13 +195,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:0281a68e5290c6568ee6fff442b090f0e1cd7ad09ac010a2c29a28020673085f",
+    "source_fingerprint": "sha256:240f8286974ade63eb5473ae619cc26fc891b81a17e62bd38b1fee78e7f13466",
     "source_doc_hashes": {
-      "spec.md": "42e66bfb2beebcb792f6ad7e800d730e74540b20da408fa6f1050a7f8bf7485b",
-      "plan.md": "145c28d351b697875f0613218672374739a659d28fd7448baa938523bbf018de",
-      "tasks.md": "18c60dd47ed756a1e9805fd4629412fd6c5afcd42caa92d0874d1c566976cdad",
-      "checklist.md": "285549ebfb907fe2eadb51163f913f54ba7f3e05ec856cdf84a2e3d43624f078",
-      "implementation-summary.md": "92a0fe484aa928c17ec11ce149052e172a326a4872b821538b6de5b52508b31e"
+      "spec.md": "375f0f316cddf3824024f46baada1904598b2124e8a28ec487e6753dab8af318",
+      "plan.md": "8480d68edc993917b655ba8491eb175092b435776adb5b5383a3de00bf3ffc20",
+      "tasks.md": "5ee415dcd7de42d14f6db1ebc5c3e209a37b6dcf28ea0e857a87223acd85efb8",
+      "checklist.md": "e55db7360515f5ea60e66f405bb08cbe924b48e90d7a69777f17391e5b16552e",
+      "implementation-summary.md": "f729d2d9e5bcb1de527df03bedb04653dd976f902b2b2b0968cf81012881665c"
     },
     "last_active_child_id": null,
     "last_active_at": null

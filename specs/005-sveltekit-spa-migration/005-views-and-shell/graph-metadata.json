@@ -185,7 +185,7 @@
     ],
     "causal_summary": "Extract App.tsx's six view functions into Svelte views — Enrollment/Home/Review/Inbox in parallel, Session alone (it owns the socket + virtualizer, swapping @tanstack/react-virtual→svelte-virtual) — then the +layout shell (both context providers, theme, SW registration) and the 3-URL routing via goto/afterNavigate. This is where the branch first runs end-to-end.",
     "created_at": "2026-08-19T17:24:03.678Z",
-    "last_save_at": "2026-08-24T16:38:15.476Z",
+    "last_save_at": "2026-08-24T17:58:13.505Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -195,13 +195,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:c9ab91fc99c2b09d93e57d174fff12adf30fd7f2a8dbb219e09018147e31e633",
+    "source_fingerprint": "sha256:f7eec46ec0f89af27dac9b7f8ebae2699fd94530c6ca9baef4b94bf72c3df3bf",
     "source_doc_hashes": {
-      "spec.md": "c2c44052d416225ec02ea9674f9c93e576da45dfa6adbde09b66aea9728b0a2f",
-      "plan.md": "f66eac81c78f804e52f4f34f213574f498160b185548c340a4156138c483df5c",
-      "tasks.md": "5e4ef1e24acf5ab2d0152add51158c359098701f3259f55440785dd3eb51e5a1",
-      "checklist.md": "6c2d3623e0a37ba0d3df5621c3181f22be1ca56a6ff44d69e5ff09eae39b198d",
-      "implementation-summary.md": "d9cd2b2c3261f80e0f140c994710004d520c30e8a06353e88f25b85bf493bef3"
+      "spec.md": "dcb6b5be3ad14603d5447e3f5c22dc8d770d335f0183d2c14f276c589e420367",
+      "plan.md": "3b102e07558624ba774e0322c1b3b9c6b0e3db2dbedc329ad1f0b6970b3ffcc2",
+      "tasks.md": "d74d6d067bb7541bf5b4307b523f4144f71546ddaa522baccce7d6cc814e59a6",
+      "checklist.md": "076fd7c45f289702a937530563326caed4c86181e36568ced65b62d7cc6c34de",
+      "implementation-summary.md": "093cb2dfd7503555d6683640fd2a905bc42a93f10e36a9bc45612ea9f57fe8db"
     },
     "last_active_child_id": null,
     "last_active_at": null

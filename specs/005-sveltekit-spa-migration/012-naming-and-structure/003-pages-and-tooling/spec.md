@@ -9,7 +9,7 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"
+    packet_pointer: "specs/005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"
     last_updated_at: "2026-08-23T20:24:46Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Scoped as the wide rename plus the tooling catch-up and barrier."

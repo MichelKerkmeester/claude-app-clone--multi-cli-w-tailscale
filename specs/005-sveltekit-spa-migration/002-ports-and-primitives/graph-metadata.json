@@ -185,7 +185,7 @@
     ],
     "causal_summary": "Port the framework-agnostic TypeScript (relay.ts, state.ts, cache.ts, auth.ts, effort.ts, pure halves of runtime.ts/commands.ts, workers) verbatim, and build the shared a11y primitives — Button plus thin Bits UI wrappers Sheet/Menu/ToggleGroup/RadioGroup/Switch/Collapsible — that every later component composes. K parallel, disjoint files.",
     "created_at": "2026-08-19T17:24:02.664Z",
-    "last_save_at": "2026-08-24T16:38:15.464Z",
+    "last_save_at": "2026-08-24T17:58:13.498Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -195,13 +195,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:79ecdd06e65827aa4bc79c94fd7c56b3d16a4254c9e43091f8753e731ca4bc34",
+    "source_fingerprint": "sha256:586218668b2d75442a67b63ab1359a9e2edead53e853207cc34a9d23e051834b",
     "source_doc_hashes": {
-      "spec.md": "f576ab0ae5819500487235d78a843e6f7c9c4f55e5ab565ce2a3d824b8b624ec",
-      "plan.md": "648e39b6b35fc6a1a9b5f189a0f94d14418fbc4ed8ef70c86a3273046d8cdffb",
-      "tasks.md": "68368f2124d635c4391736b4ee18d4ef250456c62931fad11cfa5f757e43304e",
-      "checklist.md": "f3384afc57f029fa489f652eef678137ef169bde2c9e7abd796259dbd7a389ec",
-      "implementation-summary.md": "60df6eff9dd728d0858bb55f8c4c3bc873cb6f6ed9129cbc863c6286860f43dd"
+      "spec.md": "271bcf1741636776e4e4e2d2be0b40b47a9243805f18ef0e5efca75552734477",
+      "plan.md": "f3ec794550d39e43df7982fea8822fc1dbf68776d38f36df37c315ce6f655951",
+      "tasks.md": "70c1cbd01eb4e85d70e4da1f1bffa5d99d93e9f25b3fab0e9ea312d941ccb8bd",
+      "checklist.md": "137f2c4a330f6dc73115b1ce966f1c3c5c5add420223bb017386524934892a9c",
+      "implementation-summary.md": "5d9569c4e7e1c6bd22d78d5b198bab0963c6cc560e08b095b659e137b6eae0b3"
     },
     "last_active_child_id": null,
     "last_active_at": null

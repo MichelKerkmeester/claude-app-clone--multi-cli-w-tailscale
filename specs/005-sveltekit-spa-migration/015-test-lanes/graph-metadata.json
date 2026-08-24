@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Replace the hardcoded logic-test allowlist with a glob, stop mocking the virtualizer out of existence, give ESLint a Svelte parser, and cover the transcript reducer. A precondition packet: it makes every later fix provable.",
     "created_at": "2026-08-23T10:26:59.698Z",
-    "last_save_at": "2026-08-24T16:38:15.533Z",
+    "last_save_at": "2026-08-24T17:58:13.879Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:607814407f0acbba070014df9586b19175cb00d78c3ffc01f517c225a8e26cd9",
+    "source_fingerprint": "sha256:d4d1055f8241f5d7a34460c42527debcbeffe34db5b9bdd54382717e24935ce1",
     "source_doc_hashes": {
-      "spec.md": "2fed0033b3f4b4f9307616a6557683d097c2aa09b9e00bc186e2c557acb6960d",
-      "plan.md": "1dac858fb375b2b0e0cc9ddc54a072b9e01cc1356a10a49730a0411eae6170e3",
-      "tasks.md": "ab3a0bd81bb0d1a383b198ad5619ca76da83c358f782d4d38b2c09641c88e236",
-      "checklist.md": "2452b79d176bdc3609782daae5db20451897c9bc37b7c652625fa37ab0f9c678",
-      "implementation-summary.md": "3093f9297c870e85c35582826787c165e25a150822fe383be1e395f2b835a187"
+      "spec.md": "fd5d04baaa838ce42d475bc2da9c04d9f9f71659fb265cd760eaff3acaa9dc6b",
+      "plan.md": "33b272cab61dd8d7d51cbc3377428680cc4cf477531e3e6b0677c41a1726a2a6",
+      "tasks.md": "e63c6cc4ed9c0a3d25e12a0296570eb83f886847a2950246de071c10c51a1219",
+      "checklist.md": "18863811592f3ac0317791f044fb8f6365cbeb78715a0fa78d190015fc8f1ecc",
+      "implementation-summary.md": "3dc88f11571b31af77d14909b1ba0cc1e4eccd0857fe5e85ce898ce28c7fc38f"
     },
     "last_active_child_id": null,
     "last_active_at": null

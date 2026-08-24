@@ -4,8 +4,8 @@ description: "Continuity anchor. Nothing is implemented yet: this records the th
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/018-transcript-affordances"
-    last_updated_at: "2026-08-24T03:23:43Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/018-transcript-affordances"
+    last_updated_at: "2026-08-24T17:58:13.900Z"
     last_updated_by: "claude-opus-5"
     recent_action: "All four affordances shipped; the operator delegated the three judgements."
     next_safe_action: "None — the packet is complete."

@@ -182,7 +182,7 @@
     ],
     "causal_summary": "Move the 82 classes that app.css defines but only one component uses into that component's scoped style block, proven value-identical by the token-identity gate. app.css keeps tokens, theme, resets and the 44 genuinely shared classes.",
     "created_at": "2026-08-24T06:38:17.083Z",
-    "last_save_at": "2026-08-24T16:38:15.579Z",
+    "last_save_at": "2026-08-24T17:58:14.036Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:0778a074bf93f5015167fc2cf8e8e1c95e5c9a47bdb67837e3ea382dedda2376",
+    "source_fingerprint": "sha256:c492a39b5760af2c8af8391c11c66fc327e095828e3ae72d779259bfd5437241",
     "source_doc_hashes": {
-      "spec.md": "c842c011bf9bd84302ed8ed229fb57b1c0403de33313825d4e489e71f6af09d0",
-      "plan.md": "e922356455106e5ce146668ebad75322985147c01ea6076ef3b8e08b924f94e4",
-      "tasks.md": "d700490e037b519e1130d4cb061af67d43e98dbb073818fa9189c0dbad98f7bf",
-      "checklist.md": "21359d62aacd62dd85a2556c719a9afcbc78f57a6e3b3e5cbe903f5f28319de6",
-      "implementation-summary.md": "6bec069a08432c34d1a02521dc25efe37d0a622fdfd361ab221ccb6c28332d28"
+      "spec.md": "aebe166e0cbd668e6cb40f2524f6f48e0c977c38df63975eb028b86d5059fdc0",
+      "plan.md": "3011f5d1feb0fc7a171d3872c361392829422e3bcf5dc25161a7355a7192c533",
+      "tasks.md": "808b0d7257aeb7dba436608d18ab31e99a27caced0b1af0620ce9648c882114a",
+      "checklist.md": "eb430feeaa28898737a1bd349c652b8ead21cdf9f9bd3ad29ed4e6a5491135ed",
+      "implementation-summary.md": "d1368fa98d84900d7263c266864bf4342245f6322bcac0614b1b937c79abfb05"
     },
     "last_active_child_id": null,
     "last_active_at": null

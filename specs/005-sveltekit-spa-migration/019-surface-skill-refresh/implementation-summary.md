@@ -4,8 +4,8 @@ description: "Continuity anchor. Nothing is implemented yet: this records why th
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/019-surface-skill-refresh"
-    last_updated_at: "2026-08-24T03:23:45Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/019-surface-skill-refresh"
+    last_updated_at: "2026-08-24T17:58:13.902Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Merged into the live skill line and verified by a dispatch."
     next_safe_action: "None — the packet is complete."

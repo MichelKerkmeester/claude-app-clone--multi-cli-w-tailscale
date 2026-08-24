@@ -4,7 +4,7 @@ description: "Why kebab-case wins over Svelte's PascalCase convention, why the k
 contextType: "decision"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
+    packet_pointer: "specs/005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "All four decisions accepted; operator confirmed 002 and 003."

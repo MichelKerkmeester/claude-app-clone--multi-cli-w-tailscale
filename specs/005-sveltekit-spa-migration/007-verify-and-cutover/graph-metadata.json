@@ -187,7 +187,7 @@
     ],
     "causal_summary": "Build the CSS-corpus builder, commit the token-identity resolver gate (0 diffs across 3 themes = the pixel-identity proof), rewrite the 75 tests to @testing-library/svelte, repoint CDP at the built preview, run a deep-review fan-out against the frozen contracts, then cut over: all nine objective gates green + validate.sh --strict, and close the spec amendment.",
     "created_at": "2026-08-19T17:24:04.291Z",
-    "last_save_at": "2026-08-24T16:38:15.485Z",
+    "last_save_at": "2026-08-24T17:58:13.520Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -198,13 +198,13 @@
       "implementation-summary.md",
       "handover.md"
     ],
-    "source_fingerprint": "sha256:c504644d8e698b284de0adadb370b77f765f89a6ffdbff1610b2ff72a26d4d4d",
+    "source_fingerprint": "sha256:1cc9fb76af4205feae68e0e409fe1e7919e41043aff6010a23b2f3a7805f5062",
     "source_doc_hashes": {
-      "spec.md": "b76215d331718bd148d8350841f94cabd819a04a00100b3be8c745edcc183217",
-      "plan.md": "80abaa76a7eeb4a601909c4467a0d3934d7d5f4f4fdb305a410437b1f80990e5",
-      "tasks.md": "1af5122e7953f0dbd22731ac501aa0a2e3f4c15dcb790bf0f1cec11ca45720f4",
-      "checklist.md": "3607e3f7a3ec8b51e73c4e285bad16a73aa9d86f697222fe1b5db88a50f5dd13",
-      "implementation-summary.md": "5df7bae95dad36f952dfb5ef47c06e040122e216862de6e2a07dbd304cad0457",
+      "spec.md": "adc2c1e714fb693ef179ca2b81033a898fc377a3c84c3e2992ab09e1c12b2756",
+      "plan.md": "b36037c14b0c67a7c50eccf284b361e6f67e84faf9243abd3bb17411ec1fed4c",
+      "tasks.md": "36c773b1c6cf8f0e91d13945be9bd8e97c1e00ac7f24426b4212dd40737134de",
+      "checklist.md": "12b342360d7e8fba2c8c88670f95cffa008149b425f1688caf348756867cd3fb",
+      "implementation-summary.md": "acc0707c607bc58702feed439e3eb10c01322d2da2fc7ebd2a94b010a3f236ed",
       "handover.md": "f87ff8f234925389cf649813d1915ee8741ccea31356808c77b6c05c5320b529"
     },
     "last_active_child_id": null,

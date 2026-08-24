@@ -4,7 +4,7 @@ description: "Move the 82 classes that app.css defines but only one component us
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/020-source-structure/001-css-ownership"
+    packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/001-css-ownership"
     last_updated_at: "2026-08-24T08:15:46Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Phase A scoped; work-list frozen at 82 classes."
@@ -17,6 +17,9 @@ _memory:
 <!-- SPECKIT_LEVEL: 2 -->
 
 # Phase A — CSS ownership
+
+> **Phase links** — Parent: [`../spec.md`](../spec.md) · Successor: `002-comment-structure`
+
 
 ---
 

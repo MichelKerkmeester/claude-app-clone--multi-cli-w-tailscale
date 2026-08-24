@@ -4,8 +4,8 @@ description: "What the surface-skill refactor shipped, how it landed without tou
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
-    last_updated_at: "2026-08-24T05:55:14Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
+    last_updated_at: "2026-08-24T17:58:13.536Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Superseded by 019; R4 salvaged into the live skill at v1.4.0.0."
     next_safe_action: "None — superseded; the branch stays as history, unmerged."

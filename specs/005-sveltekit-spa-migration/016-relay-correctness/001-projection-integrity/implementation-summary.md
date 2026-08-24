@@ -4,8 +4,8 @@ description: "The projection, framing and retention halves shipped and are prove
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"
-    last_updated_at: "2026-08-24T04:43:07Z"
+    packet_pointer: "specs/005-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"
+    last_updated_at: "2026-08-24T17:58:13.872Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Epoch rotation, consumer resolution and ended-epoch collection shipped."
     next_safe_action: "Rehearse collection against a copy of a real database (T2.11)."

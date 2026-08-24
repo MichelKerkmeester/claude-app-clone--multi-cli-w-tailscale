@@ -85,15 +85,15 @@
     ],
     "causal_summary": "Phase parent for the naming pass: one kebab-case grammar for every file and folder, kind-first component names, and a shared/ tree split by responsibility to replace the 28-file grab-bag. Pure rename and move — no rendered value, behaviour, route or a11y contract changes.",
     "created_at": "2026-08-23T09:57:24.802Z",
-    "last_save_at": "2026-08-24T16:40:11.941Z",
+    "last_save_at": "2026-08-24T17:58:13.690Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:62ff19ba784bdb75b872c6b75d2430e4e6f07142f5f85a1f4413e591040fd878",
+    "source_fingerprint": "sha256:0d9b56c0a42288eec3ed33ed8a10a751a2e58e7f631ef4b72ea450165c88d651",
     "source_doc_hashes": {
-      "spec.md": "d89f728762b3a474fefb0894ae9053e9696b77bd3c53a4ede2261c9dff99753e"
+      "spec.md": "3bf6bd5c5606e4603190490bd34e189309e68fe2bbeb52f3fa73e13470c1b00e"
     },
     "last_active_child_id": "005-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling",
     "last_active_at": null

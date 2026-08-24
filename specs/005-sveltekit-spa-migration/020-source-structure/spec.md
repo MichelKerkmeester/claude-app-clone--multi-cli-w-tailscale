@@ -4,7 +4,7 @@ description: "Phase parent for finishing the migration's one-file-per-component 
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/020-source-structure"
+    packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure"
     last_updated_at: "2026-08-24T06:40:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Phase parent scoped; three children created."
@@ -17,6 +17,9 @@ _memory:
 <!-- SPECKIT_LEVEL: 3 -->
 
 # Source structure — phase parent
+
+> **Phase links** — Parent: [`../spec.md`](../spec.md) · Predecessor: `019-surface-skill-refresh`
+
 
 ---
 

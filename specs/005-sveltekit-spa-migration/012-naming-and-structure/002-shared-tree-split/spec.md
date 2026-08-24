@@ -9,7 +9,7 @@ importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "005-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"
+    packet_pointer: "specs/005-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"
     last_updated_at: "2026-08-23T14:00:00Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Scoped as the widest specifier impact in the naming pass."

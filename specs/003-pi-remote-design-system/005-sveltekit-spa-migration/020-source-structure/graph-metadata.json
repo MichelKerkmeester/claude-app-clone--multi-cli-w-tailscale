@@ -30,7 +30,7 @@
       "style"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
       "spec.md"
     ],
@@ -80,7 +80,7 @@
     ],
     "causal_summary": "Phase parent for finishing the migration's one-file-per-component intent: move single-owner CSS into its component's scoped style, standardise the section-comment vocabulary, and teach both in the surface skill.",
     "created_at": "2026-08-24T06:38:17.258Z",
-    "last_save_at": "2026-08-24T06:38:17.258Z",
+    "last_save_at": "2026-08-24T08:18:07.553Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [

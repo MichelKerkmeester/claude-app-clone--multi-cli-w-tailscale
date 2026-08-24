@@ -30,7 +30,7 @@
       "operator-requested"
     ],
     "importance_tier": "normal",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
@@ -185,7 +185,7 @@
     ],
     "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
     "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-24T03:21:51.525Z",
+    "last_save_at": "2026-08-24T03:25:14.161Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -194,12 +194,12 @@
       "tasks.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:11e70c30fe8d0d9cb875760f7e634aca1be0048dc34814db72148c2fa4d7ced1",
+    "source_fingerprint": "sha256:44927ef8de6c175733c29c6d152ae6826509fd39c30fc24b8c42b6b429863fc2",
     "source_doc_hashes": {
-      "spec.md": "57047bf1ea5e627d11e498471b27347c028ed86c94eb3ad8c204514e92899bc2",
-      "plan.md": "9e412791a856615ee0b7303ccf8065c4cf5d49bf91cad8488b944d473831ac7d",
-      "tasks.md": "e88e3082eafc63b170355457e7548fa80a8538ef1af5f62a20bddf2286a98028",
-      "implementation-summary.md": "1b6986eb2cbffff3bf4d83840f75479eef698f54209f5371e5364c9cba9dcbe9"
+      "spec.md": "51c6917fc8bea5ae3f7ffb2d5398285d231feb0631df29b8e401d405c6bb18d3",
+      "plan.md": "576f9ad1e458d878afcd2f6a64f606aacad040870402b36dcefa589489dd59fa",
+      "tasks.md": "4873a79850a0f397f3c21062e0925a16273a7e7e3354742a89863948a828a3f6",
+      "implementation-summary.md": "230dc70cf24024b6e9f313622a37c43be9d350dea428ae725356d58791fb39cc"
     },
     "last_active_child_id": null,
     "last_active_at": null

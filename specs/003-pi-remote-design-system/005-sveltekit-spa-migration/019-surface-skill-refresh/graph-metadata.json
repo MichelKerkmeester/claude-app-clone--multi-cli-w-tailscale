@@ -30,7 +30,7 @@
       "comment"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
@@ -148,7 +148,7 @@
         "source": "derived"
       },
       {
-        "name": "T3.5",
+        "name": "zero",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Re-open the sk-code-mobile-cli surface skill once the naming, comment and documentation packets have landed, teach it what actually shipped, and merge the branch that has been stranded since the framework refactor.",
     "created_at": "2026-08-23T10:47:21.393Z",
-    "last_save_at": "2026-08-23T22:48:43.594Z",
+    "last_save_at": "2026-08-24T03:23:45.528Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:d4905e20a2fed09b5e07ee756624cb1daa52a66059a5aa48a9cc5582af9e5df5",
+    "source_fingerprint": "sha256:323e781cdaa7b139b2439760307c1419d703ffda5addb53af2f4a9f86184bcac",
     "source_doc_hashes": {
-      "spec.md": "0656e343c403d50097dc63832dfe22aa50879bf66ecf47005589fbe7e1903a4f",
-      "plan.md": "d051419063f46d796d30885a4d27cedd203c0363f25eb5a76d66234319ba995b",
-      "tasks.md": "c2982f961aecaa45cb3e1c31f9f4456ea6aa97b44dacf3997ce0baa2cf7f337c",
-      "checklist.md": "bc7756c3b76ff7c522a194a4639441731e56f058d0252e8d3d759f5790e9c5a2",
-      "implementation-summary.md": "2b700f68e4159b1308f2bee03cff2e66328ea0e4f6f0d105596698683a5ea7ef"
+      "spec.md": "9f7abcbc8dcf8cdd1bc49e453c0adc2a3a503360ee03e5d236cc42239355628d",
+      "plan.md": "dd5cf6db689853ce2f122bf08f245e092579e984587984aabb18890e0750865c",
+      "tasks.md": "dbfb9796718445db578d1f72a19714a69fb87de4e322e620ee9e8c69225c7bf1",
+      "checklist.md": "d8d06eda35132417a3051717abfd7f69293c3f87701c288211069f1a8c50e06a",
+      "implementation-summary.md": "e526e49273cc3a5b45fbc8e51bc2239f4d25f3173b549dcd184f37b7f6bf914f"
     },
     "last_active_child_id": null,
     "last_active_at": null

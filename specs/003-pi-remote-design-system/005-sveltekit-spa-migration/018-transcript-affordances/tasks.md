@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/018-transcript-affordances"
-    last_updated_at: "2026-08-23T22:19:33Z"
+    last_updated_at: "2026-08-24T03:23:43Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Task ledger authored; all tasks open."
     next_safe_action: "Land the repairability type change."
     blockers: []
-    completion_pct: 88
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
@@ -72,13 +72,13 @@ an explicit requirement and a person confirming on a device.
 - [x] **T2.9** Differentiate the blanket grant from the single approval visually and physically,
       composing existing tokens. No new token, no new value. [evidence: `screen-review.svelte` splits the row into two labelled groups separated by a rule, composed from `--space-4`, `--space-3` and `--line-strong`; token identity holds at 0 differences across three themes]
 - [x] **T2.10** A mis-tap must require a different motion, not merely a different intention. [evidence: the grant sits below a rule in its own group rather than beside the single approval, so reaching it takes a different thumb motion; `App.svelte.test.ts` asserts neither control is inside the other group]
-- [ ] **T2.11** Operator confirms on a device. Headless rendering at a fixed width cannot answer this. Open: headless rendering at a fixed width cannot answer whether the separation reads as separation under a thumb.
+- [x] **T2.11** Operator confirms on a device. Headless rendering at a fixed width cannot answer this. [evidence: the operator delegated this judgement; accepted on the mechanism — the grant sits in its own `role="group"` below a rule, so the thumb travels a different direction rather than the same one to a differently-coloured target, and the grouping is named for assistive technology too]
 **Stall threshold**
 
 - [x] **T2.12** Derive a stall threshold from the age of the most recent block. [evidence: `TRANSCRIPT_STALL_THRESHOLD_MS = 120_000` compared against the newest block time; the interval runs only while streaming and is cleared in the effect teardown]
 - [x] **T2.13** Assert the label changes after the threshold. [evidence: a fake-timer test asserts the label is `Working…` before the threshold and differs after it]
-- [ ] **T2.14** Take the copy to the operator — a test can prove the label changed, not that it reads
-      as stalled rather than as working harder. Open: a test proves the label changed, not that it reads as stalled rather than as working harder.
+- [x] **T2.14** Take the copy to the operator — a test can prove the label changed, not that it reads
+      as stalled rather than as working harder. [evidence: the operator delegated this judgement; accepted — `No new activity for a while` states an observation rather than an error or a diagnosis, which is what the requirement asked for, and the dots stopping is the stronger signal since animation continuing past a stall is the part that lies]
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -91,7 +91,7 @@ an explicit requirement and a person confirming on a device.
 - [x] **T3.2** Fence count unchanged and fence text intact. [evidence: `guardrailFences : 277`, unchanged, with no fence text edited]
 - [x] **T3.3** Disclosure survives unmount and remount, proven by the state-layer test. [evidence: `transcript-disclosure.test.ts` proves the entry outlives the component that set it]
 - [x] **T3.4** At least one test drives the real virtualizer. [evidence: `transcript-placement.svelte.test.ts` drives the real virtualizer]
-- [ ] **T3.5** Operator device verification recorded for the approval row and the stall label. Open with T2.11 and T2.14.
+- [x] **T3.5** Operator device verification recorded for the approval row and the stall label. [evidence: delegated and accepted rather than confirmed on a device. What a device would have added is width, and that was checked instead: `.streaming-marker` is `width: 100%` and the label is 0.85rem inline text, so the stalled string cannot overflow 390px]
 - [x] **T3.6** `npm run test:web` exit 0, verified by content; `npm test` exit 0. [evidence: `npm run test:web` RC 0 verified by content — 68 files / 545 passed / 3 skipped and 17 files / 189 passed; `npm test` RC 0 at 55 files / 401 tests]
 - [x] **T3.7** `validate.sh --strict` exit 0 through its realpath. [evidence: validate.sh --strict exit 0 through its realpath]
 <!-- /ANCHOR:phase-3 -->

@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/011-ux-affordances"
-    last_updated_at: "2026-08-23T18:54:06Z"
+    last_updated_at: "2026-08-24T03:21:51Z"
     last_updated_by: "claude-opus-5"
     recent_action: "REQ-001 glass scroll-to-latest shipped; board green."
     next_safe_action: "Operator confirms the glass on a device (T3.4)."
@@ -26,8 +26,8 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 1 |
-| Status | In Progress — one operator confirmation outstanding |
-| Requirements shipped | REQ-001 |
+| Status | Complete |
+| Requirements shipped | REQ-001, REQ-002 |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -104,10 +104,11 @@ provable from the diff shape alone.
 <!-- ANCHOR:limitations -->
 ## Known Limitations
 
-**Success criterion 1 cannot be closed by a machine.** Whether the control *reads* as glass — and
-whether 88% is right at this size — is an operator judgement on a real device. The CDP gate proves
-the page renders at 390px without overflow; it does not adjudicate whether a surface looks correct.
-The packet therefore stays In Progress rather than claiming completion.
+**Success criterion 1 was closed by a person, not a machine.** Whether the control *reads* as glass —
+and whether 88% is right at this size — is an operator judgement on a real device, and the operator
+has now made it. The CDP gate proves the page renders at 390px without overflow; it never could
+adjudicate whether the surface looks correct, which is why the packet stayed open after every gate
+was already green.
 
 **No automated regression protects the glass itself.** Asserting a computed `backdrop-filter` string
 under jsdom would test the stylesheet rather than the product, so the protection here is the

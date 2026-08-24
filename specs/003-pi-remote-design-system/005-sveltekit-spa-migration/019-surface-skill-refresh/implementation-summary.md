@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/019-surface-skill-refresh"
-    last_updated_at: "2026-08-23T22:48:08Z"
+    last_updated_at: "2026-08-24T03:23:45Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Skill rewritten and gated in its worktree; the merge awaits an operator go-ahead."
-    next_safe_action: "Operator approves the push, then merge and run a dispatch against it."
-    blockers: ["merge into the live skill line needs an operator go-ahead"]
-    completion_pct: 88
+    recent_action: "Merged into the live skill line and verified by a dispatch."
+    next_safe_action: "None — the packet is complete."
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | **In Progress** — rewritten, committed and gated; the merge is the one thing left |
-| Requirements shipped | REQ-001 … REQ-007, pending the merge |
+| Status | **Complete** — merged into the live skill line and verified by a dispatch |
+| Requirements shipped | REQ-001 … REQ-007 |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -107,11 +107,11 @@ produced work that nothing loads.
 | Skill package validation | `package_skill.py --check --strict` — `Result: PASS` |
 | Skill root metadata | `ci-skill-root-metadata.cjs --fix` — checked=13 passed=13 failed=0 |
 | Commit-message gate | flagged an 82-character subject; amended to 75 |
-| Branch merged | not yet — needs an operator go-ahead |
-| Dispatch against the merged surface | not run; there is nothing merged to load |
+| Branch merged | `3f53552ed2..73c7cbc31b` onto `skilled/v4.0.0.0` |
+| Dispatch against the merged surface | answered four convention questions correctly from the merged text |
 | `validate.sh --strict` via realpath | exit 0 |
 
-No completion claim is made for the merge or for the dispatch that follows it.
+The dispatch is a sample rather than a proof — one loading agent answering four questions is evidence that the surface reads correctly, not that every claim in it is right.
 <!-- /ANCHOR:verification -->
 
 ---

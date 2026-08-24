@@ -135,9 +135,7 @@
     "015",
     "011"
    ],
-   "gate": "three transcript affordances land; nine gates green",
-   "held": true,
-   "heldReason": "All four affordances shipped and every gate is green. The three open items are operator confirmations under a thumb and on a device, which no gate can make."
+   "gate": "three transcript affordances land; nine gates green"
   },
   {
    "id": "019",
@@ -146,16 +144,12 @@
     "013",
     "014"
    ],
-   "gate": "conventions surface teaches the shipped tree; stranded branch merged",
-   "held": true,
-   "heldReason": "The surface is rewritten, committed in its worktree and past every pre-push gate. The merge into the live skill line needs an operator go-ahead, and the dispatch that verifies meaning has nothing to load until it happens."
+   "gate": "conventions surface teaches the shipped tree; stranded branch merged"
   },
   {
    "id": "011",
    "deps": [],
-   "gate": "operator confirms the affordance on a device",
-   "held": true,
-   "heldReason": "Every machine-checkable criterion is met and the affordance shipped; what remains is whether the control reads as glass on a real device, which no gate can decide. Downstream work does not build on that judgement."
+   "gate": "operator confirms the affordance on a device"
   }
  ]
 }

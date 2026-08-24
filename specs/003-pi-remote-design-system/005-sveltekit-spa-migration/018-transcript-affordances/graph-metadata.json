@@ -136,12 +136,6 @@
         "source": "derived"
       },
       {
-        "name": "T2.11",
-        "kind": "key_phrase",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "evidence",
         "kind": "key_phrase",
         "path": "tasks.md",
@@ -155,6 +149,12 @@
       },
       {
         "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 2: IMPLEMENTATION",
         "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
@@ -186,7 +186,7 @@
     ],
     "causal_summary": "Three client changes the virtualizer and the copy catalog make necessary: disclosure state that survives scrolling, an approval row where the blanket grant is not a twin of the single one, and a transcript that can say stalled rather than working forever.",
     "created_at": "2026-08-23T10:47:21.093Z",
-    "last_save_at": "2026-08-23T22:20:01.806Z",
+    "last_save_at": "2026-08-24T03:23:43.223Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -196,13 +196,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:1405573d28dde73e35a6e1746e37881466e625cc5c8ab6c0cc2c6775b9c374ee",
+    "source_fingerprint": "sha256:d5f3097a1f1e9adcdbc7df41ff6a82f672eddfc89a7eeb63ff52ed48d08d3733",
     "source_doc_hashes": {
-      "spec.md": "28e809667783a892c7a325ba6ac93897025dcdc9d0f6bb85f93ac1a6cae008c6",
-      "plan.md": "765730f82afbc40abd38e27bb6ab618c5e72ef80f544be823319397573cc60d4",
-      "tasks.md": "c28672212936d8b4ae1a231e8df84cfc6ebbe5722a342d5e81b92c449684c5dc",
-      "checklist.md": "961955cda416fbf716d2525926e47daace0dbbda2d49bbbea08d4144a5f65e88",
-      "implementation-summary.md": "9c70e5b5f69499dd93a050853558f1fa1193e04a1021e9a5848f19cea566dec5"
+      "spec.md": "4aed43ff446378832c331cd29020a03d7882f62809a122427f11457d7681792c",
+      "plan.md": "d83eb8b769bdaadd7547ef4212409ea1dea64738d95ff013255b8f443b949768",
+      "tasks.md": "1762fc0ea376ffb3329d697a9bded45db79f6a6dccb00ca3600db11e50ff9fda",
+      "checklist.md": "c02c0d0cfd40c244f27c6ba2079b50d1b98c9e8ad05f1f9fba1844f8a1aa5b31",
+      "implementation-summary.md": "f7323d839f088455d2e1e38bafd2516516e80c2d6cacd86d6e334f5619e8551e"
     },
     "last_active_child_id": null,
     "last_active_at": null

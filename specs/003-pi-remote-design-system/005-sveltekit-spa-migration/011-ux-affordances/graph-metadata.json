@@ -69,12 +69,6 @@
         "source": "derived"
       },
       {
-        "name": "In Progress",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
         "name": "the",
         "kind": "key_phrase",
         "path": "spec.md",
@@ -94,6 +88,12 @@
       },
       {
         "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
@@ -153,6 +153,12 @@
         "source": "derived"
       },
       {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
         "name": "What Was Built",
         "kind": "proper_noun",
         "path": "implementation-summary.md",
@@ -179,7 +185,7 @@
     ],
     "causal_summary": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a rendered value. The migration children and the 007-EXT quality pass are bound by a hard zero-rendered-change invariant, so a request like 'make the scroll-to-latest control glass' has nowhere else to live. Each change is opt-in, individually scoped, and must still honour the frozen --pi-* token set, the a11y contracts and the security posture.",
     "created_at": "2026-08-23T06:14:40.344Z",
-    "last_save_at": "2026-08-23T20:18:34.981Z",
+    "last_save_at": "2026-08-24T03:21:51.525Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -188,12 +194,12 @@
       "tasks.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:cb39351887d1913d930d76a39d34d312a00d155a09598d2d14306c0f176bfb5a",
+    "source_fingerprint": "sha256:11e70c30fe8d0d9cb875760f7e634aca1be0048dc34814db72148c2fa4d7ced1",
     "source_doc_hashes": {
-      "spec.md": "a101790ecf0497eec9244c79f47e00183c0baf7cc084d68049dc70c1aea9e819",
-      "plan.md": "574a68baf7b1dd8368a4fe5ff950db368c76e753d9552c14d1cdb4214cae88c4",
-      "tasks.md": "11e62b2deeef7b04d6d3ef77cfe919393151041de74f62aa146091ee5401a627",
-      "implementation-summary.md": "11e2948dbbd754574d27decc85a02dcdc05784dd7935e98e2c8ba5475fa105c2"
+      "spec.md": "57047bf1ea5e627d11e498471b27347c028ed86c94eb3ad8c204514e92899bc2",
+      "plan.md": "9e412791a856615ee0b7303ccf8065c4cf5d49bf91cad8488b944d473831ac7d",
+      "tasks.md": "e88e3082eafc63b170355457e7548fa80a8538ef1af5f62a20bddf2286a98028",
+      "implementation-summary.md": "1b6986eb2cbffff3bf4d83840f75479eef698f54209f5371e5364c9cba9dcbe9"
     },
     "last_active_child_id": null,
     "last_active_at": null

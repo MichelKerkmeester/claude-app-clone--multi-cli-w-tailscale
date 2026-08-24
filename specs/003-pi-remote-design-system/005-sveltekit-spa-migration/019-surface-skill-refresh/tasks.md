@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/019-surface-skill-refresh"
-    last_updated_at: "2026-08-23T22:48:08Z"
+    last_updated_at: "2026-08-24T03:23:45Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Task ledger authored; all tasks open."
     next_safe_action: "Wait for the three editability packets, then audit."
     blockers: []
-    completion_pct: 90
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
@@ -79,9 +79,9 @@ loaded the merged surface, because until then nothing actually reads any of this
 - [x] **T3.3** The skill's own document validation passes. [evidence: `ci-skill-root-metadata.cjs --fix` reports checked=13 passed=13 failed=0 fixed=0]
 - [x] **T3.4** The three pre-push gates pass: commit-message shape, branch naming, metadata manifest
       regeneration. Each has failed a previous attempt, so each is checked rather than assumed. [evidence: branch naming issued by the allocator; the metadata manifest gate passes 13/13; the commit-message hook flagged an 82-character subject, which was amended to 75]
-- [ ] **T3.5** The branch merges into the live skill line. Open: the branch is committed in its worktree and every pre-push gate passes, but pushing to the live skill line needs the operator's go-ahead, and an approval given for an earlier push does not carry to this one.
-- [ ] **T3.6** A dispatch loads the merged surface on a small real task, and its output has the shape
-      the tree wants. This is the only check that tests meaning rather than form. Open with T3.5 — there is nothing merged to load yet.
+- [x] **T3.5** The branch merges into the live skill line. [evidence: fast-forwarded `3f53552ed2..73c7cbc31b` onto `skilled/v4.0.0.0` with the operator's go-ahead; the merged surface reads back through the symlink at version 1.2.0.0 with zero stale path claims]
+- [x] **T3.6** A dispatch loads the merged surface on a small real task, and its output has the shape
+      the tree wants. This is the only check that tests meaning rather than form. [evidence: a read-only dispatch loaded the merged surface and answered four convention questions from it — `sheet-transcript-density.svelte` in `pages/chat/chrome/`, its sibling story plus the README and CODE pair, `shared/state/` chosen by reason to change, and the runes audit including tracing called methods rather than searching for a `dispatch(` call]
 - [x] **T3.7** `validate.sh --strict` exit 0 on this packet through its realpath. [evidence: validate.sh --strict exit 0 through its realpath]
 <!-- /ANCHOR:phase-3 -->
 

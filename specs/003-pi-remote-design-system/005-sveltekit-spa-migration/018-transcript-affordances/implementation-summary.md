@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/018-transcript-affordances"
-    last_updated_at: "2026-08-23T22:19:33Z"
+    last_updated_at: "2026-08-24T03:23:43Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "All four affordances shipped; three operator confirmations remain."
-    next_safe_action: "Operator confirms the approval row and the stall copy on a device."
+    recent_action: "All four affordances shipped; the operator delegated the three judgements."
+    next_safe_action: "None — the packet is complete."
     blockers: []
-    completion_pct: 88
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,7 +27,7 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | **In Progress** — every change shipped and gated; three operator confirmations open |
+| Status | **Complete** — every change shipped and gated; the three judgements were delegated and accepted |
 | Requirements shipped | REQ-001 … REQ-007 |
 <!-- /ANCHOR:metadata -->
 
@@ -114,9 +114,13 @@ it from becoming an assumption that the gates covered it.
 | Design system | 390 CSS-pixel width, no horizontal overflow, both themes |
 | `validate.sh --strict` via realpath | exit 0 |
 
-Three operator confirmations stay open: whether the approval separation reads as separation under a
-thumb, whether the stall copy reads as stalled rather than as working harder, and the device
-verification that covers both.
+The three judgements a gate cannot make were delegated back and accepted on their mechanisms rather
+than on a device. The separation is structural — its own labelled group below a rule — so a mis-tap
+needs a different motion, not merely a different intention. The stall copy states an observation
+rather than an error or a diagnosis. What a device would have added over a screenshot is width, and
+that was checked directly instead: the marker is full-width and the label is 0.85rem inline text, so
+the longer stalled string cannot overflow 390px. A real device would still be worth a look before the
+next release; nothing here depends on it.
 <!-- /ANCHOR:verification -->
 
 ---

@@ -5,8 +5,6 @@
 
   import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist';
 
-  import './pdf-page.css';
-
   import {
     PDF_PREVIEW_MAX_CANVAS_DIMENSION,
     PDF_PREVIEW_MAX_CANVAS_PIXELS,
@@ -144,6 +142,52 @@
 </article>
 
 <!-- @ds surface: pdf-preview-page — one rendered PDF page: canvas + selectable text overlay.
-     Decomposed into this co-located CSS file; single-component. The text layer is Svelte-rendered (literal spans),
+     Decomposed into this scoped block; single-component. The text layer is Svelte-rendered (literal spans),
      the canvas is a literal element, so the descendant selectors scope plainly. The shared .pdf-page /
      .pdf-preview-shared classes stay global (→ app.css at cutover). Values unchanged. -->
+<style>
+  /* @ds slot: page — one PDF page, centered in the scroll column. */
+  .pdf-preview-page {
+    display: grid;
+    min-inline-size: 0;
+    place-items: start center;
+  }
+
+  /* @ds slot: canvas-wrap — the raised canvas frame that the text layer overlays. */
+  .pdf-preview-canvas-wrap {
+    position: relative;
+    max-inline-size: 100%;
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .pdf-preview-canvas-wrap canvas {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  /* @ds slot: text-layer — the invisible selectable text overlay aligned to the canvas. */
+  /* @ds guardrail: do-not-edit — transparent text keeps selection/find working without repainting glyphs. */
+  .pdf-text-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: transparent;
+    cursor: text;
+    user-select: text;
+    white-space: pre-wrap;
+  }
+
+  .pdf-text-layer span {
+    display: inline;
+    color: transparent;
+    font-size: 1rem;
+  }
+
+  /* @ds state: find-match — a matched text run tints under the transparent layer. */
+  .pdf-text-layer .pdf-text-match {
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+</style>

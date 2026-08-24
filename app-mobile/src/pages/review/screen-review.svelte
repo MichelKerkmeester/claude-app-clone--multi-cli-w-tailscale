@@ -16,8 +16,6 @@
   import { decideApproval, createAcceptEditsGrant } from '$shared/transport/relay.js';
   import Button from '$shared/primitives/button/button.svelte';
 
-  import './screen-review.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -211,7 +209,7 @@
   </section>
 </main>
 
-<!-- @ds surface: review-view — exact-action review list. Decomposed into this co-located CSS file; approval-card and its
+<!-- @ds surface: review-view — exact-action review list. Decomposed into this scoped block; approval-card and its
      descendants, approval-actions, and the result-* state variants are owned solely by this component so
      they move with it. The .back-button solo extension and the .approval-actions button / .deny-button /
      .grant-button child-primitive selectors use :global so Svelte scoping cannot drop them. The shared
@@ -222,3 +220,248 @@
      .approval-card prefers-contrast/forced-colors border groups, the .approval-actions button ink-override
      group (shared with composer/enrollment/push), and .inline-alert / .surface-kicker / .empty-state /
      .empty-glyph / .sr-only are shared by 2+ components and stay global in app.css. Values unchanged. -->
+<style>
+  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
+  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
+  .review-view {
+    padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
+  }
+
+  /* @ds surface: home-view — hero, session roster, device footer, push settings. */
+  /* @ds state: loading · empty · error · stale — via shared empty-state, inline-alert and freshness surfaces. */
+  .review-heading h1 {
+    max-width: 13ch;
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(2.85rem, 8vw, 5.75rem);
+    font-weight: 620;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  /* @ds surface: back-button — quiet back arrow, built on the shared chrome-button base. */
+  :global(.back-button) {
+    position: relative;
+    padding-inline-start: 1.65rem;
+  }
+
+  /* @ds slot: chevron */
+  :global(.back-button::before) {
+    position: absolute;
+    inset-inline-start: 0.65rem;
+    content: '←';
+  }
+  /* @ds end surface: back-button */
+
+  /* @ds surface: review-heading — review surface intro (states below via approval-card / inline-alert). */
+  /* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
+  /* @ds slot: heading — surface title + description. */
+  .review-heading {
+    max-width: 58rem;
+    padding-bottom: clamp(2.5rem, 7vw, 5rem);
+  }
+
+  .review-heading h1 {
+    max-width: 15ch;
+    font-size: clamp(2.8rem, 7vw, 5.6rem);
+  }
+
+  .review-heading > p:last-child {
+    max-width: 43rem;
+    margin: var(--space-6) 0 0;
+    color: var(--ink-secondary);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  /* @ds state: info — grant-banner (active accept-edits lease). */
+  /* @ds state: error — inline-alert (surface error). */
+  /* @ds state: stale — barrier-note (reconciliation / checking). */
+  .grant-banner {
+    margin-bottom: var(--space-4);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: 0.8rem;
+    font-weight: 650;
+    line-height: 1.45;
+  }
+
+  .approval-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .approval-card {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .approval-pending {
+    border-color: color-mix(in oklch, var(--warning) 55%, var(--line));
+    box-shadow: var(--shadow-raised);
+  }
+
+  .approval-card > header,
+  .approval-tool,
+  .approval-arguments {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .approval-card > header,
+  .approval-tool > span,
+  .approval-arguments > span,
+  .approval-digest,
+  .approval-result {
+    color: var(--ink-muted);
+    font-size: 0.7rem;
+    font-weight: 680;
+    line-height: 1.4;
+  }
+
+  .approval-card > header time {
+    color: var(--warning);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .approval-tool strong {
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+  }
+
+  .approval-arguments {
+    display: grid;
+  }
+
+  .approval-arguments pre {
+    margin: 0;
+    overflow: auto;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .approval-digest,
+  .approval-result {
+    padding: var(--space-3) var(--space-6);
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+  }
+
+  .approval-actions {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6) var(--space-6);
+  }
+
+  .approval-decision-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .approval-grant-group {
+    display: grid;
+    gap: var(--space-3);
+    padding-block-start: var(--space-4);
+    border-block-start: 1px solid var(--line-strong);
+  }
+
+  :global(.approval-actions button) {
+    min-height: 3rem;
+    padding-inline: var(--space-3);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 720;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) ease,
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  :global(.approval-actions button[data-hovered]) {
+    background: var(--accent-strong);
+  }
+
+  :global(.approval-actions button[data-disabled]) {
+    background: var(--surface-muted);
+    color: var(--ink-muted);
+    cursor: wait;
+  }
+
+  :global(.approval-actions .deny-button) {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+
+  :global(.approval-actions .deny-button[data-hovered]) {
+    background: var(--danger);
+    color: white;
+  }
+
+  :global(.approval-actions .grant-button) {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  :global(.approval-actions .grant-button[data-hovered]) {
+    background: var(--surface-muted);
+  }
+
+  .result-approved,
+  .result-consumed {
+    color: var(--success);
+  }
+
+  .result-verifying {
+    color: var(--warning);
+    animation: signal-pulse 1.4s ease-in-out infinite;
+  }
+
+  .result-denied,
+  .result-expired,
+  .result-revoked,
+  .result-failed {
+    color: var(--danger);
+  }
+
+  @media (max-width: 39rem) {
+    .review-view {
+      padding-top: var(--space-6);
+    }
+
+    .approval-card > header,
+    .approval-tool {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .approval-decision-group {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
+  .review-view {
+    padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  }
+
+  /* @ds end surface: review-view */
+</style>

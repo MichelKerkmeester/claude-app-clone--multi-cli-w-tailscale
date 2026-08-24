@@ -134,8 +134,6 @@
   import SheetTitle from '$shared/primitives/sheet/sheet-title.svelte';
   import EffortRadioGroup from './radio-effort.svelte';
 
-  import './sheet-model-effort.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 7. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -1102,9 +1100,656 @@
   {/if}
 {/snippet}
 
-<!-- @ds surface: model-effort-sheet — the model picker + effort sheet overlay. Decomposed into this co-located CSS file;
+<!-- @ds surface: model-effort-sheet — the model picker + effort sheet overlay. Decomposed into this scoped block;
      model-effort-sheet owned rules and this sheet's owned members of mixed pairs move with it.
      Shared overlay/modal chrome (.react-aria-Popover, system-wide prefers-reduced-motion grouping
      .model-sheet-modal with plan-review-modal / session-card) stays global. Effort radio-group
      rules stay with EffortRadioGroup.svelte. Child-primitive classes and react-aria/runtime
      data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->
+<style>
+  /* @ds surface: model-effort-sheet — the model picker + effort sheet overlay. */
+  /* @ds surface: overlay — model-effort-sheet is an INSTANCE of the shared overlay
+     primitive (backdrop → raised panel → grabber → header/body/footer).
+     Physical unification of the per-surface overlay chrome is a documented follow-up. */
+  /* @ds slot: backdrop — the ModalOverlay scrim + placement. */
+  /* The model catalog is host-authored; the sheet can only request a host-authorized change. */
+  :global(.model-sheet-overlay) {
+    /* @ds edit: tokens — component tokens. Each is a thin alias to a semantic role,
+       so this surface retints by editing the role it points at (primitive → semantic
+       → component). Edit them here instead of on :root. */
+    --model-sheet-raised: var(--surface);
+    --model-sheet-ink: var(--ink);
+    --model-sheet-muted: var(--ink-muted);
+    --model-sheet-accent: var(--accent-ink);
+    --model-sheet-ui-accent: var(--accent-strong);
+    --model-sheet-selection: var(--accent-soft);
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    display: flex;
+    max-inline-size: 100vw;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    background: color-mix(in srgb, #24221f 56%, transparent);
+    animation: model-sheet-backdrop-in 180ms ease-out;
+  }
+
+  /* @ds state: exiting — backdrop fade-out while the overlay unmounts. */
+   /* @ds guardrail: do-not-edit — The data-exiting / drag / snap choreography is driven by the modal exit and swipe-dismiss handlers; dismissal semantics never change here. */
+  :global(.model-sheet-overlay[data-exiting]) {
+    animation: model-sheet-backdrop-out 220ms ease-in;
+  }
+
+  /* @ds edit: tokens — theme remap, dark. The same component tokens resolve to their
+     dark semantic roles here. The ui-accent points at --accent-ink, not --accent-strong,
+     because --accent-strong carries no dark override and would not match the dark
+     UI accent. */
+  :global(:root[data-theme='dark'] .model-sheet-overlay) {
+    --model-sheet-raised: var(--surface);
+    --model-sheet-ink: var(--ink);
+    --model-sheet-muted: var(--ink-muted);
+    --model-sheet-accent: var(--accent-ink);
+    --model-sheet-ui-accent: var(--accent-ink);
+    --model-sheet-selection: var(--accent-soft);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    /* @ds edit: tokens — theme remap, system-dark. Dark semantic roles again, driven
+       by the OS-dark signal; ui-accent resolves to --accent-ink for the same reason
+       as the explicit dark block. */
+    :global(:root[data-theme='system'] .model-sheet-overlay) {
+      --model-sheet-raised: var(--surface);
+      --model-sheet-ink: var(--ink);
+      --model-sheet-muted: var(--ink-muted);
+      --model-sheet-accent: var(--accent-ink);
+      --model-sheet-ui-accent: var(--accent-ink);
+      --model-sheet-selection: var(--accent-soft);
+    }
+  }
+
+  /* @ds end surface: model-effort-sheet */
+
+  /* @ds edit: layout — sheet stacking, sizing, and the live drag-offset pull. */
+  /* @ds slot: panel — the Modal raised surface; the --model-sheet-drag-offset var
+     stays the layout input for swipe-dismiss. */
+  /* @ds state: opening · open — entry rise/settle, then rest; exiting, dragging and
+     snapping are separate state rules below. */
+  .model-sheet-modal {
+    inline-size: min(92vw, 24rem);
+    max-inline-size: 100vw;
+    max-block-size: calc(var(--visual-viewport-height, 100dvh) * 0.75);
+    overflow: hidden;
+    border-radius: 24px 24px 0 0;
+    background: var(--model-sheet-raised);
+    color: var(--model-sheet-ink);
+    transform: translateY(var(--model-sheet-drag-offset, 0));
+    animation: model-sheet-in 280ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* @ds state: dragging — free drag while a swipe is in flight. */
+  .model-sheet-modal.is-dragging {
+    animation: none;
+    transition: none;
+  }
+
+  /* @ds state: snapping — settle back to rest after a swipe. */
+  .model-sheet-modal.is-snapping {
+    transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* @ds state: exiting — panel slides down + fades while the overlay unmounts. */
+  :global(.model-sheet-overlay[data-exiting]) .model-sheet-modal {
+    animation: model-sheet-out 220ms ease-in;
+  }
+
+  /* @ds edit: layout — sheet body column with symmetric block-end and intentionally
+     asymmetric inline safe-area insets (left/right preserved). */
+  .model-sheet-dialog {
+    display: flex;
+    min-inline-size: 0;
+    max-block-size: inherit;
+    flex-direction: column;
+    overflow: hidden;
+    outline: none;
+    padding-block-end: max(16px, env(safe-area-inset-bottom));
+    padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+    font-family: var(--font-sans);
+  }
+
+  .model-sheet-content {
+    display: contents;
+  }
+
+  /* @ds slot: drag-handle — grabber + swipe surface. */
+  .model-sheet-drag-region {
+    flex: 0 0 auto;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .model-sheet-drag-region:active {
+    cursor: grabbing;
+  }
+
+  .model-sheet-grabber {
+    inline-size: 36px;
+    block-size: 4px;
+    flex: 0 0 auto;
+    margin-block: 0.6rem 0.25rem;
+    margin-inline: auto;
+    border-radius: 999px;
+    background: var(--model-sheet-muted);
+    opacity: 0.65;
+  }
+
+  /* @ds slot: header */
+  .model-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-block: 0.25rem 0.75rem;
+    padding-inline: var(--space-4);
+  }
+
+  :global(.model-sheet-title) {
+    margin: 0;
+    color: var(--model-sheet-ink);
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  :global(.model-sheet-close) {
+    display: grid;
+    inline-size: 44px;
+    block-size: 44px;
+    flex: 0 0 auto;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--model-sheet-ink);
+    cursor: pointer;
+  }
+
+  :global(.model-sheet-close[data-hovered]),
+  :global(.model-sheet-cancel[data-hovered]) {
+    background: var(--model-sheet-selection);
+  }
+
+  /* @ds slot: status-lines — policy, catalog state, mutation, and empty copy. */
+  /* @ds state: model-open — the model picker panel. */
+  .model-sheet-policy,
+  .model-sheet-catalog-state,
+  .model-sheet-mutation,
+  .model-sheet-empty {
+    margin: 0;
+    color: var(--model-sheet-muted);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .model-sheet-policy,
+  .model-sheet-catalog-state,
+  .model-sheet-mutation {
+    padding-block: 0.5rem;
+    padding-inline: var(--space-4);
+  }
+
+  /* @ds state: terminal-blocked — streaming or delivery barrier seam. */
+  .model-sheet-policy,
+  .model-sheet-mutation.is-barrier {
+    border-block: 1px solid var(--model-sheet-ui-accent);
+    background: var(--model-sheet-selection);
+    color: var(--model-sheet-accent);
+  }
+
+  .model-sheet-catalog-state :global(button) {
+    min-block-size: 44px;
+    border: 0;
+    background: transparent;
+    color: var(--model-sheet-accent);
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  /* @ds slot: search — rendered only when the catalog reaches the search threshold. */
+  /* @ds state: search-shown — the ≥8-model finder seam. */
+  .model-sheet-search {
+    display: grid;
+    gap: 0.35rem;
+    padding-block-end: var(--space-2);
+    padding-inline: var(--space-4);
+    color: var(--model-sheet-muted);
+    font-size: 0.75rem;
+    font-weight: 620;
+  }
+
+  .model-sheet-search-control {
+    display: flex;
+    min-inline-size: 0;
+    min-block-size: 44px;
+    align-items: center;
+    gap: var(--space-2);
+    padding-inline-start: var(--space-3);
+    border: 1px solid var(--model-sheet-muted);
+    border-radius: 12px;
+    background: var(--model-sheet-raised);
+    color: var(--model-sheet-muted);
+  }
+
+  .model-sheet-search input {
+    min-inline-size: 0;
+    min-block-size: 42px;
+    flex: 1;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--model-sheet-ink);
+    font-size: 1rem;
+  }
+
+  .model-sheet-search-control:focus-within {
+    outline: 2px solid var(--model-sheet-ui-accent);
+    outline-offset: 2px;
+  }
+
+  :global(.model-sheet-search-clear) {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    align-self: stretch;
+    padding-inline: var(--space-3);
+    border: 0;
+    background: transparent;
+    color: var(--model-sheet-accent);
+    font-weight: 620;
+  }
+
+  /* @ds slot: model-list — catalog rows, on the model-open section. */
+  .model-sheet-list {
+    display: grid;
+    min-inline-size: 0;
+    flex: 1 1 auto;
+    gap: var(--space-2);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    padding-block: 0 var(--space-2);
+    padding-inline: var(--space-3);
+    outline: none;
+  }
+
+  .model-sheet-list .react-aria-ListBoxSection {
+    display: grid;
+    min-inline-size: 0;
+    gap: 2px;
+  }
+
+  .model-sheet-list .react-aria-Header {
+    padding-block: 0.5rem 0.25rem;
+    padding-inline: var(--space-2);
+    color: var(--model-sheet-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+  }
+
+  .model-sheet-row {
+    display: grid;
+    min-inline-size: 0;
+    min-block-size: 64px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem var(--space-2);
+    align-content: center;
+    padding-block: 0.65rem;
+    padding-inline: var(--space-3);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    color: var(--model-sheet-ink);
+    cursor: pointer;
+    outline: none;
+  }
+
+  :global(.model-sheet-row[data-hovered]),
+  :global(.model-sheet-row[data-focused]) {
+    background: var(--model-sheet-selection);
+  }
+
+  .model-sheet-row[data-selected] {
+    border-color: var(--model-sheet-ui-accent);
+    background: var(--model-sheet-selection);
+  }
+
+  :global(.model-sheet-row[data-focus-visible]),
+  :global(.model-sheet-close[data-focus-visible]),
+  :global(.model-sheet-cancel[data-focus-visible]),
+  :global(.model-sheet-switch[data-focus-visible]),
+  :global(.model-sheet-search-clear[data-focus-visible]),
+  :global(.model-sheet-nav-button[data-focus-visible]),
+  :global(.effort-sheet-nav-button[data-focus-visible]),
+  :global(.effort-sheet-reconcile-button[data-focus-visible]),
+  .model-sheet-catalog-state :global(button[data-focus-visible]) {
+    outline-color: var(--model-sheet-ui-accent);
+    outline-style: solid;
+    outline-width: 2px;
+    outline-offset: 2px;
+  }
+
+  /* @ds state: read-only / disabled — model row not actionable. */
+  .model-sheet-row[data-disabled] {
+    cursor: default;
+    opacity: 0.72;
+  }
+
+  .model-sheet-row-main,
+  .model-sheet-row-states,
+  .model-sheet-row-description {
+    display: flex;
+    min-inline-size: 0;
+    align-items: center;
+  }
+
+  .model-sheet-row-main {
+    flex-wrap: wrap;
+    gap: 0.2rem var(--space-2);
+  }
+
+  .model-sheet-row-label {
+    overflow-wrap: anywhere;
+    font-size: 0.98rem;
+    font-weight: 650;
+  }
+
+  .model-sheet-row-id {
+    overflow: hidden;
+    max-inline-size: 100%;
+    color: var(--model-sheet-muted);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+    unicode-bidi: isolate;
+  }
+
+  .model-sheet-row-states {
+    justify-content: flex-end;
+    gap: 0.35rem;
+    color: var(--model-sheet-accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .model-state-current,
+  .model-state-selected {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+  }
+
+  .model-sheet-row-description {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.55rem;
+    color: var(--model-sheet-muted);
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  .model-state-unavailable {
+    color: var(--model-sheet-accent);
+    font-weight: 650;
+  }
+
+  .model-sheet-empty {
+    min-block-size: 9rem;
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+  }
+
+  .model-sheet-skeletons {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .model-sheet-skeleton {
+    min-block-size: 64px;
+    border-radius: 14px;
+    background: var(--model-sheet-selection);
+    animation: model-sheet-pulse 1.2s ease-in-out infinite alternate;
+  }
+
+  .model-sheet-mutation {
+    min-block-size: 2.5rem;
+  }
+
+  /* @ds slot: footer */
+  .model-sheet-footer {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    gap: var(--space-2);
+    padding-block-start: var(--space-2);
+    padding-inline: var(--space-4);
+    border-block-start: 1px solid color-mix(in srgb, var(--model-sheet-muted) 35%, transparent);
+  }
+
+  :global(.model-sheet-cancel),
+  :global(.model-sheet-switch) {
+    min-inline-size: 0;
+    min-block-size: 48px;
+    border-radius: 12px;
+    font-weight: 680;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+  }
+
+  :global(.model-sheet-cancel) {
+    border: 1px solid var(--model-sheet-muted);
+    background: transparent;
+    color: var(--model-sheet-ink);
+  }
+
+  :global(.model-sheet-switch) {
+    border: 1px solid var(--model-sheet-ui-accent);
+    background: var(--model-sheet-ink);
+    color: var(--model-sheet-raised);
+  }
+
+  /* @ds state: committing / disabled — model & effort actions locked while a request
+     is in flight or change authority is blocked. */
+  :global(.model-sheet-switch[data-disabled]),
+  :global(.model-sheet-cancel[data-disabled]),
+  :global(.model-sheet-close[data-disabled]) {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  @keyframes model-sheet-in {
+    from {
+      transform: translateY(36px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes model-sheet-backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes model-sheet-backdrop-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes model-sheet-out {
+    from {
+      transform: translateY(var(--model-sheet-drag-offset, 0));
+      opacity: 1;
+    }
+    to {
+      transform: translateY(36px);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.model-sheet-overlay),
+    :global(.model-sheet-overlay[data-exiting]),
+    :global(.model-sheet-overlay[data-exiting]) .model-sheet-modal,
+    .model-sheet-skeleton {
+      animation: none;
+    }
+
+    :global(.model-sheet-overlay[data-exiting]) .model-sheet-modal,
+    :global(.model-sheet-overlay) :global(button):active:not(:disabled),
+    :global(.model-sheet-overlay) :global(button[data-pressed]):not([data-disabled]) {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  @keyframes model-sheet-pulse {
+    from {
+      opacity: 0.55;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* ── Effort section: one full-width radio row per host-advertised level ── */
+  /* @ds state: effort-open — the sheet draws its effort section. */
+  .effort-sheet-section {
+    display: flex;
+    min-inline-size: 0;
+    min-block-size: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  /* @ds state: pending-effort — the status line reporting the in-flight effort request. */
+  .effort-sheet-status {
+    flex: 0 0 auto;
+    margin: 0;
+    padding-block: 0.5rem;
+    padding-inline: var(--space-4);
+    color: var(--model-sheet-muted);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .effort-sheet-reconcile {
+    flex: 0 0 auto;
+    padding-inline: var(--space-4);
+  }
+
+  :global(.effort-sheet-reconcile-button) {
+    min-block-size: 44px;
+    border: 0;
+    background: transparent;
+    color: var(--model-sheet-accent);
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .effort-radio-scroll {
+    min-inline-size: 0;
+    min-block-size: 0;
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    padding-block: 0 var(--space-2);
+    padding-inline: var(--space-3);
+  }
+
+  /* Muted copy on the soft selection wash drops below 4.5:1 in the bone
+     theme, so selected/focused/hovered rows promote descriptions and IDs
+     to the ink token; the accent states column already passes there. */
+  :global(.model-sheet-row[data-hovered]) .model-sheet-row-id,
+  :global(.model-sheet-row[data-hovered]) .model-sheet-row-description,
+  :global(.model-sheet-row[data-focused]) .model-sheet-row-id,
+  :global(.model-sheet-row[data-focused]) .model-sheet-row-description,
+  :global(.model-sheet-row[data-selected]) .model-sheet-row-id,
+  :global(.model-sheet-row[data-selected]) .model-sheet-row-description {
+    color: var(--model-sheet-ink);
+  }
+
+  /* Section navigation between the model picker and the effort radio group. */
+  .model-sheet-nav,
+  .effort-sheet-nav {
+    display: flex;
+    min-inline-size: 0;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding-block: var(--space-1) var(--space-2);
+  }
+
+  .effort-sheet-nav {
+    justify-content: flex-start;
+    padding-inline: var(--space-4);
+  }
+
+  :global(.model-sheet-nav-button),
+  :global(.effort-sheet-nav-button) {
+    display: inline-flex;
+    min-block-size: 44px;
+    align-items: center;
+    gap: 0.3rem;
+    padding-inline: 0.5rem;
+    border: 0;
+    background: transparent;
+    color: var(--model-sheet-accent);
+    font-size: 0.85rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  :global(.model-sheet-nav-button[data-hovered]),
+  :global(.effort-sheet-nav-button[data-hovered]) {
+    color: var(--model-sheet-ink);
+  }
+
+  /* Section nav arrows are physical drawings; mirror them under an RTL
+     document so "back" keeps pointing at the section that precedes it. */
+  :global([dir='rtl'] .model-sheet-nav-button svg),
+  :global([dir='rtl'] .effort-sheet-nav-button svg) {
+    transform: scaleX(-1);
+  }
+
+  @media (max-width: 360px) {
+    .model-sheet-header,
+    .model-sheet-search,
+    .model-sheet-policy,
+    .model-sheet-catalog-state,
+    .model-sheet-mutation,
+    .model-sheet-footer,
+    .effort-sheet-status,
+    .effort-sheet-reconcile,
+    .effort-sheet-nav {
+      padding-inline: var(--space-3);
+    }
+  }
+</style>

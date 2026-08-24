@@ -17,8 +17,6 @@
   import { hover } from '$shared/primitives/a11y/interactions.js';
   import { createTranscriptDisclosureBinding } from '$shared/state/transcript-disclosure.svelte.js';
 
-  import './collapsed-evidence.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -76,7 +74,43 @@
   {@render children()}
 </Collapsible>
 
-<!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. Decomposed into this co-located CSS file;
+<!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. Decomposed into this scoped block;
      evidence-trigger is a Collapsible.Trigger primitive so its class and react-aria/runtime data-attributes use
      :global so Svelte scoping cannot drop them. evidence-chevron/evidence-summary are shared with
      NormalizedActivityGroup and stay global here. Values unchanged. -->
+<style>
+  /* Routine evidence: a quiet, self-describing disclosure that sits calmly beside prose. */
+  /* @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. */
+  :global(.evidence-trigger) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.25rem;
+    padding: var(--space-1) var(--space-2);
+    border: 0;
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* @ds state: hover */
+  :global(.evidence-trigger[data-hovered] .evidence-summary) {
+    color: var(--ink-secondary);
+  }
+
+  /* @ds slot: chevron */
+  :global(.evidence-chevron) {
+    display: inline-block;
+    font-size: 1rem;
+    line-height: 1;
+    transition: transform var(--duration-state) var(--ease-out);
+  }
+
+  /* @ds state: expanded */
+  :global(.evidence-trigger[data-expanded] .evidence-chevron) {
+    transform: rotate(90deg);
+  }
+  /* @ds end surface: evidence-disclosure */
+</style>

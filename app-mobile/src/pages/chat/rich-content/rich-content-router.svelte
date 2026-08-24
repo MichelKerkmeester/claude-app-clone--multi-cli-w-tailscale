@@ -88,8 +88,6 @@
   import SafeMarkdown from './safe-markdown.svelte';
   import TextArtifactCard from './card-text-artifact.svelte';
 
-  import './rich-content-router.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -171,6 +169,30 @@
   </RichBlockFrame>
 {/if}
 
-<!-- @ds surface: rich-prose-block — the plain-prose / safe-Markdown read-out block. Decomposed into this co-located CSS file;
+<!-- @ds surface: rich-prose-block — the plain-prose / safe-Markdown read-out block. Decomposed into this scoped block;
      the selectors it was grouped with (safe-markdown*, rich-block-frame, artifact-viewer*)
      stay with their own components. Values unchanged; the bidi-plaintext guardrail is preserved. -->
+<style>
+  /* @ds slot: prose — bidirectional-safe plain-text read-out; capped to reading width. */
+  /* @ds guardrail: do-not-edit — Unicode-bidi: plaintext keeps directional text stable and un-clickable-into; do not weaken. */
+  .rich-prose-block {
+    min-inline-size: 0;
+    max-inline-size: var(--reading-width);
+    direction: auto;
+    text-align: start;
+    unicode-bidi: plaintext;
+    margin-block: var(--space-3);
+  }
+
+  /* @ds surface: fallback/activity cards — quiet presentation for non-card blocks. */
+  /* @ds state: malformed-fallback — unsupported/undisplayable blocks present as a
+     quiet card without card chrome. */
+  /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
+  :global(.rich-fallback-card) {
+    box-shadow: none;
+  }
+
+  :global(.rich-activity-card) {
+    box-shadow: none;
+  }
+</style>

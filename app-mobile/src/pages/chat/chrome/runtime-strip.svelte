@@ -49,8 +49,6 @@
   import ToggleGroup from '$shared/primitives/choice/toggle-group.svelte';
   import ToggleGroupItem from '$shared/primitives/choice/toggle-group-item.svelte';
 
-  import './runtime-strip.css';
-
   let {
     controls,
     sheetOpen,
@@ -176,7 +174,115 @@
   </span>
 </div>
 
-<!-- @ds surface: runtime-strip — host-backed readout + controls strip. Decomposed into this co-located CSS file;
+<!-- @ds surface: runtime-strip — host-backed readout + controls strip. Decomposed into this scoped block;
      effort-trigger and build-plan-toggle are owned solely by this component so they move with it.
      Child-primitive classes and react-aria/runtime data-attributes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->
+<style>
+  /* @ds surface: runtime-strip — host-backed readout + controls strip. */
+  .runtime-strip {
+    display: flex;
+    min-inline-size: 0;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-block: var(--space-2) 0;
+    padding-inline: var(--page-gutter);
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+  }
+
+  /* @ds slot: readout — confirmed model / effort readout. */
+  .runtime-readout {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  /* @ds slot: readout-label */
+  .runtime-readout-label {
+    color: var(--ink-muted);
+    font-size: 0.65rem;
+    font-weight: 650;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  /* @ds slot: readout-value */
+  .runtime-readout-value {
+    color: var(--ink-secondary);
+    font-weight: 620;
+  }
+
+  /* @ds surface: effort-trigger — opens the shared model/effort sheet. */
+  /* @ds state: default */
+  :global(.runtime-effort-trigger) {
+    display: inline-flex;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    align-items: center;
+    gap: 0.35rem;
+    padding-inline: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink-secondary);
+    cursor: pointer;
+  }
+
+  /* @ds state: hover */
+  :global(.runtime-effort-trigger[data-hovered]) {
+    background: var(--surface-muted);
+  }
+
+  /* @ds state: focus-visible */
+  :global(.runtime-effort-trigger[data-focus-visible]) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  /* @ds end surface: effort-trigger */
+
+  /* @ds surface: build-plan-toggle — the Build / Plan segmented toggle. */
+  :global(.runtime-control.runtime-mode) {
+    display: inline-flex;
+    padding: 0.2rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+  }
+
+  /* @ds state: default */
+  :global(.runtime-mode .react-aria-ToggleButton) {
+    min-block-size: 2rem;
+    padding-inline: 0.7rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+    font-weight: 620;
+    cursor: pointer;
+  }
+
+  /* @ds state: selected */
+  :global(.runtime-mode .react-aria-ToggleButton[data-selected]) {
+    background: var(--ink);
+    color: var(--ink-inverse);
+  }
+
+  /* @ds state: disabled */
+  :global(.runtime-mode .react-aria-ToggleButton[data-disabled]) {
+    cursor: default;
+    opacity: 0.5;
+  }
+  /* @ds end surface: build-plan-toggle */
+
+  /* @ds slot: status — applied runtime status hint. */
+  .runtime-status {
+    min-block-size: 1rem;
+    white-space: nowrap;
+  }
+  /* @ds end surface: runtime-strip */
+</style>

@@ -11,7 +11,6 @@
 </script>
 
 <script lang="ts">
-  import './assistant-actions.css';
   // ───────────────────────────────────────────────────────────────────
   // 1. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -99,7 +98,45 @@
   </div>
 {/if}
 
-<!-- @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. Decomposed into this co-located CSS file;
+<!-- @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. Decomposed into this scoped block;
      turn-actions / turn-action and their hover/focus-visible states are owned solely
      by this component so they move with it. Native div/button elements stay scoped. Values
      unchanged. -->
+<style>
+  /* Under-answer action row — quiet monochrome, like the Claude app. */
+  /* @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. */
+  .turn-actions {
+    display: flex;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+
+  /* @ds slot: action — a Copy / Share answer button. */
+  .turn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2rem;
+    padding: 0.3rem 0.6rem;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    font-weight: 550;
+    cursor: pointer;
+  }
+
+  /* @ds state: hover */
+  .turn-action:hover {
+    background: var(--surface-muted);
+    color: var(--ink-secondary);
+  }
+
+  /* @ds state: focus-visible */
+  .turn-action:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  /* @ds end surface: turn-actions */
+</style>

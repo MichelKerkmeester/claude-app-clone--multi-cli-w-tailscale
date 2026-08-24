@@ -54,10 +54,10 @@ const HOST_STATE: RuntimeStateDto = {
 // (reduced-motion overrides, text-size-adjust) live in app.css. Each assertion
 // is repointed to its owning source with the same rule text/values.
 const SHEET_CSS = normalizeSvelteCss(
-  readFileSync('app-mobile/src/pages/chat/chrome/sheet-model-effort.css', 'utf8'),
+  readFileSync('app-mobile/src/pages/chat/chrome/sheet-model-effort.svelte', 'utf8'),
 );
 const EFFORT_CSS = normalizeSvelteCss(
-  readFileSync('app-mobile/src/pages/chat/chrome/radio-effort.css', 'utf8'),
+  readFileSync('app-mobile/src/pages/chat/chrome/radio-effort.svelte', 'utf8'),
 );
 const APP_CSS = readFileSync('app-mobile/src/app.css', 'utf8');
 

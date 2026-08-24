@@ -29,8 +29,6 @@
   import { messageFrom } from '$shared/format/view-helpers.js';
   import Button from '$shared/primitives/button/button.svelte';
 
-  import './screen-enrollment.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -116,7 +114,7 @@
   </section>
 </main>
 
-<!-- @ds surface: enrollment-view — first-run device binding. Decomposed into this co-located CSS file;
+<!-- @ds surface: enrollment-view — first-run device binding. Decomposed into this scoped block;
      enrollment-view / enrollment-card / surface-symbol / scan-button / enrollment-actions are owned
      solely by this component so they move with it. The .enrollment-actions button child-primitive
      selectors and their shared grouped/state overrides (composer/approval/push)
@@ -124,3 +122,129 @@
      only the enrollment-specific button rules would diverge from the original cascade. .surface-kicker
      (shared by review/home/inbox/plan surfaces), .barrier-note (shared by the session surface), and
      .inline-alert (shared by the composer) are shared by 2+ components and stay global. Values unchanged. -->
+<style>
+  /* @ds surface: enrollment-view — first-run device binding. */
+  /* @ds edit: layout — full-frame centring + safe gutters. */
+  /* @ds state: idle · busy · error · authenticating — binding lifecycle. */
+  .enrollment-view {
+    display: grid;
+    min-height: calc(100dvh - 4.25rem);
+    padding: clamp(1rem, 6vw, 4rem) var(--page-gutter);
+    place-items: center;
+  }
+
+  .enrollment-card {
+    width: min(100%, 42rem);
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    border-radius: var(--radius-lg);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-raised);
+  }
+
+  /* @ds slot: symbol — the π mark. */
+  .surface-symbol {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--space-8);
+    place-items: center;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  .enrollment-card h1 {
+    max-width: 11ch;
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(2.7rem, 8vw, 4.8rem);
+    font-weight: 620;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .enrollment-card > p:not(.surface-kicker) {
+    max-width: 34rem;
+    margin: var(--space-6) 0;
+    color: var(--ink-secondary);
+    line-height: 1.65;
+  }
+
+  .enrollment-card > label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-size: 0.78rem;
+    font-weight: 680;
+  }
+
+  .enrollment-card textarea {
+    width: 100%;
+    min-height: 8rem;
+    resize: vertical;
+    padding: var(--space-4);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.55;
+  }
+
+  /* @ds slot: actions — scan + enroll controls. */
+  .enrollment-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  /* .enrollment-actions button, .scan-button base — split: the button
+     child-primitive part stays global (see header comment); the scan-button own-element part
+     moves here scoped. */
+  .scan-button {
+    display: inline-flex;
+    min-height: 2.9rem;
+    align-items: center;
+    justify-content: center;
+    padding-inline: var(--space-4);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .scan-button input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  @media (max-width: 39rem) {
+    .enrollment-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .scan-button {
+      width: 100%;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .scan-button {
+      min-height: 44px;
+    }
+  }
+  /* @ds end surface: enrollment-view */
+</style>

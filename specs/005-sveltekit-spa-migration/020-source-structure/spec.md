@@ -5,7 +5,7 @@ contextType: "planning"
 _memory:
   continuity:
     packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure"
-    last_updated_at: "2026-08-24T06:40:00Z"
+    last_updated_at: "2026-08-24T18:35:59Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Phase parent scoped; three children created."
     next_safe_action: "Run 001-css-ownership: move the 82 single-owner classes into their components."
@@ -64,7 +64,8 @@ reference scan and a loading dispatch — and mixing them would blur which gate 
 |---|---|---|
 | A | `001-css-ownership` | Move the 82 single-owner classes from `app.css` into their components' scoped `<style>`, prop-classes via `:global()`. `app.css` keeps tokens, theme, resets and the 44 shared classes. |
 | B | `002-comment-structure` | Standardise the Svelte section-comment vocabulary and order across components; comment-only, no value change. |
-| C | `003-skill-update` | Teach the `app.css` ownership rule and the section vocabulary in `sk-code-mobile-cli`; merge to the live skill line. |
+| C | `003-css-files` | Extract each component's `<style>` into a co-located `.css` file it imports, browsable per component; the sk-code skill doc landed separately as a merged Public PR. |
+| D | `004-styles-into-svelte` | Fold the component CSS back into scoped `<style>` — one file per component again; `app.css` stays the global layer. |
 <!-- /ANCHOR:phases -->
 
 ---

@@ -45,8 +45,6 @@
   import SheetContent from '$shared/primitives/sheet/sheet-content.svelte';
   import SheetTitle from '$shared/primitives/sheet/sheet-title.svelte';
 
-  import './sheet-plan-review.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -297,9 +295,280 @@
   </Sheet>
 {/if}
 
-<!-- @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. Decomposed into this co-located CSS file;
+<!-- @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. Decomposed into this scoped block;
      plan-review-sheet owned rules and this sheet's owned members of shared ready/review pairs move with it.
      Grouped plan-ready-* siblings stay global (plan-ready-card). The system-wide
      prefers-reduced-motion group that includes .plan-review-modal stays global (shared with
      2+ surfaces). Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->
+<style>
+  /* @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. */
+  /* @ds surface: overlay — plan-review-sheet is an INSTANCE of the shared overlay
+     primitive (backdrop → raised panel → grabber → header/body/footer).
+     Physical unification of the per-surface overlay chrome is a documented follow-up. */
+  /* @ds guardrail: do-not-edit — The review sheet is the only atomic execute path; dismissal and execute-authority semantics live in the component logic. Edit look and motion only. */
+  /* @ds slot: overlay — fixed scrim + centring.
+     @ds edit: layout — z-index 100 keeps it above every mode surface. */
+  :global(.plan-review-overlay) {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    background: color-mix(in srgb, var(--ink) 58%, transparent);
+  }
+
+  /* @ds slot: modal — bottom-docked sheet + entry motion. */
+  /* @ds slot: panel — the Modal raised surface. */
+  /* @ds state: opening · open — entry fade/rise, then rest. */
+  .plan-review-modal {
+    inline-size: min(100%, 44rem);
+    max-block-size: 100dvh;
+    margin-inline: auto;
+    overflow: auto;
+    background: var(--surface-raised);
+    color: var(--ink);
+    animation: plan-review-in 180ms ease-out;
+  }
+
+  /* @ds slot: dialog — scroll column + safe-area gutters. */
+  .plan-review-dialog {
+    display: grid;
+    min-block-size: 100%;
+    align-content: start;
+    gap: var(--space-6);
+    padding: max(var(--space-6), env(safe-area-inset-top))
+      max(var(--space-6), env(safe-area-inset-right)) max(var(--space-6), env(safe-area-inset-bottom))
+      max(var(--space-6), env(safe-area-inset-left));
+    outline: none;
+  }
+
+  /* @ds slot: grabber — swipe-dismiss handle. */
+  .plan-review-grabber {
+    inline-size: 2.25rem;
+    block-size: 0.25rem;
+    justify-self: center;
+    border-radius: 999px;
+    background: var(--ink-muted);
+    opacity: 0.7;
+  }
+
+  /* @ds slot: header — title + check mark; shared with plan-review-sheet. */
+  .plan-review-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  /* @ds slot: kicker — shared section eyebrow pair; shared with plan-review-sheet. */
+  .plan-review-header .surface-kicker {
+    margin-bottom: var(--space-2);
+  }
+
+  /* @ds slot: title — display serif cap; shared with plan-review-sheet. */
+  :global(.plan-review-title) {
+    max-inline-size: 30ch;
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 4vw, 1.7rem);
+    font-weight: 400;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  /* @ds slot: revision — mono pill. */
+  .plan-review-revision {
+    flex: 0 0 auto;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 650;
+  }
+
+  /* @ds slot: content — summary + details. */
+  .plan-review-content {
+    display: grid;
+    gap: var(--space-6);
+    min-block-size: 0;
+    padding-block-end: var(--space-6);
+    border-block-end: 1px solid var(--line);
+  }
+
+  /* @ds slot: summary — plain prose; shared with plan-review-sheet. */
+  .plan-review-summary {
+    margin: 0;
+    color: var(--ink-secondary);
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  /* @ds slot: meta — revision / steps / published grid; shared with plan-review-sheet. */
+  .plan-review-details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  /* @ds slot: meta-cell — one fact; shared with plan-review-sheet. */
+  .plan-review-details > div {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  /* @ds slot: meta-label — dt; shared with plan-review-sheet. */
+  .plan-review-details dt {
+    color: var(--ink-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* @ds slot: meta-value — dd; shared with plan-review-sheet. */
+  .plan-review-details dd {
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+  }
+
+  /* @ds slot: actions — keep · revise · leave · execute rail. */
+  .plan-review-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  /* @ds state: review CTA — shared pill chrome for the ready card and review sheet. */
+  :global(.plan-review-safe),
+  :global(.plan-review-revise),
+  :global(.plan-review-leave),
+  :global(.plan-review-execute) {
+    min-block-size: 44px;
+    padding-inline: var(--space-4);
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  /* @ds state: non-executing actions — keep · revise · leave. */
+  :global(.plan-review-safe),
+  :global(.plan-review-revise),
+  :global(.plan-review-leave) {
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--ink);
+  }
+
+  /* @ds state: execute CTA — the atomic execute path. */
+  :global(.plan-review-execute) {
+    border: 0;
+    background: var(--action-bg);
+    color: var(--action-fg);
+  }
+
+  /* @ds state: executing — execute CTA disabled while the execution lease is in flight. */
+  :global(.plan-review-execute[data-disabled]) {
+    cursor: wait;
+    opacity: 0.55;
+  }
+
+  /* @ds state: hover — non-executing actions. */
+  :global(.plan-review-safe[data-hovered]),
+  :global(.plan-review-revise[data-hovered]),
+  :global(.plan-review-leave[data-hovered]) {
+    background: var(--surface-muted);
+  }
+
+  /* @ds state: hover — execute CTA. */
+  :global(.plan-review-execute[data-hovered]) {
+    opacity: 0.82;
+  }
+
+  /* @ds end surface: plan-review-sheet */
+
+  /* @ds edit: motion — review-sheet entry. */
+  @keyframes plan-review-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* @ds edit: layout — narrow reflow of the ready card and review sheet. */
+  @media (max-width: 24rem) {
+    .plan-review-details,
+    .plan-review-actions {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* @ds edit: layout — viewport-height cap for the review sheet. */
+  .plan-review-modal {
+    max-block-size: 100svh;
+    max-block-size: 100dvh;
+  }
+
+  /* @ds edit: layout — safe-area gutters for the review sheet. */
+  .plan-review-dialog {
+    padding-block-start: max(var(--space-6), env(safe-area-inset-top, 0px));
+    padding-block-end: max(var(--space-6), env(safe-area-inset-bottom, 0px));
+    padding-inline-start: max(var(--space-6), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--space-6), env(safe-area-inset-right, 0px));
+  }
+
+  /* @ds edit: layout — wrap handling for the card/sheet headers. */
+  .plan-review-header {
+    min-inline-size: 0;
+    flex-wrap: wrap;
+  }
+
+  .plan-review-header > div {
+    min-inline-size: 0;
+  }
+
+  /* @ds edit: layout — bidi + wrap for the card/sheet text. */
+  :global(.plan-review-title),
+  .plan-review-summary {
+    overflow-wrap: anywhere;
+    unicode-bidi: plaintext;
+  }
+
+  /* @ds edit: layout — bidi isolation for the mono revision and ltr meta values. */
+  .plan-review-revision,
+  .plan-review-details dd[dir='ltr'] {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  /* @ds edit: layout — narrow reflow of the composer bar + ready/review card + sheets. */
+  @media (max-width: 27rem) {
+    .plan-review-details,
+    .plan-review-actions {
+      grid-template-columns: 1fr;
+    }
+
+    :global(.plan-review-safe),
+    :global(.plan-review-revise),
+    :global(.plan-review-leave),
+    :global(.plan-review-execute) {
+      inline-size: 100%;
+    }
+  }
+</style>

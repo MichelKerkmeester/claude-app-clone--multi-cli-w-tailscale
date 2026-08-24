@@ -71,10 +71,10 @@ const HOST_STATE: RuntimeStateDto = {
 // port, component-owned rules live in scoped <style> blocks. Each assertion is
 // repointed to its owning source with the same rule text/values.
 const SHEET_CSS = normalizeSvelteCss(
-  readFileSync('app-mobile/src/pages/chat/chrome/sheet-model-effort.css', 'utf8'),
+  readFileSync('app-mobile/src/pages/chat/chrome/sheet-model-effort.svelte', 'utf8'),
 );
 const HEADER_CSS = normalizeSvelteCss(
-  readFileSync('app-mobile/src/pages/chat/chrome/session-header.css', 'utf8'),
+  readFileSync('app-mobile/src/pages/chat/chrome/session-header.svelte', 'utf8'),
 );
 
 // ───────────────────────────────────────────────────────────────────

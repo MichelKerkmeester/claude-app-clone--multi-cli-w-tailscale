@@ -167,8 +167,6 @@
   } from './use-artifact-resource.svelte.js';
   import { useArtifactHistory } from './use-artifact-history.svelte.js';
 
-  import './artifact-viewer-provider.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -468,3 +466,20 @@
 
 {@render children()}
 <ArtifactViewerHost {phase} {preview} onClose={close} />
+
+<style>
+  /* @ds slot: privacy-curtain — opaque cover shown on dismissal while content unmounts. */
+  /* @ds state: privacy-covered — the curtain is fully opaque and pointer-blocking. */
+  /* @ds guardrail: do-not-edit — z-index 10000 opaque cover; the privacy invariant. */
+  :global(.artifact-viewer-privacy-curtain) {
+    position: fixed;
+    z-index: 10000;
+    inset: 0;
+    inline-size: 100vw;
+    block-size: 100svh;
+    block-size: 100dvh;
+    background: #24221f;
+    opacity: 1;
+    pointer-events: all;
+  }
+</style>

@@ -21,7 +21,6 @@
 </script>
 
 <script lang="ts">
-  import './status-pill.css';
   let { phase }: StatusPillProps = $props();
 </script>
 
@@ -32,10 +31,38 @@
   {labels[phase]}
 </span>
 
-<!-- @ds surface: status-pill — connection-phase status. Decomposed into this co-located CSS file; status-pill,
+<!-- @ds surface: status-pill — connection-phase status. Decomposed into this scoped block; status-pill,
      status-pill i and status-live are owned solely by this component so they move with it. The
      pulsing group (.status-authenticating/connecting/reconnecting i joined with .state-running /
      .agent-running .state-icon) and the error group (.status-error joined with .state-interrupted)
      are shared with the session-state surface, and the @media (max-width: 52rem) .status-pill rule
      is grouped with .wordmark-copy — those grouped selectors stay GLOBAL in app.css (unchanged)
      so their byte-for-byte structure is preserved. Values unchanged. -->
+<style>
+  /* @ds surface: status-pill — connection-phase status. */
+  .status-pill {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.45rem;
+    padding-inline: var(--space-3);
+    color: var(--ink-muted);
+    font-size: 0.7rem;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  /* @ds slot: dot */
+  .status-pill i {
+    width: 0.48rem;
+    height: 0.48rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* @ds state: live */
+  .status-live {
+    color: var(--success);
+  }
+  /* @ds end surface: status-pill */
+</style>

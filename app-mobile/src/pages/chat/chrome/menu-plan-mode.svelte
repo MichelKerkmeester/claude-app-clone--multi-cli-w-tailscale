@@ -37,8 +37,6 @@
   import MenuContent from '$shared/primitives/menu/menu-content.svelte';
   import MenuItem from '$shared/primitives/menu/menu-item.svelte';
 
-  import './menu-plan-mode.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -150,7 +148,93 @@
     {/if}
 </MenuContent>
 
-<!-- @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. Decomposed into this co-located CSS file;
+<!-- @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. Decomposed into this scoped block;
      plan-mode-popover / plan-mode-row are child primitives (MenuContent / MenuItem) so they move
      with this surface. Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->
+<style>
+  /* The two-row mode menu: focus movement only, activation alone reports. */
+  /* @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. */
+  /* @ds slot: popover — floating placement chrome + raised elevation. */
+  /* @ds surface: overlay — plan-mode-popover is an INSTANCE of the shared overlay
+     primitive (a raised panel over its anchored trigger). Physical unification
+     of the per-surface overlay chrome is a documented follow-up. */
+  :global(.plan-mode-popover) {
+    min-inline-size: min(88vw, 18rem);
+    padding: var(--space-1);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-raised);
+    outline: none;
+  }
+
+  /* @ds slot: menu — list column for the two rows. */
+  .plan-mode-menu {
+    display: grid;
+    gap: 2px;
+    padding: 0;
+    outline: none;
+  }
+
+  /* @ds slot: row — a Build or Plan choice; selection gating is authority-driven. */
+  :global(.plan-mode-row) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 var(--space-3);
+    min-block-size: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--ink);
+    font-size: 0.9rem;
+    font-weight: 620;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  /* @ds state: row · focused — move-only, never a selection. */
+  :global(.plan-mode-row[data-focused]) {
+    background: var(--surface-muted);
+    outline: none;
+  }
+
+  /* @ds state: row · focus-visible */
+  :global(.plan-mode-row[data-focus-visible]) {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+
+  /* @ds state: row · disabled — selection unsafe (executing) or already current. */
+  :global(.plan-mode-row[data-disabled]) {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  /* @ds slot: row-description — bounded local copy under the row label. */
+  :global(.plan-mode-row .react-aria-Text[slot='description']) {
+    grid-column: 1;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  /* @ds state: row · selected — the ✓ on the confirmed mode's row. */
+  :global(.plan-mode-row > svg) {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    color: var(--accent-ink);
+  }
+
+  /* @ds slot: note — bounded reason when a row cannot be chosen. */
+  .plan-mode-menu-note {
+    margin: var(--space-2) var(--space-3) var(--space-1);
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+  /* @ds end surface: plan-mode-menu */
+</style>

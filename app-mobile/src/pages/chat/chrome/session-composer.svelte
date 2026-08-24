@@ -101,8 +101,6 @@
   import { createPlanModeShortcut } from '$shared/commands/plan-mode-shortcut.js';
   import Button from '$shared/primitives/button/button.svelte';
 
-  import './session-composer.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -813,10 +811,229 @@
   </svg>
 {/snippet}
 
-<!-- @ds surface: composer — the input island. Decomposed into this co-located CSS file; the composer-region /
+<!-- @ds surface: composer — the input island. Decomposed into this scoped block; the composer-region /
      composer-disclaimer / composer-input / composer-bar / composer-left / composer-right /
      attachment-draft-message owned rules move with it. Child-primitive classes
      (composer-tray / composer-primary / composer-later / composer-spinner) and the shared 44px
      target / prefers-contrast / forced-colors / reduced-motion / clay-override / safe-area
      groups stay GLOBAL in app.css (they are shared grouped selectors — moving them into scope
      would reverse the cascade against those global overrides). Values unchanged. -->
+<style>
+  /* @ds state: promptError — inline-alert rendered above the tray (shared error surface). */
+  /* @ds edit: layout — sticky bottom-anchor + canvas fade; the keyboard-anchor
+     --visual-viewport-height var feeds the anchor and stays the layout input. */
+  /* @ds guardrail: do-not-edit — presentation of the viewer-open state; keep the blur/inert pair. */
+  .composer-region {
+    position: sticky;
+    z-index: 5;
+    bottom: 0;
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    padding-inline-start: max(var(--space-3), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--space-3), env(safe-area-inset-right, 0px));
+    background: linear-gradient(to top, var(--canvas) 66%, transparent);
+  }
+
+  /* @ds surface: composer — the input island. */
+  /* @ds edit: layout — tray geometry; safe gutters are token-driven. */
+  .composer-tray {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+    border: 1px solid var(--line-strong);
+    border-radius: 1.75rem;
+    background: var(--surface);
+    box-shadow: var(--shadow-raised);
+  }
+
+  /* Dashed Plan outline: host-confirmed only; execution is solid. */
+  .composer-tray.is-plan-mode {
+    border-style: dashed;
+    border-color: var(--line-strong);
+  }
+
+  .composer-tray.is-executing-mode {
+    border-color: var(--line-strong);
+  }
+
+  /* ── Installed-PWA safe-area hardening ───────────────────────────────
+     With viewport-fit=cover the layout extends under the notch and rounded
+     corners in landscape; interactive islands keep clear of the insets while
+     portrait (all-zero insets) renders exactly as before. */
+  .composer-tray {
+    margin-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
+  }
+
+  .composer-tray {
+    min-inline-size: 0;
+    margin-inline-start: max(0px, env(safe-area-inset-left, 0px));
+    margin-inline-end: max(0px, env(safe-area-inset-right, 0px));
+  }
+
+  .composer-disclaimer {
+    margin: 0;
+    padding-inline: var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  /* @ds slot: input — the single editing field; colour/type stay token-driven. */
+  .composer-input {
+    width: 100%;
+    min-height: 1.75rem;
+    max-height: 140px;
+    padding: var(--space-2) var(--space-2) var(--space-1);
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    resize: none;
+  }
+
+  .composer-input:focus {
+    outline: none;
+  }
+
+  /* @ds state: awaitingSnapshot · sendingPrompt · slashSubmitting — the input is
+     disabled while the composer is busy or syncing (plus a non-live connection). */
+  .composer-input:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .composer-input::placeholder {
+    color: var(--ink-muted);
+  }
+
+  .composer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .composer-left,
+  .composer-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .attachment-draft-message {
+    margin: 0;
+    padding-inline: var(--space-2);
+    color: var(--ink-muted);
+    font-family: var(--font-display);
+    font-size: 0.84rem;
+    line-height: 1.35;
+  }
+
+  /* @ds slot: primary-action — the single circular morphing disc (send/steer/sending).
+     The class is passed to the Button primitive, so Svelte cannot hash it → :global. */
+  :global(.composer-primary) {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+      background var(--duration-state, 120ms) var(--ease-out, ease),
+      opacity var(--duration-state, 120ms) var(--ease-out, ease);
+  }
+
+  /* @ds state: send · steer — the morphing primary disc; steer shares this form. */
+  :global(.composer-primary.is-send) {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  :global(.composer-primary.is-send[data-hovered]) {
+    background: var(--accent-strong);
+  }
+
+  /* @ds state: stop — the interrupt disc for a running turn. */
+  :global(.composer-primary.is-stop) {
+    background: var(--action-bg);
+    color: var(--action-fg);
+  }
+
+  /* @ds state: stopping · sending-inhibit — the disc's disabled affordance. */
+  :global(.composer-primary[data-disabled]) {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  :global(.composer-primary[data-focus-visible]) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* @ds state: later — the secondary "send after this turn" affordance (Button primitive → :global). */
+  :global(.composer-later) {
+    min-height: 2.25rem;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-secondary);
+    font-size: 0.85rem;
+    font-weight: 550;
+    cursor: pointer;
+  }
+
+  :global(.composer-later[data-disabled]) {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  /* @ds surface: spinner — shared inline pending/busy indicator. */
+  /* @ds state: sending · slashSubmitting — the disc's busy form.
+     The SpinnerGlyph <svg> is rendered by this component → normally scoped. */
+  .composer-spinner {
+    animation: composer-spin 0.8s linear infinite;
+  }
+
+  /* @ds guardrail: reduced-motion keeps the shared spinner static — Never remove. */
+  @media (prefers-reduced-motion: reduce) {
+    .composer-spinner {
+      animation: none;
+    }
+  }
+
+  /* Narrow widths give the mode control its own toolbar row above the
+     textarea: the left group wraps so the label never truncates Plan ·
+     read-only and the primary action stays on the first row. */
+  @media (max-width: 400px) {
+    .composer-bar {
+      flex-wrap: wrap;
+      row-gap: var(--space-1);
+    }
+
+    .composer-left {
+      flex-wrap: wrap;
+      row-gap: var(--space-1);
+    }
+  }
+
+  /* @ds edit: layout — narrow reflow of the composer bar + ready/review card + sheets. */
+  @media (max-width: 27rem) {
+    .composer-bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    .composer-left {
+      min-inline-size: 0;
+      flex-wrap: wrap;
+    }
+  }
+</style>

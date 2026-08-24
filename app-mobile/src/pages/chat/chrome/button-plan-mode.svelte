@@ -36,8 +36,6 @@
   import MenuTrigger from '$shared/primitives/menu/menu-trigger.svelte';
   import PlanModeMenu from './menu-plan-mode.svelte';
 
-  import './button-plan-mode.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -211,7 +209,125 @@
   </svg>
 {/snippet}
 
-<!-- @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. Decomposed into this co-located CSS file;
+<!-- @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. Decomposed into this scoped block;
      plan-mode-button / plan-mode-label are owned solely by this component so they move with it.
      Child-primitive classes and react-aria/runtime data-attributes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->
+<style>
+  /* ── Persistent Plan mode control (immediately after "+") ────────────
+     One 44px tab stop with a host-confirmed label. Plan is conveyed
+     redundantly (lock glyph + words), never by clay alone. */
+  /* @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. */
+  /* @ds state: chart — the ModePresentationKind set. The default chrome carries
+     checking · build · running · stale · offline · forbidden · unsupported ·
+     extension-error · delivery-unknown · unavailable; plan / executing / applying
+     have dedicated states below. Disabling is driven by the fail-closed
+     presentation kind, never by this class. */
+  /* @ds state: default */
+  :global(.plan-mode-button) {
+    display: inline-flex;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding-inline: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink-secondary);
+    font-size: 0.85rem;
+    font-weight: 620;
+    line-height: 1.2;
+    cursor: pointer;
+    transition:
+      background var(--duration-fast, 120ms) var(--ease-out, ease),
+      color var(--duration-fast, 120ms) var(--ease-out, ease),
+      border-color var(--duration-fast, 120ms) var(--ease-out, ease);
+  }
+
+  /* @ds state: hover · pressed */
+  :global(.plan-mode-button[data-hovered]),
+  :global(.plan-mode-button[data-pressed]) {
+    background: var(--surface-muted);
+  }
+
+  /* @ds state: focus-visible */
+  :global(.plan-mode-button[data-focus-visible]) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* @ds state: disabled */
+  :global(.plan-mode-button[data-disabled]) {
+    cursor: default;
+    opacity: 0.85;
+  }
+
+  /* @ds state: plan — host-confirmed Plan; lock glyph + words, never clay alone. */
+  :global(.plan-mode-button.is-plan) {
+    border-color: var(--line-strong);
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+
+  /* @ds state: plan · hover · pressed */
+  :global(.plan-mode-button.is-plan[data-hovered]),
+  :global(.plan-mode-button.is-plan[data-pressed]) {
+    background: var(--accent-soft);
+  }
+
+  /* @ds state: executing — plan execution in progress; rows stay disabled. */
+  :global(.plan-mode-button.is-executing) {
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  /* @ds state: applying — a mode change is in flight. */
+  :global(.plan-mode-button.is-applying) .plan-mode-label {
+    color: var(--ink-muted);
+  }
+
+  /* @ds slot: label — bounded, ellipsis-capped visible label. */
+  .plan-mode-label {
+    max-inline-size: 11rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* @ds end surface: plan-mode-button */
+
+  /* Narrow widths give the mode control its own toolbar row above the
+     textarea: the left group wraps so the label never truncates Plan ·
+     read-only and the primary action stays on the first row. */
+  @media (max-width: 400px) {
+    :global(.plan-mode-button) {
+      flex: 1 1 auto;
+    }
+
+    .plan-mode-label {
+      max-inline-size: none;
+    }
+  }
+
+  /* @ds slot: label — lets the button label shrink; see plan-mode-button. */
+  .plan-mode-label {
+    min-inline-size: 0;
+  }
+
+  /* @ds edit: layout — narrow reflow of the composer bar + ready/review card + sheets. */
+  @media (max-width: 27rem) {
+    :global(.plan-mode-button) {
+      min-inline-size: 44px;
+      flex: 1 1 9rem;
+    }
+
+    .plan-mode-label {
+      max-inline-size: none;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+</style>

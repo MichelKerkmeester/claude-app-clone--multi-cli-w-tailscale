@@ -63,8 +63,6 @@
   import { useCopyFeedback } from './use-copy-feedback.svelte.js';
   import { hover } from '$shared/primitives/a11y/interactions.js';
 
-  import './card-command-output.css';
-
   interface Props {
     block: NormalizedCommandBlock;
     onOpen?: (trigger?: HTMLButtonElement | null) => void;
@@ -222,3 +220,51 @@
   <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
   <p class="rich-copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
+
+<style>
+  /* @ds surface: command-output-card — Bash command + output preview with unit
+     Copy and a full-screen Open handoff. */
+  /* @ds slot: output — vertical spacing between the command and output regions. */
+  .rich-command-region + .rich-command-region {
+    margin-block-start: var(--space-4);
+  }
+
+  /* @ds slot: output-heading — Output title + earlier-lines-clipped count row. */
+  .rich-command-region-heading {
+    justify-content: space-between;
+    margin-block-end: var(--space-2);
+  }
+
+  /* @ds slot: label — Command / Output region subheadings. */
+  .rich-command-region h4 {
+    font-size: 0.8125rem;
+  }
+
+  /* @ds slot: output-preview — tail-window preview of command output. */
+  .rich-output-preview {
+    block-size: 8.5rem;
+    contain: content;
+  }
+
+  /* @ds slot: labels — clipped-count and output-meta share muted small type. */
+  .rich-clipped-count {
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+  }
+
+  .rich-output-meta {
+    margin: var(--space-2) 0 0;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+  }
+
+  /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
+     polite live region whose text carries the outcome; the presence styles are this. */
+  /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
+  .rich-copy-status {
+    min-block-size: 1.25rem;
+    margin: var(--space-2) 0 0;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+  }
+</style>

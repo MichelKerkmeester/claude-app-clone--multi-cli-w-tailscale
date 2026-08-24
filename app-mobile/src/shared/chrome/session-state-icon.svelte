@@ -11,7 +11,6 @@
 </script>
 
 <script lang="ts">
-  import './session-state-icon.css';
   let { status }: SessionStateIconProps = $props();
 </script>
 
@@ -21,7 +20,7 @@
   {status === 'idle' ? '✓' : status === 'running' ? '•' : status === 'interrupted' ? '!' : '?'}
 </span>
 
-<!-- @ds surface: session-state-icon — per-session status glyph. Decomposed into this co-located CSS file; the
+<!-- @ds surface: session-state-icon — per-session status glyph. Decomposed into this scoped block; the
      .state-icon slot is owned solely by this component (it renders the span directly) so it moves
      with it. The pulsing group (.state-running .state-icon and .agent-running .state-icon, joined
      with .status-authenticating/connecting/reconnecting i) and the .state-running / .state-idle /
@@ -29,3 +28,18 @@
      the state-X wrapper — those grouped selectors stay GLOBAL in app.css (unchanged) so their
      byte-for-byte structure is preserved and the global ancestor rules still reach this scoped
      .state-icon at runtime. Values unchanged. -->
+<style>
+  /* @ds slot: icon */
+  .state-icon {
+    display: inline-grid;
+    width: 1.25rem;
+    height: 1.25rem;
+    place-items: center;
+    border-radius: 50%;
+    background: currentColor;
+    color: var(--surface);
+    font-size: 0.72rem;
+    line-height: 1;
+  }
+  /* @ds end surface: session-state-icon */
+</style>

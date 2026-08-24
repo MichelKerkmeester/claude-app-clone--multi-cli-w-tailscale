@@ -142,7 +142,6 @@
 </script>
 
 <script lang="ts">
-  import './markdown-preview.css';
   // ───────────────────────────────────────────────────────────────────
   // 3. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -175,9 +174,98 @@
   <article class="artifact-markdown-preview" aria-label={ariaLabel} dir="auto" data-display-buffer="true" data-find-term={findTerm || undefined}>{#each blocks as block, index (index)}{#if block.kind === 'heading'}<svelte:element this={`h${block.level}`}>{@render inline(parseInline(block.text))}</svelte:element>{:else if block.kind === 'paragraph'}<p>{@render inline(parseInline(block.lines.join('\n')))}</p>{:else if block.kind === 'quote'}<blockquote>{@render inline(parseInline(block.lines.join('\n')))}</blockquote>{:else if block.kind === 'list'}<svelte:element this={block.ordered ? 'ol' : 'ul'}>{#each block.items as item, itemIndex (itemIndex)}<li>{@render inline(parseInline(item))}</li>{/each}</svelte:element>{:else if block.kind === 'code'}<pre class="artifact-markdown-code"><code>{block.text}</code></pre>{:else if block.kind === 'rule'}<hr />{/if}{/each}</article>
 {/if}
 
-<!-- @ds surface: artifact-markdown-preview — the bounded safe-Markdown render well. Decomposed into this co-located CSS file.
+<!-- @ds surface: artifact-markdown-preview — the bounded safe-Markdown render well. Decomposed into this scoped block.
      The markdown blocks render via svelte:element / renderer constructs, so the descendant
      tag rules use :global(tag) (faithful — same reach; prune-proof). Links render as inert spans, so the
      defensive .artifact-markdown-preview a rule is kept via :global(a). Dark re-inks use
      :global(:root[data-theme='dark']). The shared .artifact-empty-preview stays global. Literal hex
      preserved. Values unchanged. -->
+<style>
+  /* @ds slot: markdown-well — the bounded safe-Markdown render surface. */
+  /* @ds guardrail: do-not-edit — Bounded reading well; selectable; links/images render inert. */
+  .artifact-markdown-preview {
+    max-inline-size: 100%;
+    max-block-size: 100%;
+    overflow: auto;
+    color: #24221f;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    line-height: 1.65;
+    text-align: start;
+    user-select: text;
+    unicode-bidi: plaintext;
+    padding: 0.25rem 0.1rem;
+  }
+
+  /* @ds slot: markdown-block — shared block spacing for rendered prose blocks (dynamic elements). */
+  .artifact-markdown-preview :global(p),
+  .artifact-markdown-preview :global(h1),
+  .artifact-markdown-preview :global(h2),
+  .artifact-markdown-preview :global(h3),
+  .artifact-markdown-preview :global(h4),
+  .artifact-markdown-preview :global(h5),
+  .artifact-markdown-preview :global(h6),
+  .artifact-markdown-preview :global(blockquote),
+  .artifact-markdown-preview :global(ul),
+  .artifact-markdown-preview :global(ol) {
+    max-inline-size: 100%;
+    margin-block: 0 1rem;
+    overflow-wrap: anywhere;
+  }
+
+  /* @ds slot: markdown-quote — blockquote inset rule. */
+  .artifact-markdown-preview :global(blockquote) {
+    margin-inline: 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 3px solid #d97757;
+    color: #6c6a65;
+  }
+
+  /* @ds slot: markdown-anchor — defensive anchor styling (links render as inert spans; kept faithful). */
+  .artifact-markdown-preview :global(a) {
+    color: #8a452f;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  /* @ds slot: markdown-code — fenced code block. */
+  .artifact-markdown-code {
+    overscroll-behavior: contain;
+    overflow-anchor: none;
+    user-select: text;
+    -webkit-user-select: text;
+    background: #24221f;
+    color: #f8f8f6;
+    max-inline-size: 100%;
+    margin: 0 0 1rem;
+    overflow: auto;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    white-space: pre;
+  }
+
+  /* @ds slot: markdown-link — inert link span. */
+  .artifact-markdown-link {
+    color: #8a452f;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  /* @ds slot: markdown-image — inert image placeholder. */
+  .artifact-markdown-image {
+    color: #6c6a65;
+    font-style: italic;
+  }
+
+  /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
+  :global(:root[data-theme='dark']) .artifact-markdown-image {
+    color: #9f998f;
+  }
+
+  :global(:root[data-theme='dark']) .artifact-markdown-link {
+    color: #f0b19a;
+  }
+</style>

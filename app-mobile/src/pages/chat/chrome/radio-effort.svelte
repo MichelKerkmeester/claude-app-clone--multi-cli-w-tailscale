@@ -35,8 +35,6 @@
   import RadioGroup from '$shared/primitives/choice/radio-group.svelte';
   import RadioGroupItem from '$shared/primitives/choice/radio-group-item.svelte';
 
-  import './radio-effort.css';
-
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -181,7 +179,132 @@
   {/each}
 </RadioGroup>
 
-<!-- @ds slot: effort-group — the controlled list of effort radio rows. Decomposed into this co-located CSS file;
+<!-- @ds slot: effort-group — the controlled list of effort radio rows. Decomposed into this scoped block;
      effort-radio-group / effort-radio-row and their states are owned solely by this component so they
      move with it. Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->
+<style>
+  /* @ds slot: effort-group — the controlled list of effort radio rows. */
+  /* @ds state: group aria-busy — while a set-thinking-level mutation is in flight the
+     group is read-only (still focusable) and marked busy. */
+  :global(.effort-radio-group) {
+    display: grid;
+    min-inline-size: 0;
+    gap: 2px;
+    outline: none;
+  }
+
+  :global(.effort-radio-row) {
+    display: grid;
+    min-inline-size: 0;
+    min-block-size: 44px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem var(--space-2);
+    align-content: center;
+    padding-block: 0.5rem;
+    padding-inline: var(--space-3);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    color: var(--model-sheet-ink);
+    cursor: pointer;
+    outline: none;
+  }
+
+  :global(.effort-radio-row[data-hovered]),
+  :global(.effort-radio-row[data-focused]) {
+    background: var(--model-sheet-selection);
+  }
+
+  :global(.effort-radio-row[data-selected]) {
+    border-color: var(--model-sheet-ui-accent);
+    background: var(--model-sheet-selection);
+  }
+
+  :global(.effort-radio-row[data-focus-visible]) {
+    outline-color: var(--model-sheet-ui-accent);
+    outline-style: solid;
+    outline-width: 2px;
+    outline-offset: 2px;
+  }
+
+  /* @ds state: read-only / disabled — effort row not actionable. */
+  :global(.effort-radio-row[data-disabled]) {
+    cursor: default;
+    opacity: 0.72;
+  }
+
+  .effort-radio-row-main,
+  .effort-radio-row-states {
+    display: flex;
+    min-inline-size: 0;
+    align-items: center;
+  }
+
+  .effort-radio-row-main {
+    flex-wrap: wrap;
+    gap: 0.2rem var(--space-2);
+  }
+
+  .effort-radio-row-label {
+    overflow-wrap: anywhere;
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+
+  .effort-radio-row-states {
+    justify-content: flex-end;
+    gap: 0.35rem;
+    color: var(--model-sheet-accent);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  /* @ds state: effort-confirmed — ✓ on the settled row. */
+  .effort-state-confirmed {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+    animation: effort-check-in 120ms ease-out;
+  }
+
+  /* @ds state: effort-requested — in-flight application spinner; also the visual for
+     the group's pending-effort / aria-busy window. */
+  .effort-state-requested {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+  }
+
+  :global(.effort-spinner) {
+    animation: composer-spin 0.8s linear infinite;
+  }
+
+  .effort-radio-row-description {
+    grid-column: 1 / -1;
+    color: var(--model-sheet-muted);
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  /* Muted copy on the soft selection wash drops below 4.5:1 in the bone
+     theme, so selected/focused/hovered rows promote descriptions and IDs
+     to the ink token; the accent states column already passes there. */
+  :global(.effort-radio-row[data-hovered]) .effort-radio-row-description,
+  :global(.effort-radio-row[data-focused]) .effort-radio-row-description,
+  :global(.effort-radio-row[data-selected]) .effort-radio-row-description {
+    color: var(--model-sheet-ink);
+  }
+
+  @keyframes effort-check-in {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>

@@ -126,8 +126,26 @@
         "source": "derived"
       },
       {
+        "name": "Then Gemini",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
         "name": "No Svelte",
         "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "bounded",
+        "kind": "key_phrase",
         "path": "handover.md",
         "source": "derived"
       },
@@ -142,41 +160,23 @@
         "kind": "key_phrase",
         "path": "handover.md",
         "source": "derived"
-      },
-      {
-        "name": "no",
-        "kind": "key_phrase",
-        "path": "handover.md",
-        "source": "derived"
-      },
-      {
-        "name": "nineteen",
-        "kind": "key_phrase",
-        "path": "handover.md",
-        "source": "derived"
-      },
-      {
-        "name": "and",
-        "kind": "key_phrase",
-        "path": "handover.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "The Pi Remote mobile web app is hard to author as a designer",
     "created_at": "2026-08-19T17:23:39.714Z",
-    "last_save_at": "2026-08-23T18:52:16.416Z",
+    "last_save_at": "2026-08-24T04:45:27.372Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "handover.md"
     ],
-    "source_fingerprint": "sha256:dafcdd318967e244502a14038b60890ef62967b2651890675ef425f972ce3adb",
+    "source_fingerprint": "sha256:615df02890a7bad7dc6d8bdef188707502f18bbe980428f642a7b6bb6a388459",
     "source_doc_hashes": {
-      "spec.md": "e0e8b7af0da967b131ec6ebf752ca151be49c1f85680ddc0229e1ceba0102edf",
-      "handover.md": "7444877c639bf1a6285a29af1063e8c749cdf9a2dd1073a63d7117116832c373"
+      "spec.md": "bc799cda67ba1ca27b813cb0c81bd77036c9385580adfb7100a506345cd67ea6",
+      "handover.md": "ef8551fc1d0810c9b13517a0605e15529cabcff5dcea1d852753c52e94fe52d0"
     },
-    "last_active_child_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/007-verify-and-cutover",
+    "last_active_child_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/019-surface-skill-refresh",
     "last_active_at": null
   }
 }

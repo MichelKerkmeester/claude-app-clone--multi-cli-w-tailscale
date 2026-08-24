@@ -7,10 +7,10 @@ _memory:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration"
     last_updated_at: "2026-08-23T15:00:00Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Handover authored for the nine-packet post-cutover queue."
-    next_safe_action: "Start 015 and the 016 relay lane in parallel."
+    recent_action: "Post-cutover queue complete; all thirteen nodes at 100% and pushed."
+    next_safe_action: "None in this queue — see what a next session would pick up."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 # Handover — SvelteKit SPA migration
@@ -22,31 +22,43 @@ status and open-work sections are superseded by this file.
 
 ## 1. WHERE THINGS STAND
 
-The migration itself is **done**. Svelte is the only runtime, React is fully deleted, the cutover
-passed all nine gates and is on `origin/main`. Children `001`–`007` are complete.
+The migration and the post-cutover queue are both **done**. Svelte is the only runtime, React is
+fully deleted, and all thirteen queue nodes report complete with `validate.sh --strict` at 0 errors
+and 0 warnings. Everything is on `origin/main`.
 
-What remains is a queue of nine packets that came out of two sources: three editability complaints
-the operator raised directly (naming, comments, folder docs), and eleven ranked recommendations from
-a five-repo research sweep that an Opus-5 council then synthesised. Every one of those eleven is
-homed in a packet. None of the nine has started.
+| Packet | What shipped |
+|---|---|
+| `011-ux-affordances` | glass scroll-to-latest, and an interrupt a draft can no longer hide |
+| `012/001` · `012/002` · `012/003` | kebab-case and kind-first names across 219 files, `shared/` split by reason to change, conventions authority corrected |
+| `013-comment-grammar` | module banners and why-comments; 0 lowercase starts, 0 commented-out lines |
+| `014-folder-documentation` | every source folder documented, with a code map only where the folder earns one |
+| `015-test-lanes` | glob lane, real virtualizer, Svelte lint, reducer coverage |
+| `016/001` · `016/002` · `016/003` | projection sequencing, epoch rotation with bounded collection, foreground proof on every mutation route, heartbeat liveness, and client close classification |
+| `017-ask-question-activation` | the ask-question service constructed, connected and proved from a real route |
+| `018-transcript-affordances` | disclosure state that survives scrolling, a standing grant that is no longer a twin of the single approval, and a marker that admits a stall |
+| `019-surface-skill-refresh` | the surface skill teaching the shipped tree, merged to the live line at v1.3.0.0 |
 
-| Packet | Level | State |
-|---|---|---|
-| `011-ux-affordances` | 1 | code shipped at 90%; one operator device-confirmation outstanding |
-| `012/001-grammar-and-manifest` | 2 | **shipped** — manifest, applier, scan; primitives and chrome moved |
-| `012/002-shared-tree-split` | 2 | **shipped** — `shared/data/` dissolved into seven folders |
-| `012/003-pages-and-tooling` | 2 | next in the client lane; consumes the manifest and the kind overlay |
-| `013-comment-grammar` | 2 | scoped; blocked on 012 (same source files) |
-| `014-folder-documentation` | 2 | scoped; blocked on 012 and 013 |
-| `015-test-lanes` | 2 | **shipped** — glob lane, real virtualizer, Svelte lint, reducer coverage |
-| `016/001-projection-integrity` | 2 | projection, framing and retention **shipped**; epoch half held for the operator |
-| `016/002-route-authority` | 2 | in progress — steps 1 and 2 of 5 shipped |
-| `016/003-connection-lifecycle` | 2 | scoped; carries an operator question |
-| `017-ask-question-activation` | 2 | scoped; blocked on 016 |
-| `018-transcript-affordances` | 2 | scoped; blocked on 012, 015, 011 |
-| `019-surface-skill-refresh` | 2 | scoped; last — describes what shipped |
+**The board, re-run from the final state:** build RC 0 · typecheck 1124 files / 0 errors · `npm test`
+55 files / 401 tests RC 0 · `npm run test:web` 68 + 17 files RC 0 · token identity 0 differences
+across light, dark and system · catalog smoke 534 frames / 0 throws · runtime smoke 4 of 4 surfaces ·
+design system 390px both themes · guardrail fences 277 · folder-doc and naming scans at zero.
 
-Twenty spec folders validate `--strict` at 0 errors / 0 warnings.
+### What a next session would pick up
+
+Nothing in this queue. The things worth knowing:
+
+- **Two flakes are known and not regressions.** `auth.test.ts` races on a bound-ticket window, and
+  the pinned-Pi integration probe drives a real subprocess. The backend suite runs its files serially
+  because at 55 concurrent files that probe failed every run, asserting image bytes reached stdout —
+  a serial run of the same 55 disproves it.
+- **Reported, not absorbed:** inline-text artifact previews are undeliverable because the sanitiser
+  omits a field the type guard requires; a second cached sequence survives in
+  `projectSubmittedAttachments`; `highlight.worker.ts` carries an invalid regex escape; and the
+  ask-question handoff correlates by FIFO because the protocol carries no id.
+- **`016/001` T2.11 is closed but bounded.** Collection was rehearsed against a copy of the live
+  database, which selects nothing, because no deployed database has yet held an ended epoch. The
+  deletion branch is proved by a constructed store only, and will not meet real accumulated data
+  until a host has restarted more than ten times.
 
 ---
 

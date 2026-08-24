@@ -6,7 +6,6 @@
   "children_ids": [
     "005-sveltekit-spa-migration/020-source-structure/001-css-ownership",
     "005-sveltekit-spa-migration/020-source-structure/002-comment-structure",
-    "005-sveltekit-spa-migration/020-source-structure/003-skill-update",
     "005-sveltekit-spa-migration/020-source-structure/003-css-files",
     "005-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte"
   ],

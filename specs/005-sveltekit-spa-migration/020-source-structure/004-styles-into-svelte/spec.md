@@ -18,6 +18,8 @@ _memory:
 
 # Phase D — Styles into Svelte
 
+> **Phase links** — Parent: [`../spec.md`](../spec.md) · Predecessor: `003-css-files`
+
 ---
 
 <!-- ANCHOR:metadata -->

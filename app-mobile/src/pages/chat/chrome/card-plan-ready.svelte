@@ -3,11 +3,23 @@
   // MODULE: PLAN READY CARD
   // ───────────────────────────────────────────────────────────────────
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
 
   // @ds surface: plan-ready-card — live validated plan summary + review entry.
   // @ds guardrail: do-not-edit — isReviewablePlanArtifact gates rendering on live + newest + valid, and canReview disables the review CTA until the host binds the plan. Not designer-editable.
   const PLAN_TITLE_DISPLAY_CAP = 160;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface PlanReadyCardProps {
     readonly artifact: PlanArtifactDto | null | undefined;
@@ -20,6 +32,10 @@
     readonly onReview: () => void;
     reviewButtonRef?: HTMLButtonElement | null;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   // @ds guardrail: do-not-edit — The reviewability gate (live · newest · valid) — Not designer-editable.
   export function isReviewablePlanArtifact(
@@ -46,7 +62,15 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 5. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import Button from '$shared/primitives/button/button.svelte';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. PROPS
+  // ───────────────────────────────────────────────────────────────────
 
   let {
     artifact,
@@ -56,6 +80,10 @@
     onReview,
     reviewButtonRef = $bindable(null),
   }: PlanReadyCardProps = $props();
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
 
   const reviewable = $derived(
     isReviewablePlanArtifact(artifact, isLive, isNewest) ? artifact : null,

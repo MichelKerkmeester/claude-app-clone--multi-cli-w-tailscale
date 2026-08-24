@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ARTIFACT VIEWER PROVIDER
+  // ───────────────────────────────────────────────────────────────────
+
   import { getContext, setContext, type Snippet } from 'svelte';
   import {
     isInboundImageReadyBlock,
@@ -16,7 +20,15 @@
     InMemoryArtifactDocument,
   } from './types.js';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   const ARTIFACT_VIEWER_KEY = Symbol('pi-remote:artifact-viewer');
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   export function getArtifactViewer(): ArtifactViewerContextValue {
     const context = getContext<ArtifactViewerContextValue | null>(ARTIFACT_VIEWER_KEY);
@@ -145,7 +157,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import ArtifactViewerHost from './artifact-viewer-host.svelte';
@@ -156,7 +168,7 @@
   import { useArtifactHistory } from './use-artifact-history.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { children }: { readonly children: Snippet } = $props();
@@ -165,7 +177,7 @@
   // @ds guardrail: do-not-edit — The phase machine, dismissal choreography, generation guards, timer bookkeeping, focus/scroll restoration, and privacy-curtain lifecycle are behavioural and NOT designer-editable. Styling belongs in artifact-viewer surface blocks.
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 5. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let phase = $state<ArtifactViewerPhase>('closed');
@@ -179,7 +191,7 @@
   const history = useArtifactHistory(() => close('history'));
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. HANDLERS
+  // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function clearTimers(): void {
@@ -347,7 +359,7 @@
   }
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. EFFECTS
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => () => {

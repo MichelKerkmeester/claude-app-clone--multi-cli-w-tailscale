@@ -33,7 +33,13 @@
   let now = $state(Date.now());
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 4. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const pending = $derived(approvals.filter((approval) => approval.status === 'pending'));
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -66,7 +72,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. HANDLERS
+  // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function decide(approval: ApprovalCardDto, decision: 'approve' | 'deny'): void {
@@ -83,12 +89,6 @@
         pendingId = null;
       });
   }
-
-  // ───────────────────────────────────────────────────────────────────
-  // 6. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  const pending = $derived(approvals.filter((approval) => approval.status === 'pending'));
 </script>
 
 <!-- @ds surface: review-view — exact-action review list. States: empty · pending · expired · submitted · error. -->

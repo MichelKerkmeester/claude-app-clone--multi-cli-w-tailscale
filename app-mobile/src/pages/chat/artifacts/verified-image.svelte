@@ -1,8 +1,16 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: VERIFIED IMAGE
+  // ───────────────────────────────────────────────────────────────────
+
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
   import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
   import type { InboundImageLifecycleState } from './image-status.svelte';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface VerifiedImageProps {
     readonly block: InboundImageReadyBlock;
@@ -13,6 +21,10 @@
     readonly lifecycleState?: InboundImageLifecycleState;
     readonly onStateChange?: (state: InboundImageLifecycleState) => void;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function stateForResourceStatus(status: ArtifactResourceStatus): InboundImageLifecycleState | null {
     switch (status) {
@@ -49,11 +61,15 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { demoInboundArtifactResource, isDemoMode } from '$shared/fixtures/demo.js';
   import { useArtifactResource } from './use-artifact-resource.svelte.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. PROPS
+  // ───────────────────────────────────────────────────────────────────
 
   let {
     block,
@@ -66,7 +82,7 @@
   }: VerifiedImageProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. LOCAL STATE
+  // 5. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   // svelte-ignore state_referenced_locally
@@ -87,7 +103,23 @@
   );
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. EFFECTS
+  // 6. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const showPixels = $derived(
+    !imageFailed &&
+      resource.current.status === 'ready' &&
+      resource.current.objectUrl !== null &&
+      (lifecycleState === undefined ||
+        lifecycleState === 'inline-ready' ||
+        lifecycleState === 'full-fetching' ||
+        lifecycleState === 'stalled' ||
+        lifecycleState === 'full-degraded' ||
+        lifecycleState === 'offline-loaded'),
+  );
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -137,21 +169,6 @@
     if (next !== null) onStateChange(next);
   });
 
-  // ───────────────────────────────────────────────────────────────────
-  // 4. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  const showPixels = $derived(
-    !imageFailed &&
-      resource.current.status === 'ready' &&
-      resource.current.objectUrl !== null &&
-      (lifecycleState === undefined ||
-        lifecycleState === 'inline-ready' ||
-        lifecycleState === 'full-fetching' ||
-        lifecycleState === 'stalled' ||
-        lifecycleState === 'full-degraded' ||
-        lifecycleState === 'offline-loaded'),
-  );
 </script>
 
 <div

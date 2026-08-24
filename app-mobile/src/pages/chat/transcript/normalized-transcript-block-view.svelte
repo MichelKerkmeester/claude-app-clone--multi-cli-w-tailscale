@@ -14,9 +14,17 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: NormalizedTranscriptBlockView — renders a normalized transcript block via Block or RichContentRouter.
   import Block from './block.svelte';
   import RichContentRouter from '../rich-content/rich-content-router.svelte';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
 
   let {
     block,

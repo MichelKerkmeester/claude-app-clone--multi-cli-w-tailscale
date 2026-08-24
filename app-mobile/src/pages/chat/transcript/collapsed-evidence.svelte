@@ -34,7 +34,18 @@
   let triggerButton = $state<HTMLButtonElement | null>(null);
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. HANDLERS
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
+  $effect(() => {
+    const button = triggerButton;
+    if (button === null) return;
+    if (disclosure.open) button.setAttribute('data-expanded', 'true');
+    else button.removeAttribute('data-expanded');
+  });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function attachEvidenceTrigger(node: HTMLElement): (() => void) | void {
@@ -49,17 +60,6 @@
       if (triggerButton === button) triggerButton = null;
     };
   }
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. EFFECTS
-  // ───────────────────────────────────────────────────────────────────
-
-  $effect(() => {
-    const button = triggerButton;
-    if (button === null) return;
-    if (disclosure.open) button.setAttribute('data-expanded', 'true');
-    else button.removeAttribute('data-expanded');
-  });
 </script>
 
 <!-- The trigger names what it reveals (e.g. "Tool call · grep") instead of a generic "Show",

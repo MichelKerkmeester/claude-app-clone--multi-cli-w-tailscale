@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { getContext, setContext, untrack, type Snippet } from 'svelte';
   import {
     MEDIA_SOURCE_MIME_TYPES,
@@ -14,6 +18,10 @@
     type AttachmentDraftAction,
     type AttachmentDraftState,
   } from './attachment-state.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   interface StoredAttachment {
     readonly file: File;
@@ -46,6 +54,10 @@
     readonly getObjectUrl: (id: string) => string | null;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   const EMPTY_CONTEXT: AttachmentDraftContextValue = {
     state: EMPTY_ATTACHMENT_DRAFT,
     mediaAvailable: false,
@@ -67,6 +79,10 @@
 
   const ATTACHMENT_DRAFT_KEY = Symbol('pi-remote:attachment-draft');
 
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
   export function getAttachmentDraft(): AttachmentDraftContextValue {
     return getContext<AttachmentDraftContextValue | null>(ATTACHMENT_DRAFT_KEY) ?? EMPTY_CONTEXT;
   }
@@ -82,6 +98,10 @@
 
 <script lang="ts">
   // @ds surface: AttachmentDraftProvider — context provider for the chat attachment draft (selection, previews, capability gating).
+  // ───────────────────────────────────────────────────────────────────
+  // 5. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     children,
     sessionId = null,
@@ -90,13 +110,13 @@
   }: AttachmentDraftProviderProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 1. DERIVED STATE
+  // 6. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const mediaAvailable = $derived(capabilityAllowsPhotos(capability));
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. LOCAL STATE
+  // 7. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   // svelte-ignore state_referenced_locally
@@ -114,38 +134,7 @@
   let previewTrigger: HTMLElement | null = null;
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. HANDLERS
-  // ───────────────────────────────────────────────────────────────────
-
-  function dispatch(action: AttachmentDraftAction): void {
-    draftState = attachmentDraftReducer(draftState, action);
-  }
-
-  function revokeObjectUrl(id: string): void {
-    const entry = stored.get(id);
-    if (entry === undefined) return;
-    if (entry.objectUrl !== null && typeof URL.revokeObjectURL === 'function') {
-      URL.revokeObjectURL(entry.objectUrl);
-    }
-    stored.delete(id);
-  }
-
-  function revokeAllObjectUrls(): void {
-    for (const id of stored.keys()) revokeObjectUrl(id);
-  }
-
-  function clearStoredDraft(): void {
-    revokeAllObjectUrls();
-    dispatch({ type: 'lifecycle-clear' });
-  }
-
-  function clearForCapabilityLoss(message: string | null, phase: 'idle' | 'model-blocked'): void {
-    revokeAllObjectUrls();
-    dispatch({ type: 'lifecycle-clear', message, phase });
-  }
-
-  // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -196,6 +185,37 @@
       revokeAllObjectUrls();
     };
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 9. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
+  function dispatch(action: AttachmentDraftAction): void {
+    draftState = attachmentDraftReducer(draftState, action);
+  }
+
+  function revokeObjectUrl(id: string): void {
+    const entry = stored.get(id);
+    if (entry === undefined) return;
+    if (entry.objectUrl !== null && typeof URL.revokeObjectURL === 'function') {
+      URL.revokeObjectURL(entry.objectUrl);
+    }
+    stored.delete(id);
+  }
+
+  function revokeAllObjectUrls(): void {
+    for (const id of stored.keys()) revokeObjectUrl(id);
+  }
+
+  function clearStoredDraft(): void {
+    revokeAllObjectUrls();
+    dispatch({ type: 'lifecycle-clear' });
+  }
+
+  function clearForCapabilityLoss(message: string | null, phase: 'idle' | 'model-blocked'): void {
+    revokeAllObjectUrls();
+    dispatch({ type: 'lifecycle-clear', message, phase });
+  }
 
   function selectFiles(files: FileList | readonly File[] | null): void {
     if (!mediaAvailable || files === null) {

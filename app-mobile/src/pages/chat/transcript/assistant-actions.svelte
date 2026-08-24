@@ -3,10 +3,6 @@
   // MODULE: ASSISTANT ACTIONS
   // ───────────────────────────────────────────────────────────────────
 
-  // ───────────────────────────────────────────────────────────────────
-  // 1. PUBLIC PROPS
-  // ───────────────────────────────────────────────────────────────────
-
   /** Under-answer actions. Capability-gated and honest: Copy renders only where the Clipboard
    * API exists, and Share only where Web Share does — no decorative or disabled fake actions. */
   export interface AssistantActionsProps {
@@ -16,10 +12,14 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 2. CAPABILITY STATE
+  // 1. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { text }: AssistantActionsProps = $props();
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
 
   let copied = $state(false);
 

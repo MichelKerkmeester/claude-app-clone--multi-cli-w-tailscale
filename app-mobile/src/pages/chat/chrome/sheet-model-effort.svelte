@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { applyingEffortMessage, effortStrings } from '$shared/catalog/effort.js';
   import {
     runtimePhaseIsRepairable,
@@ -8,10 +12,18 @@
   } from '$shared/state/runtime.js';
   import { runtimeIssueMessage } from '$shared/state/runtime-issues.js';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   export const SEARCH_THRESHOLD = 8;
   export const SWIPE_DISMISS_RATIO = 0.3;
   export const SWIPE_DISMISS_VELOCITY = 1_200;
   export const EMPTY_LEVELS: readonly string[] = [];
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export type EffortSheetSection = 'model' | 'effort';
 
@@ -25,6 +37,10 @@
     triggerRef?: HTMLButtonElement | null;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 4. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   export const RECONCILE_PHASES: ReadonlySet<RuntimePhase> = new Set([
     'ready-empty',
     'unsupported',
@@ -35,6 +51,10 @@
     'delivery-unknown',
     'inconsistent-state',
   ]);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   export function effortSectionStatus(
     runtime: RuntimeUiState,
@@ -81,7 +101,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 6. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import type { AvailableModelDto, RuntimeControlResponse } from '@pi-remote/pi-rpc-protocol';
@@ -115,7 +135,7 @@
   import EffortRadioGroup from './radio-effort.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 7. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -126,24 +146,13 @@
     triggerRef = null,
   }: ModelEffortSheetProps = $props();
 
-  const runtime = $derived(runtimeControls.runtime);
+  // ───────────────────────────────────────────────────────────────────
+  // 8. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
 
-  // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
-  // Copy is restored to the host value after every change (non-optimistic).
-  const hostOpen = $derived(isOpen);
   let sheetOpen = $state(false);
-
-  $effect(() => {
-    sheetOpen = hostOpen;
-  });
-
-  // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
-  // ───────────────────────────────────────────────────────────────────
-
   let section = $state<EffortSheetSection>('model');
   let query = $state('');
-  const deferredQuery = $derived(query);
   let draftKey = $state<string | null>(null);
   let isCommitting = $state(false);
   let terminalBlocked = $state(false);
@@ -169,8 +178,15 @@
   let prevEffortPending: string | null = null;
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. DERIVED STATE
+  // 9. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
+
+  const runtime = $derived(runtimeControls.runtime);
+
+  // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
+  // Copy is restored to the host value after every change (non-optimistic).
+  const hostOpen = $derived(isOpen);
+  const deferredQuery = $derived(query);
 
   const current = $derived(runtime.state?.model ?? null);
   const currentKey = $derived(current === null ? null : modelKey(current));
@@ -236,8 +252,12 @@
   );
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. EFFECTS
+  // 10. EFFECTS
   // ───────────────────────────────────────────────────────────────────
+
+  $effect(() => {
+    sheetOpen = hostOpen;
+  });
 
   $effect(() => {
     if (!isOpen) return;
@@ -361,7 +381,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. HANDLERS
+  // 11. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   const restoreTriggerFocus = () => {
@@ -615,7 +635,7 @@
   }
 
   // ───────────────────────────────────────────────────────────────────
-  // 7. HELPERS
+  // 12. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
   function attachRowInteractions(node: Element): () => void {

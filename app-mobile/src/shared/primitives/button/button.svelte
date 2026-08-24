@@ -3,9 +3,17 @@
 	// MODULE: BUTTON PRIMITIVE
 	// ───────────────────────────────────────────────────────────────────
 	// @ds primitive: Button — Keep interaction state in actions so touch input never leaves CSS :hover stuck.
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { hover, press, focusVisible, focused } from '../a11y/interactions.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
 
 	interface Props extends Omit<HTMLButtonAttributes, 'class' | 'type' | 'disabled' | 'onclick'> {
 		class?: string;

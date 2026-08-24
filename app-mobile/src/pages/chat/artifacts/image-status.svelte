@@ -174,7 +174,7 @@
   };
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. PUBLIC PROPS
+  // 3. TYPES
   // ───────────────────────────────────────────────────────────────────
 
   export interface ImageStatusProps {
@@ -191,10 +191,14 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 4. RENDER STATE
+  // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { state, message, onAction, disabledActions = [] }: ImageStatusProps = $props();
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
 
   const definition = $derived(STATUS_DEFINITIONS[state]);
   const copy = $derived(message ?? definition.copy);

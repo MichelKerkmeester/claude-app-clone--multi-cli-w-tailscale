@@ -15,6 +15,10 @@
     type TextSpan,
   } from './pdf-preview-shared.js';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   interface Props {
     pdfDocument: PDFDocumentProxy;
     pageNumber: number;
@@ -23,10 +27,6 @@
     findTerm: string;
     onStateChange: (state: PdfPreviewState) => void;
   }
-
-  // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
-  // ───────────────────────────────────────────────────────────────────
 
   let { pdfDocument, pageNumber, scale, textLayerSafe, findTerm, onStateChange }: Props = $props();
 

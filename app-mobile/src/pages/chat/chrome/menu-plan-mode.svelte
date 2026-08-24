@@ -1,5 +1,13 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ConfirmedMode } from '$shared/state/runtime.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface PlanModeMenuProps {
     readonly confirmedMode: ConfirmedMode;
@@ -11,6 +19,10 @@
     readonly onSelect: (target: 'build' | 'plan') => void;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds state: build · plan rows — labels + descriptions are bounded local copy.
   const BUILD_DESCRIPTION = 'Pi may request write-capable tools; approvals still apply.';
   const PLAN_DESCRIPTION = 'Read-only exploration and planning.';
@@ -18,7 +30,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { focusVisible, focused } from '$shared/primitives/a11y/interactions.js';
@@ -26,13 +38,19 @@
   import MenuItem from '$shared/primitives/menu/menu-item.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { confirmedMode, rowsDisabled, rowsDisabledReason, onSelect }: PlanModeMenuProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 6. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  let localMode = $state<ConfirmedMode>('unknown');
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   // Host-confirmed mode only; Bits MenuItem has no selection to bind, so a local
@@ -40,13 +58,7 @@
   const hostMode = $derived(confirmedMode);
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. LOCAL STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  let localMode = $state<ConfirmedMode>('unknown');
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. EFFECTS
+  // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -54,7 +66,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. HANDLERS
+  // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function onRowSelect(target: 'build' | 'plan'): void {

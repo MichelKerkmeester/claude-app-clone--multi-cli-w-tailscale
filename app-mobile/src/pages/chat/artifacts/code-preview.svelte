@@ -1,8 +1,20 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: CODE PREVIEW
+  // ───────────────────────────────────────────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. TYPES
+  // ───────────────────────────────────────────────────────────────────
+
   interface FindPart {
     readonly text: string;
     readonly mark: boolean;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function findParts(text: string, findTerm: string): readonly FindPart[] {
     if (findTerm.trim().length === 0) return [{ text, mark: false }];
@@ -25,13 +37,17 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import {
     normalizeHighlightLanguage,
     useHighlightedCode,
   } from '../rich-content/use-highlighted-code.svelte.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. PROPS
+  // ───────────────────────────────────────────────────────────────────
 
   interface Props {
     text: string;
@@ -56,7 +72,15 @@
   }: Props = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. DERIVED STATE
+  // 5. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  let scrollEl = $state<HTMLDivElement | null>(null);
+  let atLiveEdgeRef = true;
+  let atLiveEdge = $state(true);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const safeLanguage = $derived(normalizeHighlightLanguage(language));
@@ -72,35 +96,7 @@
   const lines = $derived(text.split('\n'));
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  let scrollEl = $state<HTMLDivElement | null>(null);
-  let atLiveEdgeRef = true;
-  let atLiveEdge = $state(true);
-
-  // ───────────────────────────────────────────────────────────────────
-  // 4. HANDLERS
-  // ───────────────────────────────────────────────────────────────────
-
-  function updateLiveEdge(): void {
-    const scroll = scrollEl;
-    if (scroll === null) return;
-    const nextAtLiveEdge = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight <= 96;
-    atLiveEdgeRef = nextAtLiveEdge;
-    if (atLiveEdge !== nextAtLiveEdge) atLiveEdge = nextAtLiveEdge;
-  }
-
-  function jumpToLatest(): void {
-    const scroll = scrollEl;
-    if (scroll === null) return;
-    scroll.scrollTop = scroll.scrollHeight;
-    atLiveEdgeRef = true;
-    atLiveEdge = true;
-  }
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. EFFECTS
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -118,6 +114,26 @@
       atLiveEdge = true;
     }
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 8. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
+  function updateLiveEdge(): void {
+    const scroll = scrollEl;
+    if (scroll === null) return;
+    const nextAtLiveEdge = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight <= 96;
+    atLiveEdgeRef = nextAtLiveEdge;
+    if (atLiveEdge !== nextAtLiveEdge) atLiveEdge = nextAtLiveEdge;
+  }
+
+  function jumpToLatest(): void {
+    const scroll = scrollEl;
+    if (scroll === null) return;
+    scroll.scrollTop = scroll.scrollHeight;
+    atLiveEdgeRef = true;
+    atLiveEdge = true;
+  }
 </script>
 
 <!-- @ds surface: code-preview — the highlighted code well, gutter, and live-edge follow. -->

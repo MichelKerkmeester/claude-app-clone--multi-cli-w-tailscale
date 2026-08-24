@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ARTIFACT VIEWER HOST
+  // ───────────────────────────────────────────────────────────────────
+
   import {
     isInboundImageReadyBlock,
     isFilePreviewBlock,
@@ -15,11 +19,19 @@
   } from './types.js';
   import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. TYPES
+  // ───────────────────────────────────────────────────────────────────
+
   export interface ArtifactViewerHostProps {
     readonly phase: ArtifactViewerPhase;
     readonly preview: ArtifactPreview | null;
     readonly onClose: (reason: ArtifactDismissalReason) => void;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
 
   const EDGE_BACK_START = 28;
   const EDGE_BACK_DISTANCE = 64;
@@ -29,6 +41,10 @@
 
   const FOCUS_TRAP_SELECTOR =
     'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function isReadyDescriptor(block: FilePreviewBlock): boolean {
     if (block.renderer === 'pdf' && block.textLayerSafe !== true) return false;
@@ -183,7 +199,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { useVisualViewportAnchor } from '$shared/viewport/use-visual-viewport-anchor.svelte.js';
@@ -209,7 +225,7 @@
   import { useArtifactResource } from './use-artifact-resource.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { phase, preview, onClose }: ArtifactViewerHostProps = $props();
@@ -221,7 +237,7 @@
   useVisualViewportAnchor();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let dialogEl = $state<HTMLElement | null>(null);
@@ -237,7 +253,7 @@
   let detailsOpen = $state(false);
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -256,7 +272,7 @@
   };
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. DERIVED STATE
+  // 8. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const sourceValue = $derived<unknown>(preview?.source);
@@ -397,7 +413,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. HANDLERS
+  // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   // @ds state: edge-back · voiceover-scrub — swipe-from-edge and focus-scrub dismissal reasons.

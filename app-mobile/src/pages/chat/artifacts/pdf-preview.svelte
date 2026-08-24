@@ -1,4 +1,12 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: PDF PREVIEW
+  // ───────────────────────────────────────────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   export {
     PDF_PREVIEW_MAX_BYTES,
     PDF_PREVIEW_MAX_PAGES,
@@ -10,12 +18,17 @@
     getPdfPreviewRuntimeMetrics,
     pagesAround,
   } from './pdf-preview-shared.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
+
   export type { PdfPreviewState, PdfPreviewProps } from './pdf-preview-shared.js';
 </script>
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import type { PDFDocumentProxy, PDFDocumentLoadingTask } from 'pdfjs-dist';
@@ -36,13 +49,13 @@
   } from './pdf-preview-shared.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { block, bytes, findTerm = '', onFindTermChange, onStateChange }: PdfPreviewProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 5. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let pdfState = $state<PdfPreviewState>('loading');
@@ -56,7 +69,20 @@
   let scrollEl = $state<HTMLDivElement | null>(null);
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 6. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const scale = $derived(
+    !fitWidth || containerWidth <= 0 || pageWidth <= 0
+      ? clampZoom(zoom)
+      : clampZoom(containerWidth / pageWidth),
+  );
+
+  const visiblePages = $derived(pdfDocument === null ? [] : pagesAround(currentPage, pageCount));
+  const message = $derived(stateMessage(pdfState));
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -160,19 +186,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  const scale = $derived(
-    !fitWidth || containerWidth <= 0 || pageWidth <= 0
-      ? clampZoom(zoom)
-      : clampZoom(containerWidth / pageWidth),
-  );
-
-  const visiblePages = $derived(pdfDocument === null ? [] : pagesAround(currentPage, pageCount));
-
-  // ───────────────────────────────────────────────────────────────────
-  // 6. HANDLERS
+  // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function onPageState(nextState: PdfPreviewState): void {
@@ -196,7 +210,6 @@
     if (nearestPage !== currentPage) currentPage = nearestPage;
   }
 
-  const message = $derived(stateMessage(pdfState));
 </script>
 
 <!-- @ds surface: pdf-preview — the controlled PDF.js reader (bounded pages/canvases). -->

@@ -1,6 +1,14 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { RuntimeControls } from '$shared/state/runtime.js';
   import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/commands/commands.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface ComposerToolsProps {
     readonly runtimeControls: RuntimeControls;
@@ -12,6 +20,10 @@
     readonly shiftTabEnabled: boolean;
     readonly onShiftTabPreferenceChange: (enabled: boolean) => void;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   // @ds guardrail: tools popover status hint — Ported verbatim from SessionComposer.
   function statusHint(status: RuntimeControls['runtime']['status'], hasPending: boolean): string {
@@ -32,7 +44,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { Popover } from 'bits-ui';
@@ -42,7 +54,7 @@
   import { ATTACHMENT_ACCEPT } from '../attachments/attachment-state.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -57,13 +69,7 @@
   }: ComposerToolsProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  const runtime = $derived(runtimeControls.runtime);
-
-  // ───────────────────────────────────────────────────────────────────
-  // 4. LOCAL STATE
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   // Popover open state; bind:open keeps the local copy in sync while onOpenChange
@@ -72,8 +78,24 @@
   let contentEl = $state<HTMLElement | null>(null);
   let toolsDialogEl = $state<HTMLElement | null>(null);
 
+  // Hand-rolled FileTrigger parity: a hidden input per action, clicked by its
+  // Paired button; the input delivers the selection then resets value='' so a
+  // Repeated pick of the same file still fires onchange.
+  let photoLibraryInput = $state<HTMLInputElement | null>(null);
+  let takePhotoInput = $state<HTMLInputElement | null>(null);
+
+  // Data-focus-visible on the .tools-checkbox label mirrors react-aria's focus
+  // Ring, bridged from the visually-hidden input that actually holds focus.
+  let checkboxFocusVisible = $state(false);
+
   // ───────────────────────────────────────────────────────────────────
-  // 5. EFFECTS
+  // 7. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const runtime = $derived(runtimeControls.runtime);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -82,18 +104,12 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. HANDLERS
+  // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function handleOpenChange(next: boolean): void {
     onOpenChange(next);
   }
-
-  // Hand-rolled FileTrigger parity: a hidden input per action, clicked by its
-  // Paired button; the input delivers the selection then resets value='' so a
-  // Repeated pick of the same file still fires onchange.
-  let photoLibraryInput = $state<HTMLInputElement | null>(null);
-  let takePhotoInput = $state<HTMLInputElement | null>(null);
 
   function openPhotoLibrary(): void {
     photoLibraryInput?.click();
@@ -110,10 +126,6 @@
       target.value = '';
     }
   }
-
-  // Data-focus-visible on the .tools-checkbox label mirrors react-aria's focus
-  // Ring, bridged from the visually-hidden input that actually holds focus.
-  let checkboxFocusVisible = $state(false);
 
   function onCheckboxFocus(event: FocusEvent): void {
     const target = event.currentTarget;

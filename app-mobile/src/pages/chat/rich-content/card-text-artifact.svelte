@@ -24,7 +24,13 @@
   const feedback = useCopyFeedback();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  let openButton = $state<HTMLButtonElement | null>(null);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const lines = $derived(displayLines(block.canonicalSource));
@@ -35,13 +41,7 @@
   );
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. LOCAL STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  let openButton = $state<HTMLButtonElement | null>(null);
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. HANDLERS
+  // 5. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
   function textArtifactLabel(value: NormalizedTextArtifactBlock['label']): string {

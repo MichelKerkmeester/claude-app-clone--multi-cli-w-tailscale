@@ -3,8 +3,16 @@
   // MODULE: HEADER
   // ───────────────────────────────────────────────────────────────────
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ConnectionPhase } from '../state/state.js';
   import type { ThemePreference } from '../format/view-helpers.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface HeaderProps {
     readonly connection: ConnectionPhase;
@@ -18,9 +26,17 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 3. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import Button from '../primitives/button/button.svelte';
   import StatusPill from './status-pill.svelte';
   import ThemeControl from './theme-control.svelte';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. PROPS
+  // ───────────────────────────────────────────────────────────────────
 
   let {
     connection,

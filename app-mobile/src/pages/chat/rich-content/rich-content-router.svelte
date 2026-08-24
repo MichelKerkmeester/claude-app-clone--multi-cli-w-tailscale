@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { DisplayTranscriptBlock } from '$shared/state/state.js';
   import type {
     NormalizedCodeBlock,
@@ -8,10 +12,18 @@
   } from './normalize-transcript-blocks.js';
   import type { F6RichBlock } from './f6-viewer-adapter.js';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
+
   export interface RichContentRouterProps {
     readonly block: NormalizedTranscriptBlock;
     readonly onOpen?: (block: F6RichBlock, trigger?: HTMLButtonElement | null) => void;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   // These pure guards are exported for transcript projection and security tests.
   export function isNormalizedRichContentBlock(value: unknown): value is NormalizedTranscriptBlock {
@@ -65,7 +77,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { getOptionalArtifactViewer } from '../artifacts/artifact-viewer-provider.svelte';
@@ -77,7 +89,7 @@
   import TextArtifactCard from './card-text-artifact.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { block, onOpen }: RichContentRouterProps = $props();
@@ -89,13 +101,13 @@
   const viewer = getOptionalArtifactViewer();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 6. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const canOpen = $derived(onOpen !== undefined || viewer !== null);
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   // @ds guardrail: do-not-edit — The viewer handoff keeps an in-memory document current for hosted blocks; no fetch, endpoint, ticket, download, or host-file read is added.
@@ -105,7 +117,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. HANDLERS
+  // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   // @ds guardrail: do-not-edit — The open handoff delegates to bound onOpen or the viewer's openInMemory with the same document; nothing is fetched, written, or read from the host.

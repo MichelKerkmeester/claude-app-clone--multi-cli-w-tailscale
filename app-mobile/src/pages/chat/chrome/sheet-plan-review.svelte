@@ -1,5 +1,13 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface PlanReviewSheetProps {
     readonly isOpen: boolean;
@@ -14,6 +22,10 @@
     triggerRef?: HTMLElement | null;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
   function formatReviewTime(value: string): string {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return 'Unknown time';
@@ -25,7 +37,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import Button from '$shared/primitives/button/button.svelte';
@@ -34,7 +46,7 @@
   import SheetTitle from '$shared/primitives/sheet/sheet-title.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -49,12 +61,8 @@
     triggerRef = null,
   }: PlanReviewSheetProps = $props();
 
-  // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
-  // Copy is restored to the host value after every change (non-optimistic).
-  const hostOpen = $derived(isOpen);
-
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let sheetOpen = $state(false);
@@ -62,12 +70,24 @@
   let sheetEl = $state<HTMLElement | null>(null);
   let swipeStart = $state<{ readonly x: number; readonly y: number } | null>(null);
 
+  // ───────────────────────────────────────────────────────────────────
+  // 7. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
+  // Copy is restored to the host value after every change (non-optimistic).
+  const hostOpen = $derived(isOpen);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 8. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
   $effect(() => {
     sheetOpen = hostOpen;
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. HANDLERS
+  // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   const restoreFocus = () => {
@@ -156,7 +176,7 @@
   }
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. HELPERS
+  // 10. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
   function attachSheet(node: Element): () => void {

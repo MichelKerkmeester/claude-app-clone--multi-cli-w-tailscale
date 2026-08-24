@@ -1,5 +1,13 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { NormalizedCommandBlock } from './normalize-transcript-blocks.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface CommandSnapshot {
     readonly blockId: string;
@@ -7,6 +15,10 @@
     readonly command: string | null;
     readonly output: string | null;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   // The pure reconciliation helper is exported for deterministic streaming tests.
   export function reconcileCommandSnapshot(
@@ -44,7 +56,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import RichBlockFrame from './rich-block-frame.svelte';
@@ -57,7 +69,7 @@
   }
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { block, onOpen }: Props = $props();
@@ -69,7 +81,13 @@
   let previousSnapshot: CommandSnapshot | null = null;
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 6. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  let openButton = $state<HTMLButtonElement | null>(null);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const snapshot = $derived.by(() => {
@@ -101,13 +119,7 @@
   );
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. LOCAL STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  let openButton = $state<HTMLButtonElement | null>(null);
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. HANDLERS
+  // 8. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
   function lifecycleText(value: NormalizedCommandBlock['lifecycle']): string {

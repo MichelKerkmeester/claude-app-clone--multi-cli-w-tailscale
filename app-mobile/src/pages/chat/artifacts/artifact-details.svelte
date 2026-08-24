@@ -17,6 +17,10 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds surface: ArtifactDetails — openable definition list of image-artifact metadata.
   interface Props {
     model: ArtifactDetailsModel;
@@ -25,6 +29,10 @@
   }
 
   let { model, open, id = 'artifact-details' }: Props = $props();
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function formatBytes(value: number): string {
     if (value < 1024) return `${value} B`;

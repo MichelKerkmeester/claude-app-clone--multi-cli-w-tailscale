@@ -55,6 +55,10 @@
     void Promise.all(tasks).finally(done);
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
   function getThemeColors() {
     const root = document.documentElement;
     const dark =

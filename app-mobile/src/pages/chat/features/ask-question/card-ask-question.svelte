@@ -1,5 +1,13 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { AskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface AskQuestionCardProps {
     readonly block: AskQuestionTranscriptMeta;
@@ -8,12 +16,16 @@
     readonly principal?: string | undefined;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   let askQuestionUidSequence = 0;
 </script>
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { untrack } from 'svelte';
@@ -38,7 +50,7 @@
   import { useAskQuestionState } from './use-ask-question-state.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { block, canAnswer = true, principal }: AskQuestionCardProps = $props();
@@ -47,7 +59,7 @@
   // @ds guardrail: One-use ticketed, revision-bound, FAIL-CLOSED mutation path. Ticketing, revision binding, non-optimistic submit, and keyboard/a11y wiring live in the hooks and are NOT designer-editable. Only the @ds surface: ask-question CSS is editable.
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let viewModel = $state<AskQuestionViewModel | null>(null);
@@ -71,7 +83,7 @@
   const errorId = `${uid}-error`;
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. DERIVED STATE
+  // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const lifecyclePhase = $derived(transcriptStatusToUiState(block.status));
@@ -95,35 +107,7 @@
   );
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. HANDLERS
-  // ───────────────────────────────────────────────────────────────────
-
-  function submitAnswer(): void {
-    if (terminal || submitting) return;
-    const intent = stateApi.beginSubmit();
-    if (intent !== null) void mutation.submit(intent);
-  }
-
-  useAskQuestionKeyboardNavigation(
-    () => cardEl,
-    () => ({
-      identity: `${block.questionId}:${block.presentedRevision}`,
-      enabled: viewModel !== null && canAnswer && !submitting && !terminal,
-      terminal,
-      optionCount: viewModel?.display.options.length ?? 0,
-      hasFreeText: viewModel?.display.freeText.allowed ?? false,
-      freeTextRequired: viewModel?.display.freeText.required ?? false,
-      labelId,
-      optionsLabelId,
-      statusId,
-      errorId,
-      errorVisible: validationVisible,
-      submit: submitAnswer,
-    }),
-  );
-
-  // ───────────────────────────────────────────────────────────────────
-  // 6. EFFECTS
+  // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -173,6 +157,34 @@
       }
     };
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 9. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
+  function submitAnswer(): void {
+    if (terminal || submitting) return;
+    const intent = stateApi.beginSubmit();
+    if (intent !== null) void mutation.submit(intent);
+  }
+
+  useAskQuestionKeyboardNavigation(
+    () => cardEl,
+    () => ({
+      identity: `${block.questionId}:${block.presentedRevision}`,
+      enabled: viewModel !== null && canAnswer && !submitting && !terminal,
+      terminal,
+      optionCount: viewModel?.display.options.length ?? 0,
+      hasFreeText: viewModel?.display.freeText.allowed ?? false,
+      freeTextRequired: viewModel?.display.freeText.required ?? false,
+      labelId,
+      optionsLabelId,
+      statusId,
+      errorId,
+      errorVisible: validationVisible,
+      submit: submitAnswer,
+    }),
+  );
 </script>
 
 {#if viewModel === null}

@@ -27,7 +27,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. PROPS AND STATE
+  // 1. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   // @ds surface: SecureImagePreview — sanitized image preview with pointer and keyboard zoom and pan.
@@ -43,7 +43,15 @@
     onStateChange,
   }: SecureImagePreviewProps = $props();
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let panStart: { x: number; y: number; panX: number; panY: number } | null = null;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function updatePan(event: PointerEvent): void {
     const start = panStart;

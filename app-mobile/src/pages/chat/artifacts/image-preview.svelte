@@ -1,11 +1,23 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: IMAGE PREVIEW
+  // ───────────────────────────────────────────────────────────────────
+
   import type { FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
 
   export const IMAGE_PREVIEW_MAX_BYTES = 50 * 1024 * 1024;
   export const IMAGE_PREVIEW_MAX_DIMENSION = 8_192;
   export const IMAGE_PREVIEW_MAX_PIXELS = 16_000_000;
   export const IMAGE_PREVIEW_MIN_ZOOM = 1;
   export const IMAGE_PREVIEW_MAX_ZOOM = 4;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export type ImagePreviewState = 'loading' | 'ready' | 'corrupt' | 'too-large';
 
@@ -14,6 +26,10 @@
     readonly bytes: Uint8Array | null;
     readonly onStateChange?: (state: ImagePreviewState) => void;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function isBoundedImage(width: number, height: number): boolean {
     return (
@@ -43,13 +59,13 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. PROPS
+  // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { block, bytes, onStateChange }: ImagePreviewProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. LOCAL STATE
+  // 5. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let imageState = $state<ImagePreviewState>('loading');
@@ -59,7 +75,13 @@
   let panStart: { x: number; y: number; panX: number; panY: number } | null = null;
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. EFFECTS
+  // 6. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const message = $derived(messageForState(imageState));
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -108,7 +130,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. HANDLERS
+  // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function updatePan(event: PointerEvent): void {
@@ -129,12 +151,6 @@
     zoom = bounded;
     if (bounded === IMAGE_PREVIEW_MIN_ZOOM) pan = { x: 0, y: 0 };
   }
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  const message = $derived(messageForState(imageState));
 </script>
 
 <!-- @ds surface: image-preview — the sanitized image stage with zoom and pan. -->

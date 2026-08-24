@@ -1,8 +1,13 @@
 <script module lang="ts">
-  import type { DisplayTranscriptBlock, TodoProjectionState } from '$shared/state/state.js';
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: TRANSCRIPT LIST
+  // ───────────────────────────────────────────────────────────────────
 
-  // Two minutes leaves room for normal long-running reasoning while surfacing a sleeping or wedged host.
-  export const TRANSCRIPT_STALL_THRESHOLD_MS = 120_000;
+  // ───────────────────────────────────────────────────────────────────
+  // 1. TYPES
+  // ───────────────────────────────────────────────────────────────────
+
+  import type { DisplayTranscriptBlock, TodoProjectionState } from '$shared/state/state.js';
 
   export interface TranscriptListProps {
     readonly sessionId?: string;
@@ -14,6 +19,17 @@
     readonly onRefreshTodos?: () => void;
     readonly onClearTodoAnnouncement?: () => void;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
+  // Two minutes leaves room for normal long-running reasoning while surfacing a sleeping or wedged host.
+  export const TRANSCRIPT_STALL_THRESHOLD_MS = 120_000;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function blockLabel(block: DisplayTranscriptBlock): string {
     const labels: Record<DisplayTranscriptBlock['kind'], string> = {
@@ -37,7 +53,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { untrack } from 'svelte';
@@ -54,7 +70,7 @@
   import AssistantActions from './assistant-actions.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -71,7 +87,7 @@
   const artifactSessionId = $derived(sessionId ?? '');
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let scrollEl = $state<HTMLDivElement | null>(null);
@@ -82,7 +98,7 @@
   let stallClock = $state(Date.now());
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. HANDLERS
+  // 7. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   // @ds guardrail: live-edge measurement + scroll handlers (followToBottom, onScroll) — Not designer-editable.
@@ -102,7 +118,7 @@
   }
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. DERIVED STATE
+  // 8. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   // @ds guardrail: block normalization (normalizeTranscriptBlocks), turn grouping (groupNormalizedTranscript, groupBlocksIntoTurns) and todo-row insertion — Not designer-editable.
@@ -146,7 +162,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. EFFECTS
+  // 9. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {

@@ -1,24 +1,53 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: ARTIFACT CARD
+  // ───────────────────────────────────────────────────────────────────
+
   import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface ArtifactCardProps {
     readonly block: FileDiffBlock;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   const PEEK_LINE_COUNT = 6;
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 3. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { getOptionalArtifactViewer } from './artifact-viewer-provider.svelte';
   import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 4. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { block }: ArtifactCardProps = $props();
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
 
   // @ds surface: artifact-card — the in-transcript read-only card that opens the diff viewer.
   // @ds slot: glyph | body (meta · summary · peek) | open — the card chrome regions.
   // @ds guardrail: do-not-edit — The button + click opening the viewer are frozen.
   let buttonRef = $state<HTMLButtonElement | null>(null);
   const viewer = getOptionalArtifactViewer();
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const patchLines = $derived(block.patch.split('\n'));
   const peekLines = $derived(
     Array.from({ length: PEEK_LINE_COUNT }, (_, index) => patchLines[index] ?? ''),

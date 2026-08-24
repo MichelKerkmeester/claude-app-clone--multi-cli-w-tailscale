@@ -1,5 +1,13 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { RuntimeControls } from '$shared/state/runtime.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export type ThemePreference = 'system' | 'light' | 'dark';
 
@@ -18,7 +26,15 @@
     modelTriggerRef?: HTMLButtonElement | null;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   const THEME_OPTIONS = ['system', 'light', 'dark'] as const;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function themeOptionLabel(option: ThemePreference): string {
     return option === 'system' ? 'Auto' : option === 'light' ? 'Light' : 'Dark';
@@ -48,7 +64,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 5. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { modelEffortTriggerName, effortTriggerText } from '$shared/catalog/effort.js';
@@ -58,7 +74,7 @@
   import Button from '$shared/primitives/button/button.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 6. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -74,7 +90,15 @@
   }: SessionHeaderProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 7. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  let overflowOpen = $state(false);
+  let overflowContentEl = $state<HTMLElement | null>(null);
+  let overflowDialogEl = $state<HTMLElement | null>(null);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 8. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const runtime = $derived(runtimeControls.runtime);
@@ -86,15 +110,7 @@
   );
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. LOCAL STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  let overflowOpen = $state(false);
-  let overflowContentEl = $state<HTMLElement | null>(null);
-  let overflowDialogEl = $state<HTMLElement | null>(null);
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. EFFECTS
+  // 9. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {

@@ -3,9 +3,17 @@
   // MODULE: RICH BLOCK FRAME
   // ───────────────────────────────────────────────────────────────────
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { Snippet } from 'svelte';
   import type { RedactionMetadata } from '@pi-remote/pi-rpc-protocol';
   import RedactionBadge from './redaction-badge.svelte';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
 
   interface Props {
     title: string;

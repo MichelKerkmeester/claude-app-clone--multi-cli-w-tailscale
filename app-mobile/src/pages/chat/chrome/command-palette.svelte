@@ -9,7 +9,15 @@
   // Binding — it NEVER submits, and only relay-filtered (non-privileged)
   // Commands are ever offered.
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/commands/commands.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface CommandPaletteProps {
     readonly catalog: HostCommandCatalogState;
@@ -20,7 +28,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { Combobox } from 'bits-ui';
@@ -30,13 +38,13 @@
   import { rankHostCommands } from '$shared/commands/rank-host-commands.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { catalog, onInsert, isDisabled = false }: CommandPaletteProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 5. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let query = $state('');
@@ -47,7 +55,16 @@
   let inputEl: HTMLInputElement | null = null;
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 6. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  // Filtering is deterministic and owned by the frozen ranker; the palette renders
+  // Exactly the ranked snapshot. Bits must not apply its own input filtering.
+  // @ds guardrail: ranker — Deterministic host-command ranking.
+  const ranked = $derived.by(() => rankHostCommands(catalog.commands, query));
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -60,16 +77,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  // Filtering is deterministic and owned by the frozen ranker; the palette renders
-  // Exactly the ranked snapshot. Bits must not apply its own input filtering.
-  // @ds guardrail: ranker — Deterministic host-command ranking.
-  const ranked = $derived.by(() => rankHostCommands(catalog.commands, query));
-
-  // ───────────────────────────────────────────────────────────────────
-  // 6. HANDLERS
+  // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function onQueryInput(event: Event): void {

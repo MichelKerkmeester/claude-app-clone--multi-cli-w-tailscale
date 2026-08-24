@@ -3,8 +3,16 @@
   // MODULE: ENROLLMENT SCREEN
   // ───────────────────────────────────────────────────────────────────
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { ConnectionPhase } from '$shared/state/state.js';
   import type { DeviceIdentity } from '$shared/transport/auth.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface EnrollmentProps {
     readonly phase: ConnectionPhase;
@@ -13,15 +21,31 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 3. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { enrollDevice, establishSession, scanQrImage } from '$shared/transport/auth.js';
   import { messageFrom } from '$shared/format/view-helpers.js';
   import Button from '$shared/primitives/button/button.svelte';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 4. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let { phase, onEnrolled }: EnrollmentProps = $props();
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
 
   let qrData = $state('');
   let error = $state<string | null>(null);
   let busy = $state(false);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
 
   const submit = () => {
     busy = true;

@@ -12,11 +12,23 @@
   // Touches the host execution path. The panel is an overlay, so opening and
   // Closing displace nothing.
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { HostCommandCatalogState, HostCommandCatalogStatus } from '$shared/commands/commands.js';
   import type { RankedHostCommand } from '$shared/commands/rank-host-commands.js';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   /** The listbox the composer's aria-controls references while rows exist. */
   export const SLASH_LISTBOX_ID = 'slash-command-list';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   /** Open-panel states with objective DOM presentation. */
   export type SlashPanelOpenState =
@@ -37,6 +49,10 @@
   /** Surface-level states, including the closed and drafted composer conditions. */
   export type SlashSurfaceState = SlashPanelOpenState | 'closed' | 'drafted';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 4. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   /** Row-bearing states: the listbox is rendered and enabled rows may insert. */
   const ROW_BEARING_STATES: ReadonlySet<SlashPanelOpenState> = new Set([
     'ready.unfiltered',
@@ -45,6 +61,10 @@
     'ready.staleOffline',
     'session.running',
   ]);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface SlashPanelDerivation {
     readonly surfaceState: SlashSurfaceState;
@@ -71,6 +91,10 @@
     readonly running: boolean;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 6. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   const CLOSED: SlashPanelDerivation = {
     surfaceState: 'closed',
     panelOpen: false,
@@ -79,6 +103,10 @@
     canRetry: false,
     message: null,
   };
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   /** The explicit open-state machine and its fail-closed actions are frozen: no state
    *  Can ever enable submission; insertion is the only action, and it exists only in
@@ -185,6 +213,10 @@
     return state !== null && ROW_BEARING_STATES.has(state);
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 8. TYPES
+  // ───────────────────────────────────────────────────────────────────
+
   export interface ComposerCommandAutocompleteProps {
     readonly prompt: string;
     /** The effective open condition after the tools-browser exclusion. */
@@ -208,6 +240,10 @@
     readonly onAnnounce: (message: string) => void;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 9. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   /** The tallest the card may be: 280px, 40% of the visual viewport, or the space above the composer. */
   const MAX_PANEL_HEIGHT_PX = 280;
   const PANEL_VIEWPORT_FRACTION = 0.4;
@@ -218,7 +254,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 10. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { useVisualViewportAnchor } from '$shared/viewport/use-visual-viewport-anchor.svelte.js';
@@ -226,7 +262,7 @@
   import CommandOption from './command-option.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 11. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -251,7 +287,14 @@
   // @ds guardrail: anchor — Visual-viewport anchor for the popover max height.
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 12. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  type PanelBox = { left: number; bottom: number; width: number };
+  let panelBox = $state<PanelBox | null>(null);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 13. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const viewportHeightPx = $derived(viewportAnchor.viewportHeightPx);
@@ -271,8 +314,38 @@
   // Frozen; restyling never changes which surface state renders.
   // @ds guardrail: trigger-predicate — Leading-slash open condition and state mapping.
 
+  const maxHeight = $derived.by(() => {
+    if (viewportHeightPx === null) return undefined;
+    const spaceAbove =
+      anchorTopPx === null
+        ? viewportHeightPx
+        : Math.max(MIN_PANEL_HEIGHT_PX, anchorTopPx - ANCHOR_GAP_PX);
+    return Math.min(MAX_PANEL_HEIGHT_PX, viewportHeightPx * PANEL_VIEWPORT_FRACTION, spaceAbove);
+  });
+
+  const panelStyle = $derived.by(() => {
+    const parts: string[] = ['position: fixed'];
+    if (panelBox !== null) {
+      parts.push(`left: ${panelBox.left}px`);
+      parts.push(`bottom: ${panelBox.bottom}px`);
+      parts.push(`--trigger-width: ${panelBox.width}px`);
+    }
+    if (maxHeight !== undefined) {
+      parts.push(`max-block-size: ${maxHeight}px`);
+    }
+    return parts.join('; ');
+  });
+
+  const hasError = $derived(derivation.panelState !== null && derivation.panelState.startsWith('error.'));
+  const runningNote = $derived(
+    running &&
+      showRows &&
+      derivation.panelState !== null &&
+      derivation.panelState !== 'session.running',
+  );
+
   // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 14. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   // Keep the active row visible: virtual focus must follow arrows without
@@ -308,18 +381,6 @@
     return () => window.clearTimeout(timer);
   });
 
-  const maxHeight = $derived.by(() => {
-    if (viewportHeightPx === null) return undefined;
-    const spaceAbove =
-      anchorTopPx === null
-        ? viewportHeightPx
-        : Math.max(MIN_PANEL_HEIGHT_PX, anchorTopPx - ANCHOR_GAP_PX);
-    return Math.min(MAX_PANEL_HEIGHT_PX, viewportHeightPx * PANEL_VIEWPORT_FRACTION, spaceAbove);
-  });
-
-  type PanelBox = { left: number; bottom: number; width: number };
-  let panelBox = $state<PanelBox | null>(null);
-
   $effect(() => {
     void viewportHeightPx;
     void anchorTopPx;
@@ -339,27 +400,6 @@
       width: rect.width,
     };
   });
-
-  const panelStyle = $derived.by(() => {
-    const parts: string[] = ['position: fixed'];
-    if (panelBox !== null) {
-      parts.push(`left: ${panelBox.left}px`);
-      parts.push(`bottom: ${panelBox.bottom}px`);
-      parts.push(`--trigger-width: ${panelBox.width}px`);
-    }
-    if (maxHeight !== undefined) {
-      parts.push(`max-block-size: ${maxHeight}px`);
-    }
-    return parts.join('; ');
-  });
-
-  const hasError = $derived(derivation.panelState !== null && derivation.panelState.startsWith('error.'));
-  const runningNote = $derived(
-    running &&
-      showRows &&
-      derivation.panelState !== null &&
-      derivation.panelState !== 'session.running',
-  );
 </script>
 
 <!-- The popover lifecycle, outside-press dismissal, and aria/role wiring are frozen;

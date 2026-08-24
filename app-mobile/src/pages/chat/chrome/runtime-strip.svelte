@@ -1,5 +1,13 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { RuntimeControls } from '$shared/state/runtime.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface RuntimeStripProps {
     readonly controls: RuntimeControls;
@@ -10,6 +18,10 @@
     /** Attached to the effort trigger so the sheet can restore focus to it. */
     effortTriggerRef?: HTMLButtonElement | null;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function statusHint(status: RuntimeControls['runtime']['status'], hasPending: boolean): string {
     switch (status) {
@@ -29,7 +41,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { effortTriggerName, effortTriggerText } from '$shared/catalog/effort.js';
@@ -45,7 +57,15 @@
   }: RuntimeStripProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. DERIVED STATE
+  // 5. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  // Host-confirmed selection only; Bits UI single-type allows emptying, so a local
+  // Copy is restored to hostMode after every change (non-optimistic, no empty).
+  let modeValue = $state('');
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const runtime = $derived(controls.runtime);
@@ -59,15 +79,7 @@
   const hostMode = $derived(snapshot === null ? '' : planActive ? 'plan' : 'build');
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  // Host-confirmed selection only; Bits UI single-type allows emptying, so a local
-  // Copy is restored to hostMode after every change (non-optimistic, no empty).
-  let modeValue = $state('');
-
-  // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
@@ -75,7 +87,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. HANDLERS
+  // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   function onModeChange(next: string): void {

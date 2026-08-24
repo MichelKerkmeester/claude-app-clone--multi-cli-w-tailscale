@@ -16,15 +16,7 @@
   const draft = getAttachmentDraft();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  const item = $derived(
-    draft.state.items.find((candidate) => candidate.id === draft.state.previewId) ?? null,
-  );
-
-  // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 2. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let dialogEl = $state<HTMLElement | null>(null);
@@ -33,6 +25,18 @@
   let wasOpen = false;
 
   useVisualViewportAnchor(() => dialogEl);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const item = $derived(
+    draft.state.items.find((candidate) => candidate.id === draft.state.previewId) ?? null,
+  );
+  const previewUrl = $derived(item === null ? null : draft.getObjectUrl(item.id));
+  const unavailable = $derived(
+    item !== null && (item.preview === 'unavailable' || previewUrl === null || previewFailed),
+  );
 
   // ───────────────────────────────────────────────────────────────────
   // 4. EFFECTS
@@ -51,11 +55,6 @@
     wasOpen = isOpen;
     if (!isOpen) previewFailed = false;
   });
-
-  const previewUrl = $derived(item === null ? null : draft.getObjectUrl(item.id));
-  const unavailable = $derived(
-    item !== null && (item.preview === 'unavailable' || previewUrl === null || previewFailed),
-  );
 
   // ───────────────────────────────────────────────────────────────────
   // 5. HANDLERS

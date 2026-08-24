@@ -1,7 +1,15 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { SessionListState, ConnectionPhase } from '$shared/state/state.js';
   import type { ReadOnlyCache } from '$shared/transport/cache.js';
   import type { DeviceIdentity } from '$shared/transport/auth.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface HomeProps {
     readonly sessions: SessionListState;
@@ -16,7 +24,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { sessionStatusLabel, compactId, relativeTime } from '$shared/format/view-helpers.js';
@@ -27,7 +35,7 @@
   import PushSettings from './push-settings.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -41,7 +49,7 @@
   }: HomeProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 5. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   // @ds guardrail: staleness derivation — Not designer-editable.

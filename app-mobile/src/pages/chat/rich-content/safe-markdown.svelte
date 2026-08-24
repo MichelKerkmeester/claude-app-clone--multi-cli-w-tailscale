@@ -2,6 +2,10 @@
   // @ds surface: safe-markdown — renders already-redacted Markdown to safe prose.
   // @ds guardrail: do-not-edit — This module is the read-only sanitization boundary; the allowlist, URL/scheme filtering, and character escaping are frozen and NOT designer-editable.
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. TYPES
+  // ───────────────────────────────────────────────────────────────────
+
   interface ParagraphNode {
     readonly kind: 'paragraph';
     readonly text: string;
@@ -45,6 +49,10 @@
     | { readonly kind: 'em'; readonly text: string }
     | { readonly kind: 'del'; readonly text: string };
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   // @ds guardrail: do-not-edit — The sanitization patterns reject raw HTML/markup, unsafe URL schemes, and control/bidi characters verbatim; do not broaden them.
   const RAW_HTML_PATTERN =
     /<\s*\/?\s*(?:script|style|form|input|textarea|button|img|iframe|frame|object|embed|audio|video|source|svg|link|meta|base)\b|<\s*\/?\s*[a-z][^>]*>/iu;
@@ -75,6 +83,10 @@
   const BIDI_CONTROL_PATTERN = new RegExp(`[${BIDI_CONTROL_CLASS}]`, 'gu');
   const ASCII_CONTROL_PATTERN = new RegExp(`[${ASCII_CONTROL_CLASS}]`, 'gu');
   const FENCE_PATTERN = /^ {0,3}(`{3,}|~{3,})([^\r\n]*)\r?$/u;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   // @ds guardrail: do-not-edit — parseSafeMarkdown is the fail-closed AST boundary: unsafe input returns null and SafeMarkdown falls back to escaped verbatim text.
   export function parseSafeMarkdown(source: string): readonly SafeMarkdownNode[] | null {
@@ -365,13 +377,13 @@
   }
 
   // ───────────────────────────────────────────────────────────────────
-  // 1. PROPS
+  // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { source, class: className = '', ariaLabel = 'Formatted text' }: Props = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. DERIVED STATE
+  // 5. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const ast = $derived(parseSafeMarkdown(source));

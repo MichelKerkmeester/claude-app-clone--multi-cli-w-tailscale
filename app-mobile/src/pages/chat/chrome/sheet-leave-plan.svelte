@@ -23,6 +23,10 @@
   import SheetContent from '$shared/primitives/sheet/sheet-content.svelte';
   import SheetTitle from '$shared/primitives/sheet/sheet-title.svelte';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
+
   let {
     isOpen,
     onOpenChange,
@@ -34,7 +38,14 @@
   }: LeavePlanSheetProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. DERIVED STATE
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  let sheetOpen = $state(false);
+  let stayEl = $state<HTMLButtonElement | null>(null);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const isPlanReady = $derived(variant === 'plan-ready' || planReady);
@@ -44,19 +55,16 @@
   const hostOpen = $derived(isOpen);
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  let sheetOpen = $state(false);
-  let stayEl = $state<HTMLButtonElement | null>(null);
-
-  // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
     sheetOpen = hostOpen;
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
 
   const restoreTriggerFocus = () => {
     // The modal restores focus on its own; this timer covers paths where the
@@ -69,10 +77,6 @@
     onOpenChange(false);
     restoreTriggerFocus();
   };
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. HANDLERS
-  // ───────────────────────────────────────────────────────────────────
 
   function onSheetOpenChange(next: boolean): void {
     if (!next) close();

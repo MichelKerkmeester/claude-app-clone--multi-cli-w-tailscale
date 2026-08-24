@@ -19,22 +19,42 @@
 </script>
 
 <script lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
+  // ───────────────────────────────────────────────────────────────────
 
   let { item, previewUrl, onOpen, onRemove, position, total }: AttachmentTileProps = $props();
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   let previewFailed = $state(false);
   let previewButtonRef = $state<HTMLButtonElement | null>(null);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const unavailable = $derived(
+    item.preview === 'unavailable' || previewUrl === null || previewFailed,
+  );
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
     void previewUrl;
     void item.preview;
     previewFailed = false;
   });
-
-  const unavailable = $derived(
-    item.preview === 'unavailable' || previewUrl === null || previewFailed,
-  );
 </script>
 
 <div class="attachment-tile">

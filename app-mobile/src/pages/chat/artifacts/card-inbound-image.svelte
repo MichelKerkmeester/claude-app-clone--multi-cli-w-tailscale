@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // MODULE: CARD INBOUND IMAGE
+  // ───────────────────────────────────────────────────────────────────
+
   import type { InboundImageBlock } from '@pi-remote/pi-rpc-protocol';
 
   import {
@@ -6,6 +10,10 @@
     type InboundImageLifecycleState,
     type InboundImageStatusAction,
   } from './image-status.svelte';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 1. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface InboundImageCardProps {
     readonly block: InboundImageBlock;
@@ -17,6 +25,10 @@
     readonly onAction?: (action: InboundImageStatusAction) => void;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   const PIXEL_STATES = new Set<InboundImageLifecycleState>([
     'inline-ready',
     'full-fetching',
@@ -24,6 +36,10 @@
     'full-degraded',
     'offline-loaded',
   ]);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function initialState(block: InboundImageBlock, deferReady: boolean): InboundImageLifecycleState {
     if (block.availability === 'processing') return 'processing';
@@ -75,7 +91,7 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
@@ -87,7 +103,7 @@
   import VerifiedImage from './verified-image.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -101,10 +117,9 @@
   // @ds surface: inbound-image-card — the in-transcript inbound-image card and its lifecycle.
   // @ds guardrail: do-not-edit — The lifecycle state machine, press-cancel gesture guard, and viewer open handoff are behavioural; do not change them.
   const viewer = getOptionalArtifactViewer();
-  const controlled = $derived(fixtureState !== undefined);
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   // svelte-ignore state_referenced_locally
@@ -116,20 +131,10 @@
   let pressCancelled = false;
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  $effect(() => {
-    const identity = `${block.id}:${block.revision}:${deferReady ? 'deferred' : 'direct'}`;
-    if (identityRef === identity) return;
-    identityRef = identity;
-    currentState = initialState(block, deferReady);
-  });
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
+  const controlled = $derived(fixtureState !== undefined);
   const imageState = $derived(fixtureState ?? currentState);
   const definition = $derived(imageStatusDefinition(imageState));
   const aspectRatio = $derived(aspectRatioFor(block));
@@ -148,7 +153,18 @@
   );
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. HANDLERS
+  // 8. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
+  $effect(() => {
+    const identity = `${block.id}:${block.revision}:${deferReady ? 'deferred' : 'direct'}`;
+    if (identityRef === identity) return;
+    identityRef = identity;
+    currentState = initialState(block, deferReady);
+  });
+
+  // ───────────────────────────────────────────────────────────────────
+  // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   const handleStateChange = (next: InboundImageLifecycleState): void => {

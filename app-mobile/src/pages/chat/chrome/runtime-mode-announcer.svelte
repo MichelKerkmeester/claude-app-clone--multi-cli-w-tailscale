@@ -1,6 +1,14 @@
 <script module lang="ts">
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { planModePresentation, type ModePresentationKind } from './plan-mode-presentation.js';
   import type { RuntimeUiState } from '$shared/state/runtime.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
 
   // @ds state: alert — conflicts · permission loss · delivery uncertainty route to the alert region.
   const ALERT_KINDS: ReadonlySet<ModePresentationKind> = new Set([
@@ -9,6 +17,19 @@
     'extension-error',
     'delivery-unknown',
   ]);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. TYPES
+  // ───────────────────────────────────────────────────────────────────
+
+  export interface RuntimeModeAnnouncerProps {
+    readonly runtime: RuntimeUiState;
+    readonly connection: string;
+  }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function politeCopyFor(kind: ModePresentationKind): string {
     switch (kind) {
@@ -38,21 +59,17 @@
     }
   }
 
-  export interface RuntimeModeAnnouncerProps {
-    readonly runtime: RuntimeUiState;
-    readonly connection: string;
-  }
 </script>
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { runtime, connection }: RuntimeModeAnnouncerProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. LOCAL STATE
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   // @ds surface: runtime-mode-announcer — dual polite/alert live regions for mode transitions.
@@ -65,13 +82,13 @@
   let primed = false;
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const presentation = $derived(planModePresentation(runtime, connection));
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
+  // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {

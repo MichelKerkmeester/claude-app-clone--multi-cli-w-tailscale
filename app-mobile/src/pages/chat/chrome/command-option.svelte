@@ -11,12 +11,24 @@
   // Bidi-override character that somehow reaches the client is replaced for
   // Display only; insertion always uses the canonical DTO string.
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { RankedHostCommand } from '$shared/commands/rank-host-commands.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   /** The stable option id the composer's aria-activedescendant references. */
   export function optionId(name: string): string {
     return `slash-option-${name}`;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
 
   /** Display-only escape: canonical names never contain these, but visible text is
    *  A security surface. The replacement is display-only; insertion always uses the
@@ -24,9 +36,17 @@
    *  @ds guardrail: escaping — Unsafe/bidi-override characters are display-replaced. */
   export const UNSAFE_NAME_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g;
 
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
   export function escapeUnsafeName(name: string): string {
     return name.replace(UNSAFE_NAME_CHARACTERS, '\uFFFD');
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 5. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface CommandOptionProps {
     readonly command: RankedHostCommand;
@@ -37,6 +57,10 @@
     /** Completed-press announcement for a disabled row's disclosed reason. */
     readonly onDisabledPress: (reason: string) => void;
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. HELPERS
+  // ───────────────────────────────────────────────────────────────────
 
   function sourceLabel(source: RankedHostCommand['source']): string {
     switch (source) {
@@ -52,16 +76,20 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 7. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { commandGraphemes } from '$shared/commands/rank-host-commands.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 8. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { command, active, onInsert, onDisabledPress }: CommandOptionProps = $props();
+
+  // ───────────────────────────────────────────────────────────────────
+  // 9. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
 
   /** A pointer drag farther than this cancels activation (no accidental tap-drag inserts). */
   const DRAG_SLOP_PX = 10;
@@ -70,6 +98,18 @@
   // Drag-cancel flag mid-gesture (useRef equivalent).
   let pressOrigin: { x: number; y: number } | null = null;
   let dragged = false;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 10. DERIVED STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const graphemes = $derived(commandGraphemes(escapeUnsafeName(command.name)));
+  const matched = (index: number) =>
+    command.matchRanges.some((range) => range.start <= index && index < range.end);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 11. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
 
   const onPointerDown = (event: PointerEvent) => {
     // Focus stays in the textarea: no focus steal, no text selection, no
@@ -109,13 +149,6 @@
     }
   };
 
-  // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
-  // ───────────────────────────────────────────────────────────────────
-
-  const graphemes = $derived(commandGraphemes(escapeUnsafeName(command.name)));
-  const matched = (index: number) =>
-    command.matchRanges.some((range) => range.start <= index && index < range.end);
 </script>
 
 <!-- This row only restyles; its role, aria wiring, and virtual-focus hook are frozen. -->

@@ -3,11 +3,23 @@
   // MODULE: ATTACHMENT RAIL
   // ───────────────────────────────────────────────────────────────────
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import { getAttachmentDraft } from './attachment-draft-provider.svelte';
   import AttachmentTile from './attachment-tile.svelte';
 
+  // ───────────────────────────────────────────────────────────────────
+  // 2. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
   const draft = getAttachmentDraft();
   let pendingRemoval: { readonly index: number } | null = null;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 3. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
     void draft.state.items;

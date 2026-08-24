@@ -16,9 +16,17 @@
   // Action route between local Insert (panel open) and native multiline/send
   // (panel closed), and no panel interaction can ever reach submission.
 
+  // ───────────────────────────────────────────────────────────────────
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
   import type { RuntimeControls } from '$shared/state/runtime.js';
   import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/commands/commands.js';
   import type { RuntimeMediaCapabilityDto } from '@pi-remote/pi-rpc-protocol';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. TYPES
+  // ───────────────────────────────────────────────────────────────────
 
   export interface SessionComposerProps {
     readonly sessionId?: string;
@@ -56,12 +64,16 @@
     readonly onAttachmentSubmitted?: () => void;
   }
 
+  // ───────────────────────────────────────────────────────────────────
+  // 3. CONSTANTS
+  // ───────────────────────────────────────────────────────────────────
+
   const MAX_TRAY_HEIGHT_PX = 140;
 </script>
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. IMPORTS
+  // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
   import { untrack } from 'svelte';
@@ -90,7 +102,7 @@
   import Button from '$shared/primitives/button/button.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. PROPS
+  // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let {
@@ -123,7 +135,7 @@
   }: SessionComposerProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   // The textarea is the ONLY editing field; the refs below own DOM nodes.
@@ -173,7 +185,7 @@
   }));
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. DERIVED STATE
+  // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   // A turn is running when either the relay session card or the host-
@@ -309,7 +321,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. EFFECTS
+  // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   // Draft recovery (sessionStorage); media bytes are never placed in storage.
@@ -408,18 +420,7 @@
   });
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. HELPERS
-  // ───────────────────────────────────────────────────────────────────
-
-  function grow(): void {
-    const element = textareaEl;
-    if (element === null) return;
-    element.style.height = 'auto';
-    element.style.height = `${Math.min(element.scrollHeight, MAX_TRAY_HEIGHT_PX)}px`;
-  }
-
-  // ───────────────────────────────────────────────────────────────────
-  // 7. HANDLERS
+  // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   // Explicit send routing: a slash draft goes through the ticketed slash
@@ -551,6 +552,17 @@
       event.preventDefault();
       submit();
     }
+  }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 10. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
+  function grow(): void {
+    const element = textareaEl;
+    if (element === null) return;
+    element.style.height = 'auto';
+    element.style.height = `${Math.min(element.scrollHeight, MAX_TRAY_HEIGHT_PX)}px`;
   }
 </script>
 

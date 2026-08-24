@@ -346,6 +346,35 @@ Do not adopt these. Each was tried and rejected in a source repo, with the reaso
 
 ---
 
+## 4b. CURRENT IMPLEMENTATION STATUS
+
+An audit of each recommendation against the shipped code, run after the 011–019 queue closed. It
+collapses the decision: five items are effectively done, four do not fit this architecture, and only a
+handful are genuine open choices. Each verdict is confirmed against source unless marked inferred.
+
+| ID | Verdict | Evidence |
+|---|---|---|
+| R-03 | **Shipped** | close-code classification in `use-sync-socket.svelte.ts` (016/003): 4003 permanent, 4001 immediate, else backoff |
+| R-06 | **Shipped** | `TRANSCRIPT_STALL_THRESHOLD_MS` marker in `transcript-list.svelte` (018) |
+| R-09 | **Shipped** | `transcript-disclosure.svelte.ts`, a `SvelteMap` keyed by block id held outside the row (018) |
+| R-07 | **Mostly shipped** | content-free push hint (opaque lookup id + attention class) in `push-service.ts`; the poll-on-wake and re-read-before-send confirmations are absent |
+| R-02 | **Mostly shipped** | typed `unsupported`/`unsupported_operation` in `runtime-service.ts`; session-manager authority for a mutable request on a viewer-only session is unverified |
+| R-01 | **Partial** | the client already forces a resync on epoch mismatch (`use-sync-socket.svelte.ts`, 016/001); the server-side snapshot-boundary + frame-queue and the gap-free handoff test (0 tests) are the remaining half — and the epoch rotation may already close the loss window here |
+| R-05 | **Decided against** | 018 shipped the spatial separation and deliberately rejected the risk classifier — a wrong risk label is worse than none (`018/plan.md`). The research's classifier half conflicts with a shipped decision |
+| R-12 | **Small follow-up** | 009 shipped the real-decorator render test; permission and planning harness states remain |
+| R-04 | **Deferred refactor** | the `$effect` self-invalidation doctrine ships as prose in the surface skill (019) plus seven fixes; the one-service-owns-the-machine refactor is the deferred remainder |
+| R-08 | **Architecture-scoped** | `attachment-limits.ts` / `attachment-normalizer.ts` exist and the maps are bounded (016/001); the full filesystem jail is a source-repo concern — this relay is content-free and does not write attacker-named files |
+| R-10 | **Out of scope** | the phone and relay never build the prompt; Pi owns compaction. Nothing here budgets a context it does not construct |
+| R-11 | **Half moot** | the app already owns its wire vocabulary (`packages/pi-rpc-protocol`); the upstream-skew adapter targets OpenCode-wrapping clients, and Pi Remote wraps Pi directly |
+| R-13 | **Architecture mismatch** | no CLI wait-state model exists — this app uses ask-question + approvals, not mobilecli's numbered/yes-no keystroke machine. `prompt_hash`/`approval_model` have no wire event to sit on |
+
+**What that leaves as a genuine choice:** R-01's server-side gap-free handoff and its test (only if the
+loss window survives the epoch-rotation resync — worth confirming first); R-02's session-manager
+authority gap (small); R-07's poll-on-wake hardening (small); R-12's harness states (small); and R-04's
+refactor (deferred). Everything else is shipped, already decided, or does not fit this architecture.
+
+---
+
 ## 5. DECISION
 
 Recommended grouping, if you want phases rather than item-by-item:

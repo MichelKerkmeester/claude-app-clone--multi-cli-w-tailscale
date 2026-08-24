@@ -16,7 +16,7 @@
   import type { HostCommandCatalogState, SelectedCommandBinding } from '$shared/commands/commands.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface CommandPaletteProps {

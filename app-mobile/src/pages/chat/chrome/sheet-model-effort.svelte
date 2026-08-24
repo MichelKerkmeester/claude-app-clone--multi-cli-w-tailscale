@@ -22,7 +22,7 @@
   export const EMPTY_LEVELS: readonly string[] = [];
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. TYPES
+  // 3. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export type EffortSheetSection = 'model' | 'effort';

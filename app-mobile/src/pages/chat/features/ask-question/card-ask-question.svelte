@@ -6,7 +6,7 @@
   import type { AskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface AskQuestionCardProps {

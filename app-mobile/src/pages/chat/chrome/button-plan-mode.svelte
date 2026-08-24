@@ -6,7 +6,7 @@
   import type { RuntimeUiState } from '$shared/state/runtime.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface PlanModeButtonProps {

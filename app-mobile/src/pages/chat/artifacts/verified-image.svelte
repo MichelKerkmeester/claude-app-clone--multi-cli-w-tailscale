@@ -9,7 +9,7 @@
   import type { InboundImageLifecycleState } from './image-status.svelte';
 
   // ───────────────────────────────────────────────────────────────────
-  // 1. TYPES
+  // 1. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface VerifiedImageProps {

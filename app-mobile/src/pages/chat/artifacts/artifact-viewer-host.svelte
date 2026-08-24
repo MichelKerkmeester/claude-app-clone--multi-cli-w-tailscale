@@ -20,7 +20,7 @@
   import type { ArtifactResourceStatus } from './use-artifact-resource.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 1. TYPES
+  // 1. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface ArtifactViewerHostProps {

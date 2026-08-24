@@ -3,7 +3,7 @@
   // @ds guardrail: do-not-edit — This module is the read-only sanitization boundary; the allowlist, URL/scheme filtering, and character escaping are frozen and NOT designer-editable.
 
   // ───────────────────────────────────────────────────────────────────
-  // 1. TYPES
+  // 1. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   interface ParagraphNode {

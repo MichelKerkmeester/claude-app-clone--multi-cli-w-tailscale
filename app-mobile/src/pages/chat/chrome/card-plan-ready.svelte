@@ -18,7 +18,7 @@
   const PLAN_TITLE_DISPLAY_CAP = 160;
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. TYPES
+  // 3. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface PlanReadyCardProps {

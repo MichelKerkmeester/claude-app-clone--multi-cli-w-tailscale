@@ -16,7 +16,7 @@
   export const IMAGE_PREVIEW_MAX_ZOOM = 4;
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export type ImagePreviewState = 'loading' | 'ready' | 'corrupt' | 'too-large';

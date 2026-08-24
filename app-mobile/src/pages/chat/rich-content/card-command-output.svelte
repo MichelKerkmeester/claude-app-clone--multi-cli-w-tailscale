@@ -6,7 +6,7 @@
   import type { NormalizedCommandBlock } from './normalize-transcript-blocks.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface CommandSnapshot {

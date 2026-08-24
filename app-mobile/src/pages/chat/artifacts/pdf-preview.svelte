@@ -20,7 +20,7 @@
   } from './pdf-preview-shared.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export type { PdfPreviewState, PdfPreviewProps } from './pdf-preview-shared.js';

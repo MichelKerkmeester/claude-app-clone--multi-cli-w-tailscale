@@ -27,7 +27,7 @@
   export const SLASH_LISTBOX_ID = 'slash-command-list';
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. TYPES
+  // 3. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   /** Open-panel states with objective DOM presentation. */
@@ -63,7 +63,7 @@
   ]);
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. TYPES
+  // 5. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface SlashPanelDerivation {
@@ -214,7 +214,7 @@
   }
 
   // ───────────────────────────────────────────────────────────────────
-  // 8. TYPES
+  // 8. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface ComposerCommandAutocompleteProps {

@@ -13,7 +13,7 @@
   import type { F6RichBlock } from './f6-viewer-adapter.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface RichContentRouterProps {

@@ -6,7 +6,7 @@
   import type { TodoProjectionV1 } from '@pi-remote/pi-rpc-protocol';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface TodoPanelProps {

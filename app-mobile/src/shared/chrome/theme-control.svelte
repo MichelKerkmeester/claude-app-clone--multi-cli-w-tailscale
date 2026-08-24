@@ -10,7 +10,7 @@
   import type { ThemePreference } from '../format/view-helpers.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface ThemeControlProps {

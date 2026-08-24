@@ -6,7 +6,7 @@
   import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
   // ───────────────────────────────────────────────────────────────────
-  // 1. TYPES
+  // 1. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface ArtifactCardProps {

@@ -6,7 +6,7 @@
   import type { ConfirmedMode } from '$shared/state/runtime.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface PlanModeMenuProps {

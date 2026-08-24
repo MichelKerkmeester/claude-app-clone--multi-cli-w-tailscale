@@ -8,7 +8,7 @@
   import type { DeviceIdentity } from '$shared/transport/auth.js';
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. TYPES
+  // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
   export interface HomeProps {

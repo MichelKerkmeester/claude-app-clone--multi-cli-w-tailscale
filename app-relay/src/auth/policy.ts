@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Action Authorization Policy
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type AuthorizedAction =
   | 'health:read'
   | 'sessions:list'
@@ -36,6 +40,10 @@ export const ATTACHMENT_ACTIONS = [
 ] as const;
 export type AttachmentAction = (typeof ATTACHMENT_ACTIONS)[number];
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 export const READ_ONLY_ACTIONS = ['artifact:read'] as const;
 export const HOST_AUTHORITATIVE_ACTIONS = ['artifact:publish'] as const;
 export type HostAuthoritativeAction = (typeof HOST_AUTHORITATIVE_ACTIONS)[number];
@@ -68,6 +76,10 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   'ask-question.answer',
   ...ATTACHMENT_ACTIONS,
 ]);
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Media stays unavailable by default and is enabled only by the runtime capability. */
 export function isMediaFeatureEnabled(

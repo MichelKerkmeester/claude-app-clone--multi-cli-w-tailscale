@@ -1,0 +1,29 @@
+{
+  "specFolder": "006-relay-source-structure",
+  "description": "Phase parent for making the app-relay backend source read the same way the web client does: numbered section banners in every source file, a module",
+  "keywords": [
+    "phase",
+    "parent",
+    "app-relay",
+    "backend",
+    "source",
+    "read",
+    "same",
+    "way",
+    "web",
+    "client",
+    "numbered",
+    "section",
+    "banners",
+    "every",
+    "file",
+    "module"
+  ],
+  "lastUpdated": "2026-08-24T18:56:36.186Z",
+  "specId": "006",
+  "folderSlug": "relay-source-structure",
+  "parentChain": [],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "3"
+}

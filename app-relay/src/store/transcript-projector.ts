@@ -2,6 +2,10 @@
 // MODULE: Pi Event Transcript Projector
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash } from 'node:crypto';
 
 import type {
@@ -33,6 +37,10 @@ import { isAskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
 import type { ArtifactStore } from './artifact-store.js';
 import { projectRedactedAttachmentBlock } from '../attachments/attachment-transcript-projector.js';
 import { getAllowlistedArtifactSnapshot, sanitizeArtifactSnapshot } from './artifact-sanitizer.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 type TranscriptBlockBody =
   | { readonly kind: 'text'; readonly text: string; readonly role?: 'assistant' | 'user' }
@@ -85,6 +93,10 @@ type TranscriptBlockBody =
       readonly previewRetained: false;
     };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const EMPTY_REDACTION: RedactionMetadata = {
   policyVersion: 1,
   fieldsRedacted: 0,
@@ -107,6 +119,10 @@ export interface InboundImageProjectionContext {
   readonly mediaClass: InboundImageMediaClass;
   readonly source: InboundImageSource;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Project only the durable identity of a host-owned question. */
 export function projectAskQuestionTranscriptMeta(input: {
@@ -809,6 +825,10 @@ export class TranscriptProjector {
     return callId;
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function inboundImageBlockBase(context: InboundImageProjectionContext): {
   readonly id: string;

@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Relay Entrypoint
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { randomBytes, randomUUID } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -46,11 +50,19 @@ import {
 } from './store/todo-projector.js';
 import { TranscriptProjector } from './store/transcript-projector.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const HOST_ID = 'host_local';
 const WORKSPACE_REF = 'workspace_default';
 const SESSION_ID = 'session_local';
 const DEFAULT_PORT = 4_310;
 const ASK_QUESTION_HANDOFF_TIMEOUT_MS = 15_000;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface HostAskQuestionBinding {
   readonly requestId: string;
@@ -61,6 +73,10 @@ interface PendingAskQuestionHandoff {
   readonly timer: NodeJS.Timeout;
   settled: boolean;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Start the durable relay, loopback API and one supervised Pi RPC source. */
 export async function runRelay(): Promise<() => Promise<void>> {
@@ -295,6 +311,10 @@ export async function runRelay(): Promise<() => Promise<void>> {
     store.close();
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function askQuestionPresentationFor(event: PiRpcEvent): {
   readonly presentation: AskQuestionPresentedEvent;

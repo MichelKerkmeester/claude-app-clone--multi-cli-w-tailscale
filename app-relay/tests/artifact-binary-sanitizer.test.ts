@@ -1,8 +1,20 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Binary Sanitizer TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash } from 'node:crypto';
 
 import { describe, expect, it } from 'vitest';
 
 import { sanitizeArtifactSnapshot } from '../src/store/artifact-sanitizer.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const PNG_WITH_METADATA = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
@@ -12,6 +24,10 @@ const PDF_WITHOUT_ACTIVE_CONTENT = Buffer.from(
   '%PDF-1.4\n1 0 obj\n<< /Type /Page /Contents 2 0 R >>\nendobj\n2 0 obj\n<< /Length 0 >>\nstream\n\nendstream\nendobj\n%%EOF\n',
   'latin1',
 );
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function digest(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');
@@ -68,6 +84,10 @@ function approved(
     ...extra,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('binary artifact sanitizer', () => {
   it('decodes and re-encodes PNG bytes without metadata or profile chunks', () => {

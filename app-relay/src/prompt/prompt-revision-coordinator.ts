@@ -2,6 +2,10 @@
 // MODULE: Accepted Prompt Revision Coordination
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 /** Mutations which change the prompt revision observed by attachment sets. */
 export type AcceptedPromptMutation = 'user' | 'runtime';
 
@@ -10,6 +14,10 @@ export type AcceptedPromptMutation = 'user' | 'runtime';
  * are deliberately not represented here because they do not change the
  * command contract an attachment set was bound to.
  */
+// ───────────────────────────────────────────────────────────────────
+// 2. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export class PromptRevisionCoordinator {
   private revision: number;
 

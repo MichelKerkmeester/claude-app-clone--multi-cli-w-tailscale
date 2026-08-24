@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Loopback Read-Only HTTP Server
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { timingSafeEqual } from 'node:crypto';
 import { createServer } from 'node:http';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -74,6 +78,10 @@ import {
   type PromptService,
 } from '../prompt/prompt-service.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const LOOPBACK_HOST = '127.0.0.1';
 const DEFAULT_PORT = 4_310;
 const MAX_HTTP_BODY_BYTES = 16_384;
@@ -94,6 +102,10 @@ const TAILSCALE_IDENTITY_HEADERS = [
   'tailscale-user-profile-pic',
   'tailscale-app-capabilities',
 ] as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface SubscribeRequest {
   readonly type: 'subscribe';
@@ -157,6 +169,10 @@ export interface RunningReadOnlyServer {
   readonly foregroundDeviceIds: ReadonlySet<string>;
   readonly stop: () => Promise<void>;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Start a fail-closed read-only API that cannot bind beyond IPv4 loopback. */
 export async function startReadOnlyServer(
@@ -380,6 +396,10 @@ export async function startReadOnlyServer(
     },
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function handleHttp(
   request: IncomingMessage,

@@ -2,6 +2,10 @@
 // MODULE: Canonical Relay Redaction
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   AskQuestionDisplayDto,
   AvailableModelDto,
@@ -40,6 +44,10 @@ import {
 
 import type { ParsedPlanArtifact } from '../runtime/plan-status.js';
 import { allowlistRedactedAttachmentBlock } from '../attachments/attachment-transcript-projector.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REDACTION_POLICY_VERSION = 1 as const;
 const PATH_KEYS = new Set(['cwd', 'fulloutputpath', 'path', 'sessionfile', 'workspacepath']);
@@ -82,10 +90,18 @@ const CONTROL_OR_BIDI_PATTERN =
 const TOOL_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/u;
 const REDACTION_MAX_FIELDS = 10_000;
 
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 interface RedactionState {
   fieldsRedacted: number;
   readonly reasons: Set<string>;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Apply the only redaction policy allowed before persistence or broadcast. */
 export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TPayload>): Envelope {
@@ -107,6 +123,10 @@ export function redactEnvelope<TPayload extends JsonValue>(envelope: Envelope<TP
     redaction,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function isAskQuestionDisplayCarrier(value: JsonValue): boolean {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;

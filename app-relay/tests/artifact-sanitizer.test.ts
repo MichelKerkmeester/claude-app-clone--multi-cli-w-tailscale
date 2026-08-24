@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Sanitizer TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash } from 'node:crypto';
 import { deflateSync } from 'node:zlib';
 import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
@@ -15,12 +23,20 @@ import {
 } from '../src/store/artifact-sanitizer.js';
 import { decodeImage, encodeImage, sniffImage } from '../src/attachments/attachment-decoder.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const SECRET = 'CANARY_ARTIFACT_SECRET_001';
 const PATH = '/Users/operator/private/source.ts';
 const STATIC_WEBP = Buffer.from(
   'UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAgA0JaQAA3AA/vv9UAA=',
   'base64',
 );
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function digest(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');
@@ -78,6 +94,10 @@ function quarantine(): string {
 function expectEmpty(root: string): void {
   expect(readdirSync(root)).toEqual([]);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('inbound image sanitizer', () => {
   it('reuses the bounded decoder path and burns a confirmed mask before both encodes', async () => {

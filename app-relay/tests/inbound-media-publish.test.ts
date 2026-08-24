@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Inbound Media Publish TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash } from 'node:crypto';
 import { deflateSync } from 'node:zlib';
 import { readdirSync } from 'node:fs';
@@ -10,6 +18,10 @@ import {
 } from '../../extensions/pi-remote-inbound-media/src/index.js';
 import { RelayStore, type InboundPublishInput } from '../src/store/relay-store.js';
 import { SyncHub } from '../src/replay/sync.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function pngFixture(width = 16, height = 16): Buffer {
   const raw = Buffer.alloc((width * 4 + 1) * height);
@@ -75,6 +87,10 @@ function baseInput(body: Buffer, overrides: Partial<InboundPublishInput> = {}): 
     ...overrides,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('inbound media publication', () => {
   it('runs a deterministic pre-stdout host seam through processing, exact read, revocation, and expiry', async () => {

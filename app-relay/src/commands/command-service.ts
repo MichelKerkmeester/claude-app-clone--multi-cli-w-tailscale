@@ -2,6 +2,10 @@
 // MODULE: Versioned Command Catalog Authority
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { randomUUID } from 'node:crypto';
 
 import type {
@@ -15,6 +19,10 @@ import type {
 import type { RpcSupervisor } from '../rpc/supervisor.js';
 import { projectCommandCatalog } from '../store/redaction.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 // Names that could carry a privileged or destructive action are hidden from the
 // phone by default. Discovery is a convenience; it must never widen what a remote
 // device can reach beyond the ticketed prompt path.
@@ -26,6 +34,10 @@ const PRIVILEGED_COMMAND_PATTERN =
 // phone slash catalog. Safe non-control commands stay discoverable.
 const PLAN_CONTROL_COMMAND_NAMES = new Set(['plan']);
 
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type CommandAvailability = 'idle' | 'running';
 
 /** Fail-closed verdict for one explicit slash submission binding. */
@@ -36,6 +48,10 @@ export interface CommandServiceOptions {
   /** Explicit host generation identity; omitted only in tests. */
   readonly hostEpoch?: string;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * The relay's sole authority for what a phone may discover and submit as a slash
@@ -132,6 +148,10 @@ export class CommandService {
     return 'allowed';
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function isSafeCommand(descriptor: CommandDescriptorDto): boolean {
   return (

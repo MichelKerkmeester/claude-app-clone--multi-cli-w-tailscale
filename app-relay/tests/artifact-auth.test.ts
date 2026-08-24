@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Auth TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
 
 import {
@@ -16,6 +24,10 @@ import { startReadOnlyServer, type RunningReadOnlyServer } from '../src/http/ser
 import { SyncHub } from '../src/replay/sync.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
@@ -36,6 +48,10 @@ interface AuthorizedClient {
 
 const harnesses: Harness[] = [];
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(async () => {
   await Promise.all(
     harnesses.splice(0).map(async ({ server, store }) => {
@@ -44,6 +60,10 @@ afterEach(async () => {
     }),
   );
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('inbound artifact read authorization', () => {
   it('keeps artifact:read distinct, read-only, and allowed in plan mode', async () => {
@@ -202,6 +222,10 @@ describe('inbound artifact read authorization', () => {
     expect(limiter.tryAcquire('device_001', 'session_local', 'full').allowed).toBe(true);
   });
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function createHarness(): Promise<Harness> {
   const store = new RelayStore();

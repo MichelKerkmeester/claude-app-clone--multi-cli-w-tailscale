@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Prompt Submission Service
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { randomUUID } from 'node:crypto';
 
 import {
@@ -21,6 +25,10 @@ import type { RpcSupervisor } from '../rpc/supervisor.js';
 import type { RelayStore } from '../store/relay-store.js';
 import type { TranscriptProjector } from '../store/transcript-projector.js';
 import { PromptRevisionCoordinator } from './prompt-revision-coordinator.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface PromptServiceOptions {
   readonly store: RelayStore;
@@ -66,7 +74,15 @@ interface SubmissionRecord {
   block?: TextBlock;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const MAX_SUBMISSION_RECORDS = 256;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Send steering input to Pi, then publish only its redacted transcript projection. */
 export class PromptService {
@@ -327,6 +343,10 @@ export class PromptService {
     }
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function resolveEpoch(epoch: string | (() => string)): string {
   return typeof epoch === 'function' ? epoch() : epoch;

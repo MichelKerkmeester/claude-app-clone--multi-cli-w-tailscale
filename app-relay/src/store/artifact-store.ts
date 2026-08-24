@@ -2,6 +2,10 @@
 // MODULE: Immutable Relay Artifact Store
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash, randomBytes } from 'node:crypto';
 import {
   chmodSync,
@@ -29,6 +33,10 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 import type Database from 'better-sqlite3';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 export const MAX_ARTIFACT_BYTES = 50 * 1024 * 1024;
 export const DEFAULT_ARTIFACT_RETENTION_MS = 24 * 60 * 60 * 1_000;
 export const MAX_ARTIFACT_RETENTION_MS = 7 * 24 * 60 * 60 * 1_000;
@@ -40,6 +48,10 @@ export const MAX_INBOUND_TURN_BYTES = 8 * 1024 * 1024;
 export const INBOUND_ARTIFACT_RETENTION_MS = 24 * 60 * 60 * 1_000;
 export const MAX_INBOUND_FULL_BYTES = 2 * 1024 * 1024;
 export const MAX_INBOUND_THUMBNAIL_BYTES = 256 * 1024;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface ArtifactIdentity {
   readonly sessionId: string;
@@ -192,6 +204,10 @@ interface ArtifactRow {
 }
 
 /** Persist only already-sanitized bytes under an immutable exact identity. */
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export class ArtifactStore {
   private readonly now: () => number;
   private readonly maxBytes: number;
@@ -858,6 +874,10 @@ export class ArtifactStore {
     };
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function digestBytes(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');

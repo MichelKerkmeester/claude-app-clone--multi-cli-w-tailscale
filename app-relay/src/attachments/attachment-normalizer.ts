@@ -2,6 +2,10 @@
 // MODULE: Quarantine Image Normalizer
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { MediaOutputMimeType } from '@pi-remote/pi-rpc-protocol';
 
 import {
@@ -17,6 +21,10 @@ import {
   type SniffFailureCode,
 } from './attachment-decoder.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export interface NormalizedImage {
   readonly bytes: Uint8Array;
   readonly mimeType: MediaOutputMimeType;
@@ -30,6 +38,10 @@ export type NormalizationFailureCode =
 export type NormalizationResult =
   | { readonly ok: true; readonly image: NormalizedImage }
   | { readonly ok: false; readonly code: NormalizationFailureCode };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Decode, orient, bound, and re-encode without retaining source metadata. */
 export async function normalizeImage(
@@ -112,6 +124,10 @@ export async function normalizeImage(
     if (!returnedOutput) encoded?.fill(0);
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 interface Raster {
   readonly data: Uint8Array;

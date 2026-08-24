@@ -2,6 +2,10 @@
 // MODULE: Normalized Image Host-to-Pi Bridge
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isPiRpcCommand,
   type MediaOutputMimeType,
@@ -19,9 +23,17 @@ import type {
   AttachmentStatusDto,
 } from './attachment-types.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const MAX_IMAGES = 4;
 const MAX_NORMALIZED_BYTES_PER_IMAGE = 2 * 1024 * 1024;
 const MAX_NORMALIZED_BYTES_PER_TURN = 8 * 1024 * 1024;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type PiImageBridgeRejection =
   | 'invalid-reference'
@@ -90,6 +102,10 @@ export interface PiImageDeliveryResult {
  * Final capability boundary for normalized image delivery. No caller receives
  * a Pi image or its encoded representation; this class owns the one RPC send.
  */
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export class PiImageBridge {
   private readonly activeSets = new Set<string>();
   private readonly consumedSets = new Set<string>();
@@ -294,6 +310,10 @@ export class PiImageBridge {
     await this.options.attachments.markDeliveryUnknown(setId).catch(() => undefined);
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function sameOwner(left: AttachmentOwner, right: AttachmentOwner): boolean {
   return (

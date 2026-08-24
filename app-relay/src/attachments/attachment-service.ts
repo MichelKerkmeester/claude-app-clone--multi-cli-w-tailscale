@@ -2,6 +2,10 @@
 // MODULE: Ephemeral Attachment Service
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash, randomBytes } from 'node:crypto';
 import { open } from 'node:fs/promises';
 import { chmod, mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
@@ -44,6 +48,10 @@ import {
   type AttachmentTicketBinding,
 } from './attachment-types.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const DEFAULT_QUARANTINE_ROOT = join(tmpdir(), 'pi-remote-attachments');
 const MAX_MANAGED_SETS = 256; // Caps retained reservation metadata after its quota is released.
 const MAX_SUBMISSION_RECORDS = 256; // Caps idempotency history after its set is gone.
@@ -71,6 +79,10 @@ interface SubmissionRecord {
   readonly manifestFingerprint: string;
   readonly setId: string;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface AttachmentServiceOptions {
   readonly now?: () => number;
@@ -106,6 +118,10 @@ export interface AttachmentServiceStats {
   readonly normalizedBytes: number;
   readonly relayBytes: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Keep all byte-bearing state in an ephemeral, permission-locked quarantine. */
 export class AttachmentService {
@@ -739,6 +755,10 @@ export class AttachmentService {
     }
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function toReservationRecord(set: ManagedSet): AttachmentReservationRecord {
   return {

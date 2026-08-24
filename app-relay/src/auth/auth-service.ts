@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Application Session Service
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { randomBytes } from 'node:crypto';
 
 import {
@@ -32,6 +36,10 @@ import {
   type AttachmentTicketDto,
 } from '../attachments/attachment-types.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const DEFAULT_SESSION_TTL_MS = 15 * 60_000;
 const DEFAULT_TICKET_TTL_MS = 20_000;
 const DEFAULT_RUNTIME_TICKET_TTL_MS = 10_000;
@@ -39,6 +47,10 @@ const DEFAULT_ASK_QUESTION_TICKET_TTL_MS = 10_000;
 const DEFAULT_CHALLENGE_TTL_MS = 60_000;
 const DEFAULT_ARTIFACT_PUBLISH_TICKET_TTL_MS = 90_000;
 const MAX_ARTIFACT_PUBLISH_BYTES = 15 * 1024 * 1024;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface PendingSessionChallenge extends SessionChallengeResponse {
   readonly deviceId: string;
@@ -181,6 +193,10 @@ export interface AuthServiceOptions {
   readonly attachmentTicketTtlMs?: number;
   readonly artifactPublishTicketTtlMs?: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Coordinate device proof, short sessions, one-use tickets and revocation. */
 export class AuthService {
@@ -813,6 +829,10 @@ export class AuthService {
     }
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function isArtifactPublishTicketBinding(
   value: unknown,

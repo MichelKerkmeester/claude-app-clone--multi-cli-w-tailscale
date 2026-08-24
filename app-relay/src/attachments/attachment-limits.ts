@@ -2,7 +2,15 @@
 // MODULE: Relay Attachment Limits
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { DEFAULT_MEDIA_POLICY } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 export const MAX_ATTACHMENTS_PER_SET = DEFAULT_MEDIA_POLICY.maxImagesPerTurn;
 export const MAX_SOURCE_BYTES_PER_IMAGE = DEFAULT_MEDIA_POLICY.maxSourceBytesPerImage;
@@ -47,8 +55,16 @@ export const LATENCY_LOG_BUCKETS_MS = [
   Number.POSITIVE_INFINITY,
 ] as const;
 
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type AttachmentSizeBucket = 'empty' | 'tiny' | 'small' | 'medium' | 'large' | 'maximum';
 export type AttachmentLatencyBucket = 'fast' | 'short' | 'medium' | 'long' | 'batch' | 'timeout';
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 export function sizeBucket(bytes: number): AttachmentSizeBucket {
   if (bytes <= SIZE_LOG_BUCKETS[0]) return 'empty';

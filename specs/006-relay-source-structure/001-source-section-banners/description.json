@@ -1,0 +1,16 @@
+{
+  "level": "2",
+  "specFolder": "006-relay-source-structure/001-source-section-banners",
+  "description": "Add numbered // N.",
+  "keywords": [
+    "numbered"
+  ],
+  "lastUpdated": "2026-08-24T19:38:08.181Z",
+  "specId": "001",
+  "folderSlug": "source-section-banners",
+  "parentChain": [
+    "006-relay-source-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

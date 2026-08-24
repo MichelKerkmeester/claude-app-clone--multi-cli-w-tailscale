@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Approval Lease Service
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash, randomBytes } from 'node:crypto';
 
 import {
@@ -22,6 +26,10 @@ import type { SyncHub } from '../replay/sync.js';
 import type { RelayStore } from '../store/relay-store.js';
 import { redactJson } from '../store/redaction.js';
 import { verifyFinalGate } from './final-gate.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface LeaseRow {
   readonly approvalId: string;
@@ -62,6 +70,10 @@ interface InFlightExecution {
 
 type GrantTerminalStatus = 'expired' | 'revoked' | 'restart-invalidated';
 
+// ───────────────────────────────────────────────────────────────────
+// 3. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const MAX_GRANT_ACTIONS = 10;
 const MAX_GRANT_TTL_MS = 10 * 60_000;
 
@@ -79,6 +91,10 @@ export interface ApprovalServiceOptions {
   readonly now?: () => number;
   readonly defaultTtlMs?: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Own one-decision approval state and one-shot execution authority. */
 export class ApprovalService {
@@ -785,6 +801,10 @@ const LEASE_SELECT = `
     settled_at AS settledAt, reason
   FROM approval_leases
 `;
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function opaqueId(prefix: string): string {
   return `${prefix}_${randomBytes(18).toString('base64url')}`;

@@ -2,6 +2,10 @@
 // MODULE: Relay Attachment Types
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   AttachmentCancellationReason,
   AttachmentManifestItem,
@@ -11,6 +15,10 @@ import type {
   MediaSourceMimeType,
 } from '@pi-remote/pi-rpc-protocol';
 import { isOpaqueId } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type AttachmentSetState =
   | 'reserved'
@@ -158,6 +166,10 @@ export type AttachmentErrorCode =
   | 'output_too_large'
   | 'internal';
 
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export class AttachmentServiceError extends Error {
   public constructor(readonly code: AttachmentErrorCode) {
     super(code);
@@ -244,6 +256,10 @@ export function isOutputMime(value: unknown): value is MediaOutputMimeType {
 export function isSha256(value: unknown): value is string {
   return typeof value === 'string' && /^[A-Za-z0-9_-]{43}$/u.test(value);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function baseKeys(...extra: string[]): string[] {
   return [

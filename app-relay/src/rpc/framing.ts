@@ -2,15 +2,31 @@
 // MODULE: Strict LF JSONL Framing
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { StringDecoder } from 'node:string_decoder';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const DEFAULT_MAX_RECORD_BYTES = 1_048_576;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface JsonlFramingOptions {
   readonly onRecord: (record: unknown) => void;
   readonly onError: (error: Error) => void;
   readonly maxRecordBytes?: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Decode UTF-8 JSON records while treating LF as the only delimiter. */
 export class StrictJsonlDecoder {

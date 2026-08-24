@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "packet_id": "006-relay-source-structure",
+  "spec_folder": "006-relay-source-structure",
+  "parent_id": null,
+  "children_ids": [
+    "006-relay-source-structure/001-source-section-banners",
+    "006-relay-source-structure/002-bare-file-headers",
+    "006-relay-source-structure/003-attachments-readme",
+    "006-relay-source-structure/004-folder-ownership-map"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "phase",
+      "parent",
+      "app-relay",
+      "backend",
+      "source",
+      "read",
+      "same",
+      "way",
+      "web",
+      "client",
+      "numbered",
+      "section"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. PHASE DOCUMENTATION MAP",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. INVARIANTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase parent for making the app-relay backend source read the same way the web client does: numbered section banners in every source file, a module header on the files that lack one, a README for the attachments subsystem, and a reason-to-change map for the top-level source folders. Comment and documentation only — no behaviour changes.",
+    "created_at": "2026-08-24T19:29:08.880Z",
+    "last_save_at": "2026-08-24T19:42:46.889Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:d341bf71e7f6a0429a06f13f2ec11a3a3b9d0964f02218d4ea7d16ecc6e0133f",
+    "source_doc_hashes": {
+      "spec.md": "aca40bd0355575207f179ab1bd4257199a09a68a7d21f5e2ca98cd8699711701"
+    },
+    "last_active_child_id": "006-relay-source-structure/001-source-section-banners",
+    "last_active_at": null
+  }
+}

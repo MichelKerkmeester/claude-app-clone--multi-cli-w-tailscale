@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Store TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash } from 'node:crypto';
 import { mkdtempSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -9,12 +17,20 @@ import { describe, expect, it } from 'vitest';
 import { ArtifactStore } from '../src/store/artifact-store.js';
 import { RelayStore } from '../src/store/relay-store.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const BYTES = Buffer.from('safe relay artifact\n', 'utf8');
 const IDENTITY = {
   sessionId: 'session_local',
   artifactId: 'artifact_store_001',
   revision: 'rev_store_001',
 } as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function descriptor(bytes = BYTES, overrides: Partial<FilePreviewBlock> = {}): FilePreviewBlock {
   return {
@@ -41,6 +57,10 @@ function descriptor(bytes = BYTES, overrides: Partial<FilePreviewBlock> = {}): F
 function digest(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('immutable artifact store', () => {
   it('stores sanitized bytes once and rejects identity reuse with different bytes', () => {

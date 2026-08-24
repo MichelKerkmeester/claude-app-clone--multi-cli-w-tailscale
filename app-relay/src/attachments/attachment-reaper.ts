@@ -2,14 +2,26 @@
 // MODULE: Attachment Lifecycle Reaper
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { UNCOMMITTED_TTL_MS } from './attachment-limits.js';
 import { AttachmentService } from './attachment-service.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface AttachmentReaperOptions {
   readonly service: AttachmentService;
   readonly now?: () => number;
   readonly intervalMs?: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Converge every transient lifecycle boundary on the same unlink path. */
 export class AttachmentReaper {

@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Mutation Lane TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { EventEmitter } from 'node:events';
 import { PassThrough } from 'node:stream';
 import type { ChildProcessWithoutNullStreams, spawn as nodeSpawn } from 'node:child_process';
@@ -7,9 +15,17 @@ import { describe, expect, it, vi } from 'vitest';
 import { RpcSupervisor } from '../src/rpc/supervisor.js';
 import { RpcDemultiplexer } from '../src/rpc/demux.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function response(id: string, command: string): string {
   return `${JSON.stringify({ id, type: 'response', command, success: true })}\n`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('supervisor settled mutation lane', () => {
   it('waits for the first response before writing the second mutation', async () => {

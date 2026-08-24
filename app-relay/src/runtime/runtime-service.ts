@@ -2,6 +2,10 @@
 // MODULE: Authoritative Runtime Control Service
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   MediaPolicyDto,
   PiRpcCommand,
@@ -46,8 +50,16 @@ import {
   type ParsedPlanArtifact,
 } from './plan-status.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const IDEMPOTENCY_CAP = 256;
 const MODE_CONFIRM_TIMEOUT_MS = 4_000;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface RuntimeServiceOptions {
   readonly sessionId: string;
@@ -78,6 +90,10 @@ type RuntimeValidationReason =
   | 'streaming_active';
 
 /** A mutation the host delivered and explicitly rejected — never a delivery-unknown. */
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 class HostRejectedError extends Error {
   public constructor(readonly reasonCode: 'policy_blocked' | 'host_rejected') {
     super(reasonCode);
@@ -882,6 +898,10 @@ export class RuntimeService {
     return storeSettled(this.planIdempotency, controlId, response);
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function withMediaCapability(
   snapshot: RuntimeSnapshotDto,

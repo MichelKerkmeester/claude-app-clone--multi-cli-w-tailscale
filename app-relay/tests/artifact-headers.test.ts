@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Headers TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash, generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
 
 import {
@@ -15,6 +23,10 @@ import { SyncHub } from '../src/replay/sync.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
 const SERVE_SECRET = 'serve_0123456789abcdefghijklmnopqrstuvwxyz';
@@ -27,6 +39,10 @@ interface Harness {
 
 const harnesses: Harness[] = [];
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(async () => {
   await Promise.all(
     harnesses.splice(0).map(async ({ server, store }) => {
@@ -35,6 +51,10 @@ afterEach(async () => {
     }),
   );
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('inbound artifact read response integrity', () => {
   it('emits only the exact private immutable variant headers', async () => {
@@ -98,6 +118,10 @@ describe('inbound artifact read response integrity', () => {
     expect(`"${flippedDigest}"`).not.toBe(response.headers.get('etag'));
   });
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function createHarness(): Promise<Harness> {
   const store = new RelayStore();

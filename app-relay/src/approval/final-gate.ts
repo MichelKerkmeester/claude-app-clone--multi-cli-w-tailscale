@@ -2,7 +2,15 @@
 // MODULE: Pi Remote Final Approval Gate
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { approvalActionDigest, type ApprovalAction } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type FinalGateDenial =
   | 'digest-mismatch'
@@ -30,6 +38,10 @@ export interface FinalGateLease {
 export type FinalGateResult =
   | { readonly allowed: true; readonly digest: string }
   | { readonly allowed: false; readonly reason: FinalGateDenial };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Recompute the exact action at the final boundary without mutating lease state. */
 export function verifyFinalGate(input: {

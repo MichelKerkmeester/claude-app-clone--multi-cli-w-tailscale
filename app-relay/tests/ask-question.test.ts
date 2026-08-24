@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Ask Question TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -12,6 +20,10 @@ import { SyncHub } from '../src/replay/sync.js';
 import { projectAskQuestionDisplay, redactEnvelope } from '../src/store/redaction.js';
 import { RelayStore } from '../src/store/relay-store.js';
 import { serializePushHint, createAttentionPayload } from '../src/push/push-service.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const IDENTITY = {
   hostId: 'host_local',
@@ -60,6 +72,10 @@ const PRESENTATION: AskQuestionPresentedEvent = {
   },
   requiresReadOnlyHint: true,
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('host-owned ask-question mutation lane', () => {
   it('rejects a duplicate question identity at the same revision', () => {
@@ -293,6 +309,10 @@ describe('host-owned ask-question mutation lane', () => {
     }
   });
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function createHarness(
   handoff: (input: unknown) => Promise<unknown>,

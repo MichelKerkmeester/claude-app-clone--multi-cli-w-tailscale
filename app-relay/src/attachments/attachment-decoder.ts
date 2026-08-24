@@ -2,6 +2,10 @@
 // MODULE: Memory-Isolated Image Decoder Adapter
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
@@ -10,6 +14,10 @@ import type { MediaOutputMimeType } from '@pi-remote/pi-rpc-protocol';
 
 import { IMAGE_DECODE_TIMEOUT_MS, MAX_DECODED_AREA, MAX_SOURCE_EDGE } from './attachment-limits.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const JPEG = 'image/jpeg' as const;
 const PNG = 'image/png' as const;
 const WEBP = 'image/webp' as const;
@@ -17,6 +25,10 @@ const JPEG_SOF_MARKERS = new Set([
   0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf,
 ]);
 const PNG_SIGNATURE = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 type SupportedMime = typeof JPEG | typeof PNG | typeof WEBP;
 
@@ -72,6 +84,10 @@ export interface DecodedImage {
 
 let codecState: CodecState | null = null;
 let codecInitialization: Promise<void> | null = null;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Load each codec from a compiled on-disk module exactly once. */
 export async function initializeAttachmentDecoder(): Promise<void> {
@@ -177,6 +193,10 @@ export async function encodeImage(
         );
   return Uint8Array.from(new Uint8Array(encoded));
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function sniffMagic(bytes: Uint8Array): SupportedMime | null {
   if (startsWith(bytes, PNG_SIGNATURE)) return PNG;

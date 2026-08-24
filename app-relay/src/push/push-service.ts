@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Attention and Web Push Service
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createCipheriv, createDecipheriv, randomBytes, randomUUID } from 'node:crypto';
 
 import {
@@ -23,12 +27,20 @@ import webpush from 'web-push';
 
 import type { RelayStore } from '../store/relay-store.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const DEFAULT_PREFERENCES: PushPreferences = {
   needs_input: true,
   finished: true,
   error: true,
 };
 const MAX_ATTENTION_ITEMS = 200;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface SubscriptionRow {
   readonly deviceId: string;
@@ -69,6 +81,10 @@ export interface PublishContext {
   readonly committed: boolean;
   readonly foregroundDeviceIds?: ReadonlySet<string>;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Persist bounded attention metadata and deliver content-free Web Push hints. */
 export class PushService {
@@ -408,6 +424,10 @@ export async function sendContentFreePushHint(
 ): Promise<number> {
   return service.sendContentFreeHint(hint, context);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function toItem(row: AttentionRow): AttentionItemDto {
   return {

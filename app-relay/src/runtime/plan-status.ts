@@ -1,9 +1,21 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Plan Status and Artifact Parsing
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isOpaqueId,
   isOpaqueToken,
   type PlanValidityValue,
   type RuntimeMode,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 export const PLAN_STATUS_KEY = 'pi-remote-plan-mode';
 export const PLAN_ARTIFACT_KEY = 'pi-remote-plan-artifact';
@@ -12,6 +24,10 @@ const PLAN_TITLE_CAP = 500;
 const PLAN_SUMMARY_CAP = 2_000;
 const PLAN_STEP_CAP = 10_000;
 const PLAN_APPROACH_CAP = 100;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 /** A plan artifact exactly as the host published it, before any DTO projection. */
 export interface ParsedPlanArtifact {
@@ -24,6 +40,10 @@ export interface ParsedPlanArtifact {
   readonly stepCount: number;
   readonly approachCount: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /**
  * True when the record is an extension runtime error. Extension health is
@@ -102,6 +122,10 @@ export function parsePlanArtifact(record: unknown): ParsedPlanArtifact | null {
     approachCount: plan.approachCount,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

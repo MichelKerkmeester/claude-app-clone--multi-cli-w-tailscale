@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Release Rollback Drill
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash } from 'node:crypto';
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -18,6 +22,10 @@ import { SyncHub } from '../replay/sync.js';
 import { MigrationRunner } from '../store/migrations.js';
 import { RelayStore } from '../store/relay-store.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export interface RollbackDrillReport {
   readonly schemaVersion: 1;
   readonly status: 'PASS';
@@ -30,6 +38,10 @@ export interface RollbackDrillReport {
   readonly fullAccessRelaunchArgs: readonly string[];
   readonly fullAccessRelaunchNeedsMigration: false;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Exercise authority drain, backup restore and down-migration on app-local disposable state. */
 export function runRollbackDrill(releaseRoot = defaultReleaseRoot()): RollbackDrillReport {
@@ -179,6 +191,10 @@ export function runRollbackDrill(releaseRoot = defaultReleaseRoot()): RollbackDr
     rmSync(tempRoot, { recursive: true, force: true });
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function action(suffix: string): Omit<ApprovalAction, 'policyVersion'> {
   return {

@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact HTTP TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash, generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
 
 import {
@@ -15,6 +23,10 @@ import { startReadOnlyServer, type RunningReadOnlyServer } from '../src/http/ser
 import { SyncHub } from '../src/replay/sync.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
@@ -45,6 +57,10 @@ afterEach(async () => {
   );
 });
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function digest(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');
 }
@@ -74,6 +90,10 @@ function descriptor(
     ...overrides,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('authenticated exact artifact reads', () => {
   it('serves one exact revision and keeps range identity and security headers stable', async () => {

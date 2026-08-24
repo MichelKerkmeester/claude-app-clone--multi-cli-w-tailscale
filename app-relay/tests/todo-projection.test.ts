@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Todo Projection TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -16,6 +24,10 @@ import {
   TodoProjector,
 } from '../src/store/todo-projector.js';
 import { RelayStore } from '../src/store/relay-store.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const IDENTITY = {
   hostId: 'host_local',
@@ -56,6 +68,10 @@ function defaultTasks(): readonly object[] {
     },
   ];
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('host todo projection', () => {
   it('allowlists stable identity, redacted display fields, state, order, revisions, and timestamps', () => {

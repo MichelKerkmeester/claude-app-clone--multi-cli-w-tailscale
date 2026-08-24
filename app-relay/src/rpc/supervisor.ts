@@ -2,6 +2,10 @@
 // MODULE: Persistent Pi RPC Supervisor
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
@@ -21,9 +25,17 @@ import {
   isAuthoritativeTodoProjectionEvent,
 } from '../store/todo-projector.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const DEFAULT_REQUEST_TIMEOUT_MS = 15_000;
 const DEFAULT_MAX_RESTARTS = 3;
 const MAX_RESTART_DELAY_MS = 5_000;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type SupervisorState = 'stopped' | 'starting' | 'running' | 'fixture' | 'failed';
 
@@ -55,6 +67,10 @@ export interface SupervisorHealth {
   readonly restartCount: number;
   readonly stderrBytes: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 /** Remove image-shaped event payloads before any relay framing or projection path. */
 export function stripImagePayloadFromEventFrame(record: unknown): unknown {
@@ -88,6 +104,10 @@ function isImageValue(value: unknown): boolean {
       typeof candidate.data === 'string')
   );
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Own exactly one persistent Pi RPC child and its serialized command stream. */
 export class RpcSupervisor {

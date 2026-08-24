@@ -2,6 +2,10 @@
 // MODULE: Durable Redacted Relay Store
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
 
@@ -57,12 +61,20 @@ import {
   projectInboundTerminalBlock,
 } from './transcript-projector.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const DEFAULT_RETENTION_EVENTS = 1_000;
 const MAX_RETENTION_EVENTS = 10_000;
 const DEFAULT_TRANSCRIPT_PAGE_SIZE = 50;
 const MAX_TRANSCRIPT_PAGE_SIZE = 100;
 // Keep recent restart history inspectable while bounding transcript storage across epochs.
 const MAX_RETAINED_ENDED_EPOCHS = 10;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface StreamIdentity {
   readonly hostId: string;
@@ -165,6 +177,10 @@ const INBOUND_REDACTION: Envelope['redaction'] = {
   fieldsRedacted: 0,
   reasons: [],
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Persist redacted envelopes with epoch order, deduplication and retention floors. */
 export class RelayStore {
@@ -1126,6 +1142,10 @@ export class RelayStore {
     }
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function isTodoEnvelopeCandidate(value: unknown): value is Envelope {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;

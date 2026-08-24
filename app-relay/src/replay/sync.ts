@@ -2,6 +2,10 @@
 // MODULE: Replay and Live Sync Barrier
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { isAskQuestionTranscriptMeta, isEnvelope } from '@pi-remote/pi-rpc-protocol';
 import type {
   AskQuestionTranscriptMeta,
@@ -12,6 +16,10 @@ import type {
 } from '@pi-remote/pi-rpc-protocol';
 
 import type { RelayStore } from '../store/relay-store.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface SubscriptionIdentity {
   readonly hostId: string;
@@ -26,6 +34,10 @@ interface Subscription {
   barrier: number;
   readonly queued: Envelope[];
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Join replay and live delivery without interleaving pre-snapshot deltas. */
 export class SyncHub {

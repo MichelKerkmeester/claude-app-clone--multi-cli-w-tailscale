@@ -2,11 +2,19 @@
 // MODULE: Redacted Attachment Transcript Projector
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   isRedactedAttachmentBlock,
   type RedactedAttachmentBlock,
   type RedactedAttachmentStatus,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 /** The only attachment fields permitted in a durable transcript card. */
 export const REDACTED_ATTACHMENT_ALLOWLIST = [
@@ -22,6 +30,10 @@ export const REDACTED_ATTACHMENT_ALLOWLIST = [
   'previewRetained',
 ] as const;
 
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export interface RedactedAttachmentProjectionInput {
   readonly id: string;
   readonly revision: number;
@@ -30,6 +42,10 @@ export interface RedactedAttachmentProjectionInput {
   readonly ordinal: number;
   readonly status: RedactedAttachmentStatus;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Construct an attachment card from already-safe transcript identity fields. */
 export function projectRedactedAttachmentBlock(

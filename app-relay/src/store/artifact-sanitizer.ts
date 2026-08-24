@@ -2,6 +2,10 @@
 // MODULE: Fail-closed Artifact Snapshot Sanitizer
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash, randomBytes } from 'node:crypto';
 import { chmodSync, lstatSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -30,6 +34,10 @@ import {
   type SniffedImage,
 } from '../attachments/attachment-decoder.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const MAX_TEXT_BYTES = 2 * 1024 * 1024;
 const MAX_INLINE_TEXT_BYTES = 256 * 1024;
 const MAX_DISPLAY_NAME = 200;
@@ -48,6 +56,10 @@ const PDF_ACTIVE_NAME_PATTERN =
   /\/(?:AA|AcroForm|EmbeddedFile|EmbeddedFiles|Filespec|GoToR|ImportData|JavaScript|JS|Launch|Movie|Named|OpenAction|RichMedia|Sound|SubmitForm|URI|XFA)\b/iu;
 const PDF_UNSAFE_ANNOTATION_PATTERN = /\/(?:Annots|Annot|Link|Widget|3D)\b/iu;
 const PDF_METADATA_NAME_PATTERN = /\/(?:Metadata|PieceInfo)\b/iu;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface SanitizedRaster {
   readonly bytes: Buffer;
@@ -158,6 +170,10 @@ class InboundSanitizationFailure extends Error {
     super(reason);
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Return only a snapshot carrying an explicit relay allowlist marker. */
 export function getAllowlistedArtifactSnapshot(value: unknown): Record<string, unknown> | null {
@@ -332,6 +348,10 @@ export function sanitizeArtifactSnapshot(value: unknown): SanitizedArtifactSnaps
 
 /** Alias used by projection callers to make the publication boundary explicit. */
 export const projectArtifactSnapshot = sanitizeArtifactSnapshot;
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function textSource(snapshot: Record<string, unknown>): string | null {
   if (typeof snapshot.text === 'string') return snapshot.text;

@@ -2,10 +2,18 @@
 // MODULE: Opaque Session Catalog
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { isOpaqueId } from '@pi-remote/pi-rpc-protocol';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
 import type { RelayStore } from '../store/relay-store.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Keep filesystem paths and prompt-derived labels outside the client catalog. */
 export class SessionCatalog {

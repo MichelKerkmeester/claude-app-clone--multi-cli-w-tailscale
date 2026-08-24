@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Fixed-Window Rate Limiter
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 interface RateBucket {
   count: number;
   resetAt: number;
@@ -11,6 +15,10 @@ interface ByteBucket {
   bytes: number;
   resetAt: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 export const ARTIFACT_READ_WINDOW_MS = 5 * 60_000;
 export const ARTIFACT_THUMBNAIL_READ_LIMIT = 60;
@@ -35,6 +43,10 @@ interface ArtifactReadActive {
   thumbnail: number;
   full: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Bound repeated ingress attempts without retaining request payloads. */
 export class FixedWindowRateLimiter {
@@ -174,6 +186,10 @@ export class AttachmentRateLimiter {
     return true;
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function retryAfterSeconds(resetAt: number, now: number): number {
   return Math.max(1, Math.ceil(Math.max(0, resetAt - now) / 1_000));

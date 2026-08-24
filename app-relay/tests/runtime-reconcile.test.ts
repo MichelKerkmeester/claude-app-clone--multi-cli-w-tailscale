@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Runtime Reconcile TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
 
 import {
@@ -17,6 +25,10 @@ import { SyncHub } from '../src/replay/sync.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
 const SERVE_SECRET = 'serve_secret_abcdefghijklmnopqrstuvwxyz';
@@ -29,6 +41,10 @@ interface Harness {
 
 const harnesses: Harness[] = [];
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(async () => {
   while (harnesses.length > 0) {
     const harness = harnesses.pop();
@@ -37,6 +53,10 @@ afterEach(async () => {
     harness.store.close();
   }
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('runtime reconcile endpoint', () => {
   it('returns one snapshot without tickets, foreground authority, or mutation calls', async () => {
@@ -92,6 +112,10 @@ describe('runtime reconcile endpoint', () => {
     expect(await limited?.json()).toEqual({ error: 'rate-limited' });
   });
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function createHarness(runtime: {
   readonly hydrate: () => Promise<unknown>;

@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Read TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
 
 import {
@@ -15,6 +23,10 @@ import { SyncHub } from '../src/replay/sync.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const ORIGIN = 'https://pi-remote.example.test';
 const PRINCIPAL = 'operator@example.test';
 const SERVE_SECRET = 'serve_0123456789abcdefghijklmnopqrstuvwxyz';
@@ -29,6 +41,10 @@ interface Harness {
 
 const harnesses: Harness[] = [];
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(async () => {
   await Promise.all(
     harnesses.splice(0).map(async ({ server, store }) => {
@@ -37,6 +53,10 @@ afterEach(async () => {
     }),
   );
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('authenticated inbound artifact reads', () => {
   it('serves only the requested exact sanitized revision and variant', async () => {
@@ -183,6 +203,10 @@ describe('authenticated inbound artifact reads', () => {
     expect(fullLimited.headers.get('retry-after')).toMatch(/^\d+$/u);
   });
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function createHarness(): Promise<Harness> {
   let now = Date.now();

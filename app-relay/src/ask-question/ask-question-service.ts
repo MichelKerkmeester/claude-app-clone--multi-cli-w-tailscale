@@ -2,6 +2,10 @@
 // MODULE: Host-Owned Ask-Question Authority
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { randomBytes } from 'node:crypto';
 
 import {
@@ -32,6 +36,10 @@ import type { SyncHub } from '../replay/sync.js';
 import { projectAskQuestionDisplay } from '../store/redaction.js';
 import { RelayStore, type StreamIdentity } from '../store/relay-store.js';
 import { projectAskQuestionTranscriptMeta } from '../store/transcript-projector.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type AskQuestionAuthorityStatus =
   | 'pending'
@@ -96,6 +104,10 @@ interface QuestionRecord {
   lastMetadata: AskQuestionTranscriptMeta | null;
   readonly results: Map<string, AskQuestionAnswerResult>;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Owns pending-question lifecycle, validation, idempotency and callback confirmation. */
 export class AskQuestionService {
@@ -612,6 +624,10 @@ export class AskQuestionService {
     return typeof this.options.epoch === 'function' ? this.options.epoch() : this.options.epoch;
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function transcriptStatus(status: AskQuestionAuthorityStatus): AskQuestionTranscriptMeta['status'] {
   if (status === 'pending') return 'presented';

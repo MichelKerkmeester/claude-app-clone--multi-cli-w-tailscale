@@ -2,12 +2,24 @@
 // MODULE: Numbered SQL Migration Runner
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
 import type Database from 'better-sqlite3';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const MIGRATION_PATTERN = /^(\d{3})-([a-z0-9-]+)\.(up|down)\.sql$/;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface MigrationFile {
   readonly version: number;
@@ -18,6 +30,10 @@ interface MigrationFile {
 interface AppliedMigrationRow {
   readonly version: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Apply and reverse numbered SQL migration pairs transactionally. */
 export class MigrationRunner {

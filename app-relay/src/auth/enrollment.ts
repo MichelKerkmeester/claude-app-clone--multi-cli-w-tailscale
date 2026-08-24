@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Device Enrollment Registry
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash, createPublicKey, randomBytes, verify } from 'node:crypto';
 
 import {
@@ -13,10 +17,18 @@ import {
   type EnrollmentRequest,
 } from '@pi-remote/pi-rpc-protocol';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 // Private single-operator deployment favors a longer pairing window so phone enrollment over
 // the tailnet is not a race. The challenge stays single-use and signature-bound, and is only
 // reachable over the private tailnet, so the wider window adds little practical exposure.
 const DEFAULT_CHALLENGE_TTL_MS = 30 * 60_000;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface PendingEnrollment {
   readonly payload: EnrollmentQr;
@@ -37,6 +49,10 @@ export interface EnrollmentRegistryOptions {
   readonly now?: () => number;
   readonly challengeTtlMs?: number;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Own short-lived pairing challenges and enrolled device public keys. */
 export class EnrollmentRegistry {
@@ -150,6 +166,10 @@ export function verifyDeviceSignature(
     return false;
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function opaqueId(prefix: string): string {
   return `${prefix}_${randomBytes(24).toString('base64url')}`;

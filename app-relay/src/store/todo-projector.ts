@@ -2,6 +2,10 @@
 // MODULE: Host-Owned Todo Projection
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash } from 'node:crypto';
 
 import {
@@ -19,8 +23,16 @@ import {
 
 import { redactJson } from './redaction.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 export const TODO_PROJECTION_SOURCE_METHOD = 'setTodoProjection' as const;
 export const TODO_PROJECTION_SOURCE_KEY = 'pi-remote-todo-projection' as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type TodoProjectionUpdate =
   | { readonly kind: 'todo.snapshot.v1'; readonly payload: TodoProjectionV1 }
@@ -32,6 +44,10 @@ export interface AuthoritativeTodoProjectionEvent extends PiRpcEvent {
   readonly statusKey?: typeof TODO_PROJECTION_SOURCE_KEY;
   readonly projection?: JsonValue;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Identify structured host data before it can enter transcript projection. */
 export function isAuthoritativeTodoProjectionEvent(
@@ -217,6 +233,10 @@ export class TodoProjector {
   }
 
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function projectDeltaPayload(raw: unknown): TodoProjectionDeltaV1 | null {
   const record = asRecord(raw);

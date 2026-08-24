@@ -2,13 +2,25 @@
 // MODULE: Pi Remote Mutation Command Policy
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type MutationFamily = 'filesystem' | 'process' | 'network';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const FAMILY_TOOLS: Readonly<Record<MutationFamily, ReadonlySet<string>>> = {
   filesystem: new Set(['edit', 'write']),
   process: new Set(['bash']),
   network: new Set(['fetch']),
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Default-deny mutation policy with exactly one enabled command family at a time. */
 export class MutationPolicy {

@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Inbound Media Negative Controls TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
@@ -7,6 +15,10 @@ import {
   type ArtifactPublishTicketBinding,
 } from '../../src/auth/auth-service.js';
 import { authorizeAction } from '../../src/auth/policy.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const SERVER_SOURCE = readFileSync(new URL('../../src/http/server.ts', import.meta.url), 'utf8');
 const MIGRATION_SOURCE = readFileSync(
@@ -25,6 +37,10 @@ const BINDING: ArtifactPublishTicketBinding = {
   declaredByteLength: 128,
   declaredMediaFamily: 'screenshot',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('inbound media negative controls', () => {
   it('binds one-use publication authority to the complete context and denies replay/wrong context', () => {

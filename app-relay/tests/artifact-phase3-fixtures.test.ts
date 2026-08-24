@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Artifact Response Fixtures TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createHash } from 'node:crypto';
 
 import type { FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
@@ -7,9 +15,17 @@ import { sanitizeArtifactSnapshot } from '../src/store/artifact-sanitizer.js';
 import { ArtifactStore } from '../src/store/artifact-store.js';
 import { RelayStore } from '../src/store/relay-store.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const SESSION_ID = 'session_phase3_fixtures';
 const ARTIFACT_ID = 'artifact_phase3_fixtures';
 const REVISION = 'rev_phase3_fixture_001';
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function digest(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');
@@ -58,6 +74,10 @@ function storedDescriptor(
     ...overrides,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('artifact response fixtures', () => {
   it('projects an empty exact response without inventing body bytes', () => {

@@ -2,12 +2,20 @@
 // MODULE: RPC Response and Event Demultiplexer
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { isPiRpcEvent, isPiRpcResponse } from '@pi-remote/pi-rpc-protocol';
 import type {
   AskQuestionResultReason,
   PiRpcEvent,
   PiRpcResponse,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 interface PendingResponse {
   readonly resolve: (response: PiRpcResponse) => void;
@@ -33,6 +41,10 @@ export interface RpcDemultiplexerOptions {
   readonly onProtocolError: (error: Error) => void;
   readonly askQuestionCallback?: AskQuestionCallbackRoute;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 /** Correlate responses by request id while delivering events independently. */
 export class RpcDemultiplexer {
@@ -115,6 +127,10 @@ export class RpcDemultiplexer {
     return true;
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function normalizeAskQuestionCallbackOutcome(
   outcome: AskQuestionCallbackOutcome,

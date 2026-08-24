@@ -5,9 +5,9 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/020-source-structure/001-css-ownership"
-    last_updated_at: "2026-08-24T08:15:46Z"
-    last_updated_by: "claude-opus-5"
-    recent_action: "47 classes moved; 35 retained as shared guardrails; all gates green."
+    last_updated_at: "2026-08-24T08:49:19Z"
+    last_updated_by: "claude-opus-4-8"
+    recent_action: "48 relocated; app.css 3,197->2,895; remainder shared guardrails; gates green."
     next_safe_action: "Proceed to Phase B (comment structure)."
     blockers: []
     completion_pct: 100
@@ -36,11 +36,11 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-47 of `app.css`'s 82 single-owner classes moved into the scoped `<style>` of the component that uses
-them. `app.css` fell from 3,197 to 2,901 lines and now holds tokens, theme remaps, resets, the 44
+48 of `app.css`'s 82 single-owner classes moved into the scoped `<style>` of the component that uses
+them. `app.css` fell from 3,197 to 2,895 lines and now holds tokens, theme remaps, resets, the 44
 genuinely shared classes, and the shared accessibility guardrail blocks.
 
-The other 35 single-owner-looking classes stayed in `app.css` on purpose. Measured against the code,
+The other 34 single-owner-looking classes stayed in `app.css` on purpose. Measured against the code,
 they are woven into shared a11y guardrail rules — `.composer-plus, .composer-primary, … { min-inline-size:
 44px }`, `@media (prefers-reduced-motion) { .effort-spinner, .model-sheet-skeleton, … { animation:
 none } }`, contrast and forced-colors blocks — that group several components and are asserted there by
@@ -103,7 +103,15 @@ smoke are what actually protect a11y through a CSS relocation, and each was run.
 
 **The slim is ~9%, not the ~50% first estimated.** `app.css` is not mostly single-component bloat: ~262
 lines are tokens/theme/resets that must be global, 44 classes are genuinely shared, and a large slice
-is cross-component a11y guardrails. Moving the 35 guardrail-entangled classes would require splitting
+is cross-component a11y guardrails. Moving the remaining guardrail-entangled classes would require splitting
 shared guardrail blocks and repointing the a11y tests, scattering rules that are safer audited as a set
 — which is why they were retained rather than moved.
+
+**The strip is at its measured ceiling under single-owner-only.** A follow-up pass re-checked every
+class still in `app.css`: of the 31 single-owner-by-markup classes that remain, each shares a selector
+group with a class owned by a different component (the 44px touch-target block, the reduced-motion
+block, the artifact/rich-content shared blocks), so none is cleanly movable. The one exception — the
+`.ask-question-option-row` system-theme override, an orphaned sibling of a variant already in the
+component — was relocated, completing its three-theme set in one file. Nothing single-owner-and-standalone
+is left; stripping further means decomposing shared guardrails and rewriting their a11y oracles.
 <!-- /ANCHOR:limitations -->

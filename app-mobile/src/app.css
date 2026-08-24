@@ -996,12 +996,6 @@ button[data-pressed]:not([data-disabled]) {
    scroll container. */
 /* @ds end surface: todos */
 
-@media (prefers-color-scheme: dark) {
-  :root[data-theme='system'] .ask-question-option-row[aria-pressed='true'] {
-    color: var(--ink);
-  }
-}
-
 /* Local photo draft: a compact, horizontal rail that never becomes a second editor. */
 
 /* @ds surface: rich-content-cards — the rich-content card group: command/output,

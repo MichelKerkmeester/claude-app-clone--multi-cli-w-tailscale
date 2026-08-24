@@ -151,4 +151,11 @@
   :global(:root[data-theme='dark']) .ask-question-option-row[aria-pressed='true'] {
     color: var(--ink);
   }
+
+  /* @ds state: selected · system-dark — under OS dark, the system-theme selected row re-inks to base ink. */
+  @media (prefers-color-scheme: dark) {
+    :global(:root[data-theme='system']) .ask-question-option-row[aria-pressed='true'] {
+      color: var(--ink);
+    }
+  }
 </style>

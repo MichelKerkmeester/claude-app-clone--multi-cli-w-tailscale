@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Protocol Guard Tests
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -86,6 +90,10 @@ import {
   sha256,
 } from '../src/index.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const ENVELOPE = {
   v: 1,
   eventId: 'event_001',
@@ -101,6 +109,10 @@ const ENVELOPE = {
   redaction: { policyVersion: 1, fieldsRedacted: 0, reasons: [] },
   replay: { eligible: true, snapshotEligible: true },
 } as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('protocol guards', () => {
   it('accepts supported commands, responses and events', () => {

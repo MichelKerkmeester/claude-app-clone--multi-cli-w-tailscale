@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Protocol Guards
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   AcceptEditsGrantDto,
   AskQuestionAnswer,
@@ -172,6 +176,10 @@ import {
   TODO_TASK_STATES,
 } from './types.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const APPROVAL_RESULT_STATUSES = new Set([
   'approved',
   'denied',
@@ -316,6 +324,10 @@ const MEDIA_MAX_SESSION_EPOCH_LENGTH = 256;
 const MEDIA_MAX_NORMALIZED_BASE64 = Math.ceil(MEDIA_MAX_NORMALIZED_BYTES_PER_IMAGE / 3) * 4;
 
 /** Return whether a value can be serialized as JSON without coercion. */
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export function isJsonValue(value: unknown): value is JsonValue {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') {
     return true;
@@ -776,6 +788,10 @@ export function isNormalizedPiImage(value: unknown): value is NormalizedPiImage 
     isBase64(value.data, 4, MEDIA_MAX_NORMALIZED_BASE64, MEDIA_MAX_NORMALIZED_BYTES_PER_IMAGE)
   );
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function isNormalizedPiImageArray(value: unknown): value is readonly NormalizedPiImage[] {
   if (!Array.isArray(value) || value.length > MEDIA_MAX_IMAGES) return false;

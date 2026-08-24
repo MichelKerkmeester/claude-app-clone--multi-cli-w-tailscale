@@ -1,11 +1,19 @@
 #!/usr/bin/env node
 
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Design System CDP Gate
+// ───────────────────────────────────────────────────────────────────
+
 // Durable WHY: proving a token refactor is pixel-identical needs an objective,
 // scripted baseline of the app's default surface. This runner boots the web app
 // in local demo mode at a true 390 CSS-pixel viewport, asserts that width with
 // zero horizontal overflow, and captures a PNG for diffing. It reuses the shared
 // Chrome-over-CDP pattern (findChrome + launch + /json/list page target +
 // Runtime.evaluate) and the already-declared `ws` dependency.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -14,9 +22,17 @@ import { tmpdir } from 'node:os';
 
 import WebSocket from 'ws';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const HOST = '127.0.0.1';
 const DEV_PORT = 4173;
 const DEV_URL = `http://${HOST}:${DEV_PORT}`;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function parseArgs(argv) {
   const options = {};
@@ -254,6 +270,10 @@ async function exerciseDefaultSurface(client, theme, outputPath, viewportWidth) 
   writeFileSync(outputPath, Buffer.from(screenshot.data, 'base64'));
   return state;
 }
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const surface = requiredOption(options, 'surface');

@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Naming Completeness Scan
 // ───────────────────────────────────────────────────────────────────
+
 // Reports every in-scope file whose name does not match the grammar. The
 // SvelteKit reserved names are excluded by name rather than incidentally: a
 // scan that happens to miss them is not a gate, because the day one starts
@@ -9,16 +10,28 @@
 // Usage: node scripts/naming/scan-naming.mjs [--scope <path-prefix>]
 // Exit 0 = every in-scope name matches; exit 2 = offenders listed.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readdirSync, statSync } from 'node:fs';
 import { join, relative, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { kebabBasename, isReservedName, isRouteParameterSegment, RESERVED_SVELTEKIT } from './naming-rules.mjs';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const SOURCE_ROOT = 'app-mobile/src';
 const EXCLUDED_DIRS = new Set(['routes']);
 const SOURCE_EXTENSIONS = ['.svelte', '.ts'];
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
@@ -32,6 +45,10 @@ function walk(dir, out = []) {
   }
   return out;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const scopeIndex = process.argv.indexOf('--scope');

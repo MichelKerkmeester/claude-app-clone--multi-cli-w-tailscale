@@ -14,10 +14,18 @@
 // stdout. A final self-scan refuses to print anything that still looks like a
 // secret or absolute path, so a leak fails the run instead of leaking.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 import { fullAccessPiArguments } from '../app-relay/dist/index.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REQUEST_TIMEOUT_MS = numberFromEnv('PI_REMOTE_VERIFY_TIMEOUT_MS', 20_000);
 const PLAN_SMOKE = process.argv.includes('--no-plan-smoke') ? false : true;
@@ -45,6 +53,10 @@ const PLAN_MODES = new Set(['build', 'plan', 'executing-plan', 'unknown']);
 // desktop-parity (all-tools, no-gate) child; full access stays operator-run.
 const SAFE_POSTURE_ARGS = ['--mode', 'rpc', '--no-session', '--no-tools', '--no-extensions'];
 const POSTURE = process.env.PI_REMOTE_VERIFY_POSTURE === 'safe' ? 'safe' : 'full-access';
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 async function main() {
   const args = POSTURE === 'safe' ? [...SAFE_POSTURE_ARGS] : [...fullAccessPiArguments()];
@@ -96,6 +108,10 @@ async function main() {
 }
 
 // ── /plan smoke: enter plan, observe an RPC-visible signal, restore mode ──────
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function runPlanSmoke(client, initialMode) {
   const result = {
@@ -398,5 +414,9 @@ const entryPath = process.argv[1];
 if (entryPath !== undefined && import.meta.url === pathToFileURL(entryPath).href) {
   void main();
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. EXPORTS
+// ───────────────────────────────────────────────────────────────────
 
 export { isPass, projectState, projectModels, projectLevels, projectCommands };

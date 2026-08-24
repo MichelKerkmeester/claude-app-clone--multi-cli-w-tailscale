@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Catalog Render CDP Gate
+// ───────────────────────────────────────────────────────────────────
+
 // Catalog render gate: prove every Storybook story renders — light AND dark —
 // without throwing. `storybook build` only proves the stories COMPILE; a story
 // can build clean and still throw at render (e.g. a component reading a context
@@ -11,6 +15,10 @@
 // Exit 0 = every rendered story clean; 2 = at least one story threw; 1 = harness
 // could not run (no build, no Chrome, no story index).
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
@@ -18,6 +26,10 @@ import { existsSync, mkdtempSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, normalize, extname } from 'node:path';
 import WebSocket from 'ws';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const HOST = '127.0.0.1';
 const args = process.argv.slice(2);
@@ -34,6 +46,10 @@ const CONTENT_TYPES = {
   '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2',
   '.woff': 'font/woff', '.ttf': 'font/ttf', '.map': 'application/json',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function findChrome() {
   const p = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -154,6 +170,10 @@ function collectErrors(c) {
       : '';
   return { consoleErrors: consoleErrors.length, exceptions: exceptions.length, sample };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 async function main() {
   const staticDir = STATIC;

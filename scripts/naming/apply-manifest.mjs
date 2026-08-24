@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Rename Manifest Applier
 // ───────────────────────────────────────────────────────────────────
+
 // Moves files and rewrites the specifiers that point at them, both derived from
 // the manifest. Hand-editing a specifier to unbreak a build is the one shortcut
 // that must not be taken: it decouples the imports from the moves, and the next
@@ -10,10 +11,18 @@
 //   node scripts/naming/apply-manifest.mjs --scope <path-prefix>            (dry run)
 //   node scripts/naming/apply-manifest.mjs --scope <path-prefix> --apply
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, relative, dirname, resolve, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const MANIFEST = join(REPO_ROOT, 'scripts/naming/rename-manifest.json');
@@ -35,6 +44,10 @@ const SPECIFIER_ROOTS = [
   'tests',
 ];
 const SPECIFIER_EXTENSIONS = ['.svelte', '.ts', '.tsx', '.js', '.mjs'];
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function argValue(flag) {
   const index = process.argv.indexOf(flag);
@@ -176,6 +189,10 @@ function moveFile(row, apply) {
   }
   git(['mv', row.from, row.to]);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const scope = argValue('--scope');

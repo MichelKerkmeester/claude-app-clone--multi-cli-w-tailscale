@@ -2,9 +2,17 @@
 // MODULE: Pi Remote Protocol Device Proofs
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { DevicePublicKeyJwk, EnrollmentQr, SessionChallengeResponse } from './types.js';
 
 /** Produce the byte-stable enrollment statement signed by a new device. */
+// ───────────────────────────────────────────────────────────────────
+// 2. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export function enrollmentProof(enrollment: EnrollmentQr, publicKey: DevicePublicKeyJwk): string {
   return [
     'pi-remote-enrollment-v1',

@@ -2,11 +2,19 @@
 // MODULE: Pi Remote Release Rollback Drill Tests
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
 import { runRollbackDrill } from '../app-relay/src/release/rollback-drill.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('executable rollback drill', () => {
   it('executes restore and down-migration without losing sessions or uncertainty', () => {

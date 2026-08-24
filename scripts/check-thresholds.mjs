@@ -2,15 +2,27 @@
 // MODULE: Pi Remote Threshold Checker
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { collectMachineMeasurements, evaluateThresholds } from '../release/threshold-gate.mjs';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const appRoot = fileURLToPath(new URL('../', import.meta.url));
 const args = process.argv.slice(2);
 const measurementsFlag = args.indexOf('--measurements');
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 try {
   const config = JSON.parse(

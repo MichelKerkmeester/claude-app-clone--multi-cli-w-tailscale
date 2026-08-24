@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Queue Advancement
 // ───────────────────────────────────────────────────────────────────
+
 // Computes which node to work next instead of leaving it to recollection.
 // A node has advanced when its packet validates strict and its own completion
 // is recorded; it is ready when every dependency has advanced. A held node
@@ -10,10 +11,18 @@
 //
 // Usage: node scripts/queue/next-node.mjs
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const PACKET_ROOT = 'specs/003-pi-remote-design-system/005-sveltekit-spa-migration';
@@ -21,6 +30,10 @@ const VALIDATE =
   '/Users/michelkerkmeester/MEGA/Development/Code_Environment/Public/.opencode/skills/system-spec-kit/scripts/spec/validate.sh';
 
 /** Resolve a node id to the folder that holds its documents, parent or child. */
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function packetFolder(id) {
   const [parent, child] = id.split('/');
   const root = join(REPO_ROOT, PACKET_ROOT);
@@ -52,6 +65,10 @@ function validates(folder) {
     return output.length > 0 && !output.includes('RESULT: FAILED');
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const graph = JSON.parse(readFileSync(join(REPO_ROOT, 'scripts/queue/graph.json'), 'utf8'));

@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Rollout Evaluator
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export function evaluateRollout(config, evidence) {
   const failures = [];
   if (config?.schemaVersion !== 1 || !Array.isArray(config.stages)) {

@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Kind Prefix Overlay Builder
 // ───────────────────────────────────────────────────────────────────
+
 // Emits the manifest overlay that puts the kind first in a component's name.
 // The rule is deliberately mechanical: a component whose name ends in one of
 // the closed kinds is an instance of that kind, and everything else is a
@@ -9,11 +10,19 @@
 //
 // Usage: node scripts/naming/build-kind-overlay.mjs
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { toKebab, splitBasename } from './naming-rules.mjs';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const PAGES_ROOT = 'app-mobile/src/pages';
@@ -46,6 +55,10 @@ const SCREENS = {
   'app-mobile/src/pages/enrollment/Enrollment': 'screen-enrollment',
   'app-mobile/src/pages/enrollment/enrollment': 'screen-enrollment',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
@@ -81,6 +94,10 @@ function kindFirstStem(stem) {
   }
   return null;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const overlay = {};

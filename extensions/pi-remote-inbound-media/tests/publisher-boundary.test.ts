@@ -2,9 +2,17 @@
 // MODULE: Pi Remote Inbound Media Boundary Tests
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it, vi } from 'vitest';
 
 import { createInboundMediaHostAdapter, type ApprovedImageOutput } from '../src/index.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('inbound media host boundary', () => {
   it('advertises no capability and forwards nothing when interception is unavailable', () => {

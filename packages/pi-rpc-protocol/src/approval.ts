@@ -2,7 +2,15 @@
 // MODULE: Pi Remote Protocol Canonical Approval Hashing
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { ApprovalAction, AskQuestionAnswer, JsonValue } from './types.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const SHA256_INITIAL = new Uint32Array([
   0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
@@ -19,6 +27,10 @@ const SHA256_CONSTANTS = new Uint32Array([
 ]);
 
 /** Serialize JSON with recursively sorted object keys and no implicit coercion. */
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export function canonicalizeJson(value: JsonValue): string {
   if (value === null || typeof value === 'boolean' || typeof value === 'string') {
     return JSON.stringify(value);
@@ -145,6 +157,10 @@ export function sha256(value: string): string {
   }
   return [...hash].map((part) => part.toString(16).padStart(8, '0')).join('');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function rotateRight(value: number, count: number): number {
   return (value >>> count) | (value << (32 - count));

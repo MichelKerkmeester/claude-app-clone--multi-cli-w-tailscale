@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Rich Content CDP Gate
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
@@ -7,9 +15,17 @@ import { tmpdir } from 'node:os';
 
 import WebSocket from 'ws';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const HOST = '127.0.0.1';
 const DEV_PORT = 4173;
 const DEV_URL = `http://${HOST}:${DEV_PORT}`;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function parseArgs(argv) {
   const options = {};
@@ -606,6 +622,10 @@ async function exerciseRichRelease(client, theme, outputPath, viewportWidth) {
     viewer: viewerState,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));

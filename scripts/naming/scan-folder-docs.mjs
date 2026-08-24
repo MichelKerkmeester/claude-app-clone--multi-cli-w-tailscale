@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Folder Documentation Coverage Scan
 // ───────────────────────────────────────────────────────────────────
+
 // Every folder holding source should answer what it is for. A folder with
 // enough structure to get lost in should also answer how that structure is
 // arranged, in a second document. A folder holding one file has no such
@@ -15,9 +16,17 @@
 //
 // Usage: node scripts/naming/scan-folder-docs.mjs [--json]
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readdirSync, statSync, readFileSync, existsSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const SOURCE_ROOT = 'app-mobile/src';
@@ -28,6 +37,10 @@ const CODE_DOC = 'CODE.md';
 const CODE_DOC_SOURCE_THRESHOLD = 3;
 
 /** Direct source files, ignoring stories, which describe a component rather than being one. */
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function directSourceCount(dir) {
   return readdirSync(dir).filter(
     (entry) =>
@@ -80,6 +93,10 @@ function referencedPaths(markdown) {
   }
   return references;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const folders = [...sourceFolders(join(REPO_ROOT, SOURCE_ROOT))].sort();

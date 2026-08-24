@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Token Identity Resolver
+// ───────────────────────────────────────────────────────────────────
+
 // Token-identity resolver — the browser-free acceptance oracle for the SvelteKit migration.
 //
 // WHY browser-free: the app ships a strict CSP (style-src 'self', no unsafe-inline), so headless
@@ -17,12 +21,20 @@
 //
 // Multiple input files are concatenated (corpus mode). Exit 0 = ok / 0 diffs; exit 2 = diffs or failure.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readFileSync, writeFileSync } from 'node:fs';
 
 // Read a CSS source. A .svelte file contributes only its <style> block bodies (the scoped CSS the
 // migration moves each surface's rules into); anything else is read as raw CSS. This lets the diff
 // gate assemble the post-migration corpus straight from the component tree:
 //   diff <baseline.json> app-mobile/src/app.css app-mobile/src/**/*.svelte
+// ───────────────────────────────────────────────────────────────────
+// 2. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function readCssInput(file) {
   const text = readFileSync(file, 'utf8');
   if (!file.endsWith('.svelte')) return text;
@@ -37,6 +49,10 @@ function readCssInput(file) {
 // light  = the base :root block.
 // dark   = :root base then :root[data-theme='dark'] overrides.
 // system = :root base then the @media(prefers-color-scheme:dark) :root[data-theme='system'] overrides.
+// ───────────────────────────────────────────────────────────────────
+// 3. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const THEMES = ['light', 'dark', 'system'];
 
 // Normalized global-root selectors (whitespace-collapsed, quotes normalized to single).
@@ -50,6 +66,10 @@ const ROOT_SYSTEM = ":root[data-theme='system']";
 //   - selector: normalized selector text
 //   - media:    the @media prelude if the rule sits inside one, else null
 // -------------------------------------------------------------------------------------------------
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function stripComments(css) {
   return css.replace(/\/\*[\s\S]*?\*\//g, '');

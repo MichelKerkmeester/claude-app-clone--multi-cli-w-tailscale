@@ -1,14 +1,14 @@
 ---
-title: "Relay source structure — section banners, file headers, and folder documentation"
-description: "Phase parent for making the app-relay backend source read the same way the web client does: numbered section banners in every source file, a module header on the files that lack one, a README for the attachments subsystem, and a reason-to-change map for the top-level source folders. Comment and documentation only — no behaviour changes."
+title: "Backend and shared source structure — section banners, file headers, and folder documentation"
+description: "Phase parent for making the non-web source read the same way the web client does: numbered section banners, a module header on the files that lack one, and folder documentation. It began on app-relay (children 001-004) and extends to the repo-root shared code — packages, scripts, extensions, release and root tests (children 005-006). Comment and documentation only — no behaviour changes."
 contextType: "planning"
 _memory:
   continuity:
     packet_pointer: "specs/006-relay-source-structure"
-    last_updated_at: "2026-08-24T21:00:00Z"
+    last_updated_at: "2026-08-24T21:36:29.678Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Phase parent scoped; four children created for the relay source-structure pass."
-    next_safe_action: "Run 001-source-section-banners: add numbered section banners to the 36 module files."
+    recent_action: "Extended the packet with two root-code children (005 banners, 006 folder docs)."
+    next_safe_action: "Run 005-root-source-banners: banner the 47 repo-root code files."
     blockers: []
     completion_pct: 0
 ---
@@ -16,7 +16,10 @@ _memory:
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
 <!-- SPECKIT_LEVEL: 3 -->
 
-# Relay source structure — phase parent
+# Backend and shared source structure — phase parent
+
+> The folder is named `006-relay-source-structure` because the work began on app-relay; it has since
+> grown to cover the repo-root shared code. The name is kept to preserve packet identity and history.
 
 ---
 
@@ -27,8 +30,8 @@ _memory:
 |---|---|
 | Parent | (top-level spec) |
 | Mode | Phase parent |
-| Children | `001-source-section-banners`, `002-bare-file-headers`, `003-attachments-readme`, `004-folder-ownership-map` |
-| Status | Planned |
+| Children | `001-source-section-banners`, `002-bare-file-headers`, `003-attachments-readme`, `004-folder-ownership-map`, `005-root-source-banners`, `006-root-folder-docs` |
+| Status | In Progress |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -48,6 +51,12 @@ The web client (`app-mobile`) already reads this way: every file has a header, i
 numbered banners, and folders that earn one have a README. This packet brings the relay source to the
 same standard so a maintainer moves between the two surfaces without relearning the layout.
 
+The same unevenness holds for the code at the repo root that both apps depend on — the shared
+`pi-rpc-protocol` package, the build and gate `scripts`, the three Pi `extensions`, the `release` tooling
+and the root `tests`. Forty-seven of those files have a `// MODULE:` header but no interior section
+banners or none at all, and four folders (the `packages` and `extensions` containers, and two of the
+three extensions) have no README. Children 005 and 006 finish the same alignment there.
+
 Each concern is a phase because each has a different failure mode and a different proof. A banner pass
 is proven by showing the non-comment source is byte-identical and the suite stays green. A new header
 on a bare file is the same comment-only proof over a different file set. A README and a folder map are
@@ -66,6 +75,8 @@ what.
 | B | `002-bare-file-headers` | Give the 16 files with no banner a `// MODULE:` header and the same numbered sections — 15 test suites and `src/runtime/plan-status.ts`. Comment-only. |
 | C | `003-attachments-readme` | Write a README for `src/attachments`, the eight-file inbound-media subsystem, so a first reader learns the decode → bound → normalise → project → reap flow. |
 | D | `004-folder-ownership-map` | Write a reason-to-change map for the 16 `src/` folders: for each folder, what it owns and the change that belongs there. One map, not sixteen READMEs. |
+| E | `005-root-source-banners` | Ensure every repo-root code file has a `// MODULE:` header and numbered section banners — 47 files across `packages`, `scripts`, `extensions`, `release` and root `tests`. Comment-only; the non-comment source stays byte-identical. |
+| F | `006-root-folder-docs` | Fill the missing folder READMEs: the two undocumented Pi extensions, and the `packages` and `extensions` container maps. Documentation only. |
 <!-- /ANCHOR:phases -->
 
 ---
@@ -75,9 +86,10 @@ what.
 
 Non-negotiable across every phase:
 
-- No behaviour change. The relay serves the same responses, the same auth and mutation policy, the same
-  attachment handling. Phases A and B touch only comments; phases C and D add only documentation files.
-- The app-relay test suite stays green, run on its explicit `tests` directory from the final state.
+- No behaviour change. The relay and the shared code behave identically. The banner and header phases
+  (A, B, E) touch only comments; the documentation phases (C, D, F) add only documentation files.
+- The affected test suites stay green from the final state — the app-relay suite for A-D, and the
+  root/package/extension suites plus typecheck for the shared code the root phases touch.
 - Comment-only phases prove the non-comment source is byte-identical before and after.
 - Comment hygiene: no spec path, ticket id, or REQ/CHK/task id in any code comment.
 <!-- /ANCHOR:invariants -->

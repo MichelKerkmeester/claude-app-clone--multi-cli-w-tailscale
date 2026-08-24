@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Inbound Media Host Boundary
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type InboundMediaSource = 'tool_result' | 'assistant_output' | 'extension';
 export type InboundMediaClass = 'screenshot' | 'raster' | 'generated';
 
@@ -62,6 +66,10 @@ export interface PiInboundMediaExtensionContext {
   readonly runtimeSnapshot?: InboundMediaRuntimeSnapshot | null;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const INBOUND_MEDIA_CAPABILITY: InboundMediaCapability = Object.freeze({
   enabled: true,
   imageIn: true,
@@ -79,6 +87,10 @@ const INBOUND_MEDIA_CLASSES = new Set<InboundMediaClass>(['screenshot', 'raster'
  * Build the host seam. The callback receives only an opaque capability handle;
  * transport writers are intentionally never used by this boundary.
  */
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export function createInboundMediaHostAdapter(
   options: InboundMediaAdapterOptions = {},
 ): InboundMediaHostAdapter {
@@ -143,6 +155,10 @@ export default function piRemoteInboundMedia(
 export function isAllowlistedInboundMediaSource(value: unknown): value is InboundMediaSource {
   return typeof value === 'string' && INBOUND_MEDIA_SOURCES.has(value as InboundMediaSource);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function isRuntimeMediaCapabilityEnabled(
   snapshot: InboundMediaRuntimeSnapshot | null | undefined,

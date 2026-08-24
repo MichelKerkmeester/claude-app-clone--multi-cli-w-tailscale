@@ -2,10 +2,18 @@
 // MODULE: Pi Remote Threshold Evaluator
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { gzipSync } from 'node:zlib';
 import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 export const REQUIRED_METRICS = [
   'foregroundP95LatencyMs',
@@ -17,6 +25,10 @@ export const REQUIRED_METRICS = [
   'wcagConformanceLevel',
   'bundleGzipBytes',
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 export function evaluateThresholds(config, measurements) {
   const failures = [];
@@ -189,6 +201,10 @@ export async function collectMachineMeasurements(appRoot) {
     rmSync(tempRoot, { recursive: true, force: true });
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function listFiles(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

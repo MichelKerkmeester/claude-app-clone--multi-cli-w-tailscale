@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Comment-Only Diff Verifier
 // ───────────────────────────────────────────────────────────────────
+
 // Proves that a change touched comments and nothing else, which is the whole
 // safety argument of a comment pass. Matching changed lines against comment
 // markers is not enough: a continuation line of a block or HTML comment starts
@@ -12,10 +13,18 @@
 //
 // Usage: node scripts/naming/verify-comment-only.mjs <ref> [-- <pathspec>...]
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
@@ -29,6 +38,10 @@ const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
  * is reported as a code change — the packet bans trailing comments anyway, and
  * a gate that errs toward stopping is the right kind of wrong here.
  */
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function stripCommentLines(source) {
   const kept = [];
   let region = null;
@@ -57,6 +70,10 @@ function stripCommentLines(source) {
   }
   return kept.join('\n');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const ref = process.argv[2];

@@ -2,9 +2,17 @@
 // MODULE: Pi Remote Threshold Evaluator Tests
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import { evaluateThresholds, REQUIRED_METRICS } from '../release/threshold-gate.mjs';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function config(overrides = {}) {
   return {
@@ -23,6 +31,10 @@ function config(overrides = {}) {
     ),
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('release threshold gate', () => {
   it('fails when a measured metric has no declared threshold', () => {

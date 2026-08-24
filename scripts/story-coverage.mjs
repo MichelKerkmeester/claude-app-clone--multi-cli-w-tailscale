@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Story Coverage Gate
+// ───────────────────────────────────────────────────────────────────
+
 // Story-coverage gate: every renderable Svelte component must have a co-located
 // *.stories.ts (or *.stories.svelte), so the catalog stays complete as the app
 // grows. Intentional exceptions live in story-coverage-allowlist.json, each with
@@ -5,14 +9,26 @@
 // stale allowlist entry, so the gate can sit on the board.
 //
 // Usage: node scripts/story-coverage.mjs [--json]
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, relative, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SRC = join(ROOT, 'app-mobile', 'src');
 const ALLOWLIST = join(ROOT, 'scripts', 'story-coverage-allowlist.json');
 const jsonMode = process.argv.includes('--json');
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
@@ -22,6 +38,10 @@ function walk(dir, out = []) {
   }
   return out;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 const all = walk(SRC);
 const components = all

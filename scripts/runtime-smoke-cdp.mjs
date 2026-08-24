@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Runtime Smoke CDP Gate
+// ───────────────────────────────────────────────────────────────────
+
 // Durable WHY: the migration's static gates (svelte-check, token-identity) all
 // pass on code that CRASHES when actually run — a class of ported React-useEffect -> Svelte-$effect
 // self-invalidation (a synchronous dispatch reduces its own $state, so the effect takes that state
@@ -11,6 +15,10 @@
 // Usage:  node scripts/runtime-smoke-cdp.mjs [--surface home,session,review,inbox]
 // Exit 0 = every exercised surface rendered with zero runtime errors; exit 2 = a crash/error.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -18,10 +26,18 @@ import { join } from 'node:path';
 
 import WebSocket from 'ws';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const HOST = '127.0.0.1';
 const DEV_PORT = 4173;
 const DEV_URL = `http://${HOST}:${DEV_PORT}`;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function parseArgs(argv) {
   const options = {};
@@ -255,6 +271,10 @@ const SURFACES = {
     return clicked;
   },
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));

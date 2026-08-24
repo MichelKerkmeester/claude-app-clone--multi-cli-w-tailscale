@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Pi Remote Plan Extension
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   PlanArtifactAdapter,
   type PlanArtifact,
@@ -5,7 +13,15 @@ import {
   type PlanDraft,
 } from './plan-artifact.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 type PlanMode = 'build' | 'plan' | 'executing-plan';
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 export const STATUS_KEY = 'pi-remote-plan-mode';
 
@@ -133,6 +149,10 @@ export interface PlanExecutionRequest {
  * extension tools, and unknown MCP tools are mutation-capable until proven
  * otherwise. Bash is classified separately against the narrow allowlist.
  */
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export function isPlanReadOnlyTool(
   toolName: string,
   readOnlyExtensionTools: ReadonlySet<string> = READ_ONLY_EXTENSION_TOOLS,

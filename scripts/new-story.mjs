@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Story Scaffold Generator
+// ───────────────────────────────────────────────────────────────────
+
 // Story scaffold: emit a correct CSF3 story stub co-located with a Svelte
 // component, so adding a component (or filling a coverage gap) is one command.
 // The stub compiles and renders a props-free component as-is; a context-coupled
@@ -5,12 +9,24 @@
 // decorator added by hand (see any sibling *.stories.ts) — the TODO marks that.
 //
 // Usage: npm run story:new app-mobile/src/<path>/<Component>.svelte
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { existsSync, writeFileSync } from 'node:fs';
 import { dirname, basename, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const arg = process.argv[2];
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 if (!arg) {
   console.error('Usage: npm run story:new app-mobile/src/<path>/<Component>.svelte');
   process.exit(2);

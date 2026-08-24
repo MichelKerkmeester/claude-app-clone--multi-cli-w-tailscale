@@ -1,17 +1,26 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Rename Manifest Builder
 // ───────────────────────────────────────────────────────────────────
+
 // Emits one row per in-scope file: where it is, and where the grammar says it
 // belongs. The manifest is the only input the mover and the specifier rewriter
 // read, so a file missing here is a file that silently does not move.
 //
 // Usage: node scripts/naming/build-manifest.mjs [--out <path>]
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readdirSync, statSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { join, relative, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { kebabBasename, isReservedName, isRouteParameterSegment, isCaseOnlyRename } from './naming-rules.mjs';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const SOURCE_ROOT = 'app-mobile/src';
@@ -81,6 +90,10 @@ const DATA_FOLDERS = {
 // rather than editing manifest rows by hand.
 const KIND_OVERLAY_PATH = join(REPO_ROOT, 'scripts/naming/kind-prefixes.json');
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function readKindOverlay() {
   if (!existsSync(KIND_OVERLAY_PATH)) return {};
   return JSON.parse(readFileSync(KIND_OVERLAY_PATH, 'utf8'));
@@ -121,6 +134,10 @@ function targetFor(relativePath, overlay) {
   }
   return `${dir}/${kebabBasename(name)}`;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const outIndex = process.argv.indexOf('--out');

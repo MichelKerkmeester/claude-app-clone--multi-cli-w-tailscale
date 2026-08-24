@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Pi Remote Ask Question TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -9,6 +17,10 @@ import {
   isAskQuestionTranscriptMeta,
   isTranscriptBlock,
 } from '../src/index.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const PRESENTATION = {
   type: 'session.ask-question.presented',
@@ -41,6 +53,10 @@ const PRESENTATION = {
   },
   requiresReadOnlyHint: true,
 } as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ask-question protocol', () => {
   it('accepts the bounded display contract and rejects unknown display keys', () => {

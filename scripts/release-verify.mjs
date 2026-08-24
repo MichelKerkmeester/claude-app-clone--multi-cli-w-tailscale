@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Release Verification Runner
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -9,11 +13,19 @@ import { fileURLToPath } from 'node:url';
 
 import { evaluateRollout, validateOperatorEvidence } from '../release/rollout-gate.mjs';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const appRoot = path.resolve(fileURLToPath(new URL('../', import.meta.url)));
 const args = process.argv.slice(2);
 const measurementsPath = relativeInputAfter('--measurements');
 const operatorEvidencePath = relativeInputAfter('--operator-evidence');
 const evidenceDirectory = path.join(appRoot, 'release/evidence');
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 mkdirSync(evidenceDirectory, { recursive: true });
 const startedAt = new Date().toISOString();
 const evidencePath = path.join(
@@ -219,6 +231,10 @@ for (const stage of rollout.stages) {
   );
 }
 if (machineStatus !== 'PASS') process.exitCode = 1;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function runGate(id, command, executable, args, toolNames) {
   const gateStartedAt = new Date().toISOString();

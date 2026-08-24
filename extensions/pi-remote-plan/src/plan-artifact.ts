@@ -1,4 +1,16 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Pi Remote Plan Artifact
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { randomBytes } from 'node:crypto';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 export const PLAN_ARTIFACT_KEY = 'pi-remote-plan-artifact';
 
@@ -9,6 +21,10 @@ export const PLAN_SUMMARY_CAP = 2_000;
 export const PLAN_STEP_CAP = 10_000;
 export const PLAN_APPROACH_CAP = 100;
 export const PLAN_APPROACH_LABEL_CAP = 500;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export type PlanValidity = 'valid' | 'superseded' | 'invalid';
 
@@ -65,6 +81,10 @@ interface BoundApproach {
  * because every publication flows through accept/invalidate. The opaque token
  * is freshly minted per revision and never derived from plan text.
  */
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export class PlanArtifactAdapter {
   private artifact: PlanArtifact | null = null;
   private readonly randomToken: () => string;
@@ -126,6 +146,10 @@ export class PlanArtifactAdapter {
     return toPublication(invalidated);
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function toPublication(artifact: PlanArtifact): PlanArtifactPublication {
   const { approachIds: _approachIds, ...plan } = artifact;

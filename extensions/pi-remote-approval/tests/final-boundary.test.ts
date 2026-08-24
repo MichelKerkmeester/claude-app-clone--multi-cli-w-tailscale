@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Final Boundary Tests
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { approvalActionDigest } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -10,7 +14,15 @@ import {
   createFinalBoundaryHandler,
 } from '../src/index.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const context = { sessionManager: { getSessionId: () => 'session_local' } };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('Pi final-boundary fixture', () => {
   it('allows only an exact requested and consumed action', async () => {
@@ -179,6 +191,10 @@ const PENDING_QUESTION = {
     maxSelections: 2,
   },
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function fixtureOptions(
   authorizer = {

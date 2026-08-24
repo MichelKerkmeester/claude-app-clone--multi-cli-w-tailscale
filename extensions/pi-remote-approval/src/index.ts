@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Approval Extension Boundary
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import {
   approvalActionDigest,
   isAskQuestionAnswer,
@@ -17,6 +21,10 @@ import {
   type AskQuestionSelectionMode,
   type JsonValue,
 } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
 
 export interface ToolCallEvent {
   readonly toolName: string;
@@ -81,6 +89,10 @@ export interface AskQuestionAdapterInput {
  * Integration-time verification must bind these functions to Pi's exact
  * event and callback names; this adapter intentionally does not fabricate them.
  */
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export function createAskQuestionAnswerAdapter(
   contract: AskQuestionCallbackContract,
 ): (input: AskQuestionAdapterInput) => Promise<AskQuestionCallbackOutcome> {
@@ -260,6 +272,10 @@ export default function piRemoteApproval(pi: PiExtensionApi): void {
     authorizer: createRelayLeaseAuthorizer({ baseUrl, secret }),
   });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function toolsForFamily(family: string): ReadonlySet<string> {
   if (family === 'filesystem') return new Set(['edit', 'write']);

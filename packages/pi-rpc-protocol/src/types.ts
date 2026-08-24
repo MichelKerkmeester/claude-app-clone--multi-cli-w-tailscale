@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Protocol Types
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. TYPE DEFINITIONS
+// ───────────────────────────────────────────────────────────────────
+
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonObject | readonly JsonValue[];
 
@@ -14,6 +18,10 @@ export interface ImageContent extends JsonObject {
   readonly data: string;
   readonly mimeType: string;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 export const MEDIA_SOURCE_MIME_TYPES = [
   'image/jpeg',

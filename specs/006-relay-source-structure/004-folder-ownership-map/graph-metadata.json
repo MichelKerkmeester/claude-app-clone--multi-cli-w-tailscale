@@ -182,7 +182,7 @@
     ],
     "causal_summary": "Write a reason-to-change map for the 16 top-level app-relay/src folders — for each folder, what it owns and the kind of change that belongs there — so a maintainer knows where a change goes. One map, not sixteen READMEs. Documentation only — no code change.",
     "created_at": "2026-08-24T19:29:18.642Z",
-    "last_save_at": "2026-08-24T19:46:25.058Z",
+    "last_save_at": "2026-08-24T21:41:27.664Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:64f9fd84fe4ec5a81b40dc08676f296cea1383913d349d4c11a470e5da491874",
+    "source_fingerprint": "sha256:eb5734fe6327e1f71b3ff8da45c3ebfee02b63124f265ed5e7589e572adb3b27",
     "source_doc_hashes": {
-      "spec.md": "485de041b98c3be1646ba48c5656aeae956cc74a2ff17e49e31ea11152253866",
-      "plan.md": "952e804215de2e27d3a404e6cff03a3f09b28f5ef728c6cf7191faf0c79b3454",
-      "tasks.md": "2fb38d67850e111ea03b712541931f571a61e823a11dd8f4c8a7f7baa6249587",
-      "checklist.md": "8f156f7f7ca856c9988489a33fbbdfa9e1dfa3b9e8778178fad2b4d7e125932d",
-      "implementation-summary.md": "63cb962c60662a688960e2ea2a8cfea0aa4ca5d76b93c6dfbbedf4817b946486"
+      "spec.md": "0c75cd2f21e69ee8de5e18f6a518672edd63005c0b99723ca354061e32ed90f4",
+      "plan.md": "1a094babb443cca9080da3d99809e1dba46f311b1e8fd628b21478dbef28d651",
+      "tasks.md": "fa6781f1b366c6f8cfef103f6ba139c2753c9d34cccdb5285b1ded6fd5196c03",
+      "checklist.md": "e38354a59e84dfcea8d7628de23afd7934d91a022b3e1ba737540a636709168f",
+      "implementation-summary.md": "f2e4ef79565d96ed39329a0f1bdbd4f45b90c6fb345ab32ecd7a77a4238ea761"
     },
     "last_active_child_id": null,
     "last_active_at": null

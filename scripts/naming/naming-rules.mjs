@@ -1,12 +1,17 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Naming Rules
 // ───────────────────────────────────────────────────────────────────
+
 // The single place the file-naming grammar is expressed. Every rename in this
 // programme is generated from here rather than typed, so the moves and the
 // import rewrites cannot drift apart.
 
 // SvelteKit reads these names as routing directives, so they are the URL
 // contract rather than a naming choice and never take part in a rename.
+// ───────────────────────────────────────────────────────────────────
+// 1. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 export const RESERVED_SVELTEKIT = [
   '+page',
   '+layout',
@@ -17,6 +22,10 @@ export const RESERVED_SVELTEKIT = [
 ];
 
 /** True when a path segment is a SvelteKit route parameter such as [id]. */
+// ───────────────────────────────────────────────────────────────────
+// 2. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 export function isRouteParameterSegment(segment) {
   return /^\[.*\]$/.test(segment);
 }

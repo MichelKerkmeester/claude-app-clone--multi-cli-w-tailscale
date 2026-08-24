@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Comment-Only Diff Gate
+// ───────────────────────────────────────────────────────────────────
+
 // Comment-only gate: prove a documentation pass changed nothing but comments.
 // The token-identity resolver strips comments before diffing, so it is blind to
 // this class of edit by design — and a sectioning pass that accidentally moves,
@@ -9,7 +13,15 @@
 //   node scripts/comment-only-check.mjs [<git-range-or-ref>] [-- <pathspec>...]
 // With no range it checks the working tree against HEAD (the pre-commit case).
 // Exit 0 = comment-only; 1 = a code line changed; 2 = the diff could not be read.
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { execFileSync } from 'node:child_process';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const argv = process.argv.slice(2);
 const sep = argv.indexOf('--');
@@ -22,6 +34,10 @@ const paths = sep === -1 ? ['app-mobile/src'] : argv.slice(sep + 1);
 const OK = /^\s*(\/\/.*)?$/;
 
 let diff;
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 try {
   const args = ['diff', '-U0'];
   if (range) args.push(range);

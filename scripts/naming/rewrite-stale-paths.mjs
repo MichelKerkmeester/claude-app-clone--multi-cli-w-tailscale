@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Stale Path Sweep
 // ───────────────────────────────────────────────────────────────────
+
 // Rewrites references to files that have already moved, wherever a reference
 // can hide. The manifest applier handles the common shapes at move time; this
 // is the backstop for the rest, because a path can be named by a bare string
@@ -12,10 +13,18 @@
 //
 // Usage: node scripts/naming/rewrite-stale-paths.mjs <since-ref> [--apply]
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readdirSync, statSync, readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, relative, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const SEARCH_ROOTS = [
@@ -29,6 +38,10 @@ const SEARCH_ROOTS = [
   'tests',
 ];
 const SEARCH_EXTENSIONS = ['.svelte', '.ts', '.tsx', '.js', '.mjs', '.cjs', '.md'];
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function walk(dir, out = []) {
   let entries;
@@ -72,6 +85,10 @@ const QUOTED = /(['"])([^'"\n]+)\1/g;
 // naming a file that has been renamed is worse than no document, because it is
 // believed.
 const BACKTICKED = /(`)([^`\n]+)\1/g;
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const sinceRef = process.argv[2];

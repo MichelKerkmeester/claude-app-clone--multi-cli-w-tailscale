@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Comment Grammar Scan
 // ───────────────────────────────────────────────────────────────────
+
 // Measures the three comment properties that can be counted, so the packet
 // that fixes them reports a delta rather than a claim. The fourth property —
 // whether a comment says why rather than what — is not measurable and is not
@@ -8,9 +9,17 @@
 //
 // Usage: node scripts/naming/scan-comments.mjs [--json]
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readdirSync, statSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const SOURCE_ROOT = 'app-mobile/src';
@@ -22,6 +31,10 @@ const RULE = '─';
 const NOT_A_SENTENCE = /^(eslint-|@ts-|prettier-|svelte-ignore|deno-|c8 |istanbul |ANCHOR|\/|\*|-|@)/;
 
 /** Every file under the source root, for counts that must match the gate. */
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function walkAll(dir, out = []) {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
@@ -52,6 +65,10 @@ function commentBody(line) {
   if (trimmed.startsWith('*') && !trimmed.startsWith('*/')) return trimmed.slice(1).trim();
   return null;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 function main() {
   const files = walk(join(REPO_ROOT, SOURCE_ROOT))

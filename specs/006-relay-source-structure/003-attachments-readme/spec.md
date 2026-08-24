@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/006-relay-source-structure/003-attachments-readme"
-    last_updated_at: "2026-08-24T21:00:00Z"
+    last_updated_at: "2026-08-24T19:46:24.715Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "README written for src/attachments, describing the decode-to-reap flow and per-file ownership."
     next_safe_action: "Proceed to 004-folder-ownership-map."

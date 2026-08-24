@@ -2,14 +2,26 @@
 // MODULE: Pi Remote Rollout Checker
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { evaluateRollout, validateOperatorEvidence } from '../release/rollout-gate.mjs';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
+
 const appRoot = fileURLToPath(new URL('../', import.meta.url));
 const args = process.argv.slice(2);
+
+// ───────────────────────────────────────────────────────────────────
+// 3. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 try {
   const evidencePath = valueAfter('--evidence') ?? latestEvidencePath();
@@ -41,6 +53,10 @@ try {
   process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
   process.exitCode = 1;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function valueAfter(flag) {
   const index = args.indexOf(flag);

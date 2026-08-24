@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Pi Remote Plan Mode TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it, vi } from 'vitest';
 
 import piRemotePlan, {
@@ -8,6 +16,10 @@ import piRemotePlan, {
 } from '../src/index.js';
 import type { PlanArtifactPublication, PlanDraft } from '../src/plan-artifact.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 type PlanApi = Parameters<typeof piRemotePlan>[0];
 type CommandOptions = Parameters<PlanApi['registerCommand']>[1];
 type CommandHandler = CommandOptions['handler'];
@@ -15,6 +27,10 @@ type ToolCallHandler = Parameters<PlanApi['on']>[1];
 type ToolCallEvent = Parameters<ToolCallHandler>[0];
 type AgentEndHandler = Parameters<PlanApi['on']>[1];
 type TestContext = Parameters<CommandHandler>[1];
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('Pi remote plan mode', () => {
   it('enters plan mode by removing edit and write and publishing the mode', async () => {
@@ -443,6 +459,10 @@ describe('Pi remote plan mode', () => {
     });
   });
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function draft(title: string): PlanDraft {
   return { title, summary: `Summary of ${title}`, steps: [{ step: title }] };

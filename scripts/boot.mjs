@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Pi Remote One-Command Boot
 // ───────────────────────────────────────────────────────────────────
+
 // Durable WHY: a fresh agent must boot the whole deployment from one
 // command and hand the user a complete download and install message.
 // This file preflights the host, builds the app, starts the supervised
@@ -10,11 +11,19 @@
 // the live deployment instead of duplicating relays, Serve routes,
 // or enrollment payloads.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_RELAY_PORT = 4310;
@@ -47,6 +56,10 @@ class BootError extends Error {
     this.name = 'BootError';
   }
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function fail(message) {
   throw new BootError(message);
@@ -713,6 +726,10 @@ async function detectLiveDeployment(config) {
   step('deployment', 'already live, verifying posture');
   return serveStatus;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));

@@ -1,11 +1,23 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Skill Reference Scan
+// ───────────────────────────────────────────────────────────────────
+
 // Durable WHY: a surface skill that names a path which no longer exists teaches a
 // dispatch to look in the wrong place, and nothing else in the toolchain notices —
 // the skill lives in another repository from the tree it describes. This resolves
 // every path the skill names against the shipped tree, so drift is caught by a
 // command rather than by a confused agent.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. CONSTANTS
+// ───────────────────────────────────────────────────────────────────
 
 const APP_ROOT = resolve(import.meta.dirname, '../..');
 
@@ -23,6 +35,10 @@ const BACKTICKED = /`([^`\s]+)`/g;
 // that starts resolving is drift too, so it is checked in the opposite direction.
 const COUNTER_EXAMPLE = /not\s+`([^`\s]+)`/g;
 const FILENAME = /^[a-z0-9][a-z0-9.-]*\.(ts|tsx|svelte|css|mjs|cjs|js)$/;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function indexFilenames(dir, into = new Set(), depth = 0) {
   if (depth > 8) return into;
@@ -65,6 +81,10 @@ function pathResolves(token) {
 }
 
 const target = process.argv[2];
+// ───────────────────────────────────────────────────────────────────
+// 4. CORE LOGIC
+// ───────────────────────────────────────────────────────────────────
+
 if (target === undefined) {
   process.stderr.write('usage: scan-skill-references.mjs <skill-file.md>\n');
   process.exit(2);

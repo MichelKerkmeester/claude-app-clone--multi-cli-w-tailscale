@@ -124,9 +124,7 @@
     "012/003",
     "013"
    ],
-   "gate": "folder-documentation scan reports zero gaps",
-   "held": true,
-   "heldReason": "All 59 documents are written and the coverage, reference, hygiene and security scans report zero gaps. What remains is the operator's one-file-versus-two answer and their read of the exemplar pair."
+   "gate": "folder-documentation scan reports zero gaps"
   },
   {
    "id": "018",

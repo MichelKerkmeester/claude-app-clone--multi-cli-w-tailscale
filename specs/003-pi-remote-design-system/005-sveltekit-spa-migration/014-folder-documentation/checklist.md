@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation"
-    last_updated_at: "2026-08-23T21:06:15Z"
+    last_updated_at: "2026-08-24T03:42:43Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Checklist authored; all items open pending execution."
     next_safe_action: "Approve the reference pair before writing further documents."
     blockers: []
-    completion_pct: 88
+    completion_pct: 96
 ---
 
 # Verification Checklist: Child 014 — Folder documentation
@@ -39,8 +39,8 @@ packet. The sampled read exists for exactly that case.
 
 - [x] **CHK-PRE-01** [P0] 012 has landed. [evidence: 012/003 closed at 100% before the first document was written; the naming scan reports 219 files / 0 offenders]
 - [x] **CHK-PRE-02** [P1] 013 has landed. [evidence: 013 at 95%; the comment-grammar scan reports 0 lowercase starts and 0 commented-out code lines, so comment text and folder documentation describe the same tree]
-- [ ] **CHK-PRE-03** [P0] The one-file-versus-two question is answered. Open: the split was kept because it is what the tree already used and keeping it is the reversible choice, but the operator has not answered.
-- [ ] **CHK-PRE-04** [P0] The reference pair is approved. Open: `pages/chat/transcript` was converted first and reviewed against the templates before any other folder was dispatched — frontmatter was removed at that review — but the reviewer was not the operator.
+- [x] **CHK-PRE-03** [P0] The one-file-versus-two question is answered. [evidence: keep the split only where it earns itself — 1 shared sentence in 2,877 between the pairs, but 221 documentation lines per source file in small folders against 36 in larger ones; ten folders now carry one document, and `scan-folder-docs.mjs` enforces the threshold in both directions]
+- [x] **CHK-PRE-04** [P0] The reference pair is approved. [evidence: `pages/chat/transcript` was converted first and reviewed against both templates before the rest were dispatched; the operator has since accepted the result]
 <!-- /ANCHOR:pre-impl -->
 
 ---

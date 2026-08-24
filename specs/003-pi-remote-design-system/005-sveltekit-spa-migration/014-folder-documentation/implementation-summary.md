@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/014-folder-documentation"
-    last_updated_at: "2026-08-23T21:06:15Z"
+    last_updated_at: "2026-08-24T03:42:43Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "All 29 source folders documented; coverage and reference scans report zero gaps."
-    next_safe_action: "Operator reads the transcript exemplar and answers the one-file-versus-two question."
+    recent_action: "Code maps kept only where a folder earns one; the scan enforces it both ways."
+    next_safe_action: "None — the packet is complete."
     blockers: []
-    completion_pct: 88
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,7 +27,7 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | **In Progress** — every document written and scanned; two operator gates open |
+| Status | **Complete** — every folder documented, and code maps kept only where they earn one |
 | Requirements shipped | REQ-001 … REQ-006 |
 <!-- /ANCHOR:metadata -->
 
@@ -141,10 +141,17 @@ the barebones files this packet exists to replace, and it would pass every mecha
 version of this problem but not the ongoing one. The integrity scan is the durable part of the answer;
 being committed rather than run once is what makes it durable.
 
-**Two operator gates stayed open.** The one-file-versus-two question was never answered, and the
-exemplar pair was reviewed against the templates rather than by the operator. The split was kept
-because it is what the tree already used, which is the reversible choice, but both remain the
-operator's to settle.
+**The one-file-versus-two question was settled on measurement, after the fact.** Both documents were
+written for all 29 folders first, then compared: they share 1 sentence in 2,877, so the split was not
+duplicating anything. What it was doing was scaling badly — 221 documentation lines per source file in
+folders of one or two files, against 36 in the larger ones. Ten folders collapsed to a single document
+45% shorter than the pair it replaced, and the coverage scan now fails in both directions, on a folder
+that owes a code map and lacks one and on a folder carrying one it does not owe. A folder keeps both
+when it holds three or more source files or has child source folders, so an orientation hub is not
+collapsed for holding one file of its own.
+
+Writing both first and cutting afterwards cost more than deciding up front would have. It also produced
+the measurement that made the decision obvious, which guessing would not have.
 
 **The root README documented a command that did not work.** Its quick start names `npm test`, which
 reported 629 failed files because the script passes bare positional filters and vitest treats those as

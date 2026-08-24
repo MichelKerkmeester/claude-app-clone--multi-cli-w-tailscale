@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience"
-    last_updated_at: "2026-08-23T11:00:00Z"
+    last_updated_at: "2026-08-24T05:55:17Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Packet documentation completed; coverage at 74/74."
-    next_safe_action: "Install addon-vitest to close REQ-002."
+    recent_action: "Story-upkeep rule (R4) live at v1.4.0.0; addon-vitest deferral recorded."
+    next_safe_action: "None — the packet is complete with a documented deferral."
     blockers: []
-    completion_pct: 90
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
@@ -64,8 +64,8 @@ Requirement ids refer to `spec.md`. Evidence is a command result or the current 
 - [x] **T2.8** `PdfPage.svelte` allowlisted rather than given a story: its required prop is
       loader-injected, and typing it needs a cast or a suppression, both of which the codebase bans.
       Its rendering is exercised through `PdfPreview`'s story.
-- [ ] **T2.9** `@storybook/addon-vitest` — run the stories as interaction tests through the Vitest
-      browser provider. Not installed; `STORYBOOK.md` records it as planned.
+- [~] **T2.9** `@storybook/addon-vitest` — run the stories as interaction tests through the Vitest
+      browser provider. Not installed; `STORYBOOK.md` records it as planned. [deferred: `@storybook/addon-vitest` duplicates the `catalog-smoke-cdp.mjs` gate, which already renders every story in both themes and fails on a throw — R2 deferred it for exactly that reason. Running stories twice buys no coverage the board does not already have. The self-maintaining half of the story lane shipped: the R4 story-upkeep rule is now live in the surface skill at v1.4.0.0]
 - [x] **T2.10** Chromatic decision recorded rather than left open — visual regression is intentionally
       declined.
 <!-- /ANCHOR:phase-2 -->

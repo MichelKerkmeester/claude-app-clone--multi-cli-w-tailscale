@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
-    last_updated_at: "2026-08-23T10:50:00Z"
+    last_updated_at: "2026-08-24T05:55:14Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Packet documentation completed; two open items recorded."
-    next_safe_action: "Update svelte-conventions.md to Format A, then merge the branch."
+    recent_action: "Superseded by 019; R4 salvaged into the live skill at v1.4.0.0."
+    next_safe_action: "None — superseded; the branch stays as history, unmerged."
     blockers: []
-    completion_pct: 90
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,7 +27,7 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 2 |
-| Status | Shipped to a branch; two items outstanding |
+| Status | Superseded by 019 — the one salvageable deliverable (R4) landed at v1.4.0.0 |
 | Requirements shipped | REQ-001 … REQ-005 |
 <!-- /ANCHOR:metadata -->
 
@@ -114,19 +114,21 @@ this packet's to touch.
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-**The branch is stranded, and that was deliberate.** `branches/008-sk-code-mobile-cli-svelte` has never
-been merged into the live `skilled/v4.0.0.0`. It was held back because of the item below — merging a
-conventions authority that teaches a superseded convention would propagate the wrong grammar to every
-future dispatch. Until it merges, no workflow actually loads this refactor.
+**The branch was superseded rather than merged, and that is the resolution.** The plan here was to
+correct `svelte-conventions.md` to the Format-A grammar and then merge
+`branches/008-sk-code-mobile-cli-svelte`. Between then and now, packet 019 rewrote the live skill from
+scratch to teach the correct Format-A grammar (`SKILL.md` §3b, v1.3.0.0, reference scan broken-0). That
+made merging this branch the wrong move: its content teaches the superseded compact divider form and
+its `v1.2.0.0` changelog collides with the one 019 shipped, so a merge would regress the live skill.
 
-**`svelte-conventions.md` documents the superseded divider grammar.** It teaches the compact
-`// ─── Label ───` form. The authoritative contract is Format A — a `// ` prefix followed by exactly
-67 box-drawing characters, with a numbered section label between two rules — and the app was converted
-to it in 007-EXT across 45 files and 213 dividers. The skill therefore currently teaches something the
-codebase no longer does. This must be fixed before the merge, not after.
+The branch is therefore abandoned in place — left as history, never merged. The one deliverable unique
+to it and still worth having, the R4 story-upkeep rule, was salvaged into the live skill directly at
+v1.4.0.0 (`3eece78aa8`), pointing at the repo-root `STORYBOOK.md` rather than the stranded conventions
+doc. Nothing else on the branch survives the supersession.
 
-**The residual-reference sweep was a grep, not a semantic review.** It confirms no React instruction
-survives verbatim. It cannot confirm that every rewritten passage is *right* about Svelte — that is
-what a dispatch loading the surface would reveal, and no such dry-run has run against the merged
-surface because it is not merged.
+**The meaning check ran against 019's merged surface, not this branch.** A grep can only confirm no
+React instruction survives verbatim, not that the prose is right about Svelte. That check happened
+under 019: a read-only dispatch loaded the merged surface and answered four convention questions
+correctly from it. This branch's own prose was never dry-run, because it was superseded rather than
+merged.
 <!-- /ANCHOR:limitations -->

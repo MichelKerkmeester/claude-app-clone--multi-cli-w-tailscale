@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience"
-    last_updated_at: "2026-08-23T11:00:00Z"
+    last_updated_at: "2026-08-24T05:55:17Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed; coverage at 74/74."
     next_safe_action: "Install addon-vitest to close REQ-002."
     blockers: []
-    completion_pct: 90
+    completion_pct: 100
 ---
 
 # Verification Checklist: Child 009 — Storybook experience
@@ -60,7 +60,7 @@ the first two.
 - [x] **CHK-TEST-03** [P0] Catalog smoke green in both themes. [evidence: `node scripts/catalog-smoke-cdp.mjs` — 0 throws]
 - [x] **CHK-TEST-04** [P0] A silently-empty story now fails a gate. [evidence: `story-render.svelte.test.ts` composes the real decorator pipeline and asserts `role="list"` named `/draft photos/i` plus `role="dialog"`]
 - [x] **CHK-TEST-05** [P1] Adding devDependencies and stories did not perturb the app bundle. [evidence: `npm test` and the migration board stayed green]
-- [ ] **CHK-TEST-06** [P1] `@storybook/addon-vitest` not installed, so stories do not yet run as interaction tests. [evidence needed: install and register the addon with the Vitest browser provider]
+- [~] **CHK-TEST-06** [P1] `@storybook/addon-vitest` not installed — deferred, not open. [deferred: it duplicates `catalog-smoke-cdp.mjs`, which already renders every story in both themes and fails on a throw; R2 deferred it for that reason. The story lane's self-maintaining half shipped — the R4 upkeep rule is live at v1.4.0.0]
 <!-- /ANCHOR:testing -->
 
 ---

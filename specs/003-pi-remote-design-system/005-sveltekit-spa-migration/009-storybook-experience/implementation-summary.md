@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/009-storybook-experience"
-    last_updated_at: "2026-08-23T11:00:00Z"
+    last_updated_at: "2026-08-24T05:55:17Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Packet documentation completed; coverage at 74/74."
-    next_safe_action: "Install addon-vitest to close REQ-002."
+    recent_action: "R4 story-upkeep rule live at v1.4.0.0; addon-vitest deferral recorded."
+    next_safe_action: "None — the packet is complete with a documented deferral."
     blockers: []
-    completion_pct: 90
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,7 +27,7 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Level | 3 |
-| Status | Complete except REQ-002's addon-vitest |
+| Status | Complete — addon-vitest deferred as a documented duplicate of catalog-smoke |
 | Requirements shipped | REQ-001, REQ-003 … REQ-007; REQ-002 partial |
 <!-- /ANCHOR:metadata -->
 

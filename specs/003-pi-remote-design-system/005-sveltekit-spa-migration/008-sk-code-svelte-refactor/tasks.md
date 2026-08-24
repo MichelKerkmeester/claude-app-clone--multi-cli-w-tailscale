@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
-    last_updated_at: "2026-08-23T10:50:00Z"
+    last_updated_at: "2026-08-24T05:55:14Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Packet documentation completed; two open items recorded."
-    next_safe_action: "Update svelte-conventions.md to Format A, then merge the branch."
+    recent_action: "Superseded by 019; the one salvageable deliverable (R4) landed at v1.4.0.0."
+    next_safe_action: "None — superseded; the branch stays as history, unmerged."
     blockers: []
-    completion_pct: 90
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
@@ -81,13 +81,13 @@ isolated-worktree constraint implicitly.
 - [x] **T3.5** Landed via isolated worktrees on `branches/008-sk-code-mobile-cli-svelte`, allocated by
       sk-git rather than hand-named; origin tip `2b7622c32d` across three commits. Both worktrees
       removed; the shared checkout was never staged.
-- [ ] **T3.6** Correct `svelte-conventions.md` to the Format A divider grammar. It currently teaches
+- [~] **T3.6** Correct `svelte-conventions.md` to the Format A divider grammar. It currently teaches
       the compact `// ─── Label ───` form, while the authoritative contract is a `// ` prefix plus
       exactly 67 box-drawing characters around a numbered label — and 007-EXT converted the app to
-      Format A across 45 files and 213 dividers. The surface teaches what the codebase no longer does.
-- [ ] **T3.7** Merge the branch into the live `skilled/v4.0.0.0`. Held until T3.6 lands, because
+      Format A across 45 files and 213 dividers. The surface teaches what the codebase no longer does. [superseded: the branch is abandoned, not merged, so `svelte-conventions.md` is not corrected in place. The correct Format-A grammar reached the live skill by a different route — packet 019 rewrote `SKILL.md` §3b at v1.3.0.0 and it validates broken-0]
+- [~] **T3.7** Merge the branch into the live `skilled/v4.0.0.0`. Held until T3.6 lands, because
       merging a conventions authority that teaches a superseded grammar propagates it to every
-      subsequent dispatch.
+      subsequent dispatch. [superseded: merging the branch would REGRESS the live skill, which 019 already made correct, and its `v1.2.0.0` changelog collides with the shipped one. The one deliverable unique to the branch and worth keeping — the R4 story-upkeep rule — was salvaged into the live skill at v1.4.0.0 (`3eece78aa8`). The branch is left in place as history, not merged]
 - [~] **T3.8** No dry-run dispatch has been executed against the merged surface, since it is not
       merged. The structural gates confirm form, not that each rewritten passage is right about Svelte.
 <!-- /ANCHOR:phase-3 -->

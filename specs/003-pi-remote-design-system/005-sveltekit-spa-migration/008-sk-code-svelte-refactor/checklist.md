@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/008-sk-code-svelte-refactor"
-    last_updated_at: "2026-08-23T10:50:00Z"
+    last_updated_at: "2026-08-24T05:55:14Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Packet documentation completed; two open items recorded."
     next_safe_action: "Update svelte-conventions.md to Format A, then merge the branch."
     blockers: []
-    completion_pct: 90
+    completion_pct: 100
 ---
 
 # Verification Checklist: Child 008 — sk-code-mobile-cli React to Svelte refactor
@@ -66,8 +66,8 @@ structural proxy, and this checklist says so rather than implying otherwise.
 
 - [x] **CHK-FIX-01** [P1] Stale hardcoded fence count replaced with count-fresh guidance, so the doc cannot go stale again. [evidence: `editability-guardrails.md` no longer names a fixed number]
 - [x] **CHK-FIX-02** [P1] Proven traps folded into the doctrine rather than left as tribal knowledge. [evidence: `svelte-conventions.md` covers the `$effect` self-invalidation trap, the `fileURLToPath` space-in-path bug and the virtualizer store API]
-- [ ] **CHK-FIX-03** [P0] `svelte-conventions.md` still teaches the superseded compact divider form. [evidence needed: Format A is a `// ` prefix plus 67 box-drawing characters around a numbered label, and 007-EXT converted 45 files and 213 dividers to it]
-- [ ] **CHK-FIX-04** [P0] Branch not merged into the live `skilled/v4.0.0.0`, so no workflow loads the refactor. [evidence needed: merge after CHK-FIX-03]
+- [~] **CHK-FIX-03** [P0] `svelte-conventions.md` teaches the superseded compact divider form — moot. [superseded: the branch is abandoned, not corrected-and-merged; the live skill teaches the correct Format-A grammar via 019's `SKILL.md` §3b rewrite, reference scan broken-0]
+- [~] **CHK-FIX-04** [P0] Branch not merged — deliberately, and now correctly so. [superseded: merging would regress the live skill 019 already fixed; the salvageable R4 rule landed separately at v1.4.0.0 (`3eece78aa8`). The branch stays as history]
 <!-- /ANCHOR:fix-completeness -->
 
 ---

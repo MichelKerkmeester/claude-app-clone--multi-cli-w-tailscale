@@ -359,7 +359,7 @@ handful are genuine open choices. Each verdict is confirmed against source unles
 | R-09 | **Shipped** | `transcript-disclosure.svelte.ts`, a `SvelteMap` keyed by block id held outside the row (018) |
 | R-07 | **Mostly shipped** | content-free push hint (opaque lookup id + attention class) in `push-service.ts`; the poll-on-wake and re-read-before-send confirmations are absent |
 | R-02 | **Mostly shipped** | typed `unsupported`/`unsupported_operation` in `runtime-service.ts`; session-manager authority for a mutable request on a viewer-only session is unverified |
-| R-01 | **Partial** | the client already forces a resync on epoch mismatch (`use-sync-socket.svelte.ts`, 016/001); the server-side snapshot-boundary + frame-queue and the gap-free handoff test (0 tests) are the remaining half — and the epoch rotation may already close the loss window here |
+| R-01 | **Shipped** | `SyncHub.subscribe` (`replay/sync.ts`) registers before building the snapshot, queues live envelopes while `isInitializing`, then flushes them filtered to `seq > barrier` and sorted — the atomic boundary + server-side queue + ordered flush R-01 prescribes. mobilecli's loss window (register after readiness) does not exist here. The gap-free handoff test R-01 asks for already ships: `sync.test.ts:42` injects a delta during the snapshot handoff and asserts snapshot-then-delta in order. Client resync on gap is 016/001 |
 | R-05 | **Decided against** | 018 shipped the spatial separation and deliberately rejected the risk classifier — a wrong risk label is worse than none (`018/plan.md`). The research's classifier half conflicts with a shipped decision |
 | R-12 | **Small follow-up** | 009 shipped the real-decorator render test; permission and planning harness states remain |
 | R-04 | **Deferred refactor** | the `$effect` self-invalidation doctrine ships as prose in the surface skill (019) plus seven fixes; the one-service-owns-the-machine refactor is the deferred remainder |
@@ -368,10 +368,11 @@ handful are genuine open choices. Each verdict is confirmed against source unles
 | R-11 | **Half moot** | the app already owns its wire vocabulary (`packages/pi-rpc-protocol`); the upstream-skew adapter targets OpenCode-wrapping clients, and Pi Remote wraps Pi directly |
 | R-13 | **Architecture mismatch** | no CLI wait-state model exists — this app uses ask-question + approvals, not mobilecli's numbered/yes-no keystroke machine. `prompt_hash`/`approval_model` have no wire event to sit on |
 
-**What that leaves as a genuine choice:** R-01's server-side gap-free handoff and its test (only if the
-loss window survives the epoch-rotation resync — worth confirming first); R-02's session-manager
-authority gap (small); R-07's poll-on-wake hardening (small); R-12's harness states (small); and R-04's
-refactor (deferred). Everything else is shipped, already decided, or does not fit this architecture.
+**What that leaves as a genuine choice:** three small hardening items — R-02's session-manager
+authority gap, R-07's poll-on-wake and re-read-before-send, R-12's permission/planning harness states —
+plus R-04's one-service refactor (deferred, post-007-EXT). R-01 turned out fully shipped and tested once
+checked against source, so no Tier-A work remains. Everything else is shipped, already decided against,
+or does not fit a content-free relay that wraps Pi directly.
 
 ---
 

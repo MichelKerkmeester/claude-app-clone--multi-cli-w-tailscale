@@ -12,41 +12,27 @@
   "derived": {
     "trigger_phrases": [],
     "key_topics": [
-      "sk-code",
-      "mobile-cli",
+      "phase",
+      "plans",
+      "new",
       "mode",
-      "design",
-      "plan",
-      "plan-only",
-      "dedicated",
+      "sk-code",
+      "parent",
+      "hub",
+      "purely",
+      "mobile-cli",
       "app",
       "work",
-      "tasks",
-      "checklist",
-      "implementation"
+      "apps"
     ],
     "importance_tier": "important",
-    "status": "complete",
+    "status": "planned",
     "key_files": [
-      "checklist.md",
-      "spec.md",
       "plan.md",
       "tasks.md",
-      "implementation-summary.md"
+      "spec.md"
     ],
     "entities": [
-      {
-        "name": "checklist.md",
-        "kind": "doc",
-        "path": "checklist.md",
-        "source": "derived"
-      },
-      {
-        "name": "spec.md",
-        "kind": "doc",
-        "path": "spec.md",
-        "source": "derived"
-      },
       {
         "name": "plan.md",
         "kind": "doc",
@@ -60,20 +46,8 @@
         "source": "derived"
       },
       {
-        "name": "implementation-summary.md",
+        "name": "spec.md",
         "kind": "doc",
-        "path": "implementation-summary.md",
-        "source": "derived"
-      },
-      {
-        "name": "Summary This",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Redaction Planning",
-        "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
       },
@@ -90,25 +64,37 @@
         "source": "derived"
       },
       {
-        "name": "Summary",
+        "name": "1. METADATA",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Problem & Goal",
+        "name": "2. PROBLEM & PURPOSE",
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Approach Ground",
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In scope",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Smart Routing",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Smart Routing",
+        "name": "Verification Run",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
@@ -120,21 +106,33 @@
         "source": "derived"
       },
       {
-        "name": "Approach",
+        "name": "1. SUMMARY",
         "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Steps",
+        "name": "2. QUALITY GATES",
         "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Files to change",
+        "name": "3. ARCHITECTURE",
         "kind": "heading",
         "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Every Phase",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
@@ -144,61 +142,33 @@
         "source": "derived"
       },
       {
-        "name": "read-only",
-        "kind": "key_phrase",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "symlinks",
-        "kind": "key_phrase",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "pointers",
-        "kind": "key_phrase",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "optional",
-        "kind": "quoted",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "every",
-        "kind": "key_phrase",
-        "path": "checklist.md",
-        "source": "derived"
-      },
-      {
-        "name": "Hub-contract grounding",
+        "name": "TASK NOTATION",
         "kind": "heading",
-        "path": "checklist.md",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "sk-code Mobile-CLI mode — design plan (plan-only)",
+    "causal_summary": "This phase **plans, but does not build**, a new mode under the `sk-code` parent hub, purely for Mobile-CLI app work (`apps/pi-remote-web/` and its siblings), so future code work…",
     "created_at": "2026-08-17T05:11:33.348Z",
-    "last_save_at": "2026-08-24T16:38:15.444Z",
+    "last_save_at": "2026-08-24T17:54:43.597Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
-      "tasks.md",
-      "checklist.md",
-      "implementation-summary.md"
+      "tasks.md"
     ],
-    "source_fingerprint": "sha256:a55d1e9702520f888746d3a4229376c14e4bf1d20e319fb0c09c533ebd298ad1",
+    "source_fingerprint": "sha256:17b6d0e53a05302a3e57053194d1b086c968de7385f2019ac8e08920920972f5",
     "source_doc_hashes": {
-      "spec.md": "74a775cba46aa5880c00a213e4598c67baecb0b8789db268018f7e080ac2b392",
-      "plan.md": "c8a800aa7437baca1b6cc63d057b8e7a980fac6cfd2132f1b43f7186ccb29286",
-      "tasks.md": "8f52be5ae93b50df8659351af74ff38df178763f72e81125269e6329ac7dc0c1",
-      "checklist.md": "11730dbe395f1932f5e62df2c2ab66d210dcb5fde83485d32cde48085792691d",
-      "implementation-summary.md": "3c9acde6a488bc8dbfd75e257793784642a36afebc2d860738cbc4ccab9393ba"
+      "spec.md": "32b473730b93ddd2177f0aecbb44ba571c9aa31b5e3f388edc433ca83bcdb739",
+      "plan.md": "6c189cb641570e06b015b11314fbe1903128d4b6080f8cd0ea5648ca1f03b38a",
+      "tasks.md": "24f2ce3699b428f61df6112c48185817ccefe701d446a259f2fb847993ebc50b"
     },
     "last_active_child_id": null,
     "last_active_at": null

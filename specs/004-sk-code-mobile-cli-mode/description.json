@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/004-sk-code-mobile-cli-mode",
+  "specFolder": "004-sk-code-mobile-cli-mode",
   "description": "Code work on `apps/pi-remote-web/` detects a generic frontend surface and does not auto-load this",
   "keywords": [
     "code",

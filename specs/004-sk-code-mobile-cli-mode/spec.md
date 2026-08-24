@@ -6,7 +6,7 @@ trigger_phrases:
 importance_tier: "important"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/004-sk-code-mobile-cli-mode"
+    packet_pointer: "specs/004-sk-code-mobile-cli-mode"
     last_updated_at: "2026-08-17T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Scaffolded plan-only phase with one sk-code mode-design-plan leaf"
@@ -77,4 +77,4 @@ surface-detection marker, verification commands).
 
 - [`implementation-phases.md`](implementation-phases.md) — the plan-only flow and documentary gate.
 - `.opencode/skills/sk-code/SKILL.md` — the hub contract the plan is grounded in.
-- [`../build-strategy.md`](../build-strategy.md) — the conventions the planned mode encodes.
+- `build-strategy` (folded into this packet during the reorg) — the conventions the planned mode encodes.

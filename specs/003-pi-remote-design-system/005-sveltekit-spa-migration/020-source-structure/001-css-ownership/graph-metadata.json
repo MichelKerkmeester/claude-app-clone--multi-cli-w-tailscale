@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "packet_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/020-source-structure/001-css-ownership",
+  "spec_folder": "003-pi-remote-design-system/005-sveltekit-spa-migration/020-source-structure/001-css-ownership",
+  "parent_id": "003-pi-remote-design-system/005-sveltekit-spa-migration/020-source-structure",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "move",
+      "classes",
+      "app",
+      "css",
+      "defines",
+      "only",
+      "one",
+      "component",
+      "scoped",
+      "style",
+      "block",
+      "proven"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "plan.md",
+      "checklist.md",
+      "spec.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "their",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Luna Max Fast",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "token",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 3: VERIFICATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "VERIFICATION PROTOCOL",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Move the 82 classes that app.css defines but only one component uses into that component's scoped style block, proven value-identical by the token-identity gate. app.css keeps tokens, theme, resets and the 44 genuinely shared classes.",
+    "created_at": "2026-08-24T06:38:17.083Z",
+    "last_save_at": "2026-08-24T06:44:33.302Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:f15dab7f03c9ea17b2d2ff3175f19a8ef8bddc8df31c1bf09e0d7ccf04096c1f",
+    "source_doc_hashes": {
+      "spec.md": "55f8a081ef02fdc51012018cf4376facf72c331ebe3abed19866215a2e66f53c",
+      "plan.md": "2c569ba8241212f40f002a85767f3249f9893a33098d44ba3cd73f8e47b86d7a",
+      "tasks.md": "f08e18cd2eb5ec45bcd75bebc35b6c8394432a716ef5cd5297137e3ecf1fe703",
+      "checklist.md": "7ada91359345c595f3a9f25e82f5ad6d3d1529e849ede9bf765961339f75f6f4"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

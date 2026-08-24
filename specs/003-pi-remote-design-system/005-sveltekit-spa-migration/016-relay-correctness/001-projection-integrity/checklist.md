@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "003-pi-remote-design-system/005-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"
-    last_updated_at: "2026-08-23T21:21:55Z"
+    last_updated_at: "2026-08-24T04:43:07Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Checklist authored; all items open pending execution."
     next_safe_action: "Reproduce the drop before changing code."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 # Verification Checklist: Child 016/001 — Projection integrity
@@ -70,7 +70,7 @@ a real database, only against a test-constructed store.
 <!-- ANCHOR:fix-completeness -->
 ## Fix Completeness
 
-- [ ] **CHK-FIX-01** [P0] Rotation and collection landed together. [deferred: held together as required — rotation alone multiplies orphaned partitions]
+- [x] **CHK-FIX-01** [P0] Rotation and collection landed together. [evidence: both in the same commit — `supervisor.onLifecycle` reallocates the epoch and `collectEndedEpochEnvelopes` bounds what the retired ones keep, so rotation never ran without the collection that stops it multiplying orphaned partitions]
 - [x] **CHK-FIX-02** [P1] The four unbounded attachment maps are bounded. [evidence: `app-relay/src/attachments/attachment-service.ts:556` bounds three collections; `deviceReservedBytes` already self-trims]
 - [x] **CHK-FIX-03** [P1] Throws newly surfaced by the narrowed `try` are reported, not absorbed. [evidence: three defects recorded in `implementation-summary.md` under known limitations, none absorbed]
 - [x] **CHK-FIX-04** [P2] The transcript now shows a generation change. [evidence: confirmed by reading the consumer rather than by a test — `use-sync-socket.svelte.ts` compares its cursor epoch against each sync message and fires `pi-remote:transcript-superseded` on a mismatch]
@@ -82,7 +82,7 @@ a real database, only against a test-constructed store.
 ## Security
 
 - [x] **CHK-SEC-01** [P0] No security invariant is touched. [evidence: the diff touches sequencing and retention only; `npx vitest run app-relay/tests/security/` passes]
-- [ ] **CHK-SEC-02** [P0] Collection was verified against a database copy first. [deferred: held with collection; nothing in this child deletes a row]
+- [x] **CHK-SEC-02** [P0] Collection was verified against a database copy first. [evidence: rehearsed on a `VACUUM INTO` copy of `app-relay/pi-remote.db` — 1 epoch and 12 envelopes before and after, 0 selected for collection, no error against the shipped schema. A plain `cp` is not a valid copy of a WAL-mode database and reported an empty table; the deletion branch itself stays proved by the constructed store, because no deployed database has yet held an ended epoch]
 - [x] **CHK-SEC-03** [P1] No new error output leaks session content. [evidence: `app-relay/tests/framing-error-surfacing.test.ts` asserts a canary string absent from the reported message]
 - [x] **CHK-SEC-04** [P1] Nothing under `specs/context/**` is touched. [evidence: `git status` shows no write under `specs/context/`]
 <!-- /ANCHOR:security -->

@@ -3,25 +3,20 @@
 You are the **orchestrator**. Work autonomously. Read `handover.md`, `roadmap.md` and `goal.md` in
 `specs/003-pi-remote-design-system/005-sveltekit-spa-migration/` first — they are ground truth.
 
-**Status.** The SvelteKit migration and the **011–019 post-cutover queue are done** — all 13 nodes at
-100%, nine gates green from the final state, pushed; `scripts/queue/graph.json` is drained. What
-remains is the `goal.md` §7–10 tail the queue never modeled:
+**Status.** The migration, the **011–019 queue**, and packets **008 and 009** are done — 13 queue nodes
+at 100%, nine gates green from the final state, pushed; `scripts/queue/graph.json` drained. 008 was
+closed as superseded by 019 (its branch left as history, unmerged) and its one live-worthy deliverable,
+the R4 story-upkeep rule, was salvaged into the skill at v1.4.0.0; 009's addon-vitest is a documented
+deferral. **The one thing left is a decision:**
 
-- **008 skill refactor** — `branches/008-sk-code-mobile-cli-svelte` is stranded and **superseded by
-  019**, which already taught the live skill the correct Format-A grammar; merging it would *regress*
-  the skill and its `v1.2.0.0` changelog collides. Only the **R4 story-upkeep rule** (a 009 deliverable,
-  0 hits live) and `svelte-conventions.md` are unique to it. **Decision:** abandon the branch salvaging
-  only R4 — or also rewrite `svelte-conventions.md` to Format A and keep it.
-- **009 storybook** — 90%; REQ-002 addon-vitest is a documented deferral; needs the R4 rule and
-  completion docs.
-- **010 research** — 3/5 legs landed; openclaude-android mid-flight, remote-for-opencode barely
-  started. **§6: recommendations are presented and dispositioned before any scaffolding** — your call
-  to finish the two legs and present, or disposition as-is.
+- **010 research** — complete; R-01..R-13 in `010-context-repo-research/recommendations.md`.
+  R-03/R-06/R-09 already shipped by the queue; the rest propose new transport and authority phases.
+  **§6: nothing is scaffolded until the operator dispositions each by ID** — awaiting that decision.
 
 **Mode — autonomous graph-loop.** Finish a node → pass its gate → advance. Proceed, verify, commit,
 push; don't hold for per-step approval. **Stop and escalate only on:** a broken invariant, a red gate
-that resists one bounded repair, or a destructive/irreversible act — **008's branch disposition and all
-of 010 hit those, so they need an operator decision, not autonomous churn.**
+that resists one bounded repair, or a destructive/irreversible act — **010's scaffolding is §6-gated, so
+it needs an operator decision, not autonomous churn.**
 
 **Who writes what.** You own spec docs, git, barrier/shared files (`app.css`, `+layout.svelte`,
 `routes/*`, configs, `package.json`), installs, cross-repo work, verification outside the sandbox. The

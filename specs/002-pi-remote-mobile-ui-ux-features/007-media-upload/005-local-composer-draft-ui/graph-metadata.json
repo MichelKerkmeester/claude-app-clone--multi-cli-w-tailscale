@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -19,15 +19,19 @@
       "redacted-card",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary",
+      "phase"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -52,6 +56,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -137,25 +147,45 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Luna Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "The App",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "Local Composer Draft, Preview, and Redacted-Card UI",
     "created_at": "2026-08-16T07:15:18.605Z",
-    "last_save_at": "2026-08-16T11:59:27.486Z",
+    "last_save_at": "2026-08-24T16:38:15.256Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:f0c9e284cc84747491df42def523140ed8bb1ac18dedb06845c2602f0bd4dfbc",
+    "source_fingerprint": "sha256:96094a1c0f83a8ea52c2863293ae20ee06227e8c4afc1835274de2399737f23c",
     "source_doc_hashes": {
       "spec.md": "43cbcc8b937fa633657ba2cb9ea78ed2f26092a59e68e9ba6d784cbac2c4919e",
       "plan.md": "ceb72c00017e6e68f13ab46e6895801c9f183e505b08d752d18fba481eaedae7",
-      "tasks.md": "618f3213b6d3abce8b85125815c4ae93da267db372e9a26b0d64db96d470ceb8",
-      "checklist.md": "ef3006f84b587a17f792c3ee01e8dc33f065ad717fec1d4597dcbbe9195f4760"
+      "tasks.md": "724e3093adef78d7b00c4070a87d26b946332b521af0d8e21718190d7ed11d62",
+      "checklist.md": "d0939aa2fa7b806b78d41da4344e2ea9353c376382570579a4264e179be4ba6e",
+      "implementation-summary.md": "02cdb2fa3c385b63a4375f87e76503e3d41e4fccf1b25a9ba17965a440df3f18"
     },
     "last_active_child_id": null,
     "last_active_at": null

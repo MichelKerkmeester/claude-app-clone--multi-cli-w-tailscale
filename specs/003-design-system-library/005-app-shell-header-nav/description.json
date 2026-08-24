@@ -1,0 +1,21 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/005-app-shell-header-nav",
+  "description": "Grandchild 4 \u2014 App shell, header & navigation",
+  "keywords": [
+    "grandchild",
+    "app",
+    "shell",
+    "header",
+    "navigation"
+  ],
+  "lastUpdated": "2026-08-17T04:56:04.888Z",
+  "specId": "004",
+  "folderSlug": "app-shell-header-nav",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

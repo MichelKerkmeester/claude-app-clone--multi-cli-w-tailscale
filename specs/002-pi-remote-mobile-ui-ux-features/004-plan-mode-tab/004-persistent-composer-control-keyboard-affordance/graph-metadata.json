@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/004-persistent-composer-control-keyboard-affordance",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/004-persistent-composer-control-keyboard-affordance",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/004-persistent-composer-control-keyboard-affordance",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/004-persistent-composer-control-keyboard-affordance",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -20,15 +20,18 @@
       "affordance",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -53,6 +56,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -156,25 +165,39 @@
         "kind": "key_phrase",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Flash Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 3 \u2014 Persistent composer control and keyboard affordance",
+    "causal_summary": "Phase 3 — Persistent composer control and keyboard affordance",
     "created_at": "2026-08-16T07:15:11.327Z",
-    "last_save_at": "2026-08-16T11:59:23.012Z",
+    "last_save_at": "2026-08-24T16:38:15.165Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:81987a00f0ac68bb95cd2348f6debf57d1fa7c8185c2f8e1650db1cde6a4567d",
+    "source_fingerprint": "sha256:86789b6f59fc31331596152d2f5f3864f3776f5568d5e1c84498acfee77551f4",
     "source_doc_hashes": {
       "spec.md": "ce160f78884411d865d388c325ac100b77d545b19a35421015dedcecea712ee4",
       "plan.md": "b55402b225585421de4df70bd1c8a81eca514c32922603f1c1aa7886416de23d",
       "tasks.md": "c16743c7346ca6c227808f5725d2c5142469953eba7a7e26bc109e8e956fa206",
-      "checklist.md": "a4ff099272ce11fc8873efb98a850b3b5d3bc1e3777b29ef418ba915a0b9518d"
+      "checklist.md": "ac936fd979abefb6695601de74b8d5c04f50cf4d0b0f9e7f923f98bff774beb9",
+      "implementation-summary.md": "c32b3769d4bd12905b3ffc6a3847a5d213594569d404da463fa73007a49b6543"
     },
     "last_active_child_id": null,
     "last_active_at": null

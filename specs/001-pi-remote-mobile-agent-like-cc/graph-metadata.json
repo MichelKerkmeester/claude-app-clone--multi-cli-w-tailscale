@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc",
-  "spec_folder": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc",
+  "packet_id": "001-pi-remote-mobile-agent-like-cc",
+  "spec_folder": "001-pi-remote-mobile-agent-like-cc",
   "parent_id": null,
   "children_ids": [
     "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/001-contract-and-threat-baseline",
@@ -20,7 +20,24 @@
     "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/014-onboarding-and-root-readme",
     "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/015-doc-quality-and-catalog",
     "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/016-ai-deploy-and-onboarding",
-    "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/017-chat-ux-and-restyle"
+    "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/017-chat-ux-and-restyle",
+    "001-pi-remote-mobile-agent-like-cc/001-contract-and-threat-baseline",
+    "001-pi-remote-mobile-agent-like-cc/002-automated-test-harness",
+    "001-pi-remote-mobile-agent-like-cc/003-relay-protocol-and-state",
+    "001-pi-remote-mobile-agent-like-cc/004-auth-and-tailnet-boundary",
+    "001-pi-remote-mobile-agent-like-cc/005-mobile-pwa-and-reconciliation",
+    "001-pi-remote-mobile-agent-like-cc/006-approval-and-remote-mutation",
+    "001-pi-remote-mobile-agent-like-cc/007-push-and-platform-hardening",
+    "001-pi-remote-mobile-agent-like-cc/008-documentation-and-runbooks",
+    "001-pi-remote-mobile-agent-like-cc/009-release-verification-and-rollout",
+    "001-pi-remote-mobile-agent-like-cc/010-code-readme-coverage",
+    "001-pi-remote-mobile-agent-like-cc/011-architecture-reference",
+    "001-pi-remote-mobile-agent-like-cc/012-docs-as-skill-references",
+    "001-pi-remote-mobile-agent-like-cc/013-code-standards-alignment",
+    "001-pi-remote-mobile-agent-like-cc/014-onboarding-and-root-readme",
+    "001-pi-remote-mobile-agent-like-cc/015-doc-quality-and-catalog",
+    "001-pi-remote-mobile-agent-like-cc/016-ai-deploy-and-onboarding",
+    "001-pi-remote-mobile-agent-like-cc/017-chat-ux-and-restyle"
   ],
   "manual": {
     "depends_on": [],
@@ -54,13 +71,20 @@
     "key_files": [
       "spec.md",
       "001-contract-and-threat-baseline/spec.md",
-      "009-release-verification-and-rollout/spec.md"
+      "009-release-verification-and-rollout/spec.md",
+      "handover.md"
     ],
     "entities": [
       {
         "name": "spec.md",
         "kind": "doc",
         "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "handover.md",
+        "kind": "doc",
+        "path": "handover.md",
         "source": "derived"
       },
       {
@@ -98,19 +122,57 @@
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "Tailscale Serve",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "Deployed Runtime Boundary",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "Contract Audit",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "Merge Gate",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "Boot Pi Remote",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "Pi CLI exposes a persistent local RPC subprocess, not a secure mobile product",
     "created_at": "2026-08-10T17:46:19.156Z",
-    "last_save_at": "2026-08-15T11:27:03.610Z",
+    "last_save_at": "2026-08-24T16:38:14.978Z",
     "save_lineage": "same_pass",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "handover.md"
     ],
-    "source_fingerprint": "sha256:ea41df4434d0122e9589f3a6a2c83738b5150f71b3eea09edb68a054479d3dd9",
+    "source_fingerprint": "sha256:1b7b60541ef0bff534644c9632992189e67e112653a443b73c0985a56ea66b35",
     "source_doc_hashes": {
-      "spec.md": "86aec4f8c269707d6a034b6d57167b6e99ac908ec4a3ddbdcd361256360e4eb8"
+      "spec.md": "86aec4f8c269707d6a034b6d57167b6e99ac908ec4a3ddbdcd361256360e4eb8",
+      "handover.md": "bec9519616aa20bc0496af667a476f82fd70a6bbcb55b0792d20562074d02d3d"
     },
     "last_active_child_id": "app-remote-agent-chat/001-pi-remote-mobile-agent-like-cc/017-chat-ux-and-restyle",
     "last_active_at": "2026-08-13T07:39:24.617Z"

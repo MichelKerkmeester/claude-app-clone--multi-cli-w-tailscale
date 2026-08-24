@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "packet_id": "003-design-system-library",
+  "spec_folder": "003-design-system-library",
+  "parent_id": null,
+  "children_ids": [
+    "003-design-system-library/001-architecture-conventions-tokens",
+    "003-design-system-library/002-tokens-foundation",
+    "003-design-system-library/003-theming-light-dark",
+    "003-design-system-library/004-primitives-react-aria",
+    "003-design-system-library/005-app-shell-header-nav",
+    "003-design-system-library/006-transcript-message-blocks",
+    "003-design-system-library/007-composer-input",
+    "003-design-system-library/008-model-effort-sheet",
+    "003-design-system-library/009-slash-command-autocomplete",
+    "003-design-system-library/010-plan-mode-controls",
+    "003-design-system-library/011-rich-content-cards",
+    "003-design-system-library/012-artifacts-viewer-previews",
+    "003-design-system-library/013-overlays-sheets-modals",
+    "003-design-system-library/014-question-todos-surfaces",
+    "003-design-system-library/015-states-interaction-motion",
+    "003-design-system-library/016-catalog-docs-preview",
+    "003-design-system-library/017-editability-audit-and-guide"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "phase",
+      "parent",
+      "react-era",
+      "design",
+      "system",
+      "decide",
+      "architecture",
+      "conventions",
+      "tokens",
+      "migrate",
+      "component",
+      "groups"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "The Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. PHASE DOCUMENTATION MAP",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. INVARIANTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase parent for the React-era design system: decide the architecture, conventions and tokens; migrate ~15 component groups from one global stylesheet onto a shared component library; and audit that a designer can edit each surface safely. The SvelteKit rewrite that later superseded the rendering path is its own top-level spec.",
+    "created_at": "2026-08-24T16:38:15.360Z",
+    "last_save_at": "2026-08-24T16:51:44.778Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:b0660452b953636227bd95c30573d6880c0d80d528be5c2aef83d0fbf7b6fc5f",
+    "source_doc_hashes": {
+      "spec.md": "73ac2b2adb5121c9ffd461c2a0c64ee3c6c7d2a2c7ca7421dff4925be4360226"
+    },
+    "last_active_child_id": "003-design-system-library/017-editability-audit-and-guide",
+    "last_active_at": null
+  }
+}

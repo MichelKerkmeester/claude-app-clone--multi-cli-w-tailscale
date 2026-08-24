@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/007-media-upload",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features",
   "children_ids": [
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/001-research",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
@@ -10,12 +10,12 @@
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/006-end-to-end-submission-release",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/001-research",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/006-end-to-end-submission-release"
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/001-research",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/006-end-to-end-submission-release"
   ],
   "manual": {
     "depends_on": [],
@@ -24,7 +24,7 @@
   },
   "derived": {
     "trigger_phrases": [
-      "f5 media upload \u2014 photos in chat"
+      "f5 media upload — photos in chat"
     ],
     "key_topics": [
       "media",
@@ -35,7 +35,7 @@
       "synthesis"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "research/research.md"
@@ -102,9 +102,9 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "F5 Media Upload \u2014 Photos in Chat",
+    "causal_summary": "F5 Media Upload — Photos in Chat",
     "created_at": "2026-08-16T07:15:16.818Z",
-    "last_save_at": "2026-08-16T11:59:26.413Z",
+    "last_save_at": "2026-08-24T16:40:11.807Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [

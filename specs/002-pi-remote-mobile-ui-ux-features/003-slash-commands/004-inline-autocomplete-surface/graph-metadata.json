@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/003-slash-commands",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -19,15 +19,18 @@
       "surface",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -52,6 +55,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -149,25 +158,45 @@
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Not sent,",
+        "kind": "quoted",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "No command selected",
+        "kind": "quoted",
+        "path": "checklist.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 3 \u2014 Inline terminal-style autocomplete surface",
+    "causal_summary": "Phase 3 — Inline terminal-style autocomplete surface",
     "created_at": "2026-08-16T07:15:08.971Z",
-    "last_save_at": "2026-08-16T11:59:21.776Z",
+    "last_save_at": "2026-08-24T16:38:15.138Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:ad64f14ebf7dae9f6cdf4662f68bb35517c5c7d29b6061c1e31550ca1cdecb4f",
+    "source_fingerprint": "sha256:0fdd2e776cabda7b0d4d2b4f063e4e99ced9040326d01eb831092b9e124e854a",
     "source_doc_hashes": {
       "spec.md": "6072d47abafbef5285e72ff77664013a28023d096929c40bcf57f767c698d38d",
       "plan.md": "5e2a0164b295979907e3f221a04dbfb4a1fbba81b2e94bdc99a0bed8f5819363",
       "tasks.md": "c6cc2b03563679f954d2c69ae7bea6558c5065009e6168fa8aa382cff01bd0bb",
-      "checklist.md": "16c87a618cd2aaca7a313e5218adec636282fc914760a57c189ccb8ed6e8fc54"
+      "checklist.md": "1bd824b5488a8dfae691005958bc1b10793bcf506cf0441abb15cd4fb6503c5d",
+      "implementation-summary.md": "f4d281c2551bbd1e599090084287d2ae6d0520e988bd2e535768271f6bfca788"
     },
     "last_active_child_id": null,
     "last_active_at": null

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -19,15 +19,19 @@
       "transcript",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary",
+      "phase"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -52,6 +56,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -125,25 +135,63 @@
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Luna Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "two",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "idempotency",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "Normalized Pi Image Bridge and Redacted Transcript",
     "created_at": "2026-08-16T07:15:18.246Z",
-    "last_save_at": "2026-08-16T11:59:27.255Z",
+    "last_save_at": "2026-08-24T16:38:15.251Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:4df0a8cf9e64fbd28dbb1fc5d5c10def46ed6479c0b0691ba3bebfdeea1a701a",
+    "source_fingerprint": "sha256:aa499ceff13fe5eb745fddc045d922b009f593ba7965a1ee8e1a5c9c095dad67",
     "source_doc_hashes": {
       "spec.md": "9db638673b922e0df4dff3550716fc950c5dc094dc0545459993d04798075907",
       "plan.md": "21612999df3795a3a7db3fcf984a36ac74877a50a9f3c6103b92383bbdc867ff",
-      "tasks.md": "89e2dc9ba80c5f05e2a483f0354830c4bd3163606943d94e46e85350c7d42712",
-      "checklist.md": "902ba81099f06c9636741941be744ed98270e87f97a1eda837286100e4a7a4ec"
+      "tasks.md": "ae368243767ca5ceac1d21b4d27aee9f1508a8360b917dda7d7f55cf5ec89aa1",
+      "checklist.md": "2ca58054d938e4e2859ad011f31cbf3381b3f14d107d51a980d959a187bea98b",
+      "implementation-summary.md": "888204a82b09afd0ea83467e6f33d0128a34f8512ed67b4a0cca707cf36bc4e3"
     },
     "last_active_child_id": null,
     "last_active_at": null

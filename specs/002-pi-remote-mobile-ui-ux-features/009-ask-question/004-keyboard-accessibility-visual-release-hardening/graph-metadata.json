@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/009-ask-question",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -26,12 +26,13 @@
       "tasks"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -56,6 +57,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -153,25 +160,45 @@
         "kind": "key_phrase",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "region",
+        "kind": "quoted",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "status",
+        "kind": "quoted",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "alert",
+        "kind": "quoted",
+        "path": "checklist.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 3 \u2014 Keyboard and thumb navigation, accessibility, visual, and iPhone/PWA release hardening",
+    "causal_summary": "Phase 3 — Keyboard and thumb navigation, accessibility, visual, and iPhone/PWA release hardening",
     "created_at": "2026-08-16T11:07:31.692Z",
-    "last_save_at": "2026-08-16T11:59:30.267Z",
+    "last_save_at": "2026-08-24T16:38:15.325Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:88895a551e795acd46fcd3a80247fa01354dbde96343c39d0cf770860ec05963",
+    "source_fingerprint": "sha256:f7a5de56d0aadcc6d07a768735aa5862632c85c98f0ee04205451f30d19c3394",
     "source_doc_hashes": {
       "spec.md": "3ea2a2d762b3b37791a8cfe4a11bb8fa51d3768d1e53c6c8b010519ec4684759",
       "plan.md": "0be256522a13f265e78efdc513bebb9cf1a5c64f4a6dc476d830a57519d3491b",
       "tasks.md": "fc732b4f8b6351e49782da2bfe11f0afc3bf0c4540a5256001af3c215cbe1fa1",
-      "checklist.md": "11bc6d1c1de462c445ab1c46655ce090258e77a5e904290a91fee977f49b5912"
+      "checklist.md": "ab59fea18baaee8dea2715070ad64771a3061d4e8311b18bbc38728f9b44aee7",
+      "implementation-summary.md": "9cef492377c1ae543f684a95bc71dc5d0df4a40c6df0c981d23527b913432e37"
     },
     "last_active_child_id": null,
     "last_active_at": null

@@ -1,0 +1,28 @@
+{
+  "specFolder": "005-sveltekit-spa-migration/020-source-structure",
+  "description": "Phase parent for finishing the migration's one-file-per-component intent: move single-owner CSS into its component's scoped style, standardise the",
+  "keywords": [
+    "phase",
+    "parent",
+    "finishing",
+    "migration",
+    "one-file-per-component",
+    "intent",
+    "move",
+    "single-owner",
+    "css",
+    "component",
+    "scoped",
+    "style",
+    "standardise"
+  ],
+  "lastUpdated": "2026-08-24T06:36:41.649Z",
+  "specId": "020",
+  "folderSlug": "source-structure",
+  "parentChain": [
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "3"
+}

@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-sveltekit-spa-migration/016-relay-correctness",
+  "spec_folder": "005-sveltekit-spa-migration/016-relay-correctness",
+  "parent_id": "005-sveltekit-spa-migration",
+  "children_ids": [
+    "005-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity",
+    "005-sveltekit-spa-migration/016-relay-correctness/002-route-authority",
+    "005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "relay correctness projection epoch",
+      "foreground invariant route gap",
+      "relay heartbeat close codes"
+    ],
+    "key_topics": [
+      "relay",
+      "correctness",
+      "projection",
+      "epoch",
+      "foreground",
+      "invariant",
+      "route",
+      "gap",
+      "heartbeat",
+      "close",
+      "codes",
+      "phase"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "three",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "injectable",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase parent for the relay-side defects the cross-repo council surfaced: a silent projection data loss, an epoch that never rotates on host restart, three routes that skip the foreground invariant, a rate-limit header the client already parses, and a socket with no liveness proof.",
+    "created_at": "2026-08-23T10:35:57.121Z",
+    "last_save_at": "2026-08-24T16:40:11.956Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:86668973c963ecebcdeeb7eae58871e555d85ae8b144fe51fb767e03d04d1b65",
+    "source_doc_hashes": {
+      "spec.md": "c8ae770dc8c4dddf3dd1dbb89c610b022e2047c7a3b6b824353f457364d95c53"
+    },
+    "last_active_child_id": "005-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle",
+    "last_active_at": null
+  }
+}

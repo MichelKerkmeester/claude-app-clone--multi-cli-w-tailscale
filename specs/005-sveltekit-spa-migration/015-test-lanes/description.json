@@ -1,0 +1,29 @@
+{
+  "level": "2",
+  "specFolder": "005-sveltekit-spa-migration/015-test-lanes",
+  "description": "Replace the hardcoded logic-test allowlist with a glob, stop mocking the virtualizer out of existence, give ESLint a Svelte parser, and cover the",
+  "keywords": [
+    "replace",
+    "hardcoded",
+    "logic-test",
+    "allowlist",
+    "glob",
+    "stop",
+    "mocking",
+    "virtualizer",
+    "existence",
+    "give",
+    "eslint",
+    "svelte",
+    "parser",
+    "cover"
+  ],
+  "lastUpdated": "2026-08-23T13:58:23.224Z",
+  "specId": "015",
+  "folderSlug": "test-lanes",
+  "parentChain": [
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

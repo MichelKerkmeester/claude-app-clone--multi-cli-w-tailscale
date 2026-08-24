@@ -1,0 +1,28 @@
+{
+  "level": "2",
+  "specFolder": "005-sveltekit-spa-migration/006-catalog",
+  "description": "Stand up @storybook/sveltekit, seed stories from registry.ts's pure-data index, and add a mock-context decorator that injects a runtime over demo.ts",
+  "keywords": [
+    "stand",
+    "storybook",
+    "sveltekit",
+    "seed",
+    "stories",
+    "registry",
+    "pure-data",
+    "index",
+    "mock-context",
+    "decorator",
+    "injects",
+    "runtime",
+    "demo"
+  ],
+  "lastUpdated": "2026-08-23T07:04:15.844Z",
+  "specId": "006",
+  "folderSlug": "catalog",
+  "parentChain": [
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

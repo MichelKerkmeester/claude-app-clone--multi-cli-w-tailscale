@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/002-openable-redacted-diff-foundation",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/002-openable-redacted-diff-foundation",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/005-file-preview/002-openable-redacted-diff-foundation",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/005-file-preview/002-openable-redacted-diff-foundation",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/005-file-preview",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -19,15 +19,18 @@
       "foundation",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -52,6 +55,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -137,25 +146,57 @@
         "kind": "key_phrase",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "File diff viewer",
+        "kind": "quoted",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Typed transcript",
+        "kind": "quoted",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Luna Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Source Serif",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 1 \u2014 Openable redacted diff foundation",
+    "causal_summary": "Phase 1 — Openable redacted diff foundation",
     "created_at": "2026-08-16T07:15:13.284Z",
-    "last_save_at": "2026-08-16T11:59:24.329Z",
+    "last_save_at": "2026-08-24T16:38:15.192Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:819d4c763bbe5f2e975a2b5383ef48b0378d77bfef6c90e89fc2250453f54081",
+    "source_fingerprint": "sha256:85086625783d734ebdae463a0ce9ef6b3ad04e82a25d73719182decec5b5fdb1",
     "source_doc_hashes": {
       "spec.md": "5edd3e5e96f65417b7e0238314c3f6b3ecf2bc29ccc0f95c0f7acf2e0dee82bd",
       "plan.md": "1ffc9a5c90b0a63346e4a3ed51b11e30e50e118b802b64c303ed6fc98ce64880",
       "tasks.md": "bea1e3b9455809a4d1da4e96f1caf318b0efa83a87b2bf7c95f3b393e15810cd",
-      "checklist.md": "e1fb0d5db4d04518ee6a2bd3a0f27135ee9b30091aad77bc54a8e7bcbeef29f4"
+      "checklist.md": "0480a69d4aaf0287275c71db6f8bed92374c77c2e2cab34c3fd896109cb493ef",
+      "implementation-summary.md": "ba312148eaecf547decbe3915cc80a924344c7c927c2716e6b47985a9d14fec3"
     },
     "last_active_child_id": null,
     "last_active_at": null

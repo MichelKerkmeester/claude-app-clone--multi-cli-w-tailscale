@@ -1,0 +1,20 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/002-tokens-foundation",
+  "description": "Grandchild 1 \u2014 Token library foundation",
+  "keywords": [
+    "grandchild",
+    "token",
+    "library",
+    "foundation"
+  ],
+  "lastUpdated": "2026-08-17T04:49:27.869Z",
+  "specId": "001",
+  "folderSlug": "tokens-foundation",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

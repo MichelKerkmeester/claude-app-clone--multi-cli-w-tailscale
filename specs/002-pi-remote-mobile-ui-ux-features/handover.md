@@ -12,7 +12,7 @@
 > 0.84.2 rejects image RPC). The engineering is complete up to the flag; flipping it is an operator action.
 > Decoder architecture (operator-approved): WASM codecs (`@jsquash/jpeg|png|webp`, exact-pinned) for
 > JPEG/PNG/WebP; the relay rejects raw HEIC and the composer converts HEIC→JPEG client-side.
-> Features **008–010 pending** (008/009 hard-gated). A sibling **`specs/003-pi-remote-design-system/`**
+> Features **008–010 pending** (008/009 hard-gated). A sibling **`specs/003-design-system-library/`**
 > packet (planning scaffold only; `2899db2`) also lives on `main`.
 > **Resume ladder:** this file → `build-strategy.md` (§3 model roster + the dispatch how-to) →
 > the target feature's `spec.md` + `implementation-phases.md` + `research/research.md` → its build
@@ -101,7 +101,7 @@ Quotas rotate; probe before relying. As of `07bd02f`:
 
 ## 8. The 003 design-system packet (separate, planning-only)
 
-`specs/003-pi-remote-design-system/` (committed `2899db2`) — a NEW phase-parent packet scaffolding a **designer-editable** coded design system (Untitled-UI-React-grade, taken further so a low-code designer can safely adjust styling/markup/layout/per-state via a token-driven architecture + an `@ds` inline-comment grammar + guardrails). Four phases: (1) architecture + conventions + token library — **research-first with a 20-iteration deep-research scaffold, models TBD, NOT run**; (2) implement + migrate all components, **15 per-surface child phases**; (3) refine + audit designer-editability; (4) a new `sk-code` mobile-cli **surface mode** (plan only). `validate.sh --strict` clean. **Operator decisions still open:** the Phase-1 research model roster + `/deep:research`-vs-external-CLI; the final `@ds` grammar prefix + token-layer boundaries; whether Phase 3/4 stay lean-parents-with-one-leaf or become direct leaves. This packet is independent of the 002 build; do NOT block 002 on it.
+`specs/003-design-system-library/` (committed `2899db2`) — a NEW phase-parent packet scaffolding a **designer-editable** coded design system (Untitled-UI-React-grade, taken further so a low-code designer can safely adjust styling/markup/layout/per-state via a token-driven architecture + an `@ds` inline-comment grammar + guardrails). Four phases: (1) architecture + conventions + token library — **research-first with a 20-iteration deep-research scaffold, models TBD, NOT run**; (2) implement + migrate all components, **15 per-surface child phases**; (3) refine + audit designer-editability; (4) a new `sk-code` mobile-cli **surface mode** (plan only). `validate.sh --strict` clean. **Operator decisions still open:** the Phase-1 research model roster + `/deep:research`-vs-external-CLI; the final `@ds` grammar prefix + token-layer boundaries; whether Phase 3/4 stay lean-parents-with-one-leaf or become direct leaves. This packet is independent of the 002 build; do NOT block 002 on it.
 
 ## 9. Next steps (in order)
 

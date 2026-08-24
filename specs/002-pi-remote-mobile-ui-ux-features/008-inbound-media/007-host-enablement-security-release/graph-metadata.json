@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/008-inbound-media",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -39,12 +39,13 @@
       "kill"
     ],
     "importance_tier": "normal",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
       "checklist.md",
-      "tasks.md"
+      "tasks.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -69,6 +70,12 @@
         "name": "tasks.md",
         "kind": "doc",
         "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -184,31 +191,27 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Implementation The",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "Connect the completed slices to the allowlisted host integration and pass security, device, release, and kill-switch gates.",
     "created_at": "2026-08-16T07:15:22.067Z",
-    "last_save_at": "2026-08-16T11:59:29.199Z",
+    "last_save_at": "2026-08-24T16:38:15.301Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:1cdd7515f40e0f514c07f0587f723f176eee0021f4b3495bc0aca6b3504339ef",
+    "source_fingerprint": "sha256:2152ccf25d62b2e9c02d2b8c205c82908ce75a83553f41fce0f80f9e45db4275",
     "source_doc_hashes": {
       "spec.md": "a97951d3d14a33c167ad66fcd1a0dd7d9e28ace5b1c9fec7112788cb337d22ba",
       "plan.md": "adc5438e3dc99a8afa4e00c175f07f59ee303f488b71fb9a88a51b1a3854f6f2",
       "tasks.md": "105c9cc13ac823e67c88c7e058187b2dfc51996199ccd26ba0327eb91443dd3b",
-      "checklist.md": "3ca13daff962109d594f35148807d64e11baff46277b15e37f71c6d1fd184583"
+      "checklist.md": "ecb397ca1d7300d4582212d579ddf2d9b8491a678a4db05994a0bf355494610c",
+      "implementation-summary.md": "a56718d5711294c08c6220857ef2a95c535f5de6ab07cbcc4dcec474259be267"
     },
     "last_active_child_id": null,
     "last_active_at": null

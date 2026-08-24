@@ -26,7 +26,7 @@
 9. `009-ask-question` — inline question card for `pi`'s ask-question; answering is a one-use revision-bound ticketed mutation; hard-gated.
 10. `010-todos` — read-only inline projection of `pi`'s todo/plan list (phone never mutates it); grouped states, progress, live updates.
 
-**Progress.** 6/10 built + merged to `main` (23/40 build phases; `main` `07bd02f`). 007's hard-gate review is done (approved; two decoder must-fix items in `007-media-upload/adversarial-security-review.md`) — build starts at its Phase 1. 008–010 pending (008/009 hard-gated). Sibling `specs/003-pi-remote-design-system/` (designer-editable design system, planning scaffold) also on `main`.
+**Progress.** 6/10 built + merged to `main` (23/40 build phases; `main` `07bd02f`). 007's hard-gate review is done (approved; two decoder must-fix items in `007-media-upload/adversarial-security-review.md`) — build starts at its Phase 1. 008–010 pending (008/009 hard-gated). Sibling `specs/003-design-system-library/` (designer-editable design system, planning scaffold) also on `main`.
 
 **Build model.** One build phase per external-model dispatch, verified INDEPENDENTLY outside any sandbox (typecheck + `npm test` + `test:web` + `build`) plus an adversarial review of the diff and true-390px light/dark CDP, then committed per-phase and merged per-feature. Routes rotate on quota (see `handover.md` §5). Hard-gated features get a Claude adversarial security/redaction review of the spec BEFORE any build phase.
 

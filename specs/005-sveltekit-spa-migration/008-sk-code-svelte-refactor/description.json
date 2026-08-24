@@ -1,0 +1,28 @@
+{
+  "level": "2",
+  "specFolder": "005-sveltekit-spa-migration/008-sk-code-svelte-refactor",
+  "description": "Completely refactor the sk-code-mobile-cli surface skill so it teaches the SvelteKit 5 / Svelte 5 stack instead of React \u2014 SMART ROUTING +",
+  "keywords": [
+    "completely",
+    "refactor",
+    "sk-code-mobile-cli",
+    "surface",
+    "skill",
+    "teaches",
+    "sveltekit",
+    "svelte",
+    "stack",
+    "instead",
+    "react",
+    "smart",
+    "routing"
+  ],
+  "lastUpdated": "2026-08-23T07:07:37.619Z",
+  "specId": "008",
+  "folderSlug": "sk-code-svelte-refactor",
+  "parentChain": [
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/008-inbound-media",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/008-inbound-media",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features",
   "children_ids": [
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/001-research",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/002-protocol-capability-boundary",
@@ -11,13 +11,13 @@
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/005-transcript-inline-image-card",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/006-fullscreen-privacy-accessibility",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/001-research",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/002-protocol-capability-boundary",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/003-ticketed-publication-sanitization-storage",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/004-exact-read-viewer-foundation",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/005-transcript-inline-image-card",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/006-fullscreen-privacy-accessibility",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release"
+    "002-pi-remote-mobile-ui-ux-features/008-inbound-media/001-research",
+    "002-pi-remote-mobile-ui-ux-features/008-inbound-media/002-protocol-capability-boundary",
+    "002-pi-remote-mobile-ui-ux-features/008-inbound-media/003-ticketed-publication-sanitization-storage",
+    "002-pi-remote-mobile-ui-ux-features/008-inbound-media/004-exact-read-viewer-foundation",
+    "002-pi-remote-mobile-ui-ux-features/008-inbound-media/005-transcript-inline-image-card",
+    "002-pi-remote-mobile-ui-ux-features/008-inbound-media/006-fullscreen-privacy-accessibility",
+    "002-pi-remote-mobile-ui-ux-features/008-inbound-media/007-host-enablement-security-release"
   ],
   "manual": {
     "depends_on": [],
@@ -26,7 +26,7 @@
   },
   "derived": {
     "trigger_phrases": [
-      "f8 \u2014 inbound media preview"
+      "f8 — inbound media preview"
     ],
     "key_topics": [
       "inbound",
@@ -36,7 +36,7 @@
       "synthesis"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "research/research.md"
@@ -115,9 +115,9 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "F8 \u2014 Inbound Media Preview",
+    "causal_summary": "F8 — Inbound Media Preview",
     "created_at": "2026-08-16T07:15:19.350Z",
-    "last_save_at": "2026-08-16T11:59:27.884Z",
+    "last_save_at": "2026-08-24T16:40:11.822Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [

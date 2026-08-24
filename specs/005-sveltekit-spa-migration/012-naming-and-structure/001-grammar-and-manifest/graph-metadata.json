@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest",
+  "spec_folder": "005-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest",
+  "parent_id": "005-sveltekit-spa-migration/012-naming-and-structure",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "rename manifest kebab case",
+      "kind prefix list confirm",
+      "shared primitives sub folders"
+    ],
+    "key_topics": [
+      "rename",
+      "manifest",
+      "kebab",
+      "case",
+      "kind",
+      "prefix",
+      "list",
+      "confirm",
+      "shared",
+      "primitives",
+      "sub",
+      "folders"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "decision-record.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "spec.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "decision-record.md",
+        "kind": "doc",
+        "path": "decision-record.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "SvelteKit",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "EXECUTIVE SUMMARY",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Decide Operator",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Task Checklist Before",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Execution Rules",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Status Reporting Format Each",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Blocked Task Protocol Stop",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "one",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "git",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol This",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Settle the naming grammar, build the rename manifest as data, generate the specifier rewrite from it, and prove the mechanics on shared/primitives and shared/chrome before 148 files are in flight.",
+    "created_at": "2026-08-23T10:58:30.521Z",
+    "last_save_at": "2026-08-24T16:38:15.510Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "decision-record.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:684ddd1ef9f620ae6ff5e21157e97fb1c3d1a05a964c231afa6be824f8828e27",
+    "source_doc_hashes": {
+      "spec.md": "7145397fc677f3024199881d4ebf8262b7e2185f57a905b3c303b9d6abdf8b3c",
+      "plan.md": "3f884e91933a551a3edd339ac4a91822ecc559c468f2c9c9a9a091931d7f5398",
+      "tasks.md": "6e7dae5ccb336bd427d01263e75241d0a80c22bcfb63268c17ddae37d93fe9d4",
+      "checklist.md": "6bba2516cbe1a27b16d9669302df604372531677eda7fbd55be62c92d15f92c6",
+      "decision-record.md": "80b5fb3caf202c18029c318f4b8827a546784cfb3805ea2d6536830eb93fa3c7",
+      "implementation-summary.md": "f60de68653f692a5181dcef20b1f48181ad41d8a2ff9f67e71ced40eca26ee32"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

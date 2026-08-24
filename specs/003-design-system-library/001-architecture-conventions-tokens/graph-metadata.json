@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "packet_id": "003-design-system-library/001-architecture-conventions-tokens",
+  "spec_folder": "003-design-system-library/001-architecture-conventions-tokens",
+  "parent_id": "003-design-system-library",
+  "children_ids": [
+    "app-mobile-cli/003-design-system-library/001-architecture-conventions-tokens/001-research",
+    "003-design-system-library/001-architecture-conventions-tokens/001-research"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "phase 1 — architecture, conventions & token library"
+    ],
+    "key_topics": [
+      "phase",
+      "architecture",
+      "conventions",
+      "token",
+      "library",
+      "cannot",
+      "migrate",
+      "components",
+      "safely",
+      "until",
+      "three",
+      "things"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "spec.md",
+      "research/research.md",
+      "001-research/implementation-summary.md",
+      "research/PROVENANCE.md",
+      "research/BRIEF.md",
+      "research/deep-research-config.json"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "research.md",
+        "kind": "doc",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "PROVENANCE.md",
+        "kind": "doc",
+        "path": "research/PROVENANCE.md",
+        "source": "derived"
+      },
+      {
+        "name": "BRIEF.md",
+        "kind": "doc",
+        "path": "research/BRIEF.md",
+        "source": "derived"
+      },
+      {
+        "name": "deep-research-config.json",
+        "kind": "config",
+        "path": "research/deep-research-config.json",
+        "source": "derived"
+      },
+      {
+        "name": "Token Library",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Begin Phase",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement Phase",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Investigate",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Radix Themes",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Source Serif",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "The Phase",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "React Aria",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Designer Guide",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase 2 cannot migrate ~55 components safely until three things are decided: how a component is",
+    "created_at": "2026-08-17T05:00:03.588Z",
+    "last_save_at": "2026-08-24T16:38:15.364Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "source_fingerprint": "sha256:5eb126eecbf88ac47768f86d90b909655f595b46695d927b69fdb83231e93779",
+    "source_doc_hashes": {
+      "spec.md": "dc579fd4a73cd32a393a55729452a9d38549ce98eb0f2981efc56687a7f96f51",
+      "research/research.md": "9c62d7aedabbaaf1296ca728eff518b70cc031d71edf997efef091ce41b37f97"
+    },
+    "last_active_child_id": "app-mobile-cli/003-design-system-library/001-architecture-conventions-tokens/001-research",
+    "last_active_at": null
+  }
+}

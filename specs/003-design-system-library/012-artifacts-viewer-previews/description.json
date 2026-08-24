@@ -1,0 +1,20 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/012-artifacts-viewer-previews",
+  "description": "Grandchild 11 \u2014 Artifacts viewer & previews",
+  "keywords": [
+    "grandchild",
+    "artifacts",
+    "viewer",
+    "previews"
+  ],
+  "lastUpdated": "2026-08-17T04:58:47.903Z",
+  "specId": "011",
+  "folderSlug": "artifacts-viewer-previews",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

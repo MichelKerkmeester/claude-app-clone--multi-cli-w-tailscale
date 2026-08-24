@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/012-manual-testing-playbook",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/012-manual-testing-playbook",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "pi remote manual testing playbook",
+      "root testing playbook",
+      "app validation scenarios"
+    ],
+    "key_topics": [
+      "remote",
+      "manual",
+      "testing",
+      "playbook",
+      "root",
+      "app",
+      "validation",
+      "scenarios",
+      "automated",
+      "vitest",
+      "coverage",
+      "internals"
+    ],
+    "importance_tier": "normal",
+    "status": "complete",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "implementation-summary.md",
+      "checklist.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Feature Specification",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Root Manual Testing Playbook",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Ship",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Plan",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verify",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Tasks: Root Manual Testing Playbook",
+        "kind": "quoted",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "frontmatter",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Structure",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Content",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pipeline",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "the DeepSeek-writes",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Pi Remote has automated Vitest coverage of internals but no reproducible, operator-facing validation package that maps each shipped capability to a deterministic scenario — exact prompt, command sequence, expected signals, evidence, and a binary verdict",
+    "created_at": "2026-08-24T16:38:15.356Z",
+    "last_save_at": "2026-08-24T16:38:15.356Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:f8f0c306e19703b6a9e2b106e534420bc8aaad81672579dfbaa36fd2da3a4819",
+    "source_doc_hashes": {
+      "spec.md": "08757e6a5c92bc16470367cb31c8b5ddcdd5043a6e82b64a5b7d13d74db936f0",
+      "plan.md": "eac987925d5085a59433daa84992d838cdeb05bc9498af0e395e0ca44a892b56",
+      "tasks.md": "3da8e43792ba2aa3ac9e8793415c556d6a66dfb991664e076e944054d7135f6b",
+      "checklist.md": "11e2f2156033a4d64d361b392a10b509a55e0db24a37a5ee18ef176dbd16f746",
+      "implementation-summary.md": "ca36cec7183ec88c56bfe802513b14ddb1fdfc63f66715d532ae80ff538c3a0a"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

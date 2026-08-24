@@ -1,0 +1,28 @@
+{
+  "level": "0",
+  "specFolder": "003-design-system-library",
+  "description": "Phase parent for the React-era design system: decide the architecture, conventions and tokens; migrate ~15 component groups from one global stylesheet",
+  "keywords": [
+    "phase",
+    "parent",
+    "react-era",
+    "design",
+    "system",
+    "decide",
+    "architecture",
+    "conventions",
+    "tokens",
+    "migrate",
+    "component",
+    "groups",
+    "one",
+    "global",
+    "stylesheet"
+  ],
+  "lastUpdated": "2026-08-24T16:51:22.885Z",
+  "specId": "003",
+  "folderSlug": "design-system-library",
+  "parentChain": [],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

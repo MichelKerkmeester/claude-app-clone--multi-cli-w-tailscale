@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -19,15 +19,19 @@
       "cleanup",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary",
+      "phase"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -52,6 +56,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -127,29 +137,67 @@
         "source": "derived"
       },
       {
+        "name": "full",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
         "name": "approved",
         "kind": "key_phrase",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Luna Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "header-time",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "no Pi",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
         "source": "derived"
       }
     ],
     "causal_summary": "Ticketed Binary Ingress, Quarantine, and Cleanup",
     "created_at": "2026-08-16T07:15:17.855Z",
-    "last_save_at": "2026-08-16T11:59:27.035Z",
+    "last_save_at": "2026-08-24T16:38:15.247Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:990d00ae7b0d6525660c83056051aaa8609c471ed581376eab40d24c34538597",
+    "source_fingerprint": "sha256:617971188b4061e1cb2e8fbcc2b457abd59cfda9ff713d432bcca21fde098153",
     "source_doc_hashes": {
       "spec.md": "b8d1cb8df082d966db889499ae6a01dc227028610b26922452017ddc29fb66b3",
       "plan.md": "7fe1613d24a210f1a3e268f5327dc7ae317ce51deb37bdd8231c9bd788ef466a",
-      "tasks.md": "584c08a023e94b82b9ac4046b0e64c1eab0a95d913a985226e51cfd982bf6bc4",
-      "checklist.md": "8eb327d4f78a5f1cc56db723dc516d135a8225747c062091e16c7122c5384075"
+      "tasks.md": "84722f39e5d328e489fabab6c14e77903bde67be966c309cfe5e48e8bc239de1",
+      "checklist.md": "0a07cae4e552dfce33fb065b95d4030e522c90b1963f13e784687103c48d2dec",
+      "implementation-summary.md": "f0aeecd2c92a3b46bb09b3a99e410ceda604afcd301384b8f2e1cd31bfaa6e6d"
     },
     "last_active_child_id": null,
     "last_active_at": null

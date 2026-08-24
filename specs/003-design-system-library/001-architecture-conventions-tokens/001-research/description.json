@@ -1,0 +1,22 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/001-architecture-conventions-tokens/001-research",
+  "description": "Research \u2014 Architecture, Conventions & Token Library",
+  "keywords": [
+    "research",
+    "architecture",
+    "conventions",
+    "token",
+    "library"
+  ],
+  "lastUpdated": "2026-08-17T04:46:40.677Z",
+  "specId": "001",
+  "folderSlug": "research",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library",
+    "001-architecture-conventions-tokens"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

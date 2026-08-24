@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/003-inline-card-options-freetext-state-machine",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/003-inline-card-options-freetext-state-machine",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/009-ask-question/003-inline-card-options-freetext-state-machine",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/009-ask-question/003-inline-card-options-freetext-state-machine",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/009-ask-question",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -26,12 +26,13 @@
       "checklist"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -56,6 +57,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -147,25 +154,51 @@
         "kind": "key_phrase",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Luna Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Continuation Next",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 2 \u2014 Inline ask-question card, options, free-text, and non-optimistic state machine",
+    "causal_summary": "Phase 2 — Inline ask-question card, options, free-text, and non-optimistic state machine",
     "created_at": "2026-08-16T11:07:31.544Z",
-    "last_save_at": "2026-08-16T11:59:30.025Z",
+    "last_save_at": "2026-08-24T16:38:15.321Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:06ab79beb6cbe4428f4d3aeadd981346cd671493acba7de8dd61cace23caeadf",
+    "source_fingerprint": "sha256:6d43225f4b674531ec2623a88ab31a698b999f6cd69054d8add50d2f91dc0d35",
     "source_doc_hashes": {
       "spec.md": "8089fa3657a798ef86f97720bca52b1f1e14479af5f303b5551e641c41dab286",
       "plan.md": "c2a72f44cf49acae1b4b7df2e4a6abf8ca6d9f34978336d4284549562640939f",
       "tasks.md": "5354a8c869f5e9597dcc72a66a2c5c02b5752afa944da48884588360431af022",
-      "checklist.md": "40550663eadee9e0df8d4b27c6be47f3cff06ede78adbc30d667a89fe0c26246"
+      "checklist.md": "34f3b8de3563340da9e0c3a3162d8283223dba30db29c6fde873486c782ef3be",
+      "implementation-summary.md": "40c90ae4341b223d2cb876f5a445b4161e6cc4ce2a58cef4a19faa80345585f0"
     },
     "last_active_child_id": null,
     "last_active_at": null

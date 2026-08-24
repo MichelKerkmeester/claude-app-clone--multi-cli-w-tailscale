@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/004-canonical-effort-sheet",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/004-canonical-effort-sheet",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/002-change-effort/004-canonical-effort-sheet",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/002-change-effort/004-canonical-effort-sheet",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/002-change-effort",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -22,15 +22,17 @@
       "points",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -55,6 +57,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -148,29 +156,49 @@
         "source": "derived"
       },
       {
+        "name": "the CDP",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "model-effort-dialog",
+        "kind": "quoted",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
         "name": "dialog",
         "kind": "quoted",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 3 \u2014 Canonical sheet, effort rows, and shared entry points",
+    "causal_summary": "Phase 3 — Canonical sheet, effort rows, and shared entry points",
     "created_at": "2026-08-16T07:15:06.668Z",
-    "last_save_at": "2026-08-16T11:59:20.565Z",
+    "last_save_at": "2026-08-24T16:38:15.109Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b1bbf0926aacfd60983ff3eea583d8d2706e181db79a65070e57db0da4faa4c9",
+    "source_fingerprint": "sha256:c21ed1157e8e73487561480b7c2c672dd6df00adab701e3a2e4c15535d829d08",
     "source_doc_hashes": {
       "spec.md": "f81ecc8ea610c3688c7b609351e42a5bdc9d93f7b457b3eb751a8722408f2755",
       "plan.md": "b306a4debdfa9024f82d44b8554d5748f8781ca95718c4768433bf645c5dbecb",
       "tasks.md": "cbe375c7296430d7c88df596a8e79124f3f9380b3b939b85930a73cf3fb8c395",
-      "checklist.md": "2704c58d39d88789290e8d651953ea2dbe7c343bbb899d770e9c3cff4dced2e6"
+      "checklist.md": "0f122720f5c50c59aab677aba3c3d759a5cfdb8d111cc0c16ae759b3e0117793",
+      "implementation-summary.md": "a6c0e15106575e40e0c2eb61e5cded3b9bd993430168005adb9b0f192e5508ff"
     },
     "last_active_child_id": null,
     "last_active_at": null

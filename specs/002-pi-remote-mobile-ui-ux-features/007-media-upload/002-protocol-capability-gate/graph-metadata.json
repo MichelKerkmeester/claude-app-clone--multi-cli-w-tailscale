@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -19,15 +19,19 @@
       "gate",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary",
+      "phase"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -52,6 +56,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -119,25 +129,57 @@
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
+      },
+      {
+        "name": "CDP",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Luna Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "the Codex CLI",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "cross-field",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "Protocol Contracts and Fail-Closed Capability Gate",
     "created_at": "2026-08-16T07:15:17.510Z",
-    "last_save_at": "2026-08-16T11:59:26.826Z",
+    "last_save_at": "2026-08-24T16:38:15.243Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:e8b71bbeefbd4e6b431c7e0676879b65a8de332719e0d5cf2c35076f81c8677f",
+    "source_fingerprint": "sha256:7faf4b6a418f292181670f60962456d95d3915366605ecb417572cbb789b61d2",
     "source_doc_hashes": {
       "spec.md": "b00b44ebed98d4ef2e7222b60766da3900f88d89aa1afd6c776c9baa63377a0e",
       "plan.md": "19e650eb427fa27091da0aa2d205250db405c95faebf7582752de9fc0fa3b0a7",
-      "tasks.md": "5f2cdc2a115b32e57594c91ed3e8df999fff42c4e5db19356d5211e76283bed4",
-      "checklist.md": "2a24b666c69131c649f90af7dbd6be81dc85013f7132b01f5347725459b2f022"
+      "tasks.md": "ec1d9463db3af63e56a57f363a6ced1838ae218c75c87051b66b5fbda60314e1",
+      "checklist.md": "e15b30c99a3aee0798aead6769f1f9da87df4a17a1160a2000e70cd73e8995f3",
+      "implementation-summary.md": "3b44b4f8879f02e467c5a48c15bf037e94b258f110e7ce0642589d474dac4002"
     },
     "last_active_child_id": null,
     "last_active_at": null

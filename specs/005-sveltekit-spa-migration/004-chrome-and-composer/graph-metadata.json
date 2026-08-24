@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-sveltekit-spa-migration/004-chrome-and-composer",
+  "spec_folder": "005-sveltekit-spa-migration/004-chrome-and-composer",
+  "parent_id": "005-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "svelte chrome composer leaveplansheet focus parity",
+      "melt ui composer autocomplete pi remote"
+    ],
+    "key_topics": [
+      "svelte",
+      "chrome",
+      "composer",
+      "leaveplansheet",
+      "focus",
+      "parity",
+      "melt",
+      "autocomplete",
+      "remote",
+      "rewrite",
+      "shared",
+      "sessionheader"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Shared Chrome",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "regression",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "focus-trap",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Explicit",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Catalog",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "deliberately",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "focus",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "that",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol Chrome",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Rewrite the shared chrome (SessionHeader, RuntimeStrip, TodoPanel, plan components, ModelEffortSheet) in parallel, then the composer (SessionComposer + ComposerCommandAutocomplete) and LeavePlanSheet serially and single-focus — these hand-roll focus/IME/slash and are the highest a11y-parity risk. Composer autocomplete uses Melt UI (focus stays in the textarea).",
+    "created_at": "2026-08-19T17:24:03.332Z",
+    "last_save_at": "2026-08-24T16:38:15.472Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:214abbbc2a59fdb4876bc467d8b305423a6722638ad589f0c5031e70e255e4d4",
+    "source_doc_hashes": {
+      "spec.md": "577e08fbd281329428a5c4d65c254af770d6e30f453d7a9419fe244a2db176fd",
+      "plan.md": "876438f9bc66c10a9be92b6d8bf474a74182b0f5f65179414538232121f93536",
+      "tasks.md": "df2d345003365227930134963d4ebe7c35c7408247719baa35c995786e9e7c80",
+      "checklist.md": "86023c4547e9812e9795d2d8eea2ecac6a674f7cbc775c6694753b2bd12a3ed7",
+      "implementation-summary.md": "13d1ce5e917c55477790248477cc301591ab8d8eb9358217a5efbce4e04c1667"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

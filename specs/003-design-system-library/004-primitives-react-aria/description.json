@@ -1,0 +1,19 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/004-primitives-react-aria",
+  "description": "Grandchild 3 \u2014 Control primitives",
+  "keywords": [
+    "grandchild",
+    "control",
+    "primitives"
+  ],
+  "lastUpdated": "2026-08-17T04:55:22.336Z",
+  "specId": "003",
+  "folderSlug": "primitives-react-aria",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

@@ -1,0 +1,21 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/015-states-interaction-motion",
+  "description": "Grandchild 14 \u2014 State vocabulary, interaction & motion",
+  "keywords": [
+    "grandchild",
+    "state",
+    "vocabulary",
+    "interaction",
+    "motion"
+  ],
+  "lastUpdated": "2026-08-17T04:57:28.406Z",
+  "specId": "014",
+  "folderSlug": "states-interaction-motion",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

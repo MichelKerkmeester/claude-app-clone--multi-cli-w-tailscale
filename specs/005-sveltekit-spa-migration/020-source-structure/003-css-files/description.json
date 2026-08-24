@@ -1,0 +1,30 @@
+{
+  "specFolder": "005-sveltekit-spa-migration/020-source-structure/003-css-files",
+  "description": "Extract every component's scoped <style> block into a co-located .css file it imports, so the CSS is browsable per component as the operator asked.",
+  "keywords": [
+    "extract",
+    "every",
+    "component",
+    "scoped",
+    "style",
+    "block",
+    "co-located",
+    "css",
+    "file",
+    "imports",
+    "browsable",
+    "per",
+    "operator",
+    "asked"
+  ],
+  "lastUpdated": "2026-08-24T12:29:21.256Z",
+  "level": "2",
+  "specId": "003",
+  "folderSlug": "css-files",
+  "parentChain": [
+    "005-sveltekit-spa-migration",
+    "020-source-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

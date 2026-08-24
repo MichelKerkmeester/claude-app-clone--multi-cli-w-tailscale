@@ -1,0 +1,26 @@
+{
+  "level": "phase",
+  "specFolder": "app-mobile-cli/003-design-system-library/001-architecture-conventions-tokens",
+  "description": "Phase 2 cannot migrate ~55 components safely until three things are decided: how a component is",
+  "keywords": [
+    "phase",
+    "cannot",
+    "migrate",
+    "components",
+    "safely",
+    "until",
+    "three",
+    "things",
+    "decided",
+    "component"
+  ],
+  "lastUpdated": "2026-08-17T04:47:03.190Z",
+  "specId": "001",
+  "folderSlug": "architecture-conventions-tokens",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

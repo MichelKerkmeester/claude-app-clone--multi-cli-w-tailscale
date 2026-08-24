@@ -1,0 +1,19 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/007-composer-input",
+  "description": "Grandchild 6 \u2014 Composer input",
+  "keywords": [
+    "grandchild",
+    "composer",
+    "input"
+  ],
+  "lastUpdated": "2026-08-17T04:57:39.758Z",
+  "specId": "006",
+  "folderSlug": "composer-input",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

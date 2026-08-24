@@ -1,0 +1,28 @@
+{
+  "specFolder": "005-sveltekit-spa-migration/019-surface-skill-refresh",
+  "description": "Re-open the sk-code-mobile-cli surface skill once the naming, comment and documentation packets have landed, teach it what actually shipped, and merge",
+  "keywords": [
+    "re-open",
+    "sk-code-mobile-cli",
+    "surface",
+    "skill",
+    "naming",
+    "comment",
+    "documentation",
+    "packets",
+    "landed",
+    "teach",
+    "actually",
+    "shipped",
+    "merge"
+  ],
+  "lastUpdated": "2026-08-23T10:44:49.676Z",
+  "specId": "019",
+  "folderSlug": "surface-skill-refresh",
+  "parentChain": [
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "2"
+}

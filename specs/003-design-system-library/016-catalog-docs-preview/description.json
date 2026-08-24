@@ -1,0 +1,21 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/016-catalog-docs-preview",
+  "description": "Grandchild 15 \u2014 Live catalog & designer docs",
+  "keywords": [
+    "grandchild",
+    "live",
+    "catalog",
+    "designer",
+    "docs"
+  ],
+  "lastUpdated": "2026-08-17T04:58:21.764Z",
+  "specId": "015",
+  "folderSlug": "catalog-docs-preview",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

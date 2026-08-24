@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/003-slash-commands",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/003-slash-commands",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features",
   "children_ids": [
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/001-research",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/002-versioned-catalog-authority",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/003-shared-command-engine",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
     "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/005-explicit-send-pwa-hardening",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/001-research",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/002-versioned-catalog-authority",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/003-shared-command-engine",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/005-explicit-send-pwa-hardening"
+    "002-pi-remote-mobile-ui-ux-features/003-slash-commands/001-research",
+    "002-pi-remote-mobile-ui-ux-features/003-slash-commands/002-versioned-catalog-authority",
+    "002-pi-remote-mobile-ui-ux-features/003-slash-commands/003-shared-command-engine",
+    "002-pi-remote-mobile-ui-ux-features/003-slash-commands/004-inline-autocomplete-surface",
+    "002-pi-remote-mobile-ui-ux-features/003-slash-commands/005-explicit-send-pwa-hardening"
   ],
   "manual": {
     "depends_on": [],
@@ -22,7 +22,7 @@
   },
   "derived": {
     "trigger_phrases": [
-      "f3 \u2014 typed \u201c/\u201d commands"
+      "f3 — typed “/” commands"
     ],
     "key_topics": [
       "typed",
@@ -31,7 +31,7 @@
       "synthesis"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "research/research.md"
@@ -104,9 +104,9 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "F3 \u2014 Typed \u201c/\u201d Commands",
+    "causal_summary": "F3 — Typed “/” Commands",
     "created_at": "2026-08-16T07:15:07.443Z",
-    "last_save_at": "2026-08-16T11:59:20.975Z",
+    "last_save_at": "2026-08-24T16:40:11.749Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [

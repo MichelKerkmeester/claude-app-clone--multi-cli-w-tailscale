@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos/004-live-delta-accessibility-visual-release-hardening",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos/004-live-delta-accessibility-visual-release-hardening",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/010-todos/004-live-delta-accessibility-visual-release-hardening",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/010-todos/004-live-delta-accessibility-visual-release-hardening",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/010-todos",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -26,12 +26,13 @@
       "checklist"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -56,6 +57,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -141,25 +148,57 @@
         "kind": "key_phrase",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "separate",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Final state — COMPLETE (010 feature done)",
+        "kind": "heading",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 3 \u2014 Live delta updates, accessibility, visual, and iPhone/PWA release hardening",
+    "causal_summary": "Phase 3 — Live delta updates, accessibility, visual, and iPhone/PWA release hardening",
     "created_at": "2026-08-16T11:07:32.140Z",
-    "last_save_at": "2026-08-16T11:59:31.354Z",
+    "last_save_at": "2026-08-24T16:38:15.345Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:38a3a2d294a6f65d9cb5f585096a37c09e80ebb76a7d1ce8cfdce9863a5eade8",
+    "source_fingerprint": "sha256:68def45988b52a800e558532ed2b7a0fb7807ea5d368a164ed12f39c4fd54731",
     "source_doc_hashes": {
       "spec.md": "67f413379d9cfa02cef5c14f88668c31b73ea118ad1cf1d29f4177f2c4495bb3",
       "plan.md": "9383caa26e5e558351a18dabc0212688abc872b075d2214786b09365f50cbc93",
       "tasks.md": "12a882435e7f7368669b6fcf0bedab07e8961e07e093ac27de4a30c95e87be30",
-      "checklist.md": "d1f2308d519071c010d1d3e8b58007fefb7a948bf7deeef67f8157a420ffad2e"
+      "checklist.md": "ee8639e948d4476ca07f04e7aad379d45dde2c631e0e6078f752dbbcc4e65aa4",
+      "implementation-summary.md": "df5bb19785c7c26bdf2b1ace505ef475c985d039215b0e4b65cd3dc68afa321c"
     },
     "last_active_child_id": null,
     "last_active_at": null

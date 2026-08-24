@@ -1,0 +1,21 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/003-theming-light-dark",
+  "description": "Grandchild 2 \u2014 Light/dark theming & contrast",
+  "keywords": [
+    "grandchild",
+    "light",
+    "dark",
+    "theming",
+    "contrast"
+  ],
+  "lastUpdated": "2026-08-17T04:54:39.402Z",
+  "specId": "002",
+  "folderSlug": "theming-light-dark",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

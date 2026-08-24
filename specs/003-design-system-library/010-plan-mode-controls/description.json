@@ -1,0 +1,19 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/010-plan-mode-controls",
+  "description": "Grandchild 9 \u2014 Plan-mode controls",
+  "keywords": [
+    "grandchild",
+    "plan-mode",
+    "controls"
+  ],
+  "lastUpdated": "2026-08-17T04:57:05.351Z",
+  "specId": "009",
+  "folderSlug": "plan-mode-controls",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

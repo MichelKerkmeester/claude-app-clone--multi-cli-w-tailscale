@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/009-ask-question",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -20,15 +20,18 @@
       "redaction",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -56,6 +59,12 @@
         "source": "derived"
       },
       {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
         "name": "Summary This",
         "kind": "proper_noun",
         "path": "spec.md",
@@ -80,14 +89,14 @@
         "source": "derived"
       },
       {
-        "name": "Summary",
-        "kind": "heading",
+        "name": "two",
+        "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Problem & Goal",
-        "kind": "heading",
+        "name": "no",
+        "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
@@ -156,25 +165,39 @@
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 1 \u2014 Ask-question protocol, host authority, and redaction",
+    "causal_summary": "Phase 1 — Ask-question protocol, host authority, and redaction",
     "created_at": "2026-08-16T11:03:09.399Z",
-    "last_save_at": "2026-08-16T12:37:15.362Z",
+    "last_save_at": "2026-08-24T16:38:15.317Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:583212b00e492f9f8a74f86c3a1736a4bde21b50b92325cef01ac55437b3343d",
+    "source_fingerprint": "sha256:16bdfe35a5d8bb650dd76b92dd1ad87ffc9a6acb5c60ce05dbb3aea1b93ae7f4",
     "source_doc_hashes": {
-      "spec.md": "1d9dead636e1a63f83a9618cf92b084da57c824db03158f96a8e909b49fd532f",
+      "spec.md": "d1effda82c12fe196c6c9f3f5575d305f3b3ca3e98398f4b4a190575984acce9",
       "plan.md": "469aaa591ac008cf7ff19b6932f5efcbfb4dd278e60dfbe59b16e222391ce79e",
       "tasks.md": "1cb1f4e8866160c4ab407800a4e52d7f7a3525ceb7a257e90d4468d0c5a93fb8",
-      "checklist.md": "7d256926d695f0ac4844069cbf26ccd9e39618e2d85a34262da9f22c9669421c"
+      "checklist.md": "99fb5bcf7122b086ae420fbe938673a7b31acd9d80cb715219f4076c35ba919a",
+      "implementation-summary.md": "55e935e7d8c6efabc7aab917bf72d128c1418762d137df2aa928cb7d12a78a8f"
     },
     "last_active_child_id": null,
     "last_active_at": null

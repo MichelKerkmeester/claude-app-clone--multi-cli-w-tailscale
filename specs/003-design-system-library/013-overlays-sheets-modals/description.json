@@ -1,0 +1,21 @@
+{
+  "level": "3",
+  "specFolder": "app-mobile-cli/003-design-system-library/013-overlays-sheets-modals",
+  "description": "Grandchild 12 \u2014 Overlay, sheet & modal primitives",
+  "keywords": [
+    "grandchild",
+    "overlay",
+    "sheet",
+    "modal",
+    "primitives"
+  ],
+  "lastUpdated": "2026-08-17T04:55:42.603Z",
+  "specId": "012",
+  "folderSlug": "overlays-sheets-modals",
+  "parentChain": [
+    "app-mobile-cli",
+    "003-design-system-library"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

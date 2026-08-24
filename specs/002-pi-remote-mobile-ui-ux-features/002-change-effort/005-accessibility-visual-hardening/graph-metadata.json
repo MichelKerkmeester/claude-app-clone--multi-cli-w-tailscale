@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/005-accessibility-visual-hardening",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/005-accessibility-visual-hardening",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/002-change-effort/005-accessibility-visual-hardening",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/002-change-effort/005-accessibility-visual-hardening",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/002-change-effort",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -20,15 +20,18 @@
       "proof",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -53,6 +56,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -138,25 +147,57 @@
         "kind": "key_phrase",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Flash Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "the Devin CLI",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "non-color-only",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "CSS",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 4 \u2014 Accessibility, visual hardening, and device proof",
+    "causal_summary": "Phase 4 — Accessibility, visual hardening, and device proof",
     "created_at": "2026-08-16T07:15:07.070Z",
-    "last_save_at": "2026-08-16T11:59:20.779Z",
+    "last_save_at": "2026-08-24T16:38:15.113Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:a66ab0e16c917d4a488e7d7b8b1f5ffe5dfe6bcf51c7241db1fa4d528f89b3f4",
+    "source_fingerprint": "sha256:5936a8c3a3ccdeba722537ab332e9c58c288cbc80a3db943689a13cc922e1cf7",
     "source_doc_hashes": {
       "spec.md": "116c63edf89b80086b29f28949c132b5d531a1e6ab7d136273d2077b3f807302",
       "plan.md": "5fe8516812cecb6ca214dfbc3652b5054103b98111c7ae50735024f91b9708c2",
       "tasks.md": "d6751ae1c98252c16b46382c19683155f7a1ce07c510a91c5c7a3e313d9831f7",
-      "checklist.md": "aba13e99823550b44c1d6e8d96b6d711c61defcdf8bc346b64ce2d3adaeee669"
+      "checklist.md": "ea68f5f3937b5522a882587c840967fc7b6f6f76ce137e9c28f105c865f721d7",
+      "implementation-summary.md": "484e0cb4a94e5b387800e8e6fd76c4c75beed4e869dde9a3fc826b9376efa796"
     },
     "last_active_child_id": null,
     "last_active_at": null

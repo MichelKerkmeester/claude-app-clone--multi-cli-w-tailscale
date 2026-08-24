@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/003-host-enforcement-structured-plan-lifecycle",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/003-host-enforcement-structured-plan-lifecycle",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/003-host-enforcement-structured-plan-lifecycle",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/003-host-enforcement-structured-plan-lifecycle",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -19,17 +19,26 @@
       "plan",
       "lifecycle",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
+      "implementation-summary.md",
       "spec.md",
       "plan.md",
       "tasks.md",
       "checklist.md"
     ],
     "entities": [
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
       {
         "name": "spec.md",
         "kind": "doc",
@@ -137,25 +146,57 @@
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
+      },
+      {
+        "name": "an EMPTY",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Flash Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "redacted",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "the Devin CLI",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 2 \u2014 Host enforcement and structured plan lifecycle",
+    "causal_summary": "Phase 2 — Host enforcement and structured plan lifecycle",
     "created_at": "2026-08-16T07:15:10.980Z",
-    "last_save_at": "2026-08-16T11:59:22.767Z",
+    "last_save_at": "2026-08-24T16:38:15.161Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8e0009e68636266d70c3b3e20469e3060383e023a8de5131e2fd1f9175af296e",
+    "source_fingerprint": "sha256:ba695794fbbd221108c37951902bf7094bb5cfcda68120dd748262205a795f7a",
     "source_doc_hashes": {
       "spec.md": "96e9a84c5c72485aa52d28d5b4e864c9361c590525a45bad792bb813eb3c9c0c",
       "plan.md": "eed02d0f559c893461da29ed162c2fd4957e441527b483896a529d62dfed8499",
       "tasks.md": "70e6655137376c7476fad263153ea58f195d7af7b427e020c4c75f91d47c6876",
-      "checklist.md": "2e53b212449fa1e61faa797f9f7268ad778bf340555500e065b30aa3ba2a551f"
+      "checklist.md": "a6eea3b95343d31f0df667de939f2ecbd70a9c7ff9c0f8c7f111898752ac73f3",
+      "implementation-summary.md": "2c2384d83731a3059f88595695b09bc57c3a99fa1998c1b3cc0e1b5b0dfbdfe0"
     },
     "last_active_child_id": null,
     "last_active_at": null

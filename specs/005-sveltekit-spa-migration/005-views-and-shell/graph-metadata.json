@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-sveltekit-spa-migration/005-views-and-shell",
+  "spec_folder": "005-sveltekit-spa-migration/005-views-and-shell",
+  "parent_id": "005-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "extract app.tsx views svelte session socket virtualizer",
+      "sveltekit layout routes goto pi remote"
+    ],
+    "key_topics": [
+      "extract",
+      "app",
+      "tsx",
+      "views",
+      "svelte",
+      "session",
+      "socket",
+      "virtualizer",
+      "sveltekit",
+      "layout",
+      "routes",
+      "goto"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Extract App",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "The Session",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "goto",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "live",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "How App",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done The",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done End",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "route",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "guarded",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol The",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Extract App.tsx's six view functions into Svelte views — Enrollment/Home/Review/Inbox in parallel, Session alone (it owns the socket + virtualizer, swapping @tanstack/react-virtual→svelte-virtual) — then the +layout shell (both context providers, theme, SW registration) and the 3-URL routing via goto/afterNavigate. This is where the branch first runs end-to-end.",
+    "created_at": "2026-08-19T17:24:03.678Z",
+    "last_save_at": "2026-08-24T16:38:15.476Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:c9ab91fc99c2b09d93e57d174fff12adf30fd7f2a8dbb219e09018147e31e633",
+    "source_doc_hashes": {
+      "spec.md": "c2c44052d416225ec02ea9674f9c93e576da45dfa6adbde09b66aea9728b0a2f",
+      "plan.md": "f66eac81c78f804e52f4f34f213574f498160b185548c340a4156138c483df5c",
+      "tasks.md": "5e4ef1e24acf5ab2d0152add51158c359098701f3259f55440785dd3eb51e5a1",
+      "checklist.md": "6c2d3623e0a37ba0d3df5621c3181f22be1ca56a6ff44d69e5ff09eae39b198d",
+      "implementation-summary.md": "d9cd2b2c3261f80e0f140c994710004d520c30e8a06353e88f25b85bf493bef3"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

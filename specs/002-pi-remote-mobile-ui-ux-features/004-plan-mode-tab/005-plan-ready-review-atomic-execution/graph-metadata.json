@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/005-plan-ready-review-atomic-execution",
-  "spec_folder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/005-plan-ready-review-atomic-execution",
-  "parent_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab",
+  "packet_id": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/005-plan-ready-review-atomic-execution",
+  "spec_folder": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/005-plan-ready-review-atomic-execution",
+  "parent_id": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab",
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -21,17 +21,26 @@
       "execution",
       "plan",
       "tasks",
-      "checklist"
+      "checklist",
+      "implementation",
+      "summary"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
+      "implementation-summary.md",
       "spec.md",
       "plan.md",
       "tasks.md",
       "checklist.md"
     ],
     "entities": [
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
       {
         "name": "spec.md",
         "kind": "doc",
@@ -127,25 +136,57 @@
         "kind": "key_phrase",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Luna Max",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "opencode-go",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "fresh",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "foreground",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Phase 4 \u2014 Plan-ready card, review sheet, and atomic execution",
+    "causal_summary": "Phase 4 — Plan-ready card, review sheet, and atomic execution",
     "created_at": "2026-08-16T07:15:11.726Z",
-    "last_save_at": "2026-08-16T11:59:23.269Z",
+    "last_save_at": "2026-08-24T16:38:15.169Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:2f2938cadb079803f57c49079dd9518d06c704607ddab343cb0817fbda4e9f8a",
+    "source_fingerprint": "sha256:e61ac924303e3a5f8b331728301932bfd35073a1e7c58c858e55ce6ef020c0ff",
     "source_doc_hashes": {
       "spec.md": "77377ae6cdd7e73078d3d1754e3cf1e05fdb0cb107f563da29cda0e5d249ccad",
       "plan.md": "6dbbda55eca7931053fd444d616b53307d91f5b4b9da9a881fe9d05e28426599",
       "tasks.md": "9ff1c5726405cfd2c8da6e4a53c62024e4ca96a549e6427c2c131de1f0b383f7",
-      "checklist.md": "e880592fb103334a4f906bdacf016de6a52b25182e0690dce3e09ee983335798"
+      "checklist.md": "d95f30222e9ed7121be9adbaa8c374140d80d6034cb94e608ba44350169f72b8",
+      "implementation-summary.md": "1b35a26f536efba18cff8dbd5291172c78c07c6ad46510ad56b8806edf5358cb"
     },
     "last_active_child_id": null,
     "last_active_at": null

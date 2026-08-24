@@ -1,0 +1,21 @@
+{
+  "level": "2",
+  "specFolder": "005-sveltekit-spa-migration/017-ask-question-activation",
+  "description": "Wire the one relay service that was never constructed.",
+  "keywords": [
+    "wire",
+    "one",
+    "relay",
+    "service",
+    "never",
+    "constructed"
+  ],
+  "lastUpdated": "2026-08-23T17:48:05.282Z",
+  "specId": "017",
+  "folderSlug": "ask-question-activation",
+  "parentChain": [
+    "005-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

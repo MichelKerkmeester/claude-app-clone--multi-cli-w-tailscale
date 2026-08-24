@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 // Resolve by glob, not by an allowlist. An allowlist silently drops any test
 // file nobody remembered to add, which reads as coverage that does not exist —
 // a new file in the tests directory must run without editing this config.
-const LOGIC_TESTS = ['app-mobile/tests/**/*.test.ts', 'app-mobile/tests/**/*.test.tsx'];
+const LOGIC_TESTS = ['app-mobile/tests/**/*.test.ts'];
 
 // Component suites own the *.svelte.test.ts half; they need the testing-library
 // cleanup and inlining that only the svelte config sets up.

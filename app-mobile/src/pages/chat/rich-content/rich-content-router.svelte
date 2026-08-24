@@ -171,4 +171,16 @@
     unicode-bidi: plaintext;
     margin-block: var(--space-3);
   }
+
+  /* @ds surface: fallback/activity cards — quiet presentation for non-card blocks. */
+  /* @ds state: malformed-fallback — unsupported/undisplayable blocks present as a
+     quiet card without card chrome. */
+  /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
+  :global(.rich-fallback-card) {
+    box-shadow: none;
+  }
+
+  :global(.rich-activity-card) {
+    box-shadow: none;
+  }
 </style>

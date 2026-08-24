@@ -330,6 +330,16 @@
      app.css. The body:has(.slash-panel) .scroll-to-latest override is body-rooted and couples to
      the slash-panel surface, so it is wrapped in :global. Values unchanged. -->
 <style>
+  /* @ds surface: empty-state — empty/unavailable list state. */
+  /* @ds state: empty-transcript — the TranscriptList "no blocks yet" message. */
+  .empty-transcript {
+    padding: clamp(3rem, 8vw, 6rem) var(--space-4);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-lg);
+    color: var(--ink-muted);
+    text-align: center;
+  }
+
   /* @ds slot: frame — transcript region wrapper (positioning only). */
   .transcript-frame {
     position: relative;

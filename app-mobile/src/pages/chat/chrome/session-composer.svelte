@@ -810,6 +810,7 @@
   /* @ds state: promptError — inline-alert rendered above the tray (shared error surface). */
   /* @ds edit: layout — sticky bottom-anchor + canvas fade; the keyboard-anchor
      --visual-viewport-height var feeds the anchor and stays the layout input. */
+  /* @ds guardrail: do-not-edit — presentation of the viewer-open state; keep the blur/inert pair. */
   .composer-region {
     position: sticky;
     z-index: 5;

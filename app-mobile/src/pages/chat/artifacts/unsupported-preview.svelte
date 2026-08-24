@@ -25,6 +25,7 @@
      foreign ancestor. Literal hex values preserved byte-for-byte. -->
 <style>
   /* @ds surface: unsupported-preview — the unavailable/unsupported read notice card. */
+  /* @ds guardrail: do-not-edit — theme-invariant light literal; stays fixed. */
   .artifact-unsupported-preview {
     max-inline-size: 100%;
     margin: 0;

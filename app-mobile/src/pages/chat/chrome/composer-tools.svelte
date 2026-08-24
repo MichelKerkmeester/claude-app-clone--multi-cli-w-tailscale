@@ -283,6 +283,15 @@
      GLOBAL in app.css. Child-primitive classes and react-aria/runtime data-attributes use
      :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>
+  /* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
+  /* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
+  :global(.composer-tools-popover) {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-raised);
+  }
+
   /* @ds slot: tools-trigger — the "+" popover trigger. */
   :global(.composer-plus) {
     display: grid;

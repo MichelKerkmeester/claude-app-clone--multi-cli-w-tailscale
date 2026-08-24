@@ -332,24 +332,6 @@ button[data-pressed]:not([data-disabled]) {
   background: color-mix(in oklch, var(--canvas) 94%, transparent);
 }
 
-/* @ds end surface: app-shell */
-/* @ds surface: topbar — global chrome header for the non-session surfaces. */
-/* @ds edit: layout — sticky-bar geometry + safe top gutter. */
-.topbar {
-  position: sticky;
-  z-index: 20;
-  top: 0;
-  display: flex;
-  min-height: 4.25rem;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: max(var(--space-2), env(safe-area-inset-top)) var(--page-gutter) var(--space-2);
-  border-bottom: 1px solid var(--line);
-  background: color-mix(in oklch, var(--canvas) 91%, transparent);
-  backdrop-filter: blur(12px);
-}
-
 /* @ds slot: wordmark — Pi Remote wordmark block. */
 
 /* @ds slot: nav — Inbox · Review actions; theme-toggle and status slots are shared surfaces below. */
@@ -430,10 +412,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
 /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
-.home-view,
-.session-view,
-.review-view,
-.inbox-view {
+.home-view{
   padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
 }
 
@@ -448,12 +427,8 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds surface: home-view — hero, session roster, device footer, push settings. */
-/* @ds state: loading · empty · error · stale — via shared empty-state, inline-alert and freshness surfaces. */
-
-.hero h1,
-.review-heading h1,
-.inbox-heading h1,
-.enrollment-card h1 {
+/* @ds state: loading · empty · error · stale — via shared empty-state,
+.inbox-heading h1{
   max-width: 13ch;
   margin: 0;
   color: var(--ink);
@@ -482,16 +457,14 @@ button[data-pressed]:not([data-disabled]) {
   margin-bottom: var(--space-6);
 }
 
-.section-heading h2,
-.push-settings h2 {
+.section-heading h2{
   margin: 0;
   font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 650;
   letter-spacing: -0.025em;
 }
 
-.section-heading p,
-.push-settings p {
+.section-heading p{
   max-width: 34rem;
   margin: var(--space-2) 0 0;
   color: var(--ink-muted);
@@ -527,57 +500,9 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds slot: device — device-key footer (logout · revoke). */
 
 /* @ds surface: push-settings — device notification preferences. */
-/* @ds state: loading · disabled · off · on — support check, relay-off, enable CTA, preference grid. */
-
-.push-settings > button[data-hovered] {
+/* @ds state: loading · disabled · off · on — support check, relay-off, enable CTA{
   background: var(--accent-strong);
   color: white;
-}
-
-/* @ds slot: preferences — per-class alert switches. */
-
-/* @ds end surface: push-settings */
-/* @ds end surface: home-view */
-/* @ds surface: enrollment-view — first-run device binding. */
-/* @ds edit: layout — full-frame centring + safe gutters. */
-/* @ds state: idle · busy · error · authenticating — binding lifecycle. */
-
-/* @ds slot: symbol — the π mark. */
-
-/* @ds slot: actions — scan + enroll controls. */
-
-.enrollment-actions button,
-.scan-button {
-  display: inline-flex;
-  min-height: 2.9rem;
-  align-items: center;
-  justify-content: center;
-  padding-inline: var(--space-4);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--ink);
-  font-size: 0.78rem;
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.enrollment-actions button {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: white;
-}
-
-.enrollment-actions button[data-hovered] {
-  background: var(--accent-strong);
-}
-
-.enrollment-actions button[data-disabled] {
-  border-color: var(--line);
-  background: var(--surface-muted);
-  color: var(--ink-muted);
-  cursor: not-allowed;
 }
 
 /* @ds end surface: enrollment-view */
@@ -602,23 +527,14 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 0.72rem;
   font-weight: 700;
 }
-
-/* @ds surface: review-heading — review surface intro (states below via approval-card / inline-alert). */
-/* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
-/* @ds slot: heading — surface title + description. */
-.review-heading,
 .inbox-heading {
   max-width: 58rem;
   padding-bottom: clamp(2.5rem, 7vw, 5rem);
 }
-
-.review-heading h1,
 .inbox-heading h1 {
   max-width: 15ch;
   font-size: clamp(2.8rem, 7vw, 5.6rem);
 }
-
-.review-heading > p:last-child,
 .inbox-heading > p:last-child {
   max-width: 43rem;
   margin: var(--space-6) 0 0;
@@ -626,11 +542,6 @@ button[data-pressed]:not([data-disabled]) {
   font-size: 1rem;
   line-height: 1.65;
 }
-
-/* @ds state: info — grant-banner (active accept-edits lease). */
-/* @ds state: error — inline-alert (surface error). */
-/* @ds state: stale — barrier-note (reconciliation / checking). */
-.grant-banner,
 .inline-alert,
 .barrier-note {
   margin-bottom: var(--space-4);
@@ -653,32 +564,6 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--warning);
 }
 
-.approval-list,
-.attention-list {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.approval-actions button {
-  min-height: 3rem;
-  padding-inline: var(--space-3);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: var(--accent);
-  color: white;
-  font-size: 0.78rem;
-  font-weight: 720;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color var(--duration-fast) ease,
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.approval-actions button[data-hovered] {
-  background: var(--accent-strong);
-}
-
 .attention-card > span:not(.attention-icon) {
   font-size: 0.9rem;
   font-weight: 700;
@@ -686,8 +571,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds surface: empty-state — empty/unavailable list state. */
 /* @ds state: empty-transcript — the TranscriptList "no blocks yet" message. */
-.empty-state,
-.empty-transcript {
+.empty-state{
   padding: clamp(3rem, 8vw, 6rem) var(--space-4);
   border: 1px dashed var(--line-strong);
   border-radius: var(--radius-lg);
@@ -1156,21 +1040,10 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds guardrail: do-not-edit — scrollable code/text wells contain their own
    overscroll so panning never chains to the page. */
 .rich-shell-well,
-.rich-code-preview,
-.safe-markdown-code,
-.artifact-code-preview,
-.artifact-diff-preview,
-.artifact-text-preview,
-.artifact-markdown-code {
+.artifact-diff-preview{
   overscroll-behavior: contain;
 }
-
-/* @ds guardrail: do-not-edit — panning previews do not shift scroll anchoring. */
-.rich-code-preview,
-.artifact-code-preview,
-.artifact-diff-preview,
-.artifact-text-preview,
-.artifact-markdown-code {
+.artifact-diff-preview{
   overflow-anchor: none;
 }
 
@@ -1302,29 +1175,10 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds slot: header — title/eyebrow/metadata versus status/redaction row. */
-/* @ds edit: layout — header gap, alignment, space-between rhythm. */
-
-/* @ds slot: heading — eyebrow + title + metadata column. */
-
-/* @ds slot: title — card title (h3) and the command-region subheadings (h4). */
-.rich-block-heading h3,
-.rich-command-region h4 {
+/* @ds edit: layout — header gap, alignment{
   margin: 0;
   color: var(--ink);
   font-weight: 600;
-}
-
-/* @ds slot: label — eyebrow kicker above the card title. */
-
-/* @ds slot: metadata · status · actions · output-heading — shared flex row rhythm. */
-.rich-block-metadata,
-.rich-block-status,
-.rich-command-region-heading,
-.rich-block-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-items: center;
 }
 
 /* @ds slot: metadata — quiet factual chips (language, call, lines, labels). */
@@ -1370,21 +1224,6 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--accent-ink);
 }
 
-/* @ds surface: command-output-card — Bash command + output preview with unit
-   Copy and a full-screen Open handoff. */
-/* @ds slot: output — vertical spacing between the command and output regions. */
-
-/* @ds slot: output-heading — Output title + earlier-lines-clipped count row. */
-.rich-command-region-heading {
-  justify-content: space-between;
-  margin-block-end: var(--space-2);
-}
-
-/* @ds slot: label — Command / Output region subheadings. */
-.rich-command-region h4 {
-  font-size: 0.8125rem;
-}
-
 /* @ds slot: command / output / code well — mono well shared by the command and
    the diff preview; no horizontal page overflow (scrolls inside its own box). */
 .rich-shell-well {
@@ -1405,17 +1244,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: running-tail — React sets data-tail-first='true'; the preview shows
    the newest output lines at the bottom while a command streams. */
 
-/* @ds slot: labels — clipped-count, output-meta, and code/text continuation
-   captions share the same muted small type. */
-
-/* @ds slot: labels — output-meta and continuation caption rhythm. */
-
-/* @ds surface: code-card — fenced source preview with optional progressive
-   highlighting and a full-screen Open handoff. */
-/* @ds slot: code-preview — horizontally panning code viewport. */
-/* @ds state: code — plaintext-first; progressively highlighted via the
-   data-highlight-status hook that React owns (plain · pending · highlighted). */
-.rich-code-preview {
+/* @ds slot: labels — clipped-count, output-meta{
   max-block-size: 228px;
   min-inline-size: 0;
   overflow-x: auto;
@@ -1445,42 +1274,10 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
-/* @ds slot: prose spacing — block-level rhythm for headings and quotes. */
-
-/* @ds slot: prose-quote — blockquote border + muted ink. */
-
-/* @ds slot: prose-list — ordered/unordered list rhythm and indent. */
-
-/* @ds slot: prose-inline-code — inline code chip. */
-
-/* @ds slot: safe-markdown-code — fenced code block rendered by SafeMarkdown. */
-.safe-markdown-code {
-  max-inline-size: 100%;
-  margin-block: 0 var(--space-3);
-  padding: var(--space-3);
-  overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface-code);
-  color: var(--ink-inverse);
-  font: 0.8125rem/1.45 var(--font-mono);
-  white-space: pre;
-}
-
 /* @ds slot: safe-markdown-code — neutralizes the inline-chip chrome inside a
    fenced block. */
 
-/* @ds slot: prose-table — table rhythm, borders, and start-aligned cells. */
-
-/* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
-   polite live region whose text carries the outcome; the presence styles are this. */
-/* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
-
-/* @ds surface: fallback/activity cards — quiet presentation for non-card blocks. */
-/* @ds state: malformed-fallback — unsupported/undisplayable blocks present as a
-   quiet card without card chrome. */
-.rich-fallback-card,
-.rich-activity-card {
+/* @ds slot: prose-table — table rhythm, borders{
   box-shadow: none;
 }
 
@@ -1679,27 +1476,7 @@ button[data-pressed]:not([data-disabled]) {
    @ds guardrail: do-not-edit — theme-invariant token colours must stay fixed. */
 
 /* @ds surface: diff-preview — the unified-diff read well. */
-/* @ds guardrail: do-not-edit — fixed ltr, isolate bidi, selectable, in-box panning. */
-
-/* @ds state: wrapped — diff wrap toggles line wrapping. */
-
-/* @ds slot: line — one diff row. */
-
-/* @ds state: add · remove · find-match — per-line tint. */
-/* @ds guardrail: do-not-edit — theme-invariant light literal; stays fixed. */
-
-/* @ds surface: loading-preview — the skeleton shimmer before content arrives. */
-/* @ds state: loading — content still resolving. */
-
-/* @ds slot: skeleton-row — one placeholder bar. */
-
-/* @ds slot: skeleton-row — partial-width placeholder row. */
-
-/* @ds surface: unsupported-preview · empty-preview — quiet read notices. */
-/* @ds state: unsupported · withheld · denied · missing · corrupt · too-large · empty · whitespace —
-   the caller picks the message; the presence chrome is this. */
-
-.artifact-unsupported-preview,
+/* @ds guardrail: do-not-edit — fixed ltr, isolate bidi, selectable,
 .artifact-empty-preview {
   max-inline-size: 100%;
   margin: 0;
@@ -1740,8 +1517,6 @@ button[data-pressed]:not([data-disabled]) {
    @ds guardrail: do-not-edit — dark reading surfaces stay fully opaque and legible. */
 
 :root[data-theme='dark'] .artifact-viewer-modal,
-:root[data-theme='dark'] .artifact-text-preview,
-:root[data-theme='dark'] .artifact-unsupported-preview,
 :root[data-theme='dark'] .artifact-empty-preview,
 :root[data-theme='dark'] .artifact-find-control,
 :root[data-theme='dark'] .artifact-control-button,
@@ -1858,23 +1633,6 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 680;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-}
-
-/* @ds surface: session-header — in-session quiet header (back · model · overflow). */
-/* @ds edit: layout — grid geometry + safe top gutter. */
-/* ── Session header (in-session): back · centered model · overflow ─────── */
-.session-header {
-  position: sticky;
-  top: 0;
-  z-index: 6;
-  display: grid;
-  grid-template-columns: 2.75rem 1fr 2.75rem;
-  align-items: center;
-  gap: var(--space-2);
-  padding: max(var(--space-2), env(safe-area-inset-top)) var(--page-gutter) var(--space-2);
-  border-bottom: 1px solid var(--line);
-  background: color-mix(in oklch, var(--canvas) 90%, transparent);
-  backdrop-filter: blur(12px);
 }
 
 /* @ds slot: icon — back and overflow icon buttons. */
@@ -2059,10 +1817,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* Popover sheets + every react-aria dropdown (Select / ComboBox / Dialog). */
 /* @ds end surface: session-view */
-/* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
-/* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
-.session-sheet-popover,
-.composer-tools-popover {
+/* @ds surface: session-sheet — in-session overflow popover (nav · theme){
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--surface-raised);
@@ -2689,24 +2444,14 @@ button[data-pressed]:not([data-disabled]) {
 
 @media (max-width: 39rem) {
 
-  .home-view,
-  .session-view,
-  .review-view,
-  .inbox-view {
+  .home-view{
     padding-top: var(--space-6);
   }
 
   .section-heading,
-  .session-title,
-  .device-footer,
-  .enrollment-actions {
+  .session-title{
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .enrollment-actions button,
-  .scan-button {
-    width: 100%;
   }
 
   .session-title {
@@ -2727,8 +2472,7 @@ button[data-pressed]:not([data-disabled]) {
 
 @media (pointer: coarse) {
   button,
-  [role='switch'],
-  .scan-button {
+  [role='switch']{
     min-height: 44px;
   }
 }
@@ -2898,18 +2642,8 @@ body,
   min-block-size: 100dvh;
 }
 
-/* @ds edit: layout — safe top inline gutters for the chrome headers. */
-.topbar,
-.session-header {
-  padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
-  padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
-}
-
 /* @ds edit: layout — safe inline gutters for the routed surfaces. */
-.home-view,
-.session-view,
-.review-view,
-.inbox-view {
+.home-view{
   padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
   padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
 }
@@ -2961,17 +2695,12 @@ select:focus-visible,
 /* @ds slot: label — lets the button label shrink; see plan-mode-button. */
 
 /* Clay is an accent, not the foreground for normal-size action labels. */
-.composer-primary.is-send,
-.enrollment-actions button,
-.approval-actions button {
+.composer-primary.is-send{
   background: var(--ink);
   color: var(--ink-inverse);
 }
 
-.composer-primary.is-send[data-hovered],
-.enrollment-actions button[data-hovered],
-.approval-actions button[data-hovered],
-.push-settings > button[data-hovered] {
+.composer-primary.is-send[data-hovered]{
   background: var(--surface-muted);
   color: var(--ink);
 }
@@ -3112,31 +2841,6 @@ select:focus-visible,
 .artifact-image-pan-controls button {
   min-inline-size: 44px;
   min-block-size: 44px;
-}
-
-/* @ds slot: privacy-curtain — opaque cover shown on dismissal while content unmounts. */
-/* @ds state: privacy-covered — the curtain is fully opaque and pointer-blocking. */
-/* @ds guardrail: do-not-edit — z-index 10000 opaque cover; the privacy invariant. */
-
-.artifact-viewer-privacy-curtain {
-  position: fixed;
-  z-index: 10000;
-  inset: 0;
-  inline-size: 100vw;
-  block-size: 100svh;
-  block-size: 100dvh;
-  background: #24221f;
-  opacity: 1;
-  pointer-events: all;
-}
-
-/* @ds state: viewer-open — while the reader is open the composer recedes (blur + inert). */
-/* @ds guardrail: do-not-edit — presentation of the viewer-open state; keep the blur/inert pair. */
-
-html[data-artifact-viewer-open='true'] .composer-region {
-  filter: blur(0.5rem);
-  pointer-events: none;
-  user-select: none;
 }
 
 /* @ds state: privacy-covered — the dialog is hidden under the opaque curtain. */

@@ -544,6 +544,24 @@
      the .agent-running .state-icon pulsing group stays global (shared with the agent-row surface).
      Values unchanged. -->
 <style>
+  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
+  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
+  .session-view {
+    padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
+  }
+
+  @media (max-width: 39rem) {
+    .session-view {
+      padding-top: var(--space-6);
+    }
+  }
+
+  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
+  .session-view {
+    padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  }
+
   /* @ds surface: session-view — in-session composition root (header · statusline · transcript · composer). */
   /* @ds state: active · stale — reconnecting readout; error via inline-alert. */
   .session-statusline {

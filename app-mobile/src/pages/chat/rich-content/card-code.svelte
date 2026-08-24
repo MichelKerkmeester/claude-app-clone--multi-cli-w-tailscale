@@ -128,6 +128,7 @@
   /* @ds slot: code-preview — horizontally panning code viewport. */
   /* @ds state: code — plaintext-first; progressively highlighted via the
      data-highlight-status hook (plain · pending · highlighted). */
+  /* @ds guardrail: do-not-edit — panning previews do not shift scroll anchoring. */
   .rich-code-preview {
     max-block-size: 228px;
     min-inline-size: 0;

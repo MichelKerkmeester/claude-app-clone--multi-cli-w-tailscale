@@ -221,6 +221,25 @@
      group (shared with composer/enrollment/push), and .inline-alert / .surface-kicker / .empty-state /
      .empty-glyph / .sr-only are shared by 2+ components and stay global in app.css. Values unchanged. -->
 <style>
+  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
+  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
+  .review-view {
+    padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
+  }
+
+  /* @ds surface: home-view — hero, session roster, device footer, push settings. */
+  /* @ds state: loading · empty · error · stale — via shared empty-state, inline-alert and freshness surfaces. */
+  .review-heading h1 {
+    max-width: 13ch;
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(2.85rem, 8vw, 5.75rem);
+    font-weight: 620;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
   /* @ds surface: back-button — quiet back arrow, built on the shared chrome-button base. */
   :global(.back-button) {
     position: relative;
@@ -234,6 +253,46 @@
     content: '←';
   }
   /* @ds end surface: back-button */
+
+  /* @ds surface: review-heading — review surface intro (states below via approval-card / inline-alert). */
+  /* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
+  /* @ds slot: heading — surface title + description. */
+  .review-heading {
+    max-width: 58rem;
+    padding-bottom: clamp(2.5rem, 7vw, 5rem);
+  }
+
+  .review-heading h1 {
+    max-width: 15ch;
+    font-size: clamp(2.8rem, 7vw, 5.6rem);
+  }
+
+  .review-heading > p:last-child {
+    max-width: 43rem;
+    margin: var(--space-6) 0 0;
+    color: var(--ink-secondary);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  /* @ds state: info — grant-banner (active accept-edits lease). */
+  /* @ds state: error — inline-alert (surface error). */
+  /* @ds state: stale — barrier-note (reconciliation / checking). */
+  .grant-banner {
+    margin-bottom: var(--space-4);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: 0.8rem;
+    font-weight: 650;
+    line-height: 1.45;
+  }
+
+  .approval-list {
+    display: grid;
+    gap: var(--space-4);
+  }
 
   .approval-card {
     overflow: hidden;
@@ -383,6 +442,10 @@
   }
 
   @media (max-width: 39rem) {
+    .review-view {
+      padding-top: var(--space-6);
+    }
+
     .approval-card > header,
     .approval-tool {
       align-items: flex-start;
@@ -393,5 +456,12 @@
       grid-template-columns: 1fr;
     }
   }
+
+  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
+  .review-view {
+    padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  }
+
   /* @ds end surface: review-view */
 </style>

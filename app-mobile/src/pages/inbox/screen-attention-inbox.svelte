@@ -126,6 +126,12 @@
      .surface-kicker (many), and .empty-state / .empty-glyph (Review/Home) are shared by 2+
      components and stay global in app.css. Values unchanged. -->
 <style>
+  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
+  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
+  .inbox-view {
+    padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
+  }
+
   /* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
   /* @ds slot: heading — surface title + description. */
   .inbox-heading {
@@ -225,6 +231,10 @@
   }
 
   @media (max-width: 39rem) {
+    .inbox-view {
+      padding-top: var(--space-6);
+    }
+
     :global(.attention-card) {
       grid-template-columns: 2.5rem 1fr;
     }
@@ -236,5 +246,11 @@
     :global(.attention-card strong) {
       grid-column: 2;
     }
+  }
+
+  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
+  .inbox-view {
+    padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
   }
 </style>

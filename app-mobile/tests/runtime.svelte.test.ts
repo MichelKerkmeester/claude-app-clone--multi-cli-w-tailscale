@@ -19,6 +19,10 @@
 // $state writes are synchronous, so imperative phase asserts after each
 // settle read the getter directly. Fake timers mirror the oracle exactly.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
 import { waitFor } from '@testing-library/svelte';
@@ -43,6 +47,10 @@ import {
 } from '../src/shared/state/runtime.js';
 import { useRuntime } from '../src/shared/state/use-runtime.svelte.js';
 import RuntimeStatusRegion from '../src/pages/chat/transcript/runtime-status-region.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const relay = vi.hoisted(() => {
   class RuntimeRelayError extends Error {
@@ -145,6 +153,10 @@ async function initRuntime(): Promise<void> {
   });
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 beforeEach(() => {
   vi.clearAllMocks();
   vi.useRealTimers();
@@ -159,6 +171,10 @@ afterEach(() => {
   factoryScope = null;
   vi.useRealTimers();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function ready() {
   return runtimeReducer(INITIAL_RUNTIME_STATE, {
@@ -179,6 +195,10 @@ function readyWith(state: RuntimeStateDto) {
 function issue(code: RuntimeIssue['code']): RuntimeIssue {
   return { code, retryAfterMs: null };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('runtime state table', () => {
   it('starts checking with nothing confirmed', () => {

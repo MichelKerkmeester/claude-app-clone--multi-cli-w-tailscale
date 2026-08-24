@@ -1,9 +1,21 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ARTIFACT TRANSPORT TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { webcrypto } from 'node:crypto';
 
 import { sha256, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ArtifactReadError, readArtifact } from '../src/shared/transport/relay.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const BODY = 'safe exact revision bytes\n';
 const BLOCK: FilePreviewBlock = {
@@ -25,10 +37,18 @@ const BLOCK: FilePreviewBlock = {
   content: { kind: 'artifact-ref' },
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('direct exact artifact transport', () => {
   it('uses a GET exact tuple and validates body, digest, revision, ETag and headers', async () => {

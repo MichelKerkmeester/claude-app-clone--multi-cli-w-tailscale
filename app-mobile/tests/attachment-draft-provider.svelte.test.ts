@@ -8,6 +8,10 @@
 // "Strict Mode" test keeps every leak assertion (revoke once, no fetch/xhr,
 // no extra timers on unmount) without the React.StrictMode wrapper.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -18,6 +22,10 @@ import {
 } from '../src/pages/chat/attachments/attachment-state.js';
 import AttachmentDraftTestSurface from './support/AttachmentDraftTestSurface.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   for (const restore of objectUrlRestorers.splice(0)) restore();
@@ -25,7 +33,15 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+// ───────────────────────────────────────────────────────────────────
+// 3. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const objectUrlRestorers: Array<() => void> = [];
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function photo(name: string, type = 'image/jpeg'): File {
   return new File(['local image bytes'], name, { type });
@@ -75,6 +91,10 @@ function renderDraft({
     props: { capability, sessionId, modelCanViewPhotos, files },
   });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('attachment draft reducer', () => {
   it('stores only generic metadata and keeps lifecycle transitions serializable', () => {

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: INBOUND IMAGE STATES TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/inbound-image-states.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle. The React useArtifactResource hook
@@ -8,13 +12,25 @@
 // state is rendered via InboundImageStatesCorpus.svelte (the Svelte equivalent
 // of the oracle's INBOUND_IMAGE_LIFECYCLE_STATES.map(<InboundImageCard/>)).
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 import { render, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const resource = vi.hoisted(() => ({
   useArtifactResource: vi.fn(),
 }));
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 vi.mock('../src/pages/chat/artifacts/use-artifact-resource.svelte.js', () => resource);
 
@@ -98,6 +114,10 @@ const ACTION_LABEL: Record<string, string> = {
 afterEach(() => {
   vi.clearAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('inbound image lifecycle states', () => {
   it('renders every state copy, geometry, busy signal, and only its listed actions', () => {

@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: MENU FOCUS TRAP DISMISS TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeModelCatalogDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -5,6 +13,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/shared/state/runtime.js';
 import PlanModeButton from '../src/pages/chat/chrome/button-plan-mode.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -26,6 +38,10 @@ const MODELS: RuntimeModelCatalogDto = {
   canSetModelWhileStreaming: false,
   models: [],
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function readyRuntime(): RuntimeUiState {
   return runtimeReducer(INITIAL_RUNTIME_STATE, {
@@ -60,11 +76,19 @@ function renderMenu() {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   document.body.style.cssText = '';
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('shared menu accessibility parity', () => {
   it('keeps focus contained and the menu open for forward and reverse Tab', async () => {

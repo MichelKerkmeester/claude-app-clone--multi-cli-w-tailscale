@@ -1,13 +1,29 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Theme Control Toggle Button Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import ThemeControl from '../src/shared/chrome/theme-control.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ThemeControl toggle buttons', () => {
   it('renders independent toggle buttons and preserves selected-option behavior', async () => {

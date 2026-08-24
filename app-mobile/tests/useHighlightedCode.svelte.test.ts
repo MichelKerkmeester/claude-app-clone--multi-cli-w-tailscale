@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: USE HIGHLIGHTED CODE TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/useHighlightedCode.test.tsx (React behavior oracle)
 // to @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle. The React renderHook probe is
@@ -8,6 +12,10 @@
 // getHighlightResourceStats / highlightEligibility / hashCanonicalSource
 // pure-helper assertions are ported verbatim. React act() calls are replaced
 // by await tick() / waitFor to flush Svelte's reactive updates.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import { tick } from 'svelte';
@@ -22,6 +30,10 @@ import {
 } from '../src/pages/chat/rich-content/use-highlighted-code.svelte.js';
 
 import HighlightedCodeProbe from './support/HighlightedCodeProbe.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 interface WorkerMessage {
   readonly source: string;
@@ -61,12 +73,20 @@ class ControlledWorker {
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   ControlledWorker.instances.length = 0;
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('useHighlightedCode', () => {
   it('shows plaintext first, sends only bounded redacted fields, and accepts a matching response', async () => {

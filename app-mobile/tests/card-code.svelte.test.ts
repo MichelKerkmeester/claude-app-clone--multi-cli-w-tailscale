@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: CARD CODE TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,6 +15,10 @@ import {
   normalizeTranscriptBlocks,
   type NormalizedCodeBlock,
 } from '../src/pages/chat/rich-content/normalize-transcript-blocks.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 // CodeCard progressive-highlights via a Web Worker, but jsdom has no Worker.
 // A real Worker global lets the highlight life-cycle take its normal dispatch
@@ -64,11 +76,19 @@ function codeBlock(): NormalizedCodeBlock {
   return block;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 beforeEach(installWorkerShim);
 afterEach(() => {
   cleanup();
   restoreWorker();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('CodeCard', () => {
   it('uses escaped plaintext without line numbers and copies the canonical source', async () => {

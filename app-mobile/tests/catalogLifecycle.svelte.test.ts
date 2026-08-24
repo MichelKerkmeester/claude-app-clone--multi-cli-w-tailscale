@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Command Catalog Lifecycle Tests (Svelte port)
 // ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/catalogLifecycle.test.tsx (React behavior oracle)
 // to the Svelte runes factory. The React *.test.tsx oracle is NEVER modified.
 // Proves the session-scoped in-memory lifecycle: one shared prefetch, no
@@ -14,6 +15,10 @@
 // HostCommandCatalogState via onControls. The pure-logic describes (binding
 // scope, lifecycle helper determinism) import the shared helpers from
 // commands.ts directly — identical to the oracle.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { cleanup, render, waitFor } from '@testing-library/svelte';
 import { flushSync } from 'svelte';
@@ -30,6 +35,10 @@ import {
   type ScopedCommandSnapshot,
 } from '../src/shared/commands/commands.js';
 import CatalogLifecycleHarness from './support/CatalogLifecycleHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const relay = vi.hoisted(() => {
   class CatalogLifecycleError extends Error {
@@ -88,10 +97,18 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 async function flushMicrotasks(): Promise<void> {
   await Promise.resolve();
   await Promise.resolve();
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -103,6 +120,10 @@ afterEach(() => {
   cleanup();
   vi.useRealTimers();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('useHostCommandCatalog lifecycle', () => {
   it('prefetches one catalog for a live session and shares it between consumers', async () => {

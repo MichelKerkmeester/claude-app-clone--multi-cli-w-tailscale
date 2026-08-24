@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ARTIFACT VIEWER HOST TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/ArtifactViewer.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle; the Svelte viewer opens via the
@@ -10,6 +14,10 @@
 // their own scoped styles; the oracle's CSS import was visual-only and
 // asserted no CSS regexes, so nothing is repointed.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -20,6 +28,10 @@ import type { ArtifactViewerContextValue } from '../src/pages/chat/artifacts/typ
 import ArtifactViewerCardsHarness from './support/ArtifactViewerCardsHarness.svelte';
 import ArtifactPreviewTriggerHarness from './support/ArtifactPreviewTriggerHarness.svelte';
 import ArtifactViewerApiOnlyHarness from './support/ArtifactViewerApiOnlyHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const FIRST: FileDiffBlock = {
   id: 'block_file_diff_first',
@@ -91,6 +103,10 @@ const STALE_ARTIFACT_PREVIEW: FilePreviewBlock = {
   content: { kind: 'artifact-ref' },
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -98,6 +114,10 @@ afterEach(() => {
   document.documentElement.removeAttribute('data-artifact-viewer-open');
   document.getElementById('artifact-viewer-privacy-curtain')?.remove();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function renderCards(onReady?: (api: ArtifactViewerContextValue) => void) {
   return render(ArtifactViewerCardsHarness, {
@@ -137,6 +157,10 @@ function artifactResponse(status: number, text = ''): Response {
     arrayBuffer: async () => new TextEncoder().encode(text).buffer,
   } as unknown as Response;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ArtifactViewer', () => {
   it('opens one labelled dialog, focuses the safe heading, and renders exact patch bytes', async () => {

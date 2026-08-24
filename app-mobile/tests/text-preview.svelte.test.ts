@@ -1,7 +1,19 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Text Preview Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
 import TextPreview from '../src/pages/chat/artifacts/text-preview.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('TextPreview', () => {
   it('renders exact text as selectable DOM content and supports bounded chunks', () => {

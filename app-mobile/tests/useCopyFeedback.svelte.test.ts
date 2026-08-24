@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: USE COPY FEEDBACK TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/useCopyFeedback.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle. The React CopyHarness (which calls
@@ -7,6 +11,10 @@
 // The factory uses $state (no $effect), so the harness pattern (option b) is
 // used: the reactive state is projected to the DOM for assertions.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +22,15 @@ import { COPY_FAILURE_MESSAGE } from '../src/pages/chat/rich-content/use-copy-fe
 
 import CopyFeedbackProbe from './support/CopyFeedbackProbe.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(cleanup);
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('useCopyFeedback', () => {
   it('copies directly from the canonical source and announces one named result', async () => {

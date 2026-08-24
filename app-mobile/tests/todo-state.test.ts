@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Todo State Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   Envelope,
   SyncDelta,
@@ -10,6 +18,10 @@ import { describe, expect, it } from 'vitest';
 
 import { buildTodoDisplayModel } from '../src/shared/state/todo-model.js';
 import { EMPTY_TODO_PROJECTION_STATE, todoProjectionReducer } from '../src/shared/state/todo-state.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const sessionId = 'session_todos_001';
 const epoch = 'epoch_todos_001';
@@ -91,6 +103,10 @@ function snapshotMessage(
 function selectedState() {
   return todoProjectionReducer(EMPTY_TODO_PROJECTION_STATE, { type: 'select', sessionId });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('todo display model', () => {
   it('uses the closed state order while preserving host order and contiguous group headings', () => {

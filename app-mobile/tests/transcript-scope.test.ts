@@ -1,14 +1,23 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Transcript Session-Scope Guards
 // ───────────────────────────────────────────────────────────────────
+
 // Proves that in-flight prompt settlements (optimistic, accepted,
 // rejected) are bound to the session that started them: a settlement that
 // arrives after a session switch can never display another session's rows.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import type { TextBlock } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
 
 import { EMPTY_TRANSCRIPT, transcriptReducer, type TranscriptState } from '../src/shared/state/state.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const SESSION_A = 'session_scope_a';
 const SESSION_B = 'session_scope_b';
@@ -29,6 +38,10 @@ function block(id: string, text: string): TextBlock {
 function selected(sessionId: string): TranscriptState {
   return transcriptReducer(EMPTY_TRANSCRIPT, { type: 'select', sessionId });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('prompt settlements are session-scoped', () => {
   it('accepts an optimistic block for the current session', () => {

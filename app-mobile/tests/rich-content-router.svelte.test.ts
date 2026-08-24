@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Rich Content Router Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,6 +15,10 @@ import {
   normalizeTranscriptBlocks,
   type NormalizedTranscriptBlock,
 } from '../src/pages/chat/rich-content/normalize-transcript-blocks.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 // CodeCard progressive-highlights via a Web Worker, but jsdom has no Worker.
 // A real Worker global lets the highlight life-cycle take its normal dispatch
@@ -21,6 +33,10 @@ class NoopHighlightWorker {
 }
 
 const originalWorker = (globalThis as { Worker?: unknown }).Worker;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function installWorkerShim(): void {
   Object.defineProperty(globalThis, 'Worker', {
@@ -57,11 +73,19 @@ function normalized(kind: string, text: string): NormalizedTranscriptBlock {
   return block;
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 beforeEach(installWorkerShim);
 afterEach(() => {
   cleanup();
   restoreWorker();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('RichContentRouter', () => {
   it('routes code to a card and keeps malformed fallback non-copyable and non-openable', async () => {

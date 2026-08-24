@@ -6,6 +6,10 @@
 // the mutation lane mints a fresh ticket and unique control ID per attempt
 // while classifying ambiguous delivery as terminal.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it, vi } from 'vitest';
 
 import type {
@@ -20,6 +24,10 @@ import {
   fetchRuntimeSnapshot,
   parseBoundedRetryAfter,
 } from '../src/shared/transport/relay.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const CURRENT_MODEL = { provider: 'deepseek', id: 'deepseek-v4-flash', label: 'DeepSeek Flash' };
 
@@ -50,6 +58,10 @@ const SNAPSHOT: RuntimeSnapshotDto = {
   models: MODELS,
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function jsonResponse(
   value: unknown,
   status = 200,
@@ -73,6 +85,10 @@ function expectRuntimeIssue(error: unknown): RuntimeRelayError {
   expect(error).toBeInstanceOf(RuntimeRelayError);
   return error as RuntimeRelayError;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('parseBoundedRetryAfter', () => {
   it('accepts only integer delta-seconds and clamps to the bound', () => {

@@ -19,11 +19,19 @@
 // the heading — which both confirms the dialog opened and matches the
 // oracle's first assertion.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import LeavePlanSheet from '../src/pages/chat/chrome/sheet-leave-plan.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 afterEach(() => {
   cleanup();
@@ -56,6 +64,10 @@ function renderSheet(overrides: SheetOverrides = {}) {
   });
   return { onOpenChange, onSwitchToBuild, onLeaveWithoutRunning };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('LeavePlanSheet', () => {
   it('keeps the existing authority-expanding copy for a normal mode exit', async () => {

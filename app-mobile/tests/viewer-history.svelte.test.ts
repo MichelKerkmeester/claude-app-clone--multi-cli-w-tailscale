@@ -6,12 +6,24 @@
 // identically; focus restoration is awaited with waitFor because
 // restorePreview schedules the focus return on setTimeout(0).
 
+// ───────────────────────────────────────────────────────────────────
+// MODULE: VIEWER HISTORY TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
 import InboundImageOpenButtonsHarness from './support/InboundImageOpenButtonsHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const FIRST: InboundImageReadyBlock = {
   id: 'block_history_first',
@@ -56,10 +68,18 @@ const SECOND: InboundImageReadyBlock = {
   artifact: { ...FIRST.artifact, id: 'artifact_history_second', revision: 'rev_history_second' },
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   window.history.replaceState({}, '', '/');
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('viewer history and focus ownership', () => {
   it('uses one history child, restores transcript scroll, and returns focus to the trigger', async () => {

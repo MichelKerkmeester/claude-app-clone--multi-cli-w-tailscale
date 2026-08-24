@@ -1,15 +1,24 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Local Attachment Preview Tests (Svelte port)
 // ───────────────────────────────────────────────────────────────────
+
 // Ports app-mobile/tests/AttachmentPreviewDialog.test.tsx (React behavior
 // oracle) to @testing-library/svelte. The React *.test.tsx oracle is NEVER
 // modified.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import AttachmentDraftProviderHarness from './support/AttachmentDraftProviderHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 afterEach(cleanup);
 
@@ -18,6 +27,10 @@ function renderPreview(type?: string) {
     props: { capability: { enabled: true, imageIn: true }, mode: 'preview', fileType: type },
   });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('AttachmentPreviewDialog', () => {
   it('uses the existing viewer shell, closes without discarding, and restores tile focus', async () => {

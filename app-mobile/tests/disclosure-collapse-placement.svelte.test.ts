@@ -1,15 +1,31 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: DISCLOSURE COLLAPSE PLACEMENT TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of the React behaviour oracle for this case.
 // to @testing-library/svelte. The React *.test.tsx oracle is NEVER modified. Only
 // the import lines, the two mocked modules, and the render call shape are adapted;
 // every assertion mirrors the React oracle.
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const resource = vi.hoisted(() => ({
   useArtifactResource: vi.fn(),
 }));
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 // The Svelte useArtifactResource is a runes factory returning `{ current }`,
 // whereas the React hook returned the snapshot directly, so the Svelte
@@ -117,6 +133,10 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('transcript disclosure persistence', () => {
   it('keeps the tool-origin image visible and operable after the disclosure collapses', async () => {

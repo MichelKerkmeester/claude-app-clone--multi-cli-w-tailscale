@@ -13,11 +13,19 @@
 // rule and AttachmentPreviewDialog.svelte for the media rule. The rule text
 // and values are unchanged; only the readFileSync source path moved.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import AttachmentDraftProviderHarness from './support/AttachmentDraftProviderHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 afterEach(() => {
   cleanup();
@@ -28,11 +36,19 @@ afterEach(() => {
   document.documentElement.style.removeProperty('zoom');
 });
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function renderRail(capability?: { readonly enabled: boolean; readonly imageIn: boolean }) {
   return render(AttachmentDraftProviderHarness, {
     props: { capability: capability ?? { enabled: true, imageIn: true }, mode: 'rail' },
   });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('AttachmentRail', () => {
   it('renders an ordered, generic Photo rail without exposing filenames', async () => {

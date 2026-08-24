@@ -5,6 +5,10 @@
 // normalization, host-order tie-breaks, disabled-row handling, active-name
 // retention, grapheme match ranges, and the hard no-autocorrect rule.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
@@ -14,6 +18,10 @@ import {
   rankHostCommands,
   type RankedHostCommand,
 } from '../src/shared/commands/rank-host-commands.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 function command(name: string, extra?: Partial<CommandDescriptorDto>): CommandDescriptorDto {
   return {
@@ -27,9 +35,17 @@ function command(name: string, extra?: Partial<CommandDescriptorDto>): CommandDe
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function names(items: readonly RankedHostCommand[]): readonly string[] {
   return items.map((item) => item.name);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('rankHostCommands tiers', () => {
   it('ranks exact canonical names above name prefixes, with host order between prefix ties', () => {

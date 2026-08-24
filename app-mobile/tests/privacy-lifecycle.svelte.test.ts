@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Privacy Lifecycle Tests
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/privacy-lifecycle.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle. The React OpenDiff + <ArtifactViewerProvider>
@@ -9,6 +13,10 @@
 // (phase transitions on setTimeout(0), state flush on microtask), so assertions
 // are awaited with waitFor / findBy* before reading sync state.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sha256, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
@@ -19,6 +27,10 @@ import { clearArtifactResourceStore } from '../src/pages/chat/artifacts/use-arti
 
 import PrivacyDiffHarness from './support/PrivacyDiffHarness.svelte';
 import ArtifactResourceProbe from './support/ArtifactResourceProbe.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const IMAGE_BYTES = new TextEncoder().encode('privacy image bytes');
 const IMAGE_DIGEST = sha256('privacy image bytes');
@@ -43,6 +55,10 @@ const IMAGE: FilePreviewBlock = {
 
 let restoreUrlStubs: (() => void) | null = null;
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function installResourceStubs() {
   vi.stubGlobal('createImageBitmap', vi.fn(async () => ({ close: vi.fn() })));
   const createObjectURL = vi.fn(() => 'blob:privacy');
@@ -61,6 +77,10 @@ function installResourceStubs() {
   return { createObjectURL, revokeObjectURL };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   clearArtifactResourceStore();
@@ -71,6 +91,10 @@ afterEach(() => {
   document.documentElement.removeAttribute('data-artifact-viewer-privacy');
   document.getElementById('artifact-viewer-privacy-curtain')?.remove();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('privacy lifecycle', () => {
   it('covers before React closes the viewer for every privacy invalidation event', async () => {

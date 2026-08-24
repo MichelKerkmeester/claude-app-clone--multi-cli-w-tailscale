@@ -1,10 +1,15 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Command Palette Tests (Svelte port)
 // ───────────────────────────────────────────────────────────────────
+
 // Ports app-mobile/tests/CommandPalette.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle — same roles, names, text, values,
 // counts, ordering, and negative assertions.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -15,6 +20,10 @@ import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
 import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shared/commands/commands.js';
 import CommandPalette from '../src/pages/chat/chrome/command-palette.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
   // bits-ui positions Combobox content via floating-ui, which under jsdom
@@ -40,6 +49,10 @@ afterEach(() => {
   document.body.removeAttribute('style');
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const COMMANDS: readonly CommandDescriptorDto[] = [
   {
@@ -72,6 +85,10 @@ function catalogState(commands: readonly CommandDescriptorDto[]): HostCommandCat
   return { status: 'ready', snapshot, commands, refresh: vi.fn() };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function optionNames(): readonly (string | null)[] {
   return screen
     .getAllByRole('option')
@@ -87,6 +104,10 @@ async function openPalette(): Promise<void> {
   await userEvent.click(screen.getByRole('combobox'));
   await tick();
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('CommandPalette', () => {
   it('inserts the selected command with a scoped binding and never submits', async () => {

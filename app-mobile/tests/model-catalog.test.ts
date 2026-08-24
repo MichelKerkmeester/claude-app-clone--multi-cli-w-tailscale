@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: MODEL CATALOG TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { AvailableModelDto } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
 
@@ -9,11 +17,19 @@ import {
   organizeModelCatalog,
 } from '../src/shared/catalog/model-catalog.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const MODELS: readonly AvailableModelDto[] = [
   { provider: 'Zeta', id: 'zeta-standard', label: 'Zeta Standard' },
   { provider: 'Alpha', id: 'alpha-pro', label: 'Álpha Pro', reasoning: true },
   { provider: 'Alpha', id: 'alpha-mini', label: 'Alpha Mini' },
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('model catalog helpers', () => {
   it('uses encoded stable identity and deterministic current-first grouping', () => {

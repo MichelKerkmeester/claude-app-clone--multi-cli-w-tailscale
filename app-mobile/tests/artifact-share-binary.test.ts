@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ARTIFACT SHARE BINARY TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -5,10 +13,18 @@ import {
   shareDisplayedArtifact,
 } from '../src/pages/chat/artifacts/artifact-share.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('binary artifact share boundary', () => {
   it('requires canShare({ files }) and shares no URL or host handoff', async () => {
@@ -61,4 +77,3 @@ describe('binary artifact share boundary', () => {
     expect(share).not.toHaveBeenCalled();
   });
 });
-

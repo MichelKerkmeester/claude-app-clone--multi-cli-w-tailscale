@@ -2,6 +2,10 @@
 // MODULE: Pi Remote Web App Tests (Svelte Port)
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   ApprovalCardDto,
   AskQuestionDisplayDto,
@@ -18,6 +22,10 @@ import { readFileSync } from 'node:fs';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const relay = vi.hoisted(() => {
   class CatalogLifecycleError extends Error {
@@ -79,6 +87,10 @@ const attention = vi.hoisted(() => ({
   unsubscribeFromPush: vi.fn(),
   updatePushPreferences: vi.fn(),
 }));
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 vi.mock('@tanstack/svelte-virtual', () => {
   const store = (value: unknown) => ({
@@ -251,6 +263,10 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 it('lists sessions on Home', async () => {
   const sessions: readonly SessionCardDto[] = [
@@ -1433,6 +1449,10 @@ it('renders the Attention Inbox', async () => {
   expect(await screen.findByText('Needs input')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /open current state/i })).toBeInTheDocument();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function block<T extends TranscriptBlock>(value: Omit<T, 'revision' | 'seq' | 'occurredAt'>): T {
   return {

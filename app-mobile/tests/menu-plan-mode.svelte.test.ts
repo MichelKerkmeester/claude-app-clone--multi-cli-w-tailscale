@@ -16,6 +16,10 @@
 // menu's aria-label is "Agent mode", which the oracle's /Open mode|Agent mode/
 // matcher already accepts.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeModelCatalogDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -23,6 +27,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/shared/state/runtime.js';
 import PlanModeButton from '../src/pages/chat/chrome/button-plan-mode.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -44,6 +52,10 @@ const MODELS: RuntimeModelCatalogDto = {
   canSetModelWhileStreaming: false,
   models: [],
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function readyWith(state: RuntimeStateDto): RuntimeUiState {
   return runtimeReducer(INITIAL_RUNTIME_STATE, { type: 'hydrated', state, models: MODELS });
@@ -91,6 +103,10 @@ function renderMenu(overrides: MenuOverrides = {}) {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 beforeEach(() => {
   document.body.style.cssText = '';
 });
@@ -103,6 +119,10 @@ afterEach(() => {
   document.body.style.cssText = '';
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('PlanModeMenu rows', () => {
   it('renders exactly two rows with the consequence descriptions', async () => {

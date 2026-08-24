@@ -1,8 +1,13 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Transcript Reducer Tests
 // ───────────────────────────────────────────────────────────────────
+
 // The reducer decides what a reader sees after every sync message, and until
 // now nothing exercised it directly.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import type { Envelope, SyncDelta, SyncGap, SyncSnapshot } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
@@ -12,6 +17,10 @@ import {
   transcriptReducer,
   type TranscriptState,
 } from '../src/shared/state/state.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const SESSION_ID = 'session_reducer_001';
 const EPOCH = 'epoch_reducer_001';
@@ -74,6 +83,10 @@ function selected(): TranscriptState {
 function withSnapshot(seqs: readonly number[] = [1, 2]): TranscriptState {
   return transcriptReducer(selected(), { type: 'snapshot', message: snapshot(seqs), at: AT });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('transcript reducer', () => {
   it('takes a snapshot as the authoritative history', () => {

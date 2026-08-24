@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: F6 VIEWER ADAPTER TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/F6ViewerAdapter.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle. The React ApiCapture/useArtifactViewer
@@ -9,6 +13,10 @@
 // act() flush semantics. The normalizeTranscriptBlocks import path is unchanged
 // (../src/rich-content/normalizeTranscriptBlocks.js); createInMemoryArtifactDocument
 // moved to ../src/lib/rich-content/F6ViewerAdapter.js (its real Svelte location).
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { tick } from 'svelte';
@@ -22,6 +30,10 @@ import {
 } from '../src/pages/chat/rich-content/normalize-transcript-blocks.js';
 
 import F6ViewerHarness from './support/F6ViewerHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 // The in-memory code document renders through CodePreview with highlighting
 // enabled. Under jsdom `Worker` is undefined, and the Svelte highlight port's
@@ -39,6 +51,10 @@ class NoopWorker {
   public terminate(): void {}
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 beforeEach(() => {
   vi.stubGlobal('Worker', NoopWorker);
 });
@@ -48,6 +64,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function codeBlock(): NormalizedCodeBlock {
   const [block] = normalizeTranscriptBlocks({
@@ -67,6 +87,10 @@ function codeBlock(): NormalizedCodeBlock {
   if (block === undefined) throw new Error('Expected code block.');
   return block;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('F6ViewerAdapter', () => {
   it('opens one shared in-memory viewer, records only the opaque block id, and never fetches', async () => {

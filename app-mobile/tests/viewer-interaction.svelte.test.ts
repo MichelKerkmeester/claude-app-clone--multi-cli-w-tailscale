@@ -6,12 +6,24 @@
 // Svelte phase machine schedules the opening/exit/focus transitions on
 // setTimeout(0) (matching the React act() flush semantics).
 
+// ───────────────────────────────────────────────────────────────────
+// MODULE: VIEWER INTERACTION TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 
 import ViewerInteractionHarness from './support/ViewerInteractionHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const DIFF: FileDiffBlock = {
   id: 'block_phase_viewer_interaction',
@@ -23,12 +35,20 @@ const DIFF: FileDiffBlock = {
   patch: '@@ interaction\n-old\n+new',
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   window.history.replaceState({}, '', '/');
   vi.restoreAllMocks();
   document.documentElement.removeAttribute('data-artifact-viewer-open');
   document.getElementById('artifact-viewer-privacy-curtain')?.remove();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('viewer interaction ownership', () => {
   it('blurs the composer, focuses the heading, and restores scroll and trigger focus', async () => {

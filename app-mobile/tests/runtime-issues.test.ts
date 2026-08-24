@@ -5,10 +5,18 @@
 // union and that every rendered string is bounded local text — raw status,
 // body, server, host, or RPC fragments can never be formatted.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { RUNTIME_ISSUE_CODES } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
 
 import { RUNTIME_ISSUE_COPY, runtimeIssueMessage } from '../src/shared/state/runtime-issues.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('runtime issue copy allowlist', () => {
   it('covers every protocol issue code with non-empty local copy', () => {

@@ -2,11 +2,19 @@
 // MODULE: Derived Turns Tests
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import type { TextBlock, ToolCallBlock, TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 
 import { groupBlocksIntoTurns } from '../src/shared/state/turns.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 let seq = 0;
 function user(id: string, text = 'hi'): TextBlock {
@@ -26,6 +34,10 @@ function tool(id: string): ToolCallBlock {
     occurredAt: 't',
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('groupBlocksIntoTurns', () => {
   it('returns no turns for an empty transcript', () => {

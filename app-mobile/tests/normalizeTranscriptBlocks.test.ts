@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: NORMALIZE TRANSCRIPT BLOCKS TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
 
@@ -7,11 +15,19 @@ import {
   normalizeTranscriptBlocks,
 } from '../src/pages/chat/rich-content/normalize-transcript-blocks.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const REDACTION = {
   policyVersion: 1,
   fieldsRedacted: 1,
   reasons: ['command'],
 } as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function base(id: string, seq: number, revision = 1) {
   return {
@@ -51,6 +67,10 @@ function richResult(id: string, callId: string, seq: number, output: string, rev
     redaction: REDACTION,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('normalizeTranscriptBlocks', () => {
   it('pairs shell call and result by opaque callId and keeps a result-only pending state', () => {

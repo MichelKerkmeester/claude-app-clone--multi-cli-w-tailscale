@@ -4,6 +4,10 @@
 // Ports app-mobile/tests/SessionHeader.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -11,6 +15,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import SessionHeader from '../src/pages/chat/chrome/session-header.svelte';
 import { INITIAL_RUNTIME_STATE, type RuntimeControls, type RuntimeUiState } from '../src/shared/state/runtime.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -22,6 +30,10 @@ const HOST_STATE: RuntimeStateDto = {
   streaming: false,
   updatedAt: '2026-08-16T10:00:00.000Z',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function readyRuntime(state: RuntimeStateDto | null = HOST_STATE): RuntimeUiState {
   return {
@@ -75,6 +87,10 @@ function renderHeader({
   return { onOpenModelSheet };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   // SessionHeader mounts a bits-ui Menu; if any test opens it, BodyScrollLock
@@ -83,6 +99,10 @@ afterEach(() => {
   document.body.style.cssText = '';
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('SessionHeader', () => {
   it('renders the confirmed model and effort as separate spans inside one localized readout', () => {

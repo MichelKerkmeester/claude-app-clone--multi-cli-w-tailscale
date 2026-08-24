@@ -7,11 +7,19 @@
 // (vs the React options object); the harness passes that factory. The mock
 // surface (vi.mock of attachment-client.js) is identical.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AttachmentSubmissionSurface from './support/AttachmentSubmissionSurface.svelte';
 import ComposerRecoverySurface from './support/ComposerRecoverySurface.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const client = vi.hoisted(() => {
   class MockAttachmentClientError extends Error {
@@ -38,6 +46,10 @@ const client = vi.hoisted(() => {
   };
 });
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 vi.mock('../src/pages/chat/attachments/attachment-client.js', () => client);
 
 afterEach(() => {
@@ -56,6 +68,10 @@ beforeEach(() => {
   client.commitAttachmentSubmission.mockResolvedValue(undefined);
   client.cancelAttachmentReservation.mockResolvedValue(undefined);
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('explicit attachment submission', () => {
   it('does not read or request attachment bytes before an explicit Send', async () => {
@@ -280,6 +296,10 @@ describe('text-only process-death recovery', () => {
     ).toBeInTheDocument();
   });
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function renderSubmissionHarness(options: Partial<SubmissionHarnessOptions> = {}) {
   return render(AttachmentSubmissionSurface, {

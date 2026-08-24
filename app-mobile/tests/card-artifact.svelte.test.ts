@@ -1,8 +1,20 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: CARD ARTIFACT TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
 import ArtifactCard from '../src/pages/chat/artifacts/card-artifact.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const DIFF: FileDiffBlock = {
   id: 'block_file_diff_card',
@@ -18,9 +30,17 @@ const DIFF: FileDiffBlock = {
 // returns null outside a provider; the card still renders identically and the open
 // path is a no-op. The React oracle's assertions only observe the rendered card, so
 // no provider wrapper is required to reproduce them.
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function renderCard() {
   return render(ArtifactCard, { props: { block: DIFF } });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ArtifactCard', () => {
   it('does not auto-open and exposes one whole-card button', () => {

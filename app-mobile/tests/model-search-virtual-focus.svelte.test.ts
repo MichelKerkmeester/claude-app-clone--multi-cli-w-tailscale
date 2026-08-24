@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: MODEL SEARCH VIRTUAL FOCUS TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   AvailableModelDto,
   RuntimeStateDto,
@@ -8,6 +16,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { RuntimeControls, RuntimeUiState } from '../src/shared/state/runtime.js';
 import ModelEffortSheet, { SEARCH_THRESHOLD } from '../src/pages/chat/chrome/sheet-model-effort.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const CURRENT: AvailableModelDto = {
   provider: 'alpha',
@@ -27,10 +39,18 @@ const HOST_STATE: RuntimeStateDto = {
   updatedAt: '2026-08-16T10:00:00.000Z',
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function models(count: number): readonly AvailableModelDto[] {
   return [
@@ -68,6 +88,10 @@ function runtimeControls(runtime: RuntimeUiState): RuntimeControls {
     setMode: vi.fn().mockResolvedValue(null),
   };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('model search virtual focus', () => {
   it('keeps DOM focus on the search input while arrows move aria-activedescendant', async () => {

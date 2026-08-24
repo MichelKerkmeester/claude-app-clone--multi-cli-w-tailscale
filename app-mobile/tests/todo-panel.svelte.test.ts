@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Todo Panel Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TodoProjectionV1, TodoTaskProjectionV1 } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -7,6 +15,10 @@ import TodoPanel from '../src/pages/chat/chrome/todo-panel.svelte';
 import TodoProjectionBlock from '../src/pages/chat/transcript/todo-projection-block.svelte';
 import { DEMO_TODO_FIXTURE } from '../src/shared/fixtures/demo.js';
 import type { TodoProjectionState } from '../src/shared/state/todo-state.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const updatedAt = '2026-08-18T10:00:00.000Z';
 
@@ -52,10 +64,18 @@ function projectionState(value: TodoProjectionV1 | null): TodoProjectionState {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   document.body.removeAttribute('dir');
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('read-only todo panel', () => {
   it('renders 3/8, the clay hairline, localized state counts, groups, and host order', () => {

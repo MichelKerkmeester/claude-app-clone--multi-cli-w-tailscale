@@ -1,7 +1,19 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: MARKDOWN PREVIEW TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
 import MarkdownPreview, { parseMarkdown } from '../src/pages/chat/artifacts/markdown-preview.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('MarkdownPreview', () => {
   it('renders a bounded safe AST without raw HTML, navigation, images, or frames', () => {

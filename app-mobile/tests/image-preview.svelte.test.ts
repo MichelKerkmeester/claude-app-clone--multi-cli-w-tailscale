@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: IMAGE PREVIEW TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
@@ -6,6 +14,10 @@ import ImagePreview, {
   IMAGE_PREVIEW_MAX_BYTES,
   IMAGE_PREVIEW_MAX_ZOOM,
 } from '../src/pages/chat/artifacts/image-preview.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 function block(overrides: Partial<FilePreviewBlock> = {}): FilePreviewBlock {
   return {
@@ -40,10 +52,18 @@ class FakeImage {
   }
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ImagePreview', () => {
   it('renders bounded zoom controls and revokes the displayed blob URL on unmount', async () => {

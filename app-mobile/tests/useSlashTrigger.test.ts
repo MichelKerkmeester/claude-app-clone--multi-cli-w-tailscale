@@ -1,9 +1,14 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Slash Trigger Predicate Tests
 // ───────────────────────────────────────────────────────────────────
+
 // Proves the leading-slash predicate is a pure function of draft, caret,
 // selection, focus, IME composition, and the Escape dismissal latch — with
 // zero transport or filtering involvement.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { describe, expect, it } from 'vitest';
 
@@ -13,6 +18,10 @@ import {
   useSlashTrigger,
   type SlashTriggerInput,
 } from '../src/shared/commands/use-slash-trigger.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function trigger(overrides: Partial<SlashTriggerInput>): ReturnType<typeof deriveSlashTrigger> {
   return deriveSlashTrigger({
@@ -25,6 +34,10 @@ function trigger(overrides: Partial<SlashTriggerInput>): ReturnType<typeof deriv
     ...overrides,
   });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('deriveSlashTrigger', () => {
   it('opens on a bare slash at index zero', () => {

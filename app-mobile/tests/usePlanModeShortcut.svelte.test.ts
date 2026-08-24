@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Composer-Scoped Shortcut Tests (Svelte port)
 // ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/usePlanModeShortcut.test.tsx (React behavior
 // oracle) to the Svelte factory. The React *.test.tsx oracle is NEVER
 // modified. createPlanModeShortcut is a plain factory (no runes) that
@@ -12,6 +13,10 @@
 // getComposer: () => HTMLTextAreaElement | null instead of composerRef;
 // the access is adapted but every assertion (defaultPrevented, callback
 // counts, negative assertions) is identical.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -27,6 +32,10 @@ import {
   createPlanModeShortcut,
   type PlanModeShortcutOptions,
 } from '../src/shared/commands/plan-mode-shortcut.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -48,6 +57,10 @@ const MODELS: RuntimeModelCatalogDto = {
   canSetModelWhileStreaming: false,
   models: [],
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function readyWith(state: RuntimeStateDto): RuntimeUiState {
   return runtimeReducer(INITIAL_RUNTIME_STATE, { type: 'hydrated', state, models: MODELS });
@@ -116,10 +129,18 @@ function keyDown(
   return { event, dispatched };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('Shift+Tab interception guards', () => {
   it.each([

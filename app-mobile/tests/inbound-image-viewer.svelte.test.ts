@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: INBOUND IMAGE VIEWER TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/InboundImageViewer.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle; the Svelte viewer opens via the
@@ -10,12 +14,20 @@
 // Svelte phase machine schedules them on setTimeout(0), matching the React
 // act() flush semantics.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
 import InboundImageTriggerHarness from './support/InboundImageTriggerHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const IMAGE: InboundImageReadyBlock = {
   id: 'block_phase_image_viewer',
@@ -53,6 +65,10 @@ const IMAGE: InboundImageReadyBlock = {
   content: { kind: 'artifact-ref' },
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   window.history.replaceState({}, '', '/');
@@ -60,6 +76,10 @@ afterEach(() => {
   document.documentElement.removeAttribute('data-artifact-viewer-privacy');
   document.getElementById('artifact-viewer-privacy-curtain')?.remove();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('inbound image fullscreen viewer', () => {
   it('opens through the shared viewer with frozen safe metadata', async () => {

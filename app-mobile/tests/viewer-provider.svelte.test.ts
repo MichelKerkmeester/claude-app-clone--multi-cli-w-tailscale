@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: VIEWER PROVIDER TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/viewer-provider.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle; the Svelte viewer opens via the
@@ -6,12 +10,20 @@
 // immediately (no fetch) — exactly as in the React oracle — and the viewer
 // chrome (header, zoom/pan controls, details disclosure) renders regardless.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
 import InboundImageTriggerHarness from './support/InboundImageTriggerHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const INBOUND_IMAGE: InboundImageReadyBlock = {
   id: 'block_inbound_viewer_001',
@@ -49,9 +61,17 @@ const INBOUND_IMAGE: InboundImageReadyBlock = {
   content: { kind: 'artifact-ref' },
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   window.history.replaceState({}, '', '/');
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('shared inbound image viewer', () => {
   it('shows safe metadata only and exposes no export, share, save, copy, or download action', async () => {

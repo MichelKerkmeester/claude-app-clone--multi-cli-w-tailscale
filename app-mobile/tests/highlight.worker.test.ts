@@ -1,6 +1,18 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: HIGHLIGHT WORKER TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import { HIGHLIGHT_LANGUAGES, tokenizeSource } from '../src/pages/chat/rich-content/highlight.worker.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('highlight worker tokenizer', () => {
   it('keeps the allowlist fixed and returns tokens that reconstruct source', () => {

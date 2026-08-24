@@ -1,10 +1,23 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: TRANSCRIPT PLACEMENT TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/transcript-placement.test.tsx (React behavior oracle)
 // to @testing-library/svelte. The React *.test.tsx oracle is NEVER modified. Only
 // the import lines, the two mocked modules, and the render call shape are adapted;
 // every assertion mirrors the React oracle.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const resource = vi.hoisted(() => ({
   useArtifactResource: vi.fn(),
@@ -13,6 +26,11 @@ const resource = vi.hoisted(() => ({
 // The Svelte useArtifactResource is a runes factory returning `{ current }`,
 // whereas the React hook returned the snapshot directly, so the Svelte
 // factory mock wraps the ready snapshot in `{ current }`.
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 vi.mock('@tanstack/svelte-virtual', () => {
   const store = (value: unknown) => ({ subscribe: (run: (v: unknown) => void) => { run(value); return () => {}; } });
   return {
@@ -141,6 +159,10 @@ afterEach(() => {
   vi.useRealTimers();
   vi.clearAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('transcript inline image placement', () => {
   it('keeps tool images outside the disclosure, preserves assistant order, stacks two images, and adds actions once', async () => {

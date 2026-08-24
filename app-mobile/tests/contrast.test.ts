@@ -2,9 +2,17 @@
 // MODULE: Applied-Palette WCAG Contrast Inventory
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import { readCssCorpus } from './support/css-corpus';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 // The applied-palette rules now live across app.css + each component's scoped <style> rather than one
 // style.css, so assert against the assembled corpus — that keeps this gate working once style.css is
@@ -14,6 +22,10 @@ const STYLE = readCssCorpus();
 // The exact Claude semantic values applied in style.css. This computes the real WCAG
 // 2.x contrast ratio for each meaningful foreground/background pair so the "meets WCAG
 // contrast" requirement is proven by arithmetic, not asserted.
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function channel(component: number): number {
   const c = component / 255;
@@ -92,6 +104,10 @@ const MODEL_SHEET_DARK: readonly Pair[] = [
     min: LARGE_OR_NON_TEXT,
   },
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('applied Claude palette meets WCAG contrast', () => {
   for (const pair of LIGHT) {

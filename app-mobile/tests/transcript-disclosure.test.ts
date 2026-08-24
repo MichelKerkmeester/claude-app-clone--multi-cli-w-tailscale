@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Transcript Disclosure Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -5,9 +13,17 @@ import {
   pruneTranscriptDisclosureState,
 } from '../src/shared/state/transcript-disclosure.svelte.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   pruneTranscriptDisclosureState([]);
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('transcript disclosure state', () => {
   it('keeps expansion when a block row unmounts and remounts', () => {

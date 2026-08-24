@@ -1,9 +1,25 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Root Error Boundary Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, render, screen } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import RootErrorBoundaryHarness from './support/RootErrorBoundaryHarness.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(cleanup);
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('RootErrorBoundary', () => {
   it('renders children unchanged when nothing throws', () => {

@@ -1,3 +1,7 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ARTIFACT MEMORY TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/artifact-memory.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle. The React renderHook(useArtifactResource)
@@ -9,6 +13,10 @@
 // a fresh probe, awaits ready, asserts the verified bytes, calls close(),
 // awaits closed, asserts bytes/buffer are purged, then unmounts.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, render, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sha256, type FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
@@ -17,6 +25,10 @@ import type { ArtifactResource } from '../src/shared/transport/relay.js';
 import type { ArtifactResourceSnapshot } from '../src/pages/chat/artifacts/use-artifact-resource.svelte.js';
 
 import ArtifactResourceProbe from './support/ArtifactResourceProbe.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const DISPLAYED_BYTES = new TextEncoder().encode('sanitized-binary');
 
@@ -41,10 +53,18 @@ function block(): FilePreviewBlock {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('binary artifact lifecycle', () => {
   it('purges verified binary bytes after every close across repeated opens', async () => {

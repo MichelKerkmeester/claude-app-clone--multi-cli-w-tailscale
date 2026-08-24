@@ -2,6 +2,10 @@
 // MODULE: Session Header Overflow Dialog Tests
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -11,6 +15,10 @@ import SessionHeader, {
   type ThemePreference,
 } from '../src/pages/chat/chrome/session-header.svelte';
 import { INITIAL_RUNTIME_STATE, type RuntimeControls, type RuntimeUiState } from '../src/shared/state/runtime.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -50,6 +58,10 @@ function makeControls(): RuntimeControls {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function renderHeader({
   theme = 'system',
   onInbox = vi.fn(),
@@ -85,6 +97,10 @@ async function openOverflow() {
   return { dialog, user };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 beforeEach(() => {
   const box = {
     width: 200,
@@ -113,6 +129,10 @@ afterEach(() => {
   document.body.style.cssText = '';
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('SessionHeader overflow dialog', () => {
   it('renders navigation and theme with dialog and toggle-button semantics', async () => {

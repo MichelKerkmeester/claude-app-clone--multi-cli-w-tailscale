@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ARTIFACT SHARE TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -6,6 +14,10 @@ import {
   copyDisplayedArtifact,
   shareDisplayedArtifact,
 } from '../src/pages/chat/artifacts/artifact-share.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const BASE_INPUT = {
   displayName: 'safe.txt',
@@ -16,10 +28,18 @@ const BASE_INPUT = {
   completeness: 'complete' as const,
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('controlled artifact sharing', () => {
   it('requires both policy and a native sharing capability', () => {

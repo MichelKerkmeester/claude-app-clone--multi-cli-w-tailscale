@@ -6,6 +6,10 @@
 // announcement, and the token-edit-clears / argument-edit-retains binding
 // rules. The function is pure: no network, no storage, no side effects.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { describe, expect, it } from 'vitest';
 
 import type { SelectedCommandBinding } from '../src/shared/commands/commands.js';
@@ -14,6 +18,10 @@ import {
   insertSlashCommand,
 } from '../src/shared/commands/insert-slash-command.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const BINDING: SelectedCommandBinding = {
   hostEpoch: 'epoch-1',
   sessionId: 'session-1',
@@ -21,6 +29,10 @@ const BINDING: SelectedCommandBinding = {
   sessionRevision: 3,
   catalogRevision: 7,
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('insertSlashCommand', () => {
   it('replaces the complete token range with the canonical command and trailing space', () => {

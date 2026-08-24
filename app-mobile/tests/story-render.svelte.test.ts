@@ -13,12 +13,20 @@
 // Storybook's real decorateStory pipeline, so this asserts the shipped
 // composition rather than a model of it.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { composeStories } from '@storybook/svelte';
 import { describe, it, expect } from 'vitest';
 
 import * as railStories from '../src/pages/chat/attachments/attachment-rail.stories';
 import * as dialogStories from '../src/pages/chat/attachments/dialog-attachment-preview.stories';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 // composeStories' Svelte return shape is `{ Component, props }` per story.
 interface ComposedStory {
@@ -36,6 +44,10 @@ function compose(mod: unknown): Record<string, ComposedStory> {
 function renderStory(story: ComposedStory): void {
   render(story.Component as never, { props: story.props });
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('context-only attachment stories render their seeded content', () => {
   it('AttachmentRail shows the staged draft photos', async () => {

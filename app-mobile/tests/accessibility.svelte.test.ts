@@ -1,8 +1,16 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ACCESSIBILITY TESTS
+// ───────────────────────────────────────────────────────────────────
+
 // Port of app-mobile/tests/accessibility.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 // Each assertion mirrors the React oracle; the Svelte PreviewControls /
 // ArtifactDetails / ArtifactHeader components are rendered directly (no
 // provider) exactly as the React oracle rendered them.
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
 
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -10,6 +18,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import ArtifactDetails, { type ArtifactDetailsModel } from '../src/pages/chat/artifacts/artifact-details.svelte';
 import ArtifactHeader from '../src/pages/chat/artifacts/artifact-header.svelte';
 import PreviewControls from '../src/pages/chat/artifacts/preview-controls.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const MODEL: ArtifactDetailsModel = {
   displayName: 'Redacted capture',
@@ -23,9 +35,17 @@ const MODEL: ArtifactDetailsModel = {
   redaction: 'applied',
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('fullscreen viewer accessibility seams', () => {
   it('keeps image actions keyboard-operable and labels directional alternatives', () => {

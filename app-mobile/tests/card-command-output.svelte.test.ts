@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: CARD COMMAND OUTPUT TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TranscriptBlock } from '@pi-remote/pi-rpc-protocol';
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
@@ -9,6 +17,10 @@ import {
   normalizeTranscriptBlocks,
   type NormalizedCommandBlock,
 } from '../src/pages/chat/rich-content/normalize-transcript-blocks.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 function commandBlock(): NormalizedCommandBlock {
   const blocks = normalizeTranscriptBlocks({
@@ -53,6 +65,10 @@ function commandBlock(): NormalizedCommandBlock {
   if (block === undefined) throw new Error('Expected a command block.');
   return block;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('CommandOutputCard', () => {
   it('keeps command and output regions separate and copies exact canonical units', async () => {

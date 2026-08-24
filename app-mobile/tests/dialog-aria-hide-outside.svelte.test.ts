@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: DIALOG ARIA HIDE OUTSIDE TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -6,10 +14,18 @@ import type { FileDiffBlock } from '@pi-remote/pi-rpc-protocol';
 import AttachmentDraftProviderHarness from './support/AttachmentDraftProviderHarness.svelte';
 import ArtifactViewerCardsHarness from './support/ArtifactViewerCardsHarness.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(cleanup);
 afterEach(() => {
   document.body.style.cssText = '';
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const FIRST: FileDiffBlock = {
   id: 'block_file_diff_first',
@@ -30,6 +46,10 @@ const SECOND: FileDiffBlock = {
   summary: 'Second redacted diff',
   patch: '@@ second\n-old-second\n+new-second',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('dialog ariaHideOutside behavior', () => {
   it('hides the attachment tile from the accessibility tree while the photo preview is open', async () => {

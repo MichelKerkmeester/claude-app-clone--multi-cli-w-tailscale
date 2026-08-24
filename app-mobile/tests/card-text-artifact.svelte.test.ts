@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: CARD TEXT ARTIFACT TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TextArtifactBlock } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -8,7 +16,15 @@ import {
   type NormalizedTextArtifactBlock,
 } from '../src/pages/chat/rich-content/normalize-transcript-blocks.js';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(cleanup);
+
+// ───────────────────────────────────────────────────────────────────
+// 3. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 function artifactBlock(): NormalizedTextArtifactBlock {
   const [block] = normalizeTranscriptBlocks({
@@ -31,6 +47,10 @@ function artifactBlock(): NormalizedTextArtifactBlock {
   if (block === undefined) throw new Error('Expected a text artifact.');
   return block;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('TextArtifactCard', () => {
   it('uses trusted labels, a six-line preview, and exact text copy', async () => {

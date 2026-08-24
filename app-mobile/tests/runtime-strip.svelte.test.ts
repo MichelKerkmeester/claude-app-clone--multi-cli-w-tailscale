@@ -4,6 +4,10 @@
 // Ports app-mobile/tests/RuntimeStrip.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -17,6 +21,10 @@ import {
   type RuntimeUiState,
 } from '../src/shared/state/runtime.js';
 import type { RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -43,6 +51,10 @@ const READY: RuntimeUiState = {
   error: null,
   deliveryUnknown: false,
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function makeControls(runtime: RuntimeUiState): RuntimeControls {
   return {
@@ -75,10 +87,18 @@ function renderStrip({
   return { controls, onOpenEffortSheet, ...view };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('RuntimeStrip', () => {
   it('renders host-confirmed model and effort as separate spans plus Build/Plan', () => {

@@ -2,15 +2,27 @@
 // MODULE: Sync Socket Close Classification Tests
 // ───────────────────────────────────────────────────────────────────
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { SyncMessage } from '@pi-remote/pi-rpc-protocol';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const relay = vi.hoisted(() => ({
   fetchTranscript: vi.fn(),
   noteRelayHeartbeat: vi.fn(),
   openSyncSocket: vi.fn(),
 }));
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 vi.mock('../src/shared/transport/relay.js', () => relay);
 
@@ -125,6 +137,10 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('sync socket close classification', () => {
   it('surfaces revocation and never schedules another connection', async () => {

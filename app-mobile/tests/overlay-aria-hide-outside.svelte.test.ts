@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Overlay Aria-Hide-Outside Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
@@ -10,6 +18,10 @@ import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shar
 import CommandPalette from '../src/pages/chat/chrome/command-palette.svelte';
 import PlanModeButton from '../src/pages/chat/chrome/button-plan-mode.svelte';
 import SessionComposerHarness from './support/SessionComposerHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -52,6 +64,10 @@ const COMMANDS: readonly CommandDescriptorDto[] = [
 ];
 
 let backgroundProbe: HTMLButtonElement | null = null;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function readyWith(state: RuntimeStateDto): RuntimeUiState {
   return runtimeReducer(INITIAL_RUNTIME_STATE, { type: 'hydrated', state, models: MODELS });
@@ -99,6 +115,10 @@ function renderMenu() {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 beforeEach(() => {
   const box = {
     width: 200,
@@ -129,6 +149,10 @@ afterEach(() => {
   document.body.style.cssText = '';
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('overlay aria-hidden outside behavior', () => {
   it('hides the background accessibility tree while the menu is open and restores it on close', async () => {

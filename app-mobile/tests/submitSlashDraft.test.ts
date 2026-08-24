@@ -7,10 +7,18 @@
 // relay calls, and every settled outcome maps to a typed code that the UI
 // reconciles without retry or send-as-text fallback.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TextBlock } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { ScopedCommandSnapshot, SelectedCommandBinding } from '../src/shared/commands/commands.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const relay = vi.hoisted(() => {
   class SlashSubmitError extends Error {
@@ -42,6 +50,10 @@ const relay = vi.hoisted(() => {
     submitSlashCommand: vi.fn(),
   };
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 vi.mock('../src/shared/transport/relay.js', () => relay);
 
@@ -107,6 +119,10 @@ beforeEach(() => {
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('canonicalSlashMessage', () => {
   it('builds the exact canonical command plus user arguments', () => {

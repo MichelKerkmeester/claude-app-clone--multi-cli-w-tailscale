@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: BUTTON PLAN MODE TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeModelCatalogDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -6,6 +14,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { INITIAL_RUNTIME_STATE, runtimeReducer, type RuntimeUiState } from '../src/shared/state/runtime.js';
 import PlanModeButton from '../src/pages/chat/chrome/button-plan-mode.svelte';
 import { planModePresentation } from '../src/pages/chat/chrome/plan-mode-presentation.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -27,6 +39,10 @@ const MODELS: RuntimeModelCatalogDto = {
   canSetModelWhileStreaming: false,
   models: [],
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function readyWith(state: RuntimeStateDto): RuntimeUiState {
   return runtimeReducer(INITIAL_RUNTIME_STATE, { type: 'hydrated', state, models: MODELS });
@@ -93,6 +109,10 @@ function renderButton(
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   // Opening the menu makes bits-ui's body scroll-lock set pointer-events:
@@ -102,6 +122,10 @@ afterEach(() => {
   document.body.removeAttribute('style');
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('planModePresentation derivation', () => {
   it('shows Checking mode… and never Build before a host snapshot exists', () => {

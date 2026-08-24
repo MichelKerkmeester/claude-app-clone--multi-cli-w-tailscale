@@ -13,6 +13,10 @@
 // re-running the open-effect, so the announcement effect can observe the
 // pending→settled transition and announce exactly once.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { AvailableModelDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { readFileSync } from 'node:fs';
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
@@ -23,6 +27,10 @@ import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '../src/share
 import EffortSheetAdvanceHarness, {
   type EffortSheetAdvanceHarnessApi,
 } from './support/EffortSheetAdvanceHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const CURRENT: AvailableModelDto = {
   provider: 'alpha',
@@ -53,6 +61,10 @@ const EFFORT_CSS = normalizeSvelteCss(
 );
 const APP_CSS = readFileSync('app-mobile/src/app.css', 'utf8');
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   // bits-ui BodyScrollLock restores body pointer-events on a deferred
@@ -67,6 +79,10 @@ afterEach(() => {
   }
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function readyRuntime(state: RuntimeStateDto = HOST_STATE): RuntimeUiState {
   return {
@@ -138,6 +154,10 @@ function normalizeSvelteCss(source: string): string {
   if (styleMatch === null) return source;
   return styleMatch[1].replace(/:global\(([^)]*)\)/gu, '$1');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('one polite atomic status region, no competing alert', () => {
   it('keeps exactly one document-level status region and zero alerts in every sheet state', async () => {

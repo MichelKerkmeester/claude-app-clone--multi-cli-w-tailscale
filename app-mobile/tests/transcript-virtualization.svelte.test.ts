@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Transcript Virtualization Tests
 // ───────────────────────────────────────────────────────────────────
+
 // Every other suite that renders the transcript replaces the virtualizer with
 // a stub returning every row, so no test has ever observed virtualization
 // itself. This suite runs the real virtualizer and stubs the layout jsdom
@@ -8,11 +9,19 @@
 // offsetHeight, which jsdom always reports as zero, so an unstubbed run
 // renders an empty window and proves nothing.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, render, waitFor } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import TranscriptList from '../src/pages/chat/transcript/transcript-list.svelte';
 import type { DisplayTranscriptBlock } from '../src/shared/state/state.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const VIEWPORT_HEIGHT = 600;
 const ROW_HEIGHT = 180;
@@ -32,9 +41,17 @@ function textBlocks(count: number): readonly DisplayTranscriptBlock[] {
   })) as readonly DisplayTranscriptBlock[];
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function isScrollViewport(element: HTMLElement): boolean {
   return element.classList?.contains('transcript-scroll') === true;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
   Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
@@ -57,6 +74,10 @@ afterEach(() => {
   }
   cleanup();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('transcript virtualization', () => {
   it('renders a window rather than every block', async () => {

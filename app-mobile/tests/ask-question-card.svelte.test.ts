@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ASK QUESTION CARD TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   AskQuestionAnswerResult,
   AskQuestionDisplayDto,
@@ -7,11 +15,19 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/sv
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const relay = vi.hoisted(() => ({
   fetchAskQuestionDisplay: vi.fn(),
   requestAskQuestionAnswerTicket: vi.fn(),
   submitAskQuestionAnswer: vi.fn(),
 }));
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 vi.mock('../src/shared/transport/relay.js', () => relay);
 vi.mock('@tanstack/svelte-virtual', () => {
@@ -132,6 +148,10 @@ function rejectedResult(
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function renderCard(
   viewModel: AskQuestionDisplayDto = display,
   currentBlock: AskQuestionTranscriptMeta = block(),
@@ -163,6 +183,10 @@ afterEach(() => {
   clearAskQuestionEphemeralStore();
   localStorage.clear();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ask-question inline card', () => {
   it('renders once at the transcript position without a modal or scrim', async () => {

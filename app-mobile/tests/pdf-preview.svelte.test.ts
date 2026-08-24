@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: PDF Preview Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
@@ -29,6 +37,10 @@ import PdfPreview, {
   pagesAround,
 } from '../src/pages/chat/artifacts/pdf-preview.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 function block(overrides: Partial<FilePreviewBlock> = {}): FilePreviewBlock {
   return {
     id: 'pdf-preview-block',
@@ -53,9 +65,17 @@ function block(overrides: Partial<FilePreviewBlock> = {}): FilePreviewBlock {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('PdfPreview', () => {
   it('keeps page virtualization bounded and exposes verified text controls', async () => {

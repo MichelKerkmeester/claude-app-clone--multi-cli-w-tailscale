@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: PWA Cache Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { cleanup, render, screen } from '@testing-library/svelte';
@@ -13,6 +21,10 @@ import { loadCache, saveCache } from '../src/shared/transport/cache.js';
 import { EMPTY_TRANSCRIPT } from '../src/shared/state/state.js';
 import PlanReadyCard from '../src/pages/chat/chrome/card-plan-ready.svelte';
 import PlanReviewSheet from '../src/pages/chat/chrome/sheet-plan-review.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const SERVICE_WORKER = readFileSync('app-mobile/static/service-worker.js', 'utf8');
 const MANIFEST = JSON.parse(
@@ -85,11 +97,19 @@ const MALFORMED_ATTACHMENT = {
   previewRetained: false,
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   localStorage.clear();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('PWA shell and history-only cache boundary', () => {
   it('keeps standalone rotation enabled and caches only shell/static requests', () => {

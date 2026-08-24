@@ -1,9 +1,21 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: COLLAPSIBLE HEADING TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TodoProjectionV1 } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import TodoPanel from '../src/pages/chat/chrome/todo-panel.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const projection: TodoProjectionV1 = {
   planId: 'heading-test-plan',
@@ -23,9 +35,17 @@ const projection: TodoProjectionV1 = {
   ],
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('Collapsible heading wrapper', () => {
   it('keeps a real todo disclosure headed and operable', async () => {

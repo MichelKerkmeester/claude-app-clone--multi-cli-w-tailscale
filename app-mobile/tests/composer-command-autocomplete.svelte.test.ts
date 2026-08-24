@@ -1,6 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Inline Autocomplete Surface Tests (Svelte port)
 // ───────────────────────────────────────────────────────────────────
+
 // Ports app-mobile/tests/ComposerCommandAutocomplete.test.tsx (React
 // behavior oracle) to @testing-library/svelte. The React *.test.tsx oracle
 // is NEVER modified. The deriveSlashPanelState block and the CommandOption
@@ -25,6 +26,10 @@
 // repointed to read the actual owning files; the matched rule text and
 // values are unchanged. style.css is never imported.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { readFileSync } from 'node:fs';
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/svelte';
@@ -46,12 +51,20 @@ import type { HostCommandCatalogState, ScopedCommandSnapshot } from '../src/shar
 import type { RankedHostCommand } from '../src/shared/commands/rank-host-commands.js';
 import VisualViewportAnchorProbe from './support/VisualViewportAnchorProbe.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   document.body.removeAttribute('style');
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const COMMANDS: readonly CommandDescriptorDto[] = [
   {
@@ -152,6 +165,10 @@ const OPEN_STATES: readonly SlashPanelOpenState[] = [
   'committing',
   'session.running',
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('deriveSlashPanelState: every state is explicit and fail-closed', () => {
   const base = {

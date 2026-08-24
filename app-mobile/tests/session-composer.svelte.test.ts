@@ -9,6 +9,10 @@
 // activedescendant + the option rows. Under jsdom, async state settles via
 // svelte tick() / testing-library waitFor before synchronous assertions.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
@@ -19,6 +23,10 @@ import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 import type { HostCommandCatalogState, ScopedCommandSnapshot, SelectedCommandBinding } from '../src/shared/commands/commands.js';
 import { INITIAL_RUNTIME_STATE } from '../src/shared/state/runtime.js';
 import SessionComposerSurface from './support/SessionComposerSurface.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
   // The + tools browser is a bits-ui Popover positioned by floating-ui. Two jsdom
@@ -51,6 +59,10 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const COMMANDS: readonly CommandDescriptorDto[] = [
   {
@@ -115,6 +127,10 @@ interface HarnessProps {
   readonly localFiles?: readonly File[];
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function renderComposer(props: HarnessProps = {}) {
   const sendPrompt = props.sendPrompt ?? vi.fn();
   const sendSlashDraft = props.sendSlashDraft ?? vi.fn();
@@ -170,6 +186,10 @@ function statusText(): string {
 async function panelCopy(text: string): Promise<void> {
   await screen.findAllByText(text);
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('trigger rules', () => {
   it('opens within one rendered frame for "/" at index zero with host order', async () => {

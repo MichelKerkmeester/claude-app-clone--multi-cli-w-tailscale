@@ -1,12 +1,28 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: ARTIFACT CACHE TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { loadCache, saveCache, stripArtifactResourceState } from '../src/shared/transport/cache.js';
 import { EMPTY_TRANSCRIPT } from '../src/shared/state/state.js';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   localStorage.clear();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('artifact cache boundary', () => {
   it('strips live bytes, object URLs, and non-durable resource state recursively', () => {

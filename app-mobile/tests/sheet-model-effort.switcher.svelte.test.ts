@@ -19,6 +19,10 @@
 //   the owning component's scoped <style> block (ModelEffortSheet.svelte /
 //   SessionHeader.svelte) with the same rule text/values.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type {
   AvailableModelDto,
   RuntimeControlResponse,
@@ -35,6 +39,10 @@ import type { RuntimeControls, RuntimeUiState } from '../src/shared/state/runtim
 import ModelEffortSheet from '../src/pages/chat/chrome/sheet-model-effort.svelte';
 import SessionHeader from '../src/pages/chat/chrome/session-header.svelte';
 import ModelSwitcherHeaderHarness from './support/ModelSwitcherHeaderHarness.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const CURRENT: AvailableModelDto = {
   provider: 'alpha',
@@ -69,6 +77,10 @@ const HEADER_CSS = normalizeSvelteCss(
   readFileSync('app-mobile/src/pages/chat/chrome/session-header.css', 'utf8'),
 );
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   cleanup();
   // bits-ui BodyScrollLock restores body pointer-events on a deferred
@@ -82,6 +94,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function models(count: number): readonly AvailableModelDto[] {
   const extras = Array.from({ length: Math.max(0, count - 2) }, (_, index) => ({
@@ -172,6 +188,10 @@ function normalizeSvelteCss(source: string): string {
   if (styleMatch === null) return source;
   return styleMatch[1].replace(/:global\(([^)]*)\)/gu, '$1');
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ModelEffortSheet (model section)', () => {
   it('contains focus, initially focuses the current row, and restores the trigger without scrolling', async () => {

@@ -1,7 +1,19 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: Safe Markdown Tests
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 
 import SafeMarkdown, { parseSafeMarkdown } from '../src/pages/chat/rich-content/safe-markdown.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('SafeMarkdown', () => {
   it('renders an inert plain-text fallback for raw HTML and unsafe destinations', () => {

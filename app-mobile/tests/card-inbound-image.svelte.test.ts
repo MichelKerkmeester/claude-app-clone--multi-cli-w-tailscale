@@ -1,6 +1,18 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: CARD INBOUND IMAGE TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 // VerifiedImage reads its artifact snapshot off `resource.current`, so the
 // Svelte hook mock wraps the snapshot in `{ current }` (the React hook returned
@@ -9,6 +21,10 @@ import { describe, expect, it, vi } from 'vitest';
 const resource = vi.hoisted(() => ({
   useArtifactResource: vi.fn(),
 }));
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 vi.mock('../src/pages/chat/artifacts/use-artifact-resource.svelte.js', () => resource);
 
@@ -49,6 +65,10 @@ const READY_BLOCK: InboundImageReadyBlock = {
   shareAllowed: false,
   content: { kind: 'artifact-ref' },
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('InboundImageCard', () => {
   it('renders a ready card as one React Aria dialog button with a reserved well', () => {

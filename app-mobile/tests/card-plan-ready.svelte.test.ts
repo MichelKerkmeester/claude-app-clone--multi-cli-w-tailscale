@@ -1,9 +1,21 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: CARD PLAN READY TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import PlanReadyCard from '../src/pages/chat/chrome/card-plan-ready.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const ARTIFACT: PlanArtifactDto = {
   planId: 'plan_001',
@@ -15,6 +27,10 @@ const ARTIFACT: PlanArtifactDto = {
   validity: 'valid',
   occurredAt: '2026-01-01T12:00:00.000Z',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 afterEach(() => {
   cleanup();
@@ -28,6 +44,10 @@ function renderCard(overrides: Record<string, unknown> = {}) {
   });
   return onReview;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('PlanReadyCard', () => {
   it('renders only the newest live valid artifact and exposes review', async () => {

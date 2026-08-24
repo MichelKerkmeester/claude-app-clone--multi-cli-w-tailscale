@@ -7,11 +7,19 @@
 // the expected-revision envelope, while every local race makes ZERO
 // network calls.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { TextBlock } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { ScopedCommandSnapshot, SelectedCommandBinding } from '../src/shared/commands/commands.js';
 import { submitSlashDraft } from '../src/shared/commands/submit-slash-draft.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const SESSION = 'session_transport';
 const EPOCH = 'epoch_transport';
@@ -64,6 +72,10 @@ const BASE_INPUT = {
   running: false,
 };
 
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
+
 function jsonResponse(value: unknown, status = 200): Response {
   return new Response(JSON.stringify(value), {
     status,
@@ -110,10 +122,18 @@ function promptBodies(
     .map(([, init]) => JSON.parse(String(init?.body)) as Record<string, unknown>);
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 4. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('wire-level request counts (real relay client)', () => {
   it('spends exactly one ticket POST and one prompt POST for a valid send', async () => {

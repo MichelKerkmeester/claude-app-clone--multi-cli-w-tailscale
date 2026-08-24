@@ -11,6 +11,10 @@
 // (header → model section, strip → effort section) is covered by the
 // SessionHeader.svelte.test.ts and RuntimeStrip.svelte.test.ts ports.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { AvailableModelDto, RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -18,6 +22,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import ModelEffortSheet from '../src/pages/chat/chrome/sheet-model-effort.svelte';
 import type { RuntimeControls, RuntimePhase, RuntimeUiState } from '../src/shared/state/runtime.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 type EffortSheetSection = 'model' | 'effort';
 
@@ -42,6 +50,10 @@ const HOST_STATE: RuntimeStateDto = {
   streaming: false,
   updatedAt: '2026-08-16T10:00:00.000Z',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 afterEach(() => {
   cleanup();
@@ -103,6 +115,10 @@ async function openSheet(opts: SheetOptions = {}) {
   await screen.findByRole('dialog');
   return view;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ModelEffortSheet', () => {
   it('opens one shared dialog at the model section from the header and at the effort section from the strip', async () => {

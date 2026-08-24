@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: COMPOSER TOOLS TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
@@ -10,6 +18,10 @@ import {
   type RuntimeControls,
   type RuntimeUiState,
 } from '../src/shared/state/runtime.js';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const HOST_STATE: RuntimeStateDto = {
   sessionId: 'session_local',
@@ -80,6 +92,10 @@ async function openTools() {
   return { dialog, user };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 beforeEach(() => {
   const box = {
     width: 200,
@@ -108,6 +124,10 @@ afterEach(() => {
   document.body.style.cssText = '';
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('ComposerTools accessibility parity', () => {
   it('strips aria-haspopup from the tools trigger', () => {

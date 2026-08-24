@@ -20,12 +20,20 @@
 // dialog), so the port finds the single dialog by role and asserts the
 // aria-label attribute instead of the computed name.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import PlanReviewSheet from '../src/pages/chat/chrome/sheet-plan-review.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const ARTIFACT: PlanArtifactDto = {
   planId: 'plan_001',
@@ -37,6 +45,10 @@ const ARTIFACT: PlanArtifactDto = {
   validity: 'valid',
   occurredAt: '2026-01-01T12:00:00.000Z',
 };
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 afterEach(() => {
   cleanup();
@@ -72,6 +84,10 @@ function renderSheet(overrides: SheetOverrides = {}) {
   });
   return callbacks;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('PlanReviewSheet', () => {
   it('opens with Keep planning focused and exposes exactly four actions', async () => {

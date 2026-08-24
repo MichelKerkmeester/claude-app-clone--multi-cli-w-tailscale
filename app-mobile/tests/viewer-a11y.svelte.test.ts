@@ -1,3 +1,11 @@
+// ───────────────────────────────────────────────────────────────────
+// MODULE: VIEWER A11Y TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -8,12 +16,20 @@ import ArtifactViewerHarness from './support/ArtifactViewerHarness.svelte';
 // hold: token-identity and CDP cannot see focus order or dismissal, so these
 // assertions are the acceptance authority for the modal's behaviour.
 
+// ───────────────────────────────────────────────────────────────────
+// 2. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 afterEach(() => {
   window.history.replaceState({}, '', '/');
   vi.restoreAllMocks();
   document.documentElement.removeAttribute('data-artifact-viewer-open');
   document.getElementById('artifact-viewer-privacy-curtain')?.remove();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 3. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 async function openViewer(): Promise<HTMLButtonElement> {
   const trigger = screen.getByRole('button', { name: 'Open a11y diff' });
@@ -22,6 +38,10 @@ async function openViewer(): Promise<HTMLButtonElement> {
   await waitFor(() => expect(screen.getByRole('heading', { name: 'File diff' })).toHaveFocus());
   return trigger as HTMLButtonElement;
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('artifact viewer a11y contract', () => {
   it('opens a labelled dialog, focuses the heading, nests overlay > modal > dialog', async () => {

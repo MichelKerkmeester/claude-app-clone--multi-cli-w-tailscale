@@ -10,6 +10,14 @@
 // ported faithfully: older resolves before newer, and the factory's
 // generation guard must keep the older response from committing.
 
+// ───────────────────────────────────────────────────────────────────
+// MODULE: VIEWER RACES TESTS
+// ───────────────────────────────────────────────────────────────────
+
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sha256, type InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
@@ -21,6 +29,10 @@ import {
 } from '../src/pages/chat/artifacts/use-artifact-resource.svelte.js';
 
 import ArtifactResourceProbe from './support/ArtifactResourceProbe.svelte';
+
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
 
 const BYTES = new TextEncoder().encode('verified phase image');
 const DIGEST = sha256('verified phase image');
@@ -72,6 +84,10 @@ function resourceFor(overrides: Partial<ArtifactResource> = {}): ArtifactResourc
   };
 }
 
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
+
 let restoreUrlStubs: (() => void) | null = null;
 
 function installImageGate() {
@@ -102,6 +118,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('verified viewer races', () => {
   it('keeps the full URL absent until length, digest, headers, and decode complete', async () => {

@@ -4,15 +4,27 @@
 // Ports app-mobile/tests/EffortRadioGroup.test.tsx (React behavior oracle) to
 // @testing-library/svelte. The React *.test.tsx oracle is NEVER modified.
 
+// ───────────────────────────────────────────────────────────────────
+// 1. IMPORTS
+// ───────────────────────────────────────────────────────────────────
+
 import { cleanup, render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import EffortRadioGroup from '../src/pages/chat/chrome/radio-effort.svelte';
 
+// ───────────────────────────────────────────────────────────────────
+// 2. FIXTURES
+// ───────────────────────────────────────────────────────────────────
+
 const THREE_LEVELS = ['off', 'high', 'max'] as const;
 const FIVE_LEVELS = ['off', 'low', 'medium', 'high', 'max'] as const;
 const SEVEN_LEVELS = ['off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'] as const;
+
+// ───────────────────────────────────────────────────────────────────
+// 3. SETUP
+// ───────────────────────────────────────────────────────────────────
 
 afterEach(() => {
   cleanup();
@@ -23,6 +35,10 @@ afterEach(() => {
     Reflect.deleteProperty(element, 'scrollWidth');
   }
 });
+
+// ───────────────────────────────────────────────────────────────────
+// 4. HELPERS
+// ───────────────────────────────────────────────────────────────────
 
 function renderGroup({
   levels = SEVEN_LEVELS,
@@ -57,6 +73,10 @@ function renderGroup({
   });
   return { onSelect };
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. TESTS
+// ───────────────────────────────────────────────────────────────────
 
 describe('EffortRadioGroup', () => {
   it('renders exactly the host order and subset for three, five, and seven level fixtures', () => {

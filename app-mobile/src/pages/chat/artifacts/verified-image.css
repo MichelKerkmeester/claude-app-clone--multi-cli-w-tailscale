@@ -1,0 +1,10 @@
+/* @ds slot: thumbnail — the contained, non-interactive decoded image. */
+.inbound-image-thumbnail {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}

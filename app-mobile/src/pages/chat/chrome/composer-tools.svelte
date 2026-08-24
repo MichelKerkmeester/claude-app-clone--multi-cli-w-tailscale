@@ -53,6 +53,8 @@
   import CommandPalette from './command-palette.svelte';
   import { ATTACHMENT_ACCEPT } from '../attachments/attachment-state.js';
 
+  import './composer-tools.css';
+
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -286,7 +288,7 @@
   </Popover.Content>
 </Popover.Root>
 
-<!-- @ds surface: composer-tools — the "+" tools popover. Decomposed into this scoped block;
+<!-- @ds surface: composer-tools — the "+" tools popover. Decomposed into this co-located CSS file;
      composer-tools / tools-checkbox / tools-photo-actions / tools-action / tools-disclosure /
      tools-divider / tools-status / composer-plus are owned solely by this component so they
      move with it. Shared .tools-group / .tools-label (also used by SessionHeader) and the
@@ -294,127 +296,3 @@
      .composer-plus members of the prefers-contrast / forced-colors / 44px-target groups stay
      GLOBAL in app.css. Child-primitive classes and react-aria/runtime data-attributes use
      :global so Svelte scoping cannot drop them. Values unchanged. -->
-<style>
-  /* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
-  /* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
-  :global(.composer-tools-popover) {
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    background: var(--surface-raised);
-    box-shadow: var(--shadow-raised);
-  }
-
-  /* @ds slot: tools-trigger — the "+" popover trigger. */
-  :global(.composer-plus) {
-    display: grid;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--ink-secondary);
-    cursor: pointer;
-  }
-
-  :global(.composer-plus[data-hovered]),
-  :global(.composer-plus[data-pressed]) {
-    background: var(--surface-muted);
-  }
-
-  :global(.composer-plus[data-focus-visible]) {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-  }
-
-  /* Keyboard preference row in the tools popover. */
-  .tools-checkbox {
-    display: flex;
-    min-block-size: 44px;
-    align-items: center;
-    gap: var(--space-2);
-    color: var(--ink-secondary);
-    font-size: 0.85rem;
-    cursor: pointer;
-  }
-
-  :global(.tools-checkbox .react-aria-Checkbox-indicator) {
-    display: grid;
-    flex: none;
-    width: 1.25rem;
-    height: 1.25rem;
-    place-items: center;
-    border: 1px solid var(--control-border);
-    border-radius: 0.35rem;
-    background: var(--surface);
-    color: var(--ink-inverse);
-  }
-
-  :global(.tools-checkbox[data-selected] .react-aria-Checkbox-indicator) {
-    border-color: var(--ink);
-    background: var(--ink);
-  }
-
-  :global(.tools-checkbox[data-focus-visible] .react-aria-Checkbox-indicator) {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-  }
-
-  .tools-photo-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-  }
-
-  :global(.tools-action) {
-    min-block-size: 44px;
-    padding-inline: var(--space-2);
-    border: 1px solid var(--control-border);
-    border-radius: var(--radius-control);
-    background: var(--surface);
-    color: var(--ink);
-    font-size: 0.82rem;
-    font-weight: 650;
-    cursor: pointer;
-  }
-
-  :global(.tools-action[data-hovered]),
-  :global(.tools-action[data-pressed]) {
-    background: var(--accent-soft);
-  }
-
-  .tools-disclosure {
-    margin: var(--space-1) 0 0;
-    color: var(--ink-muted);
-    font-family: var(--font-display);
-    font-size: 0.84rem;
-    line-height: 1.35;
-  }
-
-  .tools-divider {
-    block-size: 1px;
-    background: var(--line);
-  }
-
-  @media (max-width: 20rem) {
-    .tools-photo-actions {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  /* Tools popover: model, effort, Build/Plan, and commands — one tap from "+". */
-  .composer-tools {
-    display: grid;
-    gap: var(--space-3);
-    width: min(88vw, 20rem);
-    padding: var(--space-4);
-    outline: none;
-  }
-
-  .tools-status {
-    min-height: 1rem;
-    color: var(--ink-muted);
-    font-size: 0.72rem;
-  }
-</style>

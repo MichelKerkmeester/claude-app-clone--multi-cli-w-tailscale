@@ -103,6 +103,8 @@
   import ArtifactViewerProvider from './artifacts/artifact-viewer-provider.svelte';
   import AttachmentDraftProvider from './attachments/attachment-draft-provider.svelte';
 
+  import './screen-chat.css';
+
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -537,60 +539,9 @@
 </main>
 
 <!-- @ds surface: session-view — in-session composition root (header · statusline · transcript · composer).
-     Decomposed into this scoped block; session-statusline / session-status-label / agent-dot and the
+     Decomposed into this co-located CSS file; session-statusline / session-status-label / agent-dot and the
      agent-dot.agent-running variant are owned solely by this component (rendered directly) so they
      move with it. session-view stays global (shared grouped routed-frame selector with home/review/inbox);
      inline-alert / barrier-note stay global (shared by 2+ surfaces: enrollment/review/inbox/push/composer);
      the .agent-running .state-icon pulsing group stays global (shared with the agent-row surface).
      Values unchanged. -->
-<style>
-  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
-  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
-  .session-view {
-    padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
-  }
-
-  @media (max-width: 39rem) {
-    .session-view {
-      padding-top: var(--space-6);
-    }
-  }
-
-  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
-  .session-view {
-    padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
-    padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
-  }
-
-  /* @ds surface: session-view — in-session composition root (header · statusline · transcript · composer). */
-  /* @ds state: active · stale — reconnecting readout; error via inline-alert. */
-  .session-statusline {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    padding-block: var(--space-2) var(--space-1);
-    color: var(--ink-muted);
-    font-size: 0.75rem;
-  }
-
-  /* @ds slot: label — session status text. */
-  .session-status-label {
-    font-weight: 600;
-  }
-
-  /* @ds slot: dot — session-agent status glyph. */
-  .agent-dot {
-    display: inline-grid;
-    place-items: center;
-    width: 0.95rem;
-    height: 0.95rem;
-    color: var(--ink-muted);
-  }
-
-  /* @ds state: running */
-  .agent-dot.agent-running {
-    color: var(--accent);
-  }
-  /* @ds end surface: session-view */
-</style>

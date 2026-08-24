@@ -58,6 +58,7 @@
 </script>
 
 <script lang="ts">
+  import './image-preview.css';
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -185,16 +186,7 @@
   {/if}
 </section>
 
-<!-- @ds surface: image-preview-controls — the image zoom toolbar. Decomposed into this scoped block;
+<!-- @ds surface: image-preview-controls — the image zoom toolbar. Decomposed into this co-located CSS file;
      single-component (ImagePreview). The image display classes (image-preview / image-preview-image /
      image-preview-stage) are shared with SecureImagePreview and stay global (→ app.css at cutover); the
      toolbar buttons carry the shared .artifact-control-button, also global. Values unchanged. -->
-<style>
-  /* @ds slot: image-controls — the zoom/pan toolbar row. */
-  .image-preview-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    align-items: center;
-  }
-</style>

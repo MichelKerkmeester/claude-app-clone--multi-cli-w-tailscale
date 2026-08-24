@@ -1,0 +1,182 @@
+/* @ds state: closed · drafted — surface-level open conditions. The state
+   attribute drives which presentation the surface renders. */
+.slash-surface {
+  display: contents;
+}
+
+/* @ds surface: slash-autocomplete — the inline autocomplete card and the
+   command palette share this surface name. */
+.slash-panel {
+  /* @ds edit: tokens — component tokens. Each is a thin alias to a semantic role,
+     so this surface retints by editing the role it points at (primitive → semantic
+     → component). Edit them here instead of on :root. */
+  --slash-raised: var(--surface);
+  --slash-ink: var(--ink);
+  --slash-muted: var(--ink-muted);
+  --slash-accent: var(--accent-ink);
+  --slash-ui-accent: var(--accent-strong);
+  --slash-selection: var(--accent-soft);
+  /* @ds edit: layout — popover anchoring, stacking, and max size. Keeps the
+     visual-viewport anchor input and screen-margin bounds exact. */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  inline-size: var(--trigger-width, min(calc(100vw - 24px), 40rem));
+  min-inline-size: 0;
+  max-inline-size: calc(100vw - 24px);
+  max-block-size: min(280px, calc(var(--visual-viewport-height, 100dvh) * 0.4));
+  padding: 4px;
+  overflow: hidden;
+  border: 1px solid var(--slash-ink);
+  border-radius: var(--radius-panel);
+  background: var(--slash-raised);
+  color: var(--slash-ink);
+  box-shadow: var(--shadow-raised);
+  font-family: var(--font-sans);
+}
+
+/* @ds edit: tokens — theme remap, dark. The same component tokens resolve to their
+   dark semantic roles here. The ui-accent points at --accent-ink, not --accent-strong,
+   because --accent-strong carries no dark override and would not match the dark
+   UI accent. */
+:root[data-theme='dark'] .slash-panel {
+  --slash-raised: var(--surface);
+  --slash-ink: var(--ink);
+  --slash-muted: var(--ink-muted);
+  --slash-accent: var(--accent-ink);
+  --slash-ui-accent: var(--accent-ink);
+  --slash-selection: var(--accent-soft);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* @ds edit: tokens — theme remap, system-dark. Dark semantic roles again, driven
+     by the OS-dark signal; ui-accent resolves to --accent-ink for the same reason
+     as the explicit dark block. */
+  :root[data-theme='system'] .slash-panel {
+    --slash-raised: var(--surface);
+    --slash-ink: var(--ink);
+    --slash-muted: var(--ink-muted);
+    --slash-accent: var(--accent-ink);
+    --slash-ui-accent: var(--accent-ink);
+    --slash-selection: var(--accent-soft);
+  }
+}
+
+/* @ds end surface: slash-autocomplete */
+
+/* @ds surface: status — slash-panel header states map loading · ready..empty · ready..stale-offline ·
+   error..denied onto the shared families. */
+/* @ds slot: header — the panel's status / error / empty-catalog copy line. */
+/* @ds state: loading.initial · ready.emptyCatalog · ready.noMatches ·
+   ready.staleOffline · session.running — copy-led panel states; the loading
+   and empty/no-match guards render header copy before any rows. */
+.slash-status {
+  padding: 8px 12px;
+  color: var(--slash-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+/* @ds state: error.noSnapshot · error.hostUnavailable · error.forbidden ·
+   error.incompatible — fail-closed error copy, accent-tinted. */
+.slash-status.is-error {
+  color: var(--slash-accent);
+  font-weight: 600;
+}
+
+/* @ds state: committing — transient post-insertion panel frame: no rows and no
+   copy, closed by the composer on the next commit resolution. */
+
+/* @ds slot: option-list — the scrollable listbox of command rows. */
+/* @ds state: ready.unfiltered · ready.filtered · refreshing.current ·
+   ready.staleOffline · session.running — the row-bearing panel states. */
+.slash-list {
+  flex: 0 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+/* @ds state: loading.initial — bounded skeleton rows before the first snapshot. */
+.slash-skeletons {
+  display: grid;
+  gap: 4px;
+  padding: 4px;
+}
+
+.slash-skeleton {
+  block-size: 56px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--slash-ink) 7%, transparent);
+}
+
+/* @ds slot: footer-hint — the footer with the running hint and retry affordance. */
+.slash-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 4px 0;
+}
+
+.slash-running-note {
+  padding-inline: 8px;
+  color: var(--slash-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.slash-retry {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding-inline: 14px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--slash-selection);
+  color: var(--slash-accent);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background-color 80ms linear,
+    color 80ms linear;
+}
+
+/* @ds state: retry-hovered — the revalidate affordance's hover wash. */
+.slash-retry[data-hovered] {
+  background: color-mix(in srgb, var(--slash-selection) 60%, var(--slash-raised));
+}
+
+.slash-retry[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* @ds edit: layout — installed-PWA popover bounds clear the device insets. */
+.slash-panel {
+  inline-size: var(
+    --trigger-width,
+    min(calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)), 40rem)
+  );
+  max-inline-size: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
+}
+
+/* @ds edit: contrast — system-wide forced-colors primitive: the scoped palettes yield to the user's
+   system scheme (Canvas / CanvasText / Highlight). */
+/* @ds guardrail: do-not-edit — Forced-colors yield is an accessibility guarantee; never restore a hard-coded surface/ink over the system scheme. */
+@media (forced-colors: active) {
+  .slash-retry {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: Highlight;
+  }
+
+  .slash-status.is-error,
+  .slash-running-note {
+    color: CanvasText;
+  }
+}

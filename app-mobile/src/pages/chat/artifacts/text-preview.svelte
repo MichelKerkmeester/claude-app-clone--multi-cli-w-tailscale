@@ -39,6 +39,7 @@
 </script>
 
 <script lang="ts">
+  import './text-preview.css';
   // ───────────────────────────────────────────────────────────────────
   // 1. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -69,50 +70,8 @@
   >{#each chunkText(text) as chunk, index (index)}<span class="artifact-text-chunk" data-text-chunk={index}>{#each findParts(chunk, findTerm) as part}{#if part.mark}<mark class="artifact-find-match">{part.text}</mark>{:else}{part.text}{/if}{/each}</span>{/each}</div>
 {/if}
 
-<!-- @ds surface: artifact-text-preview — the plain-text read well. Decomposed into this scoped block; the base
+<!-- @ds surface: artifact-text-preview — the plain-text read well. Decomposed into this co-located CSS file; the base
      merges the shared well-guardrail group with the text-well layout into one faithful rule. is-wrapped
      is a local soft-wrap modifier; the dark re-ink uses :global(:root[data-theme='dark']). The shared
      .artifact-empty-preview (empty/whitespace notice) and .artifact-find-match (find <mark>) stay global
      — rendered by multiple previews. Literal hex preserved. Values unchanged. -->
-<style>
-  /* @ds slot: text-well — plain-text read-out. */
-  /* @ds guardrail: do-not-edit — Bounded reading well; selectable and pan-scoped. */
-  .artifact-text-preview {
-    overscroll-behavior: contain;
-    overflow-anchor: none;
-    max-inline-size: 100%;
-    max-block-size: 100%;
-    overflow: auto;
-    color: #24221f;
-    font-family: var(--font-display);
-    font-size: 1rem;
-    line-height: 1.65;
-    text-align: start;
-    user-select: text;
-    unicode-bidi: plaintext;
-    margin: 0;
-    padding: 1rem;
-    border: 1px solid #6c6a65;
-    border-radius: 0.5rem;
-    background: #ffffff;
-    white-space: pre;
-    overflow-wrap: normal;
-  }
-
-  /* @ds state: wrapped — soft-wrap toggle. */
-  .artifact-text-preview.is-wrapped {
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-
-  /* @ds slot: text-chunk — one bounded render chunk. */
-  .artifact-text-chunk {
-    display: inline;
-  }
-
-  /* @ds state: dark — dark-theme re-ink (foreign ancestor via :global). */
-  :global(:root[data-theme='dark']) .artifact-text-preview {
-    background: #2d2a26;
-    color: #f8f8f6;
-  }
-</style>

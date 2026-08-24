@@ -647,8 +647,8 @@ describe('applied panel styling stays inside the frozen system', () => {
   // matched rule text and values are unchanged.
   const css = [
     readFileSync('app-mobile/src/app.css', 'utf8'),
-    readFileSync('app-mobile/src/pages/chat/chrome/composer-command-autocomplete.svelte', 'utf8'),
-    readFileSync('app-mobile/src/pages/chat/chrome/command-option.svelte', 'utf8'),
+    readFileSync('app-mobile/src/pages/chat/chrome/composer-command-autocomplete.css', 'utf8'),
+    readFileSync('app-mobile/src/pages/chat/chrome/command-option.css', 'utf8'),
   ].join('\n');
 
   it('uses only the frozen light tokens', () => {

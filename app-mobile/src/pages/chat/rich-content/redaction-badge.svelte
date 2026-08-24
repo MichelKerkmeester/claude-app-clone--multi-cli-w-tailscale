@@ -6,6 +6,8 @@
   // @ds surface: RedactionBadge — badge that labels redacted sensitive fields by category.
   import type { RedactionMetadata } from '@pi-remote/pi-rpc-protocol';
 
+  import './redaction-badge.css';
+
   interface Props {
     readonly redaction: RedactionMetadata | null;
   }
@@ -29,14 +31,3 @@
     Redacted{categories.length > 0 ? ` · ${categories.join(' · ')}` : ''}
   </span>
 {/if}
-
-<style>
-  .rich-redaction-badge {
-    padding: 0.2rem 0.45rem;
-    border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    color: var(--ink-muted);
-    font-size: 0.6875rem;
-    white-space: nowrap;
-  }
-</style>

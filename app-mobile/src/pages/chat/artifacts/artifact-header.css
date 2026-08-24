@@ -1,0 +1,16 @@
+/* @ds slot: revision — the exact-revision provenance line (LTR-isolated). */
+.artifact-viewer-revision {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  color: #6c6a65;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  min-inline-size: 0;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* @ds state: dark — dark-theme re-ink (foreign ancestor via :global). */
+:root[data-theme='dark'] .artifact-viewer-revision {
+  color: #9f998f;
+}

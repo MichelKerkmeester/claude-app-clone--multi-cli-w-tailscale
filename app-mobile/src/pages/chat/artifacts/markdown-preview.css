@@ -1,0 +1,87 @@
+/* @ds slot: markdown-well — the bounded safe-Markdown render surface. */
+/* @ds guardrail: do-not-edit — Bounded reading well; selectable; links/images render inert. */
+.artifact-markdown-preview {
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  overflow: auto;
+  color: #24221f;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.65;
+  text-align: start;
+  user-select: text;
+  unicode-bidi: plaintext;
+  padding: 0.25rem 0.1rem;
+}
+
+/* @ds slot: markdown-block — shared block spacing for rendered prose blocks (dynamic elements). */
+.artifact-markdown-preview p,
+.artifact-markdown-preview h1,
+.artifact-markdown-preview h2,
+.artifact-markdown-preview h3,
+.artifact-markdown-preview h4,
+.artifact-markdown-preview h5,
+.artifact-markdown-preview h6,
+.artifact-markdown-preview blockquote,
+.artifact-markdown-preview ul,
+.artifact-markdown-preview ol {
+  max-inline-size: 100%;
+  margin-block: 0 1rem;
+  overflow-wrap: anywhere;
+}
+
+/* @ds slot: markdown-quote — blockquote inset rule. */
+.artifact-markdown-preview blockquote {
+  margin-inline: 0;
+  padding-inline-start: 1rem;
+  border-inline-start: 3px solid #d97757;
+  color: #6c6a65;
+}
+
+/* @ds slot: markdown-anchor — defensive anchor styling (links render as inert spans; kept faithful). */
+.artifact-markdown-preview a {
+  color: #8a452f;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+/* @ds slot: markdown-code — fenced code block. */
+.artifact-markdown-code {
+  overscroll-behavior: contain;
+  overflow-anchor: none;
+  user-select: text;
+  -webkit-user-select: text;
+  background: #24221f;
+  color: #f8f8f6;
+  max-inline-size: 100%;
+  margin: 0 0 1rem;
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+
+/* @ds slot: markdown-link — inert link span. */
+.artifact-markdown-link {
+  color: #8a452f;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+/* @ds slot: markdown-image — inert image placeholder. */
+.artifact-markdown-image {
+  color: #6c6a65;
+  font-style: italic;
+}
+
+/* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
+:root[data-theme='dark'] .artifact-markdown-image {
+  color: #9f998f;
+}
+
+:root[data-theme='dark'] .artifact-markdown-link {
+  color: #f0b19a;
+}

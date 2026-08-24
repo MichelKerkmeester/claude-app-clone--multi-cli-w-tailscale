@@ -1,0 +1,54 @@
+/* @ds slot: theme-toggle — segmented theme control (shared theme-switcher surface below). */
+/* @ds surface: theme-switcher — segmented theme selector (ToggleButton group). */
+.theme-control {
+  display: flex;
+  padding: 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+/* @ds state: default */
+.theme-option {
+  min-height: 2.25rem;
+  padding-inline: 0.65rem;
+  font-size: 0.68rem;
+}
+
+/* @ds state: selected */
+.theme-option[data-selected] {
+  background: var(--ink);
+  color: var(--ink-inverse);
+}
+/* @ds end surface: theme-switcher */
+
+@media (max-width: 52rem) {
+  .theme-option {
+    width: 2.4rem;
+    overflow: hidden;
+    color: transparent;
+    font-size: 0;
+  }
+
+  .theme-option::before {
+    color: var(--ink-secondary);
+    font-size: 0.72rem;
+    content: 'A';
+  }
+
+  .theme-option:nth-child(2)::before {
+    content: '☀';
+  }
+  .theme-option:nth-child(3)::before {
+    content: '●';
+  }
+  .theme-option[data-selected]::before {
+    color: var(--ink-inverse);
+  }
+}
+
+@media (max-width: 39rem) {
+  .theme-control {
+    order: 3;
+  }
+}

@@ -74,11 +74,11 @@ describe('AttachmentRail', () => {
       });
       expect(element.scrollWidth).toBeLessThanOrEqual(element.clientWidth);
     }
-    expect(readFileSync('app-mobile/src/pages/chat/attachments/attachment-rail.svelte', 'utf8')).toMatch(
+    expect(readFileSync('app-mobile/src/pages/chat/attachments/attachment-rail.css', 'utf8')).toMatch(
       /\.attachment-rail\s*\{[\s\S]*?max-inline-size: 100%;[\s\S]*?overflow-x: auto;/u,
     );
     expect(
-      readFileSync('app-mobile/src/pages/chat/attachments/dialog-attachment-preview.svelte', 'utf8'),
+      readFileSync('app-mobile/src/pages/chat/attachments/dialog-attachment-preview.css', 'utf8'),
     ).toMatch(/@media \(max-width: 20rem\)[\s\S]*?\.attachment-preview-dialog/u);
   });
 

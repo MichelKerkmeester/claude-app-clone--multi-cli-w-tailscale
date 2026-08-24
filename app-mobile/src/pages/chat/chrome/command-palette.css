@@ -1,0 +1,6 @@
+/* @ds surface: slash-autocomplete — the inline autocomplete card and the
+   command palette share this surface name. */
+/* `.command-palette`, `.command-empty`, `.command-name`, and `.command-desc`
+   carry structure only; the original stylesheet has no owned declarations
+   for them. Shared overlay primitives stay in app.css:
+   .react-aria-Popover, .react-aria-ListBox, .react-aria-ListBoxItem. */

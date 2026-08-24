@@ -1,0 +1,412 @@
+/* The todo projection is a transcript annotation, not an editable task surface. */
+/* @ds surface: todos — the read-only todo projection panel (pi's plan). */
+/* @ds guardrail: READ-ONLY projection — The phone NEVER mutates pi's task list. Grouped sections and per-task states come from the projection only; edit styling, never the model. */
+.todo-panel {
+  display: grid;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  padding-block-end: max(var(--space-4), env(safe-area-inset-bottom));
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  scroll-margin-block: var(--space-8);
+}
+
+/* @ds state: all-done — every task done; the panel is quiet (no progress hairline replaces rows). */
+.todo-panel[data-todo-all-done='true'] {
+  /* The all-done rendering is quiet: no progress hairline replaces the row list. */
+  gap: var(--space-2);
+}
+
+/* @ds slot: header — sticky panel header; heading + progress-count + refresh control. */
+.todo-panel-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  /* Section heading stays anchored inside the bounded panel; never underneath
+     the safe-area or global navigation. */
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  padding-block-end: var(--space-1);
+  background: var(--canvas);
+}
+
+/* @ds slot: heading — the provenance eyebrow + read-only label. */
+.todo-panel-heading {
+  display: grid;
+  min-inline-size: 0;
+  gap: 0.15rem;
+}
+
+/* @ds slot: provenance · @ds slot: read-only-label · @ds slot: progress-count · @ds slot: sync-note · @ds slot: empty-line · @ds slot: all-done — shared margin reset. */
+.todo-provenance,
+.todo-read-only-label,
+.todo-progress-count,
+.todo-sync-note,
+.todo-empty-line,
+.todo-all-done {
+  margin: 0;
+}
+
+/* @ds slot: provenance — the "pi's plan · todo" eyebrow. */
+.todo-provenance {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+/* @ds slot: read-only-label · @ds slot: sync-note · @ds state: syncing · @ds slot: empty-line · @ds state: empty — quiet meta + status lines. */
+.todo-read-only-label,
+.todo-sync-note,
+.todo-empty-line,
+.todo-updated-label {
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+/* @ds slot: progress-count — the done/total counter. */
+.todo-progress-count {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* @ds slot: refresh · @ds slot: section-trigger — the shared 44px interactive base. */
+.todo-refresh,
+.todo-section-trigger {
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* @ds slot: refresh — refreshes the read-only projection. */
+.todo-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-control);
+  color: var(--ink-secondary);
+  font-size: 0.78rem;
+}
+
+.todo-refresh svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+/* @ds state: hover · pressed — refresh + section triggers. */
+.todo-refresh[data-hovered],
+.todo-refresh[data-pressed],
+.todo-section-trigger[data-hovered],
+.todo-section-trigger[data-pressed] {
+  background: var(--canvas-subtle);
+}
+
+/* @ds guardrail: focus-visible — The shared AA focus ring across refresh + section triggers. */
+.todo-refresh[data-focus-visible],
+.todo-section-trigger[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* @ds state: disabled — refresh fails back to a quiet, parked control. */
+.todo-refresh[data-disabled] {
+  cursor: default;
+  opacity: 0.65;
+}
+
+/* @ds slot: progress-hairline — the done/total progress bar (aria progressbar is guarded). */
+.todo-progress-hairline {
+  block-size: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line-hairline);
+}
+
+.todo-progress-hairline > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: inline-start;
+}
+
+/* @ds slot: body — the panel content area; all-done / empty / sectioned-rows states below. */
+.todo-panel-body {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--space-2);
+}
+
+/* @ds slot: rows — a collapsible state group; section state via data-todo-state (pending · in-progress · done). */
+.todo-state-section {
+  min-inline-size: 0;
+  border-block-start: 1px solid var(--line);
+}
+
+.todo-state-section > h2,
+.todo-state-section > h3 {
+  margin: 0;
+}
+
+/* @ds slot: section-trigger — the section header; chevron + label + count. */
+.todo-section-trigger {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  inline-size: 100%;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: start;
+}
+
+/* @ds slot: section-chevron — the collapse/expand chevron. */
+.todo-section-chevron {
+  color: var(--ink-muted);
+  font-size: 1rem;
+  transform: rotate(90deg);
+}
+
+/* @ds state: collapsed — closed section chevron. */
+.todo-section-trigger[aria-expanded='false'] .todo-section-chevron {
+  transform: none;
+}
+
+/* @ds slot: section-count — the per-section task count. */
+.todo-section-count {
+  min-inline-size: 1.5rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.todo-section-panel,
+.todo-group-run {
+  min-inline-size: 0;
+}
+
+.todo-group-run + .todo-group-run {
+  margin-block-start: var(--space-2);
+}
+
+/* @ds slot: group-heading — a named group label inside a section. */
+.todo-group-heading {
+  margin: 0;
+  padding: var(--space-1) 0 var(--space-1) 1.75rem;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+}
+
+/* @ds slot: rows — the task row list. */
+.todo-task-list {
+  display: grid;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* @ds slot: row — one task; state read from data-todo-task-state (pending · active/in-progress · done). */
+.todo-task-row {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block: var(--space-2);
+  border-block-start: 1px solid var(--line);
+}
+
+.todo-task-list > .todo-task-row:first-child {
+  border-block-start: 0;
+}
+
+/* @ds slot: glyph — the per-state marker; variants via .todo-state-glyph-{state}. */
+.todo-state-glyph {
+  display: inline-grid;
+  inline-size: 1rem;
+  block-size: 1rem;
+  place-items: center;
+  color: var(--ink);
+}
+
+.todo-state-glyph svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+/* @ds state: in-progress (active) — the running/highlighted task marker. */
+.todo-state-glyph-active svg {
+  fill: var(--accent);
+  stroke: var(--ink);
+}
+
+/* @ds state: done — the completed task marker. */
+.todo-state-glyph-done svg {
+  stroke-width: 2;
+}
+
+/* @ds slot: title — the task title copy. */
+.todo-task-title {
+  min-inline-size: 0;
+  color: var(--ink);
+  font-size: 0.86rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  unicode-bidi: plaintext;
+}
+
+/* @ds slot: task-state — the localized state label. */
+.todo-task-state {
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+/* @ds slot: updated-at — the per-task relative timestamp. */
+.todo-task-updated-at {
+  grid-column: 2 / -1;
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+/* @ds state: all-done — every task done; a quiet glowing summary line. */
+.todo-all-done {
+  padding-block: var(--space-3);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+/* @ds slot: provenance-updated — the relative "Updated …" timestamp. */
+.todo-updated-label {
+  justify-self: end;
+}
+
+/* @ds guardrail: sr-only polite live region — Must never take layout space, move focus, or scroll. */
+.todo-live-region {
+  /* The live region is purely a screen-reader polite queue; it must never
+     take layout space, never move focus, and never cause a scroll. */
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 24rem) {
+  .todo-panel {
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .todo-panel-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .todo-refresh {
+    grid-column: 1 / -1;
+    inline-size: 100%;
+  }
+
+  .todo-task-row {
+    grid-template-columns: 1.1rem minmax(0, 1fr);
+  }
+
+  .todo-task-state {
+    grid-column: 2;
+  }
+
+  .todo-task-updated-at {
+    grid-column: 2 / -1;
+  }
+}
+
+/* Dynamic text scaling must keep the panel usable and never overflow
+   horizontally. Inter + Source Serif 4 stay <= 1.4rem at +200% scaling. */
+@media (min-resolution: 1dppx) {
+  .todo-panel {
+    container-type: inline-size;
+  }
+
+  .todo-task-title {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+[dir='rtl'] .todo-section-chevron {
+  transform: rotate(-90deg);
+}
+
+[dir='rtl'] .todo-section-trigger[aria-expanded='false'] .todo-section-chevron {
+  transform: none;
+}
+
+[dir='rtl'] .todo-progress-hairline > span {
+  transform-origin: inline-end;
+}
+
+/* Under reduced motion the row pulse is suppressed and no layout animation
+   runs. Background updates must not auto-scroll the transcript or move
+   focus; the live region uses absolute positioning so it never affects the
+   scroll container. */
+@media (prefers-reduced-motion: reduce) {
+  .todo-panel *,
+  .todo-panel *::before,
+  .todo-panel *::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .todo-panel {
+    scroll-behavior: auto;
+  }
+
+  .todo-progress-hairline > span {
+    transition: none !important;
+  }
+}
+/* @ds end surface: todos */

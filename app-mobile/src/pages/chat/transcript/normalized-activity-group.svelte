@@ -17,6 +17,8 @@
   import { normalizedActivitySummary } from './transcript-helpers.js';
   import RichContentRouter from '../rich-content/rich-content-router.svelte';
 
+  import './normalized-activity-group.css';
+
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -86,23 +88,8 @@
   </Collapsible>
 </div>
 
-<!-- @ds surface: activity-group — grouped bare evidence surface. Decomposed into this scoped block;
+<!-- @ds surface: activity-group — grouped bare evidence surface. Decomposed into this co-located CSS file;
      activity-group/activity-stack are owned solely by this component so they move with it (scoped).
      evidence-trigger/chevron/summary are shared with CollapsedEvidence and stay :global there
      (CollapsedEvidence.svelte's scoped style block); they are not redefined here to avoid duplicate global CSS.
      Values unchanged. -->
-<style>
-  /* @ds surface: activity-group — grouped bare evidence blocks in one quiet disclosure. */
-  .activity-group {
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    background: var(--surface);
-  }
-
-  /* @ds slot: panel-body — the DisclosurePanel content stack of an evidence disclosure. */
-  .activity-stack {
-    display: grid;
-    gap: var(--space-2);
-    padding: 0 var(--space-3) var(--space-3);
-  }
-</style>

@@ -36,6 +36,7 @@
 </script>
 
 <script lang="ts">
+  import './code-preview.css';
   // ───────────────────────────────────────────────────────────────────
   // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -161,162 +162,9 @@
 </div>
 
 <!-- @ds surface: artifact-code-preview — the highlighted code well, gutter, tokens, and jump-to-latest.
-     Decomposed into this scoped block. Token classes are built by concatenation ('artifact-code-token is-' +
+     Decomposed into this co-located CSS file. Token classes are built by concatenation ('artifact-code-token is-' +
      kind), so the .is-* suffix is not a static literal — the compounds use :global(.is-*) to stay
      un-pruned (faithful). is-wrapped is a literal in a ternary so it stays plain-scoped. Dark re-inks
      use :global(:root[data-theme='dark']). .artifact-jump-latest ships native :hover/:focus-visible
      (no react-aria), preserved as-is. The shared .artifact-find-match (<mark>) stays global. Literal
      hex preserved. Values unchanged. -->
-<style>
-  /* @ds slot: code-viewer — the relative frame owning the follow-tail control. */
-  .artifact-code-viewer {
-    position: relative;
-    min-inline-size: 0;
-  }
-
-  /* @ds slot: code-well — the scrollable highlighted code surface. */
-  /* @ds guardrail: do-not-edit — Bounded reading well; selectable and pan-scoped; never overflow the page. */
-  .artifact-code-preview {
-    overscroll-behavior: contain;
-    overflow-anchor: none;
-    max-block-size: min(70dvh, 42rem);
-    overscroll-behavior-inline: contain;
-    overscroll-behavior-block: contain;
-    scrollbar-gutter: stable;
-    user-select: text;
-    -webkit-user-select: text;
-    background: #24221f;
-    color: #f8f8f6;
-    display: grid;
-    max-inline-size: 100%;
-    grid-template-columns: auto minmax(0, 1fr);
-    overflow: auto;
-    border: 1px solid #6c6a65;
-    border-radius: 0.5rem;
-    direction: ltr;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    line-height: 1.65;
-    text-align: start;
-    unicode-bidi: isolate;
-  }
-
-  /* @ds slot: gutter — the line-number rail. */
-  .artifact-code-gutter {
-    display: grid;
-    align-content: start;
-    padding: 1rem 0.7rem;
-    border-inline-end: 1px solid #6c6a65;
-    color: #6c6a65;
-    text-align: end;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  .artifact-code-gutter span {
-    min-block-size: 1.65em;
-  }
-
-  /* @ds slot: source — the highlighted code column. */
-  .artifact-code-source {
-    min-inline-size: max-content;
-    margin: 0;
-    padding: 1rem;
-    overflow: visible;
-    font: inherit;
-    white-space: pre;
-    user-select: text;
-  }
-
-  /* @ds state: wrapped — soft-wrap toggle rewraps the source column. */
-  .artifact-code-preview.is-wrapped .artifact-code-source {
-    min-inline-size: 0;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-  }
-
-  /* @ds slot: token — syntax tokens (kind suffix is dynamic; :global keeps the compounds live). */
-  .artifact-code-token:global(.is-keyword),
-  .artifact-code-token:global(.is-boolean),
-  .artifact-code-token:global(.is-tag),
-  .artifact-code-token:global(.is-heading),
-  .artifact-code-token:global(.is-ansi),
-  .artifact-code-token:global(.is-diff-add),
-  .artifact-code-token:global(.is-diff-remove) {
-    color: #f0b19a;
-  }
-
-  .artifact-code-token:global(.is-string),
-  .artifact-code-token:global(.is-number) {
-    color: #d97757;
-  }
-
-  .artifact-code-token:global(.is-comment) {
-    color: #9f998f;
-  }
-
-  /* @ds slot: jump-latest — the follow-tail live-edge control; ships native :hover/:focus-visible. */
-  .artifact-jump-latest {
-    min-block-size: 44px;
-    min-inline-size: 44px;
-    position: sticky;
-    inset-block-end: var(--space-3);
-    z-index: 1;
-    display: block;
-    margin-block-start: calc(var(--space-4) * -1);
-    margin-inline: auto;
-    padding-inline: var(--space-3);
-    border: 1px solid var(--control-border);
-    border-radius: 999px;
-    background: var(--action-bg);
-    color: var(--action-fg);
-    cursor: pointer;
-    font-size: 0.8125rem;
-  }
-
-  /* @ds guardrail: focus-visible — The AA focus ring on jump-to-latest. */
-  .artifact-jump-latest:focus-visible {
-    outline: 3px solid var(--focus);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 5px var(--accent);
-  }
-
-  /* @ds state: hover — jump-to-latest under pointer hover. */
-  .artifact-jump-latest:hover {
-    background: var(--accent-strong);
-    color: var(--ink-inverse);
-  }
-
-  /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
-  :global(:root[data-theme='dark']) .artifact-code-gutter {
-    color: #9f998f;
-  }
-
-  :global(:root[data-theme='dark']) .artifact-code-token:global(.is-comment) {
-    color: #9f998f;
-  }
-
-  :global(:root[data-theme='dark']) .artifact-code-token:global(.is-keyword) {
-    color: #f0b19a;
-  }
-
-  /* @ds guardrail: do-not-edit — Reduced motion bounds the well + jump-to-latest transitions. */
-  @media (prefers-reduced-motion: reduce) {
-    .artifact-code-preview {
-      transition-duration: 100ms;
-      scroll-behavior: auto;
-    }
-
-    .artifact-jump-latest {
-      transition-duration: 100ms;
-      scroll-behavior: auto;
-    }
-  }
-
-  /* @ds edit: layout — narrow reflow: full-width jump-to-latest at <=20rem. */
-  @media (max-width: 20rem) {
-    .artifact-jump-latest {
-      inline-size: 100%;
-    }
-  }
-</style>

@@ -71,6 +71,7 @@
 </script>
 
 <script lang="ts">
+  import './artifact-status.css';
   // ───────────────────────────────────────────────────────────────────
   // 2. LIVE REGION STATE
   // ───────────────────────────────────────────────────────────────────
@@ -104,28 +105,5 @@
 {/if}
 
 <!-- @ds surface: artifact-status — the polite status + assertive terminal-alert live regions.
-     Decomposed into this scoped block; both are single-component. terminal-alert is the visually-hidden
+     Decomposed into this co-located CSS file; both are single-component. terminal-alert is the visually-hidden
      (sr-only) pattern. Values unchanged. -->
-<style>
-  /* @ds slot: status — the polite status live region. */
-  .artifact-viewer-status {
-    min-block-size: 2.75rem;
-    padding-block: var(--space-3);
-    color: var(--ink-muted);
-    font-size: 0.78rem;
-    line-height: 1.4;
-  }
-
-  /* @ds slot: terminal-alert — the visually-hidden assertive alert live region. */
-  /* @ds guardrail: do-not-edit — Visually hidden but present for assistive tech; this is the announcement contract. */
-  .artifact-viewer-terminal-alert {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
-  }
-</style>

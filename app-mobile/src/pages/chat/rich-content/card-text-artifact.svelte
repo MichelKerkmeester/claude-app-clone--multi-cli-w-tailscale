@@ -8,6 +8,8 @@
   import { useCopyFeedback } from './use-copy-feedback.svelte.js';
   import { hover } from '$shared/primitives/a11y/interactions.js';
 
+  import './card-text-artifact.css';
+
   interface Props {
     block: NormalizedTextArtifactBlock;
     onOpen?: (trigger?: HTMLButtonElement | null) => void;
@@ -104,41 +106,3 @@
   <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
   <p class="rich-copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
-
-<style>
-  /* @ds surface: text-artifact-card — substantial text artifact preview with a
-     full-screen Open handoff. */
-  /* @ds slot: preview — clipped text-artifact preview column. */
-  .rich-text-artifact-preview {
-    max-block-size: 9.5rem;
-    overflow: hidden;
-    border-block: 1px solid var(--line);
-  }
-
-  /* @ds slot: preview — text-artifact lines (display serif, wrap-safe). */
-  .rich-text-artifact-preview pre {
-    margin: 0;
-    padding-block: var(--space-3);
-    color: var(--ink);
-    font: 1rem/1.55 var(--font-display);
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-
-  /* @ds slot: labels — text continuation caption (muted small type). */
-  .rich-continuation {
-    margin: var(--space-2) 0 0;
-    color: var(--ink-muted);
-    font-size: 0.75rem;
-  }
-
-  /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
-     polite live region whose text carries the outcome; the presence styles are this. */
-  /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
-  .rich-copy-status {
-    min-block-size: 1.25rem;
-    margin: var(--space-2) 0 0;
-    color: var(--ink-muted);
-    font-size: 0.75rem;
-  }
-</style>

@@ -1,0 +1,7 @@
+/* @ds slot: image-controls — the zoom/pan toolbar row. */
+.image-preview-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}

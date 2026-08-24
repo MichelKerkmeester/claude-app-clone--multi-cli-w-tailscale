@@ -18,6 +18,8 @@
   import { attentionIcon, attentionLabel, messageFrom, relativeTime } from '$shared/format/view-helpers.js';
   import Button from '$shared/primitives/button/button.svelte';
 
+  import './screen-attention-inbox.css';
+
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -112,7 +114,7 @@
   </section>
 </main>
 
-<!-- @ds surface: inbox-view — attention signals. Decomposed into this scoped block; inbox-heading,
+<!-- @ds surface: inbox-view — attention signals. Decomposed into this co-located CSS file; inbox-heading,
      attention-list and attention-icon are owned solely by this component so they move with it.
      .inbox-heading h1 carries the full merged declaration set from the shared hero/review/inbox/
      enrollment h1 group plus the review/inbox h1 override group;
@@ -125,132 +127,3 @@
      .session-toolbar / .back-button / .review-count (shared with Review), .inline-alert (composer),
      .surface-kicker (many), and .empty-state / .empty-glyph (Review/Home) are shared by 2+
      components and stay global in app.css. Values unchanged. -->
-<style>
-  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
-  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
-  .inbox-view {
-    padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
-  }
-
-  /* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
-  /* @ds slot: heading — surface title + description. */
-  .inbox-heading {
-    max-width: 58rem;
-    padding-bottom: clamp(2.5rem, 7vw, 5rem);
-  }
-
-  .inbox-heading h1 {
-    max-width: 15ch;
-    margin: 0;
-    color: var(--ink);
-    font-size: clamp(2.8rem, 7vw, 5.6rem);
-    font-weight: 620;
-    letter-spacing: -0.04em;
-    line-height: 0.98;
-    text-wrap: balance;
-  }
-
-  .inbox-heading > p:last-child {
-    max-width: 43rem;
-    margin: var(--space-6) 0 0;
-    color: var(--ink-secondary);
-    font-size: 1rem;
-    line-height: 1.65;
-  }
-
-  .attention-list {
-    display: grid;
-    gap: var(--space-4);
-  }
-
-  .attention-icon {
-    display: grid;
-    width: 2.4rem;
-    height: 2.4rem;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--accent-soft);
-    color: var(--accent-ink);
-    font-weight: 750;
-  }
-
-  :global(.attention-card) {
-    display: grid;
-    grid-template-columns: 2.5rem 1fr auto;
-    align-items: center;
-    gap: var(--space-3);
-    min-height: 5.5rem;
-    padding: var(--space-4);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    color: var(--ink);
-    text-align: start;
-    cursor: pointer;
-    transition:
-      border-color var(--duration-fast) ease,
-      background-color var(--duration-fast) ease;
-  }
-
-  :global(.attention-card[data-hovered]) {
-    border-color: var(--line-strong);
-    background: var(--surface-raised);
-  }
-
-  :global(.attention-card > span:not(.attention-icon)) {
-    font-size: 0.9rem;
-    font-weight: 700;
-  }
-
-  :global(.attention-card time) {
-    color: var(--ink-muted);
-    font-size: 0.7rem;
-    font-weight: 600;
-  }
-
-  :global(.attention-card strong) {
-    grid-column: 2 / -1;
-    color: var(--ink-secondary);
-    font-size: 0.78rem;
-    font-weight: 600;
-  }
-
-  :global(.attention-needs_input) .attention-icon {
-    background: var(--warning-soft);
-    color: var(--warning);
-  }
-
-  :global(.attention-finished) .attention-icon {
-    background: var(--success-soft);
-    color: var(--success);
-  }
-
-  :global(.attention-error) .attention-icon {
-    background: var(--danger-soft);
-    color: var(--danger);
-  }
-
-  @media (max-width: 39rem) {
-    .inbox-view {
-      padding-top: var(--space-6);
-    }
-
-    :global(.attention-card) {
-      grid-template-columns: 2.5rem 1fr;
-    }
-
-    :global(.attention-card time) {
-      grid-column: 2;
-    }
-
-    :global(.attention-card strong) {
-      grid-column: 2;
-    }
-  }
-
-  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
-  .inbox-view {
-    padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
-    padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
-  }
-</style>

@@ -1,0 +1,180 @@
+/* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
+/* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
+.session-sheet-popover {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-raised);
+}
+
+/* @ds surface: session-header — in-session quiet header (back · model · overflow). */
+/* @ds edit: layout — grid geometry + safe top gutter. */
+/* ── Session header (in-session): back · centered model · overflow ─────── */
+.session-header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: 2.75rem 1fr 2.75rem;
+  align-items: center;
+  gap: var(--space-2);
+  padding: max(var(--space-2), env(safe-area-inset-top)) var(--page-gutter) var(--space-2);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklch, var(--canvas) 90%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+/* @ds slot: icon — back and overflow icon buttons. */
+.session-header-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-secondary);
+  cursor: pointer;
+}
+
+.session-header-icon:last-child {
+  justify-self: end;
+}
+
+.session-header-icon[data-hovered] {
+  background: var(--surface-muted);
+}
+
+.session-header-icon[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* @ds slot: model — host-confirmed model/effort readout trigger. */
+.session-model-trigger {
+  display: inline-flex;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  flex: 1 1 auto;
+  justify-self: center;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.4rem 0.85rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 620;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.session-model-trigger[data-hovered] {
+  background: var(--surface-muted);
+}
+
+.session-model-trigger[data-disabled] {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* @ds slot: model-name — confirmed model label. */
+.session-model-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: model-header-accepted 150ms ease-out;
+}
+
+.session-runtime-controls {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  overflow: hidden;
+}
+
+.session-model-trigger[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* @ds slot: separator — between model and effort. */
+.session-header-sep {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+/* @ds slot: effort-name — confirmed effort label. */
+.session-effort-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-secondary);
+  font-size: 0.8rem;
+  font-weight: 560;
+}
+
+/* @ds slot: plan-badge — plan-mode status chip. */
+.session-plan-badge {
+  flex: 0 0 auto;
+  padding-block: 0.2rem;
+  padding-inline: 0.45rem;
+  border: 1px solid var(--accent-strong);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+/* @ds end surface: session-header */
+
+@keyframes model-header-accepted {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 360px) {
+  .session-model-trigger {
+    padding-inline: 0.55rem;
+  }
+
+  .session-header-sep {
+    display: none;
+  }
+}
+
+/* @ds slot: nav — Inbox · Review overflow items. */
+.overflow-nav {
+  display: grid;
+  gap: var(--space-1);
+}
+
+/* @ds slot: nav-item */
+.overflow-item {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* @ds state: hover */
+.overflow-item[data-hovered] {
+  background: var(--surface-muted);
+}

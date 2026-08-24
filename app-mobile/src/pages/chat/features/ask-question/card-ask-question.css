@@ -1,0 +1,104 @@
+/* @ds surface: ask-question-card — the one-use interactive question card frame. */
+.ask-question-card {
+  position: relative;
+  display: grid;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  color: var(--ink);
+  scroll-margin-block: var(--space-8);
+  overscroll-behavior: contain;
+}
+
+/* @ds state: submitting — progress bar over the card while the guarded submit is in flight. */
+.ask-question-card-submitting::before {
+  position: absolute;
+  inset-block-start: -1px;
+  inset-inline-start: 0;
+  inline-size: 100%;
+  block-size: 2px;
+  border-radius: inherit;
+  background: var(--accent-ink);
+  content: '';
+  transform-origin: inline-start;
+  animation: ask-question-progress 1.2s var(--ease-out-interface) infinite;
+}
+
+/* @ds guardrail: keyframes — The submitting progress choreography; not designer-editable. */
+@keyframes ask-question-progress {
+  0% {
+    opacity: 0.45;
+    transform: scaleX(0.15);
+  }
+  55% {
+    opacity: 1;
+    transform: scaleX(0.72);
+  }
+  100% {
+    opacity: 0.45;
+    transform: scaleX(1);
+  }
+}
+
+/* @ds state: loading — display fetch in progress; no interactive controls yet. */
+.ask-question-card-loading {
+  min-block-size: 2rem;
+  border-color: var(--line);
+}
+
+/* @ds slot: read-only-hint · @ds state: read-only — note when this authenticated read-only session gates answers. */
+.ask-question-read-only-hint {
+  max-inline-size: var(--reading-width);
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+/* @ds slot: form — the answer controls column; the guarded one-use submit lives here. */
+.ask-question-form {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--space-4);
+}
+
+/* @ds slot: validation · @ds state: error — the assertive alert for a validation problem. */
+.ask-question-validation {
+  margin: 0;
+  color: var(--accent-ink);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+/* @ds slot: answered-line · @ds state: sent — the "Answer accepted by Pi." line (accent-inked). */
+.ask-question-answered-line {
+  margin: 0;
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+@media (max-width: 30rem) {
+  .ask-question-card {
+    padding: var(--space-3);
+    gap: var(--space-3);
+  }
+}
+
+/* @ds guardrail: do-not-edit — Reduced-motion collapses card + submit animation/transition. */
+@media (prefers-reduced-motion: reduce) {
+  .ask-question-card {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .ask-question-card-submitting::before {
+    display: none;
+    animation: none !important;
+  }
+}

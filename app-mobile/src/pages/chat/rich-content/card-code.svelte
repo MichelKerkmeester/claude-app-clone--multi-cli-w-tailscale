@@ -9,6 +9,8 @@
   import { useHighlightedCode, type HighlightToken } from './use-highlighted-code.svelte.js';
   import { hover } from '$shared/primitives/a11y/interactions.js';
 
+  import './card-code.css';
+
   interface Props {
     block: NormalizedCodeBlock;
     onOpen?: (trigger?: HTMLButtonElement | null) => void;
@@ -121,51 +123,3 @@
   <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
   <p class="rich-copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
-
-<style>
-  /* @ds surface: code-card — fenced source preview with optional progressive
-     highlighting and a full-screen Open handoff. */
-  /* @ds slot: code-preview — horizontally panning code viewport. */
-  /* @ds state: code — plaintext-first; progressively highlighted via the
-     data-highlight-status hook (plain · pending · highlighted). */
-  /* @ds guardrail: do-not-edit — panning previews do not shift scroll anchoring. */
-  .rich-code-preview {
-    max-block-size: 228px;
-    min-inline-size: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-inline: contain;
-    scrollbar-width: thin;
-  }
-
-  /* @ds slot: code well — the code lines scroll inside this mono well. */
-  .rich-code-preview pre {
-    inline-size: max-content;
-    min-inline-size: 100%;
-    margin: 0;
-    padding: var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    background: var(--surface-code);
-    color: var(--ink-inverse);
-    font: 0.8125rem/1.45 var(--font-mono);
-    white-space: pre;
-  }
-
-  /* @ds slot: labels — code continuation caption (muted small type). */
-  .rich-continuation {
-    margin: var(--space-2) 0 0;
-    color: var(--ink-muted);
-    font-size: 0.75rem;
-  }
-
-  /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
-     polite live region whose text carries the outcome; the presence styles are this. */
-  /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
-  .rich-copy-status {
-    min-block-size: 1.25rem;
-    margin: var(--space-2) 0 0;
-    color: var(--ink-muted);
-    font-size: 0.75rem;
-  }
-</style>

@@ -37,6 +37,8 @@
   import { bindingFor } from '$shared/commands/commands.js';
   import { rankHostCommands } from '$shared/commands/rank-host-commands.js';
 
+  import './command-palette.css';
+
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -175,18 +177,10 @@
   </div>
 </Combobox.Root>
 
-<!-- @ds surface: slash-autocomplete — the command palette. Decomposed into this scoped block;
+<!-- @ds surface: slash-autocomplete — the command palette. Decomposed into this co-located CSS file;
      command-palette / command-empty / command-name / command-desc have no owned
      declarations in the original stylesheet (they inherit the shared overlay
      primitives). Shared .react-aria-Popover / .react-aria-ListBox /
      .react-aria-ListBoxItem stay GLOBAL — they style every react-aria dropdown
      (Select / ComboBox). Child-primitive classes and react-aria/runtime
      data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->
-<style>
-  /* @ds surface: slash-autocomplete — the inline autocomplete card and the
-     command palette share this surface name. */
-  /* `.command-palette`, `.command-empty`, `.command-name`, and `.command-desc`
-     carry structure only; the original stylesheet has no owned declarations
-     for them. Shared overlay primitives stay in app.css:
-     .react-aria-Popover, .react-aria-ListBox, .react-aria-ListBoxItem. */
-</style>

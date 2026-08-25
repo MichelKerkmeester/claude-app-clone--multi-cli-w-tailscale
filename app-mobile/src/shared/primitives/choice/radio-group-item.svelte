@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: RADIO GROUP ITEM
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: RadioGroupItem — Preserve Bits UI's group semantics while consumers own the option presentation.
+  // This primitive: RadioGroupItem — Preserve Bits UI's group semantics while consumers own the option presentation.
   import { RadioGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
@@ -13,4 +13,5 @@
   let { children, ...rest }: Props = $props();
 </script>
 
+<!-- Component content -->
 <RadioGroup.Item {...rest}>{@render children()}</RadioGroup.Item>

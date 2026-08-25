@@ -21,6 +21,7 @@
   // 3. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     void draft.state.items;
     const pending = pendingRemoval;
@@ -36,6 +37,7 @@
   });
 </script>
 
+<!-- Component content -->
 {#if draft.mediaAvailable && draft.state.items.length > 0}
   <ol class="attachment-rail" aria-label={`Draft photos, ${draft.state.items.length} items`}>
     {#each draft.state.items as item, index (item.id)}
@@ -56,8 +58,10 @@
   </ol>
 {/if}
 
-<!-- @ds surface: attachment-rail — the horizontal draft-photo rail; the tiles are child components. -->
+<!-- Attachment rail -->
+<!-- This surface: attachment-rail — the horizontal draft-photo rail; the tiles are child components. -->
 <style>
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-rail {
     display: flex;
     min-inline-size: 0;
@@ -72,6 +76,7 @@
     scrollbar-width: thin;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-rail--item {
     position: relative;
     flex: 0 0 64px;

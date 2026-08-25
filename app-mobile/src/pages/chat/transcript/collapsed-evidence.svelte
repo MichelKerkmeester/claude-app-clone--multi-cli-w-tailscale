@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Collapsed Evidence types and helpers.
   import type { Snippet } from 'svelte';
 
   export interface CollapsedEvidenceProps {
@@ -36,6 +37,7 @@
   // 4. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const button = triggerButton;
     if (button === null) return;
@@ -47,6 +49,7 @@
   // 5. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep attach evidence trigger focused on its single responsibility.
   function attachEvidenceTrigger(node: HTMLElement): (() => void) | void {
     const button = node.parentElement;
     if (!(button instanceof HTMLButtonElement)) return;
@@ -61,24 +64,27 @@
   }
 </script>
 
+<!-- Component content -->
 <!-- Self-describing trigger (e.g. "Tool call · grep"), not a generic "Show". -->
-<!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. -->
+<!-- Evidence disclosure -->
+<!-- This surface: evidence-disclosure — routine evidence Disclosure trigger + panel. -->
 <Collapsible bind:open={disclosure.open}>
   {#snippet trigger()}
-    <!-- @ds guardrail: react-aria Disclosure wiring (expansion + trigger slot + aria) — not designer-editable. -->
+    <!-- Do not edit — react-aria Disclosure wiring (expansion + trigger slot + aria) — not designer-editable. -->
     <span class="evidence--chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>
     <span class="evidence--summary">{summary}</span>
   {/snippet}
   {@render children()}
 </Collapsible>
 
-<!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. Decomposed into this scoped block;
+<!-- Evidence disclosure -->
+<!-- This surface: evidence-disclosure — routine evidence Disclosure trigger + panel. Decomposed into this scoped block;
      evidence--trigger is a Collapsible.Trigger primitive so its class and react-aria/runtime data-attributes use
      :global so Svelte scoping cannot drop them. evidence--chevron/evidence--summary are shared with
      NormalizedActivityGroup and stay global here. Values unchanged. -->
 <style>
   /* Quiet self-describing disclosure beside prose. */
-  /* @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. */
+  /* This surface: evidence-disclosure — routine evidence Disclosure trigger + panel. */
   :global(.evidence--trigger) {
     display: inline-flex;
     align-items: center;
@@ -93,12 +99,12 @@
     cursor: pointer;
   }
 
-  /* @ds state: hover */
+  /* This state: hover */
   :global(.evidence--trigger[data-hovered] .evidence--summary) {
     color: var(--ink-secondary);
   }
 
-  /* @ds slot: chevron */
+  /* This slot: chevron */
   :global(.evidence--chevron) {
     display: inline-block;
     font-size: 1rem;
@@ -106,9 +112,9 @@
     transition: transform var(--duration-state) var(--ease-out);
   }
 
-  /* @ds state: expanded */
+  /* This state: expanded */
   :global(.evidence--trigger[data-expanded] .evidence--chevron) {
     transform: rotate(90deg);
   }
-  /* @ds end surface: evidence-disclosure */
+  /* End of surface: evidence-disclosure */
 </style>

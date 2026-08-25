@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Artifact Viewer Host types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ARTIFACT VIEWER HOST
   // ───────────────────────────────────────────────────────────────────
@@ -46,11 +47,13 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep is ready descriptor focused on its single responsibility.
   function isReadyDescriptor(block: FilePreviewBlock): boolean {
     if (block.renderer === 'pdf' && block.textLayerSafe !== true) return false;
     return (block.availability ?? (block.content.kind === 'none' ? 'missing' : 'ready')) === 'ready';
   }
 
+  // Keep is legacy diff source focused on its single responsibility.
   function isLegacyDiffSource(value: unknown): value is FileDiffBlock {
     return (
       typeof value === 'object' &&
@@ -62,6 +65,7 @@
     );
   }
 
+  // Keep is in memory artifact source focused on its single responsibility.
   function isInMemoryArtifactSource(value: unknown): value is InMemoryArtifactDocument {
     return (
       typeof value === 'object' &&
@@ -76,14 +80,17 @@
     );
   }
 
+  // Keep is inbound image source focused on its single responsibility.
   function isInboundImageSource(value: unknown): value is InboundImageReadyBlock {
     return isInboundImageReadyBlock(value);
   }
 
+  // Keep descriptor subject focused on its single responsibility.
   function descriptorSubject(block: FilePreviewBlock): string {
     return block.displayName.length > 0 ? block.displayName : 'redacted file';
   }
 
+  // Keep descriptor kind focused on its single responsibility.
   function descriptorKind(
     block: FilePreviewBlock,
   ): 'image' | 'pdf' | 'text' | 'markdown' | 'code' | 'diff' | null {
@@ -100,6 +107,7 @@
     return null;
   }
 
+  // Keep unavailable message focused on its single responsibility.
   function unavailableMessage(block: FilePreviewBlock): string {
     const availability = block.availability ?? (block.content.kind === 'none' ? 'missing' : 'ready');
     if (availability === 'withheld' || block.redaction === 'withheld') {
@@ -117,6 +125,7 @@
     return 'This preview is unavailable.';
   }
 
+  // Keep terminal message focused on its single responsibility.
   function terminalMessage(status: ArtifactResourceStatus): string | null {
     switch (status) {
       case 'offline':
@@ -138,6 +147,7 @@
     }
   }
 
+  // Keep error preview message focused on its single responsibility.
   function errorPreviewMessage(status: ArtifactResourceStatus): string {
     switch (status) {
       case 'offline':
@@ -163,6 +173,7 @@
     }
   }
 
+  // Keep in memory status message focused on its single responsibility.
   function inMemoryStatusMessage(document: InMemoryArtifactDocument): string | null {
     switch (document.sourceState) {
       case 'stale-cache':
@@ -178,6 +189,7 @@
     }
   }
 
+  // Keep is resource error focused on its single responsibility.
   function isResourceError(status: ArtifactResourceStatus): boolean {
     return [
       'offline',
@@ -230,10 +242,10 @@
 
   let { phase, preview, onClose }: ArtifactViewerHostProps = $props();
 
-  // @ds surface: artifact-viewer — the modal reader chrome: header, status, controls, preview body.
-  // @ds slot: header | status | controls | body — the chrome regions styled in the matching
-  //   @ds surface: artifact-viewer scoped block.
-  // @ds guardrail: do-not-edit — The hooks below are the digest-verified, race-safe, no-fetch-on-open exact-tuple reader wiring; do not rework them.
+  // This surface: artifact-viewer — the modal reader chrome: header, status, controls, preview body.
+  // This slot: header | status | controls | body — the chrome regions styled in the matching
+  //   This surface: artifact-viewer scoped block.
+  // Do not edit — The hooks below are the digest-verified, race-safe, no-fetch-on-open exact-tuple reader wiring; do not rework them.
   useVisualViewportAnchor();
 
   // ───────────────────────────────────────────────────────────────────
@@ -256,6 +268,7 @@
   // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (preview === null || phase === 'closed' || dialogEl === null) return;
     return hideOutside([dialogEl]);
@@ -311,7 +324,7 @@
       requireImageDecode: true,
     }),
   );
-  // @ds guardrail: do-not-edit — useArtifactResource is the digest-verified, race-safe, no-fetch-on-open exact-tuple read; requireImageDecode sanitizes image bytes before any object URL exists. Keep behaviour unchanged.
+  // Do not edit — useArtifactResource is the digest-verified, race-safe, no-fetch-on-open exact-tuple read; requireImageDecode sanitizes image bytes before any object URL exists. Keep behaviour unchanged.
   const resource = useArtifactResource(
     () => sessionId,
     () => resourceBlock,
@@ -329,13 +342,16 @@
   const thumbnailSnapshot = $derived(thumbnail.current);
   const resourceSnapshot = $derived(resource.current);
 
+  // Keep on renderer status focused on its single responsibility.
   function onRendererStatus(status: ArtifactResourceStatus): void {
     rendererStatus = status;
   }
+  // Keep on pdf renderer status focused on its single responsibility.
   function onPdfRendererStatus(status: PdfPreviewState): void {
     onRendererStatus(status === 'withheld' ? 'relay-error' : status);
   }
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (phase === 'exiting' || phase === 'privacy-covered' || phase === 'closing') {
       thumbnailCloseFn();
@@ -343,7 +359,9 @@
     }
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
+    // Keep on visibility change focused on its single responsibility.
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         thumbnailCloseFn();
@@ -352,6 +370,7 @@
         resourceReloadFn();
       }
     };
+    // Keep on page show focused on its single responsibility.
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted && phase === 'ready-diff' && descriptor !== null) {
         resourceCloseFn();
@@ -366,6 +385,7 @@
     };
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     void preview?.generation;
     wrap = false;
@@ -378,6 +398,7 @@
     detailsOpen = false;
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (
       announcement === 'Requesting the same exact revision again.' &&
@@ -387,6 +408,7 @@
     }
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const active =
       preview !== null &&
@@ -399,9 +421,10 @@
     return () => window.clearTimeout(timer);
   });
 
-  // @ds guardrail: do-not-edit — VoiceOver focus-scrub past the modal boundary dismisses the reader; the capture-phase focusin containment check is frozen a11y behaviour.
+  // Do not edit — VoiceOver focus-scrub past the modal boundary dismisses the reader; the capture-phase focusin containment check is frozen a11y behaviour.
   $effect(() => {
     if (phase !== 'ready-diff' && phase !== 'ready-image') return;
+    // Keep on focus in focused on its single responsibility.
     const onFocusIn = (event: FocusEvent) => {
       const target = event.target;
       if (target instanceof Node && dialogEl?.contains(target) !== true) {
@@ -416,11 +439,12 @@
   // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds state: edge-back · voiceover-scrub — swipe-from-edge and focus-scrub dismissal reasons.
-  // @ds guardrail: do-not-edit — Gesture thresholds and the pointer/touch wiring are frozen.
+  // This state: edge-back · voiceover-scrub — swipe-from-edge and focus-scrub dismissal reasons.
+  // Do not edit — Gesture thresholds and the pointer/touch wiring are frozen.
   function startEdgeBack(x: number, y: number): void {
     if (x <= EDGE_BACK_START) edgeStart = { x, y };
   }
+  // Keep finish edge back focused on its single responsibility.
   function finishEdgeBack(x: number, y: number): void {
     const start = edgeStart;
     edgeStart = null;
@@ -432,22 +456,26 @@
       onClose('edge-back');
     }
   }
+  // Keep on pointer down focused on its single responsibility.
   function onPointerDown(event: PointerEvent): void {
     if (event.pointerType !== 'mouse') startEdgeBack(event.clientX, event.clientY);
   }
+  // Keep on pointer up focused on its single responsibility.
   function onPointerUp(event: PointerEvent): void {
     if (event.pointerType !== 'mouse') finishEdgeBack(event.clientX, event.clientY);
   }
+  // Keep on touch start focused on its single responsibility.
   function onTouchStart(event: TouchEvent): void {
     const touch = event.changedTouches[0];
     if (touch !== undefined) startEdgeBack(touch.clientX, touch.clientY);
   }
+  // Keep on touch end focused on its single responsibility.
   function onTouchEnd(event: TouchEvent): void {
     const touch = event.changedTouches[0];
     if (touch !== undefined) finishEdgeBack(touch.clientX, touch.clientY);
   }
 
-  // @ds guardrail: do-not-edit — Escape always dismisses under the react-aria contract, and Tab stays inside the dialog so focus never scrubs out.
+  // Do not edit — Escape always dismisses under the react-aria contract, and Tab stays inside the dialog so focus never scrubs out.
   function onDialogKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       event.stopPropagation();
@@ -479,18 +507,20 @@
     }
   }
 
-  // @ds guardrail: do-not-edit — Underlay presses dismiss only when the reader is dismissable; inbound images mirror the react-aria isDismissable contract.
+  // Do not edit — Underlay presses dismiss only when the reader is dismissable; inbound images mirror the react-aria isDismissable contract.
   function onOverlayPointer(event: MouseEvent): void {
     if (inbound === null && event.target === event.currentTarget) {
       onClose('escape');
     }
   }
 
+  // Keep set bounded image zoom focused on its single responsibility.
   function setBoundedImageZoom(next: number): void {
     const bounded = Math.min(IMAGE_MAX_ZOOM, Math.max(IMAGE_MIN_ZOOM, next));
     imageZoom = bounded;
     if (bounded === IMAGE_MIN_ZOOM) imagePan = { x: 0, y: 0 };
   }
+  // Keep pan image focused on its single responsibility.
   function panImage(direction: 'up' | 'down' | 'left' | 'right'): void {
     if (imageZoom <= IMAGE_MIN_ZOOM) return;
     const delta = 48;
@@ -680,10 +710,11 @@
   };
 </script>
 
-<!-- @ds state: the viewer phase (closed · opening · ready-diff · ready-image · viewer-ready ·
+<!-- Component content -->
+<!-- This state: the viewer phase (closed · opening · ready-diff · ready-image · viewer-ready ·
      full-fetching · stalled · offline-* · stale · revoked · privacy-covered · exiting ·
      aborted) drives [data-artifact-state] on the overlay and the preview body below.
-     @ds guardrail: do-not-edit — Overlay nesting, focus trapping, Escape and underlay dismissal, edge-back handlers, and ARIA attributes are frozen. -->
+     Do not edit — Overlay nesting, focus trapping, Escape and underlay dismissal, edge-back handlers, and ARIA attributes are frozen. -->
 {#if preview !== null && phase !== 'closed'}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -901,21 +932,22 @@
   </div>
 {/if}
 
-<!-- @ds surface: artifact-viewer body — the preview region, loading skeleton, and stale-revision
+<!-- Artifact viewer body -->
+<!-- This surface: artifact-viewer body — the preview region, loading skeleton, and stale-revision
      action owned by the viewer host. Decomposed into this scoped block; single-component. The shared dialog
      chrome (overlay/modal/dialog/content/summary, header, close) is shared with AttachmentPreviewDialog
      and stays in the global sheet (→ app.css at cutover). The stale action ships native
      :hover/:focus-visible; dark re-inks use :global(:root[data-theme='dark']). Literal hex preserved.
      Values unchanged. -->
 <style>
-  /* @ds slot: preview-region — the bounded body that hosts the active preview. */
+  /* This slot: preview-region — the bounded body that hosts the active preview. */
   .artifact-preview--region {
     min-inline-size: 0;
     max-inline-size: 100%;
     unicode-bidi: plaintext;
   }
 
-  /* @ds slot: loading-preview — the three-bar skeleton shown while a preview resolves. */
+  /* This slot: loading-preview — the three-bar skeleton shown while a preview resolves. */
   .artifact--loading-preview {
     display: grid;
     gap: 0.7rem;
@@ -926,6 +958,7 @@
     border-radius: 0.5rem;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .artifact--loading-preview span {
     display: block;
     block-size: 0.8rem;
@@ -934,15 +967,17 @@
     opacity: 0.45;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .artifact--loading-preview span:nth-child(2) {
     inline-size: 80%;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .artifact--loading-preview span:nth-child(3) {
     inline-size: 60%;
   }
 
-  /* @ds slot: stale-action — the "View latest" control for a stale exact revision; native pseudo-states. */
+  /* This slot: stale-action — the "View latest" control for a stale exact revision; native pseudo-states. */
   .artifact--stale-action {
     min-block-size: 44px;
     min-inline-size: 44px;
@@ -957,36 +992,39 @@
     cursor: pointer;
   }
 
-  /* @ds state: hover — stale action under pointer hover. */
+  /* This state: hover — stale action under pointer hover. */
   .artifact--stale-action:hover {
     border-color: #b85f42;
     background: #f3e4de;
   }
 
-  /* @ds guardrail: focus-visible — The AA focus ring on the stale action. */
+  /* Do not edit — focus-visible — The AA focus ring on the stale action. */
   .artifact--stale-action:focus-visible {
     outline: 3px solid #24221f;
     outline-offset: 2px;
     box-shadow: 0 0 0 5px var(--accent);
   }
 
-  /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
+  /* This state: dark — dark-theme re-inks (foreign ancestor via :global). */
   :global(:root[data-theme='dark']) .artifact--stale-action {
     background: #2d2a26;
     color: #f8f8f6;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(:root[data-theme='dark']) .artifact--stale-action:hover {
     background: #3a2720;
     color: #f8f8f6;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(:root[data-theme='dark']) .artifact--stale-action:focus-visible {
     outline-color: #f8f8f6;
   }
 
-  /* @ds guardrail: do-not-edit — reduced-motion bounds the stale-action transition. */
+  /* Do not edit — reduced-motion bounds the stale-action transition. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact--stale-action {
       transition-duration: 100ms;
       scroll-behavior: auto;

@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Menu types and helpers.
   export const MENU_DISMISS_KEY = Symbol('pi-menu-dismiss');
 </script>
 
@@ -6,7 +7,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: MENU ROOT
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: Menu — Keep dismissal in shared context so nested actions can close the menu without prop drilling.
+  // This primitive: Menu — Keep dismissal in shared context so nested actions can close the menu without prop drilling.
   import { DropdownMenu } from 'bits-ui';
   import { setContext } from 'svelte';
   import type { Snippet } from 'svelte';
@@ -22,4 +23,5 @@
   });
 </script>
 
+<!-- Component content -->
 <DropdownMenu.Root bind:open {...rest}>{@render children()}</DropdownMenu.Root>

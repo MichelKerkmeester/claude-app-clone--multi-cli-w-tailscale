@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Text Preview types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: TEXT PREVIEW
   // ───────────────────────────────────────────────────────────────────
@@ -10,6 +11,7 @@
     readonly mark: boolean;
   }
 
+  // Keep chunk text focused on its single responsibility.
   function chunkText(text: string): readonly string[] {
     if (text.length <= TEXT_CHUNK_SIZE) return [text];
     const chunks: string[] = [];
@@ -19,6 +21,7 @@
     return chunks;
   }
 
+  // Keep find parts focused on its single responsibility.
   function findParts(text: string, findTerm: string): readonly FindPart[] {
     if (findTerm.trim().length === 0) return [{ text, mark: false }];
     const needle = findTerm.toLocaleLowerCase();
@@ -53,9 +56,11 @@
   let { text, ariaLabel = 'Text preview', wrap = false, findTerm = '' }: Props = $props();
 </script>
 
-<!-- @ds surface: text-preview — the plain-text read well. -->
-<!-- @ds state: ready · empty · whitespace — the empty/whitespace copy swaps the read content. -->
-<!-- @ds guardrail: do-not-edit — Chunked rendering keeps the buffer bounded, while find highlighting renders inert <mark> text only. -->
+<!-- Component content -->
+<!-- Text preview -->
+<!-- This surface: text-preview — the plain-text read well. -->
+<!-- This state: ready · empty · whitespace — the empty/whitespace copy swaps the read content. -->
+<!-- Do not edit — Chunked rendering keeps the buffer bounded, while find highlighting renders inert <mark> text only. -->
 {#if text.length === 0}
   <p class="artifact--empty-preview">This preview is empty.</p>
 {:else if text.trim().length === 0}
@@ -69,14 +74,15 @@
   >{#each chunkText(text) as chunk, index (index)}<span class="artifact-text--chunk" data-text-chunk={index}>{#each findParts(chunk, findTerm) as part}{#if part.mark}<mark class="artifact-find--match">{part.text}</mark>{:else}{part.text}{/if}{/each}</span>{/each}</div>
 {/if}
 
-<!-- @ds surface: artifact-text--preview — the plain-text read well. Decomposed into this scoped block; the base
+<!-- Artifact text preview -->
+<!-- This surface: artifact-text--preview — the plain-text read well. Decomposed into this scoped block; the base
      merges the shared well-guardrail group with the text-well layout into one faithful rule. is-wrapped
      is a local soft-wrap modifier; the dark re-ink uses :global(:root[data-theme='dark']). The shared
      .artifact--empty-preview (empty/whitespace notice) and .artifact-find--match (find <mark>) stay global
      — rendered by multiple previews. Literal hex preserved. Values unchanged. -->
 <style>
-  /* @ds slot: text-well — plain-text read-out. */
-  /* @ds guardrail: do-not-edit — Bounded reading well; selectable and pan-scoped. */
+  /* This slot: text-well — plain-text read-out. */
+  /* Do not edit — Bounded reading well; selectable and pan-scoped. */
   .artifact-text--preview {
     overscroll-behavior: contain;
     overflow-anchor: none;
@@ -99,18 +105,18 @@
     overflow-wrap: normal;
   }
 
-  /* @ds state: wrapped — soft-wrap toggle. */
+  /* This state: wrapped — soft-wrap toggle. */
   .artifact-text--preview.is-wrapped {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
 
-  /* @ds slot: text-chunk — one bounded render chunk. */
+  /* This slot: text-chunk — one bounded render chunk. */
   .artifact-text--chunk {
     display: inline;
   }
 
-  /* @ds state: dark — dark-theme re-ink (foreign ancestor via :global). */
+  /* This state: dark — dark-theme re-ink (foreign ancestor via :global). */
   :global(:root[data-theme='dark']) .artifact-text--preview {
     background: #2d2a26;
     color: #f8f8f6;

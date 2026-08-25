@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Dialog Attachment Preview types and helpers.
   const FOCUS_TRAP_SELECTOR =
     'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 </script>
@@ -42,11 +43,13 @@
   // 4. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (item === null || dialogEl === null) return;
     return hideOutside([dialogEl]);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const isOpen = item !== null;
     if (isOpen && !wasOpen) {
@@ -60,7 +63,7 @@
   // 5. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — Removing the tile destroys the focused node, so focus moves to a live neighbor or the add-photo control before the dialog closes.
+  // Do not edit — Removing the tile destroys the focused node, so focus moves to a live neighbor or the add-photo control before the dialog closes.
   function remove(): void {
     if (item === null) return;
     const index = draft.state.items.findIndex((candidate) => candidate.id === item.id);
@@ -80,7 +83,7 @@
     });
   }
 
-  // @ds guardrail: do-not-edit — Escape and underlay press dismiss through react-aria; Tab remains contained within the dialog.
+  // Do not edit — Escape and underlay press dismiss through react-aria; Tab remains contained within the dialog.
   function onDialogKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       event.stopPropagation();
@@ -112,11 +115,13 @@
     }
   }
 
+  // Keep on overlay pointer focused on its single responsibility.
   function onOverlayPointer(event: MouseEvent): void {
     if (event.target === event.currentTarget) draft.closePreview();
   }
 </script>
 
+<!-- Component content -->
 {#if draft.mediaAvailable && item !== null}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -179,23 +184,27 @@
   </div>
 {/if}
 
-<!-- @ds surface: attachment-preview--dialog — local-photo preview; reuses the artifact-viewer modal
+<!-- Attachment preview dialog -->
+<!-- This surface: attachment-preview--dialog — local-photo preview; reuses the artifact-viewer modal
      chrome (those .artifact-viewer-* rules stay in app.css).
      The react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states on the remove control are
      preserved by the use:hover/use:press/use:focusVisible actions (touch-aware; plain :hover would stick
      after a tap); the reused close control carries use:hover/use:focusVisible for the same reason. The
      scoped remove-control attr rules use :global([data-*]) so Svelte keeps them. Values unchanged. -->
 <style>
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-preview--content {
     align-content: stretch;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-preview--actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-preview--remove {
     min-block-size: 44px;
     padding-inline: var(--space-3);
@@ -207,16 +216,19 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-preview--remove:global([data-hovered]),
   .attachment-preview--remove:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-preview--remove:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-preview--canvas {
     display: grid;
     min-inline-size: 0;
@@ -229,6 +241,7 @@
     background: var(--canvas);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-preview--image {
     display: block;
     max-inline-size: 100%;
@@ -236,6 +249,7 @@
     object-fit: contain;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-preview--unavailable {
     max-inline-size: 28ch;
     margin: 0;
@@ -247,23 +261,27 @@
   }
 
   @media (max-width: 40rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .attachment-preview--canvas {
       min-block-size: min(52dvh, 28rem);
     }
   }
 
   @media (max-width: 20rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .attachment-preview--dialog {
       padding-inline: max(var(--space-3), env(safe-area-inset-left))
         max(var(--space-3), env(safe-area-inset-right));
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .attachment-preview--canvas {
       min-block-size: 12rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .attachment-preview--remove,
     .attachment-preview--image {
       transition: none;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  // @ds route: / — home (session roster).
+  // This route: / — home (session roster).
   import { getAppState, getAppActions } from '$shared/state/app-state.svelte.js';
   import Home from '../pages/home/screen-home.svelte';
 
@@ -7,6 +7,7 @@
   const actions = getAppActions();
 </script>
 
+<!-- Component content -->
 <Home
   sessions={app.sessions}
   connection={app.connection.phase}

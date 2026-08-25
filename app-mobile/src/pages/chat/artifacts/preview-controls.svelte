@@ -63,14 +63,17 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep pan glyph focused on its single responsibility.
   function panGlyph(direction: 'up' | 'down' | 'left' | 'right'): string {
     return direction === 'up' ? '↑' : direction === 'down' ? '↓' : direction === 'left' ? '←' : '→';
   }
 </script>
 
-<!-- @ds surface: preview-controls — the per-kind toolbar (find · wrap · zoom · pan · copy · share). -->
-<!-- @ds state: kind (diff · text · markdown · code · image) decides which controls render. -->
-<!-- @ds guardrail: do-not-edit — The toolbar role=group and each aria-label/aria-pressed are frozen. -->
+<!-- Component content -->
+<!-- Preview controls -->
+<!-- This surface: preview-controls — the per-kind toolbar (find · wrap · zoom · pan · copy · share). -->
+<!-- This state: kind (diff · text · markdown · code · image) decides which controls render. -->
+<!-- Do not edit — The toolbar role=group and each aria-label/aria-pressed are frozen. -->
 <div class="artifact-preview--controls" role="group" aria-label="Preview controls">
   <span>{KIND_LABELS[kind]}</span>
   <span>{readOnly ? 'Read-only' : 'Preview'}</span>
@@ -113,13 +116,14 @@
   {/if}
 </div>
 
-<!-- @ds surface: artifact-preview--controls — the preview toolbar (chips + pan controls). Decomposed into this scoped block;
+<!-- Artifact preview controls -->
+<!-- This surface: artifact-preview--controls — the preview toolbar (chips + pan controls). Decomposed into this scoped block;
      single-component. The chip <span>s and pan <button>s are literal template elements
      (plain scoped). The buttons themselves carry the shared .artifact--control-button class, which stays
      global (→ app.css at cutover). Dark re-ink via :global(:root[data-theme]). Literal hex preserved.
      Values unchanged. -->
 <style>
-  /* @ds slot: preview-controls — the horizontal toolbar of preview chips + controls. */
+  /* This slot: preview-controls — the horizontal toolbar of preview chips + controls. */
   .artifact-preview--controls {
     max-inline-size: 100%;
     align-items: center;
@@ -136,7 +140,7 @@
     text-transform: uppercase;
   }
 
-  /* @ds slot: control-chip — the static status chips (kind, read-only, zoom %). */
+  /* This slot: control-chip — the static status chips (kind, read-only, zoom %). */
   .artifact-preview--controls span {
     min-block-size: 2rem;
     border: 1px solid var(--line);
@@ -151,26 +155,28 @@
     padding: 0.5rem 0.7rem;
   }
 
-  /* @ds slot: pan-controls — the image pan button cluster; ≥44px targets. */
+  /* This slot: pan-controls — the image pan button cluster; ≥44px targets. */
   .artifact--image-pan-controls button {
     min-inline-size: 44px;
     min-block-size: 44px;
   }
 
-  /* @ds state: dark — dark-theme re-ink (foreign ancestor via :global). */
+  /* This state: dark — dark-theme re-ink (foreign ancestor via :global). */
   :global(:root[data-theme='dark']) .artifact-preview--controls {
     color: #9f998f;
   }
 
-  /* @ds edit: layout — narrow reflow: wrap the toolbar at <=20rem. */
+  /* Editable seam: layout — narrow reflow: wrap the toolbar at <=20rem. */
   @media (max-width: 20rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact-preview--controls {
       flex-wrap: wrap;
     }
   }
 
-  /* @ds edit: layout — narrow reflow: wrap and un-scroll the toolbar at <=30rem. */
+  /* Editable seam: layout — narrow reflow: wrap and un-scroll the toolbar at <=30rem. */
   @media (max-width: 30rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact-preview--controls {
       flex-wrap: wrap;
       overflow-x: visible;

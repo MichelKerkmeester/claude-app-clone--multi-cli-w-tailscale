@@ -11,21 +11,24 @@
   let { renderer = 'this file type', message }: Props = $props();
 </script>
 
-<!-- @ds surface: unsupported-preview — the unavailable/unsupported read notice. -->
-<!-- @ds state: unsupported · withheld · denied · missing · corrupt · too-large · … — the caller
+<!-- Component content -->
+<!-- Unsupported preview -->
+<!-- This surface: unsupported-preview — the unavailable/unsupported read notice. -->
+<!-- This state: unsupported · withheld · denied · missing · corrupt · too-large · … — the caller
      passes the message; this renders the notice. -->
 <div class="artifact--unsupported-preview">
   <strong>Preview unavailable</strong>
   <p>{message ?? `${renderer} previews are not available in this reader.`}</p>
 </div>
 
-<!-- @ds surface: artifact--unsupported-preview — the unavailable/unsupported read notice. Decomposed into this scoped block;
+<!-- Artifact unsupported preview -->
+<!-- This surface: artifact--unsupported-preview — the unavailable/unsupported read notice. Decomposed into this scoped block;
      the base + dark rules were grouped with the shared .artifact--empty-preview (and
      other viewer chrome), which stay global. The dark re-ink uses the :global(:root[data-theme='dark'])
      foreign ancestor. Literal hex values preserved byte-for-byte. -->
 <style>
-  /* @ds surface: unsupported-preview — the unavailable/unsupported read notice card. */
-  /* @ds guardrail: do-not-edit — theme-invariant light literal; stays fixed. */
+  /* This surface: unsupported-preview — the unavailable/unsupported read notice card. */
+  /* Do not edit — theme-invariant light literal; stays fixed. */
   .artifact--unsupported-preview {
     max-inline-size: 100%;
     margin: 0;
@@ -38,11 +41,12 @@
     line-height: 1.55;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .artifact--unsupported-preview p {
     margin: 0.5rem 0 0;
   }
 
-  /* @ds state: dark — dark-theme re-ink (a shared group in app.css; only the unsupported slice here). */
+  /* This state: dark — dark-theme re-ink (a shared group in app.css; only the unsupported slice here). */
   :global(:root[data-theme='dark']) .artifact--unsupported-preview {
     background: #2d2a26;
     color: #f8f8f6;

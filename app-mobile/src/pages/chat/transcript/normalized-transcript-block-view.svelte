@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Normalized Transcript Block View types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: NORMALIZED TRANSCRIPT BLOCK VIEW
   // ───────────────────────────────────────────────────────────────────
@@ -18,7 +19,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: NormalizedTranscriptBlockView — renders a normalized transcript block via Block or RichContentRouter.
+  // This surface: NormalizedTranscriptBlockView — renders a normalized transcript block via Block or RichContentRouter.
   import Block from './block.svelte';
   import RichContentRouter from '../rich-content/rich-content-router.svelte';
 
@@ -34,6 +35,7 @@
   }: NormalizedTranscriptBlockViewProps = $props();
 </script>
 
+<!-- Component content -->
 {#if block.kind === 'fallback' && block.sourceBlock !== null}
   <Block block={block.sourceBlock} {sessionId} {canAnswer} {askQuestionPrincipal} />
 {:else if block.kind === 'diff' && block.sourceBlock.kind === 'file_diff'}

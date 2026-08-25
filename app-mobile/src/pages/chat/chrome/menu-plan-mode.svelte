@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Menu Plan Mode types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -23,7 +24,7 @@
   // 3. CONSTANTS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds state: build · plan rows — labels + descriptions are bounded local copy.
+  // This state: build · plan rows — labels + descriptions are bounded local copy.
   const BUILD_DESCRIPTION = 'Pi may request write-capable tools; approvals still apply.';
   const PLAN_DESCRIPTION = 'Read-only exploration and planning.';
 </script>
@@ -60,6 +61,7 @@
   // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     localMode = hostMode;
   });
@@ -68,12 +70,14 @@
   // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep on row select focused on its single responsibility.
   function onRowSelect(target: 'build' | 'plan'): void {
-    // @ds guardrail: do-not-edit — A row activation here is the only request path, never a commit; read-only guards ignore disabled or already-confirmed input even if a stale event slips past the item's disabled state.
+    // Do not edit — A row activation here is the only request path, never a commit; read-only guards ignore disabled or already-confirmed input even if a stale event slips past the item's disabled state.
     if (!rowsDisabled && localMode !== target) onSelect(target);
     localMode = hostMode;
   }
 
+  // Keep attach row interactions focused on its single responsibility.
   function attachRowInteractions(node: Element): () => void {
     const el = node as HTMLElement;
     const focusedAction = focused(el);
@@ -85,12 +89,14 @@
   }
 </script>
 
-<!-- @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. -->
-<!-- @ds guardrail: do-not-edit — React-aria Menu/MenuItem/Popover wiring (id, onAction, isDisabled, Text slots); rows are read-only, focus movement never mutates, and only an activated row reports a choice to the caller. Not designer-editable. -->
-<!-- @ds slot: popover — floating placement chrome. -->
+<!-- Component content -->
+<!-- Plan mode menu -->
+<!-- This surface: plan-mode-menu — the exact two-row Build / Plan picker. -->
+<!-- Do not edit — React-aria Menu/MenuItem/Popover wiring (id, onAction, isDisabled, Text slots); rows are read-only, focus movement never mutates, and only an activated row reports a choice to the caller. Not designer-editable. -->
+<!-- This slot: popover — floating placement chrome. -->
 <MenuContent class="plan-mode--popover" aria-label="Agent mode">
     <div class="plan-mode-menu">
-      <!-- @ds state: row build — immediately requestable when safe. -->
+      <!-- This state: row build — immediately requestable when safe. -->
       <MenuItem
         id="build"
         class="plan-mode--row"
@@ -102,7 +108,7 @@
         <span class="react-aria-Text" {...{ slot: 'label' }}>Build</span>
         <span class="react-aria-Text" {...{ slot: 'description' }}>{BUILD_DESCRIPTION}</span>
         {#if localMode === 'build'}
-          <!-- @ds slot: check-glyph — the ✓ on the confirmed row; strokes inherit currentColor. -->
+          <!-- This slot: check-glyph — the ✓ on the confirmed row; strokes inherit currentColor. -->
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
             <path
               d="M5 12.5l4.5 4.5L19 7.5"
@@ -115,7 +121,7 @@
           </svg>
         {/if}
       </MenuItem>
-      <!-- @ds state: row plan — read-only target; only activation reports. -->
+      <!-- This state: row plan — read-only target; only activation reports. -->
       <MenuItem
         id="plan"
         class="plan-mode--row"
@@ -127,7 +133,7 @@
         <span class="react-aria-Text" {...{ slot: 'label' }}>Plan</span>
         <span class="react-aria-Text" {...{ slot: 'description' }}>{PLAN_DESCRIPTION}</span>
         {#if localMode === 'plan'}
-          <!-- @ds slot: check-glyph — the ✓ on the confirmed row; strokes inherit currentColor. -->
+          <!-- This slot: check-glyph — the ✓ on the confirmed row; strokes inherit currentColor. -->
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
             <path
               d="M5 12.5l4.5 4.5L19 7.5"
@@ -142,20 +148,21 @@
       </MenuItem>
     </div>
     {#if rowsDisabled && rowsDisabledReason !== null}
-      <!-- @ds slot: note — bounded reason when a row cannot be chosen. -->
+      <!-- This slot: note — bounded reason when a row cannot be chosen. -->
       <p class="plan-mode-menu--note">{rowsDisabledReason}</p>
     {/if}
 </MenuContent>
 
-<!-- @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. Decomposed into this scoped block;
+<!-- Plan mode menu -->
+<!-- This surface: plan-mode-menu — the exact two-row Build / Plan picker. Decomposed into this scoped block;
      plan-mode--popover / plan-mode--row are child primitives (MenuContent / MenuItem) so they move
      with this surface. Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->
 <style>
   /* The two-row mode menu: focus movement only, activation alone reports. */
-  /* @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. */
-  /* @ds slot: popover — floating placement chrome + raised elevation. */
-  /* @ds surface: overlay — plan-mode--popover is an INSTANCE of the shared overlay
+  /* This surface: plan-mode-menu — the exact two-row Build / Plan picker. */
+  /* This slot: popover — floating placement chrome + raised elevation. */
+  /* This surface: overlay — plan-mode--popover is an INSTANCE of the shared overlay
      primitive (a raised panel over its anchored trigger). Physical unification
      of the per-surface overlay chrome is a documented follow-up. */
   :global(.plan-mode--popover) {
@@ -168,7 +175,7 @@
     outline: none;
   }
 
-  /* @ds slot: menu — list column for the two rows. */
+  /* This slot: menu — list column for the two rows. */
   .plan-mode-menu {
     display: grid;
     gap: 2px;
@@ -176,7 +183,7 @@
     outline: none;
   }
 
-  /* @ds slot: row — a Build or Plan choice; selection gating is authority-driven. */
+  /* This slot: row — a Build or Plan choice; selection gating is authority-driven. */
   :global(.plan-mode--row) {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -193,25 +200,25 @@
     cursor: pointer;
   }
 
-  /* @ds state: row · focused — move-only, never a selection. */
+  /* This state: row · focused — move-only, never a selection. */
   :global(.plan-mode--row[data-focused]) {
     background: var(--surface-muted);
     outline: none;
   }
 
-  /* @ds state: row · focus-visible */
+  /* This state: row · focus-visible */
   :global(.plan-mode--row[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: -2px;
   }
 
-  /* @ds state: row · disabled — selection unsafe (executing) or already current. */
+  /* This state: row · disabled — selection unsafe (executing) or already current. */
   :global(.plan-mode--row[data-disabled]) {
     cursor: default;
     opacity: 0.55;
   }
 
-  /* @ds slot: row-description — bounded local copy under the row label. */
+  /* This slot: row-description — bounded local copy under the row label. */
   :global(.plan-mode--row .react-aria-Text[slot='description']) {
     grid-column: 1;
     color: var(--ink-muted);
@@ -220,7 +227,7 @@
     line-height: 1.35;
   }
 
-  /* @ds state: row · selected — the ✓ on the confirmed mode's row. */
+  /* This state: row · selected — the ✓ on the confirmed mode's row. */
   :global(.plan-mode--row > svg) {
     grid-column: 2;
     grid-row: 1;
@@ -228,12 +235,12 @@
     color: var(--accent-ink);
   }
 
-  /* @ds slot: note — bounded reason when a row cannot be chosen. */
+  /* This slot: note — bounded reason when a row cannot be chosen. */
   .plan-mode-menu--note {
     margin: var(--space-2) var(--space-3) var(--space-1);
     color: var(--ink-muted);
     font-size: 0.78rem;
     line-height: 1.35;
   }
-  /* @ds end surface: plan-mode-menu */
+  /* End of surface: plan-mode-menu */
 </style>

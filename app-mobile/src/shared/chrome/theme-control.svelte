@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Theme Control types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: THEME CONTROL
   // ───────────────────────────────────────────────────────────────────
@@ -45,6 +46,7 @@
   // 6. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep attach theme option interactions focused on its single responsibility.
   function attachThemeOptionInteractions(node: Element): () => void {
     const el = node as HTMLElement;
     const hoverAction = hover(el);
@@ -58,9 +60,11 @@
   }
 </script>
 
-<!-- @ds surface: theme-switcher — segmented theme selector. react-aria owns selection. -->
+<!-- Component content -->
+<!-- Theme switcher -->
+<!-- This surface: theme-switcher — segmented theme selector. react-aria owns selection. -->
 <div class="theme--control" role="group" aria-label="Color theme">
-  <!-- @ds guardrail: react-aria ToggleButton wiring (isSelected/onChange/aria-label) — not designer-editable. -->
+  <!-- Do not edit — react-aria ToggleButton wiring (isSelected/onChange/aria-label) — not designer-editable. -->
   <!-- Inner wrapper keeps the segmented control fitting at 390px. -->
   <div>
     {#each themes as theme (theme)}
@@ -81,14 +85,15 @@
   </div>
 </div>
 
-<!-- @ds surface: theme-switcher — segmented theme selector (ToggleButton group). Decomposed into this scoped block;
+<!-- Theme switcher -->
+<!-- This surface: theme-switcher — segmented theme selector (ToggleButton group). Decomposed into this scoped block;
      theme--control is owned solely by this component so it moves with it. .theme--option is
      on the ToggleGroupItem primitive so it uses :global. The grouped .nav-button, .theme--option,
      .back-button base + hover rules stay GLOBAL in app.css (unchanged) so their byte-for-byte
      structure is preserved. Values unchanged. -->
 <style>
-  /* @ds slot: theme-toggle — segmented theme control (shared theme-switcher surface below). */
-  /* @ds surface: theme-switcher — segmented theme selector (ToggleButton group). */
+  /* This slot: theme-toggle — segmented theme control (shared theme-switcher surface below). */
+  /* This surface: theme-switcher — segmented theme selector (ToggleButton group). */
   .theme--control {
     display: flex;
     padding: 0.2rem;
@@ -97,21 +102,22 @@
     background: var(--surface);
   }
 
-  /* @ds state: default */
+  /* This state: default */
   :global(.theme--option) {
     min-height: 2.25rem;
     padding-inline: 0.65rem;
     font-size: 0.68rem;
   }
 
-  /* @ds state: selected */
+  /* This state: selected */
   :global(.theme--option[data-selected]) {
     background: var(--ink);
     color: var(--ink-inverse);
   }
-  /* @ds end surface: theme-switcher */
+  /* End of surface: theme-switcher */
 
   @media (max-width: 52rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.theme--option) {
       width: 2.4rem;
       overflow: hidden;
@@ -119,24 +125,29 @@
       font-size: 0;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.theme--option::before) {
       color: var(--ink-secondary);
       font-size: 0.72rem;
       content: 'A';
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.theme--option:nth-child(2)::before) {
       content: '☀';
     }
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.theme--option:nth-child(3)::before) {
       content: '●';
     }
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.theme--option[data-selected]::before) {
       color: var(--ink-inverse);
     }
   }
 
   @media (max-width: 39rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .theme--control {
       order: 3;
     }

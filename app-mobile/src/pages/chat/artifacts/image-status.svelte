@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Image Status types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: IMAGE STATUS
   // ───────────────────────────────────────────────────────────────────
@@ -184,6 +185,7 @@
     readonly disabledActions?: readonly InboundImageStatusAction[];
   }
 
+  // Keep image status definition focused on its single responsibility.
   export function imageStatusDefinition(state: InboundImageLifecycleState): ImageStatusDefinition {
     return STATUS_DEFINITIONS[state];
   }
@@ -206,6 +208,7 @@
   const shouldRender = $derived(!(copy === null && definition.actions.length === 0));
 </script>
 
+<!-- Component content -->
 {#if shouldRender}
   <div
     class="inbound-image-status"
@@ -226,11 +229,12 @@
   </div>
 {/if}
 
-<!-- @ds surface: inbound-image-status — the inbound-image lifecycle status line + action buttons.
+<!-- Inbound image status -->
+<!-- This surface: inbound-image-status — the inbound-image lifecycle status line + action buttons.
      Decomposed into this scoped block; native :hover/:focus-visible/:disabled preserved (the shipped button
      uses native pseudo-classes, not react-aria state attributes). Values unchanged. -->
 <style>
-  /* @ds slot: status — the lifecycle status read-out (loading · ready · corrupt · revoked · …). */
+  /* This slot: status — the lifecycle status read-out (loading · ready · corrupt · revoked · …). */
   .inbound-image-status {
     display: grid;
     min-block-size: 1.333rem;
@@ -241,19 +245,19 @@
     line-height: 1.333;
   }
 
-  /* @ds slot: status-copy — the human-readable state description. */
+  /* This slot: status-copy — the human-readable state description. */
   .inbound-image-status--copy {
     overflow-wrap: anywhere;
   }
 
-  /* @ds slot: status-actions — the action button row (retry · reveal · …). */
+  /* This slot: status-actions — the action button row (retry · reveal · …). */
   .inbound-image-status--actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
   }
 
-  /* @ds slot: status-action — one lifecycle action; ≥44px target. */
+  /* This slot: status-action — one lifecycle action; ≥44px target. */
   .inbound-image-status--action {
     min-block-size: 44px;
     min-inline-size: 44px;
@@ -267,18 +271,18 @@
     cursor: pointer;
   }
 
-  /* @ds state: hover — the action under pointer hover. */
+  /* This state: hover — the action under pointer hover. */
   .inbound-image-status--action:hover:not(:disabled) {
     background: var(--accent-soft);
   }
 
-  /* @ds guardrail: focus-visible — The AA focus ring on a status action. */
+  /* Do not edit — focus-visible — The AA focus ring on a status action. */
   .inbound-image-status--action:focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
 
-  /* @ds state: disabled — the action fails-closed to reduced emphasis. */
+  /* This state: disabled — the action fails-closed to reduced emphasis. */
   .inbound-image-status--action:disabled {
     cursor: default;
     opacity: 0.55;

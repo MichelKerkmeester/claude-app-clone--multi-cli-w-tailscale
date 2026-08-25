@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Attachment Tile types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ATTACHMENT TILE
   // ───────────────────────────────────────────────────────────────────
@@ -50,6 +51,7 @@
   // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     void previewUrl;
     void item.preview;
@@ -57,6 +59,7 @@
   });
 </script>
 
+<!-- Component content -->
 <div class="attachment-tile">
   <!-- svelte-ignore a11y_role_supports_aria_props_implicit -->
   <button
@@ -100,18 +103,21 @@
   <span class="attachment-tile--status" aria-live="polite">{attachmentStatusLabel(item)}</span>
 </div>
 
-<!-- @ds surface: attachment-tile — the draft photo tile; preview button, remove control, sr-only status.
+<!-- Attachment tile -->
+<!-- This surface: attachment-tile — the draft photo tile; preview button, remove control, sr-only status.
      Decomposed into this scoped block; the react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states
      are preserved by the use:hover/use:press/use:focusVisible actions (touch-aware — plain :hover would
      stick after a tap on this mobile surface). Runtime-attr rules use :global([data-*]) so Svelte keeps
      the action-set attribute selectors scoped to this component. Values unchanged. -->
 <style>
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile {
     position: relative;
     inline-size: 64px;
     block-size: 64px;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--preview {
     position: relative;
     display: grid;
@@ -130,6 +136,7 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--preview img {
     display: block;
     inline-size: 100%;
@@ -137,16 +144,19 @@
     object-fit: cover;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--preview:global([data-hovered]),
   .attachment-tile--preview:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--preview:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 3px;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--name {
     position: absolute;
     inset-block-end: 0;
@@ -162,6 +172,7 @@
     white-space: nowrap;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--unavailable {
     max-inline-size: 100%;
     padding: 3px;
@@ -171,6 +182,7 @@
     text-align: center;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--remove {
     position: absolute;
     z-index: 1;
@@ -190,21 +202,25 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--remove span {
     font-size: 1.25rem;
     line-height: 1;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--remove:global([data-hovered]),
   .attachment-tile--remove:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--remove:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--status {
     position: absolute;
     inline-size: 1px;
@@ -215,6 +231,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .attachment-tile--preview,
     .attachment-tile--remove {
       transition: none;

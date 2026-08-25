@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Verified Image types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: VERIFIED IMAGE
   // ───────────────────────────────────────────────────────────────────
@@ -26,6 +27,7 @@
   // 2. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep state for resource status focused on its single responsibility.
   function stateForResourceStatus(status: ArtifactResourceStatus): InboundImageLifecycleState | null {
     switch (status) {
       case 'loading':
@@ -122,6 +124,7 @@
   // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     void block.id;
     void block.revision;
@@ -131,6 +134,7 @@
     autoRetry = false;
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!enabled || forceLoad || nearViewport) return undefined;
     const element = wellEl;
@@ -151,6 +155,7 @@
     return () => observer.disconnect();
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const status = resource.current.status;
     if (!enabled || (status !== 'relay-error' && status !== 'stalled')) {
@@ -162,6 +167,7 @@
     return () => window.clearTimeout(timer);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const status = resource.current.status;
     if (lifecycleState !== undefined || onStateChange === undefined) return;
@@ -171,6 +177,7 @@
 
 </script>
 
+<!-- Component content -->
 <div
   bind:this={wellEl}
   class={showPixels ? 'inbound-image--well inbound-image-well-ready' : 'inbound-image--well'}
@@ -198,11 +205,12 @@
   {/if}
 </div>
 
-<!-- @ds surface: inbound-image--thumbnail — the decoded inbound image inside the well. Decomposed into this scoped block;
+<!-- Inbound image thumbnail -->
+<!-- This surface: inbound-image--thumbnail — the decoded inbound image inside the well. Decomposed into this scoped block;
      the well itself (.inbound-image--well) is shared with ImagePlaceholder and stays global.
      Values unchanged. -->
 <style>
-  /* @ds slot: thumbnail — the contained, non-interactive decoded image. */
+  /* This slot: thumbnail — the contained, non-interactive decoded image. */
   .inbound-image--thumbnail {
     display: block;
     inline-size: 100%;

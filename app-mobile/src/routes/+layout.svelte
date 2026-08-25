@@ -1,5 +1,5 @@
 <script lang="ts">
-  // @ds route: +layout — app shell: owns cross-route state and the connection/auth/theme/push lifecycle.
+  // This route: +layout — app shell: owns cross-route state and the connection/auth/theme/push lifecycle.
   // Cross-route state, auth/theme/push lifecycle, overlays; session id comes from the router URL.
 
   // ───────────────────────────────────────────────────────────────────
@@ -57,6 +57,7 @@
   // 4. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep dispatch artifact lifecycle event focused on its single responsibility.
   function dispatchArtifactLifecycleEvent(name: string): void {
     window.dispatchEvent(new Event(name));
   }
@@ -68,6 +69,7 @@
   // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const next = selectedSessionId;
     if (next !== previousSessionId) {
@@ -77,26 +79,32 @@
   });
 
   // ── Shell actions (routing + async auth combined with state) ──────────────
+  // Keep navigate focused on its single responsibility.
   function navigate(sessionId: string | null): void {
     void goto(sessionId === null ? '/' : `/session/${encodeURIComponent(sessionId)}`);
   }
+  // Keep on home focused on its single responsibility.
   function onHome(): void {
     app.reviewOpen = false;
     navigate(null);
   }
+  // Keep open review focused on its single responsibility.
   function openReview(): void {
     app.reviewOpen = true;
     app.inboxOpen = false;
   }
+  // Keep open inbox focused on its single responsibility.
   function openInbox(): void {
     app.reviewOpen = false;
     app.inboxOpen = true;
   }
+  // Keep handle enrolled focused on its single responsibility.
   function handleEnrolled(identity: DeviceIdentity): void {
     app.device = identity;
     app.authReady = true;
     app.dispatchConnection({ type: 'connecting', reconnect: false });
   }
+  // Keep handle inbox open focused on its single responsibility.
   function handleInboxOpen(resolution: AttentionResolutionDto): void {
     app.inboxOpen = false;
     if (resolution.target === 'review') {
@@ -106,6 +114,7 @@
       navigate(resolution.sessionId);
     }
   }
+  // Keep on revoke focused on its single responsibility.
   function onRevoke(): void {
     dispatchArtifactLifecycleEvent('pi-remote:app-lock');
     dispatchArtifactLifecycleEvent('pi-remote:artifact-revoked');
@@ -115,6 +124,7 @@
       app.dispatchConnection({ type: 'unenrolled' });
     });
   }
+  // Keep on logout focused on its single responsibility.
   function onLogout(): void {
     dispatchArtifactLifecycleEvent('pi-remote:logout');
     void unsubscribeFromPush()
@@ -140,6 +150,7 @@
       .querySelector('meta[name="viewport"]')
       ?.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover');
     const scheme = window.matchMedia('(prefers-color-scheme: dark)');
+    // Keep apply theme focused on its single responsibility.
     const applyTheme = () => {
       root.dataset.theme = theme;
       const dark = theme === 'dark' || (theme === 'system' && scheme.matches);
@@ -186,6 +197,7 @@
   // Push foreground reporting, gated on auth; cleared on teardown.
   $effect(() => {
     if (!app.authReady) return;
+    // Keep report focused on its single responsibility.
     const report = () => {
       void setPushForeground(document.visibilityState === 'visible').catch(() => undefined);
     };
@@ -246,6 +258,7 @@
   });
 </script>
 
+<!-- Component content -->
 <RootErrorBoundary>
   {#if !app.authReady}
     <Enrollment phase={app.connection.phase} onEnrolled={handleEnrolled} />

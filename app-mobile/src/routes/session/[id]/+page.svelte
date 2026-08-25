@@ -1,5 +1,5 @@
 <script lang="ts">
-  // @ds route: /session/[id] — one live session.
+  // This route: /session/[id] — one live session.
   import { page } from '$app/stores';
 
   import { getAppState, getAppActions } from '$shared/state/app-state.svelte.js';
@@ -14,6 +14,7 @@
   );
 </script>
 
+<!-- Component content -->
 <Session
   connection={app.connection.phase}
   {sessionId}

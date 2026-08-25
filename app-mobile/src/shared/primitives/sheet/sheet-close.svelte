@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: SHEET CLOSE
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: SheetClose — Preserve Bits UI's dialog-close semantics while consumers own the control markup.
+  // This primitive: SheetClose — Preserve Bits UI's dialog-close semantics while consumers own the control markup.
   import { Dialog } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
@@ -13,4 +13,5 @@
   let { children, ...rest }: Props = $props();
 </script>
 
+<!-- Component content -->
 <Dialog.Close {...rest}>{@render children()}</Dialog.Close>

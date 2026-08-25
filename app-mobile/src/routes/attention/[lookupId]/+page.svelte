@@ -1,5 +1,5 @@
 <script lang="ts">
-  // @ds route: /attention/[lookupId] — attention deep-link resolver (no view of its own; resolves then redirects).
+  // This route: /attention/[lookupId] — attention deep-link resolver (no view of its own; resolves then redirects).
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
@@ -24,6 +24,7 @@
   // 3. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!app.authReady) return;
     app.inboxOpen = true;

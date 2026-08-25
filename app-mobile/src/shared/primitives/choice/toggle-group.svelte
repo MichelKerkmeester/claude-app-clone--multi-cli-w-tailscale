@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: TOGGLE GROUP
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: ToggleGroup — Expose a bindable single-select group without duplicating Bits UI state handling.
+  // This primitive: ToggleGroup — Expose a bindable single-select group without duplicating Bits UI state handling.
   import { ToggleGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
@@ -14,6 +14,7 @@
   let { value = $bindable(''), children, ...rest }: Props = $props();
 </script>
 
+<!-- Component content -->
 {#snippet root({ props }: { props: Record<string, unknown> })}
   <div {...props} role="radiogroup">
     {@render children()}

@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ROOT ERROR BOUNDARY
   // ───────────────────────────────────────────────────────────────────
-  // @ds surface: RootErrorBoundary — Keep render failures inside an app-level recovery surface so reload and reset stay available.
+  // This surface: RootErrorBoundary — Keep render failures inside an app-level recovery surface so reload and reset stay available.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
@@ -20,11 +20,13 @@
   // 3. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep onerror focused on its single responsibility.
   function onerror(error: unknown): void {
     // Surface the error for test spies; omit component stacks from durable comments.
     console.error('Pi Remote failed to render.', error);
   }
 
+  // Keep reload app focused on its single responsibility.
   function reloadApp(): void {
     window.location.reload();
   }
@@ -58,6 +60,7 @@
   // 4. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep get theme colors focused on its single responsibility.
   function getThemeColors() {
     const root = document.documentElement;
     const dark =
@@ -74,6 +77,7 @@
   }
 </script>
 
+<!-- Component content -->
 <svelte:boundary {onerror}>
   {@render children()}
   {#snippet failed(_error, _reset)}

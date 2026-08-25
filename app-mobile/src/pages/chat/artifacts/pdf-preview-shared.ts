@@ -1,4 +1,6 @@
 /// <reference types="vite/client" />
+// This module holds the shared Pdf Preview Shared types, data, and helpers.
+
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -57,7 +59,7 @@ export function getPdfPreviewRuntimeMetrics(): {
 }
 
 export function loadPdfJs(): Promise<PdfJsModule> {
-  // @ds guardrail: do-not-edit — The pinned PDF.js module loads one bounded worker with annotations/XFA disabled and bounded pages/canvases. Do not re-point it.
+  // Do not edit — The pinned PDF.js module loads one bounded worker with annotations/XFA disabled and bounded pages/canvases. Do not re-point it.
   if (pdfJsPromise === null) {
     pdfJsPromise = import('pdfjs-dist').then((module) => {
       module.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;

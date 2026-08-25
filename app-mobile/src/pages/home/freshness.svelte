@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Freshness types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: FRESHNESS
   // ───────────────────────────────────────────────────────────────────
@@ -15,20 +16,23 @@
   let { stale, at }: FreshnessProps = $props();
 </script>
 
-<!-- @ds surface: freshness — sync staleness readout. -->
+<!-- Component content -->
+<!-- Freshness -->
+<!-- This surface: freshness — sync staleness readout. -->
 <div class={`freshness ${stale ? 'is-stale' : ''}`}>
   <span>{stale ? 'Stale, input disabled' : 'Live, steering enabled'}</span>
   <time datetime={at ?? undefined}>{at === null ? 'Not synced' : relativeTime(at)}</time>
 </div>
 
-<!-- @ds surface: freshness — sync staleness readout. Decomposed into this scoped block; freshness,
+<!-- Freshness -->
+<!-- This surface: freshness — sync staleness readout. Decomposed into this scoped block; freshness,
      freshness time and freshness.is-stale are owned solely by this component so they move with it.
      The @media (max-width: 39rem) .section-heading .freshness variant has an external ancestor
      (.section-heading, rendered by section headings, not this component), so the ancestor is
      :global(...) while the .freshness descendant stays scoped — matching the original selector
      structure byte-for-byte. Values unchanged. -->
 <style>
-  /* @ds surface: freshness — sync staleness readout. */
+  /* This surface: freshness — sync staleness readout. */
   .freshness {
     display: grid;
     justify-items: end;
@@ -40,7 +44,7 @@
     text-transform: uppercase;
   }
 
-  /* @ds slot: time — last-sync timestamp. */
+  /* This slot: time — last-sync timestamp. */
   .freshness time {
     color: var(--ink-muted);
     font-weight: 550;
@@ -48,15 +52,16 @@
     text-transform: none;
   }
 
-  /* @ds state: stale */
+  /* This state: stale */
   .freshness.is-stale {
     color: var(--warning);
   }
 
   @media (max-width: 39rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.section-heading) .freshness {
       justify-items: start;
     }
   }
-  /* @ds end surface: freshness */
+  /* End of surface: freshness */
 </style>

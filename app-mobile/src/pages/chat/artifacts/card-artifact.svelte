@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Card Artifact types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ARTIFACT CARD
   // ───────────────────────────────────────────────────────────────────
@@ -38,9 +39,9 @@
   // 5. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: artifact-card — the in-transcript read-only card that opens the diff viewer.
-  // @ds slot: glyph | body (meta · summary · peek) | open — the card chrome regions.
-  // @ds guardrail: do-not-edit — The button + click opening the viewer are frozen.
+  // This surface: artifact-card — the in-transcript read-only card that opens the diff viewer.
+  // This slot: glyph | body (meta · summary · peek) | open — the card chrome regions.
+  // Do not edit — The button + click opening the viewer are frozen.
   let buttonRef = $state<HTMLButtonElement | null>(null);
   const viewer = getOptionalArtifactViewer();
 
@@ -54,6 +55,7 @@
   );
 </script>
 
+<!-- Component content -->
 <button
   bind:this={buttonRef}
   type="button"
@@ -76,18 +78,19 @@
       <span>Read-only</span>
     </span>
     <span class="artifact-card--summary">{block.summary}</span>
-    <!-- @ds slot: peek — the clipped 6-line diff preview (mayReorder content only). -->
+    <!-- This slot: peek — the clipped 6-line diff preview (mayReorder content only). -->
     <span class="artifact-card-peek" aria-label="Diff preview">{#each peekLines as line, index}<span class="artifact-card-peek--line">{line || ' '}{index < peekLines.length - 1 ? '\n' : ''}</span>{/each}</span>
   </span>
   <span class="artifact-card--open" aria-hidden="true">Open</span>
 </button>
 
-<!-- @ds surface: artifact-card — the read-only in-transcript diff card. Decomposed into this scoped block;
+<!-- Artifact card -->
+<!-- This surface: artifact-card — the read-only in-transcript diff card. Decomposed into this scoped block;
      the react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states are preserved by the
      use:hover/use:press/use:focusVisible actions and scoped as :global([data-*]). The glyph icon
      geometry is shared with the viewer close icon, whose copy stays in app.css. Values unchanged. -->
 <style>
-  /* @ds slot: card — the read-only artifact card button; glyph · body · open grid. */
+  /* This slot: card — the read-only artifact card button; glyph · body · open grid. */
   .artifact-card {
     display: grid;
     min-inline-size: 0;
@@ -105,24 +108,24 @@
     cursor: pointer;
   }
 
-  /* @ds state: hover — react-aria data-hovered accent tint (via use:hover). */
+  /* This state: hover — react-aria data-hovered accent tint (via use:hover). */
   .artifact-card:global([data-hovered]) {
     border-color: var(--accent-strong);
     background: var(--accent-soft);
   }
 
-  /* @ds state: pressed — react-aria data-pressed; no press-scale. */
+  /* This state: pressed — react-aria data-pressed; no press-scale. */
   .artifact-card:global([data-pressed]) {
     transform: none;
   }
 
-  /* @ds state: focus-visible — canonical card focus ring (never colour-only). */
+  /* This state: focus-visible — canonical card focus ring (never colour-only). */
   .artifact-card:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 3px;
   }
 
-  /* @ds slot: glyph — the artifact-type glyph chip. */
+  /* This slot: glyph — the artifact-type glyph chip. */
   .artifact-card--icon {
     display: grid;
     inline-size: 2.75rem;
@@ -133,7 +136,7 @@
     color: var(--accent-ink);
   }
 
-  /* @ds slot: glyph-icon — 1.35rem stroke geometry (the viewer close icon reuses this in app.css). */
+  /* This slot: glyph-icon — 1.35rem stroke geometry (the viewer close icon reuses this in app.css). */
   .artifact-card--icon svg {
     inline-size: 1.35rem;
     block-size: 1.35rem;
@@ -144,14 +147,14 @@
     stroke-width: 1.8;
   }
 
-  /* @ds slot: body — meta · summary · peek column. */
+  /* This slot: body — meta · summary · peek column. */
   .artifact-card--body {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-2);
   }
 
-  /* @ds slot: meta — uppercase fact chips. */
+  /* This slot: meta — uppercase fact chips. */
   .artifact-card--meta {
     display: flex;
     flex-wrap: wrap;
@@ -163,14 +166,14 @@
     text-transform: uppercase;
   }
 
-  /* @ds slot: meta-sep — the '/' separator between fact chips. */
+  /* This slot: meta-sep — the '/' separator between fact chips. */
   .artifact-card--meta span + span::before {
     margin-inline-end: var(--space-2);
     content: '/';
     color: var(--line-strong);
   }
 
-  /* @ds slot: summary — the artifact's display-name read-out. */
+  /* This slot: summary — the artifact's display-name read-out. */
   .artifact-card--summary {
     overflow-wrap: anywhere;
     color: var(--ink);
@@ -179,8 +182,8 @@
     line-height: 1.35;
   }
 
-  /* @ds slot: peek — the clipped 6-line diff preview (mayReorder content only). */
-  /* @ds guardrail: do-not-edit — Peek is clipped and bidi-stable; never expand in the card. */
+  /* This slot: peek — the clipped 6-line diff preview (mayReorder content only). */
+  /* Do not edit — Peek is clipped and bidi-stable; never expand in the card. */
   .artifact-card-peek {
     display: block;
     min-inline-size: 0;
@@ -198,7 +201,7 @@
     white-space: pre;
   }
 
-  /* @ds slot: peek-line — one clipped, ellipsized peek row. */
+  /* This slot: peek-line — one clipped, ellipsized peek row. */
   .artifact-card-peek--line {
     display: block;
     min-inline-size: 0;
@@ -206,7 +209,7 @@
     text-overflow: ellipsis;
   }
 
-  /* @ds slot: open — the trailing "Open" handoff affordance. */
+  /* This slot: open — the trailing "Open" handoff affordance. */
   .artifact-card--open {
     min-block-size: 2.75rem;
     padding-block: 0.7rem;
@@ -216,25 +219,29 @@
     white-space: nowrap;
   }
 
-  /* @ds edit: layout — narrow reflow at <=24rem: drop the trailing Open, tighten glyph + grid. */
+  /* Editable seam: layout — narrow reflow at <=24rem: drop the trailing Open, tighten glyph + grid. */
   @media (max-width: 24rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact-card {
       grid-template-columns: 2.25rem minmax(0, 1fr);
       padding: var(--space-3);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact-card--icon {
       inline-size: 2.25rem;
       block-size: 2.25rem;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact-card--open {
       display: none;
     }
   }
 
-  /* @ds guardrail: do-not-edit — Reduced motion must never re-enable transform motion. */
+  /* Do not edit — Reduced motion must never re-enable transform motion. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact-card {
       animation: none;
       transition: none;

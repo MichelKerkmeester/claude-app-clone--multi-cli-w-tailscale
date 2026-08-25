@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Command Option types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: Slash Command Option (safe text-only row)
   // ───────────────────────────────────────────────────────────────────
@@ -26,13 +27,14 @@
   /** Display-only escape: canonical names never contain these, but visible text is
    *  A security surface. The replacement is display-only; insertion always uses the
    *  Canonical DTO string unchanged.
-   *  @ds guardrail: escaping — Unsafe/bidi-override characters are display-replaced. */
+   *  Do not edit — escaping — Unsafe/bidi-override characters are display-replaced. */
   export const UNSAFE_NAME_CHARACTERS = /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g;
 
   // ───────────────────────────────────────────────────────────────────
   // 4. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep escape unsafe name focused on its single responsibility.
   export function escapeUnsafeName(name: string): string {
     return name.replace(UNSAFE_NAME_CHARACTERS, '\uFFFD');
   }
@@ -55,6 +57,7 @@
   // 6. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep source label focused on its single responsibility.
   function sourceLabel(source: RankedHostCommand['source']): string {
     switch (source) {
       case 'extension':
@@ -96,6 +99,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   const graphemes = $derived(commandGraphemes(escapeUnsafeName(command.name)));
+  // Keep matched focused on its single responsibility.
   const matched = (index: number) =>
     command.matchRanges.some((range) => range.start <= index && index < range.end);
 
@@ -103,6 +107,7 @@
   // 11. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep on pointer down focused on its single responsibility.
   const onPointerDown = (event: PointerEvent) => {
     // preventDefault keeps focus in the textarea (no steal, selection, or iOS callout).
     event.preventDefault();
@@ -113,6 +118,7 @@
   const onMouseDown = (event: MouseEvent) => {
     event.preventDefault();
   };
+  // Keep on pointer move focused on its single responsibility.
   const onPointerMove = (event: PointerEvent) => {
     const origin = pressOrigin;
     if (origin === null) return;
@@ -123,6 +129,7 @@
       dragged = true;
     }
   };
+  // Keep on click focused on its single responsibility.
   const onClick = () => {
     if (dragged) {
       dragged = false;
@@ -131,7 +138,7 @@
     }
     pressOrigin = null;
     // Press requests insertion or a disabled reason; never submission.
-    // @ds guardrail: fail-closed — Press requests insertion, never submission.
+    // Do not edit — fail-closed — Press requests insertion, never submission.
     if (command.enabled) {
       onInsert(command.name);
     } else if (command.disabledReason !== null) {
@@ -141,9 +148,11 @@
 
 </script>
 
+<!-- Component content -->
 <!-- Role, aria wiring, and virtual-focus hook are frozen. -->
-<!-- @ds surface: slash-autocomplete -->
-<!-- @ds guardrail: React-aria wiring — Option role, aria-selected/aria-disabled, data-focused virtual focus, and the focus-preserving press path. -->
+<!-- Slash autocomplete > -->
+<!-- This surface: slash-autocomplete -->
+<!-- Do not edit — React-aria wiring — Option role, aria-selected/aria-disabled, data-focused virtual focus, and the focus-preserving press path. -->
 
 <!-- svelte-ignore a11y_interactive_supports_focus -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -159,7 +168,7 @@
   onpointermove={onPointerMove}
   onclick={onClick}
 >
-  <!-- @ds slot: label — the command name, match emphasis, and argument hint. -->
+  <!-- This slot: label — the command name, match emphasis, and argument hint. -->
   <span class="slash-name--line">
     <bdi dir="ltr" translate="no" class="slash-name"
       >{'/'}{#each graphemes as grapheme, index (`${index}-${grapheme}`)}{#if matched(index)}<strong
@@ -179,24 +188,25 @@
       </span>
     {/if}
   {:else}
-    <!-- @ds state: disabled-with-reason — a disabled row surfaces its disclosed reason. -->
+    <!-- This state: disabled-with-reason — a disabled row surfaces its disclosed reason. -->
     <span class="slash--disabled-reason" dir="auto">
       {command.disabledReason !== null ? command.disabledReason : 'Unavailable: not disclosed'}
     </span>
   {/if}
-  <!-- @ds slot: binding — the authoritative source binding and confirmation hint. -->
+  <!-- This slot: binding — the authoritative source binding and confirmation hint. -->
   <span class="slash--meta">
     <span class="slash-source">{sourceLabel(command.source)}</span>
     {#if command.requiresConfirmation}<span class="slash--confirm">Asks first</span>{/if}
   </span>
 </div>
 
-<!-- @ds surface: slash-autocomplete — one text-only listbox option. Decomposed into this scoped block;
+<!-- Slash autocomplete -->
+<!-- This surface: slash-autocomplete — one text-only listbox option. Decomposed into this scoped block;
      slash--option / name / match / hint / desc / meta and their states are owned solely by this
      component so they move with it. Values unchanged. -->
 <style>
-  /* @ds slot: label — the option row and its name/match/argument-hint lines. */
-  /* @ds state: enabled — an insertable row; default row presentation. */
+  /* This slot: label — the option row and its name/match/argument-hint lines. */
+  /* This state: enabled — an insertable row; default row presentation. */
   .slash--option {
     display: grid;
     gap: 2px;
@@ -212,7 +222,7 @@
     transition: background-color 80ms linear;
   }
 
-  /* @ds state: active — the virtual-focus row (aria-activedescendant). Not
+  /* This state: active — the virtual-focus row (aria-activedescendant). Not
      colour-only: it keeps its ink rail plus outline. */
   .slash--option[data-focused] {
     background: var(--slash-selection);
@@ -221,11 +231,12 @@
     outline-offset: -2px;
   }
 
-  /* @ds state: disabled-with-reason — a row that only offers its disclosed reason. */
+  /* This state: disabled-with-reason — a row that only offers its disclosed reason. */
   .slash--option[aria-disabled='true'] {
     cursor: default;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .slash-name--line {
     display: flex;
     flex-wrap: wrap;
@@ -234,6 +245,7 @@
     min-inline-size: 0;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .slash-name {
     overflow-wrap: anywhere;
     font-size: 15px;
@@ -242,14 +254,17 @@
     letter-spacing: -0.01em;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .slash--match {
     font-weight: 700;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .slash--option[aria-disabled='true'] .slash-name {
     color: var(--slash-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .slash--hint {
     color: var(--slash-muted);
     font-size: 12px;
@@ -257,7 +272,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* @ds slot: label · disabled-reason — the row's secondary line: a description
+  /* This slot: label · disabled-reason — the row's secondary line: a description
      on enabled rows, the disclosed reason on disabled rows. */
   .slash--desc,
   .slash--disabled-reason {
@@ -268,7 +283,7 @@
     color: var(--slash-muted);
   }
 
-  /* @ds slot: binding — the authoritative source binding and confirmation hint. */
+  /* This slot: binding — the authoritative source binding and confirmation hint. */
   .slash--meta {
     display: flex;
     flex-wrap: wrap;
@@ -278,24 +293,27 @@
     color: var(--slash-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .slash--confirm {
     color: var(--slash-accent);
     font-weight: 650;
   }
 
-  /* @ds edit: contrast — system-wide prefers-contrast primitive: borders carry the hierarchy the palette
+  /* Editable seam: contrast — system-wide prefers-contrast primitive: borders carry the hierarchy the palette
      otherwise implies with fill, using the frozen tokens unchanged. */
-   /* @ds guardrail: do-not-edit — The high-contrast re-render is an accessibility guarantee; never drop the border/outline carry for interactive and raised surfaces. */
+   /* Do not edit — The high-contrast re-render is an accessibility guarantee; never drop the border/outline carry for interactive and raised surfaces. */
   @media (prefers-contrast: more) {
+    /* Keep this rule aligned with its surrounding surface. */
     .slash--option[data-focused] {
       outline-width: 3px;
     }
   }
 
-  /* @ds edit: contrast — system-wide forced-colors primitive: the scoped palettes yield to the user's
+  /* Editable seam: contrast — system-wide forced-colors primitive: the scoped palettes yield to the user's
      system scheme (Canvas / CanvasText / Highlight). */
-   /* @ds guardrail: do-not-edit — Forced-colors yield is an accessibility guarantee; never restore a hard-coded surface/ink over the system scheme. */
+   /* Do not edit — Forced-colors yield is an accessibility guarantee; never restore a hard-coded surface/ink over the system scheme. */
   @media (forced-colors: active) {
+    /* Keep this rule aligned with its surrounding surface. */
     .slash--option[data-focused] {
       outline: 2px solid Highlight;
       outline-offset: -2px;

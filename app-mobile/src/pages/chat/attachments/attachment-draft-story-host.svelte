@@ -7,7 +7,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: AttachmentDraftStoryHost — story-support scaffolding for the
+  // This surface: AttachmentDraftStoryHost — story-support scaffolding for the
   // Context-only attachment components (rail, preview dialog) read everything through getAttachmentDraft().
   // This host supplies real staged files so those surfaces render without fabricated application data.
   import { onMount, type Snippet } from 'svelte';
@@ -48,6 +48,7 @@
   // 5. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep transparent pixel file focused on its single responsibility.
   function transparentPixelFile(name: string): File {
     const binary = atob(TRANSPARENT_PIXEL.slice(TRANSPARENT_PIXEL.indexOf(',') + 1));
     const bytes = new Uint8Array(binary.length);
@@ -56,4 +57,5 @@
   }
 </script>
 
+<!-- Component content -->
 {@render children()}

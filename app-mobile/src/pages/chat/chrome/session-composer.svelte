@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Session Composer types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: Session Composer (Claude-style input tray)
   // ───────────────────────────────────────────────────────────────────
@@ -317,6 +318,7 @@
   $effect(() => {
     if (!hasAttachments || prompt.length === 0) return;
     const key = `pi-remote.attachment-text-recovery.${sessionId}`;
+    // Keep save text only focused on its single responsibility.
     const saveTextOnly = () => {
       try {
         sessionStorage.setItem(key, prompt);
@@ -328,6 +330,7 @@
     return () => window.removeEventListener('pagehide', saveTextOnly);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     writeComposerShiftTabPreference(shiftTabEnabled);
   });
@@ -348,6 +351,7 @@
   // Outside taps close the panel; target keeps normal behavior.
   $effect(() => {
     if (!panelOpen) return;
+    // Keep on pointer down focused on its single responsibility.
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target as Node | null;
       if (target === null) return;
@@ -394,7 +398,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   // Slash drafts use the ticketed lane; ordinary drafts keep send/steer routing.
-  // @ds guardrail: Mutation path — Submit / steer / stop / snapshot / slash-draft / attachment flow; presentation may not reach past here.
+  // Do not edit — Mutation path — Submit / steer / stop / snapshot / slash-draft / attachment flow; presentation may not reach past here.
   function submit(): void {
     if (!attachmentCanSubmit) {
       announcement = attachmentDraft.blockingMessage ?? 'Finish checking the selected photos first.';
@@ -457,6 +461,7 @@
     activeName = null;
   }
 
+  // Keep insert active row focused on its single responsibility.
   function insertActiveRow(): void {
     if (activeName === null || !activeRow) {
       announcement = 'No command selected.';
@@ -471,6 +476,7 @@
     insertCommandAtToken(activeName, rowBinding);
   }
 
+  // Keep move active focused on its single responsibility.
   function moveActive(direction: 1 | -1): void {
     const enabledNames = ranked.items.filter((item) => item.enabled).map((item) => item.name);
     if (enabledNames.length === 0) return;
@@ -481,7 +487,7 @@
     activeName = enabledNames[next] ?? null;
   }
 
-  // @ds guardrail: React-aria + keyboard wiring — onKeyDown handles IME, shortcuts, panel routing, dismissal, and closed-panel submit without changing the interaction contract.
+  // Do not edit — React-aria + keyboard wiring — onKeyDown handles IME, shortcuts, panel routing, dismissal, and closed-panel submit without changing the interaction contract.
   function onKeyDown(event: KeyboardEvent): void {
     // IME composition owns every key: no filtering, insertion, or submit.
     if (isComposing) return;
@@ -521,6 +527,7 @@
   // 10. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep grow focused on its single responsibility.
   function grow(): void {
     const element = textareaEl;
     if (element === null) return;
@@ -529,10 +536,12 @@
   }
 </script>
 
-<!-- @ds surface: composer — the presentational seam. The tray and its slots below stay
+<!-- Component content -->
+<!-- Composer -->
+<!-- This surface: composer — the presentational seam. The tray and its slots below stay
      presentation-only; the keyboard-anchor vars (--visual-viewport-height / --trigger-width)
      feed layout unchanged. -->
-<!-- @ds guardrail: Send / steer / stop / snapshot / prompt-submission and the keyboard anchoring hook stay fenced; presentation may not reach past them. -->
+<!-- Do not edit — Send / steer / stop / snapshot / prompt-submission and the keyboard anchoring hook stay fenced; presentation may not reach past them. -->
 <div class="composer--region">
   {#if promptError !== null}<div class="inline-alert">{promptError}</div>{/if}
   <p class="composer--disclaimer">{disclaimer}</p>
@@ -579,7 +588,7 @@
         announcement = message;
       }}
     />
-    <!-- @ds slot: input — the single editing field. -->
+    <!-- This slot: input — the single editing field. -->
     <!-- svelte-ignore a11y_role_supports_aria_props_implicit -->
     <textarea
       bind:this={textareaEl}
@@ -649,7 +658,7 @@
         />
       </div>
       <div class="composer--right">
-        <!-- @ds slot: interrupt-action — the stop control stays available without replacing the draft action. -->
+        <!-- This slot: interrupt-action — the stop control stays available without replacing the draft action. -->
         {#if running && connection === 'live'}
           <Button
             type="button"
@@ -661,7 +670,7 @@
             {@render stopGlyph()}
           </Button>
         {/if}
-        <!-- @ds slot: primary-action — the draft action remains send / steer / sending. -->
+        <!-- This slot: primary-action — the draft action remains send / steer / sending. -->
         {#if running && (hasText || hasAttachments) && !slashDraft}
           <Button
             type="button"
@@ -773,7 +782,8 @@
   </svg>
 {/snippet}
 
-<!-- @ds surface: composer — the input island. Decomposed into this scoped block; the composer--region /
+<!-- Composer -->
+<!-- This surface: composer — the input island. Decomposed into this scoped block; the composer--region /
      composer--disclaimer / composer--input / composer--bar / composer--left / composer--right /
      attachment--draft-message owned rules move with it. Child-primitive classes
      (composer--tray / composer--primary / composer--later / composer--spinner) and the shared 44px
@@ -781,10 +791,10 @@
      groups stay GLOBAL in app.css (they are shared grouped selectors — moving them into scope
      would reverse the cascade against those global overrides). Values unchanged. -->
 <style>
-  /* @ds state: promptError — inline-alert rendered above the tray (shared error surface). */
-  /* @ds edit: layout — sticky bottom-anchor + canvas fade; the keyboard-anchor
+  /* This state: promptError — inline-alert rendered above the tray (shared error surface). */
+  /* Editable seam: layout — sticky bottom-anchor + canvas fade; the keyboard-anchor
      --visual-viewport-height var feeds the anchor and stays the layout input. */
-  /* @ds guardrail: do-not-edit — presentation of the viewer-open state; keep the blur/inert pair. */
+  /* Do not edit — presentation of the viewer-open state; keep the blur/inert pair. */
   .composer--region {
     position: sticky;
     z-index: 5;
@@ -798,8 +808,8 @@
     background: linear-gradient(to top, var(--canvas) 66%, transparent);
   }
 
-  /* @ds surface: composer — the input island. */
-  /* @ds edit: layout — tray geometry; safe gutters are token-driven. */
+  /* This surface: composer — the input island. */
+  /* Editable seam: layout — tray geometry; safe gutters are token-driven. */
   .composer--tray {
     display: grid;
     gap: var(--space-1);
@@ -816,6 +826,7 @@
     border-color: var(--line-strong);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .composer--tray.is-executing-mode {
     border-color: var(--line-strong);
   }
@@ -828,12 +839,14 @@
     margin-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .composer--tray {
     min-inline-size: 0;
     margin-inline-start: max(0px, env(safe-area-inset-left, 0px));
     margin-inline-end: max(0px, env(safe-area-inset-right, 0px));
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .composer--disclaimer {
     margin: 0;
     padding-inline: var(--space-2);
@@ -842,7 +855,7 @@
     text-align: center;
   }
 
-  /* @ds slot: input — the single editing field; colour/type stay token-driven. */
+  /* This slot: input — the single editing field; colour/type stay token-driven. */
   .composer--input {
     width: 100%;
     min-height: 1.75rem;
@@ -857,21 +870,24 @@
     resize: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .composer--input:focus {
     outline: none;
   }
 
-  /* @ds state: awaitingSnapshot · sendingPrompt · slashSubmitting — the input is
+  /* This state: awaitingSnapshot · sendingPrompt · slashSubmitting — the input is
      disabled while the composer is busy or syncing (plus a non-live connection). */
   .composer--input:disabled {
     cursor: not-allowed;
     opacity: 0.55;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .composer--input::placeholder {
     color: var(--ink-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .composer--bar {
     display: flex;
     align-items: center;
@@ -879,6 +895,7 @@
     gap: var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .composer--left,
   .composer--right {
     display: flex;
@@ -886,6 +903,7 @@
     gap: var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attachment--draft-message {
     margin: 0;
     padding-inline: var(--space-2);
@@ -895,7 +913,7 @@
     line-height: 1.35;
   }
 
-  /* @ds slot: primary-action — the single circular morphing disc (send/steer/sending).
+  /* This slot: primary-action — the single circular morphing disc (send/steer/sending).
      The class is passed to the Button primitive, so Svelte cannot hash it → :global. */
   :global(.composer--primary) {
     display: grid;
@@ -911,34 +929,36 @@
       opacity var(--duration-state, 120ms) var(--ease-out, ease);
   }
 
-  /* @ds state: send · steer — the morphing primary disc; steer shares this form. */
+  /* This state: send · steer — the morphing primary disc; steer shares this form. */
   :global(.composer--primary.is-send) {
     background: var(--accent);
     color: #fff;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.composer--primary.is-send[data-hovered]) {
     background: var(--accent-strong);
   }
 
-  /* @ds state: stop — the interrupt disc for a running turn. */
+  /* This state: stop — the interrupt disc for a running turn. */
   :global(.composer--primary.is-stop) {
     background: var(--action-bg);
     color: var(--action-fg);
   }
 
-  /* @ds state: stopping · sending-inhibit — the disc's disabled affordance. */
+  /* This state: stopping · sending-inhibit — the disc's disabled affordance. */
   :global(.composer--primary[data-disabled]) {
     cursor: not-allowed;
     opacity: 0.4;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.composer--primary[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
-  /* @ds state: later — the secondary "send after this turn" affordance (Button primitive → :global). */
+  /* This state: later — the secondary "send after this turn" affordance (Button primitive → :global). */
   :global(.composer--later) {
     min-height: 2.25rem;
     padding-inline: var(--space-3);
@@ -951,20 +971,22 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.composer--later[data-disabled]) {
     cursor: not-allowed;
     opacity: 0.4;
   }
 
-  /* @ds surface: spinner — shared inline pending/busy indicator. */
-  /* @ds state: sending · slashSubmitting — the disc's busy form.
+  /* This surface: spinner — shared inline pending/busy indicator. */
+  /* This state: sending · slashSubmitting — the disc's busy form.
      The SpinnerGlyph <svg> is rendered by this component → normally scoped. */
   .composer--spinner {
     animation: composer-spin 0.8s linear infinite;
   }
 
-  /* @ds guardrail: reduced-motion keeps the shared spinner static — Never remove. */
+  /* Do not edit — reduced-motion keeps the shared spinner static — Never remove. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .composer--spinner {
       animation: none;
     }
@@ -974,25 +996,29 @@
      textarea: the left group wraps so the label never truncates Plan ·
      read-only and the primary action stays on the first row. */
   @media (max-width: 400px) {
+    /* Keep this rule aligned with its surrounding surface. */
     .composer--bar {
       flex-wrap: wrap;
       row-gap: var(--space-1);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .composer--left {
       flex-wrap: wrap;
       row-gap: var(--space-1);
     }
   }
 
-  /* @ds edit: layout — narrow reflow of the composer bar + ready/review card + sheets. */
+  /* Editable seam: layout — narrow reflow of the composer bar + ready/review card + sheets. */
   @media (max-width: 27rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .composer--bar {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .composer--left {
       min-inline-size: 0;
       flex-wrap: wrap;

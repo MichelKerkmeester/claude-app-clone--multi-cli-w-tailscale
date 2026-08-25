@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Screen Home types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -52,12 +53,14 @@
   // 5. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: staleness derivation — Not designer-editable.
+  // Do not edit — staleness derivation — Not designer-editable.
   const isStale = $derived(sessions.source === 'cache' || connection !== 'live');
 </script>
 
-<!-- @ds surface: home-view — hero, session roster, device footer, push settings. States: loading · empty · error · stale. -->
-<!-- @ds guardrail: staleness derivation + select/revoke/logout handlers — Not designer-editable. -->
+<!-- Component content -->
+<!-- Home view -->
+<!-- This surface: home-view — hero, session roster, device footer, push settings. States: loading · empty · error · stale. -->
+<!-- Do not edit — staleness derivation + select/revoke/logout handlers — Not designer-editable. -->
 <main class="home-view">
   <section class="hero">
     <div class="hero-copy--block">
@@ -89,7 +92,7 @@
     {:else}
       <div class="session--grid">
         {#each sessions.items as session (session.id)}
-          <!-- @ds guardrail: session open onPress → onSelect route — Not designer-editable. -->
+          <!-- Do not edit — session open onPress → onSelect route — Not designer-editable. -->
           <Button class="session--card" onclick={() => onSelect(session.id)}>
             <span class={`session--state state--${session.status}`}>
               <SessionStateIcon status={session.status} />
@@ -112,7 +115,7 @@
       {device === null ? 'Device key active' : `Host ${compactId(device.hostFingerprint)}`}
     </span>
     <div>
-      <!-- @ds guardrail: device logout / revoke onPress handlers — Not designer-editable. -->
+      <!-- Do not edit — device logout / revoke onPress handlers — Not designer-editable. -->
       <Button onclick={onLogout}>Log out</Button>
       <Button onclick={onRevoke}>Revoke this device</Button>
     </div>
@@ -120,7 +123,8 @@
   <PushSettings />
 </main>
 
-<!-- @ds surface: home-view — hero, session roster, device footer, push settings. Decomposed into this scoped block;
+<!-- Home view -->
+<!-- This surface: home-view — hero, session roster, device footer, push settings. Decomposed into this scoped block;
      hero / hero-copy--block / hero-copy / relay-orbit(+::before/::after) / orbit--core / orbit-node(+one/two/three)
      / session--section / section-heading(solo) / session--grid / session--state / session--meta(+i) / open-arrow
      / device-footer(+>div) are owned solely by this component so they move with it. .session--card and
@@ -137,8 +141,8 @@
      @media .section-heading .freshness variant lives in Freshness.svelte. The orbit is static (no
      @keyframes). Values unchanged. -->
 <style>
-  /* @ds surface: home-view — hero, session roster, device footer, push settings. */
-  /* @ds state: loading · empty · error · stale — via shared empty--state, inline-alert and freshness surfaces. */
+  /* This surface: home-view — hero, session roster, device footer, push settings. */
+  /* This state: loading · empty · error · stale — via shared empty--state, inline-alert and freshness surfaces. */
   .hero {
     position: relative;
     display: grid;
@@ -149,12 +153,14 @@
     overflow: hidden;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .hero-copy--block {
     position: relative;
     z-index: 1;
     max-width: 43rem;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .hero-copy {
     max-width: 39rem;
     margin: var(--space-6) 0 0;
@@ -164,7 +170,7 @@
     text-wrap: pretty;
   }
 
-  /* @ds slot: orbit — decorative relay graphic. */
+  /* This slot: orbit — decorative relay graphic. */
   .relay-orbit {
     position: absolute;
     right: -5rem;
@@ -174,6 +180,7 @@
     border-radius: 50%;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .relay-orbit::before,
   .relay-orbit::after {
     position: absolute;
@@ -182,15 +189,18 @@
     content: '';
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .relay-orbit::before {
     inset: 18%;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .relay-orbit::after {
     inset: 36%;
     background: var(--accent-soft);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .orbit--core {
     position: absolute;
     z-index: 1;
@@ -204,6 +214,7 @@
     font-weight: 700;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .orbit-node {
     position: absolute;
     z-index: 2;
@@ -215,37 +226,42 @@
     box-shadow: 0 0 0 1px var(--accent);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .orbit-node--one {
     top: 8%;
     left: 38%;
   }
+  /* Keep this rule aligned with its surrounding surface. */
   .orbit-node--two {
     right: 8%;
     bottom: 31%;
   }
+  /* Keep this rule aligned with its surrounding surface. */
   .orbit-node--three {
     bottom: 17%;
     left: 14%;
   }
 
-  /* @ds slot: sessions — recent-sessions section. */
+  /* This slot: sessions — recent-sessions section. */
   .session--section {
     padding-top: var(--space-8);
     border-top: 1px solid var(--line-strong);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .section-heading {
     align-items: end;
     margin-bottom: var(--space-6);
   }
 
-  /* @ds slot: session--grid — the session card roster. */
+  /* This slot: session--grid — the session card roster. */
   .session--grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
     gap: var(--space-3);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session--card) {
     position: relative;
     display: grid;
@@ -265,6 +281,7 @@
       transform var(--duration-fast) var(--ease-out);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session--card::after) {
     position: absolute;
     top: 0;
@@ -277,16 +294,19 @@
     transition: opacity var(--duration-fast) ease;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session--card[data-hovered]) {
     border-color: var(--line-strong);
     background: var(--surface-raised);
     transform: translateY(-2px);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session--card[data-hovered]::after) {
     opacity: 1;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .session--state {
     display: flex;
     align-items: center;
@@ -296,6 +316,7 @@
     font-weight: 680;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session--card > strong) {
     align-self: end;
     padding-top: var(--space-4);
@@ -306,6 +327,7 @@
     letter-spacing: -0.02em;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .session--meta {
     display: flex;
     align-items: center;
@@ -315,6 +337,7 @@
     font-weight: 550;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .session--meta i {
     width: 0.2rem;
     height: 0.2rem;
@@ -322,7 +345,7 @@
     background: var(--line-strong);
   }
 
-  /* @ds slot: open-arrow — session--card affordance. */
+  /* This slot: open-arrow — session--card affordance. */
   .open-arrow {
     position: absolute;
     right: var(--space-4);
@@ -334,12 +357,13 @@
     transition: opacity var(--duration-fast) ease;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session--card[data-hovered]) .open-arrow,
   :global(.session--card[data-focus-visible]) .open-arrow {
     opacity: 1;
   }
 
-  /* @ds slot: device — device-key footer (logout · revoke). */
+  /* This slot: device — device-key footer (logout · revoke). */
   .device-footer {
     display: flex;
     align-items: center;
@@ -353,11 +377,13 @@
     font-size: 0.68rem;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .device-footer > div {
     display: flex;
     gap: var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.device-footer button) {
     min-height: 2.75rem;
     padding-inline: var(--space-3);
@@ -372,37 +398,44 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.device-footer button[data-hovered]) {
     background: var(--danger-soft);
   }
 
   @media (max-width: 52rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .relay-orbit {
       right: -10rem;
       opacity: 0.7;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .hero-copy--block {
       max-width: 75%;
     }
   }
 
   @media (max-width: 39rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .hero {
       min-height: 26rem;
       align-items: end;
       padding-bottom: var(--space-12);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .hero-copy--block {
       max-width: 100%;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .hero h1 {
       max-width: 11ch;
       font-size: clamp(2.75rem, 14vw, 4rem);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .relay-orbit {
       top: -3rem;
       right: -8rem;
@@ -410,25 +443,29 @@
       opacity: 0.45;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.session--card) {
       min-height: 9.5rem;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .device-footer > div {
       flex-wrap: wrap;
     }
   }
 
   @media (hover: none) {
+    /* Keep this rule aligned with its surrounding surface. */
     .open-arrow {
       opacity: 1;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.session--card[data-hovered]) {
       transform: none;
     }
   }
-  /* @ds end surface: home-view */
+  /* End of surface: home-view */
 </style>

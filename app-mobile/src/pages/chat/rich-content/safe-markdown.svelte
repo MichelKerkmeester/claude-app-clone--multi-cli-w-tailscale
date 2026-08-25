@@ -1,6 +1,7 @@
 <script module lang="ts">
-  // @ds surface: safe-markdown — renders already-redacted Markdown to safe prose.
-  // @ds guardrail: do-not-edit — This module is the read-only sanitization boundary; the allowlist, URL/scheme filtering, and character escaping are frozen and NOT designer-editable.
+  // This module holds the shared Safe Markdown types and helpers.
+  // This surface: safe-markdown — renders already-redacted Markdown to safe prose.
+  // Do not edit — This module is the read-only sanitization boundary; the allowlist, URL/scheme filtering, and character escaping are frozen and NOT designer-editable.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. TYPE DEFINITIONS
@@ -53,7 +54,7 @@
   // 2. CONSTANTS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — The sanitization patterns reject raw HTML/markup, unsafe URL schemes, and control/bidi characters verbatim; do not broaden them.
+  // Do not edit — The sanitization patterns reject raw HTML/markup, unsafe URL schemes, and control/bidi characters verbatim; do not broaden them.
   const RAW_HTML_PATTERN =
     /<\s*\/?\s*(?:script|style|form|input|textarea|button|img|iframe|frame|object|embed|audio|video|source|svg|link|meta|base)\b|<\s*\/?\s*[a-z][^>]*>/iu;
   const RAW_MARKUP_PATTERN = /<!--[\s\S]*?-->|<!doctype\b|<!\[cdata\[/iu;
@@ -88,7 +89,7 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — parseSafeMarkdown is the fail-closed AST boundary: unsafe input returns null and SafeMarkdown falls back to escaped verbatim text.
+  // Do not edit — parseSafeMarkdown is the fail-closed AST boundary: unsafe input returns null and SafeMarkdown falls back to escaped verbatim text.
   export function parseSafeMarkdown(source: string): readonly SafeMarkdownNode[] | null {
     if (isUnsafeMarkdown(source)) return null;
     const lines = source.split(/\r?\n/u);
@@ -194,7 +195,7 @@
     return nodes;
   }
 
-  // @ds guardrail: do-not-edit — Inline rendering interprets only the fixed tokenPattern; other runs stay plain and every link destination is scheme-filtered.
+  // Do not edit — Inline rendering interprets only the fixed tokenPattern; other runs stay plain and every link destination is scheme-filtered.
   function renderInlineParts(source: string): readonly SafeMarkdownInlinePart[] {
     const parts: SafeMarkdownInlinePart[] = [];
     let remaining = source;
@@ -229,7 +230,7 @@
     return parts;
   }
 
-  // @ds guardrail: do-not-edit — The sanitization gate rejects raw HTML/markup, control characters, and unsafe schemes in every Markdown destination.
+  // Do not edit — The sanitization gate rejects raw HTML/markup, control characters, and unsafe schemes in every Markdown destination.
   function isUnsafeMarkdown(source: string): boolean {
     if (
       RAW_HTML_PATTERN.test(source) ||
@@ -248,7 +249,7 @@
     return false;
   }
 
-  // @ds guardrail: do-not-edit — Normalize destinations before the unsafe-scheme check so control characters and percent-encoding cannot hide a match.
+  // Do not edit — Normalize destinations before the unsafe-scheme check so control characters and percent-encoding cannot hide a match.
   function normalizeForSchemeCheck(value: string): string {
     const schemeControlPattern = new RegExp(
       `[${characterRange(0x00, 0x20)}${characterRange(0x7f, 0x9f)}]`,
@@ -267,7 +268,7 @@
     return normalized;
   }
 
-  // @ds guardrail: do-not-edit — Control/bidi characters become visible markers, never executable content, so copied canonical text stays verbatim.
+  // Do not edit — Control/bidi characters become visible markers, never executable content, so copied canonical text stays verbatim.
   function presentInvisibleCharacters(value: string): {
     readonly value: string;
     readonly changed: boolean;
@@ -306,11 +307,13 @@
     return { value: presented, changed };
   }
 
+  // Keep character range focused on its single responsibility.
   function characterRange(start: number, end: number): string {
     const first = String.fromCharCode(start);
     return start === end ? first : `${first}-${String.fromCharCode(end)}`;
   }
 
+  // Keep list start focused on its single responsibility.
   function listStart(line: string): { readonly ordered: boolean; readonly text: string } | null {
     const unordered = /^ {0,3}[-+*][ \t]+(.+)$/u.exec(line);
     if (unordered !== null) return { ordered: false, text: unordered[1] ?? '' };
@@ -319,6 +322,7 @@
     return null;
   }
 
+  // Keep is table header focused on its single responsibility.
   function isTableHeader(lines: readonly string[], index: number): boolean {
     const header = lines[index];
     const separator = lines[index + 1];
@@ -330,6 +334,7 @@
     );
   }
 
+  // Keep split table row focused on its single responsibility.
   function splitTableRow(line: string): readonly string[] {
     return line
       .trim()
@@ -339,7 +344,7 @@
       .map((cell) => cell.trim());
   }
 
-  // @ds guardrail: do-not-edit — The language allowlist keeps unknown fenced labels unlabeled/plain; the set is frozen.
+  // Do not edit — The language allowlist keeps unknown fenced labels unlabeled/plain; the set is frozen.
   function safeLanguageLabel(value: string): string | null {
     const normalized = value.toLocaleLowerCase();
     const allowed = new Set([
@@ -364,6 +369,7 @@
     return allowed.has(normalized) ? normalized : null;
   }
 
+  // Keep escape reg exp focused on its single responsibility.
   function escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
   }
@@ -393,10 +399,11 @@
   );
 </script>
 
+<!-- Component content -->
 {#snippet inline(text: string)}{#each renderInlineParts(text) as part, i (i)}{#if part.kind === 'code'}<code>{part.text}</code>{:else if part.kind === 'strong'}<strong>{part.text}</strong>{:else if part.kind === 'em'}<em>{part.text}</em>{:else if part.kind === 'del'}<del>{part.text}</del>{:else}{part.text}{/if}{/each}{/snippet}
 
 {#if ast === null}
-  <!-- @ds guardrail: do-not-edit — The fail-closed fallback renders rejected source verbatim and marks the canonical source for exact copying. -->
+  <!-- Do not edit — The fail-closed fallback renders rejected source verbatim and marks the canonical source for exact copying. -->
   <div
     class={`${classes} safe-markdown--fallback`}
     aria-label={ariaLabel}
@@ -438,15 +445,15 @@
 {/if}
 
 <style>
-  /* @ds slot: safe-markdown--fallback — the fail-closed verbatim read-out. */
+  /* This slot: safe-markdown--fallback — the fail-closed verbatim read-out. */
   .safe-markdown--fallback[data-control-presentation='readonly'] {
     border-inline-start: 3px solid var(--accent-strong);
     padding-inline-start: var(--space-3);
     overflow-wrap: anywhere;
   }
 
-  /* @ds slot: safe-markdown — the safe-Markdown renderer's prose output. */
-  /* @ds guardrail: do-not-edit — This is presentation for already-sanitized Markdown; allowlisting and scheme filtering remain in the module script. */
+  /* This slot: safe-markdown — the safe-Markdown renderer's prose output. */
+  /* Do not edit — This is presentation for already-sanitized Markdown; allowlisting and scheme filtering remain in the module script. */
   .safe-markdown,
   .safe-markdown--fallback {
     min-inline-size: 0;
@@ -455,7 +462,7 @@
     overflow-wrap: anywhere;
   }
 
-  /* @ds slot: prose spacing — block-level rhythm for headings and quotes. */
+  /* This slot: prose spacing — block-level rhythm for headings and quotes. */
   .safe-markdown p,
   .safe-markdown h1,
   .safe-markdown h2,
@@ -467,21 +474,21 @@
     margin-block: 0 var(--space-3);
   }
 
-  /* @ds slot: prose-quote — blockquote border + muted ink. */
+  /* This slot: prose-quote — blockquote border + muted ink. */
   .safe-markdown blockquote {
     padding-inline-start: var(--space-3);
     border-inline-start: 3px solid var(--line-strong);
     color: var(--ink-muted);
   }
 
-  /* @ds slot: prose-list — ordered/unordered list rhythm and indent. */
+  /* This slot: prose-list — ordered/unordered list rhythm and indent. */
   .safe-markdown ul,
   .safe-markdown ol {
     margin-block: 0 var(--space-3);
     padding-inline-start: 1.4rem;
   }
 
-  /* @ds slot: prose-inline-code — inline code chip. */
+  /* This slot: prose-inline-code — inline code chip. */
   .safe-markdown code {
     padding: 0.1rem 0.25rem;
     border-radius: var(--radius-sm);
@@ -490,7 +497,7 @@
     font-size: 0.88em;
   }
 
-  /* @ds slot: safe-markdown--code — fenced code block rendered by SafeMarkdown. */
+  /* This slot: safe-markdown--code — fenced code block rendered by SafeMarkdown. */
   .safe-markdown--code {
     max-inline-size: 100%;
     margin-block: 0 var(--space-3);
@@ -504,14 +511,14 @@
     white-space: pre;
   }
 
-  /* @ds slot: safe-markdown--code — neutralizes the inline-chip chrome inside a
+  /* This slot: safe-markdown--code — neutralizes the inline-chip chrome inside a
      fenced block. */
   .safe-markdown--code code {
     padding: 0;
     background: transparent;
   }
 
-  /* @ds slot: prose-table — table rhythm, borders, and start-aligned cells. */
+  /* This slot: prose-table — table rhythm, borders, and start-aligned cells. */
   .safe-markdown table {
     inline-size: 100%;
     margin-block: 0 var(--space-3);
@@ -519,6 +526,7 @@
     font-size: 0.9em;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .safe-markdown th,
   .safe-markdown td {
     padding: var(--space-2);

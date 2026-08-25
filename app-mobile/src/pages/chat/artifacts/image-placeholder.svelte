@@ -3,7 +3,7 @@
   // MODULE: IMAGE PLACEHOLDER
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: ImagePlaceholder — empty inbound-image well shown while pixels are unavailable.
+  // This surface: ImagePlaceholder — empty inbound-image well shown while pixels are unavailable.
   interface Props {
     aspectRatio?: number | null;
     state: string;
@@ -13,6 +13,7 @@
   let { aspectRatio, state, noAspect = false }: Props = $props();
 </script>
 
+<!-- Component content -->
 <div
   class="inbound-image--well inbound-image-well-placeholder"
   data-image-well="placeholder"

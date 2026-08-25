@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Ask Question Free Text types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ASK QUESTION FREE TEXT
   // ───────────────────────────────────────────────────────────────────
@@ -20,13 +21,14 @@
   const fieldId = $derived(`ask-question-free-text-${viewModel.questionId}-${viewModel.revision}`);
 </script>
 
+<!-- Component content -->
 {#if viewModel.display.freeText.allowed}
-  <!-- @ds slot: free-text — optional/required response textarea + optional character count. -->
+  <!-- This slot: free-text — optional/required response textarea + optional character count. -->
   <div class="ask-question-free-text">
     <label for={fieldId}>
       {viewModel.display.freeText.required ? 'Your response' : 'Additional context'}
     </label>
-    <!-- @ds slot: textarea — the response input; invalid (error) state handled in CSS. -->
+    <!-- This slot: textarea — the response input; invalid (error) state handled in CSS. -->
     <textarea
       id={fieldId}
       value={value}
@@ -45,22 +47,25 @@
   </div>
 {/if}
 
-<!-- @ds surface: ask-question free-text — the response textarea + optional character count. Decomposed into this scoped block;
+<!-- Ask question free text -->
+<!-- This surface: ask-question free-text — the response textarea + optional character count. Decomposed into this scoped block;
      native aria-invalid/:focus-visible/:disabled preserved. Values unchanged. -->
 <style>
-  /* @ds slot: free-text — the response textarea + optional character count. */
+  /* This slot: free-text — the response textarea + optional character count. */
   .ask-question-free-text {
     display: grid;
     position: relative;
     gap: var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .ask-question-free-text label {
     color: var(--ink-muted);
     font-size: 0.78rem;
     font-weight: 650;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .ask-question-free-text textarea {
     min-block-size: 5rem;
     min-inline-size: 0;
@@ -75,24 +80,25 @@
     scroll-margin-block: var(--space-8);
   }
 
-  /* @ds state: error (aria-invalid) — invalid free-text input. */
+  /* This state: error (aria-invalid) — invalid free-text input. */
   .ask-question-free-text textarea[aria-invalid='true'] {
     border-color: var(--accent-ink);
   }
 
-  /* @ds guardrail: focus-visible — The shared AA focus ring across option rows, free text, and submit. */
+  /* Do not edit — focus-visible — The shared AA focus ring across option rows, free text, and submit. */
   .ask-question-free-text textarea:focus-visible {
     outline: 3px solid var(--accent-ink);
     outline-offset: 3px;
     box-shadow: 0 0 0 1px var(--surface-raised);
   }
 
-  /* @ds state: disabled — free text fails-closed to reduced emphasis. */
+  /* This state: disabled — free text fails-closed to reduced emphasis. */
   .ask-question-free-text textarea:disabled {
     cursor: default;
     opacity: 0.58;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .ask-question-free-text--count {
     justify-self: end;
     color: var(--ink-muted);

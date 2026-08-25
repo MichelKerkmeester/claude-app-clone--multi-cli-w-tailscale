@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Artifact Details types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ARTIFACT DETAILS
   // ───────────────────────────────────────────────────────────────────
@@ -21,7 +22,7 @@
   // 1. PROPS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: ArtifactDetails — openable definition list of image-artifact metadata.
+  // This surface: ArtifactDetails — openable definition list of image-artifact metadata.
   interface Props {
     model: ArtifactDetailsModel;
     open: boolean;
@@ -34,6 +35,7 @@
   // 2. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep format bytes focused on its single responsibility.
   function formatBytes(value: number): string {
     if (value < 1024) return `${value} B`;
     if (value < 1024 * 1024) return `${Math.round(value / 1024)} KB`;
@@ -41,6 +43,7 @@
   }
 </script>
 
+<!-- Component content -->
 {#if open}
   <section {id} class="artifact-details" aria-label="Image details">
     <dl>

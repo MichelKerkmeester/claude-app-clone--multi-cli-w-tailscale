@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Sheet Model Effort types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@
   // 5. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep effort section status focused on its single responsibility.
   export function effortSectionStatus(
     runtime: RuntimeUiState,
     levels: readonly string[],
@@ -94,6 +96,7 @@
     }
   }
 
+  // Keep model dom id focused on its single responsibility.
   export function modelDomId(value: string): string {
     return encodeURIComponent(value).replace(/%/gu, '_');
   }
@@ -253,10 +256,12 @@
   // 10. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     sheetOpen = hostOpen;
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!isOpen) return;
     section = initialSection;
@@ -273,12 +278,14 @@
     void runtimeControls.refresh('open');
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     return () => {
       if (snapTimerRef !== null) window.clearTimeout(snapTimerRef);
     };
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (
       runtime.status === 'ready' &&
@@ -289,11 +296,13 @@
     }
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!isOpen || !showSearch) return;
     announcement = modelCountMessage(visibleModels.length, runtime.models.length);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const searchIsVisible = isOpen && section === 'model' && showSearch;
     const optionCount = searchOptions.length;
@@ -316,6 +325,7 @@
     return () => cancelAnimationFrame(frame);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!isOpen || section !== 'model' || runtime.catalogPhase !== 'ready') return;
     const focusSearch = showSearch;
@@ -331,6 +341,7 @@
     return () => window.clearTimeout(focusTimer);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!isOpen || section !== 'effort') return;
     const focusTimer = window.setTimeout(() => {
@@ -350,6 +361,7 @@
     return () => window.clearTimeout(focusTimer);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!isOpen) return;
     const nowPending = isEffortPending ? pendingEffortLevel : null;
@@ -381,10 +393,12 @@
   // 11. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep restore trigger focus focused on its single responsibility.
   const restoreTriggerFocus = () => {
     window.setTimeout(() => triggerRef?.focus({ preventScroll: true }), 0);
   };
 
+  // Keep close focused on its single responsibility.
   const close = () => {
     if (isCommitting) return;
     dragRef = null;
@@ -394,6 +408,7 @@
     restoreTriggerFocus();
   };
 
+  // Keep on sheet open change focused on its single responsibility.
   function onSheetOpenChange(next: boolean): void {
     if (!next) {
       if (isCommitting) {
@@ -411,27 +426,30 @@
     sheetOpen = hostOpen;
   }
 
-  // @ds guardrail: do-not-edit — Bits Dialog default auto-focus is prevented so the catalog row / effort radio receives focus, never the close control.
+  // Do not edit — Bits Dialog default auto-focus is prevented so the catalog row / effort radio receives focus, never the close control.
   function onOpenAutoFocus(event: Event): void {
     event.preventDefault();
   }
 
+  // Keep on close auto focus focused on its single responsibility.
   function onCloseAutoFocus(event: Event): void {
     event.preventDefault();
     restoreTriggerFocus();
   }
 
+  // Keep on interact outside focused on its single responsibility.
   function onInteractOutside(event: PointerEvent): void {
     if (isCommitting) event.preventDefault();
   }
 
+  // Keep on overlay click focused on its single responsibility.
   function onOverlayClick(event: MouseEvent): void {
     if (isCommitting) return;
     if (event.target === event.currentTarget) close();
   }
 
-  // @ds slot: drag-handle — grabber + swipe surface.
-  // @ds guardrail: do-not-edit — Swipe-dismiss gesture wiring pairs with the react-aria modal drag choreography.
+  // This slot: drag-handle — grabber + swipe surface.
+  // Do not edit — Swipe-dismiss gesture wiring pairs with the react-aria modal drag choreography.
   const beginSwipe = (event: PointerEvent) => {
     if (isCommitting || event.button !== 0) return;
     if (
@@ -448,12 +466,14 @@
     isDragging = true;
     (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
   };
+  // Keep move swipe focused on its single responsibility.
   const moveSwipe = (event: PointerEvent) => {
     const drag = dragRef;
     if (drag === null || drag.pointerId !== event.pointerId || isCommitting) return;
     event.preventDefault();
     dragOffset = Math.max(0, event.clientY - drag.startY);
   };
+  // Keep end swipe focused on its single responsibility.
   const endSwipe = (event: PointerEvent, canDismiss: boolean) => {
     const drag = dragRef;
     if (drag === null || drag.pointerId !== event.pointerId) return;
@@ -482,7 +502,7 @@
     snapTimerRef = window.setTimeout(() => (isSnapping = false), 220);
   };
 
-  // @ds guardrail: do-not-edit — Sheet keyboard wiring (Escape and '/' shortcuts).
+  // Do not edit — Sheet keyboard wiring (Escape and '/' shortcuts).
   const handleSheetKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape' && section === 'model' && query.length > 0 && !isCommitting) {
       event.preventDefault();
@@ -505,7 +525,7 @@
     }
   };
 
-  // @ds guardrail: do-not-edit — The model commit path stages a draft; commit is the single request to the host (setModel), guarded by canCommit.
+  // Do not edit — The model commit path stages a draft; commit is the single request to the host (setModel), guarded by canCommit.
   const commit = async () => {
     if (!canCommit || draft === null) return;
     isCommitting = true;
@@ -522,7 +542,7 @@
     handleOutcome(response, draft);
   };
 
-  // @ds guardrail: do-not-edit — Outcome reconciliation maps accepted, stale, policy_blocked, and delivery-unknown to the host's authoritative answer.
+  // Do not edit — Outcome reconciliation maps accepted, stale, policy_blocked, and delivery-unknown to the host's authoritative answer.
   const handleOutcome = (response: RuntimeControlResponse, target: AvailableModelDto) => {
     switch (response.outcome.status) {
       case 'accepted':
@@ -553,7 +573,7 @@
     }
   };
 
-  // @ds guardrail: do-not-edit — Effort mutation gating uses anyPending and groupDisabled; requestEffort is the single one-at-a-time request path (setThinkingLevel).
+  // Do not edit — Effort mutation gating uses anyPending and groupDisabled; requestEffort is the single one-at-a-time request path (setThinkingLevel).
   const requestEffort = (level: string) => {
     const state = runtime.state;
     if (state === null || state.thinkingLevel === level) return;
@@ -561,6 +581,7 @@
     void runtimeControls.setThinkingLevel(level);
   };
 
+  // Keep stage model focused on its single responsibility.
   const stageModel = (model: AvailableModelDto) => {
     if (isCommitting || !isModelAvailable(model)) return;
     const key = modelKey(model);
@@ -568,6 +589,7 @@
     mutationMessage = '';
   };
 
+  // Keep on search key down focused on its single responsibility.
   function onSearchKeyDown(event: KeyboardEvent): void {
     const key = event.key;
     if (
@@ -596,6 +618,7 @@
     activeSearchIndex = next;
   }
 
+  // Keep on list key down focused on its single responsibility.
   function onListKeyDown(event: KeyboardEvent): void {
     if (showSearch) return;
     const key = event.key;
@@ -635,6 +658,7 @@
   // 12. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep attach row interactions focused on its single responsibility.
   function attachRowInteractions(node: Element): () => void {
     const el = node as HTMLElement;
     const hoverAction = hover(el);
@@ -647,6 +671,7 @@
     };
   }
 
+  // Keep attach close interactions focused on its single responsibility.
   function attachCloseInteractions(node: Element): () => void {
     const el = node as HTMLElement;
     const hoverAction = hover(el);
@@ -661,6 +686,7 @@
     };
   }
 
+  // Keep attach dialog focused on its single responsibility.
   function attachDialog(node: Element): () => void {
     const el = node as HTMLElement;
     dialogEl = el;
@@ -669,6 +695,7 @@
     };
   }
 
+  // Keep attach modal focused on its single responsibility.
   function attachModal(node: Element): () => void {
     const el = node as HTMLElement;
     modalEl = el;
@@ -678,8 +705,10 @@
   }
 </script>
 
-<!-- @ds surface: model-effort-sheet — host-backed modal overlay. -->
-<!-- @ds guardrail: do-not-edit — React-aria Modal/ModalOverlay wiring (open, dismiss, isKeyboardDismissDisabled) and the polite live announcer. -->
+<!-- Component content -->
+<!-- Model effort sheet -->
+<!-- This surface: model-effort-sheet — host-backed modal overlay. -->
+<!-- Do not edit — React-aria Modal/ModalOverlay wiring (open, dismiss, isKeyboardDismissDisabled) and the polite live announcer. -->
 <span
   class="sr-only"
   role="status"
@@ -690,7 +719,7 @@
   {announcement}
 </span>
 <Sheet bind:open={sheetOpen} onOpenChange={onSheetOpenChange}>
-  <!-- @ds slot: overlay — fixed scrim + placement.
+  <!-- This slot: overlay — fixed scrim + placement.
        Bits Overlay/Content are siblings, so the overlay class lives on Content and the
        modal/dialog nest inside — the original overlay → modal → dialog box tree. -->
   <SheetContent
@@ -705,7 +734,7 @@
     onInteractOutside={onInteractOutside}
     onclick={onOverlayClick}
   >
-    <!-- @ds slot: panel — the Modal raised surface. -->
+    <!-- This slot: panel — the Modal raised surface. -->
     <div
       class={`model-sheet--modal${isDragging ? ' is-dragging' : ''}${isSnapping ? ' is-snapping' : ''}`}
       style="--model-sheet-drag-offset: {dragOffset}px; max-width: 100vw; overflow-x: hidden"
@@ -714,7 +743,7 @@
       <div class="model-sheet--dialog" {@attach attachDialog}>
         <div class="model-sheet--content" onkeydowncapture={handleSheetKeyDown}>
           <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <!-- @ds slot: drag-handle — grabber + swipe region. @ds guardrail: do-not-edit — Pointer swipe handlers. -->
+          <!-- This slot: drag-handle — grabber + swipe region. Do not edit — Pointer swipe handlers. -->
           <div
             class="model-sheet--drag-region"
             data-testid="model-sheet--drag-region"
@@ -724,7 +753,7 @@
             onpointercancel={(event) => endSwipe(event, false)}
           >
             <div class="model-sheet--handle" aria-hidden="true"></div>
-            <!-- @ds slot: header -->
+            <!-- This slot: header -->
             <header class="model-sheet--header">
               <SheetTitle id="model-effort-title" class="model-sheet--title">
                 {section === 'model' ? strings.title : effortStrings.thinkingEffort}
@@ -762,8 +791,8 @@
                 {/each}
               </div>
             {:else if showSearch}
-              <!-- @ds slot: search — shown at the search threshold.
-                   @ds guardrail: do-not-edit — Autocomplete/SearchField wiring. -->
+              <!-- This slot: search — shown at the search threshold.
+                   Do not edit — Autocomplete/SearchField wiring. -->
               <div class="model-sheet-search">
                 <label for="model-sheet-search-input">{strings.searchLabel}</label>
                 <div class="model-sheet-search--control">
@@ -863,7 +892,7 @@
                 </svg>
               </Button>
             </div>
-            <!-- @ds slot: footer -->
+            <!-- This slot: footer -->
             <footer class="model-sheet--footer">
               <Button
                 class="model-sheet--cancel"
@@ -883,9 +912,9 @@
               </Button>
             </footer>
           {:else}
-            <!-- @ds slot: effort-group — the effort section of the sheet (effort-open). -->
-            <!-- @ds state: group aria-busy / pending-effort — while a request is in flight. -->
-            <!-- @ds guardrail: do-not-edit — Effort radio group wiring. -->
+            <!-- This slot: effort-group — the effort section of the sheet (effort-open). -->
+            <!-- This state: group aria-busy / pending-effort — while a request is in flight. -->
+            <!-- Do not edit — Effort radio group wiring. -->
             <section class="effort-sheet--section" aria-label={effortStrings.thinkingEffort}>
               {#if effortStatus !== null}
                 <p id="effort-sheet--status" class="effort-sheet--status">
@@ -957,7 +986,7 @@
   {:else if rows === 0 && catalog.retiredCurrent === null}
     <p class="model-sheet--empty">{noModelMatchMessage(displayModel(deferredQuery))}</p>
   {:else}
-    <!-- @ds slot: model-list — catalog rows on the model-open section. -->
+    <!-- This slot: model-list — catalog rows on the model-open section. -->
     <div
       role="listbox"
       id={MODEL_LISTBOX_ID}
@@ -1008,8 +1037,8 @@
     isSelected: isDraft,
     isApplying,
   })}
-  <!-- @ds slot: model-list row. -->
-   <!-- @ds guardrail: do-not-edit — React-aria ListBoxItem wiring: aria-current, aria-busy, aria-describedby, roving focus, onAction/onKeyDown. -->
+  <!-- This slot: model-list row. -->
+   <!-- Do not edit — React-aria ListBoxItem wiring: aria-current, aria-busy, aria-describedby, roving focus, onAction/onKeyDown. -->
   <div
     role="option"
     id={key}
@@ -1097,21 +1126,22 @@
   {/if}
 {/snippet}
 
-<!-- @ds surface: model-effort-sheet — the model picker + effort sheet overlay. Decomposed into this scoped block;
+<!-- Model effort sheet -->
+<!-- This surface: model-effort-sheet — the model picker + effort sheet overlay. Decomposed into this scoped block;
      model-effort-sheet owned rules and this sheet's owned members of mixed pairs move with it.
      Shared overlay/modal chrome (.react-aria-Popover, system-wide prefers-reduced-motion grouping
      .model-sheet--modal with plan-review--modal / session--card) stays global. Effort radio-group
      rules stay with EffortRadioGroup.svelte. Child-primitive classes and react-aria/runtime
      data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>
-  /* @ds surface: model-effort-sheet — the model picker + effort sheet overlay. */
-  /* @ds surface: overlay — model-effort-sheet is an INSTANCE of the shared overlay
+  /* This surface: model-effort-sheet — the model picker + effort sheet overlay. */
+  /* This surface: overlay — model-effort-sheet is an INSTANCE of the shared overlay
      primitive (backdrop → raised panel → grabber → header/body/footer).
      Physical unification of the per-surface overlay chrome is a documented follow-up. */
-  /* @ds slot: backdrop — the ModalOverlay scrim + placement. */
+  /* This slot: backdrop — the ModalOverlay scrim + placement. */
   /* The model catalog is host-authored; the sheet can only request a host-authorized change. */
   :global(.model-sheet--overlay) {
-    /* @ds edit: tokens — component tokens. Each is a thin alias to a semantic role,
+    /* Editable seam: tokens — component tokens. Each is a thin alias to a semantic role,
        so this surface retints by editing the role it points at (primitive → semantic
        → component). Edit them here instead of on :root. */
     --model-sheet-raised: var(--surface);
@@ -1132,13 +1162,13 @@
     animation: model-sheet-backdrop-in 180ms ease-out;
   }
 
-  /* @ds state: exiting — backdrop fade-out while the overlay unmounts. */
-   /* @ds guardrail: do-not-edit — The data-exiting / drag / snap choreography is driven by the modal exit and swipe-dismiss handlers; dismissal semantics never change here. */
+  /* This state: exiting — backdrop fade-out while the overlay unmounts. */
+   /* Do not edit — The data-exiting / drag / snap choreography is driven by the modal exit and swipe-dismiss handlers; dismissal semantics never change here. */
   :global(.model-sheet--overlay[data-exiting]) {
     animation: model-sheet-backdrop-out 220ms ease-in;
   }
 
-  /* @ds edit: tokens — theme remap, dark. The same component tokens resolve to their
+  /* Editable seam: tokens — theme remap, dark. The same component tokens resolve to their
      dark semantic roles here. The ui-accent points at --accent-ink, not --accent-strong,
      because --accent-strong carries no dark override and would not match the dark
      UI accent. */
@@ -1152,7 +1182,7 @@
   }
 
   @media (prefers-color-scheme: dark) {
-    /* @ds edit: tokens — theme remap, system-dark. Dark semantic roles again, driven
+    /* Editable seam: tokens — theme remap, system-dark. Dark semantic roles again, driven
        by the OS-dark signal; ui-accent resolves to --accent-ink for the same reason
        as the explicit dark block. */
     :global(:root[data-theme='system'] .model-sheet--overlay) {
@@ -1165,12 +1195,12 @@
     }
   }
 
-  /* @ds end surface: model-effort-sheet */
+  /* End of surface: model-effort-sheet */
 
-  /* @ds edit: layout — sheet stacking, sizing, and the live drag-offset pull. */
-  /* @ds slot: panel — the Modal raised surface; the --model-sheet-drag-offset var
+  /* Editable seam: layout — sheet stacking, sizing, and the live drag-offset pull. */
+  /* This slot: panel — the Modal raised surface; the --model-sheet-drag-offset var
      stays the layout input for swipe-dismiss. */
-  /* @ds state: opening · open — entry rise/settle, then rest; exiting, dragging and
+  /* This state: opening · open — entry rise/settle, then rest; exiting, dragging and
      snapping are separate state rules below. */
   .model-sheet--modal {
     inline-size: min(92vw, 24rem);
@@ -1184,23 +1214,23 @@
     animation: model-sheet-in 280ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
-  /* @ds state: dragging — free drag while a swipe is in flight. */
+  /* This state: dragging — free drag while a swipe is in flight. */
   .model-sheet--modal.is-dragging {
     animation: none;
     transition: none;
   }
 
-  /* @ds state: snapping — settle back to rest after a swipe. */
+  /* This state: snapping — settle back to rest after a swipe. */
   .model-sheet--modal.is-snapping {
     transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
-  /* @ds state: exiting — panel slides down + fades while the overlay unmounts. */
+  /* This state: exiting — panel slides down + fades while the overlay unmounts. */
   :global(.model-sheet--overlay[data-exiting]) .model-sheet--modal {
     animation: model-sheet-out 220ms ease-in;
   }
 
-  /* @ds edit: layout — sheet body column with symmetric block-end and intentionally
+  /* Editable seam: layout — sheet body column with symmetric block-end and intentionally
      asymmetric inline safe-area insets (left/right preserved). */
   .model-sheet--dialog {
     display: flex;
@@ -1214,11 +1244,12 @@
     font-family: var(--font-sans);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--content {
     display: contents;
   }
 
-  /* @ds slot: drag-handle — grabber + swipe surface. */
+  /* This slot: drag-handle — grabber + swipe surface. */
   .model-sheet--drag-region {
     flex: 0 0 auto;
     cursor: grab;
@@ -1226,10 +1257,12 @@
     user-select: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--drag-region:active {
     cursor: grabbing;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--handle {
     inline-size: 36px;
     block-size: 4px;
@@ -1241,7 +1274,7 @@
     opacity: 0.65;
   }
 
-  /* @ds slot: header */
+  /* This slot: header */
   .model-sheet--header {
     display: flex;
     align-items: center;
@@ -1251,6 +1284,7 @@
     padding-inline: var(--space-4);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet--title) {
     margin: 0;
     color: var(--model-sheet-ink);
@@ -1260,6 +1294,7 @@
     line-height: 1.2;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet--close) {
     display: grid;
     inline-size: 44px;
@@ -1274,13 +1309,14 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet--close[data-hovered]),
   :global(.model-sheet--cancel[data-hovered]) {
     background: var(--model-sheet-selection);
   }
 
-  /* @ds slot: status-lines — policy, catalog state, mutation, and empty copy. */
-  /* @ds state: model-open — the model picker panel. */
+  /* This slot: status-lines — policy, catalog state, mutation, and empty copy. */
+  /* This state: model-open — the model picker panel. */
   .model-sheet--policy,
   .model-sheet--catalog-state,
   .model-sheet--mutation,
@@ -1291,6 +1327,7 @@
     line-height: 1.45;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--policy,
   .model-sheet--catalog-state,
   .model-sheet--mutation {
@@ -1298,7 +1335,7 @@
     padding-inline: var(--space-4);
   }
 
-  /* @ds state: terminal-blocked — streaming or delivery barrier seam. */
+  /* This state: terminal-blocked — streaming or delivery barrier seam. */
   .model-sheet--policy,
   .model-sheet--mutation.is-barrier {
     border-block: 1px solid var(--model-sheet-ui-accent);
@@ -1306,6 +1343,7 @@
     color: var(--model-sheet-accent);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--catalog-state :global(button) {
     min-block-size: 44px;
     border: 0;
@@ -1316,8 +1354,8 @@
     text-underline-offset: 0.15em;
   }
 
-  /* @ds slot: search — rendered only when the catalog reaches the search threshold. */
-  /* @ds state: search-shown — the ≥8-model finder seam. */
+  /* This slot: search — rendered only when the catalog reaches the search threshold. */
+  /* This state: search-shown — the ≥8-model finder seam. */
   .model-sheet-search {
     display: grid;
     gap: 0.35rem;
@@ -1328,6 +1366,7 @@
     font-weight: 620;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-search--control {
     display: flex;
     min-inline-size: 0;
@@ -1341,6 +1380,7 @@
     color: var(--model-sheet-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-search input {
     min-inline-size: 0;
     min-block-size: 42px;
@@ -1352,11 +1392,13 @@
     font-size: 1rem;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-search--control:focus-within {
     outline: 2px solid var(--model-sheet-ui-accent);
     outline-offset: 2px;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet-search--clear) {
     min-inline-size: 44px;
     min-block-size: 44px;
@@ -1368,7 +1410,7 @@
     font-weight: 620;
   }
 
-  /* @ds slot: model-list — catalog rows, on the model-open section. */
+  /* This slot: model-list — catalog rows, on the model-open section. */
   .model-sheet--list {
     display: grid;
     min-inline-size: 0;
@@ -1382,12 +1424,14 @@
     outline: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--list .react-aria-ListBoxSection {
     display: grid;
     min-inline-size: 0;
     gap: 2px;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--list .react-aria-Header {
     padding-block: 0.5rem 0.25rem;
     padding-inline: var(--space-2);
@@ -1398,6 +1442,7 @@
     text-transform: uppercase;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-row {
     display: grid;
     min-inline-size: 0;
@@ -1414,16 +1459,19 @@
     outline: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet-row[data-hovered]),
   :global(.model-sheet-row[data-focused]) {
     background: var(--model-sheet-selection);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-row[data-selected] {
     border-color: var(--model-sheet-ui-accent);
     background: var(--model-sheet-selection);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet-row[data-focus-visible]),
   :global(.model-sheet--close[data-focus-visible]),
   :global(.model-sheet--cancel[data-focus-visible]),
@@ -1439,12 +1487,13 @@
     outline-offset: 2px;
   }
 
-  /* @ds state: read-only / disabled — model row not actionable. */
+  /* This state: read-only / disabled — model row not actionable. */
   .model-sheet-row[data-disabled] {
     cursor: default;
     opacity: 0.72;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-row--main,
   .model-sheet-row--states,
   .model-sheet-row--description {
@@ -1453,17 +1502,20 @@
     align-items: center;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-row--main {
     flex-wrap: wrap;
     gap: 0.2rem var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-row--label {
     overflow-wrap: anywhere;
     font-size: 0.98rem;
     font-weight: 650;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-row--id {
     overflow: hidden;
     max-inline-size: 100%;
@@ -1474,6 +1526,7 @@
     unicode-bidi: isolate;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-row--states {
     justify-content: flex-end;
     gap: 0.35rem;
@@ -1482,6 +1535,7 @@
     font-weight: 700;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-state--current,
   .model-state--selected {
     display: inline-flex;
@@ -1490,6 +1544,7 @@
     white-space: nowrap;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet-row--description {
     grid-column: 1 / -1;
     flex-wrap: wrap;
@@ -1499,23 +1554,27 @@
     line-height: 1.35;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-state--unavailable {
     color: var(--model-sheet-accent);
     font-weight: 650;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--empty {
     min-block-size: 9rem;
     padding: var(--space-6) var(--space-4);
     text-align: center;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--skeletons {
     display: grid;
     gap: var(--space-2);
     padding: var(--space-3);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--skeleton {
     min-block-size: 64px;
     border-radius: 14px;
@@ -1523,11 +1582,12 @@
     animation: model-sheet-pulse 1.2s ease-in-out infinite alternate;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .model-sheet--mutation {
     min-block-size: 2.5rem;
   }
 
-  /* @ds slot: footer */
+  /* This slot: footer */
   .model-sheet--footer {
     display: grid;
     flex: 0 0 auto;
@@ -1538,6 +1598,7 @@
     border-block-start: 1px solid color-mix(in srgb, var(--model-sheet-muted) 35%, transparent);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet--cancel),
   :global(.model-sheet--switch) {
     min-inline-size: 0;
@@ -1548,19 +1609,21 @@
     overflow-wrap: anywhere;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet--cancel) {
     border: 1px solid var(--model-sheet-muted);
     background: transparent;
     color: var(--model-sheet-ink);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet--switch) {
     border: 1px solid var(--model-sheet-ui-accent);
     background: var(--model-sheet-ink);
     color: var(--model-sheet-raised);
   }
 
-  /* @ds state: committing / disabled — model & effort actions locked while a request
+  /* This state: committing / disabled — model & effort actions locked while a request
      is in flight or change authority is blocked. */
   :global(.model-sheet--switch[data-disabled]),
   :global(.model-sheet--cancel[data-disabled]),
@@ -1610,6 +1673,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.model-sheet--overlay),
     :global(.model-sheet--overlay[data-exiting]),
     :global(.model-sheet--overlay[data-exiting]) .model-sheet--modal,
@@ -1617,6 +1681,7 @@
       animation: none;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.model-sheet--overlay[data-exiting]) .model-sheet--modal,
     :global(.model-sheet--overlay) :global(button):active:not(:disabled),
     :global(.model-sheet--overlay) :global(button[data-pressed]):not([data-disabled]) {
@@ -1635,7 +1700,7 @@
   }
 
   /* ── Effort section: one full-width radio row per host-advertised level ── */
-  /* @ds state: effort-open — the sheet draws its effort section. */
+  /* This state: effort-open — the sheet draws its effort section. */
   .effort-sheet--section {
     display: flex;
     min-inline-size: 0;
@@ -1644,7 +1709,7 @@
     flex-direction: column;
   }
 
-  /* @ds state: pending-effort — the status line reporting the in-flight effort request. */
+  /* This state: pending-effort — the status line reporting the in-flight effort request. */
   .effort-sheet--status {
     flex: 0 0 auto;
     margin: 0;
@@ -1655,11 +1720,13 @@
     line-height: 1.45;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .effort-sheet-reconcile {
     flex: 0 0 auto;
     padding-inline: var(--space-4);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.effort-sheet-reconcile--button) {
     min-block-size: 44px;
     border: 0;
@@ -1670,6 +1737,7 @@
     text-underline-offset: 0.15em;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .effort-radio--scroll {
     min-inline-size: 0;
     min-block-size: 0;
@@ -1704,11 +1772,13 @@
     padding-block: var(--space-1) var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .effort-sheet-nav {
     justify-content: flex-start;
     padding-inline: var(--space-4);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet-nav--button),
   :global(.effort-sheet-nav--button) {
     display: inline-flex;
@@ -1724,6 +1794,7 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.model-sheet-nav--button[data-hovered]),
   :global(.effort-sheet-nav--button[data-hovered]) {
     color: var(--model-sheet-ink);
@@ -1737,6 +1808,7 @@
   }
 
   @media (max-width: 360px) {
+    /* Keep this rule aligned with its surrounding surface. */
     .model-sheet--header,
     .model-sheet-search,
     .model-sheet--policy,

@@ -1,3 +1,5 @@
+// This module holds the shared Plan Mode Presentation types, data, and helpers.
+
 // Fail-closed plan-mode presentation for host-confirmed authority (React-free port of PlanModeButton).
 
 // ───────────────────────────────────────────────────────────────────
@@ -11,7 +13,7 @@ import { runtimeIssueMessage } from '$shared/state/runtime-issues.js';
 // 2. TYPE DEFINITIONS
 // ───────────────────────────────────────────────────────────────────
 
-// @ds state: chart — the ModePresentationKind set; each kind maps to an is-<kind> class seam.
+// This state: chart — the ModePresentationKind set; each kind maps to an is-<kind> class seam.
 export type ModePresentationKind =
   | 'checking'
   | 'build'
@@ -63,7 +65,7 @@ function confirmedLabelFor(confirmedMode: string): string {
 // ───────────────────────────────────────────────────────────────────
 
 /** Fail-closed labels from committed runtime + connection; host-confirmed mode only. */
-// @ds guardrail: do-not-edit — Default-deny, fail-closed derivation; every value is bounded local copy and no mode is guessed beyond what the host confirmed. Not designer-editable.
+// Do not edit — Default-deny, fail-closed derivation; every value is bounded local copy and no mode is guessed beyond what the host confirmed. Not designer-editable.
 export function planModePresentation(
   runtime: RuntimeUiState,
   connection: string,

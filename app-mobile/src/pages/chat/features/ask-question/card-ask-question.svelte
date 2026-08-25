@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Card Ask Question types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -55,8 +56,8 @@
 
   let { block, canAnswer = true, principal }: AskQuestionCardProps = $props();
 
-  // @ds surface: ask-question — the one-use interactive question card; slot seams below.
-  // @ds guardrail: One-use ticketed, revision-bound, FAIL-CLOSED mutation path. Ticketing, revision binding, non-optimistic submit, and keyboard/a11y wiring live in the hooks and are NOT designer-editable. Only the @ds surface: ask-question CSS is editable.
+  // This surface: ask-question — the one-use interactive question card; slot seams below.
+  // Do not edit — One-use ticketed, revision-bound, FAIL-CLOSED mutation path. Ticketing, revision binding, non-optimistic submit, and keyboard/a11y wiring live in the hooks and are NOT designer-editable. Only the This surface: ask-question CSS is editable.
 
   // ───────────────────────────────────────────────────────────────────
   // 6. LOCAL STATE
@@ -110,6 +111,7 @@
   // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const sessionId = block.sessionId;
     const questionId = block.questionId;
@@ -140,11 +142,13 @@
     };
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const status = block.status;
     untrack(() => stateApi.applyTranscriptStatus(status));
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const vm = viewModel;
     const phase = stateApi.state.phase;
@@ -162,6 +166,7 @@
   // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep submit answer focused on its single responsibility.
   function submitAnswer(): void {
     if (terminal || submitting) return;
     const intent = stateApi.beginSubmit();
@@ -187,8 +192,9 @@
   );
 </script>
 
+<!-- Component content -->
 {#if viewModel === null}
-  <!-- @ds state: loading — the display is being fetched; no interactive controls yet. -->
+  <!-- This state: loading — the display is being fetched; no interactive controls yet. -->
   <article
     bind:this={cardEl}
     class="ask-question-card ask-question-card--loading"
@@ -213,15 +219,15 @@
     aria-busy={submitting}
     tabindex="-1"
   >
-    <!-- @ds slot: prompt — question eyebrow + display headline. -->
+    <!-- This slot: prompt — question eyebrow + display headline. -->
     <AskQuestionPrompt {viewModel} />
-    <!-- @ds slot: read-only-hint — note shown while this authenticated read-only session gates answers. -->
+    <!-- This slot: read-only-hint — note shown while this authenticated read-only session gates answers. -->
     {#if viewModel.requiresReadOnlyHint}
       <p class="ask-question--read-only-hint">
         Answers are sent only while this authenticated read-only session is active.
       </p>
     {/if}
-    <!-- @ds slot: form — answer controls; the guarded one-use submit mutation is not editable. -->
+    <!-- This slot: form — answer controls; the guarded one-use submit mutation is not editable. -->
     {#if !terminal}
       <form
         class="ask-question--form"
@@ -234,14 +240,14 @@
         {#if viewModel.display.options.length > 0}
           <span id={optionsLabelId} class="sr-only">Answer options</span>
         {/if}
-        <!-- @ds slot: options — the option-row list + selection, disabled in guarded states. -->
+        <!-- This slot: options — the option-row list + selection, disabled in guarded states. -->
         <AskQuestionOptionList
           {viewModel}
           selectedOptionIds={stateApi.state.selectedOptionIds}
           disabled={controlsDisabled}
           onToggle={stateApi.selectOption}
         />
-        <!-- @ds slot: free-text — optional/required response textarea. -->
+        <!-- This slot: free-text — optional/required response textarea. -->
         <AskQuestionFreeText
           {viewModel}
           value={stateApi.state.freeText}
@@ -260,28 +266,29 @@
             {stateApi.validationMessage}
           </p>
         {/if}
-        <!-- @ds slot: submit — the guarded one-use submit button; disabled binding preserved. -->
+        <!-- This slot: submit — the guarded one-use submit button; disabled binding preserved. -->
         <AskQuestionSubmitButton disabled={!canAnswer || !stateApi.canSubmit || submitting || terminal} />
       </form>
     {/if}
-    <!-- @ds slot: status — live form-state line (sent ✓ · error ! · idle •). -->
+    <!-- This slot: status — live form-state line (sent ✓ · error ! · idle •). -->
     <AskQuestionStatus state={effectiveState} />
-    <!-- @ds state: sent — answer accepted by Pi; the immutable ✓ line. -->
+    <!-- This state: sent — answer accepted by Pi; the immutable ✓ line. -->
     {#if effectiveState.phase === 'answered-immutable' && effectiveState.errorReason === null}
       <p class="ask-question--answered-line" aria-hidden="true">Answer accepted by Pi.</p>
     {/if}
-    <!-- @ds slot: read-only-hint — reconnect note shown when the session cannot answer. -->
+    <!-- This slot: read-only-hint — reconnect note shown when the session cannot answer. -->
     {#if !canAnswer && !terminal}
       <p class="ask-question--read-only-hint">Reconnect before submitting an answer.</p>
     {/if}
   </article>
 {/if}
 
-<!-- @ds surface: ask-question-card — the question card frame: submit progress bar (+ its keyframes),
+<!-- Ask question card -->
+<!-- This surface: ask-question-card — the question card frame: submit progress bar (+ its keyframes),
      loading state, form column, validation alert, and answered line. Decomposed into this scoped block; the
      @keyframes moves with the card so Svelte scopes both together. Values unchanged. -->
 <style>
-  /* @ds surface: ask-question-card — the one-use interactive question card frame. */
+  /* This surface: ask-question-card — the one-use interactive question card frame. */
   .ask-question-card {
     position: relative;
     display: grid;
@@ -298,7 +305,7 @@
     overscroll-behavior: contain;
   }
 
-  /* @ds state: submitting — progress bar over the card while the guarded submit is in flight. */
+  /* This state: submitting — progress bar over the card while the guarded submit is in flight. */
   .ask-question-card--submitting::before {
     position: absolute;
     inset-block-start: -1px;
@@ -312,29 +319,32 @@
     animation: ask-question-progress 1.2s var(--ease-out-interface) infinite;
   }
 
-  /* @ds guardrail: keyframes — The submitting progress choreography; not designer-editable. */
+  /* Do not edit — keyframes — The submitting progress choreography; not designer-editable. */
   @keyframes ask-question-progress {
+    /* Keep this rule aligned with its surrounding surface. */
     0% {
       opacity: 0.45;
       transform: scaleX(0.15);
     }
+    /* Keep this rule aligned with its surrounding surface. */
     55% {
       opacity: 1;
       transform: scaleX(0.72);
     }
+    /* Keep this rule aligned with its surrounding surface. */
     100% {
       opacity: 0.45;
       transform: scaleX(1);
     }
   }
 
-  /* @ds state: loading — display fetch in progress; no interactive controls yet. */
+  /* This state: loading — display fetch in progress; no interactive controls yet. */
   .ask-question-card--loading {
     min-block-size: 2rem;
     border-color: var(--line);
   }
 
-  /* @ds slot: read-only-hint · @ds state: read-only — note when this authenticated read-only session gates answers. */
+  /* This slot: read-only-hint · This state: read-only — note when this authenticated read-only session gates answers. */
   .ask-question--read-only-hint {
     max-inline-size: var(--reading-width);
     margin: 0;
@@ -343,14 +353,14 @@
     line-height: 1.45;
   }
 
-  /* @ds slot: form — the answer controls column; the guarded one-use submit lives here. */
+  /* This slot: form — the answer controls column; the guarded one-use submit lives here. */
   .ask-question--form {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-4);
   }
 
-  /* @ds slot: validation · @ds state: error — the assertive alert for a validation problem. */
+  /* This slot: validation · This state: error — the assertive alert for a validation problem. */
   .ask-question--validation {
     margin: 0;
     color: var(--accent-ink);
@@ -358,7 +368,7 @@
     line-height: 1.4;
   }
 
-  /* @ds slot: answered-line · @ds state: sent — the "Answer accepted by Pi." line (accent-inked). */
+  /* This slot: answered-line · This state: sent — the "Answer accepted by Pi." line (accent-inked). */
   .ask-question--answered-line {
     margin: 0;
     color: var(--accent-ink);
@@ -367,19 +377,22 @@
   }
 
   @media (max-width: 30rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .ask-question-card {
       padding: var(--space-3);
       gap: var(--space-3);
     }
   }
 
-  /* @ds guardrail: do-not-edit — Reduced-motion collapses card + submit animation/transition. */
+  /* Do not edit — Reduced-motion collapses card + submit animation/transition. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .ask-question-card {
       animation: none !important;
       transition: none !important;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .ask-question-card--submitting::before {
       display: none;
       animation: none !important;

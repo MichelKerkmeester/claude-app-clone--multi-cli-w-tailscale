@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: MENU ITEM
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: MenuItem — Preserve Bits UI's menu-item semantics while consumers own the item presentation.
+  // This primitive: MenuItem — Preserve Bits UI's menu-item semantics while consumers own the item presentation.
   import { DropdownMenu } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
@@ -13,4 +13,5 @@
   let { children, ...rest }: Props = $props();
 </script>
 
+<!-- Component content -->
 <DropdownMenu.Item {...rest}>{@render children()}</DropdownMenu.Item>

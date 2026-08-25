@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Screen Review types and helpers.
   export interface ReviewProps {
     readonly sessions: readonly { readonly id: string }[];
     readonly onBack: () => void;
@@ -42,6 +43,7 @@
   // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const controller = new AbortController();
     void loadApprovals(sessions, controller.signal)
@@ -65,6 +67,7 @@
     };
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (focusId !== null && approvals.some((approval) => approval.approvalId === focusId)) {
       document.getElementById(`approval-${focusId}`)?.scrollIntoView({ block: 'center' });
@@ -75,6 +78,7 @@
   // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep decide focused on its single responsibility.
   function decide(approval: ApprovalCardDto, decision: 'approve' | 'deny'): void {
     pendingId = approval.approvalId;
     error = null;
@@ -91,11 +95,14 @@
   }
 </script>
 
-<!-- @ds surface: review--view — exact-action review list. States: empty · pending · expired · submitted · error. -->
-<!-- @ds guardrail: approval decisioning + grant tracking — Not designer-editable. -->
+<!-- Component content -->
+<!-- Review view -->
+<!-- This surface: review--view — exact-action review list. States: empty · pending · expired · submitted · error. -->
+<!-- Do not edit — approval decisioning + grant tracking — Not designer-editable. -->
 <main class="review--view">
   <div class="session--toolbar">
-    <!-- @ds surface: back-button — quiet back arrow. react-aria Button wiring guarded. -->
+<!-- Back button -->
+    <!-- This surface: back-button — quiet back arrow. react-aria Button wiring guarded. -->
     <Button class="back-button" onclick={onBack}>
       Back to sessions
     </Button>
@@ -118,7 +125,7 @@
   {#if error !== null}
     <div class="inline-alert">{error}</div>
   {/if}
-  <!-- @ds guardrail: sr-only live region announces decision state — Not designer-editable. -->
+  <!-- Do not edit — sr-only live region announces decision state — Not designer-editable. -->
   <div class="sr-only" aria-live="polite" aria-atomic="true">
     {pendingId === null ? '' : 'Decision submitted. Verifying at host.'}
   </div>
@@ -157,7 +164,7 @@
           </div>
           {#if approval.status === 'pending' && !expired}
             <div class="approval--actions">
-              <!-- @ds guardrail: deny / approve / grant onPress decisioning — Not designer-editable. -->
+              <!-- Do not edit — deny / approve / grant onPress decisioning — Not designer-editable. -->
               <div class="approval--decision-group" role="group" aria-label="Single action approval">
                 <Button class="deny-button" disabled={submitted} onclick={() => decide(approval, 'deny')}>
                   Deny
@@ -209,7 +216,8 @@
   </section>
 </main>
 
-<!-- @ds surface: review--view — exact-action review list. Decomposed into this scoped block; approval--card and its
+<!-- Review view -->
+<!-- This surface: review--view — exact-action review list. Decomposed into this scoped block; approval--card and its
      descendants, approval--actions, and the result-* state variants are owned solely by this component so
      they move with it. The .back-button solo extension and the .approval--actions button / .deny-button /
      .grant--button child-primitive selectors use :global so Svelte scoping cannot drop them. The shared
@@ -221,14 +229,14 @@
      group (shared with composer/enrollment/push), and .inline-alert / .surface--eyebrow / .empty--state /
      .empty--icon / .sr-only are shared by 2+ components and stay global in app.css. Values unchanged. -->
 <style>
-  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
-  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
+  /* This surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
+  /* Editable seam: layout — page gutter + safe bottom inset shared by routed surfaces. */
   .review--view {
     padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
   }
 
-  /* @ds surface: home-view — hero, session roster, device footer, push settings. */
-  /* @ds state: loading · empty · error · stale — via shared empty--state, inline-alert and freshness surfaces. */
+  /* This surface: home-view — hero, session roster, device footer, push settings. */
+  /* This state: loading · empty · error · stale — via shared empty--state, inline-alert and freshness surfaces. */
   .review--heading h1 {
     max-width: 13ch;
     margin: 0;
@@ -240,33 +248,35 @@
     text-wrap: balance;
   }
 
-  /* @ds surface: back-button — quiet back arrow, built on the shared chrome-button base. */
+  /* This surface: back-button — quiet back arrow, built on the shared chrome-button base. */
   :global(.back-button) {
     position: relative;
     padding-inline-start: 1.65rem;
   }
 
-  /* @ds slot: chevron */
+  /* This slot: chevron */
   :global(.back-button::before) {
     position: absolute;
     inset-inline-start: 0.65rem;
     content: '←';
   }
-  /* @ds end surface: back-button */
+  /* End of surface: back-button */
 
-  /* @ds surface: review--heading — review surface intro (states below via approval--card / inline-alert). */
-  /* @ds surface: inbox--heading — inbox surface intro (states: empty · error). */
-  /* @ds slot: heading — surface title + description. */
+  /* This surface: review--heading — review surface intro (states below via approval--card / inline-alert). */
+  /* This surface: inbox--heading — inbox surface intro (states: empty · error). */
+  /* This slot: heading — surface title + description. */
   .review--heading {
     max-width: 58rem;
     padding-bottom: clamp(2.5rem, 7vw, 5rem);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .review--heading h1 {
     max-width: 15ch;
     font-size: clamp(2.8rem, 7vw, 5.6rem);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .review--heading > p:last-child {
     max-width: 43rem;
     margin: var(--space-6) 0 0;
@@ -275,9 +285,9 @@
     line-height: 1.65;
   }
 
-  /* @ds state: info — grant--banner (active accept-edits lease). */
-  /* @ds state: error — inline-alert (surface error). */
-  /* @ds state: stale — barrier-note (reconciliation / checking). */
+  /* This state: info — grant--banner (active accept-edits lease). */
+  /* This state: error — inline-alert (surface error). */
+  /* This state: stale — barrier-note (reconciliation / checking). */
   .grant--banner {
     margin-bottom: var(--space-4);
     padding: var(--space-4);
@@ -289,11 +299,13 @@
     line-height: 1.45;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--list {
     display: grid;
     gap: var(--space-4);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--card {
     overflow: hidden;
     border: 1px solid var(--line);
@@ -301,11 +313,13 @@
     background: var(--surface);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--pending {
     border-color: color-mix(in oklch, var(--warning) 55%, var(--line));
     box-shadow: var(--shadow-raised);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--card > header,
   .approval--tool,
   .approval--arguments {
@@ -316,6 +330,7 @@
     border-bottom: 1px solid var(--line);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--card > header,
   .approval--tool > span,
   .approval--arguments > span,
@@ -327,20 +342,24 @@
     line-height: 1.4;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--card > header time {
     color: var(--warning);
     font-variant-numeric: tabular-nums;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--tool strong {
     font-family: var(--font-mono);
     font-size: 0.92rem;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--arguments {
     display: grid;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--arguments pre {
     margin: 0;
     overflow: auto;
@@ -352,6 +371,7 @@
     overflow-wrap: anywhere;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--digest,
   .approval--result {
     padding: var(--space-3) var(--space-6);
@@ -359,18 +379,21 @@
     font-family: var(--font-mono);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--actions {
     display: grid;
     gap: var(--space-4);
     padding: var(--space-4) var(--space-6) var(--space-6);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--decision-group {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-3);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .approval--grant-group {
     display: grid;
     gap: var(--space-3);
@@ -378,6 +401,7 @@
     border-block-start: 1px solid var(--line-strong);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.approval--actions button) {
     min-height: 3rem;
     padding-inline: var(--space-3);
@@ -394,46 +418,55 @@
       transform var(--duration-fast) var(--ease-out);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.approval--actions button[data-hovered]) {
     background: var(--accent-strong);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.approval--actions button[data-disabled]) {
     background: var(--surface-muted);
     color: var(--ink-muted);
     cursor: wait;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.approval--actions .deny-button) {
     background: var(--danger-soft);
     color: var(--danger);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.approval--actions .deny-button[data-hovered]) {
     background: var(--danger);
     color: white;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.approval--actions .grant--button) {
     border: 1px solid var(--line-strong);
     background: var(--surface);
     color: var(--ink);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.approval--actions .grant--button[data-hovered]) {
     background: var(--surface-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .result--approved,
   .result--consumed {
     color: var(--success);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .result--verifying {
     color: var(--warning);
     animation: signal-pulse 1.4s ease-in-out infinite;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .result--denied,
   .result--expired,
   .result--revoked,
@@ -442,26 +475,29 @@
   }
 
   @media (max-width: 39rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .review--view {
       padding-top: var(--space-6);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .approval--card > header,
     .approval--tool {
       align-items: flex-start;
       flex-direction: column;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .approval--decision-group {
       grid-template-columns: 1fr;
     }
   }
 
-  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
+  /* Editable seam: layout — safe inline gutters for the routed surfaces. */
   .review--view {
     padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
     padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
   }
 
-  /* @ds end surface: review--view */
+  /* End of surface: review--view */
 </style>

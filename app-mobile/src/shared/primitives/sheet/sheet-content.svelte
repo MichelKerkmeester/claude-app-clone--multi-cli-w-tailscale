@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: SHEET CONTENT
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: SheetContent — Keep assistive technology within the open sheet by hiding unrelated outside content.
+  // This primitive: SheetContent — Keep assistive technology within the open sheet by hiding unrelated outside content.
   import { Dialog } from 'bits-ui';
   import { getSheetContext, hideOutside } from '../a11y/aria-hide-outside.svelte.js';
   import type { Snippet } from 'svelte';
@@ -17,12 +17,14 @@
   let overlayEl = $state<HTMLElement | null>(null);
   const sheetContext = getSheetContext();
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (sheetContext?.isOpen() !== true || contentEl === null || overlayEl === null) return;
     return hideOutside([contentEl, overlayEl]);
   });
 </script>
 
+<!-- Component content -->
 <Dialog.Portal>
   <Dialog.Overlay bind:ref={overlayEl} class={overlayClass} />
   <Dialog.Content bind:ref={contentEl} {...rest}>{@render children()}</Dialog.Content>

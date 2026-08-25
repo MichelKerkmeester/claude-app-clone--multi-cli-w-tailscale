@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Normalized Activity Group types and helpers.
   import type { NormalizedActivityBlock } from '../rich-content/normalize-transcript-blocks.js';
 
   export interface NormalizedActivityGroupProps {
@@ -43,6 +44,7 @@
   // 4. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const button = triggerButton;
     if (button === null) return;
@@ -54,6 +56,7 @@
   // 5. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep attach evidence trigger focused on its single responsibility.
   function attachEvidenceTrigger(node: HTMLElement): (() => void) | void {
     const button = node.parentElement;
     if (!(button instanceof HTMLButtonElement)) return;
@@ -68,10 +71,13 @@
   }
 </script>
 
-<!-- @ds surface: activity--group — grouped bare evidence surface. -->
-<!-- @ds surface: evidence-disclosure — grouped activity disclosure. -->
+<!-- Component content -->
+<!-- Activity group -->
+<!-- This surface: activity--group — grouped bare evidence surface. -->
+<!-- Evidence disclosure -->
+<!-- This surface: evidence-disclosure — grouped activity disclosure. -->
 <div class="activity--group">
-  <!-- @ds guardrail: react-aria Disclosure wiring — not designer-editable. -->
+  <!-- Do not edit — react-aria Disclosure wiring — not designer-editable. -->
   <Collapsible bind:open={disclosure.open}>
     {#snippet trigger()}
       <span class="evidence--chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>
@@ -85,20 +91,21 @@
   </Collapsible>
 </div>
 
-<!-- @ds surface: activity--group — grouped bare evidence surface. Decomposed into this scoped block;
+<!-- Activity group -->
+<!-- This surface: activity--group — grouped bare evidence surface. Decomposed into this scoped block;
      activity--group/activity--stack are owned solely by this component so they move with it (scoped).
      evidence--trigger/chevron/summary are shared with CollapsedEvidence and stay :global there
      (CollapsedEvidence.svelte's scoped style block); they are not redefined here to avoid duplicate global CSS.
      Values unchanged. -->
 <style>
-  /* @ds surface: activity--group — grouped bare evidence blocks in one quiet disclosure. */
+  /* This surface: activity--group — grouped bare evidence blocks in one quiet disclosure. */
   .activity--group {
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
     background: var(--surface);
   }
 
-  /* @ds slot: panel-body — the DisclosurePanel content stack of an evidence disclosure. */
+  /* This slot: panel-body — the DisclosurePanel content stack of an evidence disclosure. */
   .activity--stack {
     display: grid;
     gap: var(--space-2);

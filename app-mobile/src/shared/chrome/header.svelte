@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Header types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: HEADER
   // ───────────────────────────────────────────────────────────────────
@@ -49,9 +50,11 @@
   }: HeaderProps = $props();
 </script>
 
+<!-- Component content -->
 <header class="topbar">
-  <!-- @ds surface: chrome-button — wordmark + nav react-aria Buttons. -->
-  <!-- @ds guardrail: react-aria Button wiring (press + aria-label) — presentation only in CSS. -->
+<!-- Chrome button -->
+  <!-- This surface: chrome-button — wordmark + nav react-aria Buttons. -->
+  <!-- Do not edit — react-aria Button wiring (press + aria-label) — presentation only in CSS. -->
   <Button class="wordmark" onclick={onHome} aria-label="Pi Remote home">
     <span class="pi-mark" aria-hidden="true">
       π
@@ -62,13 +65,13 @@
     </span>
   </Button>
   <div class="topbar--actions">
-    <!-- @ds slot: nav-inbox -->
+    <!-- This slot: nav-inbox -->
     {#if reviewAvailable}
       <Button class="nav-button" onclick={onInbox}>
         Inbox
       </Button>
     {/if}
-    <!-- @ds slot: nav-review -->
+    <!-- This slot: nav-review -->
     {#if reviewAvailable}
       <Button class="nav-button" onclick={onReview}>
         Review
@@ -79,15 +82,16 @@
   </div>
 </header>
 
-<!-- @ds surface: topbar — global chrome header for the non-session surfaces. Decomposed into this scoped block;
+<!-- Topbar -->
+<!-- This surface: topbar — global chrome header for the non-session surfaces. Decomposed into this scoped block;
      topbar, pi-mark, wordmark--copy and topbar--actions are owned solely by this component so they move
      with it. .wordmark and .nav-button are on the Button primitive so they use :global. The grouped
      .nav-button, .theme--option, .back-button base + hover rules, the grouped .wordmark--copy, .status--pill
      @media (max-width: 52rem) rule, and the grouped .topbar, .session-header safe-gutter rule stay GLOBAL
      in app.css (unchanged) so their byte-for-byte structure is preserved. Values unchanged. -->
 <style>
-  /* @ds surface: topbar — global chrome header for the non-session surfaces. */
-  /* @ds edit: layout — sticky-bar geometry + safe top gutter. */
+  /* This surface: topbar — global chrome header for the non-session surfaces. */
+  /* Editable seam: layout — sticky-bar geometry + safe top gutter. */
   .topbar {
     position: sticky;
     z-index: 20;
@@ -103,7 +107,7 @@
     backdrop-filter: blur(12px);
   }
 
-  /* @ds slot: wordmark — Pi Remote wordmark block. */
+  /* This slot: wordmark — Pi Remote wordmark block. */
   :global(.wordmark) {
     display: flex;
     min-width: 2.75rem;
@@ -118,10 +122,12 @@
     transition: opacity var(--duration-fast) ease;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.wordmark[data-hovered]) {
     opacity: 0.72;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .pi-mark {
     display: grid;
     width: 2rem;
@@ -135,48 +141,55 @@
     font-weight: 700;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .wordmark--copy {
     display: grid;
     gap: 0.05rem;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .wordmark--copy strong {
     font-size: 0.86rem;
     font-weight: 700;
     letter-spacing: -0.01em;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .wordmark--copy small {
     color: var(--ink-muted);
     font-size: 0.67rem;
     font-weight: 550;
   }
 
-  /* @ds slot: nav — Inbox · Review actions; theme-toggle and status slots are shared surfaces below. */
+  /* This slot: nav — Inbox · Review actions; theme-toggle and status slots are shared surfaces below. */
   .topbar--actions {
     display: flex;
     align-items: center;
     gap: var(--space-2);
   }
 
-  /* @ds end surface: topbar */
+  /* End of surface: topbar */
 
   @media (max-width: 52rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .topbar {
       align-items: flex-start;
     }
   }
 
   @media (max-width: 39rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .topbar {
       gap: var(--space-2);
       padding-inline: var(--space-3);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .topbar--actions {
       gap: var(--space-1);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.nav-button) {
       padding-inline: var(--space-2);
       font-size: 0.72rem;

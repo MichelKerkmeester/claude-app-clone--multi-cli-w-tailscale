@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Session State Icon types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: SESSION STATE ICON
   // ───────────────────────────────────────────────────────────────────
@@ -14,13 +15,16 @@
   let { status }: SessionStateIconProps = $props();
 </script>
 
-<!-- @ds surface: session-state-icon — per-session status glyph. -->
+<!-- Component content -->
+<!-- Session state icon -->
+<!-- This surface: session-state-icon — per-session status glyph. -->
 <span class="state--icon" aria-hidden="true">
-  <!-- @ds guardrail: aria-hidden + glyph mapping — not designer-editable. -->
+  <!-- Do not edit — aria-hidden + glyph mapping — not designer-editable. -->
   {status === 'idle' ? '✓' : status === 'running' ? '•' : status === 'interrupted' ? '!' : '?'}
 </span>
 
-<!-- @ds surface: session-state-icon — per-session status glyph. Decomposed into this scoped block; the
+<!-- Session state icon -->
+<!-- This surface: session-state-icon — per-session status glyph. Decomposed into this scoped block; the
      .state--icon slot is owned solely by this component (it renders the span directly) so it moves
      with it. The pulsing group (.state--running .state--icon and .agent--running .state--icon, joined
      with .status--authenticating/connecting/reconnecting i) and the .state--running / .state--idle /
@@ -29,7 +33,7 @@
      byte-for-byte structure is preserved and the global ancestor rules still reach this scoped
      .state--icon at runtime. Values unchanged. -->
 <style>
-  /* @ds slot: icon */
+  /* This slot: icon */
   .state--icon {
     display: inline-grid;
     width: 1.25rem;
@@ -41,5 +45,5 @@
     font-size: 0.72rem;
     line-height: 1;
   }
-  /* @ds end surface: session-state-icon */
+  /* End of surface: session-state-icon */
 </style>

@@ -2,7 +2,7 @@
 	// ───────────────────────────────────────────────────────────────────
 	// MODULE: BUTTON PRIMITIVE
 	// ───────────────────────────────────────────────────────────────────
-	// @ds primitive: Button — Keep interaction state in actions so touch input never leaves CSS :hover stuck.
+	// This primitive: Button — Keep interaction state in actions so touch input never leaves CSS :hover stuck.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -33,6 +33,7 @@
 	}: Props = $props();
 </script>
 
+<!-- Component content -->
 <button
 	{...rest}
 	class={className}

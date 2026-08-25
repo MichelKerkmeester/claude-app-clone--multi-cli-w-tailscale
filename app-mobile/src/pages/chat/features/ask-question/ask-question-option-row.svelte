@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Ask Question Option Row types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ASK QUESTION OPTION ROW
   // ───────────────────────────────────────────────────────────────────
@@ -18,7 +19,8 @@
   let { option, selected, selectionMode, disabled, onToggle }: AskQuestionOptionRowProps = $props();
 </script>
 
-<!-- @ds slot: option-row — one answer option; states idle · hover · pressed · selected · disabled. -->
+<!-- Component content -->
+<!-- This slot: option-row — one answer option; states idle · hover · pressed · selected · disabled. -->
 <button
   type="button"
   class="ask-question-option--row"
@@ -27,14 +29,14 @@
   {disabled}
   onclick={() => onToggle(option.id)}
 >
-  <!-- @ds slot: option-indicator — single (circle) / multiple (square) selection glyph. -->
+  <!-- This slot: option-indicator — single (circle) / multiple (square) selection glyph. -->
   <span
     class={`ask-question-option-indicator ask-question-option-indicator--${selectionMode}`}
     aria-hidden="true"
   >
     {selected ? '✓' : ''}
   </span>
-  <!-- @ds slot: option-copy — the option label + optional description. -->
+  <!-- This slot: option-copy — the option label + optional description. -->
   <span class="ask-question-option--copy">
     <span class="ask-question-option--label">{option.label}</span>
     {#if option.description !== undefined}
@@ -43,11 +45,12 @@
   </span>
 </button>
 
-<!-- @ds surface: ask-question option-row — one answer option. Decomposed into this scoped block; native
+<!-- Ask question option row -->
+<!-- This surface: ask-question option-row — one answer option. Decomposed into this scoped block; native
      :hover/:focus-visible/:disabled and the aria-pressed selected state preserved; the dark-theme
      selected re-ink uses :global(:root[data-theme='dark']). Values unchanged. -->
 <style>
-  /* @ds slot: option-row · @ds state: idle — one answer option; hover/pressed/selected/disabled follow. */
+  /* This slot: option-row · This state: idle — one answer option; hover/pressed/selected/disabled follow. */
   .ask-question-option--row {
     display: flex;
     min-block-size: 44px;
@@ -65,33 +68,33 @@
     touch-action: manipulation;
   }
 
-  /* @ds state: hover — the option row under pointer hover. */
+  /* This state: hover — the option row under pointer hover. */
   .ask-question-option--row:hover:not(:disabled) {
     border-color: var(--accent-ink);
     background: var(--accent-soft);
   }
 
-  /* @ds state: selected (aria-pressed) — the chosen option row. */
+  /* This state: selected (aria-pressed) — the chosen option row. */
   .ask-question-option--row[aria-pressed='true'] {
     border-color: var(--ink);
     background: var(--surface-code);
     color: var(--ink-inverse);
   }
 
-  /* @ds guardrail: focus-visible — The shared AA focus ring across option rows, free text, and submit. */
+  /* Do not edit — focus-visible — The shared AA focus ring across option rows, free text, and submit. */
   .ask-question-option--row:focus-visible {
     outline: 3px solid var(--accent-ink);
     outline-offset: 3px;
     box-shadow: 0 0 0 1px var(--surface-raised);
   }
 
-  /* @ds state: disabled — option rows fail-closed to reduced emphasis. */
+  /* This state: disabled — option rows fail-closed to reduced emphasis. */
   .ask-question-option--row:disabled {
     cursor: default;
     opacity: 0.58;
   }
 
-  /* @ds slot: option-indicator — single (circle) / multiple (square) selection glyph. */
+  /* This slot: option-indicator — single (circle) / multiple (square) selection glyph. */
   .ask-question-option-indicator {
     display: grid;
     flex: 0 0 1.25rem;
@@ -105,55 +108,60 @@
     line-height: 1;
   }
 
-  /* @ds variant: indicator-single — circular single-choice glyph. */
+  /* This variant: indicator-single — circular single-choice glyph. */
   .ask-question-option-indicator--single {
     border-radius: 999px;
   }
 
-  /* @ds slot: option-copy — the option label + optional description. */
+  /* This slot: option-copy — the option label + optional description. */
   .ask-question-option--copy {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-1);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .ask-question-option--label,
   .ask-question-option--description {
     overflow-wrap: anywhere;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .ask-question-option--label {
     font-weight: 650;
     line-height: 1.35;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .ask-question-option--description {
     color: var(--ink-muted);
     font-size: 0.82rem;
     line-height: 1.4;
   }
 
-  /* @ds state: selected · description — re-ink the description inside a selected row. */
+  /* This state: selected · description — re-ink the description inside a selected row. */
   .ask-question-option--row[aria-pressed='true'] .ask-question-option--description {
     color: inherit;
     opacity: 0.82;
   }
 
-  /* @ds guardrail: do-not-edit — Reduced-motion collapses option-row animation/transition. */
+  /* Do not edit — Reduced-motion collapses option-row animation/transition. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .ask-question-option--row {
       animation: none !important;
       transition: none !important;
     }
   }
 
-  /* @ds state: selected · dark — dark-theme selected row re-inks to base ink. */
+  /* This state: selected · dark — dark-theme selected row re-inks to base ink. */
   :global(:root[data-theme='dark']) .ask-question-option--row[aria-pressed='true'] {
     color: var(--ink);
   }
 
-  /* @ds state: selected · system-dark — under OS dark, the system-theme selected row re-inks to base ink. */
+  /* This state: selected · system-dark — under OS dark, the system-theme selected row re-inks to base ink. */
   @media (prefers-color-scheme: dark) {
+    /* Keep this rule aligned with its surrounding surface. */
     :global(:root[data-theme='system']) .ask-question-option--row[aria-pressed='true'] {
       color: var(--ink);
     }

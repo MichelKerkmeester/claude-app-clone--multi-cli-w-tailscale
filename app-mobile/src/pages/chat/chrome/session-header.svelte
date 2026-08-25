@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Session Header types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -36,6 +37,7 @@
   // 4. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep theme option label focused on its single responsibility.
   function themeOptionLabel(option: ThemePreference): string {
     return option === 'system' ? 'Auto' : option === 'light' ? 'Light' : 'Dark';
   }
@@ -46,16 +48,19 @@
     (event.currentTarget as HTMLElement).setAttribute('data-hovered', 'true');
   }
 
+  // Keep on chrome pointer leave focused on its single responsibility.
   function onChromePointerLeave(event: PointerEvent): void {
     (event.currentTarget as HTMLElement).removeAttribute('data-hovered');
   }
 
+  // Keep on chrome focus focused on its single responsibility.
   function onChromeFocus(event: FocusEvent): void {
     const node = event.currentTarget as HTMLElement;
     if (node.matches(':focus-visible')) node.setAttribute('data-focus-visible', 'true');
     else node.removeAttribute('data-focus-visible');
   }
 
+  // Keep on chrome blur focused on its single responsibility.
   function onChromeBlur(event: FocusEvent): void {
     (event.currentTarget as HTMLElement).removeAttribute('data-focus-visible');
   }
@@ -112,16 +117,19 @@
   // 9. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (overflowContentEl === null) return;
     return hideOutside([overflowContentEl]);
   });
 </script>
 
-<!-- @ds surface: session-header — quiet in-session header. Slots: back · model · overflow. -->
+<!-- Component content -->
+<!-- Session header -->
+<!-- This surface: session-header — quiet in-session header. Slots: back · model · overflow. -->
 <header class="session-header">
-  <!-- @ds slot: back — back-to-sessions control. -->
-  <!-- @ds guardrail: react-aria Button (onPress / aria-label) — Not designer-editable. -->
+  <!-- This slot: back — back-to-sessions control. -->
+  <!-- Do not edit — react-aria Button (onPress / aria-label) — Not designer-editable. -->
   <Button class="session-header--icon" aria-label="Back to sessions" onclick={onBack}>
     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
       <path
@@ -135,9 +143,9 @@
     </svg>
   </Button>
 
-  <!-- @ds slot: model — host-confirmed model / effort readout trigger. -->
+  <!-- This slot: model — host-confirmed model / effort readout trigger. -->
   <div class="session--runtime-controls">
-    <!-- @ds guardrail: react-aria Button + aria-* (expanded/controls/haspopup); 44px target — Not designer-editable. -->
+    <!-- Do not edit — react-aria Button + aria-* (expanded/controls/haspopup); 44px target — Not designer-editable. -->
     <Button
       class="session-model--trigger"
       aria-label={modelEffortTriggerName(modelLabel, modelProvider, effortText)}
@@ -172,8 +180,8 @@
       </svg>
     </Button>
 
-    <!-- @ds slot: plan-badge — plan-mode status chip. -->
-    <!-- @ds guardrail: role="status" readout — Not designer-editable. -->
+    <!-- This slot: plan-badge — plan-mode status chip. -->
+    <!-- Do not edit — role="status" readout — Not designer-editable. -->
     {#if snapshot?.mode === 'plan'}
       <span class="session--plan-badge" role="status" aria-label={modelSwitcherStrings.planMode}>
         {modelSwitcherStrings.planBadge}
@@ -181,8 +189,8 @@
     {/if}
   </div>
 
-  <!-- @ds slot: overflow — nav + theme popover trigger. -->
-  <!-- @ds guardrail: react-aria DialogTrigger / Popover / Dialog wiring — Not designer-editable. -->
+  <!-- This slot: overflow — nav + theme popover trigger. -->
+  <!-- Do not edit — react-aria DialogTrigger / Popover / Dialog wiring — Not designer-editable. -->
   <Popover.Root bind:open={overflowOpen}>
     <Popover.Trigger>
       {#snippet child({ props })}
@@ -228,8 +236,8 @@
       >
         <section class="tools--group">
           <span class="tools--label">Go to</span>
-          <!-- @ds slot: nav — Inbox · Review. -->
-          <!-- @ds guardrail: react-aria onPress nav routing — Not designer-editable. -->
+          <!-- This slot: nav — Inbox · Review. -->
+          <!-- Do not edit — react-aria onPress nav routing — Not designer-editable. -->
           <div class="overflow--nav">
             <Button class="overflow--item" onclick={onInbox}>Inbox</Button>
             <Button class="overflow--item" onclick={onReview}>Review</Button>
@@ -237,8 +245,8 @@
         </section>
         <section class="tools--group">
           <span class="tools--label">Theme</span>
-          <!-- @ds slot: theme-toggle — segmented light / dark / auto. -->
-          <!-- @ds guardrail: react-aria ToggleButton group (onChange / aria-label) — Not designer-editable. -->
+          <!-- This slot: theme-toggle — segmented light / dark / auto. -->
+          <!-- Do not edit — react-aria ToggleButton group (onChange / aria-label) — Not designer-editable. -->
           <div class="theme--control" role="group" aria-label="Color theme">
             {#each THEME_OPTIONS as option (option)}
               <button
@@ -275,13 +283,14 @@
   </Popover.Root>
 </header>
 
-<!-- @ds surface: session-header — quiet in-session header. Decomposed into this scoped block;
+<!-- Session header -->
+<!-- This surface: session-header — quiet in-session header. Decomposed into this scoped block;
      overflow--nav / overflow--item are owned solely by this component so they move with it.
      Child-primitive classes and react-aria/runtime data-attributes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->
 <style>
-  /* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
-  /* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
+  /* This surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
+  /* This slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
   :global(.session--sheet-popover) {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
@@ -289,8 +298,8 @@
     box-shadow: var(--shadow-raised);
   }
 
-  /* @ds surface: session-header — in-session quiet header (back · model · overflow). */
-  /* @ds edit: layout — grid geometry + safe top gutter. */
+  /* This surface: session-header — in-session quiet header (back · model · overflow). */
+  /* Editable seam: layout — grid geometry + safe top gutter. */
   /* ── Session header (in-session): back · centered model · overflow ─────── */
   .session-header {
     position: sticky;
@@ -306,7 +315,7 @@
     backdrop-filter: blur(12px);
   }
 
-  /* @ds slot: icon — back and overflow icon buttons. */
+  /* This slot: icon — back and overflow icon buttons. */
   :global(.session-header--icon) {
     display: grid;
     place-items: center;
@@ -320,20 +329,23 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session-header--icon:last-child) {
     justify-self: end;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session-header--icon[data-hovered]) {
     background: var(--surface-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session-header--icon[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
-  /* @ds slot: model — host-confirmed model/effort readout trigger. */
+  /* This slot: model — host-confirmed model/effort readout trigger. */
   :global(.session-model--trigger) {
     display: inline-flex;
     min-inline-size: 44px;
@@ -354,16 +366,18 @@
     overflow: hidden;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session-model--trigger[data-hovered]) {
     background: var(--surface-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session-model--trigger[data-disabled]) {
     cursor: default;
     opacity: 0.6;
   }
 
-  /* @ds slot: model-name — confirmed model label. */
+  /* This slot: model-name — confirmed model label. */
   .session-model--name {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -371,6 +385,7 @@
     animation: model-header-accepted 150ms ease-out;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .session--runtime-controls {
     display: flex;
     min-width: 0;
@@ -380,19 +395,20 @@
     overflow: hidden;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.session-model--trigger[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
-  /* @ds slot: separator — between model and effort. */
+  /* This slot: separator — between model and effort. */
   .session-header--sep {
     color: var(--ink-muted);
     font-size: 0.85rem;
     font-weight: 400;
   }
 
-  /* @ds slot: effort-name — confirmed effort label. */
+  /* This slot: effort-name — confirmed effort label. */
   .session--effort-name {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -402,7 +418,7 @@
     font-weight: 560;
   }
 
-  /* @ds slot: plan-badge — plan-mode status chip. */
+  /* This slot: plan-badge — plan-mode status chip. */
   .session--plan-badge {
     flex: 0 0 auto;
     padding-block: 0.2rem;
@@ -414,7 +430,7 @@
     font-size: 0.68rem;
     font-weight: 700;
   }
-  /* @ds end surface: session-header */
+  /* End of surface: session-header */
 
   @keyframes model-header-accepted {
     from {
@@ -426,22 +442,24 @@
   }
 
   @media (max-width: 360px) {
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.session-model--trigger) {
       padding-inline: 0.55rem;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .session-header--sep {
       display: none;
     }
   }
 
-  /* @ds slot: nav — Inbox · Review overflow items. */
+  /* This slot: nav — Inbox · Review overflow items. */
   .overflow--nav {
     display: grid;
     gap: var(--space-1);
   }
 
-  /* @ds slot: nav-item */
+  /* This slot: nav-item */
   :global(.overflow--item) {
     display: flex;
     min-height: 2.5rem;
@@ -456,7 +474,7 @@
     cursor: pointer;
   }
 
-  /* @ds state: hover */
+  /* This state: hover */
   :global(.overflow--item[data-hovered]) {
     background: var(--surface-muted);
   }

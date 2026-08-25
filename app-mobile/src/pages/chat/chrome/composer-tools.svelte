@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Composer Tools types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: tools popover status hint — Ported verbatim from SessionComposer.
+  // Do not edit — tools popover status hint — Ported verbatim from SessionComposer.
   function statusHint(status: RuntimeControls['runtime']['status'], hasPending: boolean): string {
     switch (status) {
       case 'checking':
@@ -94,6 +95,7 @@
   // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (contentEl === null) return;
     return hideOutside([contentEl]);
@@ -103,18 +105,22 @@
   // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep handle open change focused on its single responsibility.
   function handleOpenChange(next: boolean): void {
     onOpenChange(next);
   }
 
+  // Keep open photo library focused on its single responsibility.
   function openPhotoLibrary(): void {
     photoLibraryInput?.click();
   }
 
+  // Keep open take photo focused on its single responsibility.
   function openTakePhoto(): void {
     takePhotoInput?.click();
   }
 
+  // Keep on file change focused on its single responsibility.
   function onFileChange(event: Event): void {
     const target = event.currentTarget;
     if (target instanceof HTMLInputElement) {
@@ -123,21 +129,25 @@
     }
   }
 
+  // Keep on checkbox focus focused on its single responsibility.
   function onCheckboxFocus(event: FocusEvent): void {
     const target = event.currentTarget;
     checkboxFocusVisible = target instanceof HTMLInputElement && target.matches(':focus-visible');
   }
 
+  // Keep on checkbox blur focused on its single responsibility.
   function onCheckboxBlur(): void {
     checkboxFocusVisible = false;
   }
 
+  // Keep on checkbox change focused on its single responsibility.
   function onCheckboxChange(event: Event): void {
     const target = event.currentTarget;
     if (target instanceof HTMLInputElement) onShiftTabPreferenceChange(target.checked);
   }
 </script>
 
+<!-- Component content -->
 {#snippet plusGlyph()}
   <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
     <path
@@ -150,9 +160,9 @@
   </svg>
 {/snippet}
 
-<!-- @ds guardrail: tools popover react-aria wiring (DialogTrigger / Popover / Dialog) — Unchanged. -->
+<!-- Do not edit — tools popover react-aria wiring (DialogTrigger / Popover / Dialog) — Unchanged. -->
 <Popover.Root bind:open onOpenChange={handleOpenChange}>
-  <!-- @ds slot: tools-trigger — the "+" popover trigger. -->
+  <!-- This slot: tools-trigger — the "+" popover trigger. -->
   <Popover.Trigger>
     {#snippet child({ props })}
       <Button
@@ -282,7 +292,8 @@
   </Popover.Content>
 </Popover.Root>
 
-<!-- @ds surface: composer-tools — the "+" tools popover. Decomposed into this scoped block;
+<!-- Composer tools -->
+<!-- This surface: composer-tools — the "+" tools popover. Decomposed into this scoped block;
      composer-tools / tools--checkbox / tools--photo-actions / tools--action / tools--disclosure /
      tools--divider / tools--status / composer--plus are owned solely by this component so they
      move with it. Shared .tools--group / .tools--label (also used by SessionHeader) and the
@@ -291,8 +302,8 @@
      GLOBAL in app.css. Child-primitive classes and react-aria/runtime data-attributes use
      :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>
-  /* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
-  /* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
+  /* This surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
+  /* This slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
   :global(.composer-tools--popover) {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
@@ -300,7 +311,7 @@
     box-shadow: var(--shadow-raised);
   }
 
-  /* @ds slot: tools-trigger — the "+" popover trigger. */
+  /* This slot: tools-trigger — the "+" popover trigger. */
   :global(.composer--plus) {
     display: grid;
     place-items: center;
@@ -314,11 +325,13 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.composer--plus[data-hovered]),
   :global(.composer--plus[data-pressed]) {
     background: var(--surface-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.composer--plus[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
@@ -335,6 +348,7 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.tools--checkbox .react-aria-Checkbox-indicator) {
     display: grid;
     flex: none;
@@ -347,22 +361,26 @@
     color: var(--ink-inverse);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.tools--checkbox[data-selected] .react-aria-Checkbox-indicator) {
     border-color: var(--ink);
     background: var(--ink);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.tools--checkbox[data-focus-visible] .react-aria-Checkbox-indicator) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .tools--photo-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.tools--action) {
     min-block-size: 44px;
     padding-inline: var(--space-2);
@@ -375,11 +393,13 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.tools--action[data-hovered]),
   :global(.tools--action[data-pressed]) {
     background: var(--accent-soft);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .tools--disclosure {
     margin: var(--space-1) 0 0;
     color: var(--ink-muted);
@@ -388,12 +408,14 @@
     line-height: 1.35;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .tools--divider {
     block-size: 1px;
     background: var(--line);
   }
 
   @media (max-width: 20rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .tools--photo-actions {
       grid-template-columns: minmax(0, 1fr);
     }
@@ -408,6 +430,7 @@
     outline: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .tools--status {
     min-height: 1rem;
     color: var(--ink-muted);

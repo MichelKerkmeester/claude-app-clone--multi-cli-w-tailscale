@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Artifact Viewer Provider types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ARTIFACT VIEWER PROVIDER
   // ───────────────────────────────────────────────────────────────────
@@ -30,6 +31,7 @@
   // 2. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep get artifact viewer focused on its single responsibility.
   export function getArtifactViewer(): ArtifactViewerContextValue {
     const context = getContext<ArtifactViewerContextValue | null>(ARTIFACT_VIEWER_KEY);
     if (context === null || context === undefined) {
@@ -38,10 +40,12 @@
     return context;
   }
 
+  // Keep get optional artifact viewer focused on its single responsibility.
   export function getOptionalArtifactViewer(): ArtifactViewerContextValue | null {
     return getContext<ArtifactViewerContextValue | null>(ARTIFACT_VIEWER_KEY) ?? null;
   }
 
+  // Keep capture preview focused on its single responsibility.
   function capturePreview(
     block: ArtifactViewerSource,
     trigger: HTMLButtonElement | null,
@@ -81,6 +85,7 @@
     };
   }
 
+  // Keep restore preview focused on its single responsibility.
   function restorePreview(
     preview: ArtifactPreview,
     timerRef: { current: number | null },
@@ -104,6 +109,7 @@
     }, 0);
   }
 
+  // Keep tag in memory history focused on its single responsibility.
   function tagInMemoryHistory(documentId: string): void {
     const state = window.history.state;
     if (state !== null && typeof state === 'object') {
@@ -117,6 +123,7 @@
 
   const PRIVACY_CURTAIN_ID = 'artifact-viewer--privacy-curtain';
 
+  // Keep show privacy curtain focused on its single responsibility.
   function showPrivacyCurtain(): void {
     if (typeof document === 'undefined') return;
     document.documentElement.dataset.artifactViewerPrivacy = 'covered';
@@ -128,12 +135,14 @@
     document.body?.append(curtain);
   }
 
+  // Keep hide privacy curtain focused on its single responsibility.
   function hidePrivacyCurtain(): void {
     if (typeof document === 'undefined') return;
     document.getElementById(PRIVACY_CURTAIN_ID)?.remove();
     delete document.documentElement.dataset.artifactViewerPrivacy;
   }
 
+  // Keep mark viewer open focused on its single responsibility.
   function markViewerOpen(open: boolean): void {
     if (typeof document === 'undefined') return;
     if (open) {
@@ -144,6 +153,7 @@
     }
   }
 
+  // Keep purge viewer pixel nodes focused on its single responsibility.
   function purgeViewerPixelNodes(): void {
     if (typeof document === 'undefined') return;
     for (const image of document.querySelectorAll<HTMLImageElement>(
@@ -173,8 +183,8 @@
 
   let { children }: { readonly children: Snippet } = $props();
 
-  // @ds surface: artifact-viewer-provider — the viewer state machine plus privacy lifecycle.
-  // @ds guardrail: do-not-edit — The phase machine, dismissal choreography, generation guards, timer bookkeeping, focus/scroll restoration, and privacy-curtain lifecycle are behavioural and NOT designer-editable. Styling belongs in artifact-viewer surface blocks.
+  // This surface: artifact-viewer-provider — the viewer state machine plus privacy lifecycle.
+  // Do not edit — The phase machine, dismissal choreography, generation guards, timer bookkeeping, focus/scroll restoration, and privacy-curtain lifecycle are behavioural and NOT designer-editable. Styling belongs in artifact-viewer surface blocks.
 
   // ───────────────────────────────────────────────────────────────────
   // 5. LOCAL STATE
@@ -194,6 +204,7 @@
   // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep clear timers focused on its single responsibility.
   function clearTimers(): void {
     if (openingTimer !== null) window.clearTimeout(openingTimer);
     if (exitingTimer !== null) window.clearTimeout(exitingTimer);
@@ -203,6 +214,7 @@
     restoreTimer.current = null;
   }
 
+  // Keep open viewer focused on its single responsibility.
   function openViewer(
     block: ArtifactViewerSource,
     trigger: HTMLButtonElement | null,
@@ -229,6 +241,7 @@
     }, 0);
   }
 
+  // Keep open diff focused on its single responsibility.
   function openDiff(
     block: FileDiffBlock | FilePreviewBlock | InboundImageReadyBlock,
     trigger: HTMLButtonElement | null,
@@ -240,6 +253,7 @@
     openViewer(block, trigger, trigger?.dataset.artifactSessionId ?? null, 'ready-diff');
   }
 
+  // Keep open inbound image focused on its single responsibility.
   function openInboundImage(
     block: InboundImageReadyBlock,
     trigger: HTMLButtonElement | null,
@@ -253,6 +267,7 @@
     );
   }
 
+  // Keep open in memory focused on its single responsibility.
   function openInMemory(document: InMemoryArtifactDocument, trigger: HTMLButtonElement | null): void {
     clearTimers();
     clearArtifactFullResourceStore();
@@ -285,6 +300,7 @@
     }, 0);
   }
 
+  // Keep update in memory focused on its single responsibility.
   function updateInMemory(document: InMemoryArtifactDocument): void {
     const current = preview;
     if (
@@ -320,8 +336,8 @@
     preview = nextPreview;
   }
 
-  // @ds state: exiting · closed · privacy-covered — Closing covers the reader, purges image pixels, clears resources, and bumps generation before exit cleanup. Privacy/security dismissal reasons route through the covered phase.
-  // @ds guardrail: do-not-edit — The dismissal state machine and resource teardown are frozen.
+  // This state: exiting · closed · privacy-covered — Closing covers the reader, purges image pixels, clears resources, and bumps generation before exit cleanup. Privacy/security dismissal reasons route through the covered phase.
+  // Do not edit — The dismissal state machine and resource teardown are frozen.
   function close(reason: ArtifactDismissalReason = 'close'): void {
     const current = preview;
     if (current === null) {
@@ -362,6 +378,7 @@
   // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => () => {
     clearTimers();
     purgeViewerPixelNodes();
@@ -375,8 +392,9 @@
     }
   });
 
-  // @ds guardrail: do-not-edit — Privacy purge on visibility-hide/pagehide/bfcache and event wiring for logout, session-switch, artifact-revoked, and transcript-superseded are security behaviour; they stay frozen and are NOT designer-editable.
+  // Do not edit — Privacy purge on visibility-hide/pagehide/bfcache and event wiring for logout, session-switch, artifact-revoked, and transcript-superseded are security behaviour; they stay frozen and are NOT designer-editable.
   $effect(() => {
+    // Keep close hidden viewer focused on its single responsibility.
     const closeHiddenViewer = () => {
       if (document.visibilityState === 'hidden') {
         close('privacy-purge');
@@ -384,14 +402,17 @@
         hidePrivacyCurtain();
       }
     };
+    // Keep close bfcache viewer focused on its single responsibility.
     const closeBfcacheViewer = () => {
       close('pagehide');
     };
+    // Keep reconcile bfcache return focused on its single responsibility.
     const reconcileBfcacheReturn = (event: PageTransitionEvent) => {
       if (!event.persisted) return;
       if (preview !== null) close('pagehide');
       else hidePrivacyCurtain();
     };
+    // Keep invalidate viewer focused on its single responsibility.
     const invalidateViewer = (event: Event) => {
       const reasonByEvent: Record<string, ArtifactDismissalReason> = {
         'pi-remote:privacy-cover': 'privacy-purge',
@@ -464,13 +485,14 @@
   setContext(ARTIFACT_VIEWER_KEY, value);
 </script>
 
+<!-- Component content -->
 {@render children()}
 <ArtifactViewerHost {phase} {preview} onClose={close} />
 
 <style>
-  /* @ds slot: privacy-curtain — opaque cover shown on dismissal while content unmounts. */
-  /* @ds state: privacy-covered — the curtain is fully opaque and pointer-blocking. */
-  /* @ds guardrail: do-not-edit — z-index 10000 opaque cover; the privacy invariant. */
+  /* This slot: privacy-curtain — opaque cover shown on dismissal while content unmounts. */
+  /* This state: privacy-covered — the curtain is fully opaque and pointer-blocking. */
+  /* Do not edit — z-index 10000 opaque cover; the privacy invariant. */
   :global(.artifact-viewer--privacy-curtain) {
     position: fixed;
     z-index: 10000;

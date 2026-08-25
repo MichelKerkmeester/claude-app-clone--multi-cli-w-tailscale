@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: TOGGLE GROUP ITEM
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: ToggleGroupItem — Preserve Bits UI's toggle semantics while consumers own the option presentation.
+  // This primitive: ToggleGroupItem — Preserve Bits UI's toggle semantics while consumers own the option presentation.
   import { ToggleGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
@@ -13,4 +13,5 @@
   let { children, ...rest }: Props = $props();
 </script>
 
+<!-- Component content -->
 <ToggleGroup.Item {...rest}>{@render children()}</ToggleGroup.Item>

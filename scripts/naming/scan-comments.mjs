@@ -90,10 +90,10 @@ function main() {
       // Count only the first line of a comment run, not wrapped continuation lines.
       const previous = commentBody(lines[index - 1] ?? '');
       const isContinuation = previous !== null && previous.length > 0;
-      if (body.includes('@ds guardrail:')) {
-        // Guardrail fences must keep their reason on one line.
+      if (body.includes('Do not edit')) {
+        // Frozen-seam fences keep their reason on one line ("Do not edit — <why>").
         const next = commentBody(lines[index + 1] ?? '');
-        if (next !== null && next.length > 0 && !next.includes('@ds ')) multiLineFences += 1;
+        if (next !== null && next.length > 0 && !next.includes('Do not edit')) multiLineFences += 1;
         return;
       }
       if (body.includes(RULE) || /^[A-Z0-9. ]+$/.test(body)) return;
@@ -122,7 +122,7 @@ function main() {
         total +
         readFileSync(file, 'utf8')
           .split('\n')
-          .filter((line) => line.includes('@ds guardrail:')).length,
+          .filter((line) => line.includes('Do not edit')).length,
       0,
     ),
     multiLineFenceExplanations: multiLineFences,

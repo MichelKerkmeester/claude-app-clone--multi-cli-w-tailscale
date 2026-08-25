@@ -2,7 +2,7 @@
 	// ───────────────────────────────────────────────────────────────────
 	// MODULE: COLLAPSIBLE PRIMITIVE
 	// ───────────────────────────────────────────────────────────────────
-	// @ds primitive: Collapsible — Keep disclosure state bindable while Bits UI owns keyboard and visibility behavior.
+	// This primitive: Collapsible — Keep disclosure state bindable while Bits UI owns keyboard and visibility behavior.
 	import { Collapsible } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 
@@ -15,6 +15,7 @@
 	let { open = $bindable(false), trigger, children, ...rest }: Props = $props();
 </script>
 
+<!-- Component content -->
 <Collapsible.Root bind:open {...rest}>
 	<h3>
 		<Collapsible.Trigger>{@render trigger()}</Collapsible.Trigger>

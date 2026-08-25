@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Artifact Status types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ARTIFACT STATUS
   // ───────────────────────────────────────────────────────────────────
@@ -18,12 +19,13 @@
     readonly terminalMessage?: string | null;
   }
 
+  // Keep status message focused on its single responsibility.
   function statusMessage(
     phase: ArtifactViewerPhase,
     status: ArtifactResourceStatus | null | undefined,
     subject: string,
   ): string {
-    // @ds state: ArtifactResourceStatus — One exact copy line covers each resource status plus the opening and exiting phases. @ds guardrail: do-not-edit — This is the a11y status vocabulary; the messages are the exact announced copy.
+    // This state: ArtifactResourceStatus — One exact copy line covers each resource status plus the opening and exiting phases. Do not edit — This is the a11y status vocabulary; the messages are the exact announced copy.
     if (phase === 'opening') return `Opening ${subject}.`;
     if (phase === 'exiting') return `Closing ${subject}.`;
     if (status === undefined || status === null) return `${subject} ready.`;
@@ -87,6 +89,7 @@
   // svelte-ignore state_referenced_locally
   let announcedMessage = $state(message);
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const nextMessage = message;
     const timer = window.setTimeout(() => {
@@ -96,18 +99,21 @@
   });
 </script>
 
-<!-- @ds surface: artifact-status — the polite status + assertive terminal-alert live regions. -->
-<!-- @ds guardrail: do-not-edit — The status and alert live regions use fixed roles, live settings, and atomic announcements as the accessibility contract. -->
+<!-- Component content -->
+<!-- Artifact status -->
+<!-- This surface: artifact-status — the polite status + assertive terminal-alert live regions. -->
+<!-- Do not edit — The status and alert live regions use fixed roles, live settings, and atomic announcements as the accessibility contract. -->
 <div class="artifact-viewer--status" role="status" aria-live="polite" aria-atomic="true">{announcedMessage}</div>
 {#if terminalMessage !== null}
   <div class="artifact-viewer--terminal-alert" role="alert" aria-live="assertive" aria-atomic="true">{terminalMessage}</div>
 {/if}
 
-<!-- @ds surface: artifact-status — the polite status + assertive terminal-alert live regions.
+<!-- Artifact status -->
+<!-- This surface: artifact-status — the polite status + assertive terminal-alert live regions.
      Decomposed into this scoped block; both are single-component. terminal-alert is the visually-hidden
      (sr-only) pattern. Values unchanged. -->
 <style>
-  /* @ds slot: status — the polite status live region. */
+  /* This slot: status — the polite status live region. */
   .artifact-viewer--status {
     min-block-size: 2.75rem;
     padding-block: var(--space-3);
@@ -116,8 +122,8 @@
     line-height: 1.4;
   }
 
-  /* @ds slot: terminal-alert — the visually-hidden assertive alert live region. */
-  /* @ds guardrail: do-not-edit — Visually hidden but present for assistive tech; this is the announcement contract. */
+  /* This slot: terminal-alert — the visually-hidden assertive alert live region. */
+  /* Do not edit — Visually hidden but present for assistive tech; this is the announcement contract. */
   .artifact-viewer--terminal-alert {
     position: absolute;
     width: 1px;

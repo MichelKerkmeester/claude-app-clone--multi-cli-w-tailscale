@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Code Preview types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: CODE PREVIEW
   // ───────────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@
   // 2. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep find parts focused on its single responsibility.
   function findParts(text: string, findTerm: string): readonly FindPart[] {
     if (findTerm.trim().length === 0) return [{ text, mark: false }];
     const needle = findTerm.toLocaleLowerCase();
@@ -99,6 +101,7 @@
   // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     void followTail;
     void revision;
@@ -108,6 +111,7 @@
     if (scroll !== null) scroll.scrollTop = scroll.scrollHeight;
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!followTail) {
       atLiveEdgeRef = true;
@@ -119,6 +123,7 @@
   // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep update live edge focused on its single responsibility.
   function updateLiveEdge(): void {
     const scroll = scrollEl;
     if (scroll === null) return;
@@ -127,6 +132,7 @@
     if (atLiveEdge !== nextAtLiveEdge) atLiveEdge = nextAtLiveEdge;
   }
 
+  // Keep jump to latest focused on its single responsibility.
   function jumpToLatest(): void {
     const scroll = scrollEl;
     if (scroll === null) return;
@@ -136,10 +142,12 @@
   }
 </script>
 
-<!-- @ds surface: code-preview — the highlighted code well, gutter, and live-edge follow. -->
-<!-- @ds state: highlight (plain → pending → highlighted) via [data-highlight-status]; follow-tail
+<!-- Component content -->
+<!-- Code preview -->
+<!-- This surface: code-preview — the highlighted code well, gutter, and live-edge follow. -->
+<!-- This state: highlight (plain → pending → highlighted) via [data-highlight-status]; follow-tail
      live-edge via [data-live-edge] and the Jump to latest control. -->
-<!-- @ds guardrail: do-not-edit — The highlight worker and scroll/follow live-edge logic are frozen; tokens render as inert <span> text only. -->
+<!-- Do not edit — The highlight worker and scroll/follow live-edge logic are frozen; tokens render as inert <span> text only. -->
 <div class="artifact-code--viewer" data-live-edge={followTail ? atLiveEdge : undefined}>
   <div
     class={`artifact-code--preview${wrap ? ' is-wrapped' : ''}`}
@@ -160,7 +168,8 @@
   {/if}
 </div>
 
-<!-- @ds surface: artifact-code--preview — the highlighted code well, gutter, tokens, and jump-to-latest.
+<!-- Artifact code preview -->
+<!-- This surface: artifact-code--preview — the highlighted code well, gutter, tokens, and jump-to-latest.
      Decomposed into this scoped block. Token classes are built by concatenation ('artifact-code--token is-' +
      kind), so the .is-* suffix is not a static literal — the compounds use :global(.is-*) to stay
      un-pruned (faithful). is-wrapped is a literal in a ternary so it stays plain-scoped. Dark re-inks
@@ -168,14 +177,14 @@
      (no react-aria), preserved as-is. The shared .artifact-find--match (<mark>) stays global. Literal
      hex preserved. Values unchanged. -->
 <style>
-  /* @ds slot: code-viewer — the relative frame owning the follow-tail control. */
+  /* This slot: code-viewer — the relative frame owning the follow-tail control. */
   .artifact-code--viewer {
     position: relative;
     min-inline-size: 0;
   }
 
-  /* @ds slot: code-well — the scrollable highlighted code surface. */
-  /* @ds guardrail: do-not-edit — Bounded reading well; selectable and pan-scoped; never overflow the page. */
+  /* This slot: code-well — the scrollable highlighted code surface. */
+  /* Do not edit — Bounded reading well; selectable and pan-scoped; never overflow the page. */
   .artifact-code--preview {
     overscroll-behavior: contain;
     overflow-anchor: none;
@@ -201,7 +210,7 @@
     unicode-bidi: isolate;
   }
 
-  /* @ds slot: gutter — the line-number rail. */
+  /* This slot: gutter — the line-number rail. */
   .artifact-code--gutter {
     display: grid;
     align-content: start;
@@ -213,11 +222,12 @@
     -webkit-user-select: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .artifact-code--gutter span {
     min-block-size: 1.65em;
   }
 
-  /* @ds slot: source — the highlighted code column. */
+  /* This slot: source — the highlighted code column. */
   .artifact-code--source {
     min-inline-size: max-content;
     margin: 0;
@@ -228,14 +238,14 @@
     user-select: text;
   }
 
-  /* @ds state: wrapped — soft-wrap toggle rewraps the source column. */
+  /* This state: wrapped — soft-wrap toggle rewraps the source column. */
   .artifact-code--preview.is-wrapped .artifact-code--source {
     min-inline-size: 0;
     overflow-wrap: anywhere;
     white-space: pre-wrap;
   }
 
-  /* @ds slot: token — syntax tokens (kind suffix is dynamic; :global keeps the compounds live). */
+  /* This slot: token — syntax tokens (kind suffix is dynamic; :global keeps the compounds live). */
   .artifact-code--token:global(.is-keyword),
   .artifact-code--token:global(.is-boolean),
   .artifact-code--token:global(.is-tag),
@@ -246,16 +256,18 @@
     color: #f0b19a;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .artifact-code--token:global(.is-string),
   .artifact-code--token:global(.is-number) {
     color: #d97757;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .artifact-code--token:global(.is-comment) {
     color: #9f998f;
   }
 
-  /* @ds slot: jump-latest — the follow-tail live-edge control; ships native :hover/:focus-visible. */
+  /* This slot: jump-latest — the follow-tail live-edge control; ships native :hover/:focus-visible. */
   .artifact--jump-latest {
     min-block-size: 44px;
     min-inline-size: 44px;
@@ -274,47 +286,52 @@
     font-size: 0.8125rem;
   }
 
-  /* @ds guardrail: focus-visible — The AA focus ring on jump-to-latest. */
+  /* Do not edit — focus-visible — The AA focus ring on jump-to-latest. */
   .artifact--jump-latest:focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
     box-shadow: 0 0 0 5px var(--accent);
   }
 
-  /* @ds state: hover — jump-to-latest under pointer hover. */
+  /* This state: hover — jump-to-latest under pointer hover. */
   .artifact--jump-latest:hover {
     background: var(--accent-strong);
     color: var(--ink-inverse);
   }
 
-  /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
+  /* This state: dark — dark-theme re-inks (foreign ancestor via :global). */
   :global(:root[data-theme='dark']) .artifact-code--gutter {
     color: #9f998f;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(:root[data-theme='dark']) .artifact-code--token:global(.is-comment) {
     color: #9f998f;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(:root[data-theme='dark']) .artifact-code--token:global(.is-keyword) {
     color: #f0b19a;
   }
 
-  /* @ds guardrail: do-not-edit — Reduced motion bounds the well + jump-to-latest transitions. */
+  /* Do not edit — Reduced motion bounds the well + jump-to-latest transitions. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact-code--preview {
       transition-duration: 100ms;
       scroll-behavior: auto;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact--jump-latest {
       transition-duration: 100ms;
       scroll-behavior: auto;
     }
   }
 
-  /* @ds edit: layout — narrow reflow: full-width jump-to-latest at <=20rem. */
+  /* Editable seam: layout — narrow reflow: full-width jump-to-latest at <=20rem. */
   @media (max-width: 20rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .artifact--jump-latest {
       inline-size: 100%;
     }

@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Runtime Mode Announcer types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -10,7 +11,7 @@
   // 2. CONSTANTS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds state: alert — conflicts · permission loss · delivery uncertainty route to the alert region.
+  // This state: alert — conflicts · permission loss · delivery uncertainty route to the alert region.
   const ALERT_KINDS: ReadonlySet<ModePresentationKind> = new Set([
     'stale',
     'forbidden',
@@ -31,6 +32,7 @@
   // 4. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep polite copy for focused on its single responsibility.
   function politeCopyFor(kind: ModePresentationKind): string {
     switch (kind) {
       case 'build':
@@ -44,6 +46,7 @@
     }
   }
 
+  // Keep alert copy for focused on its single responsibility.
   function alertCopyFor(kind: ModePresentationKind): string {
     switch (kind) {
       case 'stale':
@@ -72,8 +75,8 @@
   // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: runtime-mode-announcer — dual polite/alert live regions for mode transitions.
-  // @ds guardrail: do-not-edit — The announce-once settle-key effect and ALERT_KINDS routing keep these inert text regions from moving focus. Not designer-editable.
+  // This surface: runtime-mode-announcer — dual polite/alert live regions for mode transitions.
+  // Do not edit — The announce-once settle-key effect and ALERT_KINDS routing keep these inert text regions from moving focus. Not designer-editable.
   let polite = $state('');
   let alert = $state('');
   // Skip announcing the first settle; only transitions are spoken.
@@ -90,6 +93,7 @@
   // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const key = presentation.kind;
     if (!primed) {
@@ -107,9 +111,10 @@
   });
 </script>
 
-<!-- @ds state: polite — settled transitions (build · plan · executing).
-     @ds guardrail: do-not-edit — role="status" + aria-live="polite" + aria-atomic region. -->
+<!-- Component content -->
+<!-- This state: polite — settled transitions (build · plan · executing).
+     Do not edit — role="status" + aria-live="polite" + aria-atomic region. -->
 <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">{polite}</div>
-<!-- @ds state: alert — conflicts · permission loss · delivery uncertainty.
-     @ds guardrail: do-not-edit — role="alert" region. -->
+<!-- This state: alert — conflicts · permission loss · delivery uncertainty.
+     Do not edit — role="alert" region. -->
 <div class="sr-only" role="alert">{alert}</div>

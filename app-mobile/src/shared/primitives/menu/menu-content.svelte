@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: MENU CONTENT
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: MenuContent — Keep keyboard and assistive-technology focus within the open menu.
+  // This primitive: MenuContent — Keep keyboard and assistive-technology focus within the open menu.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
@@ -35,13 +35,16 @@
   // 4. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (contentEl === null) return;
     return hideOutside([contentEl]);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (contentEl === null) return;
+    // Keep on keydown capture focused on its single responsibility.
     const onKeydownCapture = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return;
       if (contentEl === null) return;
@@ -57,6 +60,7 @@
   });
 </script>
 
+<!-- Component content -->
 <DropdownMenu.Portal>
   <DropdownMenu.Content {...rest} bind:ref={contentEl}>
     <button type="button" class="sr-only" tabindex="-1" aria-label="Dismiss" onclick={() => dismiss?.()}></button>

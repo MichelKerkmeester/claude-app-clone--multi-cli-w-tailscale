@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Attachment Draft Provider types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -83,21 +84,24 @@
   // 4. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep get attachment draft focused on its single responsibility.
   export function getAttachmentDraft(): AttachmentDraftContextValue {
     return getContext<AttachmentDraftContextValue | null>(ATTACHMENT_DRAFT_KEY) ?? EMPTY_CONTEXT;
   }
 
+  // Keep is accepted image focused on its single responsibility.
   function isAcceptedImage(type: string): boolean {
     return (MEDIA_SOURCE_MIME_TYPES as readonly string[]).includes(type);
   }
 
+  // Keep is preview unavailable focused on its single responsibility.
   function isPreviewUnavailable(type: string): boolean {
     return type === 'image/heic' || type === 'image/heif';
   }
 </script>
 
 <script lang="ts">
-  // @ds surface: AttachmentDraftProvider — context provider for the chat attachment draft (selection, previews, capability gating).
+  // This surface: AttachmentDraftProvider — context provider for the chat attachment draft (selection, previews, capability gating).
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -137,6 +141,7 @@
   // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (previousSession !== sessionId) {
       previousSession = sessionId;
@@ -145,6 +150,7 @@
     }
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const modelChanged = previousModelCanViewPhotos !== modelCanViewPhotos;
     previousModelCanViewPhotos = modelCanViewPhotos;
@@ -164,10 +170,12 @@
     });
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const onLogout = () => clearStoredDraft();
     const onAppLock = () => clearStoredDraft();
     const onPageHide = () => clearStoredDraft();
+    // Keep on visibility change focused on its single responsibility.
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') clearStoredDraft();
     };
@@ -188,10 +196,12 @@
   // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep dispatch focused on its single responsibility.
   function dispatch(action: AttachmentDraftAction): void {
     draftState = attachmentDraftReducer(draftState, action);
   }
 
+  // Keep revoke object url focused on its single responsibility.
   function revokeObjectUrl(id: string): void {
     const entry = stored.get(id);
     if (entry === undefined) return;
@@ -201,20 +211,24 @@
     stored.delete(id);
   }
 
+  // Keep revoke all object urls focused on its single responsibility.
   function revokeAllObjectUrls(): void {
     for (const id of stored.keys()) revokeObjectUrl(id);
   }
 
+  // Keep clear stored draft focused on its single responsibility.
   function clearStoredDraft(): void {
     revokeAllObjectUrls();
     dispatch({ type: 'lifecycle-clear' });
   }
 
+  // Keep clear for capability loss focused on its single responsibility.
   function clearForCapabilityLoss(message: string | null, phase: 'idle' | 'model-blocked'): void {
     revokeAllObjectUrls();
     dispatch({ type: 'lifecycle-clear', message, phase });
   }
 
+  // Keep select files focused on its single responsibility.
   function selectFiles(files: FileList | readonly File[] | null): void {
     if (!mediaAvailable || files === null) {
       dispatch({ type: 'picker-cancel' });
@@ -251,42 +265,52 @@
     dispatch({ type: 'validate' });
   }
 
+  // Keep cancel picker focused on its single responsibility.
   function cancelPicker(): void {
     dispatch({ type: 'picker-cancel' });
   }
 
+  // Keep remove attachment focused on its single responsibility.
   function removeAttachment(id: string): void {
     revokeObjectUrl(id);
     dispatch({ type: 'remove', id });
   }
 
+  // Keep clear draft focused on its single responsibility.
   function clearDraft(): void {
     clearStoredDraft();
   }
+  // Keep acknowledge focused on its single responsibility.
   function acknowledge(): void {
     clearStoredDraft();
   }
+  // Keep logout focused on its single responsibility.
   function logout(): void {
     clearStoredDraft();
   }
+  // Keep app lock focused on its single responsibility.
   function appLock(): void {
     clearStoredDraft();
   }
 
+  // Keep open preview focused on its single responsibility.
   function openPreview(id: string, trigger?: HTMLElement | null): void {
     previewTrigger =
       trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     dispatch({ type: 'preview-open', id });
   }
+  // Keep close preview focused on its single responsibility.
   function closePreview(): void {
     dispatch({ type: 'preview-close' });
     const trigger = previewTrigger;
     previewTrigger = null;
     queueMicrotask(() => trigger?.focus({ preventScroll: true }));
   }
+  // Keep get file focused on its single responsibility.
   function getFile(id: string): File | null {
     return stored.get(id)?.file ?? null;
   }
+  // Keep get object url focused on its single responsibility.
   function getObjectUrl(id: string): string | null {
     return stored.get(id)?.objectUrl ?? null;
   }
@@ -329,4 +353,5 @@
   setContext(ATTACHMENT_DRAFT_KEY, value);
 </script>
 
+<!-- Component content -->
 {@render children()}

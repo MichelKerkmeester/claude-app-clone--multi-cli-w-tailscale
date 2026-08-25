@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Rich Content Router types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
@@ -25,6 +26,7 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep is normalized rich content block focused on its single responsibility.
   export function isNormalizedRichContentBlock(value: unknown): value is NormalizedTranscriptBlock {
     if (typeof value !== 'object' || value === null) return false;
     const kind = (value as { readonly kind?: unknown }).kind;
@@ -39,12 +41,14 @@
     );
   }
 
+  // Keep is rich card block focused on its single responsibility.
   export function isRichCardBlock(
     block: NormalizedTranscriptBlock,
   ): block is NormalizedCommandBlock | NormalizedCodeBlock | NormalizedTextArtifactBlock {
     return block.kind === 'command' || block.kind === 'code' || block.kind === 'text-artifact';
   }
 
+  // Keep activity title focused on its single responsibility.
   function activityTitle(block: DisplayTranscriptBlock): string {
     switch (block.kind) {
       case 'thinking':
@@ -62,6 +66,7 @@
     }
   }
 
+  // Keep activity source focused on its single responsibility.
   function activitySource(block: DisplayTranscriptBlock): string {
     if (block.kind === 'thinking') return block.summary;
     if (block.kind === 'plan') return block.items.map((item) => item.text).join('\n');
@@ -93,10 +98,10 @@
 
   let { block, onOpen }: RichContentRouterProps = $props();
 
-  // @ds surface: rich-content-router — dispatches each normalized transcript block
+  // This surface: rich-content-router — dispatches each normalized transcript block
   // To its card/view. The block-kind dispatch, the viewer handoff, and the
   // Redaction handling below are guardrailed and not designer-editable.
-  // @ds guardrail: do-not-edit — The router's block-kind switch is the single dispatch point; exported type guards keep security boundaries explicit. Not designer-editable.
+  // Do not edit — The router's block-kind switch is the single dispatch point; exported type guards keep security boundaries explicit. Not designer-editable.
   const viewer = getOptionalArtifactViewer();
 
   // ───────────────────────────────────────────────────────────────────
@@ -109,7 +114,7 @@
   // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — The viewer handoff keeps an in-memory document current for hosted blocks; no fetch, endpoint, ticket, download, or host-file read is added.
+  // Do not edit — The viewer handoff keeps an in-memory document current for hosted blocks; no fetch, endpoint, ticket, download, or host-file read is added.
   $effect(() => {
     if (onOpen !== undefined || viewer === null || !isRichCardBlock(block)) return;
     viewer.updateInMemory(createInMemoryArtifactDocument(block));
@@ -119,7 +124,7 @@
   // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — The open handoff delegates to bound onOpen or the viewer's openInMemory with the same document; nothing is fetched, written, or read from the host.
+  // Do not edit — The open handoff delegates to bound onOpen or the viewer's openInMemory with the same document; nothing is fetched, written, or read from the host.
   function open(richBlock: F6RichBlock, trigger: HTMLButtonElement | null = null): void {
     if (onOpen !== undefined) {
       onOpen(richBlock, trigger);
@@ -129,7 +134,8 @@
   }
 </script>
 
-<!-- @ds guardrail: do-not-edit — Block-kind dispatch renders the matching card; prose, diff, and fallback stay redaction-bounded. -->
+<!-- Component content -->
+<!-- Do not edit — Block-kind dispatch renders the matching card; prose, diff, and fallback stay redaction-bounded. -->
 {#if block.kind === 'command'}
   <CommandOutputCard
     {block}
@@ -168,12 +174,13 @@
   </RichBlockFrame>
 {/if}
 
-<!-- @ds surface: rich--prose-block — the plain-prose / safe-Markdown read-out block. Decomposed into this scoped block;
+<!-- Rich prose block -->
+<!-- This surface: rich--prose-block — the plain-prose / safe-Markdown read-out block. Decomposed into this scoped block;
      the selectors it was grouped with (safe-markdown*, rich-block--frame, artifact-viewer*)
      stay with their own components. Values unchanged; the bidi-plaintext guardrail is preserved. -->
 <style>
-  /* @ds slot: prose — bidirectional-safe plain-text read-out; capped to reading width. */
-  /* @ds guardrail: do-not-edit — Unicode-bidi: plaintext keeps directional text stable and un-clickable-into; do not weaken. */
+  /* This slot: prose — bidirectional-safe plain-text read-out; capped to reading width. */
+  /* Do not edit — Unicode-bidi: plaintext keeps directional text stable and un-clickable-into; do not weaken. */
   .rich--prose-block {
     min-inline-size: 0;
     max-inline-size: var(--reading-width);
@@ -183,14 +190,15 @@
     margin-block: var(--space-3);
   }
 
-  /* @ds surface: fallback/activity cards — quiet presentation for non-card blocks. */
-  /* @ds state: malformed-fallback — unsupported/undisplayable blocks present as a
+  /* This surface: fallback/activity cards — quiet presentation for non-card blocks. */
+  /* This state: malformed-fallback — unsupported/undisplayable blocks present as a
      quiet card without card chrome. */
-  /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
+  /* Do not edit — role="status" aria-live="polite" live region. */
   :global(.rich--fallback-card) {
     box-shadow: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.rich--activity-card) {
     box-shadow: none;
   }

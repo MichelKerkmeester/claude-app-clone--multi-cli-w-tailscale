@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: MENU TRIGGER
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: MenuTrigger — Preserve Bits UI's menu-trigger semantics while consumers own the trigger presentation.
+  // This primitive: MenuTrigger — Preserve Bits UI's menu-trigger semantics while consumers own the trigger presentation.
   import { DropdownMenu } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
@@ -13,4 +13,5 @@
   let { children, ...rest }: Props = $props();
 </script>
 
+<!-- Component content -->
 <DropdownMenu.Trigger {...rest}>{@render children()}</DropdownMenu.Trigger>

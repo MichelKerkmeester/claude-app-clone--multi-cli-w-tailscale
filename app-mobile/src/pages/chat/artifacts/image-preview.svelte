@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Image Preview types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: IMAGE PREVIEW
   // ───────────────────────────────────────────────────────────────────
@@ -31,6 +32,7 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep is bounded image focused on its single responsibility.
   function isBoundedImage(width: number, height: number): boolean {
     return (
       width > 0 &&
@@ -41,10 +43,12 @@
     );
   }
 
+  // Keep clamp zoom focused on its single responsibility.
   function clampZoom(value: number): number {
     return Math.min(IMAGE_PREVIEW_MAX_ZOOM, Math.max(IMAGE_PREVIEW_MIN_ZOOM, value));
   }
 
+  // Keep message for state focused on its single responsibility.
   function messageForState(state: ImagePreviewState): string | null {
     switch (state) {
       case 'corrupt':
@@ -84,6 +88,7 @@
   // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     void block.digest;
     let active = true;
@@ -125,6 +130,7 @@
     };
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     onStateChange?.(imageState);
   });
@@ -133,6 +139,7 @@
   // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep update pan focused on its single responsibility.
   function updatePan(event: PointerEvent): void {
     const start = panStart;
     if (start === null || zoom <= IMAGE_PREVIEW_MIN_ZOOM) return;
@@ -142,10 +149,12 @@
     };
   }
 
+  // Keep stop pan focused on its single responsibility.
   function stopPan(): void {
     panStart = null;
   }
 
+  // Keep set bounded zoom focused on its single responsibility.
   function setBoundedZoom(next: number): void {
     const bounded = clampZoom(next);
     zoom = bounded;
@@ -153,9 +162,11 @@
   }
 </script>
 
-<!-- @ds surface: image-preview — the sanitized image stage with zoom and pan. -->
-<!-- @ds state: loading · ready · corrupt · too-large — [data-image-state] drives each. -->
-<!-- @ds guardrail: do-not-edit — Object-URL lifecycle, byte/dimension bounds, zoom clamping, and pointer-pan capture are frozen; image verification stays in the resource hook. -->
+<!-- Component content -->
+<!-- Image preview -->
+<!-- This surface: image-preview — the sanitized image stage with zoom and pan. -->
+<!-- This state: loading · ready · corrupt · too-large — [data-image-state] drives each. -->
+<!-- Do not edit — Object-URL lifecycle, byte/dimension bounds, zoom clamping, and pointer-pan capture are frozen; image verification stays in the resource hook. -->
 <section class="image-preview" aria-label="Sanitized image preview" data-image-state={imageState}>
   <div class="image-preview--controls" role="group" aria-label="Image zoom controls">
     <button type="button" class="artifact--control-button" onclick={() => setBoundedZoom(zoom - 1)} disabled={zoom <= IMAGE_PREVIEW_MIN_ZOOM}>Zoom out</button>
@@ -185,12 +196,13 @@
   {/if}
 </section>
 
-<!-- @ds surface: image-preview--controls — the image zoom toolbar. Decomposed into this scoped block;
+<!-- Image preview controls -->
+<!-- This surface: image-preview--controls — the image zoom toolbar. Decomposed into this scoped block;
      single-component (ImagePreview). The image display classes (image-preview / image-preview--image /
      image-preview--stage) are shared with SecureImagePreview and stay global (→ app.css at cutover); the
      toolbar buttons carry the shared .artifact--control-button, also global. Values unchanged. -->
 <style>
-  /* @ds slot: image-controls — the zoom/pan toolbar row. */
+  /* This slot: image-controls — the zoom/pan toolbar row. */
   .image-preview--controls {
     display: flex;
     flex-wrap: wrap;

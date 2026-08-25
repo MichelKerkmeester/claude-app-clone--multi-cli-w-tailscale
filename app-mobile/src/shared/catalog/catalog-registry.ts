@@ -1,18 +1,20 @@
+// This module holds the shared Catalog Registry types, data, and helpers.
+
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Design System Catalog Registry
 // ───────────────────────────────────────────────────────────────────
-// Pure-data backbone of the catalog. Every migrated `@ds surface:` and the
-// `@ds state:` / `@ds guardrail:` seams it declares are indexed here so the
+// Pure-data backbone of the catalog. Every migrated surface and the
+// state and guardrail seams it declares are indexed here so the
 // Catalog is a faithful, browsable index of the whole system. This module is
 // Data only — it never imports a component and never touches the app shell.
 //
-// @ds grammar used here, matching the source seams:
+// The catalog terms below mirror the source seams:
 //   Surface  — one reusable component/layout contract.
 //   State    — a declared discrete appearance the surface renders.
 //   Slot     — a named, typed region inside a surface (see source components).
 //   Variant  — an alternative presentation of a surface.
 //   Edit     — a seam a designer may change (layout, tokens, presentation).
-//   Guardrail: do-not-edit — a frozen accessibility / security / logic seam.
+//   Guardrail — a frozen accessibility, security, or logic seam.
 //   Catalog  — this read-only preview surface (the one net-new surface).
 //   Theme    — the light / dark semantic remap a surface reads via tokens.
 //
@@ -42,7 +44,7 @@ export interface CatalogSurface {
 /** Shared guardrail note for the accessibility primitives (focus / motion / status). */
 const A11Y_PRIMITIVES = {
   editability:
-    'frozen accessibility seam (@ds guardrail: do-not-edit) — every control depends on it, and the collector cannot be narrowed without breaking AA contrast.',
+    'frozen accessibility seam — every control depends on it, and the collector cannot be narrowed without breaking AA contrast.',
   preview: 'registry-only' as const,
   previewReason:
     'a shared primitive with no standalone component — it renders inside every live control, never on its own.',
@@ -84,7 +86,7 @@ export const CATALOG_SURFACES: readonly CatalogSurface[] = [
       'rate-limited', 'stop', 'stop-pending', 'unsupported',
     ],
     tokens: [],
-    editability: 'frozen convention (@ds guardrail: do-not-edit) — the state machines and the announced status text are off-limits.',
+    editability: 'frozen convention — the state machines and the announced status text are off-limits.',
     preview: 'registry-only',
     previewReason:
       'a documented convention with no shared class — each surface maps its own states onto the shared vocabulary.',
@@ -354,7 +356,7 @@ export const CATALOG_SURFACES: readonly CatalogSurface[] = [
     purpose: 'The polite status + assertive terminal-alert live regions for the reader.',
     states: ['idle', 'loading', 'stalled', 'ready', 'empty', 'offline', 'stale', 'denied', 'expired', 'missing', 'revoked', 'corrupt', 'too-large'],
     tokens: [],
-    editability: 'frozen (@ds guardrail: do-not-edit) — the announced status copy per state is the a11y contract.',
+    editability: 'frozen — the announced status copy per state is the a11y contract.',
     preview: 'live',
   },
   {

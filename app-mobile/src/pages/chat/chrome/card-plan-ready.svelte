@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Card Plan Ready types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: PLAN READY CARD
   // ───────────────────────────────────────────────────────────────────
@@ -13,8 +14,8 @@
   // 2. CONSTANTS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: plan-ready--card — live validated plan summary + review entry.
-  // @ds guardrail: do-not-edit — isReviewablePlanArtifact gates rendering on live + newest + valid, and canReview disables the review CTA until the host binds the plan. Not designer-editable.
+  // This surface: plan-ready--card — live validated plan summary + review entry.
+  // Do not edit — isReviewablePlanArtifact gates rendering on live + newest + valid, and canReview disables the review CTA until the host binds the plan. Not designer-editable.
   const PLAN_TITLE_DISPLAY_CAP = 160;
 
   // ───────────────────────────────────────────────────────────────────
@@ -37,7 +38,7 @@
   // 4. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: do-not-edit — The reviewability gate (live · newest · valid) — Not designer-editable.
+  // Do not edit — The reviewability gate (live · newest · valid) — Not designer-editable.
   export function isReviewablePlanArtifact(
     artifact: PlanArtifactDto | null | undefined,
     isLive: boolean,
@@ -52,6 +53,7 @@
     );
   }
 
+  // Keep format artifact time focused on its single responsibility.
   function formatArtifactTime(value: string): string {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return 'Unknown time';
@@ -91,28 +93,29 @@
   const title = $derived(reviewable ? reviewable.title.slice(0, PLAN_TITLE_DISPLAY_CAP) : '');
 </script>
 
+<!-- Component content -->
 {#if reviewable}
   <article class="plan-ready--card" aria-labelledby="plan-ready--title" data-plan-ready="true">
-    <!-- @ds state: live · newest · valid — renders only for a reviewable artifact. -->
-    <!-- @ds slot: header — title + check mark. -->
+    <!-- This state: live · newest · valid — renders only for a reviewable artifact. -->
+    <!-- This slot: header — title + check mark. -->
     <div class="plan-ready--header">
       <div>
         <p class="surface--eyebrow">Plan ready</p>
-        <!-- @ds slot: title -->
+        <!-- This slot: title -->
         <h2 id="plan-ready--title" class="plan-ready--title">
           {title}
         </h2>
       </div>
-      <!-- @ds slot: mark — the ✓ confirmation badge. -->
+      <!-- This slot: mark — the ✓ confirmation badge. -->
       <span class="plan-ready--mark" aria-hidden="true">
         ✓
       </span>
     </div>
-    <!-- @ds slot: summary -->
+    <!-- This slot: summary -->
     <p class="plan-ready--summary" dir="auto">
       {reviewable.summary}
     </p>
-    <!-- @ds slot: meta — revision / steps / published grid. -->
+    <!-- This slot: meta — revision / steps / published grid. -->
     <dl class="plan-ready--meta">
       <div>
         <dt>Revision</dt>
@@ -129,8 +132,8 @@
         </dd>
       </div>
     </dl>
-    <!-- @ds state: review CTA — canReview → 'Review plan' (waiting-for-live-confirmation below).
-        @ds guardrail: do-not-edit — React-aria Button wiring (ref, isDisabled, onPress). -->
+    <!-- This state: review CTA — canReview → 'Review plan' (waiting-for-live-confirmation below).
+        Do not edit — React-aria Button wiring (ref, isDisabled, onPress). -->
     <Button
       class="plan-ready--review"
       type="button"
@@ -145,17 +148,18 @@
     >
       {canReview ? 'Review plan' : 'Waiting for live confirmation'}
     </Button>
-    <!-- @ds state: waiting-for-live-confirmation — the disabled CTA until the host binds the plan. -->
+    <!-- This state: waiting-for-live-confirmation — the disabled CTA until the host binds the plan. -->
   </article>
 {/if}
 
-<!-- @ds surface: plan-ready--card — live validated plan summary + review entry. Decomposed into this scoped block;
+<!-- Plan ready card -->
+<!-- This surface: plan-ready--card — live validated plan summary + review entry. Decomposed into this scoped block;
      plan-ready--card / plan-ready--mark and this card's owned members of shared ready/review pairs move
      with it. Grouped plan-review-* siblings stay global (plan-review-sheet). Child-primitive classes
      and react-aria/runtime data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>
-  /* @ds surface: plan-ready--card — live validated plan summary + review entry. */
-  /* @ds state: reviewable — renders only when the artifact is live, newest and valid. */
+  /* This surface: plan-ready--card — live validated plan summary + review entry. */
+  /* This state: reviewable — renders only when the artifact is live, newest and valid. */
   .plan-ready--card {
     display: grid;
     gap: var(--space-4);
@@ -167,7 +171,7 @@
     box-shadow: var(--shadow-raised);
   }
 
-  /* @ds slot: header — title + check mark; shared with plan-review-sheet. */
+  /* This slot: header — title + check mark; shared with plan-review-sheet. */
   .plan-ready--header {
     display: flex;
     align-items: flex-start;
@@ -175,12 +179,12 @@
     gap: var(--space-4);
   }
 
-  /* @ds slot: kicker — shared section eyebrow pair; shared with plan-review-sheet. */
+  /* This slot: kicker — shared section eyebrow pair; shared with plan-review-sheet. */
   .plan-ready--header .surface--eyebrow {
     margin-bottom: var(--space-2);
   }
 
-  /* @ds slot: title — display serif cap; shared with plan-review-sheet. */
+  /* This slot: title — display serif cap; shared with plan-review-sheet. */
   .plan-ready--title {
     max-inline-size: 30ch;
     margin: 0;
@@ -192,7 +196,7 @@
     overflow-wrap: anywhere;
   }
 
-  /* @ds slot: mark — the ✓ confirmation badge; never clay-only. */
+  /* This slot: mark — the ✓ confirmation badge; never clay-only. */
   .plan-ready--mark {
     display: grid;
     min-inline-size: 2.25rem;
@@ -205,7 +209,7 @@
     font-weight: 700;
   }
 
-  /* @ds slot: summary — plain prose; shared with plan-review-sheet. */
+  /* This slot: summary — plain prose; shared with plan-review-sheet. */
   .plan-ready--summary {
     margin: 0;
     color: var(--ink-secondary);
@@ -215,7 +219,7 @@
     overflow-wrap: anywhere;
   }
 
-  /* @ds slot: meta — revision / steps / published grid; shared with plan-review-sheet. */
+  /* This slot: meta — revision / steps / published grid; shared with plan-review-sheet. */
   .plan-ready--meta {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -223,14 +227,14 @@
     margin: 0;
   }
 
-  /* @ds slot: meta-cell — one fact; shared with plan-review-sheet. */
+  /* This slot: meta-cell — one fact; shared with plan-review-sheet. */
   .plan-ready--meta > div {
     display: grid;
     gap: 0.2rem;
     min-width: 0;
   }
 
-  /* @ds slot: meta-label — dt; shared with plan-review-sheet. */
+  /* This slot: meta-label — dt; shared with plan-review-sheet. */
   .plan-ready--meta dt {
     color: var(--ink-muted);
     font-size: 0.68rem;
@@ -239,7 +243,7 @@
     text-transform: uppercase;
   }
 
-  /* @ds slot: meta-value — dd; shared with plan-review-sheet. */
+  /* This slot: meta-value — dd; shared with plan-review-sheet. */
   .plan-ready--meta dd {
     margin: 0;
     color: var(--ink);
@@ -248,7 +252,7 @@
     overflow-wrap: anywhere;
   }
 
-  /* @ds state: review CTA — shared pill chrome for the ready card and review sheet. */
+  /* This state: review CTA — shared pill chrome for the ready card and review sheet. */
   :global(.plan-ready--review) {
     min-block-size: 44px;
     padding-inline: var(--space-4);
@@ -258,7 +262,7 @@
     cursor: pointer;
   }
 
-  /* @ds state: review CTA active — card entry into the review sheet. */
+  /* This state: review CTA active — card entry into the review sheet. */
   :global(.plan-ready--review) {
     justify-self: start;
     border: 1px solid var(--line-strong);
@@ -266,64 +270,70 @@
     color: var(--ink);
   }
 
-  /* @ds state: waiting-for-live-confirmation — review CTA disabled until the
+  /* This state: waiting-for-live-confirmation — review CTA disabled until the
      host binds the plan. */
   :global(.plan-ready--review[data-disabled]) {
     cursor: wait;
     opacity: 0.55;
   }
 
-  /* @ds state: hover — non-executing actions. */
+  /* This state: hover — non-executing actions. */
   :global(.plan-ready--review[data-hovered]) {
     background: var(--surface-muted);
   }
 
-  /* @ds end surface: plan-ready--card */
+  /* End of surface: plan-ready--card */
 
-  /* @ds edit: layout — wrap handling for the card/sheet headers. */
+  /* Editable seam: layout — wrap handling for the card/sheet headers. */
   .plan-ready--header {
     min-inline-size: 0;
     flex-wrap: wrap;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .plan-ready--header > div {
     min-inline-size: 0;
   }
 
-  /* @ds edit: layout — bidi + wrap for the card/sheet text. */
+  /* Editable seam: layout — bidi + wrap for the card/sheet text. */
   .plan-ready--title,
   .plan-ready--summary {
     overflow-wrap: anywhere;
     unicode-bidi: plaintext;
   }
 
-  /* @ds edit: layout — bidi isolation for the mono revision and ltr meta values. */
+  /* Editable seam: layout — bidi isolation for the mono revision and ltr meta values. */
   .plan-ready--meta dd[dir='ltr'] {
     direction: ltr;
     unicode-bidi: isolate;
   }
 
-  /* @ds edit: layout — narrow reflow of the ready card and review sheet. */
+  /* Editable seam: layout — narrow reflow of the ready card and review sheet. */
   @media (max-width: 24rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .plan-ready--card {
       padding: var(--space-4);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .plan-ready--meta {
       grid-template-columns: 1fr;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.plan-ready--review) {
       inline-size: 100%;
     }
   }
 
-  /* @ds edit: layout — narrow reflow of the composer bar + ready/review card + sheets. */
+  /* Editable seam: layout — narrow reflow of the composer bar + ready/review card + sheets. */
   @media (max-width: 27rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .plan-ready--meta {
       grid-template-columns: 1fr;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.plan-ready--review) {
       inline-size: 100%;
     }

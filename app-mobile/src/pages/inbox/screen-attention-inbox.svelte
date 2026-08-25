@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Screen Attention Inbox types and helpers.
   import type { AttentionItemDto } from '@pi-remote/pi-rpc-protocol';
   import { openAttentionHint } from '$shared/format/attention.js';
 
@@ -32,7 +33,7 @@
   let error = $state<string | null>(null);
   let opening = $state<string | null>(null);
 
-  // @ds guardrail: inbox fetch + open handlers — Not designer-editable.
+  // Do not edit — inbox fetch + open handlers — Not designer-editable.
   onMount(() => {
     const controller = new AbortController();
     void fetchAttention(controller.signal)
@@ -49,6 +50,7 @@
   // 4. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep open item focused on its single responsibility.
   function openItem(item: AttentionItemDto): void {
     opening = item.lookupId;
     error = null;
@@ -63,11 +65,14 @@
   }
 </script>
 
-<!-- @ds surface: inbox--view — attention signals. States: empty · error. -->
-<!-- @ds guardrail: inbox fetch + open handlers — Not designer-editable. -->
+<!-- Component content -->
+<!-- Inbox view -->
+<!-- This surface: inbox--view — attention signals. States: empty · error. -->
+<!-- Do not edit — inbox fetch + open handlers — Not designer-editable. -->
 <main class="inbox--view">
   <div class="session--toolbar">
-    <!-- @ds surface: back-button — quiet back arrow. react-aria Button wiring guarded. -->
+<!-- Back button -->
+    <!-- This surface: back-button — quiet back arrow. react-aria Button wiring guarded. -->
     <Button class="back-button" onclick={onBack}>
       Back to sessions
     </Button>
@@ -112,7 +117,8 @@
   </section>
 </main>
 
-<!-- @ds surface: inbox--view — attention signals. Decomposed into this scoped block; inbox--heading,
+<!-- Inbox view -->
+<!-- This surface: inbox--view — attention signals. Decomposed into this scoped block; inbox--heading,
      attention--list and attention--icon are owned solely by this component so they move with it.
      .inbox--heading h1 carries the full merged declaration set from the shared hero/review/inbox/
      enrollment h1 group plus the review/inbox h1 override group;
@@ -126,19 +132,20 @@
      .surface--eyebrow (many), and .empty--state / .empty--icon (Review/Home) are shared by 2+
      components and stay global in app.css. Values unchanged. -->
 <style>
-  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
-  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
+  /* This surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
+  /* Editable seam: layout — page gutter + safe bottom inset shared by routed surfaces. */
   .inbox--view {
     padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
   }
 
-  /* @ds surface: inbox--heading — inbox surface intro (states: empty · error). */
-  /* @ds slot: heading — surface title + description. */
+  /* This surface: inbox--heading — inbox surface intro (states: empty · error). */
+  /* This slot: heading — surface title + description. */
   .inbox--heading {
     max-width: 58rem;
     padding-bottom: clamp(2.5rem, 7vw, 5rem);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .inbox--heading h1 {
     max-width: 15ch;
     margin: 0;
@@ -150,6 +157,7 @@
     text-wrap: balance;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .inbox--heading > p:last-child {
     max-width: 43rem;
     margin: var(--space-6) 0 0;
@@ -158,11 +166,13 @@
     line-height: 1.65;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attention--list {
     display: grid;
     gap: var(--space-4);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .attention--icon {
     display: grid;
     width: 2.4rem;
@@ -174,6 +184,7 @@
     font-weight: 750;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.attention--card) {
     display: grid;
     grid-template-columns: 2.5rem 1fr auto;
@@ -192,22 +203,26 @@
       background-color var(--duration-fast) ease;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.attention--card[data-hovered]) {
     border-color: var(--line-strong);
     background: var(--surface-raised);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.attention--card > span:not(.attention--icon)) {
     font-size: 0.9rem;
     font-weight: 700;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.attention--card time) {
     color: var(--ink-muted);
     font-size: 0.7rem;
     font-weight: 600;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.attention--card strong) {
     grid-column: 2 / -1;
     color: var(--ink-secondary);
@@ -215,40 +230,47 @@
     font-weight: 600;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.attention--needs_input) .attention--icon {
     background: var(--warning-soft);
     color: var(--warning);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.attention--finished) .attention--icon {
     background: var(--success-soft);
     color: var(--success);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.attention--error) .attention--icon {
     background: var(--danger-soft);
     color: var(--danger);
   }
 
   @media (max-width: 39rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .inbox--view {
       padding-top: var(--space-6);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.attention--card) {
       grid-template-columns: 2.5rem 1fr;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.attention--card time) {
       grid-column: 2;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.attention--card strong) {
       grid-column: 2;
     }
   }
 
-  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
+  /* Editable seam: layout — safe inline gutters for the routed surfaces. */
   .inbox--view {
     padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
     padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));

@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Pdf Preview types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: PDF PREVIEW
   // ───────────────────────────────────────────────────────────────────
@@ -85,6 +86,7 @@
   // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     void block.digest;
     let active = true;
@@ -168,14 +170,17 @@
     };
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     onStateChange?.(pdfState);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     void pdfDocument;
     const element = scrollEl;
     if (element === null || typeof ResizeObserver === 'undefined') return undefined;
+    // Keep update focused on its single responsibility.
     const update = () => {
       containerWidth = element.clientWidth;
     };
@@ -189,10 +194,12 @@
   // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep on page state focused on its single responsibility.
   function onPageState(nextState: PdfPreviewState): void {
     if (nextState !== 'ready') pdfState = nextState;
   }
 
+  // Keep on scroll focused on its single responsibility.
   function onScroll(): void {
     const container = scrollEl;
     if (container === null) return;
@@ -212,9 +219,11 @@
 
 </script>
 
-<!-- @ds surface: pdf-preview — the controlled PDF.js reader (bounded pages/canvases). -->
-<!-- @ds state: loading · ready · corrupt · too-large · withheld — [data-pdf-state] each. -->
-<!-- @ds guardrail: do-not-edit — The worker disables annotations/XFA, pages and canvases stay bounded, and text renders only after relay attestation. -->
+<!-- Component content -->
+<!-- Pdf preview -->
+<!-- This surface: pdf-preview — the controlled PDF.js reader (bounded pages/canvases). -->
+<!-- This state: loading · ready · corrupt · too-large · withheld — [data-pdf-state] each. -->
+<!-- Do not edit — The worker disables annotations/XFA, pages and canvases stay bounded, and text renders only after relay attestation. -->
 <section class="pdf-preview" aria-label="Sanitized PDF preview" data-pdf-state={pdfState}>
   <div class="pdf-preview--controls" role="group" aria-label="PDF controls">
     <button type="button" class="artifact--control-button" onclick={() => (currentPage = Math.max(1, currentPage - 1))} disabled={currentPage <= 1 || pageCount === 0}>Previous</button>
@@ -235,21 +244,22 @@
   <div bind:this={scrollEl} class="pdf-preview--scroll" onscroll={onScroll} data-pdf-rendered-pages={visiblePages.length}>{#if pdfState === 'ready' && pdfDocument !== null}{@const readyDocument = pdfDocument}{#each visiblePages as pageNumber (`${block.revision}-${pageNumber}-${scale}`)}<PdfPage pdfDocument={readyDocument} pageNumber={pageNumber} scale={scale} textLayerSafe={block.textLayerSafe === true} findTerm={findTerm} onStateChange={onPageState} />{/each}{/if}</div>
 </section>
 
-<!-- @ds surface: pdf-preview — the controlled PDF.js reader shell: controls, page indicator, and the
+<!-- Pdf preview -->
+<!-- This surface: pdf-preview — the controlled PDF.js reader shell: controls, page indicator, and the
      page scroll column (individual pages are the PdfPage child). Decomposed into this scoped block; all
      single-component and static. .pdf-preview--controls was grouped with the different
      .image-preview--controls (ImagePreview) — only the pdf slice moves here. The shared .pdf-page /
      .pdf-preview-shared and the .artifact--control-button / .artifact-find--control on the toolbar stay
      global (→ app.css at cutover). Literal hex preserved. Values unchanged. -->
 <style>
-  /* @ds slot: pdf-preview — the reader shell. */
+  /* This slot: pdf-preview — the reader shell. */
   .pdf-preview {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-3);
   }
 
-  /* @ds slot: pdf-controls — the PDF toolbar row. */
+  /* This slot: pdf-controls — the PDF toolbar row. */
   .pdf-preview--controls {
     display: flex;
     flex-wrap: wrap;
@@ -257,7 +267,7 @@
     align-items: center;
   }
 
-  /* @ds slot: page-indicator — the "Page N of M" read-out. */
+  /* This slot: page-indicator — the "Page N of M" read-out. */
   .pdf--page-indicator {
     min-block-size: 2.75rem;
     padding-inline: var(--space-2);
@@ -265,8 +275,8 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* @ds slot: page-scroll — the bounded, contained page scroll column. */
-  /* @ds guardrail: do-not-edit — Bounded reading well; overscroll contained so panning never chains. */
+  /* This slot: page-scroll — the bounded, contained page scroll column. */
+  /* Do not edit — Bounded reading well; overscroll contained so panning never chains. */
   .pdf-preview--scroll {
     display: grid;
     min-block-size: 12rem;

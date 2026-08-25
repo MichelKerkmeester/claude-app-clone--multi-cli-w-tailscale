@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Sheet Leave Plan types and helpers.
   export interface LeavePlanSheetProps {
     readonly isOpen: boolean;
     readonly onOpenChange: (open: boolean) => void;
@@ -57,6 +58,7 @@
   // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     sheetOpen = hostOpen;
   });
@@ -65,38 +67,43 @@
   // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep restore trigger focus focused on its single responsibility.
   const restoreTriggerFocus = () => {
     // Fallback focus when the menu row has unmounted.
     window.setTimeout(() => triggerRef?.focus({ preventScroll: true }), 0);
   };
 
+  // Keep close focused on its single responsibility.
   const close = () => {
     onOpenChange(false);
     restoreTriggerFocus();
   };
 
+  // Keep on sheet open change focused on its single responsibility.
   function onSheetOpenChange(next: boolean): void {
     if (!next) close();
     else onOpenChange(true);
     sheetOpen = hostOpen;
   }
 
-  // @ds guardrail: do-not-edit — Bits Dialog default auto-focus is prevented so the safe action (Stay) receives focus, never Switch to Build.
+  // Do not edit — Bits Dialog default auto-focus is prevented so the safe action (Stay) receives focus, never Switch to Build.
   function onOpenAutoFocus(event: Event): void {
     event.preventDefault();
     stayEl?.focus({ preventScroll: true });
   }
 
+  // Keep on close auto focus focused on its single responsibility.
   function onCloseAutoFocus(event: Event): void {
     event.preventDefault();
     restoreTriggerFocus();
   }
 
+  // Keep on overlay click focused on its single responsibility.
   function onOverlayClick(event: MouseEvent): void {
     if (event.target === event.currentTarget) close();
   }
 
-  // @ds guardrail: do-not-edit — Safe-action focus effect; lands on Stay, never Switch to Build.
+  // Do not edit — Safe-action focus effect; lands on Stay, never Switch to Build.
   $effect(() => {
     if (!isOpen) return;
     // Initial focus lands on the safe action, never on Switch to Build.
@@ -104,6 +111,7 @@
     return () => window.clearTimeout(timer);
   });
 
+  // Keep attach stay focused on its single responsibility.
   function attachStay(node: Element): () => void {
     const el = node as HTMLButtonElement;
     stayEl = el;
@@ -113,6 +121,7 @@
   }
 </script>
 
+<!-- Component content -->
 <!-- ───────────────────────────────────────────────────────────────────
      MODULE: Leave Plan Mode Confirmation Sheet
      ───────────────────────────────────────────────────────────────────
@@ -122,12 +131,13 @@
      leave the confirmed Plan state untouched. Focus enters on the safe
      action and returns to the mode button when the sheet closes. -->
 
-<!-- @ds surface: leave-plan--sheet — confirmation before Plan → Build expands host authority. -->
-<!-- @ds guardrail: do-not-edit — onSwitchToBuild is the only host mutation path; Stay and every dismissal leave the confirmed Plan state untouched, and focus lands on Stay first. Not designer-editable. -->
-<!-- @ds state: mode · plan-ready — variants of the same authority-expanding confirmation (copy only). -->
-<!-- @ds guardrail: do-not-edit — ModalOverlay/Modal/Dialog React-aria wiring (open, dismiss, focus restore) — Not designer-editable. -->
+<!-- Leave plan sheet -->
+<!-- This surface: leave-plan--sheet — confirmation before Plan → Build expands host authority. -->
+<!-- Do not edit — onSwitchToBuild is the only host mutation path; Stay and every dismissal leave the confirmed Plan state untouched, and focus lands on Stay first. Not designer-editable. -->
+<!-- This state: mode · plan-ready — variants of the same authority-expanding confirmation (copy only). -->
+<!-- Do not edit — ModalOverlay/Modal/Dialog React-aria wiring (open, dismiss, focus restore) — Not designer-editable. -->
 <Sheet bind:open={sheetOpen} onOpenChange={onSheetOpenChange}>
-  <!-- @ds slot: overlay — fixed scrim + bottom-sheet placement.
+  <!-- This slot: overlay — fixed scrim + bottom-sheet placement.
        Bits Overlay/Content are siblings, so the overlay class lives on Content and the
        modal/dialog nest inside — the original overlay → modal → dialog box tree. -->
   <SheetContent
@@ -138,20 +148,20 @@
     onCloseAutoFocus={onCloseAutoFocus}
     onclick={onOverlayClick}
   >
-    <!-- @ds slot: sheet — constraint + raised bottom sheet. -->
+    <!-- This slot: sheet — constraint + raised bottom sheet. -->
     <div class="leave-plan--sheet">
       <div class="leave-plan--dialog">
-        <!-- @ds slot: title -->
+        <!-- This slot: title -->
         <SheetTitle class="leave-plan--title">
           Leave plan mode?
         </SheetTitle>
-        <!-- @ds slot: body — explanatory copy. -->
+        <!-- This slot: body — explanatory copy. -->
         <p class="leave-plan--body">
           Pi may request write-capable tools again. The current plan will not run.
         </p>
-        <!-- @ds slot: actions — stay · switch rail. -->
+        <!-- This slot: actions — stay · switch rail. -->
         <div class="leave-plan--actions">
-           <!-- @ds state: stay — the safe, authority-preserving action. @ds guardrail: do-not-edit — React-aria Button wiring (ref, onPress). -->
+           <!-- This state: stay — the safe, authority-preserving action. Do not edit — React-aria Button wiring (ref, onPress). -->
           <Button
             type="button"
             class="leave-plan--stay"
@@ -160,7 +170,7 @@
           >
             Stay in plan
           </Button>
-           <!-- @ds state: switch — the only authority-expanding path; copy switches on the mode / plan-ready variant. @ds guardrail: do-not-edit — React-aria Button wiring + the mutation call. -->
+           <!-- This state: switch — the only authority-expanding path; copy switches on the mode / plan-ready variant. Do not edit — React-aria Button wiring + the mutation call. -->
           <Button
             type="button"
             class="leave-plan--switch"
@@ -178,18 +188,19 @@
   </SheetContent>
 </Sheet>
 
-<!-- @ds surface: leave-plan--sheet — confirmation before Plan → Build expands host authority. Decomposed into this scoped block;
+<!-- Leave plan sheet -->
+<!-- This surface: leave-plan--sheet — confirmation before Plan → Build expands host authority. Decomposed into this scoped block;
      leave-plan owned rules move with it. Grouped prefers-reduced-motion / prefers-contrast /
      forced-colors siblings stay global (shared with plan-mode--button, session--card, and other
      chrome). Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->
 <style>
-  /* @ds surface: leave-plan--sheet — confirmation before Plan → Build expands host authority. */
-  /* @ds surface: overlay — leave-plan--sheet is an INSTANCE of the shared overlay
+  /* This surface: leave-plan--sheet — confirmation before Plan → Build expands host authority. */
+  /* This surface: overlay — leave-plan--sheet is an INSTANCE of the shared overlay
      primitive (backdrop → raised panel → header/body/actions). Physical unification
      of the per-surface overlay chrome is a documented follow-up. */
-  /* @ds slot: overlay — fixed scrim + bottom-sheet placement.
-     @ds edit: layout — z-index 60 keeps it above the mode surfaces and below the review sheet. */
+  /* This slot: overlay — fixed scrim + bottom-sheet placement.
+     Editable seam: layout — z-index 60 keeps it above the mode surfaces and below the review sheet. */
   :global(.leave-plan--overlay) {
     position: fixed;
     z-index: 60;
@@ -200,10 +211,10 @@
     background: rgb(0 0 0 / 35%);
   }
 
-  /* @ds slot: sheet — constraint + raised sheet + entry. */
-  /* @ds slot: panel — the raised bottom-sheet surface. */
-  /* @ds state: open — the resting raised sheet (settle transition). */
-  /* @ds guardrail: do-not-edit — Leave-plan is an authority-gating overlay; its dismissal and safe-action semantics live in the component logic. Edit look and motion only; never the dismissal behavior. */
+  /* This slot: sheet — constraint + raised sheet + entry. */
+  /* This slot: panel — the raised bottom-sheet surface. */
+  /* This state: open — the resting raised sheet (settle transition). */
+  /* Do not edit — Leave-plan is an authority-gating overlay; its dismissal and safe-action semantics live in the component logic. Edit look and motion only; never the dismissal behavior. */
   .leave-plan--sheet {
     inline-size: 100%;
     max-inline-size: 34rem;
@@ -217,7 +228,7 @@
     transition: transform 180ms var(--ease-out, ease);
   }
 
-  /* @ds slot: dialog — content column + focus seam. */
+  /* This slot: dialog — content column + focus seam. */
   .leave-plan--dialog {
     display: grid;
     gap: var(--space-3);
@@ -225,7 +236,7 @@
     outline: none;
   }
 
-  /* @ds slot: title */
+  /* This slot: title */
   :global(.leave-plan--title) {
     margin: 0;
     color: var(--ink);
@@ -235,7 +246,7 @@
     line-height: 1.3;
   }
 
-  /* @ds slot: body — explanatory copy. */
+  /* This slot: body — explanatory copy. */
   .leave-plan--body {
     margin: 0;
     color: var(--ink-secondary);
@@ -243,7 +254,7 @@
     line-height: 1.45;
   }
 
-  /* @ds slot: actions — the two-choice rail. */
+  /* This slot: actions — the two-choice rail. */
   .leave-plan--actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -251,7 +262,7 @@
     margin-block-start: var(--space-2);
   }
 
-  /* @ds state: stay · switch — shared button chrome on the two-choice rail. */
+  /* This state: stay · switch — shared button chrome on the two-choice rail. */
   :global(.leave-plan--stay),
   :global(.leave-plan--switch) {
     min-block-size: 44px;
@@ -262,14 +273,14 @@
     cursor: pointer;
   }
 
-  /* @ds state: stay — the safe, authority-preserving action. */
+  /* This state: stay — the safe, authority-preserving action. */
   :global(.leave-plan--stay) {
     border: 1px solid var(--line-strong);
     background: transparent;
     color: var(--ink);
   }
 
-  /* @ds state: switch — the only authority-expanding path; copy varies by the
+  /* This state: switch — the only authority-expanding path; copy varies by the
      mode / plan-ready variant. */
   :global(.leave-plan--switch) {
     border: 0;
@@ -277,15 +288,15 @@
     color: var(--action-fg);
   }
 
-  /* @ds state: focus-visible */
+  /* This state: focus-visible */
   :global(.leave-plan--stay[data-focus-visible]),
   :global(.leave-plan--switch[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
-  /* @ds end surface: leave-plan--sheet */
+  /* End of surface: leave-plan--sheet */
 
-  /* @ds edit: layout — safe-area gutters for the leave sheet. */
+  /* Editable seam: layout — safe-area gutters for the leave sheet. */
   .leave-plan--sheet {
     padding-block-start: max(var(--space-4), env(safe-area-inset-top, 0px));
     padding-block-end: max(var(--space-4), env(safe-area-inset-bottom, 0px));

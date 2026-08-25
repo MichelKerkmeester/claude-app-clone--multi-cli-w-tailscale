@@ -19,8 +19,8 @@
   // 2. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: push--settings — device notification preferences. States: loading · disabled · off · on.
-  // @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — Not designer-editable.
+  // This surface: push--settings — device notification preferences. States: loading · disabled · off · on.
+  // Do not edit — push fetch / subscribe / unsubscribe / preference handlers — Not designer-editable.
   let config = $state<PushConfig | null>(null);
   let error = $state<string | null>(null);
 
@@ -34,6 +34,7 @@
   // 3. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep set preferences focused on its single responsibility.
   function setPreferences(preferences: PushPreferences): void {
     config = config === null ? config : { ...config, preferences };
     void updatePushPreferences(preferences).catch((cause: unknown) => (error = messageFrom(cause)));
@@ -42,8 +43,10 @@
   const ATTENTION_CLASSES = ['needs_input', 'finished', 'error'] as const;
 </script>
 
-<!-- @ds surface: push--settings — device notification preferences. States: loading · disabled · off · on. -->
-<!-- @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — Not designer-editable. -->
+<!-- Component content -->
+<!-- Push settings -->
+<!-- This surface: push--settings — device notification preferences. States: loading · disabled · off · on. -->
+<!-- Do not edit — push fetch / subscribe / unsubscribe / preference handlers — Not designer-editable. -->
 <section class="push--settings">
   <div>
     <p class="surface--eyebrow">This device</p>
@@ -67,7 +70,7 @@
           .catch((cause: unknown) => (error = messageFrom(cause)));
       }}
     >
-      <!-- @ds guardrail: push subscribe onPress handler — Not designer-editable. -->
+      <!-- Do not edit — push subscribe onPress handler — Not designer-editable. -->
       Enable notifications
     </Button>
   {:else}
@@ -81,7 +84,7 @@
           data-selected={selected ? '' : undefined}
           onclick={() => setPreferences({ ...config!.preferences!, [attentionClass]: !selected })}
         >
-          <!-- @ds guardrail: preference Switch onChange → updatePushPreferences — Not designer-editable. -->
+          <!-- Do not edit — preference Switch onChange → updatePushPreferences — Not designer-editable. -->
           <span class="switch-track" aria-hidden="true">
             <span></span>
           </span>
@@ -89,7 +92,7 @@
         </button>
       {/each}
     </div>
-    <!-- @ds guardrail: push unsubscribe onPress handler — Not designer-editable. -->
+    <!-- Do not edit — push unsubscribe onPress handler — Not designer-editable. -->
     <Button
       class="push--disable"
       onclick={() => {
@@ -103,7 +106,8 @@
   {/if}
 </section>
 
-<!-- @ds surface: push--settings — device notification preferences. Decomposed into this scoped block;
+<!-- Push settings -->
+<!-- This surface: push--settings — device notification preferences. Decomposed into this scoped block;
      push--settings / preference-grid / switch-track and their switch state rules are owned solely
      by this component so they move with it. The hand-rolled switch renders the original
      [role='switch'] + [data-selected] + .switch-track structure the frozen CSS targets, so the
@@ -114,8 +118,8 @@
      global in app.css. The .push--settings h2 / .push--settings p solo occurrences are extracted
      from the shared .section-heading groups; the shared groups stay global. Values unchanged. -->
 <style>
-  /* @ds surface: push--settings — device notification preferences. */
-  /* @ds state: loading · disabled · off · on — support check, relay-off, enable CTA, preference grid. */
+  /* This surface: push--settings — device notification preferences. */
+  /* This state: loading · disabled · off · on — support check, relay-off, enable CTA, preference grid. */
   .push--settings {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -127,10 +131,12 @@
     background: var(--surface-muted);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .push--settings .surface--eyebrow {
     margin-bottom: var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .push--settings > span {
     color: var(--ink-secondary);
     font-size: 0.82rem;
@@ -144,6 +150,7 @@
     letter-spacing: -0.025em;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .push--settings p {
     max-width: 34rem;
     margin: var(--space-2) 0 0;
@@ -167,18 +174,20 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.push--settings > button[data-hovered]) {
     background: var(--accent-strong);
     color: white;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.push--settings .push--disable) {
     justify-self: end;
     background: transparent;
     color: var(--danger);
   }
 
-  /* @ds slot: preferences — per-class alert switches. */
+  /* This slot: preferences — per-class alert switches. */
   .preference-grid {
     display: flex;
     flex-wrap: wrap;
@@ -186,6 +195,7 @@
     gap: var(--space-3);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .preference-grid :global([role='switch']) {
     display: flex;
     min-height: 2.75rem;
@@ -197,6 +207,7 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .switch-track {
     display: flex;
     width: 2.3rem;
@@ -208,6 +219,7 @@
     transition: background-color var(--duration-state) ease;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .switch-track > span {
     width: 1.05rem;
     height: 1.05rem;
@@ -217,10 +229,12 @@
     transition: transform var(--duration-state) var(--ease-out);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global([role='switch'][data-selected]) .switch-track {
     background: var(--accent);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global([role='switch'][data-selected]) .switch-track > span {
     transform: translateX(0.95rem);
   }
@@ -232,25 +246,29 @@
   }
 
   @media (max-width: 39rem) {
+    /* Keep this rule aligned with its surrounding surface. */
     .push--settings {
       grid-template-columns: 1fr;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .preference-grid {
       justify-content: start;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     :global(.push--settings .push--disable) {
       justify-self: start;
     }
   }
 
-  /* @ds state: motion — reduced-motion switch knob zeroing. Solo occurrence extracted from
+  /* This state: motion — reduced-motion switch knob zeroing. Solo occurrence extracted from
      the shared reduced-motion group; the shared group stays global. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     :global([role='switch'][data-selected]) .switch-track > span {
       transform: none !important;
     }
   }
-  /* @ds end surface: push--settings */
+  /* End of surface: push--settings */
 </style>

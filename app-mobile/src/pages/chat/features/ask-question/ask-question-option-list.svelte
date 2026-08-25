@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Ask Question Option List types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ASK QUESTION OPTION LIST
   // ───────────────────────────────────────────────────────────────────
@@ -24,11 +25,12 @@
   );
 </script>
 
+<!-- Component content -->
 {#if viewModel.display.options.length > 0}
-  <!-- @ds slot: options — the choice fieldset; legend + the stacked option-row list. -->
+  <!-- This slot: options — the choice fieldset; legend + the stacked option-row list. -->
   <fieldset class="ask-question--options" {disabled}>
     <legend>{selectionLabel}</legend>
-    <!-- @ds slot: option-list — the stacked option rows. -->
+    <!-- This slot: option-list — the stacked option rows. -->
     <div class="ask-question-option--list">
       {#each viewModel.display.options as option (option.id)}
         <AskQuestionOptionRow
@@ -43,9 +45,10 @@
   </fieldset>
 {/if}
 
-<!-- @ds surface: ask-question option-list — the choice fieldset + stacked rows (rows are a child component). Decomposed into this scoped block; values unchanged. -->
+<!-- Ask question option list -->
+<!-- This surface: ask-question option-list — the choice fieldset + stacked rows (rows are a child component). Decomposed into this scoped block; values unchanged. -->
 <style>
-  /* @ds slot: options — the choice fieldset. */
+  /* This slot: options — the choice fieldset. */
   .ask-question--options {
     min-inline-size: 0;
     margin: 0;
@@ -53,6 +56,7 @@
     border: 0;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .ask-question--options legend {
     margin-block-end: var(--space-2);
     color: var(--ink-muted);
@@ -60,7 +64,7 @@
     font-weight: 650;
   }
 
-  /* @ds slot: option-list — the stacked option rows. */
+  /* This slot: option-list — the stacked option rows. */
   .ask-question-option--list {
     display: grid;
     min-inline-size: 0;

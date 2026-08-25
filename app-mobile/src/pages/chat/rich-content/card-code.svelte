@@ -52,12 +52,14 @@
   // 5. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep display lines focused on its single responsibility.
   function displayLines(value: string): string[] {
     const result = value.split(/\r?\n/u);
     if (result.at(-1) === '') result.pop();
     return result;
   }
 
+  // Keep clip tokens focused on its single responsibility.
   function clipTokens(
     tokens: readonly HighlightToken[],
     length: number,
@@ -75,9 +77,10 @@
   }
 </script>
 
+<!-- Component content -->
 {#snippet actionsSnippet()}
-  <!-- @ds slot: actions — Copy source + full-screen Open handoff. -->
-  <!-- @ds guardrail: do-not-edit — The exact-copy clipboard boundary; Open is a pass-through with no fetch/endpoint/ticket/download/host-file read. -->
+  <!-- This slot: actions — Copy source + full-screen Open handoff. -->
+  <!-- Do not edit — The exact-copy clipboard boundary; Open is a pass-through with no fetch/endpoint/ticket/download/host-file read. -->
   {#if feedback.canCopy}
     <button
       class="rich-block--action"
@@ -107,28 +110,28 @@
   class="rich-code-card"
   {...(feedback.canCopy || canOpen ? { actions: actionsSnippet } : {})}
 >
-  <!-- @ds slot: code-preview — horizontally panning viewport; code scrolls inside
+  <!-- This slot: code-preview — horizontally panning viewport; code scrolls inside
        its own box and never overflows the page. -->
   <div class="rich--code-preview" data-code-pan="true">
-    <!-- @ds state: code — plaintext-first; data-highlight-status (plain · pending ·
+    <!-- This state: code — plaintext-first; data-highlight-status (plain · pending ·
          highlighted) advances with the worker.
-         @ds guardrail: do-not-edit — The status attribute and token rendering are behavior owned by the highlight lifecycle. -->
+         Do not edit — The status attribute and token rendering are behavior owned by the highlight lifecycle. -->
     <pre aria-label={`${block.languageLabel} code preview`}><code data-highlight-status={highlighted.current.status}>{#if previewTokens === null}{preview}{:else}{#each previewTokens as token, index (index)}<span class={`rich-code-token is-${token.kind}`}>{token.text}</span>{/each}{/if}</code></pre>
   </div>
   {#if lines.length > PREVIEW_LINES}
     <p class="rich--continuation">{lines.length - PREVIEW_LINES} more lines</p>
   {/if}
-  <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
+  <!-- Do not edit — Polite live region announcing Copy outcomes. -->
   <p class="rich--copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
 
 <style>
-  /* @ds surface: code-card — fenced source preview with optional progressive
+  /* This surface: code-card — fenced source preview with optional progressive
      highlighting and a full-screen Open handoff. */
-  /* @ds slot: code-preview — horizontally panning code viewport. */
-  /* @ds state: code — plaintext-first; progressively highlighted via the
+  /* This slot: code-preview — horizontally panning code viewport. */
+  /* This state: code — plaintext-first; progressively highlighted via the
      data-highlight-status hook (plain · pending · highlighted). */
-  /* @ds guardrail: do-not-edit — panning previews do not shift scroll anchoring. */
+  /* Do not edit — panning previews do not shift scroll anchoring. */
   .rich--code-preview {
     max-block-size: 228px;
     min-inline-size: 0;
@@ -138,7 +141,7 @@
     scrollbar-width: thin;
   }
 
-  /* @ds slot: code well — the code lines scroll inside this mono well. */
+  /* This slot: code well — the code lines scroll inside this mono well. */
   .rich--code-preview pre {
     inline-size: max-content;
     min-inline-size: 100%;
@@ -152,16 +155,16 @@
     white-space: pre;
   }
 
-  /* @ds slot: labels — code continuation caption (muted small type). */
+  /* This slot: labels — code continuation caption (muted small type). */
   .rich--continuation {
     margin: var(--space-2) 0 0;
     color: var(--ink-muted);
     font-size: 0.75rem;
   }
 
-  /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
+  /* This state: copy — success · failure · unavailable. The Copy announcer line is a
      polite live region whose text carries the outcome; the presence styles are this. */
-  /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
+  /* Do not edit — role="status" aria-live="polite" live region. */
   .rich--copy-status {
     min-block-size: 1.25rem;
     margin: var(--space-2) 0 0;

@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Transcript List types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: TRANSCRIPT LIST
   // ───────────────────────────────────────────────────────────────────
@@ -31,6 +32,7 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep block label focused on its single responsibility.
   function blockLabel(block: DisplayTranscriptBlock): string {
     const labels: Record<DisplayTranscriptBlock['kind'], string> = {
       text: 'Assistant response',
@@ -101,13 +103,14 @@
   // 7. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: live-edge measurement + scroll handlers (followToBottom, onScroll) — Not designer-editable.
+  // Do not edit — live-edge measurement + scroll handlers (followToBottom, onScroll) — Not designer-editable.
   function followToBottom(): void {
     const element = scrollEl;
     if (element !== null) element.scrollTop = element.scrollHeight;
     newAway = 0;
   }
 
+  // Keep on scroll focused on its single responsibility.
   function onScroll(): void {
     const element = scrollEl;
     if (element === null) return;
@@ -121,7 +124,7 @@
   // 8. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds guardrail: block normalization (normalizeTranscriptBlocks), turn grouping (groupNormalizedTranscript, groupBlocksIntoTurns) and todo-row insertion — Not designer-editable.
+  // Do not edit — block normalization (normalizeTranscriptBlocks), turn grouping (groupNormalizedTranscript, groupBlocksIntoTurns) and todo-row insertion — Not designer-editable.
   const normalizedBlocks = $derived.by(() =>
     normalizeTranscriptBlocks({
       sessionId: artifactSessionId || 'unknown-session',
@@ -152,7 +155,7 @@
       stallClock - mostRecentBlockAt >= TRANSCRIPT_STALL_THRESHOLD_MS,
   );
 
-  // @ds guardrail: virtualization — Count/estimateSize/measureElement/overscan; rows are measured.
+  // Do not edit — virtualization — Count/estimateSize/measureElement/overscan; rows are measured.
   const virtualizer = createVirtualizer<HTMLDivElement, HTMLDivElement>({
     count: renderItems.length,
     getScrollElement: () => scrollEl,
@@ -164,6 +167,7 @@
   // 9. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (!running || mostRecentBlockAt === undefined) return;
     stallClock = Date.now();
@@ -173,6 +177,7 @@
     return () => clearInterval(timer);
   });
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const disclosureBlockIds = new Set([
       ...blocks.map((block) => block.id),
@@ -196,7 +201,7 @@
     });
   });
 
-  // @ds guardrail: live-edge auto-scroll effect + sr-only block-arrival announcements — Not designer-editable.
+  // Do not edit — live-edge auto-scroll effect + sr-only block-arrival announcements — Not designer-editable.
   $effect(() => {
     if (blocks.length > previousCount) {
       const addedBlocks = blocks.slice(previousCount);
@@ -218,21 +223,23 @@
   });
 </script>
 
-<!-- @ds surface: transcript-list — the virtualized typed-transcript list and its live-edge
+<!-- Component content -->
+<!-- Transcript list -->
+<!-- This surface: transcript-list — the virtualized typed-transcript list and its live-edge
      controls (scroll--to-latest pill + badge, streaming marker, sr-only announcer). -->
-<!-- @ds guardrail: virtualization, turn-grouping, block normalization, and streaming state
+<!-- Do not edit — virtualization, turn-grouping, block normalization, and streaming state
      below (hooks, effects, measurement, scroll and announce handlers) are not designer-editable. -->
 {#if blocks.length === 0 && todoProjection.projection === null}
-  <!-- @ds state: empty--transcript — shown when there are no blocks and no todo projection. -->
+  <!-- This state: empty--transcript — shown when there are no blocks and no todo projection. -->
   <div class="empty--transcript">No transcript blocks are available yet.</div>
 {:else}
-  <!-- @ds slot: frame — labelled, focussable transcript region. -->
+  <!-- This slot: frame — labelled, focussable transcript region. -->
   <section class="transcript--frame" aria-label="Typed transcript" tabindex={-1}>
-    <!-- @ds guardrail: sr-only polite live announcer — Not designer-editable. -->
+    <!-- Do not edit — sr-only polite live announcer — Not designer-editable. -->
     <div class="sr-only" aria-live="polite" aria-atomic="true">
       {announcement}
     </div>
-    <!-- @ds slot: scroll-region — the scrollable clip of the virtual list. -->
+    <!-- This slot: scroll-region — the scrollable clip of the virtual list. -->
     <div class="transcript--scroll" bind:this={scrollEl} onscroll={onScroll}>
       <div
         class="transcript--virtual"
@@ -248,7 +255,7 @@
                   ? item.kind === 'block' ? item.block.sourceBlockId : item.sourceBlockId
                   : item.blocks[0]?.sourceBlockId}
             {@const isTurnStart = leadId !== undefined && turnStartIds.has(leadId)}
-            <!-- @ds guardrail: virtualized row — MeasureElement + translateY come from the virtualizer. -->
+            <!-- Do not edit — virtualized row — MeasureElement + translateY come from the virtualizer. -->
             <div
               class={isTurnStart ? 'virtual-row turn--start' : 'virtual-row'}
               data-index={virtualItem.index}
@@ -289,7 +296,7 @@
             </div>
           {/if}
         {/each}
-        <!-- @ds state: streaming — @ds slot: streaming--marker. -->
+        <!-- This state: streaming — This slot: streaming--marker. -->
         {#if running}
           <div
             class="streaming--marker"
@@ -308,7 +315,7 @@
         {/if}
       </div>
     </div>
-    <!-- @ds state: not-live-edge — @ds slot: scroll--to-latest pill + count badge. -->
+    <!-- This state: not-live-edge — This slot: scroll--to-latest pill + count badge. -->
     {#if !atLiveEdge}
       <button
         type="button"
@@ -336,7 +343,8 @@
   </section>
 {/if}
 
-<!-- @ds surface: transcript-list — the virtualized typed-transcript list and its live-edge controls.
+<!-- Transcript list -->
+<!-- This surface: transcript-list — the virtualized typed-transcript list and its live-edge controls.
      Decomposed into this scoped block; transcript--frame/scroll/virtual, virtual-row (+turn--start),
      streaming--marker/glyph/label, scroll--to-latest (+hover), scroll--badge, and inbound-image--stack
      are owned solely by this component so they move with it (scoped). .sr-only is a shared a11y
@@ -344,8 +352,8 @@
      app.css. The body:has(.slash--panel) .scroll--to-latest override is body-rooted and couples to
      the slash--panel surface, so it is wrapped in :global. Values unchanged. -->
 <style>
-  /* @ds surface: empty--state — empty/unavailable list state. */
-  /* @ds state: empty--transcript — the TranscriptList "no blocks yet" message. */
+  /* This surface: empty--state — empty/unavailable list state. */
+  /* This state: empty--transcript — the TranscriptList "no blocks yet" message. */
   .empty--transcript {
     padding: clamp(3rem, 8vw, 6rem) var(--space-4);
     border: 1px dashed var(--line-strong);
@@ -354,7 +362,7 @@
     text-align: center;
   }
 
-  /* @ds slot: frame — transcript region wrapper (positioning only). */
+  /* This slot: frame — transcript region wrapper (positioning only). */
   .transcript--frame {
     position: relative;
     margin-top: var(--space-6);
@@ -366,9 +374,9 @@
   }
 
   /* Reader-controlled live edge: a pill to jump to the newest blocks when scrolled up. */
-  /* @ds surface: transcript-list — the virtualized transcript list and its live-edge controls. */
-  /* @ds slot: scroll--to-latest — pill, shown only away from the live edge. */
-  /* @ds state: not-live-edge */
+  /* This surface: transcript-list — the virtualized transcript list and its live-edge controls. */
+  /* This slot: scroll--to-latest — pill, shown only away from the live edge. */
+  /* This state: not-live-edge */
   .scroll--to-latest {
     position: absolute;
     bottom: var(--space-4);
@@ -388,30 +396,34 @@
     cursor: pointer;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .scroll--to-latest:hover {
     background: var(--surface-muted);
   }
 
-  /* @ds edit: surface — glass treatment for the floating control, composing the same
+  /* Editable seam: surface — glass treatment for the floating control, composing the same
      color-mix + blur(12px) idiom the header bars already use. Guarded on @supports because
      without a real backdrop blur a translucent button would sit over unblurred transcript
      text, hurting the legibility of both. */
   @supports (backdrop-filter: blur(12px)) {
+    /* Keep this rule aligned with its surrounding surface. */
     .scroll--to-latest {
       background: color-mix(in oklch, var(--surface-raised) 88%, transparent);
       backdrop-filter: blur(12px);
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .scroll--to-latest:hover {
       background: color-mix(in oklch, var(--surface-muted) 88%, transparent);
     }
   }
 
-  /* @ds edit: contrast — the high-contrast reader gives up the glass: translucency lowers the
+  /* Editable seam: contrast — the high-contrast reader gives up the glass: translucency lowers the
      chevron's effective contrast against whatever scrolls behind it, so the control returns to
      an opaque surface and carries the stronger border the app's other raised surfaces use. */
-  /* @ds guardrail: do-not-edit — The opaque high-contrast fallback is an accessibility guarantee; translucent surfaces must not survive prefers-contrast: more. */
+  /* Do not edit — The opaque high-contrast fallback is an accessibility guarantee; translucent surfaces must not survive prefers-contrast: more. */
   @media (prefers-contrast: more) {
+    /* Keep this rule aligned with its surrounding surface. */
     .scroll--to-latest,
     .scroll--to-latest:hover {
       border-color: var(--line-strong);
@@ -420,7 +432,7 @@
     }
   }
 
-  /* @ds slot: scroll--badge — new-message count pill. */
+  /* This slot: scroll--badge — new-message count pill. */
   .scroll--badge {
     position: absolute;
     top: -0.35rem;
@@ -437,7 +449,7 @@
     font-weight: 700;
   }
 
-  /* @ds slot: scroll-region — the scrollable clip of the virtual list. */
+  /* This slot: scroll-region — the scrollable clip of the virtual list. */
   .transcript--scroll {
     height: min(70dvh, 54rem);
     overflow: auto;
@@ -445,14 +457,14 @@
     scrollbar-color: var(--line-strong) transparent;
   }
 
-  /* @ds slot: virtual-list — reserves total height; rows are absolutely positioned below. */
-  /* @ds guardrail: virtualization layout — Measured rows; do not change row height math. */
+  /* This slot: virtual-list — reserves total height; rows are absolutely positioned below. */
+  /* Do not edit — virtualization layout — Measured rows; do not change row height math. */
   .transcript--virtual {
     position: relative;
     width: 100%;
   }
 
-  /* @ds guardrail: virtual row + streaming marker share the measured absolute row slot. */
+  /* Do not edit — virtual row + streaming marker share the measured absolute row slot. */
   .virtual-row,
   .streaming--marker {
     position: absolute;
@@ -468,13 +480,14 @@
     content: none;
   }
 
-  /* @ds state: turn--start — hairline + breathing room before each new prompt. */
+  /* This state: turn--start — hairline + breathing room before each new prompt. */
   .virtual-row.turn--start {
     margin-top: var(--space-6);
     padding-top: var(--space-6);
     border-top: 1px solid var(--line);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .inbound-image--stack {
     display: grid;
     min-inline-size: 0;
@@ -482,7 +495,7 @@
   }
 
   /* Inline streaming marker: a small pulsing cue attached under the active answer. */
-  /* @ds state: streaming · @ds slot: streaming--marker — the "Working…" live cue. */
+  /* This state: streaming · This slot: streaming--marker — the "Working…" live cue. */
   .streaming--marker {
     display: flex;
     align-items: center;
@@ -491,7 +504,7 @@
     padding-inline: 0;
   }
 
-  /* @ds slot: streaming--icon — pulsing dots. */
+  /* This slot: streaming--icon — pulsing dots. */
   .streaming--icon {
     display: inline-flex;
     align-items: center;
@@ -499,6 +512,7 @@
     color: var(--accent);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .streaming--icon i {
     width: 0.3rem;
     height: 0.3rem;
@@ -507,28 +521,31 @@
     animation: working-wave 1.1s ease-in-out infinite;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .streaming--icon i:nth-child(2) {
     animation-delay: 120ms;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .streaming--icon i:nth-child(3) {
     animation-delay: 240ms;
   }
 
-  /* @ds state: stalled — static dots avoid suggesting active progress after a long silence. */
+  /* This state: stalled — static dots avoid suggesting active progress after a long silence. */
   .streaming--icon.is-stalled i {
     animation: none;
   }
 
-  /* @ds slot: streaming--label */
+  /* This slot: streaming--label */
   .streaming--label {
     color: var(--ink-muted);
     font-size: 0.85rem;
     font-weight: 550;
   }
 
-  /* @ds guardrail: streaming reduced-motion — A11y invariant; do not remove. */
+  /* Do not edit — streaming reduced-motion — A11y invariant; do not remove. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .streaming--icon i {
       animation: none;
     }
@@ -542,6 +559,7 @@
     pointer-events: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .scroll--badge {
     background: var(--accent-soft);
     color: var(--accent-ink);

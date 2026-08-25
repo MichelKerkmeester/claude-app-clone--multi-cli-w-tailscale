@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Secure Image Preview types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: SECURE IMAGE PREVIEW
   // ───────────────────────────────────────────────────────────────────
@@ -30,7 +31,7 @@
   // 1. PROPS
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: SecureImagePreview — sanitized image preview with pointer and keyboard zoom and pan.
+  // This surface: SecureImagePreview — sanitized image preview with pointer and keyboard zoom and pan.
   let {
     objectUrl,
     alt,
@@ -53,6 +54,7 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep update pan focused on its single responsibility.
   function updatePan(event: PointerEvent): void {
     const start = panStart;
     if (start === null || zoom <= IMAGE_MIN_ZOOM) return;
@@ -62,11 +64,13 @@
     });
   }
 
+  // Keep stop pan focused on its single responsibility.
   function stopPan(): void {
     panStart = null;
   }
 </script>
 
+<!-- Component content -->
 {#if objectUrl === null}
   <section class="image-preview" aria-label="Sanitized image preview" data-image-state="loading">
     <p class="artifact-preview--message" role="status">Loading sanitized image.</p>

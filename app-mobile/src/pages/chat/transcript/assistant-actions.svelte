@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Assistant Actions types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ASSISTANT ACTIONS
   // ───────────────────────────────────────────────────────────────────
@@ -28,11 +29,13 @@
     typeof navigator !== 'undefined' && typeof (navigator as Navigator).share === 'function';
 </script>
 
-<!-- @ds surface: turn--actions — Copy / Share answer actions + inline glyphs. -->
+<!-- Component content -->
+<!-- Turn actions -->
+<!-- This surface: turn--actions — Copy / Share answer actions + inline glyphs. -->
 {#if canCopy || canShare}
   <div class="turn--actions">
     {#if canCopy}
-      <!-- @ds guardrail: aria-label + clipboard handler — not designer-editable. -->
+      <!-- Do not edit — aria-label + clipboard handler — not designer-editable. -->
       <button
         type="button"
         class="turn--action"
@@ -47,7 +50,7 @@
             .catch(() => undefined);
         }}
       >
-        <!-- @ds slot: copy-glyph — inline clipboard glyph; strokes inherit currentColor. -->
+        <!-- This slot: copy-glyph — inline clipboard glyph; strokes inherit currentColor. -->
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
           <rect
             x="9"
@@ -71,7 +74,7 @@
       </button>
     {/if}
     {#if canShare}
-      <!-- @ds guardrail: aria-label + share handler — not designer-editable. -->
+      <!-- Do not edit — aria-label + share handler — not designer-editable. -->
       <button
         type="button"
         class="turn--action"
@@ -80,7 +83,7 @@
           void (navigator as Navigator).share({ text }).catch(() => undefined);
         }}
       >
-        <!-- @ds slot: share-glyph — inline share glyph; strokes inherit currentColor. -->
+        <!-- This slot: share-glyph — inline share glyph; strokes inherit currentColor. -->
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
           <path
             d="M12 15V4M12 4l-4 4M12 4l4 4M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"
@@ -97,20 +100,21 @@
   </div>
 {/if}
 
-<!-- @ds surface: turn--actions — Copy / Share answer actions + inline glyphs. Decomposed into this scoped block;
+<!-- Turn actions -->
+<!-- This surface: turn--actions — Copy / Share answer actions + inline glyphs. Decomposed into this scoped block;
      turn--actions / turn--action and their hover/focus-visible states are owned solely
      by this component so they move with it. Native div/button elements stay scoped. Values
      unchanged. -->
 <style>
   /* Quiet under-answer action row. */
-  /* @ds surface: turn--actions — Copy / Share answer actions + inline glyphs. */
+  /* This surface: turn--actions — Copy / Share answer actions + inline glyphs. */
   .turn--actions {
     display: flex;
     gap: var(--space-1);
     margin-top: var(--space-2);
   }
 
-  /* @ds slot: action — a Copy / Share answer button. */
+  /* This slot: action — a Copy / Share answer button. */
   .turn--action {
     display: inline-flex;
     align-items: center;
@@ -126,16 +130,16 @@
     cursor: pointer;
   }
 
-  /* @ds state: hover */
+  /* This state: hover */
   .turn--action:hover {
     background: var(--surface-muted);
     color: var(--ink-secondary);
   }
 
-  /* @ds state: focus-visible */
+  /* This state: focus-visible */
   .turn--action:focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
-  /* @ds end surface: turn--actions */
+  /* End of surface: turn--actions */
 </style>

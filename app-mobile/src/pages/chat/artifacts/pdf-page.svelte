@@ -42,6 +42,7 @@
   // 4. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     // Void-sync reads keep Svelte tracking this async effect's rerun dependencies.
     void pdfDocument;
@@ -131,6 +132,7 @@
   });
 </script>
 
+<!-- Component content -->
 <article class="pdf-preview--page" data-pdf-page={pageNumber} aria-label={`Page ${pageNumber}`} style:min-height={viewportSize.height > 0 ? `${viewportSize.height}px` : undefined}>
   <div class="pdf-preview--canvas-wrap" style:width={viewportSize.width ? `${viewportSize.width}px` : undefined}>
     <canvas bind:this={canvasEl} aria-label={`Rendered PDF page ${pageNumber}`}></canvas>
@@ -140,19 +142,20 @@
   </div>
 </article>
 
-<!-- @ds surface: pdf-preview--page — one rendered PDF page: canvas + selectable text overlay.
+<!-- Pdf preview page -->
+<!-- This surface: pdf-preview--page — one rendered PDF page: canvas + selectable text overlay.
      Decomposed into this scoped block; single-component. The text layer is Svelte-rendered (literal spans),
      the canvas is a literal element, so the descendant selectors scope plainly. The shared .pdf-page /
      .pdf-preview-shared classes stay global (→ app.css at cutover). Values unchanged. -->
 <style>
-  /* @ds slot: page — one PDF page, centered in the scroll column. */
+  /* This slot: page — one PDF page, centered in the scroll column. */
   .pdf-preview--page {
     display: grid;
     min-inline-size: 0;
     place-items: start center;
   }
 
-  /* @ds slot: canvas-wrap — the raised canvas frame that the text layer overlays. */
+  /* This slot: canvas-wrap — the raised canvas frame that the text layer overlays. */
   .pdf-preview--canvas-wrap {
     position: relative;
     max-inline-size: 100%;
@@ -160,14 +163,15 @@
     box-shadow: var(--shadow-raised);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .pdf-preview--canvas-wrap canvas {
     display: block;
     max-inline-size: 100%;
     block-size: auto;
   }
 
-  /* @ds slot: text-layer — the invisible selectable text overlay aligned to the canvas. */
-  /* @ds guardrail: do-not-edit — transparent text keeps selection/find working without repainting glyphs. */
+  /* This slot: text-layer — the invisible selectable text overlay aligned to the canvas. */
+  /* Do not edit — transparent text keeps selection/find working without repainting glyphs. */
   .pdf-text--layer {
     position: absolute;
     inset: 0;
@@ -178,13 +182,14 @@
     white-space: pre-wrap;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .pdf-text--layer span {
     display: inline;
     color: transparent;
     font-size: 1rem;
   }
 
-  /* @ds state: find-match — a matched text run tints under the transparent layer. */
+  /* This state: find-match — a matched text run tints under the transparent layer. */
   .pdf-text--layer .pdf-text--match {
     background: var(--accent-soft);
     color: var(--ink);

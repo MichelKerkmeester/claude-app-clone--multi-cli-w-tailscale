@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Command Palette types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: Slash Command Palette (typed / commands)
   // ───────────────────────────────────────────────────────────────────
@@ -54,13 +55,14 @@
   // ───────────────────────────────────────────────────────────────────
 
   // Ranker owns filtering; Bits must not apply its own input filtering.
-  // @ds guardrail: ranker — Deterministic host-command ranking.
+  // Do not edit — ranker — Deterministic host-command ranking.
   const ranked = $derived.by(() => rankHostCommands(catalog.commands, query));
 
   // ───────────────────────────────────────────────────────────────────
   // 7. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     if (contentEl === null) return;
     const targets: Element[] = [contentEl];
@@ -73,33 +75,39 @@
   // 8. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep on query input focused on its single responsibility.
   function onQueryInput(event: Event): void {
     const target = event.currentTarget;
     if (target instanceof HTMLInputElement) query = target.value;
   }
 
+  // Keep on input focus focused on its single responsibility.
   function onInputFocus(): void {
     if (!isDisabled) open = true;
   }
 
+  // Keep chain handler focused on its single responsibility.
   function chainHandler(fromBits: unknown, event: Event): void {
     if (typeof fromBits === 'function') (fromBits as (event: Event) => void)(event);
   }
 
+  // Keep on selected change focused on its single responsibility.
   function onSelectedChange(name: string): void {
     selected = '';
     if (name.length === 0) return;
     // Binding must match the scoped snapshot; selection drafts only, never submits.
-    // @ds guardrail: fail-closed — Selection is a local insertion draft only.
+    // Do not edit — fail-closed — Selection is a local insertion draft only.
     const binding = bindingFor(catalog.snapshot, name);
     if (binding === null) return;
     onInsert(name, binding);
   }
 </script>
 
+<!-- Component content -->
 <!-- Ranking, bindings, and the fail-closed selection path are frozen. -->
-<!-- @ds surface: slash-autocomplete -->
-<!-- @ds guardrail: React-aria wiring — ComboBox select/focus lifecycle and aria/role map to Bits Combobox. -->
+<!-- Slash autocomplete > -->
+<!-- This surface: slash-autocomplete -->
+<!-- Do not edit — React-aria wiring — ComboBox select/focus lifecycle and aria/role map to Bits Combobox. -->
 <Combobox.Root
   type="single"
   disabled={isDisabled}
@@ -132,12 +140,12 @@
       <Combobox.Content class="react-aria-Popover" bind:ref={contentEl}>
         <Combobox.Viewport class="react-aria-ListBox">
           {#if ranked.items.length === 0}
-            <!-- @ds state: ready.emptyCatalog — no ranked commands; fail-closed empty copy. -->
+            <!-- This state: ready.emptyCatalog — no ranked commands; fail-closed empty copy. -->
             <span class="command--empty">No commands</span>
           {:else}
             {#each ranked.items as item (item.name)}
-              <!-- @ds slot: label — the command name and its description line. -->
-              <!-- @ds state: disabled-with-reason — a row rendered but not selectable. -->
+              <!-- This slot: label — the command name and its description line. -->
+              <!-- This state: disabled-with-reason — a row rendered but not selectable. -->
               <Combobox.Item
                 value={item.name}
                 label={item.name}
@@ -165,7 +173,8 @@
   </div>
 </Combobox.Root>
 
-<!-- @ds surface: slash-autocomplete — the command palette. Decomposed into this scoped block;
+<!-- Slash autocomplete -->
+<!-- This surface: slash-autocomplete — the command palette. Decomposed into this scoped block;
      command--palette / command--empty / command--name / command--desc have no owned
      declarations in the original stylesheet (they inherit the shared overlay
      primitives). Shared .react-aria-Popover / .react-aria-ListBox /
@@ -173,7 +182,7 @@
      (Select / ComboBox). Child-primitive classes and react-aria/runtime
      data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>
-  /* @ds surface: slash-autocomplete — the inline autocomplete card and the
+  /* This surface: slash-autocomplete — the inline autocomplete card and the
      command palette share this surface name. */
   /* `.command--palette`, `.command--empty`, `.command--name`, and `.command--desc`
      carry structure only; the original stylesheet has no owned declarations

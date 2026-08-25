@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Ask Question Prompt types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: ASK QUESTION PROMPT
   // ───────────────────────────────────────────────────────────────────
@@ -14,22 +15,24 @@
   let { viewModel }: AskQuestionPromptProps = $props();
 </script>
 
-<!-- @ds slot: prompt — the question eyebrow + display headline. -->
+<!-- Component content -->
+<!-- This slot: prompt — the question eyebrow + display headline. -->
 <div class="ask-question--prompt">
-  <!-- @ds slot: kicker — the "Pi asks" eyebrow. -->
+  <!-- This slot: kicker — the "Pi asks" eyebrow. -->
   <p class="ask-question--eyebrow">Pi asks</p>
   <h2>{viewModel.display.prompt}</h2>
 </div>
 
-<!-- @ds surface: ask-question prompt — eyebrow + display headline. Decomposed into this scoped block; values unchanged. -->
+<!-- Ask question prompt -->
+<!-- This surface: ask-question prompt — eyebrow + display headline. Decomposed into this scoped block; values unchanged. -->
 <style>
-  /* @ds slot: prompt — the question eyebrow + display headline. */
+  /* This slot: prompt — the question eyebrow + display headline. */
   .ask-question--prompt {
     display: grid;
     gap: var(--space-1);
   }
 
-  /* @ds slot: kicker — the "Pi asks" eyebrow. */
+  /* This slot: kicker — the "Pi asks" eyebrow. */
   .ask-question--eyebrow {
     margin: 0;
     color: var(--accent-ink);
@@ -39,6 +42,7 @@
     text-transform: uppercase;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .ask-question--prompt h2 {
     max-inline-size: var(--reading-width);
     margin: 0;

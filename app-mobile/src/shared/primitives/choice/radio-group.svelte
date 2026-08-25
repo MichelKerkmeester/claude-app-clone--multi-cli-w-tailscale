@@ -2,7 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: RADIO GROUP
   // ───────────────────────────────────────────────────────────────────
-  // @ds primitive: RadioGroup — Expose a bindable selection while leaving group behavior to Bits UI.
+  // This primitive: RadioGroup — Expose a bindable selection while leaving group behavior to Bits UI.
   import { RadioGroup } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
@@ -14,4 +14,5 @@
   let { value = $bindable(''), children, ...rest }: Props = $props();
 </script>
 
+<!-- Component content -->
 <RadioGroup.Root bind:value {...rest}>{@render children()}</RadioGroup.Root>

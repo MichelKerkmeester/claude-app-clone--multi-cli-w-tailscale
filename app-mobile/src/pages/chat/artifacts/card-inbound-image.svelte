@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Card Inbound Image types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: CARD INBOUND IMAGE
   // ───────────────────────────────────────────────────────────────────
@@ -41,6 +42,7 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep initial state focused on its single responsibility.
   function initialState(block: InboundImageBlock, deferReady: boolean): InboundImageLifecycleState {
     if (block.availability === 'processing') return 'processing';
     if (block.availability === 'expired') return 'expired';
@@ -51,6 +53,7 @@
     return deferReady ? 'deferred' : 'inline-ready';
   }
 
+  // Keep aspect ratio for focused on its single responsibility.
   function aspectRatioFor(block: InboundImageBlock): number {
     if (block.availability !== 'ready') return 1.6;
     const { width, height } = block.artifact.thumbnail;
@@ -58,6 +61,7 @@
     return Math.min(4, Math.max(0.5, width / height));
   }
 
+  // Keep terminal label focused on its single responsibility.
   function terminalLabel(state: InboundImageLifecycleState): string | null {
     switch (state) {
       case 'capture-permission':
@@ -84,6 +88,7 @@
     }
   }
 
+  // Keep card accessible name focused on its single responsibility.
   function cardAccessibleName(block: InboundImageBlock): string {
     return `Open ${block.displayName.toLowerCase()} preview, processed, revision ${block.revision}`;
   }
@@ -114,8 +119,8 @@
     onAction,
   }: InboundImageCardProps = $props();
 
-  // @ds surface: inbound-image-card — the in-transcript inbound-image card and its lifecycle.
-  // @ds guardrail: do-not-edit — The lifecycle state machine, press-cancel gesture guard, and viewer open handoff are behavioural; do not change them.
+  // This surface: inbound-image-card — the in-transcript inbound-image card and its lifecycle.
+  // Do not edit — The lifecycle state machine, press-cancel gesture guard, and viewer open handoff are behavioural; do not change them.
   const viewer = getOptionalArtifactViewer();
 
   // ───────────────────────────────────────────────────────────────────
@@ -156,6 +161,7 @@
   // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     const identity = `${block.id}:${block.revision}:${deferReady ? 'deferred' : 'direct'}`;
     if (identityRef === identity) return;
@@ -193,6 +199,7 @@
   };
 </script>
 
+<!-- Component content -->
 {#snippet cardBody()}
   <div class="inbound-image-card--body">
     <div class="inbound-image--identity" dir="auto">
@@ -254,7 +261,8 @@
   {/if}
 </article>
 
-<!-- @ds surface: inbound-image-card — the in-transcript inbound-image card, its open button, identity
+<!-- Inbound image card -->
+<!-- This surface: inbound-image-card — the in-transcript inbound-image card, its open button, identity
      header, and the lifecycle-state re-inking of the well/placeholder. Decomposed into this scoped block. The
      react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states are preserved via the wired
      use:hover/use:press/use:focusVisible actions and scoped as :global([data-*]). The card owns the
@@ -263,7 +271,7 @@
      The @keyframes moves with the card so Svelte renames both together. The base .inbound-image--well /
      .inbound-image--placeholder-pattern rules are shared by two children and stay global. Values unchanged. -->
 <style>
-  /* @ds surface: inbound-image-card — the inbound-image card frame; fades in on mount. */
+  /* This surface: inbound-image-card — the inbound-image card frame; fades in on mount. */
   .inbound-image-card {
     min-inline-size: 0;
     overflow: hidden;
@@ -274,7 +282,7 @@
     animation: inbound-image-card-in 120ms var(--ease-out) both;
   }
 
-  /* @ds slot: open-button — the full-card open affordance; pan-y keeps vertical scroll, and the
+  /* This slot: open-button — the full-card open affordance; pan-y keeps vertical scroll, and the
      drag/callout suppression keeps the image un-liftable. */
   .inbound-image-card--button {
     display: block;
@@ -297,23 +305,23 @@
       transform 100ms var(--ease-out);
   }
 
-  /* @ds state: hover — react-aria data-hovered accent tint (via use:hover). */
+  /* This state: hover — react-aria data-hovered accent tint (via use:hover). */
   .inbound-image-card--button:global([data-hovered]) {
     background: var(--accent-soft);
   }
 
-  /* @ds state: pressed — react-aria data-pressed; subtle press-scale (via use:press). */
+  /* This state: pressed — react-aria data-pressed; subtle press-scale (via use:press). */
   .inbound-image-card--button:global([data-pressed]) {
     transform: scale(0.985);
   }
 
-  /* @ds guardrail: focus-visible — inset canonical focus ring (via use:focusVisible). */
+  /* Do not edit — focus-visible — inset canonical focus ring (via use:focusVisible). */
   .inbound-image-card--button:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: -3px;
   }
 
-  /* @ds slot: body — the padded card interior. */
+  /* This slot: body — the padded card interior. */
   .inbound-image-card--body {
     display: grid;
     min-inline-size: 0;
@@ -321,7 +329,7 @@
     padding: var(--space-3);
   }
 
-  /* @ds slot: identity — the title + metadata header row. */
+  /* This slot: identity — the title + metadata header row. */
   .inbound-image--identity {
     display: flex;
     min-block-size: 44px;
@@ -329,14 +337,14 @@
     align-items: center;
   }
 
-  /* @ds slot: title-wrap — the stacked title + metadata column. */
+  /* This slot: title-wrap — the stacked title + metadata column. */
   .inbound-image-title--wrap {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-1);
   }
 
-  /* @ds slot: title — the inbound image display name. */
+  /* This slot: title — the inbound image display name. */
   .inbound-image-title {
     overflow-wrap: anywhere;
     font-family: var(--font-sans);
@@ -345,7 +353,7 @@
     line-height: 1.333;
   }
 
-  /* @ds slot: metadata — the fact chips (revision · size · …). */
+  /* This slot: metadata — the fact chips (revision · size · …). */
   .inbound-image--metadata {
     display: flex;
     min-inline-size: 0;
@@ -357,11 +365,12 @@
     line-height: 1.333;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .inbound-image--metadata span {
     overflow-wrap: anywhere;
   }
 
-  /* @ds state: privacy-covered · revoked — the card re-inks its (child-rendered) well to the opaque
+  /* This state: privacy-covered · revoked — the card re-inks its (child-rendered) well to the opaque
      privacy cover. The well is rendered by VerifiedImage/ImagePlaceholder, so it is matched globally. */
   .inbound-image-card[data-image-state='privacy-covered'] :global(.inbound-image--well),
   .inbound-image-card[data-image-state='revoked'] :global(.inbound-image--well) {
@@ -369,13 +378,13 @@
     background: var(--ink);
   }
 
-  /* @ds state: privacy-covered · revoked — the placeholder pattern is hidden under the privacy cover. */
+  /* This state: privacy-covered · revoked — the placeholder pattern is hidden under the privacy cover. */
   .inbound-image-card[data-image-state='privacy-covered'] :global(.inbound-image--placeholder-pattern),
   .inbound-image-card[data-image-state='revoked'] :global(.inbound-image--placeholder-pattern) {
     display: none;
   }
 
-  /* @ds guardrail: keyframes — the card mount fade; not designer-editable. */
+  /* Do not edit — keyframes — the card mount fade; not designer-editable. */
   @keyframes inbound-image-card-in {
     from {
       opacity: 0;
@@ -386,13 +395,15 @@
     }
   }
 
-  /* @ds guardrail: do-not-edit — Reduced motion bounds the card fade to a short linear step and removes press scaling. */
+  /* Do not edit — Reduced motion bounds the card fade to a short linear step and removes press scaling. */
   @media (prefers-reduced-motion: reduce) {
+    /* Keep this rule aligned with its surrounding surface. */
     .inbound-image-card {
       animation: inbound-image-card-in 100ms linear both !important;
       transition: opacity 100ms linear !important;
     }
 
+    /* Keep this rule aligned with its surrounding surface. */
     .inbound-image-card--button:global([data-pressed]) {
       transform: none !important;
     }

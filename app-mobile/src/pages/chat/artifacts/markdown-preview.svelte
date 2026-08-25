@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Markdown Preview types and helpers.
   // ───────────────────────────────────────────────────────────────────
   // MODULE: MARKDOWN PREVIEW
   // ───────────────────────────────────────────────────────────────────
@@ -26,10 +27,12 @@
     | { readonly kind: 'code'; readonly text: string }
     | { readonly kind: 'rule' };
 
+  // Keep inline text focused on its single responsibility.
   function inlineText(value: string): MarkdownInline {
     return { kind: 'text', value };
   }
 
+  // Keep parse inline focused on its single responsibility.
   function parseInline(source: string): readonly MarkdownInline[] {
     const nodes: MarkdownInline[] = [];
     const pattern =
@@ -61,6 +64,7 @@
   // 2. BOUNDED PARSER
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep parse markdown focused on its single responsibility.
   export function parseMarkdown(text: string): readonly MarkdownBlock[] {
     const lines = text.split('\n').slice(0, MAX_MARKDOWN_LINES);
     const blocks: MarkdownBlock[] = [];
@@ -161,11 +165,13 @@
   const blocks = $derived(parseMarkdown(text));
 </script>
 
+<!-- Component content -->
 {#snippet inline(nodes: readonly MarkdownInline[])}{#each nodes as node, index (index)}{#if node.kind === 'text'}{node.value}{:else if node.kind === 'strong'}<strong>{@render inline(node.value)}</strong>{:else if node.kind === 'emphasis'}<em>{@render inline(node.value)}</em>{:else if node.kind === 'code'}<code>{node.value}</code>{:else if node.kind === 'strike'}<del>{@render inline(node.value)}</del>{:else if node.kind === 'link'}<span class="artifact-markdown--link" data-navigation="disabled">{@render inline(node.label)}</span>{:else if node.kind === 'image'}<span class="artifact-markdown--image">[{node.alt}]</span>{/if}{/each}{/snippet}
 
-<!-- @ds surface: markdown-preview — the bounded safe-Markdown renderer well. -->
-<!-- @ds state: ready · empty · whitespace — empty/whitespace swap the read content. -->
-<!-- @ds guardrail: do-not-edit — parseMarkdown uses a bounded allowlist parser, so raw HTML is excluded and links/images render as inert spans. -->
+<!-- Markdown preview -->
+<!-- This surface: markdown-preview — the bounded safe-Markdown renderer well. -->
+<!-- This state: ready · empty · whitespace — empty/whitespace swap the read content. -->
+<!-- Do not edit — parseMarkdown uses a bounded allowlist parser, so raw HTML is excluded and links/images render as inert spans. -->
 {#if text.length === 0}
   <p class="artifact--empty-preview">This preview is empty.</p>
 {:else if text.trim().length === 0}
@@ -174,15 +180,16 @@
   <article class="artifact-markdown--preview" aria-label={ariaLabel} dir="auto" data-display-buffer="true" data-find-term={findTerm || undefined}>{#each blocks as block, index (index)}{#if block.kind === 'heading'}<svelte:element this={`h${block.level}`}>{@render inline(parseInline(block.text))}</svelte:element>{:else if block.kind === 'paragraph'}<p>{@render inline(parseInline(block.lines.join('\n')))}</p>{:else if block.kind === 'quote'}<blockquote>{@render inline(parseInline(block.lines.join('\n')))}</blockquote>{:else if block.kind === 'list'}<svelte:element this={block.ordered ? 'ol' : 'ul'}>{#each block.items as item, itemIndex (itemIndex)}<li>{@render inline(parseInline(item))}</li>{/each}</svelte:element>{:else if block.kind === 'code'}<pre class="artifact-markdown--code"><code>{block.text}</code></pre>{:else if block.kind === 'rule'}<hr />{/if}{/each}</article>
 {/if}
 
-<!-- @ds surface: artifact-markdown--preview — the bounded safe-Markdown render well. Decomposed into this scoped block.
+<!-- Artifact markdown preview -->
+<!-- This surface: artifact-markdown--preview — the bounded safe-Markdown render well. Decomposed into this scoped block.
      The markdown blocks render via svelte:element / renderer constructs, so the descendant
      tag rules use :global(tag) (faithful — same reach; prune-proof). Links render as inert spans, so the
      defensive .artifact-markdown--preview a rule is kept via :global(a). Dark re-inks use
      :global(:root[data-theme='dark']). The shared .artifact--empty-preview stays global. Literal hex
      preserved. Values unchanged. -->
 <style>
-  /* @ds slot: markdown-well — the bounded safe-Markdown render surface. */
-  /* @ds guardrail: do-not-edit — Bounded reading well; selectable; links/images render inert. */
+  /* This slot: markdown-well — the bounded safe-Markdown render surface. */
+  /* Do not edit — Bounded reading well; selectable; links/images render inert. */
   .artifact-markdown--preview {
     max-inline-size: 100%;
     max-block-size: 100%;
@@ -197,7 +204,7 @@
     padding: 0.25rem 0.1rem;
   }
 
-  /* @ds slot: markdown-block — shared block spacing for rendered prose blocks (dynamic elements). */
+  /* This slot: markdown-block — shared block spacing for rendered prose blocks (dynamic elements). */
   .artifact-markdown--preview :global(p),
   .artifact-markdown--preview :global(h1),
   .artifact-markdown--preview :global(h2),
@@ -213,7 +220,7 @@
     overflow-wrap: anywhere;
   }
 
-  /* @ds slot: markdown-quote — blockquote inset rule. */
+  /* This slot: markdown-quote — blockquote inset rule. */
   .artifact-markdown--preview :global(blockquote) {
     margin-inline: 0;
     padding-inline-start: 1rem;
@@ -221,14 +228,14 @@
     color: #6c6a65;
   }
 
-  /* @ds slot: markdown-anchor — defensive anchor styling (links render as inert spans; kept faithful). */
+  /* This slot: markdown-anchor — defensive anchor styling (links render as inert spans; kept faithful). */
   .artifact-markdown--preview :global(a) {
     color: #8a452f;
     text-decoration: underline;
     text-decoration-style: dotted;
   }
 
-  /* @ds slot: markdown-code — fenced code block. */
+  /* This slot: markdown-code — fenced code block. */
   .artifact-markdown--code {
     overscroll-behavior: contain;
     overflow-anchor: none;
@@ -247,24 +254,25 @@
     white-space: pre;
   }
 
-  /* @ds slot: markdown-link — inert link span. */
+  /* This slot: markdown-link — inert link span. */
   .artifact-markdown--link {
     color: #8a452f;
     text-decoration: underline;
     text-decoration-style: dotted;
   }
 
-  /* @ds slot: markdown-image — inert image placeholder. */
+  /* This slot: markdown-image — inert image placeholder. */
   .artifact-markdown--image {
     color: #6c6a65;
     font-style: italic;
   }
 
-  /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
+  /* This state: dark — dark-theme re-inks (foreign ancestor via :global). */
   :global(:root[data-theme='dark']) .artifact-markdown--image {
     color: #9f998f;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(:root[data-theme='dark']) .artifact-markdown--link {
     color: #f0b19a;
   }

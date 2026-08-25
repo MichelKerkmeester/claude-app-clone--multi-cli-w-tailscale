@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Card File Preview types and helpers.
   import type { FileDiffBlock, FilePreviewBlock } from '@pi-remote/pi-rpc-protocol';
 
   export interface FilePreviewCardProps {
@@ -27,8 +28,8 @@
   // 3. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: file-preview-card — Read-only preview card; states come from data-preview-state (ready · withheld · missing · denied · unsupported).
-  // @ds guardrail: react-aria Button press, aria-label, and viewer open (onPress) — Not designer-editable.
+  // This surface: file-preview-card — Read-only preview card; states come from data-preview-state (ready · withheld · missing · denied · unsupported).
+  // Do not edit — react-aria Button press, aria-label, and viewer open (onPress) — Not designer-editable.
   let buttonEl = $state<HTMLButtonElement | null>(null);
   const viewer = getOptionalArtifactViewer();
 
@@ -53,6 +54,7 @@
   ].join('\n'));
 </script>
 
+<!-- Component content -->
 <div class="file-preview-card" data-preview-state={availability}>
   <Button
     class="artifact-card"

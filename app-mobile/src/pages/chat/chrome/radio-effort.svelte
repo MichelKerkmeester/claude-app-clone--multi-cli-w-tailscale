@@ -1,4 +1,5 @@
 <script module lang="ts">
+  // This module holds the shared Radio Effort types and helpers.
   export interface EffortRadioGroupProps {
     /** Host-advertised levels, in host order and subset (never re-sorted). */
     readonly levels: readonly string[];
@@ -67,6 +68,7 @@
   // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep this effect synchronized with the state it observes.
   $effect(() => {
     effortValue = hostValue;
   });
@@ -75,12 +77,14 @@
   // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep on effort change focused on its single responsibility.
   function onEffortChange(next: string): void {
-    // @ds guardrail: do-not-edit — A row selection here is the only request path, never a commit; read-only guards ignore pending or disabled input even if a stale event slips past the group's state.
+    // Do not edit — A row selection here is the only request path, never a commit; read-only guards ignore pending or disabled input even if a stale event slips past the group's state.
     if (!isPending && !isDisabled && next.length > 0) onSelect(next);
     effortValue = hostValue;
   }
 
+  // Keep attach row interactions focused on its single responsibility.
   function attachRowInteractions(node: Element): () => void {
     const el = node as HTMLElement;
     const hoverAction = hover(el);
@@ -94,9 +98,10 @@
   }
 </script>
 
-<!-- @ds slot: effort-group -->
-<!-- @ds state: group aria-busy / pending-effort — set while a request is in flight. -->
-<!-- @ds guardrail: do-not-edit — React-aria RadioGroup wiring: aria-labelledby, aria-describedby, data-pending, and isReadOnly while pending. -->
+<!-- Component content -->
+<!-- This slot: effort-group -->
+<!-- This state: group aria-busy / pending-effort — set while a request is in flight. -->
+<!-- Do not edit — React-aria RadioGroup wiring: aria-labelledby, aria-describedby, data-pending, and isReadOnly while pending. -->
 <RadioGroup
   class="effort-radio--group"
   aria-labelledby={labelledBy}
@@ -115,9 +120,9 @@
     {@const name = effortRowName(level, levels)}
     {@const description = effortRowDescription(level)}
     {@const descriptionId = `effort-row-description-${ordinal}`}
-    <!-- @ds slot: effort-group row -->
-    <!-- @ds state: effort-confirmed (✓) / effort-requested (spinner) -->
-    <!-- @ds guardrail: do-not-edit — React-aria Radio wiring: aria-label, aria-describedby, roving focus, and the 44px target. -->
+    <!-- This slot: effort-group row -->
+    <!-- This state: effort-confirmed (✓) / effort-requested (spinner) -->
+    <!-- Do not edit — React-aria Radio wiring: aria-label, aria-describedby, roving focus, and the 44px target. -->
     <RadioGroupItem
       value={level}
       class={`effort-radio-row${isRequested ? ' is-requested' : ''}`}
@@ -177,13 +182,13 @@
   {/each}
 </RadioGroup>
 
-<!-- @ds slot: effort-group — the controlled list of effort radio rows. Decomposed into this scoped block;
+<!-- This slot: effort-group — the controlled list of effort radio rows. Decomposed into this scoped block;
      effort-radio--group / effort-radio-row and their states are owned solely by this component so they
      move with it. Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->
 <style>
-  /* @ds slot: effort-group — the controlled list of effort radio rows. */
-  /* @ds state: group aria-busy — while a set-thinking-level mutation is in flight the
+  /* This slot: effort-group — the controlled list of effort radio rows. */
+  /* This state: group aria-busy — while a set-thinking-level mutation is in flight the
      group is read-only (still focusable) and marked busy. */
   :global(.effort-radio--group) {
     display: grid;
@@ -192,6 +197,7 @@
     outline: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.effort-radio-row) {
     display: grid;
     min-inline-size: 0;
@@ -208,16 +214,19 @@
     outline: none;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.effort-radio-row[data-hovered]),
   :global(.effort-radio-row[data-focused]) {
     background: var(--model-sheet-selection);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.effort-radio-row[data-selected]) {
     border-color: var(--model-sheet-ui-accent);
     background: var(--model-sheet-selection);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.effort-radio-row[data-focus-visible]) {
     outline-color: var(--model-sheet-ui-accent);
     outline-style: solid;
@@ -225,12 +234,13 @@
     outline-offset: 2px;
   }
 
-  /* @ds state: read-only / disabled — effort row not actionable. */
+  /* This state: read-only / disabled — effort row not actionable. */
   :global(.effort-radio-row[data-disabled]) {
     cursor: default;
     opacity: 0.72;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .effort-radio-row--main,
   .effort-radio-row--states {
     display: flex;
@@ -238,17 +248,20 @@
     align-items: center;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .effort-radio-row--main {
     flex-wrap: wrap;
     gap: 0.2rem var(--space-2);
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .effort-radio-row--label {
     overflow-wrap: anywhere;
     font-size: 0.95rem;
     font-weight: 650;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .effort-radio-row--states {
     justify-content: flex-end;
     gap: 0.35rem;
@@ -257,7 +270,7 @@
     font-weight: 700;
   }
 
-  /* @ds state: effort-confirmed — ✓ on the settled row. */
+  /* This state: effort-confirmed — ✓ on the settled row. */
   .effort-state--confirmed {
     display: inline-flex;
     align-items: center;
@@ -266,7 +279,7 @@
     animation: effort-check-in 120ms ease-out;
   }
 
-  /* @ds state: effort-requested — in-flight application spinner; also the visual for
+  /* This state: effort-requested — in-flight application spinner; also the visual for
      the group's pending-effort / aria-busy window. */
   .effort-state--requested {
     display: inline-flex;
@@ -275,10 +288,12 @@
     white-space: nowrap;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   :global(.effort--spinner) {
     animation: composer-spin 0.8s linear infinite;
   }
 
+  /* Keep this rule aligned with its surrounding surface. */
   .effort-radio-row--description {
     grid-column: 1 / -1;
     color: var(--model-sheet-muted);

@@ -19,7 +19,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "npm run typecheck -w @pi-remote/pi-rpc-protocol && npm run typecheck -w @pi-remote/relay && npm run typecheck -w @pi-remote/web && npm run typecheck -w @pi-remote/approval-extension && npm run typecheck -w @pi-remote/plan-extension",
-    "test": "vitest run packages/pi-rpc-protocol/tests app-relay/tests extensions/pi-remote-approval/tests extensions/pi-remote-plan/tests tests",
+    "test": "vitest run packages/pi-rpc-protocol/tests app-relay/tests extensions/pi-remote-approval/tests extensions/pi-remote-plan/tests release/tests",
     "test:web": "npm run test:web:svelte && npm run test:web:logic",
     "test:web:svelte": "vitest run --config vitest.web.svelte.config.ts",
     "test:web:logic": "vitest run --config vitest.web.logic.config.ts",

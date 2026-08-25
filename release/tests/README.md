@@ -14,7 +14,7 @@ trigger_phrases:
 
 ## 1. OVERVIEW
 
-`tests/` holds the release-readiness suites at the app root. Each file covers one release component: the executable rollback drill, the threshold evaluator, and the rollout evaluator. The root `npm test` runs these files together with the protocol, relay, and approval-extension suites.
+`release/tests/` holds the release-readiness suites at the app root. Each file covers one release component: the executable rollback drill, the threshold evaluator, and the rollout evaluator. The root `npm test` runs these files together with the protocol, relay, and approval-extension suites.
 
 Current state:
 
@@ -65,12 +65,12 @@ Run from the app root:
 npm test
 ```
 
-Expected result: all suites pass, including the three files in `tests/`. The drill test creates and removes its disposable database under `release/.tmp-rollback-`.
+Expected result: all suites pass, including the three files in `release/tests/`. The drill test creates and removes its disposable database under `release/.tmp-rollback-`.
 
 ---
 
 ## 5. RELATED
 
-- [`../release/README.md`](../release/README.md)
+- [`../README.md`](../README.md)
 - [`../scripts/README.md`](../scripts/README.md)
 - [`../docs/release-verification.md`](../docs/release-verification.md)

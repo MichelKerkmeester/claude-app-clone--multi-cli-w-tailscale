@@ -1,44 +1,37 @@
 // ───────────────────────────────────────────────────────────────────
-// MODULE: Pi Remote Rollout Evaluator Tests
+// MODULE: Pi Remote Release Rollback Drill Tests
 // ───────────────────────────────────────────────────────────────────
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
 // ───────────────────────────────────────────────────────────────────
 
+import { fileURLToPath } from 'node:url';
+
 import { describe, expect, it } from 'vitest';
 
-import { evaluateRollout } from '../release/rollout-gate.mjs';
+import { runRollbackDrill } from '../../app-relay/src/release/rollback-drill.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. TESTS
 // ───────────────────────────────────────────────────────────────────
 
-describe('staged rollout gate', () => {
-  it('reports a stage as not ready when any evidence item is absent', () => {
-    const result = evaluateRollout(
-      {
-        schemaVersion: 1,
-        stages: [
-          {
-            id: 'read-only',
-            label: 'Read only',
-            killSwitch: 'stop ingress',
-            requires: ['machine:whole-gate', 'operator:device'],
-          },
-        ],
-      },
-      {
-        'machine:whole-gate': { status: 'PASS' },
-      },
-    );
+describe('executable rollback drill', () => {
+  it('executes restore and down-migration without losing sessions or uncertainty', () => {
+    const releaseRoot = fileURLToPath(new URL('../', import.meta.url));
+    const report = runRollbackDrill(releaseRoot);
 
-    expect(result.machineStatus).toBe('PASS');
-    expect(result).not.toHaveProperty('status');
-    expect(result.stages[0]).toMatchObject({ status: 'NOT-READY', available: false });
-    expect(result.stages[0].evidence).toContainEqual({
-      id: 'operator:device',
-      status: 'UNRUN',
+    expect(report).toMatchObject({
+      status: 'PASS',
+      mutationDisabled: true,
+      restoredMigrationVersion: 6,
+      relaySessionsPreserved: 1,
+      indeterminateRowsPreserved: 1,
+      nativeSessionSentinelPreserved: true,
+      fullAccessRelaunchNeedsMigration: false,
     });
+    expect(report.drainedApprovalRows).toBeGreaterThanOrEqual(1);
+    // Full-access rollback relaunches desktop-parity vector without a schema migration.
+    expect(report.fullAccessRelaunchArgs).toEqual(['--mode', 'rpc', '--no-session', '--approve']);
   });
 });

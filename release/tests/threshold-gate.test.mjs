@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { evaluateThresholds, REQUIRED_METRICS } from '../release/threshold-gate.mjs';
+import { evaluateThresholds, REQUIRED_METRICS } from '../threshold-gate.mjs';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. HELPERS

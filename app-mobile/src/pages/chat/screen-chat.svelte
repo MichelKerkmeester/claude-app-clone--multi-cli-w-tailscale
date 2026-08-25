@@ -1,4 +1,8 @@
 <script module lang="ts">
+  // Shared by every instance of this screen: the props it accepts, plus two pure
+  // helpers that need no component state — whether the current model can see an
+  // attached photo, and the friendly message shown for each slash-command failure.
+
   import type { ReadOnlyCache } from '$shared/transport/cache.js';
   import {
     transcriptReducer,
@@ -33,6 +37,8 @@
 
   const ignoreTodoAction: (a: TodoProjectionAction) => void = () => undefined;
 
+  // A model can see an attached photo unless its catalog entry says it takes no
+  // image input. When the model is unknown, assume it can (fail open on capability).
   function runtimeModelCanViewPhotos(runtime: RuntimeUiState): boolean {
     const current = runtime.state?.model;
     if (current === null || current === undefined) return true;
@@ -43,6 +49,7 @@
     return input === undefined || input.includes('image');
   }
 
+  // Turn each slash-command failure code into a short line the person can act on.
   function slashFailureMessage(code: SlashSubmitFailureCode): string {
     switch (code) {
       case 'invalid-draft':
@@ -143,6 +150,7 @@
   let sheetOpen = $state(false);
   let sheetSection = $state<EffortSheetSection>('model');
 
+  // Which button opened each overlay, so focus can return to it on close.
   let headerTrigger = $state<HTMLButtonElement | null>(null);
   let stripTrigger = $state<HTMLButtonElement | null>(null);
   let planReviewTrigger = $state<HTMLButtonElement | null>(null);
@@ -188,7 +196,7 @@
   // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
-  // Foreground/online: refresh runtime + catalog once on mount (stable closure deps).
+  // On foreground or reconnect, refresh the runtime and command catalog once.
   $effect(() => {
     const reconcileRuntime = () => {
       if (document.visibilityState === 'visible') void runtimeControls.refresh('foreground');
@@ -210,7 +218,8 @@
     };
   });
 
-  // Clear binding when session, host epoch, or revision drifts; untrack avoids an infinite loop.
+  // Drop the slash binding when the session, host epoch, or revision drifts.
+  // untrack keeps reading `binding` here from re-triggering the effect.
   $effect(() => {
     const snapshot = commandCatalog.snapshot;
     const sid = sessionId;
@@ -222,7 +231,8 @@
     });
   });
 
-  // Refresh runtime on live; untrack phase so sync messages do not re-hydrate every tick.
+  // On a live connection, refresh the runtime once — untrack the phase so sync
+  // messages don't re-hydrate it on every tick.
   $effect(() => {
     const c = connection;
     if (c === 'live' && untrack(() => runtimeControls.runtime.phase) !== 'checking') {
@@ -230,7 +240,7 @@
     }
   });
 
-  // Local flag only — bounded revalidation progress for one slash Send.
+  // Local progress flag for one slash Send's bounded cache revalidation.
   $effect(() =>
     installCacheRevalidation(() => {
       cacheResumeGeneration += 1;
@@ -241,28 +251,30 @@
   // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // One sheet; header opens model, RuntimeStrip opens effort; focus returns to the opener.
+  // Open the model or effort sheet, remembering which button to refocus on close.
   function openSheet(section: EffortSheetSection, triggerEl: HTMLButtonElement | null) {
     activeSheetTrigger = triggerEl;
     sheetSection = section;
     sheetOpen = true;
   }
 
-  // Capture previousDraft before write so bindingAfterDraftChange matches React semantics.
+  // Capture the previous draft before writing the new one, so the binding update
+  // sees the same before/after ordering React relied on.
   function handleDraftChange(value: string) {
     const previousDraft = prompt;
     prompt = value;
     binding = bindingAfterDraftChange({ previousDraft, nextDraft: value, binding });
   }
 
+  // A command picked from the list becomes the active slash binding.
   function insertCommand(name: string, inserted: SelectedCommandBinding) {
     binding = inserted;
   }
 
+  // Stop the running turn. A delivery-unknown outcome is surfaced, never retried.
   function stopRun() {
     if (stopping) return;
     stopping = true;
-    // Interrupt the running turn. Delivery-unknown is surfaced, never auto-retried.
     void abortPrompt()
       .then((result) => {
         if (result.outcome.status !== 'aborted') {
@@ -273,6 +285,8 @@
       .finally(() => (stopping = false));
   }
 
+  // Send a normal prompt: show it optimistically, submit, and put the draft back
+  // if the send is rejected.
   function sendPrompt(behavior?: 'steer' | 'followUp') {
     const message = prompt.trim();
     if (!canSubmit || message.length === 0) return;
@@ -315,7 +329,8 @@
       .finally(() => (sendingPrompt = false));
   }
 
-  // One slash Send: revalidate binding, spend ticket + revision; fail closed, no retry.
+  // Send a slash command: revalidate the binding, spend the ticket and revision,
+  // and fail closed with no retry.
   function sendSlashDraft() {
     const message = prompt.trim();
     if (binding === null || slashSubmitting || message.length === 0 || !canSubmit) return;
@@ -344,7 +359,7 @@
           binding = null;
           return;
         }
-        // Fail closed: keep draft, drop binding; stale also refreshes catalog.
+        // Failed: keep the draft, drop the binding; a stale result also refreshes the catalog.
         binding = null;
         if (outcome.code === 'stale') void commandCatalog.refresh('manual');
         promptError = slashFailureMessage(outcome.code);
@@ -352,17 +367,20 @@
       .finally(() => (slashSubmitting = false));
   }
 
-  // SessionComposer expects a functional updater wrapper around local prompt state.
+  // SessionComposer expects a functional-updater wrapper around the local prompt.
   const setPromptComposer = (updater: (current: string) => string) => {
     prompt = updater(prompt);
   };
 </script>
 
-<!-- @ds surface: session--view — in-session composition root (header · statusline · transcript · composer). -->
-<!-- @ds guardrail: connection / transcript / sync / composer logic — not designer-editable. -->
+<!-- The in-session view: header, status line, transcript, composer, and the overlay sheets. -->
+<!-- Do not edit the connection / transcript / sync / composer wiring below — it is app logic, not styling. -->
 <main class="session--view">
+  <!-- Screen-reader-only live regions for runtime status and mode changes -->
   <RuntimeStatusRegion runtime={runtimeControls.runtime} />
   <RuntimeModeAnnouncer runtime={runtimeControls.runtime} {connection} />
+
+  <!-- Header: back / inbox / review, the theme toggle, and the model picker -->
   <SessionHeader
     {onBack}
     {onInbox}
@@ -374,6 +392,8 @@
     onOpenModelSheet={() => openSheet('model', headerTrigger)}
     bind:modelTriggerRef={headerTrigger}
   />
+
+  <!-- Status line: agent dot, status label, and the updated (or "reconnecting") time -->
   <div class="session--statusline" role="status" aria-live="polite">
     <span class={`agent--dot agent--${status}`} aria-hidden="true">
       <SessionStateIcon {status} />
@@ -385,6 +405,8 @@
       </span>
     {/if}
   </div>
+
+  <!-- A transcript error, then the reconciliation barrier while awaiting a fresh snapshot -->
   {#if transcript.error !== null}
     <div class="inline-alert">{transcript.error}</div>
   {/if}
@@ -393,6 +415,8 @@
       Reconciliation barrier active. Waiting for a fresh snapshot.
     </div>
   {/if}
+
+  <!-- Plan-ready card: shown when a plan is live and reviewable -->
   <PlanReadyCard
     artifact={runtimeControls.runtime.planArtifact}
     isLive={
@@ -409,6 +433,8 @@
       runtimeControls.openPlanReview?.();
     }}
   />
+
+  <!-- Transcript: the message stream and its todo projection -->
   <ArtifactViewerProvider>
     <TranscriptList
       {sessionId}
@@ -424,12 +450,16 @@
       onClearTodoAnnouncement={() => dispatchTodoProjection({ type: 'clearAnnouncement' })}
     />
   </ArtifactViewerProvider>
+
+  <!-- Runtime strip: model and effort controls, just above the composer -->
   <RuntimeStrip
     controls={runtimeControls}
     {sheetOpen}
     onOpenEffortSheet={() => openSheet('effort', stripTrigger)}
     bind:effortTriggerRef={stripTrigger}
   />
+
+  <!-- Composer: the prompt input with its send / stop / slash actions -->
   <AttachmentDraftProvider {sessionId} capability={mediaCapability} {modelCanViewPhotos}>
     <SessionComposer
       {prompt}
@@ -464,6 +494,8 @@
       }}
     />
   </AttachmentDraftProvider>
+
+  <!-- Overlay sheets: review a plan, leave plan mode, and pick model / effort -->
   <PlanReviewSheet
     isOpen={runtimeControls.runtime.reviewOpen === true}
     onOpenChange={(open) => {
@@ -510,16 +542,13 @@
   />
 </main>
 
-<!-- @ds surface: session--view — in-session composition root (header · statusline · transcript · composer).
-     Decomposed into this scoped block; session--statusline / session--status-label / agent--dot and the
-     agent--dot.agent--running variant are owned solely by this component (rendered directly) so they
-     move with it. session--view stays global (shared grouped routed-frame selector with home/review/inbox);
-     inline-alert / barrier-note stay global (shared by 2+ surfaces: enrollment/review/inbox/push/composer);
-     the .agent--running .state--icon pulsing group stays global (shared with the agent-row surface).
-     Values unchanged. -->
 <style>
-  /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
-  /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
+  /* Only the status line, its label, and the agent dot live here — this component
+     renders them directly, so they move with it. The page frame (.session--view),
+     the shared alerts (.inline-alert / .barrier-note), and the pulsing running-dot
+     group are shared with other screens, so they stay in app.css. Values unchanged. */
+
+  /* Page frame: gutter + safe bottom inset, shared by the routed screens. */
   .session--view {
     padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
   }
@@ -530,14 +559,13 @@
     }
   }
 
-  /* @ds edit: layout — safe inline gutters for the routed surfaces. */
+  /* Safe inline gutters for notched displays. */
   .session--view {
     padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
     padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
   }
 
-  /* @ds surface: session--view — in-session composition root (header · statusline · transcript · composer). */
-  /* @ds state: active · stale — reconnecting readout; error via inline-alert. */
+  /* Status line — active or reconnecting; errors show via .inline-alert instead. */
   .session--statusline {
     display: flex;
     align-items: center;
@@ -548,12 +576,12 @@
     font-size: 0.75rem;
   }
 
-  /* @ds slot: label — session status text. */
+  /* Status text. */
   .session--status-label {
     font-weight: 600;
   }
 
-  /* @ds slot: dot — session-agent status glyph. */
+  /* Agent status dot. */
   .agent--dot {
     display: inline-grid;
     place-items: center;
@@ -562,9 +590,8 @@
     color: var(--ink-muted);
   }
 
-  /* @ds state: running */
+  /* Running: tint the dot with the accent colour. */
   .agent--dot.agent--running {
     color: var(--accent);
   }
-  /* @ds end surface: session--view */
 </style>

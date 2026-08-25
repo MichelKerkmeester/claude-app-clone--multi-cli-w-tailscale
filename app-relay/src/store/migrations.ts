@@ -42,7 +42,6 @@ export class MigrationRunner {
     private readonly migrationDirectory: string,
   ) {}
 
-  /** Apply every pending up migration in numeric order. */
   public migrateUp(): void {
     this.ensureMetadataTable();
     const applied = new Set(
@@ -66,7 +65,6 @@ export class MigrationRunner {
     }
   }
 
-  /** Reverse the latest applied migration and return its version. */
   public migrateDown(): number | null {
     this.ensureMetadataTable();
     const latest = this.database

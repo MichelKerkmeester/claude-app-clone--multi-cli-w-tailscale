@@ -166,7 +166,6 @@ export class AskQuestionService {
     return this.presentQuestion(presentation);
   }
 
-  /** Return a strict display projection only for the exact current revision. */
   public getDisplay(sessionId: string, questionId: string, revision: number): AskQuestionDisplayDto | null {
     const record = this.questions.get(questionId);
     if (
@@ -190,7 +189,6 @@ export class AskQuestionService {
     return record === undefined ? null : this.snapshotFor(record);
   }
 
-  /** Mint only after the current authoritative question is re-read as pending. */
   public async issueAnswerTicket(
     session: ApplicationSession,
     request: AskQuestionAnswerTicketRequest,

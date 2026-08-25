@@ -2,12 +2,7 @@
 // MODULE: Story Coverage Gate
 // ───────────────────────────────────────────────────────────────────
 
-// Story-coverage gate: every renderable Svelte component must have a co-located
-// *.stories.ts (or *.stories.svelte), so the catalog stays complete as the app
-// grows. Intentional exceptions live in story-coverage-allowlist.json, each with
-// a reason — nothing is silently skipped. Exit 1 on any uncovered component or a
-// stale allowlist entry, so the gate can sit on the board.
-//
+// Require a co-located story for every renderable component; exceptions live in the allowlist.
 // Usage: node scripts/story-coverage.mjs [--json]
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS

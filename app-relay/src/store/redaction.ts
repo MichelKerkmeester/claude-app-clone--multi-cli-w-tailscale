@@ -370,17 +370,12 @@ function attachTranscriptRedaction(value: JsonValue, redaction: JsonValue): Json
 }
 
 // ── Explicit safe projectors ──────────────────────────────────────────────────
-// Raw pi model/command/state responses must never reach a browser DTO through the
-// generic string-scanning redaction above, because unknown nested shapes could slip
-// a secret or path past it. These projectors are an allowlist: they emit only the
-// exact bounded fields the browser contracts declare and drop everything else, so a
-// leak is structurally impossible rather than pattern-dependent.
+// Pi responses need allowlist projectors—generic redaction cannot block unknown nested leaks.
 
 const MODEL_CATALOG_CAP = 200;
 const COMMAND_CATALOG_CAP = 500;
 const COMMAND_ALIAS_CAP = 16;
-// Identity used only by legacy projector callers that predate versioned catalogs;
-// the command service always passes the live host epoch.
+// Legacy projector callers use placeholder host epoch; command service passes live epoch.
 const DEFAULT_COMMAND_HOST_EPOCH = 'epoch_host_local';
 
 /** Project only the bounded display fields for the authenticated volatile read. */
@@ -463,12 +458,7 @@ export function projectRuntimeModelCatalog(
   return isRuntimeModelCatalogDto(dto) ? dto : null;
 }
 
-/**
- * Project a raw pi command list into the bounded, path-free, versioned browser
- * catalog. The command service supplies the live host epoch and session revision;
- * the legacy positional form keeps pre-versioning callers working with the
- * placeholder identity above.
- */
+/** Project pi command list into bounded catalog; legacy callers use placeholder host epoch. */
 export function projectCommandCatalog(
   rawData: unknown,
   sessionId: string,
@@ -575,11 +565,7 @@ export function projectRuntimeSnapshot(
   return isRuntimeSnapshotDto(snapshot) ? snapshot : null;
 }
 
-/**
- * Project the relay's in-memory plan state into the token-free browser snapshot.
- * The opaque plan binding never crosses this projector; only the allowlisted
- * redacted fields survive.
- */
+/** Token-free plan snapshot; opaque binding never crosses this projector. */
 export function projectPlanSnapshot(
   parsed: ParsedPlanArtifact | null,
   occurredAt: string,
@@ -607,11 +593,7 @@ export function projectPlanSnapshot(
     : { planId: null, planRevision: 0, validity: 'none', artifact: null };
 }
 
-/**
- * True when a transcript block is the projection residue of a plan-mode control
- * publication. Such blocks are control-plane, never user content, so they are
- * suppressed before persistence, replay, sync or broadcast.
- */
+/** Control-plane plan projection residue; suppressed before persistence or broadcast. */
 export function isControlPlaneProjection(payload: unknown): boolean {
   if (
     !isPlainObject(payload) ||

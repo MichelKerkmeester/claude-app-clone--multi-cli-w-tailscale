@@ -2,12 +2,7 @@
 // MODULE: Naming Rules
 // ───────────────────────────────────────────────────────────────────
 
-// The single place the file-naming grammar is expressed. Every rename in this
-// programme is generated from here rather than typed, so the moves and the
-// import rewrites cannot drift apart.
-
-// SvelteKit reads these names as routing directives, so they are the URL
-// contract rather than a naming choice and never take part in a rename.
+// Single grammar source for renames; SvelteKit routing names never participate.
 // ───────────────────────────────────────────────────────────────────
 // 1. CONSTANTS
 // ───────────────────────────────────────────────────────────────────
@@ -36,12 +31,7 @@ export function isReservedName(basename) {
   return RESERVED_SVELTEKIT.includes(stem) || stem.startsWith('+');
 }
 
-/**
- * Split a basename into its stem and its full suffix chain. A .svelte.ts file
- * has two dots, and truncating at the first one silently drops half the
- * extension — so the stem is everything before the first dot and the suffix is
- * everything from it.
- */
+/** Split stem and full suffix chain; truncating at the first dot drops .svelte.ts suffixes. */
 export function splitBasename(basename) {
   const dot = basename.indexOf('.');
   return dot === -1

@@ -2,17 +2,10 @@
 // MODULE: Comment-Only Diff Gate
 // ───────────────────────────────────────────────────────────────────
 
-// Comment-only gate: prove a documentation pass changed nothing but comments.
-// The token-identity resolver strips comments before diffing, so it is blind to
-// this class of edit by design — and a sectioning pass that accidentally moves,
-// drops, or duplicates a code line would sail past it. This check closes that
-// gap by reading the diff directly: every added or removed line must be a
-// comment or blank, or the gate fails.
-//
+// Prove a documentation pass changed comments only; token-identity strips comments by design.
 // Usage:
 //   node scripts/comment-only-check.mjs [<git-range-or-ref>] [-- <pathspec>...]
-// With no range it checks the working tree against HEAD (the pre-commit case).
-// Exit 0 = comment-only; 1 = a code line changed; 2 = the diff could not be read.
+// No range checks working tree vs HEAD. Exit 0 = comment-only; 1 = code changed; 2 = diff unreadable.
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
 // ───────────────────────────────────────────────────────────────────

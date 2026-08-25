@@ -211,11 +211,7 @@ export interface PromptSubmitCommand {
   readonly attachmentIds?: readonly string[];
   /** Absent for an idle send; 'steer' interrupts, 'followUp' queues behind the turn. */
   readonly streamingBehavior?: 'steer' | 'followUp';
-  /**
-   * Present only for an explicit slash submission. The relay revalidates the
-   * bound name and host/session/catalog revisions against the live catalog
-   * before forwarding; a bound submission is never steered or queued.
-   */
+  /** Slash binding only; relay revalidates name and revisions before forwarding. */
   readonly command?: CommandBindingDto;
 }
 
@@ -640,10 +636,7 @@ export interface ToolCallBlock extends TranscriptBlockBase {
   readonly kind: 'tool_call';
   readonly toolName: string;
   readonly inputSummary: string;
-  /**
-   * Rich-capable fields are optional for wire compatibility with older cached
-   * and replayed blocks. Rich eligibility requires the complete set.
-   */
+  /** Optional for wire compatibility; rich eligibility needs the complete set. */
   readonly callId?: string;
   readonly shellKind?: TranscriptShellKind;
   readonly lifecycle?: TranscriptLifecycle;
@@ -1253,10 +1246,7 @@ export interface CommandDescriptorDto {
   readonly enabled: boolean;
   readonly disabledReason: string | null;
   readonly requiresConfirmation: boolean;
-  /**
-   * Opt-in authoritative metadata. Absent unless the relay's allowlisted
-   * projection lets host data through; never inferred from descriptions.
-   */
+  /** Opt-in metadata; absent unless the allowlisted projection permits host data. */
   readonly aliases?: readonly string[];
   readonly argumentHint?: string | null;
 }
@@ -1335,11 +1325,7 @@ export interface RuntimeControlResponse {
 export const PLAN_VALIDITY_VALUES = ['none', 'valid', 'superseded', 'invalid'] as const;
 export type PlanValidityValue = (typeof PLAN_VALIDITY_VALUES)[number];
 
-/**
- * Bounded, redacted plan artifact projection. The raw host artifact is never a
- * DTO: only these allowlisted fields cross the relay, and the opaque plan token
- * is bound by value only inside guarded control requests.
- */
+/** Allowlisted relay projection; opaque plan token binds only in guarded control requests. */
 export interface PlanArtifactDto extends JsonObject {
   readonly planId: string;
   readonly planRevision: number;
@@ -1368,11 +1354,7 @@ export interface SetModeCommand extends JsonObject {
   readonly oneUseTicket: string;
 }
 
-/**
- * Reviewed-plan execution request. The token is an opaque host-issued binding
- * echoed by the phone; the exact plan binding, runtime revision and
- * postRunMode contract are all guarded before any host dispatch.
- */
+/** Reviewed-plan execution; token, binding, revision, and postRunMode are guarded before dispatch. */
 export interface ExecutePlanCommand extends JsonObject {
   readonly type: 'execute_plan';
   readonly planId: string;

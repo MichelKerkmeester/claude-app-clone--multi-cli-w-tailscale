@@ -2,17 +2,8 @@
 // MODULE: Full-Access Runtime Boundary Verifier
 // ───────────────────────────────────────────────────────────────────
 
-// Black-box probe of the deployed full-access pi child. It speaks strict
-// LF-delimited pi RPC exactly as the relay does, confirms the reads the mobile
-// control plane will depend on, and proves that /plan produces a real,
-// RPC-visible mode transition. It intentionally lives outside the unit-test
-// path because a genuine result requires an installed pi binary and mutates
-// live agent state, which it always restores before exit.
-//
-// Output is deliberately bounded and secret-free: raw model objects, session
-// files, command source paths, environment, and prompt content never reach
-// stdout. A final self-scan refuses to print anything that still looks like a
-// secret or absolute path, so a leak fails the run instead of leaking.
+// Black-box full-access pi RPC probe; restores live agent state before exit.
+// Output stays bounded and secret-free; a final self-scan fails on leak patterns.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -31,8 +22,7 @@ const REQUEST_TIMEOUT_MS = numberFromEnv('PI_REMOTE_VERIFY_TIMEOUT_MS', 20_000);
 const PLAN_SMOKE = process.argv.includes('--no-plan-smoke') ? false : true;
 const MAX_LISTED = 100;
 
-// A response that echoes any of these tells us the child leaked something the
-// browser boundary must never carry. Presence is a hard failure, not a warning.
+// Any echoed forbidden field is a hard failure.
 const FORBIDDEN_OUTPUT = [
   '/Users/',
   '/home/',
@@ -48,9 +38,7 @@ const FORBIDDEN_OUTPUT = [
 
 const PLAN_MODES = new Set(['build', 'plan', 'executing-plan', 'unknown']);
 
-// The runtime reads and the /plan transition are observable without full access.
-// The safe posture proves the RPC capability surface without launching the
-// desktop-parity (all-tools, no-gate) child; full access stays operator-run.
+// Safe posture proves RPC reads and /plan without launching the full-access child.
 const SAFE_POSTURE_ARGS = ['--mode', 'rpc', '--no-session', '--no-tools', '--no-extensions'];
 const POSTURE = process.env.PI_REMOTE_VERIFY_POSTURE === 'safe' ? 'safe' : 'full-access';
 

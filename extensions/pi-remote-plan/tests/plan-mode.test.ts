@@ -85,7 +85,7 @@ describe('Pi remote plan mode', () => {
       block: true,
       reason: 'Plan mode allows only read-only bash.',
     });
-    // find can mutate via -delete/-exec with no shell operator, so bash-find is blocked.
+    // find -delete/-exec mutates without a shell operator.
     expect(await runTool(fixture, 'bash', { command: 'find . -delete' })).toEqual({
       block: true,
       reason: 'Plan mode allows only read-only bash.',
@@ -143,7 +143,6 @@ describe('Pi remote plan mode', () => {
         reason: 'Plan mode is read-only.',
       });
     }
-    // The read-only built-ins stay permitted; bash is gated separately.
     expect(await runTool(fixture, 'read', { path: 'a' })).toBeUndefined();
     expect(await runTool(fixture, 'grep', { pattern: 'x', path: '.' })).toBeUndefined();
   });
@@ -277,7 +276,7 @@ describe('Pi remote plan mode', () => {
       stepCount: 2,
       approachCount: 2,
     });
-    // Raw plan step content never crosses the projection.
+    // Raw plan steps never cross the projection.
     expect(JSON.stringify(publication)).not.toContain('"do":"x"');
   });
 
@@ -290,7 +289,7 @@ describe('Pi remote plan mode', () => {
     expect(second.planId).toBe(first.planId);
     expect(second.planRevision).toBe(first.planRevision + 1);
     expect(second.planToken).not.toBe(first.planToken);
-    // Identical text with unrelated tokens: the token is never derived from the plan.
+    // Tokens are minted per revision, not derived from plan text.
     expect(second.planToken).not.toContain('first');
   });
 
@@ -318,7 +317,7 @@ describe('Pi remote plan mode', () => {
 
     expect(fixture.host.invalidatePlan('superseded', fixture.ctx)?.validity).toBe('superseded');
     expect(fixture.planPublications.at(-1)?.plan.validity).toBe('superseded');
-    // Nothing valid remains, so a second invalidation publishes nothing.
+    // Second invalidation publishes nothing once nothing valid remains.
     expect(fixture.host.invalidatePlan('invalid', fixture.ctx)).toBeNull();
     expect(fixture.planPublications).toHaveLength(1);
   });
@@ -410,7 +409,6 @@ describe('Pi remote plan mode', () => {
       reason: 'Plan mode is read-only.',
     });
 
-    // A repeated terminal event is a no-op.
     runAgentEnd(fixture);
     expect(fixture.statusCalls.at(-1)).toEqual([STATUS_KEY, 'plan']);
   });

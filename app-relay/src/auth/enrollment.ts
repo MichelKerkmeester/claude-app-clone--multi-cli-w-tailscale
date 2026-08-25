@@ -21,9 +21,7 @@ import {
 // 2. CONSTANTS
 // ───────────────────────────────────────────────────────────────────
 
-// Private single-operator deployment favors a longer pairing window so phone enrollment over
-// the tailnet is not a race. The challenge stays single-use and signature-bound, and is only
-// reachable over the private tailnet, so the wider window adds little practical exposure.
+// Single-operator pairing: 30m TTL; challenge stays single-use, signature-bound, tailnet-only.
 const DEFAULT_CHALLENGE_TTL_MS = 30 * 60_000;
 
 // ───────────────────────────────────────────────────────────────────

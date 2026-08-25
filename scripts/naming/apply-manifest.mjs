@@ -2,11 +2,7 @@
 // MODULE: Rename Manifest Applier
 // ───────────────────────────────────────────────────────────────────
 
-// Moves files and rewrites the specifiers that point at them, both derived from
-// the manifest. Hand-editing a specifier to unbreak a build is the one shortcut
-// that must not be taken: it decouples the imports from the moves, and the next
-// batch inherits a tree nobody can regenerate.
-//
+// Moves files and rewrites specifiers from one manifest; do not hand-edit specifiers.
 // Usage:
 //   node scripts/naming/apply-manifest.mjs --scope <path-prefix>            (dry run)
 //   node scripts/naming/apply-manifest.mjs --scope <path-prefix> --apply

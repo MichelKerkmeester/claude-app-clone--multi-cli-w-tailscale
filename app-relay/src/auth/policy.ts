@@ -70,8 +70,7 @@ const AUTHORIZED_ACTIONS = new Set<string>([
   'runtime:control',
   'plan:control',
   'commands:list',
-  // The slash submission lane is authorized separately from ordinary prompt
-  // submission so either can be denied without touching the other.
+  // Slash lane authorized separately so either path can be denied independently.
   'commands:submit',
   'ask-question.answer',
   ...ATTACHMENT_ACTIONS,

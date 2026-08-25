@@ -425,7 +425,6 @@ export class TranscriptProjector {
     return blocks;
   }
 
-  /** Project one accepted phone prompt without persisting its command authority. */
   public projectSubmittedPrompt(
     submissionId: string,
     message: string,

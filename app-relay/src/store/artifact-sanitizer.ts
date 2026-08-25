@@ -346,7 +346,6 @@ export function sanitizeArtifactSnapshot(value: unknown): SanitizedArtifactSnaps
   };
 }
 
-/** Alias used by projection callers to make the publication boundary explicit. */
 export const projectArtifactSnapshot = sanitizeArtifactSnapshot;
 
 // ───────────────────────────────────────────────────────────────────
@@ -875,7 +874,6 @@ export async function sanitizeInboundImage(
   }
 }
 
-/** Alias retained for callers that name the boundary after its capability. */
 export const sanitizeInboundMedia = sanitizeInboundImage;
 
 export async function sanitizeInboundBatch(

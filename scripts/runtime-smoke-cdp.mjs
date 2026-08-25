@@ -4,16 +4,9 @@
 // MODULE: Runtime Smoke CDP Gate
 // ───────────────────────────────────────────────────────────────────
 
-// Durable WHY: the migration's static gates (svelte-check, token-identity) all
-// pass on code that CRASHES when actually run — a class of ported React-useEffect -> Svelte-$effect
-// self-invalidation (a synchronous dispatch reduces its own $state, so the effect takes that state
-// as a dep and re-fires on its own write -> effect_update_depth_exceeded). Static analysis cannot
-// see it. This gate boots the app in demo mode under headless Chrome, drives each surface, and
-// fails if any surface throws or logs a runtime error. It is the runtime companion to the 390px
-// structural gate in design-system-cdp.mjs; both drive the same VITE_PI_DEMO demo preview over CDP.
-//
+// Runtime CDP smoke: static gates miss effect self-invalidation crashes at run time.
 // Usage:  node scripts/runtime-smoke-cdp.mjs [--surface home,session,review,inbox]
-// Exit 0 = every exercised surface rendered with zero runtime errors; exit 2 = a crash/error.
+// Exit 0 = no runtime errors; exit 2 = crash/error.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -211,8 +204,7 @@ async function navigate(client, url) {
   }
 }
 
-// Poll a boolean expression in-page until true or timeout (does not throw on timeout — the caller's
-// error assertion is the real gate; a missing selector is reported as a soft render miss).
+// Poll in-page until true; timeout is a soft miss, not the failure gate.
 async function waitFor(client, expression, timeoutMs = 8_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -231,8 +223,7 @@ const clickByText = (needle) =>
     return false;
   })()`;
 
-// Reach the demo Home (persist the ?demo=1 opt-in first — it lands lazily on the app's first
-// isDemoMode() call, after SvelteKit mounts, so wait for it before navigating on).
+// Persist ?demo=1 before navigating; demo mode lands lazily on first isDemoMode().
 async function gotoDemoHome(client) {
   await navigate(client, `${DEV_URL}/?demo=1`);
   await waitFor(client, `localStorage.getItem('pi-remote.demo') === '1'`, 10_000);

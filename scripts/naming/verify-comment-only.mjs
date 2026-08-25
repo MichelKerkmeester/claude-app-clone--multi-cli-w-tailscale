@@ -2,15 +2,7 @@
 // MODULE: Comment-Only Diff Verifier
 // ───────────────────────────────────────────────────────────────────
 
-// Proves that a change touched comments and nothing else, which is the whole
-// safety argument of a comment pass. Matching changed lines against comment
-// markers is not enough: a continuation line of a block or HTML comment starts
-// with neither, and reads as code to a line-shaped check.
-//
-// Instead both versions have their comments removed and the remainder is
-// compared. If the code with comments stripped is byte-identical, the change
-// was comments only, whatever shape those comments took.
-//
+// Prove a diff touched comments only by comparing sources with comments stripped.
 // Usage: node scripts/naming/verify-comment-only.mjs <ref> [-- <pathspec>...]
 
 // ───────────────────────────────────────────────────────────────────
@@ -28,16 +20,7 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 
-/**
- * Drop every line that is entirely a comment, and keep the rest verbatim.
- *
- * A character-level lexer is the obvious approach and the wrong one: telling a
- * regex literal from a division needs a parser, and getting it wrong silently
- * swallows the code that follows. Working line by line cannot make that
- * mistake. A trailing comment on a code line is left in place, so editing one
- * is reported as a code change — the packet bans trailing comments anyway, and
- * a gate that errs toward stopping is the right kind of wrong here.
- */
+/** Drop comment-only lines; line-wise so regex literals are not mistaken for division. */
 // ───────────────────────────────────────────────────────────────────
 // 3. HELPERS
 // ───────────────────────────────────────────────────────────────────

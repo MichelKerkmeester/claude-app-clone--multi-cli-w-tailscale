@@ -4,12 +4,7 @@
 // MODULE: Design System CDP Gate
 // ───────────────────────────────────────────────────────────────────
 
-// Durable WHY: proving a token refactor is pixel-identical needs an objective,
-// scripted baseline of the app's default surface. This runner boots the web app
-// in local demo mode at a true 390 CSS-pixel viewport, asserts that width with
-// zero horizontal overflow, and captures a PNG for diffing. It reuses the shared
-// Chrome-over-CDP pattern (findChrome + launch + /json/list page target +
-// Runtime.evaluate) and the already-declared `ws` dependency.
+// Capture a 390px demo baseline over CDP for pixel/token regression checks.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS

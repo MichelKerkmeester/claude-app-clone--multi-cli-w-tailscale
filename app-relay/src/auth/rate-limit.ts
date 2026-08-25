@@ -48,7 +48,7 @@ interface ArtifactReadActive {
 // 3. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
 
-/** Bound repeated ingress attempts without retaining request payloads. */
+/** Bound repeated ingress without retaining request payloads. */
 export class FixedWindowRateLimiter {
   private readonly buckets = new Map<string, RateBucket>();
 

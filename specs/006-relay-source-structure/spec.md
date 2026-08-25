@@ -5,10 +5,10 @@ contextType: "planning"
 _memory:
   continuity:
     packet_pointer: "specs/006-relay-source-structure"
-    last_updated_at: "2026-08-24T21:36:29.678Z"
+    last_updated_at: "2026-08-25T03:30:43.724Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Extended the packet with two root-code children (005 banners, 006 folder docs)."
-    next_safe_action: "Run 005-root-source-banners: banner the 47 repo-root code files."
+    recent_action: "Added child 007 comment-brevity across the backend and root code."
+    next_safe_action: "None — the backend and shared source-structure group is complete."
     blockers: []
     completion_pct: 0
 ---
@@ -30,7 +30,7 @@ _memory:
 |---|---|
 | Parent | (top-level spec) |
 | Mode | Phase parent |
-| Children | `001-source-section-banners`, `002-bare-file-headers`, `003-attachments-readme`, `004-folder-ownership-map`, `005-root-source-banners`, `006-root-folder-docs` |
+| Children | `001-source-section-banners`, `002-bare-file-headers`, `003-attachments-readme`, `004-folder-ownership-map`, `005-root-source-banners`, `006-root-folder-docs`, `007-comment-brevity` |
 | Status | In Progress |
 <!-- /ANCHOR:metadata -->
 
@@ -77,6 +77,7 @@ what.
 | D | `004-folder-ownership-map` | Write a reason-to-change map for the 16 `src/` folders: for each folder, what it owns and the change that belongs there. One map, not sixteen READMEs. |
 | E | `005-root-source-banners` | Ensure every repo-root code file has a `// MODULE:` header and numbered section banners — 47 files across `packages`, `scripts`, `extensions`, `release` and root `tests`. Comment-only; the non-comment source stays byte-identical. |
 | F | `006-root-folder-docs` | Fill the missing folder READMEs: the two undocumented Pi extensions, and the `packages` and `extensions` container maps. Documentation only. |
+| G | `007-comment-brevity` | Trim over-long inline comment descriptions across app-relay and the repo-root code to a concise durable-WHY style, keeping banners and fences. Comment-only, proven by an AST re-print. |
 <!-- /ANCHOR:phases -->
 
 ---

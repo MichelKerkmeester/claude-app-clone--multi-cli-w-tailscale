@@ -166,7 +166,6 @@ export class AttachmentService {
     await initializeAttachmentDecoder();
   }
 
-  /** Remove bytes left by a terminated process before accepting new work. */
   public async recoverStartup(): Promise<void> {
     this.initialized ??= this.ensureRoot();
     await this.initialized;

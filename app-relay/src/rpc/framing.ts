@@ -38,7 +38,6 @@ export class StrictJsonlDecoder {
     this.maxRecordBytes = options.maxRecordBytes ?? DEFAULT_MAX_RECORD_BYTES;
   }
 
-  /** Push one arbitrary stdout chunk into the framing buffer. */
   public push(chunk: Buffer | string): void {
     this.buffer += typeof chunk === 'string' ? chunk : this.decoder.write(chunk);
     this.consumeCompleteRecords();
@@ -50,7 +49,6 @@ export class StrictJsonlDecoder {
     }
   }
 
-  /** Reject a trailing partial record because every frame must end with LF. */
   public finish(): void {
     this.buffer += this.decoder.end();
     if (this.buffer.length > 0) {

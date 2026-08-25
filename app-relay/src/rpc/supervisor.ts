@@ -55,10 +55,7 @@ export interface RpcSupervisorOptions {
   readonly fixtureOnly?: boolean;
   readonly spawn?: typeof spawn;
   readonly env?: NodeJS.ProcessEnv | (() => NodeJS.ProcessEnv);
-  /**
-   * Integration-time verification must bind this route to Pi's exact
-   * ask-question callback/event names before enabling the capability.
-   */
+  /** Bind ask-question callback route to Pi's confirmed event shape before enabling. */
   readonly askQuestionCallback?: Omit<AskQuestionCallbackRoute, 'onOutcome'>;
 }
 
@@ -215,25 +212,21 @@ export class RpcSupervisor {
     return mutation;
   }
 
-  /** Subscribe to parsed Pi events. */
   public onEvent(listener: (event: PiRpcEvent) => void): () => void {
     this.eventListeners.add(listener);
     return () => this.eventListeners.delete(listener);
   }
 
-  /** Subscribe to supervisor lifecycle transitions. */
   public onLifecycle(listener: (event: SupervisorLifecycleEvent) => void): () => void {
     this.lifecycleListeners.add(listener);
     return () => this.lifecycleListeners.delete(listener);
   }
 
-  /** Subscribe to framing, protocol and process errors. */
   public onError(listener: (error: Error) => void): () => void {
     this.errorListeners.add(listener);
     return () => this.errorListeners.delete(listener);
   }
 
-  /** Subscribe to safe, confirmed ask-question callback outcomes only. */
   public onAskQuestionCallback(
     listener: (outcome: AskQuestionCallbackOutcome) => void,
   ): () => void {
@@ -241,13 +234,11 @@ export class RpcSupervisor {
     return () => this.askQuestionCallbackListeners.delete(listener);
   }
 
-  /** Subscribe to the explicit host-owned todo source, never to transcript text. */
   public onTodoProjection(listener: (source: unknown) => void): () => void {
     this.todoProjectionListeners.add(listener);
     return () => this.todoProjectionListeners.delete(listener);
   }
 
-  /** Return metadata-only supervisor health. */
   public health(): SupervisorHealth {
     return {
       state: this.state,

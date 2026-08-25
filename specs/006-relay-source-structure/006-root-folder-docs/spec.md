@@ -5,10 +5,10 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/006-relay-source-structure/006-root-folder-docs"
-    last_updated_at: "2026-08-24T21:41:28.315Z"
+    last_updated_at: "2026-08-25T03:30:44.019Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Four missing folder READMEs written from the real folders; no code touched."
-    next_safe_action: "None — the backend and shared source-structure group is complete."
+    next_safe_action: "Proceed to 007-comment-brevity."
     blockers: []
     completion_pct: 100
 ---
@@ -18,7 +18,7 @@ _memory:
 
 # Phase F — Root folder docs
 
-> **Phase links** — Parent: [`../spec.md`](../spec.md) · Predecessor: `005-root-source-banners`
+> **Phase links** — Parent: [`../spec.md`](../spec.md) · Predecessor: `005-root-source-banners` · Successor: `007-comment-brevity`
 
 ---
 

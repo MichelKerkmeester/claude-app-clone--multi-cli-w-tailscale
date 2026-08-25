@@ -96,9 +96,7 @@ export class PromptService {
 
   public async submit(command: PromptSubmitCommand, deviceId: string): Promise<TextBlock> {
     if (isPlanControlMessage(command.message)) {
-      // Plan control is a host-authoritative operation. A leading /plan token
-      // must never become a host prompt, transcript block, or model-visible
-      // message, so it is rejected before any forwarding or recording.
+      // Host-authoritative /plan must not become a forwarded prompt or transcript block.
       throw new SlashSubmissionError('command_denied');
     }
     if (command.command !== undefined) {
@@ -147,11 +145,7 @@ export class PromptService {
     return record === undefined || record.deviceId !== deviceId ? null : record.state;
   }
 
-  /**
-   * Interrupt the running agent. Sent immediately (not through the settled mutation
-   * lane) so it can preempt an in-flight turn; an uncertain outcome is delivery-unknown
-   * and is never retried automatically.
-   */
+  /** Immediate abort bypasses the mutation lane; delivery-unknown is terminal. */
   public async abort(): Promise<PromptAbortResponse> {
     try {
       const response = await this.options.supervisor.send({
@@ -320,11 +314,7 @@ export class PromptService {
     return committed.payload;
   }
 
-  /**
-   * Fail-closed slash gate before any forwarding. Cross-session, non-matching
-   * message prefixes, and missing authority are denied without a host read; the
-   * catalog revalidation itself is the only Pi RPC a stale check may cause.
-   */
+  /** Fail-closed slash gate before forwarding; only catalog revalidation may call Pi. */
   private async revalidateSlash(command: PromptSubmitCommand): Promise<SlashSubmissionVerdict> {
     const binding = command.command;
     if (binding === undefined) return 'allowed';
@@ -357,11 +347,7 @@ function slashMessageMatches(message: string, name: string): boolean {
   return message === `/${name}` || message.startsWith(`/${name} `);
 }
 
-/**
- * True when the first token after leading-whitespace normalization is the plan
- * control command. Any argument form (`/plan on|off|execute`) is caught by the
- * token match, and the check is case-sensitive like pi's own command matching.
- */
+/** True when the first whitespace-delimited token is `/plan` (case-sensitive). */
 function isPlanControlMessage(message: string): boolean {
   const firstToken = message.trimStart().split(/\s+/, 1)[0];
   return firstToken === '/plan';

@@ -116,9 +116,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
   });
   const attachmentReaper = new AttachmentReaper({ service: attachmentService });
   await attachmentReaper.start();
-  // Full access takes precedence over the mutation family path, so mutation stays off
-  // whenever PI_REMOTE_FULL_ACCESS is set. Nothing downstream may require the operator
-  // principal, mint an approval secret, or pass an extension authority in that mode.
+  // Full access disables mutation; no operator principal, approval secret, or extension authority.
   const mutationEnabled = !fullAccess && mutationPolicy.status().enabled;
   const extensionSecret = mutationEnabled ? randomBytes(32).toString('base64url') : null;
   const operatorPrincipal = mutationEnabled
@@ -216,8 +214,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
     const pending = pendingAskQuestionHandoffs.shift();
     if (pending !== undefined) completeAskQuestionHandoff(pending, outcome);
   });
-  // A restarted host gets a new epoch: every prior catalog snapshot and binding
-  // dies with it, so nothing from the old generation can authorize a submission.
+  // New epoch on restart invalidates prior catalog snapshots and bindings.
   supervisor.onLifecycle((event) => {
     if (event.reason === 'exit' || event.reason === 'restart' || event.reason === 'failed') {
       const endedEpoch = epoch;
@@ -298,8 +295,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
     process.stdout.write(`${JSON.stringify(server.auth.enrollment.createChallenge())}\n`);
   }
   await supervisor.start();
-  // Read authoritative runtime state once the child is live. In fixture or offline mode
-  // this stays not-live and the runtime endpoints report unavailable rather than guessing.
+  // Hydrate after child is live; fixture/offline stays unavailable rather than guessed.
   void runtime.hydrate().catch(() => undefined);
 
   return async () => {
@@ -528,7 +524,7 @@ export function publishPiEvent(
     nextSequence: () => nextProjectedSequence++,
     sessionId: identity.sessionId,
   })) {
-    // The store may decline a projection without consuming a sequence, so it owns the counter.
+    // Store may decline a projection without consuming a sequence.
     const seq = store.nextSequence(identity, epoch);
     syncHub.publish({
       ...envelope,
@@ -636,11 +632,8 @@ function parsePort(value: string | undefined): number {
   return parsed;
 }
 
-// Full access is the desktop posture. `--approve` trusts project-local files, and with no
-// `--no-tools` or `--tools` allowlist every built-in tool stays enabled. The approval
-// extension exists only to gate remote mutation through the phone, and gating tool calls
-// defeats full access, so it is deliberately not loaded here. Without it pi executes each
-// tool call directly, exactly as it does on a local desktop.
+// Desktop posture: --approve trusts local files; all tools on; no approval extension
+// (remote gating would defeat full access—pi executes tools directly).
 export function fullAccessPiArguments(): readonly string[] {
   return ['--mode', 'rpc', '--no-session', '--approve'];
 }

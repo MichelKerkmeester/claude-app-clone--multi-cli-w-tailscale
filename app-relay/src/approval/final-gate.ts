@@ -43,7 +43,7 @@ export type FinalGateResult =
 // 3. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
 
-/** Recompute the exact action at the final boundary without mutating lease state. */
+/** Recompute the action at the final boundary without mutating lease state. */
 export function verifyFinalGate(input: {
   readonly action: ApprovalAction;
   readonly lease: FinalGateLease;

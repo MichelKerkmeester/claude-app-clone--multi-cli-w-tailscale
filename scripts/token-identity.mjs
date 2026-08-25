@@ -3,23 +3,14 @@
 // MODULE: Token Identity Resolver
 // ───────────────────────────────────────────────────────────────────
 
-// Token-identity resolver — the browser-free acceptance oracle for the SvelteKit migration.
-//
-// WHY browser-free: the app ships a strict CSP (style-src 'self', no unsafe-inline), so headless
-// Chrome renders it unstyled — screenshots prove nothing about colour. Instead we resolve the
-// stylesheet text directly: every CSS custom property to its final literal, per theme state.
-//
-// The migration moves each surface's rules out of one 7,931-line style.css into per-component
-// scoped <style> blocks. "Nothing changed" means: resolve every token in all 3 theme states from
-// the post-migration corpus (all scoped <style> + app.css) and diff against the snapshot this
-// script captures from the pre-migration style.css → CHANGED/VANISHED/ADDED must all be 0.
+// Browser-free token resolver: strict CSP makes headless screenshots useless for colour checks.
 //
 // Usage:
-//   node scripts/token-identity.mjs snapshot <input.css...> --out <baseline.json>   capture a baseline
-//   node scripts/token-identity.mjs diff <baseline.json> <input.css...>             diff corpus vs baseline
-//   node scripts/token-identity.mjs verify <input.css...>                           self-check vs tokens.md goldens
+//   node scripts/token-identity.mjs snapshot <input.css...> --out <baseline.json>
+//   node scripts/token-identity.mjs diff <baseline.json> <input.css...>
+//   node scripts/token-identity.mjs verify <input.css...>
 //
-// Multiple input files are concatenated (corpus mode). Exit 0 = ok / 0 diffs; exit 2 = diffs or failure.
+// Multiple inputs concatenate (corpus mode). Exit 0 = ok; exit 2 = diffs or failure.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -27,10 +18,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 
-// Read a CSS source. A .svelte file contributes only its <style> block bodies (the scoped CSS the
-// migration moves each surface's rules into); anything else is read as raw CSS. This lets the diff
-// gate assemble the post-migration corpus straight from the component tree:
-//   diff <baseline.json> app-mobile/src/app.css app-mobile/src/**/*.svelte
+// .svelte inputs contribute only <style> bodies for post-migration corpus assembly.
 // ───────────────────────────────────────────────────────────────────
 // 2. HELPERS
 // ───────────────────────────────────────────────────────────────────
@@ -45,27 +33,19 @@ function readCssInput(file) {
   return bodies.join('\n');
 }
 
-// ---- The three theme states, keyed by the root selector that carries their token remap. ----
-// light  = the base :root block.
-// dark   = :root base then :root[data-theme='dark'] overrides.
-// system = :root base then the @media(prefers-color-scheme:dark) :root[data-theme='system'] overrides.
+// Theme states: light base; dark adds :root[data-theme='dark']; system adds prefers-color-scheme dark.
 // ───────────────────────────────────────────────────────────────────
 // 3. CONSTANTS
 // ───────────────────────────────────────────────────────────────────
 
 const THEMES = ['light', 'dark', 'system'];
 
-// Normalized global-root selectors (whitespace-collapsed, quotes normalized to single).
+// Normalized global-root selectors.
 const ROOT_LIGHT = ':root';
 const ROOT_DARK = ":root[data-theme='dark']";
 const ROOT_SYSTEM = ":root[data-theme='system']";
 
-// -------------------------------------------------------------------------------------------------
-// CSS parsing: strip comments, then walk a flat rule list honoring one level of @media nesting.
-// Every rule contributes its custom-property (--x: y) declarations, tagged with:
-//   - selector: normalized selector text
-//   - media:    the @media prelude if the rule sits inside one, else null
-// -------------------------------------------------------------------------------------------------
+// Parse custom-property rules with one level of @media nesting.
 
 // ───────────────────────────────────────────────────────────────────
 // 4. CORE LOGIC
@@ -75,12 +55,7 @@ function stripComments(css) {
   return css.replace(/\/\*[\s\S]*?\*\//g, '');
 }
 
-// Svelte's :global(X) is a compile-time scoping directive: the emitted selector is X unchanged, so
-// for token resolution (custom-property cascade keyed by selector) it must be unwrapped to its inner
-// selector. Without this, a decomposed override like `:global(:root[data-theme='dark']) .slash-panel`
-// fails to match the baseline's `:root[data-theme='dark'] .slash-panel` context key — it lands at a
-// separate key (spurious ADDED) and never overrides the base value (spurious CHANGED). Balanced-paren
-// walk so inner selectors that themselves carry parens (e.g. :not(...)) survive intact.
+// Unwrap :global(...) so themed overrides match baseline context keys.
 function unwrapGlobal(sel) {
   let out = '';
   let i = 0;
@@ -117,9 +92,8 @@ function parseRules(css) {
   const n = src.length;
 
   function parseBlockBody(body, media) {
-    // body is the inside of a `selector { ... }` — collect only custom-property declarations.
+    // Collect only custom-property declarations from a rule body.
     const decls = [];
-    // Split on ';' at top level (no nested blocks inside a normal rule body here).
     for (const raw of body.split(';')) {
       const seg = raw.trim();
       if (!seg.startsWith('--')) continue;
@@ -132,7 +106,7 @@ function parseRules(css) {
     return decls;
   }
 
-  // Walk the top level, matching `prelude { body }`, descending one level into @media.
+  // Walk top-level `prelude { body }` blocks; descend one @media level.
   function walk(text, media) {
     let p = 0;
     const len = text.length;
@@ -140,7 +114,6 @@ function parseRules(css) {
       const brace = text.indexOf('{', p);
       if (brace === -1) break;
       const prelude = text.slice(p, brace).trim();
-      // Find the matching close brace for this block.
       let depth = 1;
       let q = brace + 1;
       while (q < len && depth > 0) {
@@ -153,10 +126,9 @@ function parseRules(css) {
       p = q + 1;
 
       if (/^@media\b/i.test(prelude)) {
-        // Descend one level; nested rules carry this media prelude.
+        // Nested rules inherit this @media prelude.
         walk(body, normalizeSelector(prelude));
       } else if (/^@/.test(prelude)) {
-        // @theme and other at-rules with a plain body of declarations.
         const decls = parseBlockBody(body, media);
         if (decls.length) rules.push({ selector: normalizeSelector(prelude), media, decls });
       } else {
@@ -170,11 +142,7 @@ function parseRules(css) {
   return rules;
 }
 
-// -------------------------------------------------------------------------------------------------
-// Build, per theme, the effective declaration map keyed by "context::prop", where context is the
-// element scope a token is declared on (global root selectors collapse to "" = document scope).
-// Later declarations win (source order), matching CSS cascade for equal specificity within a theme.
-// -------------------------------------------------------------------------------------------------
+// Per-theme maps keyed by "context::prop"; later declarations win within a theme.
 
 function isGlobalRoot(sel) {
   return sel === ROOT_LIGHT || sel === ROOT_DARK || sel === ROOT_SYSTEM || sel === '@theme';
@@ -185,13 +153,12 @@ function classify(rule) {
   const { selector, media } = rule;
   const systemMedia = media && /prefers-color-scheme:\s*dark/i.test(media);
 
-  // Global document-scope tokens.
   if (selector === '@theme') return { context: '', themes: THEMES };          // theme-invariant
   if (selector === ROOT_LIGHT && !media) return { context: '', themes: THEMES }; // base, all themes
   if (selector === ROOT_DARK && !media) return { context: '', themes: ['dark'] };
   if (selector === ROOT_SYSTEM && systemMedia) return { context: '', themes: ['system'] };
 
-  // Component / surface scope. Strip a leading themed root prefix to get the base element context.
+  // Strip a themed root prefix to get the component context key.
   let context = selector;
   let themes = THEMES;
   const darkPrefix = new RegExp(`^${escapeRe(ROOT_DARK)}\\s+`);
@@ -203,7 +170,7 @@ function classify(rule) {
     context = selector.replace(systemPrefix, '');
     themes = ['system'];
   } else if (systemMedia) {
-    // A component rule inside the system media block without the [data-theme='system'] prefix.
+    // System media block without the [data-theme='system'] prefix.
     themes = ['system'];
   }
   return { context, themes };
@@ -226,20 +193,16 @@ function buildRawMaps(rules) {
   return maps;
 }
 
-// -------------------------------------------------------------------------------------------------
-// Resolve var() chains. A value may reference custom properties by name; resolve against the same
-// theme's map. Document-scope tokens (context "") are the fallback lookup for any element context.
-// -------------------------------------------------------------------------------------------------
+// Resolve var() chains; document-scope tokens are the fallback lookup.
 
 function resolveValue(rawValue, context, themeMap, seen) {
-  // Replace every var(--name[, fallback]) with the resolved name, recursively.
   return rawValue.replace(/var\(\s*(--[\w-]+)\s*(?:,\s*([^()]*(?:\([^()]*\)[^()]*)*))?\)/g, (_m, name, fallback) => {
-    // Look up the referenced property: prefer the same element context, then document scope.
+    // Prefer same context, then document scope.
     const local = `${context}::${name}`;
     const global = `::${name}`;
     let ref = themeMap.has(local) ? themeMap.get(local) : themeMap.has(global) ? themeMap.get(global) : undefined;
     if (ref === undefined) {
-      // Unresolved reference: use the fallback if present, else mark it.
+      // Unresolved: use fallback or mark UNRESOLVED.
       return fallback !== undefined ? resolveValue(fallback.trim(), context, themeMap, seen) : `UNRESOLVED(${name})`;
     }
     const cycleKey = themeMap.has(local) ? local : global;
@@ -261,9 +224,7 @@ function resolveTheme(rawMap) {
   return resolved;
 }
 
-// -------------------------------------------------------------------------------------------------
-// Snapshot / diff / verify entry points.
-// -------------------------------------------------------------------------------------------------
+// Snapshot, diff, and verify entry points.
 
 function resolveAll(cssFiles) {
   const css = cssFiles.map((f) => readCssInput(f)).join('\n');
@@ -350,9 +311,7 @@ function verify(cssFiles) {
   return failures;
 }
 
-// -------------------------------------------------------------------------------------------------
 // CLI
-// -------------------------------------------------------------------------------------------------
 
 function main() {
   const argv = process.argv.slice(2);

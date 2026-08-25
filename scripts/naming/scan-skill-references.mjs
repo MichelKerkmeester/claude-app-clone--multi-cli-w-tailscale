@@ -2,11 +2,7 @@
 // MODULE: Skill Reference Scan
 // ───────────────────────────────────────────────────────────────────
 
-// Durable WHY: a surface skill that names a path which no longer exists teaches a
-// dispatch to look in the wrong place, and nothing else in the toolchain notices —
-// the skill lives in another repository from the tree it describes. This resolves
-// every path the skill names against the shipped tree, so drift is caught by a
-// command rather than by a confused agent.
+// Resolve skill-named paths against the shipped app tree to catch cross-repo drift.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -21,18 +17,15 @@ import { join, resolve } from 'node:path';
 
 const APP_ROOT = resolve(import.meta.dirname, '../..');
 
-// Only a token that leads with a real top-level entry of the app repository is a
-// claim about the app tree. Everything else in backticks is prose, a package
-// scope, a skill-local document, or an illustrative component name.
+// Only backticked tokens rooted at a real app top-level entry are path claims.
 const APP_ROOTS = new Set(
   readdirSync(APP_ROOT).filter((entry) => !entry.startsWith('.')),
 );
-// Directories the tree used to have. Naming one is the drift this scan exists for.
+// Retired top-level names are the drift this scan exists for.
 const RETIRED_ROOTS = new Set(['apps', 'src', 'app']);
 
 const BACKTICKED = /`([^`\s]+)`/g;
-// "So `x`, not `y`" names y as a counter-example: y must NOT exist. A counter-example
-// that starts resolving is drift too, so it is checked in the opposite direction.
+// Counter-examples in "not `y`" must not exist either.
 const COUNTER_EXAMPLE = /not\s+`([^`\s]+)`/g;
 const FILENAME = /^[a-z0-9][a-z0-9.-]*\.(ts|tsx|svelte|css|mjs|cjs|js)$/;
 

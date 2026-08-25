@@ -89,7 +89,7 @@ let codecInitialization: Promise<void> | null = null;
 // 4. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
 
-/** Load each codec from a compiled on-disk module exactly once. */
+/** Load each codec from disk exactly once. */
 export async function initializeAttachmentDecoder(): Promise<void> {
   if (codecState !== null) return;
   codecInitialization ??= loadCodecs();
@@ -170,7 +170,7 @@ export async function decodeImage(
   };
 }
 
-/** Re-encode pixels through the same isolated codec boundary. */
+/** Re-encode through the same isolated codec boundary. */
 export async function encodeImage(
   image: CodecImageData,
   mimeType: MediaOutputMimeType,

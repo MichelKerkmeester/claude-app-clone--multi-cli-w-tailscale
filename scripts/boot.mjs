@@ -2,14 +2,7 @@
 // MODULE: Pi Remote One-Command Boot
 // ───────────────────────────────────────────────────────────────────
 
-// Durable WHY: a fresh agent must boot the whole deployment from one
-// command and hand the user a complete download and install message.
-// This file preflights the host, builds the app, starts the supervised
-// relay through the Serve deployment script, captures the one-time
-// enrollment payload the relay prints at startup, asserts the
-// tailnet-only posture, and prints the handoff. Re-runs converge on
-// the live deployment instead of duplicating relays, Serve routes,
-// or enrollment payloads.
+// One-command boot: preflight, build, relay, enrollment capture, tailnet check, handoff.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -28,17 +21,14 @@ import { fileURLToPath } from 'node:url';
 const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_RELAY_PORT = 4310;
 const DEFAULT_WEB_PORT = 4173;
-// The relay speaks the pi RPC protocol, which stays stable across the 0.84 patch line.
-// Accept any 0.84.x at or above the tested baseline so routine pi patch updates do not
-// block boot, while a major or minor change that can move the RPC contract still halts.
+// Accept pi 0.84.x at or above the tested patch; major/minor changes still halt boot.
 const PINNED_PI_LINE = '0.84';
 const MIN_PI_PATCH = 1;
 const COMMAND_TIMEOUT_MS = 15_000;
 const PORT_PROBE_TIMEOUT_MS = 1_500;
 const READINESS_TIMEOUT_MS = 120_000;
 const LONG_COMMAND_TIMEOUT_MS = 600_000;
-// `tailscale serve --bg` acknowledges before `serve status --json` publishes the routes, so
-// boot polls the status up to this budget before verifying the tailnet boundary.
+// tailscale serve --bg returns before status JSON is ready; poll within this budget.
 const SERVE_STATUS_TIMEOUT_MS = 15_000;
 const SERVE_STATUS_POLL_MS = 500;
 const MUTATION_FAMILIES = ['filesystem', 'process', 'network'];

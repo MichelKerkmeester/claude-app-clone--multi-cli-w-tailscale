@@ -46,7 +46,6 @@ export class SyncHub {
 
   public constructor(private readonly store: RelayStore) {}
 
-  /** Redact and persist an envelope before notifying any subscriber. */
   public publish(candidate: Envelope): Envelope {
     const result = this.store.appendEnvelope(candidate);
     if (!isEnvelope(result.envelope)) {
@@ -74,7 +73,6 @@ export class SyncHub {
     return () => this.committedListeners.delete(listener);
   }
 
-  /** Send a cursor plan, then release only live deltas beyond its barrier. */
   public subscribe(
     identity: SubscriptionIdentity,
     send: (message: SyncMessage) => void,

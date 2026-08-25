@@ -84,11 +84,7 @@ export interface AskQuestionAdapterInput {
   readonly clientMutationId: string;
 }
 
-/**
- * Adapt the assumed Pi callback contract to the relay handoff boundary.
- * Integration-time verification must bind these functions to Pi's exact
- * event and callback names; this adapter intentionally does not fabricate them.
- */
+/** Adapt Pi's callback contract to the relay handoff; does not fabricate Pi event names. */
 // ───────────────────────────────────────────────────────────────────
 // 3. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────

@@ -29,9 +29,7 @@ export type AskQuestionCallbackOutcome =
   | { readonly status: 'delivery-unknown' };
 
 export interface AskQuestionCallbackRoute {
-  /** Bind this predicate to the Pi version's confirmed callback/event shape. */
   readonly matches: (record: unknown) => boolean;
-  /** Convert a matched callback to safe outcome metadata without exposing its payload. */
   readonly map: (record: unknown) => AskQuestionCallbackOutcome;
   readonly onOutcome: (outcome: AskQuestionCallbackOutcome) => void;
 }
@@ -52,7 +50,6 @@ export class RpcDemultiplexer {
 
   public constructor(private readonly options: RpcDemultiplexerOptions) {}
 
-  /** Register one response id before writing its command to Pi stdin. */
   public expect(id: string, timeoutMs: number): Promise<PiRpcResponse> {
     if (this.pending.has(id)) {
       return Promise.reject(new Error(`RPC request id '${id}' is already pending.`));
@@ -66,7 +63,6 @@ export class RpcDemultiplexer {
     });
   }
 
-  /** Route one parsed stdout record without treating stderr as protocol input. */
   public accept(record: unknown): void {
     if (this.routeAskQuestionCallback(record)) return;
     if (isPiRpcResponse(record)) {

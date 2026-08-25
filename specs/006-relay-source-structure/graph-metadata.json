@@ -9,7 +9,8 @@
     "006-relay-source-structure/003-attachments-readme",
     "006-relay-source-structure/004-folder-ownership-map",
     "006-relay-source-structure/005-root-source-banners",
-    "006-relay-source-structure/006-root-folder-docs"
+    "006-relay-source-structure/006-root-folder-docs",
+    "006-relay-source-structure/007-comment-brevity"
   ],
   "manual": {
     "depends_on": [],
@@ -51,12 +52,6 @@
         "source": "derived"
       },
       {
-        "name": "two",
-        "kind": "key_phrase",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
         "name": "a",
         "kind": "key_phrase",
         "path": "spec.md",
@@ -79,19 +74,25 @@
         "kind": "heading",
         "path": "spec.md",
         "source": "derived"
+      },
+      {
+        "name": "3. PHASE DOCUMENTATION MAP",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "Phase parent for making the non-web source read the same way the web client does: numbered section banners, a module header on the files that lack one, and folder documentation. It began on app-relay (children 001-004) and extends to the repo-root shared code — packages, scripts, extensions, release and root tests (children 005-006). Comment and documentation only — no behaviour changes.",
     "created_at": "2026-08-24T19:29:08.880Z",
-    "last_save_at": "2026-08-24T21:36:29.678Z",
+    "last_save_at": "2026-08-25T03:30:43.724Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:897d613e89342c908978e3774abd833c3d7c00baa22fd06a5ac2097b3fb962a2",
+    "source_fingerprint": "sha256:b0788149f6f1eabd4e1c9134af47121bd092ff98d199c00141a0969a00e3cb40",
     "source_doc_hashes": {
-      "spec.md": "5a3328654e849593746d329966cf93113b699c7bf3007c52428afe8626bd34e0"
+      "spec.md": "043a01f032ec69f9a11be63f188222e4855d44135a99bd315d917ff86ce4c62f"
     },
     "last_active_child_id": "006-relay-source-structure/001-source-section-banners",
     "last_active_at": null

@@ -375,7 +375,7 @@ export class AuthService {
     action: AuthorizedAction = 'sync:read',
   ): ApplicationSession | null {
     this.prune();
-    // Repeatable artifact reads use the authenticated application session, never ticket authority.
+    // Artifact reads and attachment routes use session auth, not ticket authority.
     if (action === 'artifact:read' || isAttachmentAction(action)) return null;
     const ticket = this.tickets.get(ticketId);
     if (
@@ -658,7 +658,6 @@ export class AuthService {
     );
   }
 
-  /** Issue the shared one-use ticket for the host-owned question lane. */
   public issueAskQuestionTicket(
     session: ApplicationSession,
     binding: AskQuestionTicketBinding,

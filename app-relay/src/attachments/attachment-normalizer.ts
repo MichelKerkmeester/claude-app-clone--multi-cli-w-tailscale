@@ -43,7 +43,7 @@ export type NormalizationResult =
 // 3. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
 
-/** Decode, orient, bound, and re-encode without retaining source metadata. */
+/** Decode, orient, bound, and re-encode; source metadata is not retained. */
 export async function normalizeImage(
   input: Uint8Array,
   declaredMime: string,

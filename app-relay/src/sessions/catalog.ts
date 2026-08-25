@@ -19,7 +19,6 @@ import type { RelayStore } from '../store/relay-store.js';
 export class SessionCatalog {
   public constructor(private readonly store: RelayStore) {}
 
-  /** Register coarse state for one server-owned opaque session id. */
   public register(
     id: string,
     status: SessionCardDto['status'],
@@ -32,7 +31,6 @@ export class SessionCatalog {
     this.store.upsertSession({ id, status, updatedAt, messageCount });
   }
 
-  /** Return the read-only session card projection. */
   public list(): readonly SessionCardDto[] {
     return this.store.listSessions();
   }

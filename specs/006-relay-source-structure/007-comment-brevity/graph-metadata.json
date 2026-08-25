@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "006-relay-source-structure/006-root-folder-docs",
-  "spec_folder": "006-relay-source-structure/006-root-folder-docs",
+  "packet_id": "006-relay-source-structure/007-comment-brevity",
+  "spec_folder": "006-relay-source-structure/007-comment-brevity",
   "parent_id": "006-relay-source-structure",
   "children_ids": [],
   "manual": {
@@ -12,18 +12,18 @@
   "derived": {
     "trigger_phrases": [],
     "key_topics": [
-      "fill",
-      "missing",
-      "folder",
-      "readmes",
-      "repo",
-      "root",
-      "two",
-      "undocumented",
-      "extensions",
-      "inbound-media",
-      "plan",
-      "packages"
+      "shorten",
+      "over-long",
+      "inline",
+      "comment",
+      "descriptions",
+      "across",
+      "app-relay",
+      "repo-root",
+      "code",
+      "toward",
+      "concise",
+      "durable-why"
     ],
     "importance_tier": "important",
     "status": "complete",
@@ -66,7 +66,7 @@
         "source": "derived"
       },
       {
-        "name": "one",
+        "name": "comments",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
@@ -102,18 +102,6 @@
         "source": "derived"
       },
       {
-        "name": "title",
-        "kind": "key_phrase",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "no",
-        "kind": "key_phrase",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
         "name": "1. SUMMARY",
         "kind": "heading",
         "path": "plan.md",
@@ -138,13 +126,13 @@
         "source": "derived"
       },
       {
-        "name": "a",
-        "kind": "key_phrase",
-        "path": "tasks.md",
+        "name": "Phase 1 · app-relay",
+        "kind": "heading",
+        "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "package",
+        "name": "a",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
@@ -178,11 +166,23 @@
         "kind": "key_phrase",
         "path": "checklist.md",
         "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "VERIFICATION PROTOCOL",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
       }
     ],
-    "causal_summary": "Fill the missing folder READMEs at the repo root: the two undocumented Pi extensions (inbound-media, plan) and the packages and extensions container maps. Documentation only — no code change; each README is drawn from the real folder.",
-    "created_at": "2026-08-24T21:36:30.305Z",
-    "last_save_at": "2026-08-25T03:30:44.019Z",
+    "causal_summary": "Shorten over-long inline comment descriptions across app-relay and the repo-root code toward a concise durable-WHY style, keeping the section banners and guardrail fences. Comment-only, proven by an AST re-print that is byte-identical modulo comments.",
+    "created_at": "2026-08-25T03:30:44.319Z",
+    "last_save_at": "2026-08-25T03:30:44.319Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:74f09f5d561c0e6880684080e91e4ddd1dd8bf3e153dd4fd9ef3e50683fbdd87",
+    "source_fingerprint": "sha256:e40a57f41d9b945744eda6d5da01125220918c42d54ed8430bbc49f4db6513f5",
     "source_doc_hashes": {
-      "spec.md": "14acfc446651a1f92dc6ca05c5639a672a7d162dfd68ec12d2e247d2b6849252",
-      "plan.md": "23fe72a3bb193b7a68c0a2602926a0cbd41b57ff1a6735b3207ce7683dd8a7e6",
-      "tasks.md": "5c1ddca68fedbf932dea34c2f961a8eb1d066ba33c9d2a17f886123fac73a094",
-      "checklist.md": "f68c8db8908092a791f89b7b455f9b328cc67b4aadb1d4b2c15e18bdbae9ef36",
-      "implementation-summary.md": "d63005fde5a2b7c1f5c734ad4e0a6e6ba165368231fd4b1c8b45903781e3ee3e"
+      "spec.md": "c67c7abed23a2319e81b99706550a62de0444a5d087ec1078e731fec5117d5b6",
+      "plan.md": "a25b830b757d60447c8098f66b2ecbbe4e0c434898c6075ae143b6790999af1c",
+      "tasks.md": "30abc1d0bb25594752a064f43fb00ed7d4c7571b24b9be6780c7590952ce5a9d",
+      "checklist.md": "86abc523c6ae559e0729552bb79c4be7cd200835cba1c3f697614dc9ec1ca716",
+      "implementation-summary.md": "4c3b6d2341f5345d745b72217b9c12b6bce47733843d06accbdf82370fe98848"
     },
     "last_active_child_id": null,
     "last_active_at": null

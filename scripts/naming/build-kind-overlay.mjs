@@ -2,12 +2,7 @@
 // MODULE: Kind Prefix Overlay Builder
 // ───────────────────────────────────────────────────────────────────
 
-// Emits the manifest overlay that puts the kind first in a component's name.
-// The rule is deliberately mechanical: a component whose name ends in one of
-// the closed kinds is an instance of that kind, and everything else is a
-// feature component whose name already is the thing. Screens are listed by
-// hand because "screen" is not a suffix anyone writes.
-//
+// Emit the kind-first rename overlay for component filenames.
 // Usage: node scripts/naming/build-kind-overlay.mjs
 
 // ───────────────────────────────────────────────────────────────────

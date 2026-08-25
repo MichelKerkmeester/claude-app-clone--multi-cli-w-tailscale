@@ -107,12 +107,7 @@ export class RuntimeIssueError extends Error {
   }
 }
 
-/**
- * Owns per-session runtime authority in memory. Pi is the source of truth for model,
- * thinking level, streaming, and plan mode; this service only mirrors host-confirmed
- * state, gates mutations behind an expected revision, and refuses to guess an outcome
- * it cannot confirm (delivery-unknown is terminal until reconciliation).
- */
+/** Mirrors host-confirmed runtime state; delivery-unknown is terminal until reconcile. */
 export class RuntimeService {
   private revision = 0;
   private catalogRevision = 0;
@@ -155,14 +150,12 @@ export class RuntimeService {
         this.refreshModeProjection();
       }
       if (isPlanExtensionError(event)) {
-        // An unhealthy extension never reads as Build; the mode degrades to
-        // unknown until the host publishes a healthy mode again.
+        // Unhealthy extension never reads as Build until host republishes mode.
         this.mode = 'unknown';
         this.refreshModeProjection();
       }
       if (isPlanArtifactPublication(event)) {
-        // The host is the only source of plan bindings; a malformed publication
-        // drops the binding instead of guessing a plan to execute.
+        // Malformed plan publication drops the binding instead of guessing.
         const parsed = parsePlanArtifact(event);
         if (
           parsed !== null &&
@@ -179,8 +172,7 @@ export class RuntimeService {
         } else {
           this.planArtifactOccurredAt = null;
         }
-        // The plan projection rides inside the runtime state DTO without
-        // advancing the independent runtime revision.
+        // Plan projection rides in state DTO without bumping runtime revision.
         this.refreshPlanProjection();
       }
     });
@@ -212,10 +204,7 @@ export class RuntimeService {
     return this.revision;
   }
 
-  /**
-   * Expose the opaque binding only to the authenticated live client immediately
-   * before it asks for execution. It is never part of a runtime DTO.
-   */
+  /** Opaque binding for live client pre-execution only; never in a runtime DTO. */
   public getPlanBinding(input: {
     readonly sessionId: string;
     readonly expectedRuntimeRevision: number;
@@ -438,12 +427,7 @@ export class RuntimeService {
     this.planRevision = 0;
   }
 
-  /**
-   * The single guarded mutation entrypoint. Fails closed, is idempotent by
-   * controlId, and serializes every mutation through one single-flight lane so
-   * a second client acting on the same revision is answered stale, never
-   * double-dispatched.
-   */
+  /** Fail-closed, idempotent mutations serialized through one single-flight lane. */
   public control(command: RuntimeControlCommand): Promise<RuntimeControlResponse> {
     const settled = this.idempotency.get(command.controlId);
     if (settled !== undefined) {
@@ -563,10 +547,7 @@ export class RuntimeService {
     }
   }
 
-  /**
-   * Guarded plan-mode control. Every check below runs before any host dispatch;
-   * a timeout or transport failure is terminal delivery-unknown, never retried.
-   */
+  /** Plan control: checks run before dispatch; transport failure is terminal. */
   private async executePlanControl(command: PlanControlCommand): Promise<PlanControlResponse> {
     if (!this.live || this.currentState === null) {
       return this.settlePlan(command.controlId, {
@@ -683,8 +664,7 @@ export class RuntimeService {
 
   private async applyPlanExecution(command: ExecutePlanCommand): Promise<PlanControlResponse> {
     try {
-      // This is the dedicated host operation. It is intentionally not a prompt
-      // and cannot create transcript or model-visible content.
+      // Dedicated host op—not a prompt; no transcript or model-visible content.
       ensureAccepted(await this.supervisor.sendSettled(command as unknown as PiRpcCommand));
       await this.waitForMode('executing-plan');
       const state = this.commit(await this.supervisor.send({ type: 'get_state' }), null);
@@ -854,10 +834,7 @@ export class RuntimeService {
     this.currentState = isRuntimeStateDto(state) ? state : this.currentState;
   }
 
-  /**
-   * Mirror a host-confirmed mode event into the published state without a
-   * revision bump; the revision only advances when the relay itself commits.
-   */
+  /** Mirror host mode into published state without a revision bump. */
   private refreshModeProjection(): void {
     if (this.currentState === null) return;
     const state: RuntimeStateDto = { ...this.currentState, mode: this.mode };

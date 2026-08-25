@@ -2,18 +2,7 @@
 // MODULE: Folder Documentation Coverage Scan
 // ───────────────────────────────────────────────────────────────────
 
-// Every folder holding source should answer what it is for. A folder with
-// enough structure to get lost in should also answer how that structure is
-// arranged, in a second document. A folder holding one file has no such
-// structure, and describing it twice produced roughly six times more prose per
-// source file than the large folders got — ceremony reads as content and ages
-// the same way, so the second document is required only where it earns itself.
-//
-// This counts the folders that answer neither question, the ones that owe a
-// code map and lack it, the ones carrying a code map they do not owe, and
-// checks that whatever the documents name still exists — a document naming a
-// file that has been renamed is worse than no document, because it is believed.
-//
+// Count folder doc coverage and verify referenced paths still exist.
 // Usage: node scripts/naming/scan-folder-docs.mjs [--json]
 
 // ───────────────────────────────────────────────────────────────────
@@ -122,13 +111,11 @@ function main() {
       const path = join(REPO_ROOT, folder, doc);
       if (!existsSync(path)) continue;
       for (const reference of referencedPaths(readFileSync(path, 'utf8'))) {
-        // A bare filename is read as a sibling; anything with a slash is read
-        // from the repository root, which is how these documents write paths.
+        // Bare filenames resolve as siblings; slashed paths resolve from repo root.
         const candidate = reference.includes('/')
           ? join(REPO_ROOT, reference)
           : join(REPO_ROOT, folder, reference);
-        // Documents write paths three ways: from the repository root, from the
-        // source root, and relative to the folder they sit in.
+        // Also try repo-root, source-root, and folder-relative path spellings.
         const alternates = [
           join(REPO_ROOT, SOURCE_ROOT, reference),
           join(REPO_ROOT, folder, reference),

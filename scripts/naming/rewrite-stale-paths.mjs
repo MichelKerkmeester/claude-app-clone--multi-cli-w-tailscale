@@ -2,15 +2,7 @@
 // MODULE: Stale Path Sweep
 // ───────────────────────────────────────────────────────────────────
 
-// Rewrites references to files that have already moved, wherever a reference
-// can hide. The manifest applier handles the common shapes at move time; this
-// is the backstop for the rest, because a path can be named by a bare string
-// in an array with no call around it, and nothing resolves it until the line
-// that uses it runs.
-//
-// The rename chain comes from git rather than from the manifest, so a file
-// that moved twice still resolves to where it ended up.
-//
+// Backstop rewrite for stale path references using git rename chains.
 // Usage: node scripts/naming/rewrite-stale-paths.mjs <since-ref> [--apply]
 
 // ───────────────────────────────────────────────────────────────────
@@ -81,9 +73,7 @@ function renameChain(sinceRef) {
 }
 
 const QUOTED = /(['"])([^'"\n]+)\1/g;
-// Documentation names files in backticks rather than quotes, and a document
-// naming a file that has been renamed is worse than no document, because it is
-// believed.
+// Docs name files in backticks; a stale name is worse than no name.
 const BACKTICKED = /(`)([^`\n]+)\1/g;
 
 // ───────────────────────────────────────────────────────────────────
@@ -109,10 +99,8 @@ function main() {
     const original = readFileSync(join(REPO_ROOT, file), 'utf8');
     let changes = 0;
     const rewriteLiteral = (match, quote, literal) => {
-      // Only a literal that resolves to a file git actually moved is rewritten,
-      // which is what makes a sweep this broad safe.
-      // A document names its siblings by bare filename, so resolve those against
-      // the folder the document sits in as well as against the repository root.
+      // Rewrite only literals that resolve to a path git actually moved.
+      // Resolve bare filenames against the document folder as well as repo root.
       const candidates = literal.startsWith('.')
         ? [relative(REPO_ROOT, resolve(dirname(join(REPO_ROOT, file)), literal)).split('\\').join('/')]
         : literal.includes('/')

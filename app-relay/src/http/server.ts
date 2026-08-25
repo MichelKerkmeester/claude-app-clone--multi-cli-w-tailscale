@@ -210,8 +210,7 @@ export async function startReadOnlyServer(
   const askQuestionTicketLimiter = new FixedWindowRateLimiter(10, 60_000, options.now ?? Date.now);
   const askQuestionAnswerLimiter = new FixedWindowRateLimiter(30, 60_000, options.now ?? Date.now);
   const activeSockets = new Set<ActiveSocket>();
-  // A runtime mutation is only valid from a device that also holds a live, authenticated
-  // sync socket — a background or stale device can never steer the host.
+  // Runtime mutation requires a live authenticated sync socket from the same device.
   const isForegroundDevice = (deviceId: string, token: string): boolean =>
     [...activeSockets].some(
       (active) => active.deviceId === deviceId && active.sessionToken === token,
@@ -884,8 +883,7 @@ async function handleHttp(
       sendJson(response, 400, { error: 'invalid_prompt' });
       return;
     }
-    // A bound slash submission consumes its one-use ticket through its own
-    // authorized action, so the lane can be denied independently.
+    // Slash submissions use their own ticket action so the lane can be denied independently.
     const action = body.command === undefined ? 'prompt:submit' : 'commands:submit';
     const ticketSession = auth.consumeTicket(
       body.ticket,
@@ -939,7 +937,7 @@ async function handleHttp(
       sendJson(response, 202, { accepted: true, block });
     } catch (error: unknown) {
       if (error instanceof SlashSubmissionError) {
-        // Typed stale/denied outcomes carry no host detail and are never retried.
+        // Typed stale/denied outcomes carry no host detail and are not retried.
         sendJson(response, error.reason === 'stale_catalog' ? 409 : 403, {
           error: error.reason,
         });
@@ -1133,9 +1131,7 @@ async function handleHttp(
       sendJson(response, 400, { error: 'invalid_plan_control' });
       return;
     }
-    // Both plan operations are one-use-ticketed, session-bound controls: the
-    // ticket binds the request to the authenticated session and foreground
-    // principal before any host dispatch is possible.
+    // Plan ops are ticketed, session-bound controls before any host dispatch.
     const ticketAccepted =
       auth.consumeTicket(body.oneUseTicket, ingress.origin, ingress.principal, 'plan:control')
         ?.token === session.token;

@@ -14,8 +14,7 @@ import { randomBytes } from 'node:crypto';
 
 export const PLAN_ARTIFACT_KEY = 'pi-remote-plan-artifact';
 
-// Projection caps mirror the relay's bounded display-string contract so every
-// host publication passes the relay gate without truncation surprises.
+// Match relay display caps so publications pass the gate without truncation.
 export const PLAN_TITLE_CAP = 500;
 export const PLAN_SUMMARY_CAP = 2_000;
 export const PLAN_STEP_CAP = 10_000;
@@ -75,12 +74,7 @@ interface BoundApproach {
   readonly label: string;
 }
 
-/**
- * Host-side plan artifact authority. The adapter is the only producer of
- * structured plan publications: assistant prose can never mint a plan binding
- * because every publication flows through accept/invalidate. The opaque token
- * is freshly minted per revision and never derived from plan text.
- */
+/** Sole structured plan publisher; tokens are minted per revision, never from plan text. */
 // ───────────────────────────────────────────────────────────────────
 // 4. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
@@ -103,11 +97,7 @@ export class PlanArtifactAdapter {
     return this.artifact;
   }
 
-  /**
-   * Accept a structured draft. The current binding is invalidated and published
-   * as superseded BEFORE the replacement is published, so no window exists in
-   * which an old valid binding could execute after feedback.
-   */
+  /** Supersede the current binding before publishing the replacement. */
   public accept(draft: PlanDraft): {
     readonly superseded: PlanArtifactPublication | null;
     readonly accepted: PlanArtifactPublication;
@@ -184,12 +174,7 @@ const POSIX_PATH_PATTERN =
   /(?:~|\/(?:Users|home|private|tmp|var|etc|opt|usr|Volumes))\/[^\s"'<>]*/g;
 const WINDOWS_PATH_PATTERN = /\b[A-Za-z]:\\(?:[^\\\s"'<>]+\\)*[^\\\s"'<>]*/g;
 
-/**
- * Host-side bounded redaction: control characters are removed and secret/path
- * content is replaced with fixed markers before anything is published. The
- * result is also what the relay's safe-display gate accepts, so a publication
- * that passes here is never rejected as malformed downstream.
- */
+/** Strip controls and redact secrets/paths before publish; relay gate accepts what passes here. */
 function sanitizeProjectionField(value: string, cap: number): string | null {
   const cleaned = value
     .replace(CONTROL_OR_BIDI, '')

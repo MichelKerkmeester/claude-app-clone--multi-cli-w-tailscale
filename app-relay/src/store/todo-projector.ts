@@ -64,7 +64,7 @@ export function authoritativeTodoProjectionSource(value: unknown): unknown {
   return record?.statusKey === TODO_PROJECTION_SOURCE_KEY ? record.projection ?? null : null;
 }
 
-/** Project a host snapshot into the exact redacted v1 DTO. */
+/** Project a host snapshot into the redacted v1 DTO. */
 export function projectTodoSnapshot(raw: unknown): TodoProjectionV1 | null {
   const record = asRecord(raw);
   const planId = record?.planId;

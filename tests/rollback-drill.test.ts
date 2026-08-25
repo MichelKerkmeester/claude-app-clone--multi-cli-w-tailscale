@@ -31,8 +31,7 @@ describe('executable rollback drill', () => {
       fullAccessRelaunchNeedsMigration: false,
     });
     expect(report.drainedApprovalRows).toBeGreaterThanOrEqual(1);
-    // The full-access rollback path relaunches the verified desktop-parity vector and
-    // never depends on a schema migration to restore runtime state.
+    // Full-access rollback relaunches desktop-parity vector without a schema migration.
     expect(report.fullAccessRelaunchArgs).toEqual(['--mode', 'rpc', '--no-session', '--approve']);
   });
 });

@@ -914,7 +914,7 @@ describe('runtime control guards', () => {
       commands: [descriptor, { ...descriptor, name: 'compact', source: 'skill' }],
     } as const;
     expect(isCommandCatalogDto(catalog)).toBe(true);
-    // The pre-versioning shape is a stale/incompatible shape and is rejected whole.
+    // Pre-versioning shapes are rejected whole.
     expect(
       isCommandCatalogDto({ sessionId: 'session_local', revision: 2, commands: catalog.commands }),
     ).toBe(false);
@@ -956,7 +956,7 @@ describe('runtime control guards', () => {
     expect(isPromptSubmitCommand(command)).toBe(true);
     expect(isPromptSubmitCommand({ ...command, streamingBehavior: 'steer' })).toBe(false);
     expect(isPromptSubmitCommand({ ...command, streamingBehavior: 'followUp' })).toBe(false);
-    // An undefined binding serializes as absent and reads as an ordinary prompt.
+    // Undefined binding serializes absent and reads as an ordinary prompt.
     expect(isPromptSubmitCommand({ ...command, command: undefined })).toBe(true);
     expect(
       isPromptSubmitCommand({ ...command, command: { ...command.command, name: '../plan' } }),
@@ -967,7 +967,6 @@ describe('runtime control guards', () => {
     expect(
       isPromptSubmitCommand({ ...command, command: { ...command.command, extra: true } }),
     ).toBe(false);
-    // Without a binding the ordinary prompt shape keeps steering.
     const { command: _binding, ...ordinary } = command;
     void _binding;
     expect(isPromptSubmitCommand({ ...ordinary, streamingBehavior: 'followUp' })).toBe(true);
@@ -1011,7 +1010,7 @@ describe('runtime control guards', () => {
       catalogRevision: 1,
       commands: [descriptor],
     } as const;
-    // The guard validates shape only; the relay rejects foreign sessions before Pi.
+    // Shape-only guard; relay rejects foreign sessions before Pi.
     expect(isCommandCatalogDto(catalog)).toBe(true);
     const command = {
       type: 'prompt.submit',

@@ -335,7 +335,6 @@ export class RelayStore {
     return transaction();
   }
 
-  /** Return the next valid sequence for a current or new epoch. */
   public nextSequence(identity: StreamIdentity, epoch: string): number {
     const state = this.getStream(identity);
     return state !== null && state.currentEpoch === epoch ? state.highSeq + 1 : 1;
@@ -433,7 +432,6 @@ export class RelayStore {
       .run(card.id, card.status, card.updatedAt, card.messageCount);
   }
 
-  /** List only opaque session identifiers and coarse operational metadata. */
   public listSessions(): readonly SessionCardDto[] {
     return this.database
       .prepare(
@@ -515,7 +513,6 @@ export class RelayStore {
     };
   }
 
-  /** Close the SQLite connection after the HTTP listener stops. */
   public close(): void {
     this.artifactStore.close();
     this.database.close();

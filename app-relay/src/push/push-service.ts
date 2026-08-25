@@ -294,8 +294,7 @@ export class PushService {
       )
       .all() as SubscriptionRow[];
     let sent = 0;
-    // A client assertion can go stale and strand a device; observed socket state is
-    // the foreground state the server can actually see whenever it is available.
+    // Prefer observed socket foreground state over a stale client assertion.
     const foregroundDeviceIds =
       context.foregroundDeviceIds ?? this.assertedForegroundDevices;
     await Promise.all(
@@ -415,8 +414,7 @@ export const serializeTodoSyncAvailability = serializeTodoProjectionPushHint;
 
 export const serializeTodoProjectionHint = serializeTodoProjectionPushHint;
 
-// Push delivery is deliberately separated from attention persistence: todo data is
-// already available through authenticated sync and must not enter the push database.
+// Todo hints skip attention DB; data is already available via authenticated sync.
 export async function sendContentFreePushHint(
   service: PushService,
   hint: string,

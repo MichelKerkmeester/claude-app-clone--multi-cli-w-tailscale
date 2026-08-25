@@ -2,11 +2,7 @@
 // MODULE: Naming Completeness Scan
 // ───────────────────────────────────────────────────────────────────
 
-// Reports every in-scope file whose name does not match the grammar. The
-// SvelteKit reserved names are excluded by name rather than incidentally: a
-// scan that happens to miss them is not a gate, because the day one starts
-// matching it reports a false failure on the URL contract.
-//
+// List in-scope files whose names violate the grammar; SvelteKit reserved names are excluded by design.
 // Usage: node scripts/naming/scan-naming.mjs [--scope <path-prefix>]
 // Exit 0 = every in-scope name matches; exit 2 = offenders listed.
 

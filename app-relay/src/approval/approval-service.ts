@@ -96,7 +96,7 @@ export interface ApprovalServiceOptions {
 // 4. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
 
-/** Own one-decision approval state and one-shot execution authority. */
+/** Own one-decision approval state and one-shot execution. */
 export class ApprovalService {
   private readonly database: Database.Database;
   private readonly now: () => number;

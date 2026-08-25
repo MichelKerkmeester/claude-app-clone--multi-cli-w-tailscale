@@ -356,7 +356,6 @@ export class ArtifactStore {
     };
   }
 
-  /** Store only final inbound derivatives under random filesystem names. */
   public putInboundArtifact(input: PutInboundArtifactInput): InboundStoredArtifact {
     this.assertInboundInput(input);
     const artifactId = input.artifactId ?? opaqueInboundId('artifact');

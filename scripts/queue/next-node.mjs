@@ -2,13 +2,7 @@
 // MODULE: Queue Advancement
 // ───────────────────────────────────────────────────────────────────
 
-// Computes which node to work next instead of leaving it to recollection.
-// A node has advanced when its packet validates strict and its own completion
-// is recorded; it is ready when every dependency has advanced. A held node
-// carries an operator decision and never advances on its own, but its shipped
-// part can still satisfy a dependant — a decision left open must not stall the
-// whole graph behind it.
-//
+// Next workable graph node by strict validation and dependency satisfaction.
 // Usage: node scripts/queue/next-node.mjs
 
 // ───────────────────────────────────────────────────────────────────
@@ -78,12 +72,9 @@ function main() {
     const folder = packetFolder(node.id);
     const pct = folder === null ? null : completion(folder);
     const strict = folder === null ? false : validates(folder);
-    // A phase parent records no completion of its own; it has advanced when it
-    // validates, because its children carry the work.
+    // Phase parents advance when strict validation passes; children hold the work.
     const advanced = strict && (pct === null || pct >= 95);
-    // A held node stops advancing but must not stall the graph behind it: an
-    // open operator decision is not a reason for unrelated work to wait, so a
-    // held node whose shipped part validates still satisfies a dependency.
+    // Held nodes do not advance, but a shipped partial still satisfies dependants.
     const satisfiesDependants = advanced || (node.held !== undefined && strict && (pct ?? 0) >= 50);
     state.set(node.id, { ...node, folder, pct, strict, advanced, satisfiesDependants });
   }
@@ -112,8 +103,7 @@ function main() {
   console.log('BLOCKED');
   for (const node of blocked) console.log('  ', label(node), '<- waits on', node.unmet.join(', '));
 
-  // Among ready nodes, prefer the one the most other nodes are waiting on, so
-  // the graph widens rather than deepens.
+  // Prefer the node that unlocks the most dependants.
   const dependants = (id) => graph.nodes.filter((n) => n.deps.includes(id)).length;
   const workable = ready.filter((node) => node.held === undefined);
   workable.sort((a, b) => dependants(b.id) - dependants(a.id) || a.id.localeCompare(b.id));

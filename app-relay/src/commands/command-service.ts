@@ -23,15 +23,11 @@ import { projectCommandCatalog } from '../store/redaction.js';
 // 2. CONSTANTS
 // ───────────────────────────────────────────────────────────────────
 
-// Names that could carry a privileged or destructive action are hidden from the
-// phone by default. Discovery is a convenience; it must never widen what a remote
-// device can reach beyond the ticketed prompt path.
+// Hide privileged names from phone discovery; discovery must not widen ticketed reach.
 const PRIVILEGED_COMMAND_PATTERN =
   /credential|password|secret|token|api[-_]?key|authoriz|login|logout|session|reload|share|install|uninstall|package|trust|revoke|reset|delete|shutdown|exit|quit/i;
 
-// The extension's plan control command is host-authoritative: entering, leaving,
-// or executing a plan must go through the ticketed plan-control lane, never the
-// phone slash catalog. Safe non-control commands stay discoverable.
+// Plan control is host-authoritative; never expose it via the phone slash catalog.
 const PLAN_CONTROL_COMMAND_NAMES = new Set(['plan']);
 
 // ───────────────────────────────────────────────────────────────────
@@ -53,12 +49,7 @@ export interface CommandServiceOptions {
 // 4. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
 
-/**
- * The relay's sole authority for what a phone may discover and submit as a slash
- * command. Snapshots are complete replacements bound to the live host epoch,
- * session revision, and catalog revision; there is no fallback catalog and a
- * submission that cannot be proven current and allowed is denied before Pi sees it.
- */
+/** Sole phone slash authority; unproven bindings are denied before Pi sees them. */
 export class CommandService {
   private hostEpoch: string;
   private sessionRevision = 0;
@@ -104,7 +95,6 @@ export class CommandService {
     return this.snapshot;
   }
 
-  /** The last complete bounded snapshot, or null before the first host read. */
   public getSnapshot(): CommandCatalogDto | null {
     return this.snapshot;
   }
@@ -113,7 +103,7 @@ export class CommandService {
     return this.availability;
   }
 
-  /** Record a settled-availability transition; every change ages out prior bindings. */
+  /** Record availability transitions; each change ages out prior bindings. */
   public setAvailability(availability: CommandAvailability): void {
     if (this.availability !== availability) {
       this.availability = availability;
@@ -129,11 +119,7 @@ export class CommandService {
     this.availability = 'idle';
   }
 
-  /**
-   * Fail-closed revalidation for one explicit slash submission. A mismatch in host
-   * epoch, session revision, or the fresh catalog revision is stale; an unknown,
-   * hidden, or currently-unsafe name is denied. Neither outcome reaches Pi.
-   */
+  /** Fail-closed revalidation: stale epoch/revision or unsafe name never reaches Pi. */
   public async revalidateSlashSubmission(
     binding: CommandBindingDto,
   ): Promise<SlashSubmissionVerdict> {

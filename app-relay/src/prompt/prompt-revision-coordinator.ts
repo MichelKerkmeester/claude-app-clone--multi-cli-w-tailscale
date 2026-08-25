@@ -9,11 +9,6 @@
 /** Mutations which change the prompt revision observed by attachment sets. */
 export type AcceptedPromptMutation = 'user' | 'runtime';
 
-/**
- * Keep prompt revisions on accepted state changes only. Streaming token events
- * are deliberately not represented here because they do not change the
- * command contract an attachment set was bound to.
- */
 // ───────────────────────────────────────────────────────────────────
 // 2. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────

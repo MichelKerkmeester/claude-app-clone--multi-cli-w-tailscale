@@ -45,19 +45,12 @@ export interface ParsedPlanArtifact {
 // 4. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
 
-/**
- * True when the record is an extension runtime error. Extension health is
- * host-authoritative: an unhealthy extension must never read as Build.
- */
+/** Extension errors are host-authoritative; unhealthy extension must not read as Build. */
 export function isPlanExtensionError(record: unknown): boolean {
   return isRecord(record) && record.type === 'extension_error';
 }
 
-/**
- * Parse the only mode/status publication the relay trusts. Every other shape is
- * ignored (null) or mapped to `unknown`; a malformed or unhealthy status can
- * never be read as Build.
- */
+/** Parse the only trusted mode/status publication; malformed shapes never read as Build. */
 export function parsePlanStatus(record: unknown): RuntimeMode | null {
   if (
     !isRecord(record) ||
@@ -84,10 +77,7 @@ export function isPlanArtifactPublication(record: unknown): boolean {
   );
 }
 
-/**
- * Parse the pinned structured plan artifact publication. Malformed or foreign
- * publications return null so the relay fails closed instead of guessing a plan.
- */
+/** Parse pinned plan artifact; malformed publications fail closed. */
 export function parsePlanArtifact(record: unknown): ParsedPlanArtifact | null {
   if (
     !isRecord(record) ||

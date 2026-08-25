@@ -59,11 +59,7 @@ export interface NormalizedDerivative {
   readonly mimeType: MediaOutputMimeType;
 }
 
-/**
- * The bridge deliberately consumes capabilities instead of attachment
- * implementation details. A future attachment service adapter can keep its
- * paths and byte ownership private while satisfying this interface.
- */
+/** Capability boundary; attachment paths and byte ownership stay private. */
 export interface PiImageAttachmentSource {
   readonly getReservation: (setId: string) => AttachmentReservationRecord | null;
   readonly getPartRecords: (setId: string) => readonly AttachmentPartRecord[] | null;
@@ -98,14 +94,11 @@ export interface PiImageDeliveryResult {
   readonly attachmentCount: number;
 }
 
-/**
- * Final capability boundary for normalized image delivery. No caller receives
- * a Pi image or its encoded representation; this class owns the one RPC send.
- */
 // ───────────────────────────────────────────────────────────────────
 // 4. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
 
+/** Owns the one RPC send; callers never receive Pi image bytes. */
 export class PiImageBridge {
   private readonly activeSets = new Set<string>();
   private readonly consumedSets = new Set<string>();
@@ -139,8 +132,7 @@ export class PiImageBridge {
     try {
       await this.assertFinalGate(command, owner, attachmentIds[0]!, 1);
       for (const [index, attachmentId] of attachmentIds.entries()) {
-        // This is intentionally immediately adjacent to the derivative load:
-        // a prior check is never reused across an asynchronous boundary.
+        // Re-check final gate immediately before each async derivative load.
         const snapshot = await this.assertFinalGate(command, owner, attachmentId, index + 1);
         const derivative = await this.options.attachments.loadNormalizedDerivative(
           setId,

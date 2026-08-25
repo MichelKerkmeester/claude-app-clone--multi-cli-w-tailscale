@@ -2,12 +2,7 @@
 // MODULE: Story Scaffold Generator
 // ───────────────────────────────────────────────────────────────────
 
-// Story scaffold: emit a correct CSF3 story stub co-located with a Svelte
-// component, so adding a component (or filling a coverage gap) is one command.
-// The stub compiles and renders a props-free component as-is; a context-coupled
-// component needs its args sourced from real demo fixtures and a provider
-// decorator added by hand (see any sibling *.stories.ts) — the TODO marks that.
-//
+// Co-located CSF3 story stub for a Svelte component.
 // Usage: npm run story:new app-mobile/src/<path>/<Component>.svelte
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS

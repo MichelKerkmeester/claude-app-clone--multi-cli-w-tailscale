@@ -2,10 +2,7 @@
 // MODULE: Rename Manifest Builder
 // ───────────────────────────────────────────────────────────────────
 
-// Emits one row per in-scope file: where it is, and where the grammar says it
-// belongs. The manifest is the only input the mover and the specifier rewriter
-// read, so a file missing here is a file that silently does not move.
-//
+// Emit one rename row per in-scope file for the mover and specifier rewriter.
 // Usage: node scripts/naming/build-manifest.mjs [--out <path>]
 
 // ───────────────────────────────────────────────────────────────────

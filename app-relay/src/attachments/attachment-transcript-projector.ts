@@ -69,10 +69,7 @@ export function projectRedactedAttachmentBlock(
   return candidate;
 }
 
-/**
- * Project an untrusted attachment-shaped value structurally. No input field
- * outside the fixed allowlist is read into the returned card.
- */
+/** Allowlist projection: fields outside the fixed set never enter the card. */
 export function allowlistRedactedAttachmentBlock(value: unknown): RedactedAttachmentBlock | null {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return null;
   const source = value as Record<string, unknown>;

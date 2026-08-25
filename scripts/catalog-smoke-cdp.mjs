@@ -2,18 +2,10 @@
 // MODULE: Catalog Render CDP Gate
 // ───────────────────────────────────────────────────────────────────
 
-// Catalog render gate: prove every Storybook story renders — light AND dark —
-// without throwing. `storybook build` only proves the stories COMPILE; a story
-// can build clean and still throw at render (e.g. a component reading a context
-// that no decorator provides, or an effect that self-invalidates). This gate
-// serves the static build, drives headless Chrome over CDP to each story id in
-// both themes, and fails on any Runtime.exceptionThrown, console.error, or
-// Storybook error overlay. It is the objective substrate for migration gate 8.
-//
+// Render every Storybook story in light and dark; build-only checks miss runtime throws.
 // Usage:
 //   node scripts/catalog-smoke-cdp.mjs [--filter <substr>] [--static <dir>]
-// Exit 0 = every rendered story clean; 2 = at least one story threw; 1 = harness
-// could not run (no build, no Chrome, no story index).
+// Exit 0 = clean; 2 = story threw; 1 = harness could not run.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -56,8 +48,7 @@ function findChrome() {
   return existsSync(p) ? p : null;
 }
 
-// Minimal static file server for the storybook-static build. No deps: Storybook's
-// iframe uses absolute /assets module scripts, so file:// cannot resolve them.
+// Minimal static server; Storybook iframe needs absolute /assets URLs, not file://.
 function serveStatic(root) {
   return new Promise((resolve) => {
     const server = createServer(async (req, res) => {
@@ -132,12 +123,9 @@ async function navigate(c, url) {
   }
 }
 
-// Wait until Storybook has either mounted the story root's content or shown its
-// error overlay, so we capture the real render outcome rather than a blank frame.
+// Wait for story content or Storybook's error overlay, not a blank frame.
 async function waitForStory(c) {
-  // Real renders mount in well under a second; a frame still blank at this cap
-  // is a genuinely empty/deferred story, which is not a failure (only thrown
-  // errors are). Keep the cap tight so a large corpus doesn't take forever.
+  // Tight blank-frame cap; only thrown errors fail the gate.
   const end = Date.now() + 2500;
   while (Date.now() < end) {
     const state = await ev(c, `(() => {

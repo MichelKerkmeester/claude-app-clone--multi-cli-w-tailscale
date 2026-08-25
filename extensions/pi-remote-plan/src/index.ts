@@ -25,17 +25,10 @@ type PlanMode = 'build' | 'plan' | 'executing-plan';
 
 export const STATUS_KEY = 'pi-remote-plan-mode';
 
-/**
- * The only error text published for plan-safety failures. Bounded by design:
- * restoration and handoff failures never carry host detail, paths, or secrets.
- */
+/** Bounded plan-safety error; no host detail, paths, or secrets. */
 export const PLAN_SAFETY_ERROR = 'Plan safety could not be verified';
 
-/**
- * Bounded execution lease. A successful handoff restores the full tool set for
- * at most this long; the lease then forces Plan restrictions back even if no
- * terminal agent event was observed.
- */
+/** Execution lease; expiry restores Plan even without a terminal agent event. */
 export const EXECUTION_LEASE_MS = 60 * 60_000;
 
 interface ExtensionUIContext {
@@ -82,11 +75,7 @@ interface ExtensionAPI {
   setActiveTools(toolNames: string[]): void;
 }
 
-// Only bins that cannot mutate the workspace through their own flags. `find`,
-// `sed`, `awk`, and `tee` are deliberately excluded: they write via primaries or
-// flags (`find -delete`/`-exec`, `sed -i`, redirection) with no shell operator to
-// catch. Read-only discovery in plan mode goes through pi's dedicated read/grep/
-// find/ls tools, which are allowed as non-bash tool calls.
+// Exclude bins that mutate via flags without a shell operator; discovery uses pi read/grep/find/ls.
 export const READ_ONLY_BASH_TOOLS = [
   'ls',
   'cat',
@@ -143,12 +132,7 @@ export interface PlanExecutionRequest {
   readonly selectedApproachId?: string;
 }
 
-/**
- * Default-deny plan classification. Only explicit read-only built-ins and
- * explicitly classified extension/MCP tools pass; unknown built-ins, unknown
- * extension tools, and unknown MCP tools are mutation-capable until proven
- * otherwise. Bash is classified separately against the narrow allowlist.
- */
+/** Default-deny: only explicit read-only built-ins and classified extensions pass; bash uses the allowlist. */
 // ───────────────────────────────────────────────────────────────────
 // 4. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
@@ -237,11 +221,7 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
       (tool) => !(MUTATION_CAPABLE_BUILTINS as readonly string[]).includes(tool),
     );
 
-  /**
-   * Reapply Plan restrictions after execution. The classifier gate is the real
-   * enforcement; the active-tool set is verified as well so no mutation-capable
-   * built-in survives an execution episode.
-   */
+  /** Reapply Plan restrictions; classifier enforces and the active-tool set is verified. */
   const restorePlanRestrictions = (ctx: ExtensionContext): boolean => {
     if (capturedTools === undefined) capturedTools = [...pi.getActiveTools()];
     const full = capturedTools;
@@ -258,10 +238,7 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
     return true;
   };
 
-  /**
-   * Atomic handoff: full tools return only when restoration succeeds, and the
-   * bounded lease starts only after the handoff has been published.
-   */
+  /** Hand off full tools only after restoration succeeds; lease starts after publish. */
   const beginExecution = (ctx: ExtensionContext): boolean => {
     if (mode !== 'plan') return false;
     if (!restoreTools(ctx)) {
@@ -280,8 +257,7 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
     clearLease();
     if (mode !== 'executing-plan') return;
     if (!restorePlanRestrictions(ctx)) {
-      // Restrictions stay active (the classifier gate remains in plan mode);
-      // only the bounded safe error is emitted, never host detail.
+      // Classifier stays in plan mode; emit only the bounded safe error.
       mode = 'plan';
       publishError(ctx);
       reportPlanSafetyError(ctx);
@@ -374,8 +350,7 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
       return { block: true, reason: 'Plan mode is read-only.' };
     }
 
-    // Default-deny: only explicitly read-only tools pass; every unclassified
-    // built-in, extension, and MCP tool is mutation-capable in plan mode.
+    // Default-deny unclassified built-ins, extensions, and MCP tools.
     if (!isPlanReadOnlyTool(event.toolName)) {
       return { block: true, reason: 'Plan mode is read-only.' };
     }
@@ -385,7 +360,7 @@ export default function piRemotePlan(pi: ExtensionAPI): PlanHost {
   return {
     acceptPlan: (draft, ctx) => {
       const { superseded, accepted } = artifact.accept(draft);
-      // Invalidation of the old binding is authoritative before the replacement.
+      // Invalidate old binding before publishing replacement.
       if (superseded !== null) publishPlan(ctx, superseded);
       publishPlan(ctx, accepted);
       return artifact.get() as PlanArtifact;

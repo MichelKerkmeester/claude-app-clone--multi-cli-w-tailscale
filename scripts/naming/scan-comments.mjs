@@ -2,11 +2,7 @@
 // MODULE: Comment Grammar Scan
 // ───────────────────────────────────────────────────────────────────
 
-// Measures the three comment properties that can be counted, so the packet
-// that fixes them reports a delta rather than a claim. The fourth property —
-// whether a comment says why rather than what — is not measurable and is not
-// pretended to be here.
-//
+// Count measurable comment grammar properties for packet deltas.
 // Usage: node scripts/naming/scan-comments.mjs [--json]
 
 // ───────────────────────────────────────────────────────────────────
@@ -26,8 +22,7 @@ const SOURCE_ROOT = 'app-mobile/src';
 const EXCLUDED_DIRS = new Set(['routes']);
 const EXTENSIONS = ['.svelte', '.ts'];
 const RULE = '─';
-// Directives and quoted identifiers are not sentences, so they are not
-// capitalisation violations.
+// Directives and quoted identifiers are not sentence capitalisation violations.
 const NOT_A_SENTENCE = /^(eslint-|@ts-|prettier-|svelte-ignore|deno-|c8 |istanbul |ANCHOR|\/|\*|-|@)/;
 
 /** Every file under the source root, for counts that must match the gate. */
@@ -75,10 +70,7 @@ function main() {
     .map((full) => relative(REPO_ROOT, full).split('\\').join('/'))
     .sort();
 
-  // The fence total is counted the way the gate counts it: every line carrying
-  // the marker anywhere under the source root, stylesheet and route tree
-  // included. Counting a narrower set makes a reformatted fence read as a fence
-  // that was added, which is exactly the false alarm this packet must not raise.
+  // Match gate fence counting across the full source root, not a narrower subset.
   const fenceScope = walkAll(join(REPO_ROOT, SOURCE_ROOT));
 
   const withoutBanner = [];
@@ -95,24 +87,18 @@ function main() {
     lines.forEach((line, index) => {
       const body = commentBody(line);
       if (body === null || body.length === 0) return;
-      // Only the first line of a comment run starts a sentence. Counting every
-      // line counts wrapped prose as a violation, which would send someone to
-      // capitalise the middle of a sentence.
+      // Count only the first line of a comment run, not wrapped continuation lines.
       const previous = commentBody(lines[index - 1] ?? '');
       const isContinuation = previous !== null && previous.length > 0;
       if (body.includes('@ds guardrail:')) {
-        // Counted separately over the gate's scope; here only its shape matters.
-        // A fence whose reason spills onto the next comment line is the shape
-        // being corrected: one line of reason, or the reader stops reading.
+        // Guardrail fences must keep their reason on one line.
         const next = commentBody(lines[index + 1] ?? '');
         if (next !== null && next.length > 0 && !next.includes('@ds ')) multiLineFences += 1;
         return;
       }
       if (body.includes(RULE) || /^[A-Z0-9. ]+$/.test(body)) return;
       if (NOT_A_SENTENCE.test(body)) return;
-      // Commented-out code is counted before the continuation guard, or a run
-      // of it reports as one line. Making the instrument look away from a
-      // category is how the category survives.
+      // Count commented-out code before the continuation guard.
       if (/^(interface|const|let|var|function|import|export|type|declare|class)\b/.test(body)) {
         commentedOutCode += 1;
         return;
@@ -122,8 +108,7 @@ function main() {
     });
   }
 
-  // Stories are source too, but the packet's own baseline counts the modules
-  // only, so both scopes are reported and neither is quietly substituted.
+  // Report modules and stories separately; neither scope substitutes for the other.
   const isStory = (file) => file.endsWith('.stories.ts') || file.endsWith('.d.ts');
   const report = {
     filesScanned: files.length,

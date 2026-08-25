@@ -83,10 +83,7 @@ export const ALLOWLISTED_INBOUND_MEDIA_SOURCES = [
 const INBOUND_MEDIA_SOURCES = new Set<InboundMediaSource>(ALLOWLISTED_INBOUND_MEDIA_SOURCES);
 const INBOUND_MEDIA_CLASSES = new Set<InboundMediaClass>(['screenshot', 'raster', 'generated']);
 
-/**
- * Build the host seam. The callback receives only an opaque capability handle;
- * transport writers are intentionally never used by this boundary.
- */
+/** Callback receives only an opaque handle; transport writers stay outside this boundary. */
 // ───────────────────────────────────────────────────────────────────
 // 3. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────

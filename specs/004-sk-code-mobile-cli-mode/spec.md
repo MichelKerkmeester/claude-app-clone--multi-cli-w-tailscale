@@ -32,7 +32,7 @@ _memory:
 ## 1. METADATA
 
 - **Phase:** `app-mobile-cli/004-sk-code-mobile-cli-mode`
-- **Kind:** phase parent, plan-only; one work-leaf `001-mode-design-plan`.
+- **Kind:** phase parent, plan-only; work-leaves `001-mode-design-plan` and `002-scripts-ownership`.
 - **Independence:** authorable any time; it encodes the conventions Phase 1 defines and Phase 2 proves.
 
 ## 2. PROBLEM & PURPOSE
@@ -67,6 +67,7 @@ surface-detection marker, verification commands).
 | Leaf | Purpose |
 |------|---------|
 | [`001-mode-design-plan`](001-mode-design-plan/) | Plan the `sk-code-mobile-cli` surface packet against the real hub contract; author no skill files |
+| [`002-scripts-ownership`](002-scripts-ownership/) | Decide where the app's `scripts/` tooling lives: the app keeps it, the surface skill references it. Analysis only, no code change. |
 
 ## 5. OPEN QUESTIONS
 

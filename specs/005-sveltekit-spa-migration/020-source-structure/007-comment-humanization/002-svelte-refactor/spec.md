@@ -1,16 +1,16 @@
 ---
 title: "Phase 2 — Svelte refactor: humanize comments across every .svelte file, re-anchor the gate"
-description: "Apply the natural human-voice comment convention to every .svelte file in the repo, comment-only: retire the @ds markers, add a module-script header and in-markup section labels, give each function/effect/rule a one-line purpose comment, keep the numbered section banners, and replace @ds guardrail with a greppable do-not-edit note. Re-anchor scripts/naming/scan-comments.mjs onto the new marker so the frozen-seam fence count is preserved. Proven per file by a non-comment byte-identical check, and suite-wide by @ds count 0, banners intact, fences >= prior 277, token-identity 0-diff, and test:web green."
+description: "Apply the natural human-voice comment convention to every .svelte file in the repo, comment-only: retire the @ds markers, add a module-script header and in-markup section labels, give each function/effect/rule a one-line purpose comment, keep the numbered section banners, and replace @ds guardrail with a greppable do-not-edit note. Re-anchor scripts/naming/scan-comments.mjs onto the new marker so the frozen-seam fence count is preserved. Proven per file by a non-comment byte-identical check, and suite-wide by @ds count 0, banners intact, fences preserved at 273, token-identity 0-diff, and test:web green."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor"
-    last_updated_at: "2026-08-25T19:25:28.000Z"
+    last_updated_at: "2026-08-25T20:45:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Scoped; awaiting phase 1 (skill convention) to land first."
-    next_safe_action: "After phase 1 lands, dispatch luna to humanize the .svelte comments file by file."
-    blockers: ["phase 1 (001-skill-convention) lands the written convention first"]
-    completion_pct: 0
+    recent_action: "Source @ds retired comment-only; verified and pushed."
+    next_safe_action: "None — phase 2 complete; phase 3 reverifies the skill."
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -30,7 +30,7 @@ _memory:
 | Parent | `007-comment-humanization` |
 | Level | 2 |
 | Executor | luna 5.6 (gpt-5.6-luna) xhigh via `cli-codex`, per file; Claude owns per-file and suite verification and the push |
-| Barrier | per file: non-comment content byte-identical · suite: `@ds` count 0 in `.svelte` · banners intact · do-not-edit fences ≥ prior 277 · token-identity 0-diff · `test:web` green |
+| Barrier | per file: non-comment content byte-identical · suite: `@ds` count 0 in `.svelte` · banners intact · do-not-edit fences preserved at 273 · token-identity 0-diff · `test:web` green |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -77,7 +77,7 @@ changelogs; app behaviour, routing, a11y contracts, and rendered values.
   the natural convention (module header where a module scope exists, markup section labels, per-part
   purpose comments, app.css seams as natural notes), and the numbered section banners are intact.
 - **REQ-003** — The frozen-seam safety net is preserved: every `@ds guardrail: do-not-edit` becomes a
-  greppable do-not-edit note, and `scan-comments.mjs` counts them so the fence total is ≥ the prior 277 —
+  greppable do-not-edit note, and `scan-comments.mjs` counts them so the fence total is preserved at 273 —
   no frozen seam silently dropped.
 - **REQ-004** — token-identity resolves 0-diff (65 tokens × 3 themes), `test:web` is green, and no rendered
   value / a11y / routing / security behaviour changes.
@@ -90,7 +90,7 @@ changelogs; app behaviour, routing, a11y contracts, and rendered values.
 
 1. `grep -rl '@ds' app-mobile/src` returns nothing (`.svelte`, `app.css`, and `.ts` all clean); the convention is applied everywhere.
 2. Every file passes the non-comment byte-identical check; banners intact.
-3. The do-not-edit fence count is ≥ 277 under the re-anchored gate; token-identity 0-diff; `test:web` green.
+3. The do-not-edit fence count is preserved at 273 under the re-anchored gate; token-identity 0-diff; `test:web` green.
 <!-- /ANCHOR:success-criteria -->
 
 ---

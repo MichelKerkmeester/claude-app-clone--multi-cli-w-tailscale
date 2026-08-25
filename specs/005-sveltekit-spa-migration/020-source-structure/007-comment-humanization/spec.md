@@ -5,12 +5,12 @@ contextType: "planning"
 _memory:
   continuity:
     packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/007-comment-humanization"
-    last_updated_at: "2026-08-25T19:25:28.000Z"
+    last_updated_at: "2026-08-25T20:45:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Phase parent scoped; three nested phases created; screen-chat.svelte piloted."
-    next_safe_action: "Run 001-skill-convention: teach the natural comment convention in the surface skill."
+    recent_action: "Phases 1 (skill) and 2 (source) shipped; @ds retired everywhere."
+    next_safe_action: "Run 003-skill-reverify: reconcile the skill with the shipped source."
     blockers: []
-    completion_pct: 0
+    completion_pct: 67
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

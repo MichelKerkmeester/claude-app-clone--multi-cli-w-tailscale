@@ -26,9 +26,13 @@
       "per-part"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -76,15 +80,23 @@
     ],
     "causal_summary": "Apply the natural comment convention to every .svelte file, comment-only: retire @ds, add module headers and markup labels and per-part comments, keep banners; re-anchor scan-comments onto the do-not-edit marker so the frozen-seam fence count is preserved.",
     "created_at": "2026-08-25T19:25:28.000Z",
-    "last_save_at": "2026-08-25T19:25:28.000Z",
+    "last_save_at": "2026-08-25T20:45:00.000Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:dac13e1958d562878df098a47956ce174406778250310e8395e3ea49ffb29c25",
+    "source_fingerprint": "sha256:9f1bb3345dd09099e4fd024c8109dab387c14c0ba3d09b2f2aef98c439f940af",
     "source_doc_hashes": {
-      "spec.md": "1e8c531eb4ee969af594d66fe59bdfc965c33733bd6137d778b215576f0ad0a1"
+      "spec.md": "593cbdcada219af1cb103bf11f5036cb84ed782d3141374605d7edc75fff1e01",
+      "plan.md": "8f2f445b4dfdad29148bdb4e60a378e65191e04a182b245e972671dc36098613",
+      "tasks.md": "c6917192c22f53eb7a391b010621d7d662832cfe2af8eb6864fc759e5134d5df",
+      "checklist.md": "7ee05cf4d7ff7cfe6a1f63e874c60933049efecc791dad95bd26edcd45397c68",
+      "implementation-summary.md": "566b4a5bfbddfecf3288e584034c476041788788d6aeaf2480a56b6b74683a6b"
     },
     "last_active_child_id": null,
     "last_active_at": null

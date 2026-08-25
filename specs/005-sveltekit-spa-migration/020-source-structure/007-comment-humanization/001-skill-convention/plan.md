@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention"
-    last_updated_at: "2026-08-25T19:25:28.000Z"
+    last_updated_at: "2026-08-25T20:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Scoped; the skill's @ds footprint mapped for retirement."
     next_safe_action: "Rewrite comment-grammar.md and retire ds-grammar.md; land via Public worktree."

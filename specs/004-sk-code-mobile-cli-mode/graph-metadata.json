@@ -5,7 +5,8 @@
   "parent_id": null,
   "children_ids": [
     "app-mobile-cli/004-sk-code-mobile-cli-mode/001-mode-design-plan",
-    "004-sk-code-mobile-cli-mode/001-mode-design-plan"
+    "004-sk-code-mobile-cli-mode/001-mode-design-plan",
+    "004-sk-code-mobile-cli-mode/002-scripts-ownership"
   ],
   "manual": {
     "depends_on": [],
@@ -14,7 +15,7 @@
   },
   "derived": {
     "trigger_phrases": [
-      "phase 4 — dedicated sk-code mode for mobile-cli app work"
+      "phase 4 \u2014 dedicated sk-code mode for mobile-cli app work"
     ],
     "key_topics": [
       "phase",
@@ -81,15 +82,15 @@
     ],
     "causal_summary": "Code work on `apps/pi-remote-web/` detects a generic frontend surface and does not auto-load this",
     "created_at": "2026-08-17T05:11:33.008Z",
-    "last_save_at": "2026-08-24T17:58:13.340Z",
+    "last_save_at": "2026-08-25T19:45:00.000Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:a7b320685e6420e141d17914c9b637d6d77df695e177dbccfae815c1cf5b39bd",
+    "source_fingerprint": "sha256:70bbc32dcb759a0b9e7aa4fe83f6460fb8752fa759a868cfece881325c5d0874",
     "source_doc_hashes": {
-      "spec.md": "1ae440141c8a158472ca18c909ed04c3804864d23790550bae4c527046e68fa9"
+      "spec.md": "4ad2033063c2e8e173af5881e8b98ff3241058b0d816f49a9995d4014729b77b"
     },
     "last_active_child_id": "004-sk-code-mobile-cli-mode/001-mode-design-plan",
     "last_active_at": null

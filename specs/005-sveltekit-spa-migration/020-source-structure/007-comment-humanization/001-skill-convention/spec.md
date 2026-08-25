@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention"
-    last_updated_at: "2026-08-25T19:25:28.000Z"
+    last_updated_at: "2026-08-25T20:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Scoped; ready to update the skill's comment references off @ds."
-    next_safe_action: "Rewrite the skill's @ds comment references to the natural convention; land via Public worktree."
+    recent_action: "Skill @ds retired via luna; verified and landed as v1.7.0.0."
+    next_safe_action: "None — phase 1 complete; phase 2 applies the convention to source."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

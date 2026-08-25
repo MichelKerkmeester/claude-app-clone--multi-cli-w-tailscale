@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor",
+  "spec_folder": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor",
+  "parent_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "apply",
+      "natural",
+      "comment",
+      "convention",
+      "svelte",
+      "file",
+      "comment-only",
+      "module",
+      "headers",
+      "markup",
+      "labels",
+      "per-part"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Apply the natural comment convention to every .svelte file, comment-only: retire @ds, add module headers and markup labels and per-part comments, keep banners; re-anchor scan-comments onto the do-not-edit marker so the frozen-seam fence count is preserved.",
+    "created_at": "2026-08-25T19:25:28.000Z",
+    "last_save_at": "2026-08-25T19:25:28.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:c1e194c8d80977ebdbfdec82aeee25ac46aa16b5ae39c6835cfa3e9e2fe841f0",
+    "source_doc_hashes": {
+      "spec.md": "a3a882f0a286857da716a7b85c0c8dc380910f663a05032262c5ce4a66fac07a"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

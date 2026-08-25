@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify",
+  "spec_folder": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify",
+  "parent_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "after",
+      "refactor",
+      "re-read",
+      "surface",
+      "skill",
+      "against",
+      "shipped",
+      "svelte",
+      "reality",
+      "edge",
+      "cases",
+      "phase"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. CROSS-REFERENCES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "After the refactor, re-read the surface skill against the shipped .svelte reality and the edge cases phase 2 surfaced; fix any drift between what the skill teaches and what the code does; bump the version if it changes.",
+    "created_at": "2026-08-25T19:25:28.000Z",
+    "last_save_at": "2026-08-25T19:25:28.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:3c1508e5027a0049e0f47b8313300bfcbc26547ec7b76b10e424b6d330b80d63",
+    "source_doc_hashes": {
+      "spec.md": "4b9c6acaf7cf63add20623a6f30fa315a7e2e3f47447efb01d6b160f8ddc0a10"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

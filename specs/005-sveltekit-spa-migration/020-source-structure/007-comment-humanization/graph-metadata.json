@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization",
+  "spec_folder": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization",
+  "parent_id": "005-sveltekit-spa-migration/020-source-structure",
+  "children_ids": [
+    "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention",
+    "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor",
+    "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "phase",
+      "parent",
+      "marker",
+      "grammar",
+      "natural",
+      "human-voice",
+      "comments",
+      "svelte",
+      "file",
+      "numbered",
+      "section",
+      "banners"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "goal.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "goal.md",
+        "kind": "doc",
+        "path": "goal.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. PHASE DOCUMENTATION MAP",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. INVARIANTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. CROSS-REFERENCES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase parent: retire the @ds marker grammar for natural human-voice comments across every .svelte file, keep the numbered section banners, teach the convention in the surface skill first, then refactor, then re-verify.",
+    "created_at": "2026-08-25T19:25:28.000Z",
+    "last_save_at": "2026-08-25T19:25:28.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "goal.md"
+    ],
+    "source_fingerprint": "sha256:9a11daa50813e8cf0ab6ab094229be724cda218ed76f2bed772303a59ffc4cd2",
+    "source_doc_hashes": {
+      "spec.md": "8289cbc4979896ca05f28596b908a6fd36b5b2fed6fd5aeb17222a397c3f90fd",
+      "goal.md": "3c3355b5e2347c8d87230f5b7c804fa28085fee5bcb3e1ca95469703af8ae584"
+    },
+    "last_active_child_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention",
+    "last_active_at": "2026-08-25T19:25:28.000Z"
+  }
+}

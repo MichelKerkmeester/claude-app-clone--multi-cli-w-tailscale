@@ -1,0 +1,28 @@
+{
+  "level": "2",
+  "specFolder": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor",
+  "description": "Apply the natural comment convention to every .svelte file, comment-only: retire @ds, add module headers and markup labels and per-part comments, keep banners; ",
+  "keywords": [
+    "apply",
+    "natural",
+    "comment",
+    "convention",
+    "svelte",
+    "file",
+    "comment-only",
+    "module",
+    "headers",
+    "markup",
+    "labels"
+  ],
+  "lastUpdated": "2026-08-25T19:25:28.000Z",
+  "specId": "002",
+  "folderSlug": "svelte-refactor",
+  "parentChain": [
+    "005-sveltekit-spa-migration",
+    "020-source-structure",
+    "007-comment-humanization"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

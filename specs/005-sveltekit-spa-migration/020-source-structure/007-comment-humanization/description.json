@@ -1,0 +1,27 @@
+{
+  "level": "3",
+  "specFolder": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization",
+  "description": "Phase parent: retire the @ds marker grammar for natural human-voice comments across every .svelte file, keep the numbered section banners, teach the convention ",
+  "keywords": [
+    "phase",
+    "parent",
+    "marker",
+    "grammar",
+    "natural",
+    "human-voice",
+    "comments",
+    "svelte",
+    "file",
+    "numbered",
+    "section"
+  ],
+  "lastUpdated": "2026-08-25T19:25:28.000Z",
+  "specId": "007",
+  "folderSlug": "comment-humanization",
+  "parentChain": [
+    "005-sveltekit-spa-migration",
+    "020-source-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

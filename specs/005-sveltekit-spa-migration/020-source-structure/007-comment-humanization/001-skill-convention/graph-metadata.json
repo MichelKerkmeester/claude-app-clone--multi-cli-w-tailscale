@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention",
+  "spec_folder": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention",
+  "parent_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "update",
+      "sk-code-mobile-cli",
+      "surface",
+      "skill",
+      "grammar",
+      "teach",
+      "natural",
+      "comment",
+      "convention",
+      "module",
+      "header",
+      "kept"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Update the sk-code-mobile-cli surface skill: retire the @ds grammar and teach the natural comment convention (module header, kept banners, per-function purpose lines, markup labels, greppable do-not-edit note); land via the Public worktree flow.",
+    "created_at": "2026-08-25T19:25:28.000Z",
+    "last_save_at": "2026-08-25T19:25:28.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:feb3641dc843b22a9d16d9734ede84c9a92ad5bf0fc31abffe7b16f121987704",
+    "source_doc_hashes": {
+      "spec.md": "254d751f8087ef9ae41f4c4b26bd2b48399a9943bec68264472559a52e41bb92",
+      "plan.md": "2b3de6d832d5ec7c3e3fecfd2fe57dbb18339c8f5521ef5639595b0358cea4e6",
+      "tasks.md": "0f4342c35457d373fe2850ad6d7e285834a20ac2e7432936274de8b27c247d6b",
+      "checklist.md": "d5282a8ba8417e5ceb24012a172234d5574ab7b9c67185ffc1d60e540afe306b"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

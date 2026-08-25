@@ -5,10 +5,10 @@ contextType: "planning"
 _memory:
   continuity:
     packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure"
-    last_updated_at: "2026-08-25T04:09:45.764Z"
+    last_updated_at: "2026-08-25T19:25:28.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Phase parent scoped; three children created."
-    next_safe_action: "Run 001-css-ownership: move the 82 single-owner classes into their components."
+    recent_action: "Added child 007-comment-humanization; seven children now mapped."
+    next_safe_action: "Run 007-comment-humanization phase 1: update the surface skill off @ds."
     blockers: []
     completion_pct: 0
 ---
@@ -30,7 +30,7 @@ _memory:
 |---|---|
 | Parent | `005-sveltekit-spa-migration` |
 | Mode | Phase parent |
-| Children | `001-css-ownership`, `002-comment-structure`, `003-css-files`, `004-styles-into-svelte`, `005-comment-brevity` |
+| Children | `001-css-ownership`, `002-comment-structure`, `003-css-files`, `004-styles-into-svelte`, `005-comment-brevity`, `006-bem-css`, `007-comment-humanization` |
 | Status | In Progress |
 <!-- /ANCHOR:metadata -->
 
@@ -67,6 +67,8 @@ reference scan and a loading dispatch — and mixing them would blur which gate 
 | C | `003-css-files` | Extract each component's `<style>` into a co-located `.css` file it imports, browsable per component; the sk-code skill doc landed separately as a merged Public PR. |
 | D | `004-styles-into-svelte` | Fold the component CSS back into scoped `<style>` — one file per component again; `app.css` stays the global layer. |
 | E | `005-comment-brevity` | Trim over-long inline comment descriptions across the app-mobile source to a concise durable-WHY style, keeping banners and fences. Comment-only, proven by an AST-and-region check and token identity 0-diff. |
+| F | `006-bem-css` | Rename the app-mobile CSS classes to a dash-delimited `block--element` BEM form (402 of 499); the `is-*` state family stays single-dash. A pure relabel, proven by zero-orphan, token identity, a before/after screenshot diff, and test:web. |
+| G | `007-comment-humanization` | Retire the `@ds` marker grammar for natural human-voice comments across every `.svelte` file — banners kept, the frozen-seam net preserved as a greppable do-not-edit note — taught in the surface skill first, then refactored, then re-verified. Phase parent (three nested phases). |
 <!-- /ANCHOR:phases -->
 
 ---

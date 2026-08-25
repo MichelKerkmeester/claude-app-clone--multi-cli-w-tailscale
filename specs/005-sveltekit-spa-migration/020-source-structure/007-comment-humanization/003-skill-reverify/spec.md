@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify"
-    last_updated_at: "2026-08-25T19:25:28.000Z"
+    last_updated_at: "2026-08-25T21:00:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Scoped; runs after phase 2 refactor completes."
-    next_safe_action: "After phase 2, diff the skill's claims against the shipped .svelte convention."
-    blockers: ["phase 2 (002-svelte-refactor) ships the source first"]
-    completion_pct: 0
+    recent_action: "Skill reconciled; last @ds-named file renamed (v1.7.1.0)."
+    next_safe_action: "None — phase 3 and the packet are complete."
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -81,8 +81,27 @@ what phase 2 shipped; app behaviour.
 
 ---
 
+<!-- ANCHOR:risks -->
+## 6. RISKS & DEPENDENCIES
+
+- **The skill drifts from the source over time.** Source added after this phase could reintroduce a marker
+  the skill no longer teaches. Mitigation: the `scan-comments` fence gate and the reference-integrity scan
+  catch a reintroduced marker on the next run.
+- **Dependency:** the landed phase-1 skill and the shipped phase-2 source, read together.
+<!-- /ANCHOR:risks -->
+
+---
+
+<!-- ANCHOR:questions -->
+## 7. OPEN QUESTIONS
+
+None. The skill and the source agree; the only residue — a stale filename — was renamed.
+<!-- /ANCHOR:questions -->
+
+---
+
 <!-- ANCHOR:cross-refs -->
-## 6. CROSS-REFERENCES
+## 8. CROSS-REFERENCES
 
 - `../spec.md` — the phase parent.
 - `../001-skill-convention/` — the convention this phase reconciles against reality.

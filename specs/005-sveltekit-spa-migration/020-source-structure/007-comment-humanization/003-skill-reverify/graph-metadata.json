@@ -26,9 +26,12 @@
       "phase"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -76,15 +79,21 @@
     ],
     "causal_summary": "After the refactor, re-read the surface skill against the shipped .svelte reality and the edge cases phase 2 surfaced; fix any drift between what the skill teaches and what the code does; bump the version if it changes.",
     "created_at": "2026-08-25T19:25:28.000Z",
-    "last_save_at": "2026-08-25T19:25:28.000Z",
+    "last_save_at": "2026-08-25T21:00:00.000Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b32e9403ac76c4398ada31ee54135a4a0a0ee603e878d924814300a56b2a35ed",
+    "source_fingerprint": "sha256:61e956daeeaae26183a55c88172304c9f5f6552cc6e31af11c41ef78de20478b",
     "source_doc_hashes": {
-      "spec.md": "4b9c6acaf7cf63add20623a6f30fa315a7e2e3f47447efb01d6b160f8ddc0a10"
+      "spec.md": "4c3f38a368ff503ecd364ff4e9f171ca2c4ea8ba266c8812438624e768e64f63",
+      "plan.md": "b2a1741153f8f523fa6ee562cc705eb06333f8bd2a780c8631ebaa66a107b1aa",
+      "tasks.md": "bbded539886a16cebafa4e136a993b80f376f3f0ff44bad4bec7519a2ed66472",
+      "implementation-summary.md": "d72ae593d3d8e8e0d63cd55a04e64801e380d2af1fc5bb6510259c21da2c6d77"
     },
     "last_active_child_id": null,
     "last_active_at": null

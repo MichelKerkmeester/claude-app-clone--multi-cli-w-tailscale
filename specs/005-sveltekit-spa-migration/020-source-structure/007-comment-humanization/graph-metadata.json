@@ -30,7 +30,7 @@
       "banners"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "goal.md"
@@ -79,21 +79,21 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Phase parent: retire the @ds marker grammar for natural human-voice comments across every .svelte file, keep the numbered section banners, teach the convention in the surface skill first, then refactor, then re-verify.",
+    "causal_summary": "Phase parent for replacing the @ds inline-comment grammar with natural, concise, human-voice comments across every .svelte file: keep the numbered section banners, add a module-script header and in-markup section labels, and give each function and effect a plain purpose line. Teach the convention in the surface skill first, refactor the whole client second, then re-verify the skill against the shipped reality. Comment-only: proven by a per-file non-comment-identical check, token identity at 0 diffs, and test:web.",
     "created_at": "2026-08-25T19:25:28.000Z",
-    "last_save_at": "2026-08-25T20:45:00.000Z",
+    "last_save_at": "2026-08-25T21:00:00.000Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "goal.md"
     ],
-    "source_fingerprint": "sha256:3e93a4bf8e462de9c2d25d7b664a5f4b27be51f8030175b9cfebf90997611f40",
+    "source_fingerprint": "sha256:eed06bfe12f00e79218c3a98e5df1b12344dfa4b839e69a413fb3d8725eb461c",
     "source_doc_hashes": {
-      "spec.md": "eae53d22b0f2f0cb3fdaf92030f651a130bca6855356bf157bce18625632f7f5",
+      "spec.md": "8812fb5404e386a809169ef8c8d3f15bef914491e3fa66c185ff6079fa2992ef",
       "goal.md": "dca310bb300af90cd247ae933d8807a25dc7bedf5675287e4a2ebadd5dfea6c8"
     },
-    "last_active_child_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor",
-    "last_active_at": "2026-08-25T20:45:00.000Z"
+    "last_active_child_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify",
+    "last_active_at": "2026-08-25T21:00:00.000Z"
   }
 }

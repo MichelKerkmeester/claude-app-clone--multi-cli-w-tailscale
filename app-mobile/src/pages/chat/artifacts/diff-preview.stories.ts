@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import DiffPreview from './diff-preview.svelte';
 import { DEMO_DIFF_FIXTURE } from '$shared/fixtures/demo.js';
 
-// Reuse the frozen unified diff so each story exercises real line classes.
-// Find and wrap modifiers remain tied to real patch content.
+// Frozen unified diff — real line classes, find, and wrap modifiers.
 const FIND_TERM = 'expiresAt';
 
 const meta: Meta<typeof DiffPreview> = {

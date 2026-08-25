@@ -16,7 +16,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Feed the announcer real reducer snapshots so its live-region vocabulary stays host-confirmed.
+// Reducer snapshots for host-confirmed live-region copy.
 const IDLE_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -58,7 +58,7 @@ export const Build: Story = {
 export const Plan: Story = {
   args: {
     ...Build.args,
-    // Derive the plan story from the host-shaped snapshot so no mode copy is invented.
+    // Host snapshot with mode plan.
     runtime: hydratedRuntime({ ...IDLE_STATE, mode: 'plan' }),
   },
 };
@@ -87,7 +87,7 @@ export const Offline: Story = {
 export const Checking: Story = {
   args: {
     ...Build.args,
-    // The real initial state before the first host snapshot commits.
+    // Pre-hydration initial state.
     runtime: INITIAL_RUNTIME_STATE,
   },
 };

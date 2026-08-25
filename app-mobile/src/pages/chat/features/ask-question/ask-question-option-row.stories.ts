@@ -7,7 +7,7 @@ import type { AskQuestionOption } from '@pi-remote/pi-rpc-protocol';
 
 import AskQuestionOptionRow from './ask-question-option-row.svelte';
 
-// Reuse one demo option so each row state exercises the real option shape.
+// One demo option exercises every row state.
 const DEMO_ASK_QUESTION_OPTION: AskQuestionOption = {
   id: 'demo-option-tests',
   label: 'Run the focused tests',

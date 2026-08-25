@@ -5,10 +5,7 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  // Attention deep-link resolver — renders no view of its own. It shows the
-  // inbox overlay while it resolves the hint (gated on auth so a cold load waits
-  // for enrollment), then redirects to the Review overlay or the target session
-  // and replaces this URL. Mirrors React's attention useEffect.
+  // Resolves attention hints after auth, then redirects (Review overlay or session).
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
@@ -21,7 +18,6 @@
   // 2. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // The [lookupId] route only matches with the param present.
   const lookupId = $derived($page.params.lookupId!);
 
   // ───────────────────────────────────────────────────────────────────

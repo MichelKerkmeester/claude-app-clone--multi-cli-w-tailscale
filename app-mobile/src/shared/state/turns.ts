@@ -32,11 +32,7 @@ export interface Turn<T extends BlockLike = TranscriptBlock> {
 // ───────────────────────────────────────────────────────────────────
 
 /**
- * Group an ordered, already-normalized block list into conversational turns without
- * Mutating, renumbering, reprojecting, or dropping any block. A turn opens at each user
- * Text block and gathers the following assistant text and typed evidence until the next
- * User block. Leading or orphan evidence forms a synthetic prompt-less turn. Keys derive
- * From constituent ids so a streaming revision replacement keeps the same turn.
+ * Group blocks into turns without mutating order; keys follow first block id through streaming revisions.
  */
 export function groupBlocksIntoTurns<T extends BlockLike>(
   blocks: readonly T[],

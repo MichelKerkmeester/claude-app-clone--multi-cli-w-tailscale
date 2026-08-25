@@ -16,8 +16,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Build stories from the reducer and demo snapshot so plan-mode presentation stays host-confirmed.
-// Callbacks remain inert because the stories exercise focus and labels, not mutations.
+// Reducer + demo snapshot fixtures; callbacks noop (labels/focus only).
 const IDLE_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -60,7 +59,7 @@ export const Build: Story = {
 export const Plan: Story = {
   args: {
     ...Build.args,
-    // Derive the plan story from the host-shaped snapshot so no mode copy is invented.
+    // Host snapshot with mode plan.
     runtime: hydratedRuntime({ ...IDLE_STATE, mode: 'plan' }),
   },
 };
@@ -75,7 +74,7 @@ export const ExecutingPlan: Story = {
 export const Checking: Story = {
   args: {
     ...Build.args,
-    // The real initial state before the first host snapshot commits.
+    // Pre-hydration initial state.
     runtime: INITIAL_RUNTIME_STATE,
   },
 };

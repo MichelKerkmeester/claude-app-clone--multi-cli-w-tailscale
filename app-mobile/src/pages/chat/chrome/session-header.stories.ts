@@ -17,7 +17,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Reuse the reducer and demo snapshot so header labels reflect host-confirmed runtime state.
+// Reducer + demo snapshot fixtures.
 const DEMO_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -79,7 +79,7 @@ export const Build: Story = {
 export const Plan: Story = {
   args: {
     ...Build.args,
-    // Derive the plan story from the host-shaped snapshot so no mode copy is invented.
+    // Host snapshot with mode plan.
     runtimeControls: makeRuntimeControls(
       hydratedRuntime({ ...DEMO_STATE, mode: 'plan' }),
     ),

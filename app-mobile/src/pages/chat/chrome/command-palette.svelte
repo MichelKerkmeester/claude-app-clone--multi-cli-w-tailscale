@@ -2,12 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: Slash Command Palette (typed / commands)
   // ───────────────────────────────────────────────────────────────────
-  // Discoverable slash-command insertion over the shared session-scoped
-  // Catalog. Filtering is local and deterministic (rankHostCommands); the
-  // Palette renders whatever snapshot the session lifecycle committed, and
-  // Selecting a row inserts the canonical `/${name} ` draft with a revision
-  // Binding — it NEVER submits, and only relay-filtered (non-privileged)
-  // Commands are ever offered.
+  // Session-scoped slash insertion via rankHostCommands; selection drafts only, never submits.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
@@ -58,8 +53,7 @@
   // 6. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // Filtering is deterministic and owned by the frozen ranker; the palette renders
-  // Exactly the ranked snapshot. Bits must not apply its own input filtering.
+  // Ranker owns filtering; Bits must not apply its own input filtering.
   // @ds guardrail: ranker — Deterministic host-command ranking.
   const ranked = $derived.by(() => rankHostCommands(catalog.commands, query));
 
@@ -70,8 +64,7 @@
   $effect(() => {
     if (contentEl === null) return;
     const targets: Element[] = [contentEl];
-    // The combobox input is the active anchor for the open listbox and remains
-    // In the accessibility tree while its portalled content is visible.
+    // Keep the combobox input in the a11y tree while portalled content is open.
     if (inputEl !== null) targets.push(inputEl);
     return hideOutside(targets);
   });
@@ -96,9 +89,7 @@
   function onSelectedChange(name: string): void {
     selected = '';
     if (name.length === 0) return;
-    // Bindings only exist inside the current scoped snapshot; anything
-    // Else fails closed without touching the draft. This selection path
-    // Only ever requests an insertion draft — it never submits.
+    // Binding must match the scoped snapshot; selection drafts only, never submits.
     // @ds guardrail: fail-closed — Selection is a local insertion draft only.
     const binding = bindingFor(catalog.snapshot, name);
     if (binding === null) return;
@@ -106,8 +97,7 @@
   }
 </script>
 
-<!-- The render only restyles; the ranking-awarded collection, bindings, and the
-     fail-closed selection path below are frozen. -->
+<!-- Ranking, bindings, and the fail-closed selection path are frozen. -->
 <!-- @ds surface: slash-autocomplete -->
 <!-- @ds guardrail: React-aria wiring — ComboBox select/focus lifecycle and aria/role map to Bits Combobox. -->
 <Combobox.Root

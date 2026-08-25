@@ -173,8 +173,7 @@
     readonly startedAt: number;
   } | null = null;
   let snapTimerRef: number | null = null;
-  // The last announced effort-pending level; guards the one polite status
-  // Region so a settled outcome is announced exactly once per transition.
+  // Guards effort status announcements to one polite region per transition.
   let prevEffortPending: string | null = null;
 
   // ───────────────────────────────────────────────────────────────────
@@ -183,8 +182,7 @@
 
   const runtime = $derived(runtimeControls.runtime);
 
-  // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
-  // Copy is restored to the host value after every change (non-optimistic).
+  // Bits Dialog writes locally; mirror host open after every change.
   const hostOpen = $derived(isOpen);
   const deferredQuery = $derived(query);
 
@@ -308,8 +306,7 @@
     });
   });
 
-  // Virtual focus keeps the active search option visible without moving DOM focus
-  // Away from the input, which preserves the mobile keyboard interaction.
+  // Scroll active search option into view without stealing focus from the input.
   $effect(() => {
     const activeKey = activeSearchOptionKey;
     if (!isOpen || section !== 'model' || !showSearch || activeKey === null) return;

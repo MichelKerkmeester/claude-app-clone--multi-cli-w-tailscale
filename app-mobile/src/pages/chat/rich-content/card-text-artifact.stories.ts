@@ -12,7 +12,6 @@ import {
   type NormalizedTextArtifactBlock,
 } from './normalize-transcript-blocks.js';
 
-// Reuse normalized demo fixtures so both text-artifact labels stay grounded in real content.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

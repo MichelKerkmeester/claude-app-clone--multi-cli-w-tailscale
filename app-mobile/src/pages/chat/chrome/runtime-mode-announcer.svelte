@@ -76,8 +76,7 @@
   // @ds guardrail: do-not-edit — The announce-once settle-key effect and ALERT_KINDS routing keep these inert text regions from moving focus. Not designer-editable.
   let polite = $state('');
   let alert = $state('');
-  // The last announced settle key; the first settle is recorded without an
-  // Announcement so only actual transitions are spoken.
+  // Skip announcing the first settle; only transitions are spoken.
   let announcedKey: string | null = null;
   let primed = false;
 

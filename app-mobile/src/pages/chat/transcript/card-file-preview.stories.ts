@@ -4,8 +4,6 @@ import FilePreviewCard from './card-file-preview.svelte';
 import ArtifactViewerProvider from '../artifacts/artifact-viewer-provider.svelte';
 import { DEMO_ARTIFACT_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Reuse frozen artifact fixtures so availability stories exercise real preview provenance.
-// Context wiring remains visible without invented blocks.
 const SESSION_ID = 'demo-session-triage';
 
 const meta = {

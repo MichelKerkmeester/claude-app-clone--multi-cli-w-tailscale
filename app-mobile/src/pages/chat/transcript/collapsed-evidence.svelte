@@ -29,8 +29,7 @@
 
   const disclosure = createTranscriptDisclosureBinding(() => blockId);
 
-  // The wrapper does not forward trigger class/aria, and Bits does not emit react-aria's data-expanded/data-hovered.
-  // The button therefore sets both attributes explicitly from its state.
+  // Bits does not emit data-expanded/data-hovered; set both on the trigger explicitly.
   let triggerButton = $state<HTMLButtonElement | null>(null);
 
   // ───────────────────────────────────────────────────────────────────
@@ -62,8 +61,7 @@
   }
 </script>
 
-<!-- The trigger names what it reveals (e.g. "Tool call · grep") instead of a generic "Show",
-     so routine evidence reads as a quiet, truthful disclosure beside the assistant's prose. -->
+<!-- Self-describing trigger (e.g. "Tool call · grep"), not a generic "Show". -->
 <!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. -->
 <Collapsible bind:open={disclosure.open}>
   {#snippet trigger()}
@@ -79,7 +77,7 @@
      :global so Svelte scoping cannot drop them. evidence-chevron/evidence-summary are shared with
      NormalizedActivityGroup and stay global here. Values unchanged. -->
 <style>
-  /* Routine evidence: a quiet, self-describing disclosure that sits calmly beside prose. */
+  /* Quiet self-describing disclosure beside prose. */
   /* @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. */
   :global(.evidence-trigger) {
     display: inline-flex;

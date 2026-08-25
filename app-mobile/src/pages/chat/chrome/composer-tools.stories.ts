@@ -23,8 +23,7 @@ import type {
 } from '$shared/commands/commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Reuse runtime and command fixtures so the tools stories exercise real authority and catalog states.
-// The remaining handlers stay inert because the stories cover presentation, not mutations.
+// Runtime + catalog fixtures; handlers noop (presentation only).
 const DEMO_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -106,7 +105,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// The popover opens through its real user interaction, so the catalog story keeps that contract intact.
+// Popover opens via real interaction.
 export const Default: Story = { args: { ...baseArgs } };
 
 export const MediaAvailable: Story = {

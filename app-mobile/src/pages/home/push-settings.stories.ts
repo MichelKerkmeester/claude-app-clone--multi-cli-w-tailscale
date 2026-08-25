@@ -5,7 +5,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import PushSettings from './push-settings.svelte';
 
-// Leave the story prop-free so it exercises the component's own graceful relay-error path.
 const meta = {
   title: 'Home/PushSettings',
   component: PushSettings,

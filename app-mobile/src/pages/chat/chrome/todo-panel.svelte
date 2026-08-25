@@ -15,11 +15,7 @@
     readonly needsRefresh?: boolean;
     readonly announcement?: string;
     readonly onRefresh?: () => void;
-    /**
-     * Called after the panel has rendered an announcement so the parent can
-     * Clear the announcement slot on the next render pass. The reducer keeps
-     * The source-of-truth; the panel owns only the visual lifecycle.
-     */
+    /** Parent clears the announcement slot after render; reducer stays authoritative. */
     readonly onAnnouncementConsumed?: () => void;
     /** Optional locale used for the relative timestamp. Defaults to the platform. */
     readonly locale?: string | string[];
@@ -103,9 +99,7 @@
     lastPlanId = planId;
   });
 
-  // The live region speaks only the redacted title and the localized state. The
-  // Region is removed from the DOM between announcements so screen readers do
-  // Not re-announce stale text and the polite queue is never backlogged.
+  // Remove the live region between announcements so SR does not replay stale text.
   let lastSeen = '';
   let primed = false;
 
@@ -131,8 +125,7 @@
     if (typeof act === 'object' && act !== null) act.destroy?.();
   }
 
-  // Collapsible.Trigger is the slot=trigger button; the wrapper does not forward
-  // Trigger class/aria, and Bits does not emit data-hovered/pressed/focus-visible.
+  // Bits Collapsible.Trigger lacks forwarded class/aria and interaction data attrs.
   function attachSectionTrigger(label: string) {
     return (node: HTMLElement) => {
       const button = node.parentElement;

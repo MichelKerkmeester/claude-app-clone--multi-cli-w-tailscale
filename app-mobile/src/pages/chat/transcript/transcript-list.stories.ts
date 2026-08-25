@@ -4,8 +4,6 @@ import TranscriptList from './transcript-list.svelte';
 import { parseDisplayBlock, type DisplayTranscriptBlock, type TranscriptProvenance } from '$shared/state/state.js';
 import { DEMO_RICH_CONTENT_BLOCKS, DEMO_RICH_RELEASE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Reuse frozen rich-content fixtures through the real parser so virtualized stories exercise genuine blocks.
-// Live-edge behavior stays explicit, as does the empty state.
 const BLOCKS: readonly DisplayTranscriptBlock[] = [
   ...DEMO_RICH_CONTENT_BLOCKS,
   ...DEMO_RICH_RELEASE_BLOCKS,

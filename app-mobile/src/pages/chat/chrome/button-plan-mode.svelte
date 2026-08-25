@@ -63,8 +63,7 @@
   const presentation = $derived(planModePresentation(runtime, connection));
   const authority = $derived(modeAuthority(runtime));
 
-  // Host-confirmed open only; Bits Menu writes the next open flag, so a local
-  // Copy is restored to the host value after every change (non-optimistic).
+  // Bits Menu writes open locally; mirror host value after every change (non-optimistic).
   const hostOpen = $derived(isOpen);
 
   // ───────────────────────────────────────────────────────────────────
@@ -93,8 +92,7 @@
   function attachTrigger(node: Element): () => void {
     const el = node as HTMLButtonElement;
     buttonRef = el;
-    // The ARIA keyboard-shortcuts hint is attached on the host button so it
-    // Survives re-renders (react-aria filtered the attribute out of its prop list).
+    // aria-keyshortcuts on the host button; react-aria drops it from its prop list.
     el.setAttribute('aria-keyshortcuts', 'Shift+Tab Meta+Shift+M');
     const hoverAction = hover(el);
     const pressAction = press(el);

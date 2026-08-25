@@ -7,7 +7,6 @@ import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 import Freshness from './freshness.svelte';
 
-// Reuse the demo roster timestamp so the stories vary only the staleness decision.
 const DEMO_SESSIONS = demoPostJson('/api/sessions', {}) as {
   sessions: readonly SessionCardDto[];
 };

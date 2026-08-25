@@ -43,8 +43,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   $effect(() => {
-    // Svelte tracks only synchronous reads. The async `.then()` below performs the real reads.
-    // This effect reads every dependency synchronously and matches the original rerun set.
+    // Void-sync reads keep Svelte tracking this async effect's rerun dependencies.
     void pdfDocument;
     void pageNumber;
     void scale;

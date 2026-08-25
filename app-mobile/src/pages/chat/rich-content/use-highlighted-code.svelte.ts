@@ -54,7 +54,7 @@ export interface HighlightToken {
 }
 
 export interface UseHighlightedCodeOptions {
-  /** The canonical redacted text. This value is the only source sent to the worker. */
+  /** Canonical redacted text — the only source sent to the worker. */
   readonly source: string;
   readonly language?: string | null;
   readonly theme?: HighlightTheme;
@@ -275,11 +275,7 @@ function initialState(
 // 7. RUNES HOOK FACTORY
 // ───────────────────────────────────────────────────────────────────
 
-/**
- * Svelte 5 runes port of the React hook. Call it once during component init and pass a getter thunk that reads
- * The reactive inputs; the returned `current` getter exposes the reactive HighlightState. The $effect re-runs
- * Whenever the tracked inputs change and its cleanup terminates the worker (matching the React useEffect).
- */
+/** Runes hook: pass a getter for reactive inputs; cleanup terminates the worker on change. */
 export function useHighlightedCode(
   getOptions: () => UseHighlightedCodeOptions,
 ): { readonly current: HighlightState } {

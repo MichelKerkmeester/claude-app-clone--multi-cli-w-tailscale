@@ -7,9 +7,7 @@ import type { ConnectionPhase } from '../state/state.js';
 import type { ThemePreference } from '../format/view-helpers.js';
 import Header from './header.svelte';
 
-// The topbar uses real StatusPill and ThemeControl children; connection and theme are real state values,
-// Handlers are no-op arrows. The stories vary only `reviewAvailable`, which gates the Inbox / Review
-// Nav buttons.
+// Stories vary only `reviewAvailable`; handlers are no-ops.
 const noop = (): void => {};
 const onThemeChange = (_theme: ThemePreference): void => {};
 

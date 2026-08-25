@@ -16,10 +16,7 @@
 //   Catalog  — this read-only preview surface (the one net-new surface).
 //   Theme    — the light / dark semantic remap a surface reads via tokens.
 //
-// A surface is `live` when the catalog renders the real component over the
-// Demo fixtures; everything else is `registry-only` with the reason it cannot
-// Preview safely here (needs a live host, a socket/relay/provider, or is a
-// Documented CSS convention with no shared component).
+// `live` surfaces render real components; `registry-only` records why preview is unsafe here.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. TYPE DEFINITIONS

@@ -60,8 +60,7 @@
   // 5. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // Host-confirmed selection only; Bits UI single-type allows emptying, so a local
-  // Copy is restored to hostMode after every change (non-optimistic, no empty).
+  // Bits ToggleGroup can empty; mirror host mode after every change.
   let modeValue = $state('');
 
   // ───────────────────────────────────────────────────────────────────

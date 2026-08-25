@@ -12,8 +12,6 @@ import {
   type TranscriptProvenance,
 } from '$shared/state/state.js';
 
-// Reuse frozen fixtures through the real parser and normalizer so each story exercises a genuine normalized kind.
-// The fallback preserves the reducer's unknown-kind conversion.
 const DISPLAY_BLOCKS: readonly DisplayTranscriptBlock[] = [
   ...DEMO_RICH_CONTENT_BLOCKS,
   ...DEMO_RICH_RELEASE_BLOCKS,

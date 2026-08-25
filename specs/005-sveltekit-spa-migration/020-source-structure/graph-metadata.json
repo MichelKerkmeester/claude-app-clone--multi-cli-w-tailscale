@@ -7,7 +7,8 @@
     "005-sveltekit-spa-migration/020-source-structure/001-css-ownership",
     "005-sveltekit-spa-migration/020-source-structure/002-comment-structure",
     "005-sveltekit-spa-migration/020-source-structure/003-css-files",
-    "005-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte"
+    "005-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte",
+    "005-sveltekit-spa-migration/020-source-structure/005-comment-brevity"
   ],
   "manual": {
     "depends_on": [],
@@ -81,15 +82,15 @@
     ],
     "causal_summary": "Phase parent for finishing the migration's one-file-per-component intent: move single-owner CSS into its component's scoped style, standardise the section-comment vocabulary, and teach both in the surface skill.",
     "created_at": "2026-08-24T06:38:17.258Z",
-    "last_save_at": "2026-08-24T18:36:00.001Z",
+    "last_save_at": "2026-08-25T04:09:45.764Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:d16329066f268cf7ade933f7d4ea793405bc690e2e8208e03b524024c02abaa5",
+    "source_fingerprint": "sha256:d120fe87b62045d8c192c4e1c2e535e156f16cc09caef61bd44e4d59907cb11f",
     "source_doc_hashes": {
-      "spec.md": "fb48240f2dd2b08de1f4868e52ad5608e8acc3c45b74bdce69229d27b229ced8"
+      "spec.md": "a4e755888fef060a1f5c54864b48f6059d8390eaea62f60f33bc0a88fa16e90c"
     },
     "last_active_child_id": "005-sveltekit-spa-migration/020-source-structure/001-css-ownership",
     "last_active_at": null

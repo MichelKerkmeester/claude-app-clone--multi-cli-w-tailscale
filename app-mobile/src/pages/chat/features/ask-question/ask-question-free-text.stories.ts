@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import AskQuestionFreeText from './ask-question-free-text.svelte';
 import type { AskQuestionViewModel } from './ask-question-types.js';
 
-// Reuse the demo display so free-text stories exercise the real required and optional shapes.
+// Demo display fixtures for free-text stories.
 const DEMO_ASK_QUESTION_VIEW: AskQuestionViewModel = {
   type: 'session.ask-question.display',
   sessionId: 'demo-session-refactor',
@@ -40,7 +40,7 @@ const DEMO_ASK_QUESTION_VIEW: AskQuestionViewModel = {
   requiresReadOnlyHint: true,
 };
 
-// Keep the required story aligned with the card's required-free-text derivation.
+// Matches the card's required-free-text derivation.
 const REQUIRED_FREE_TEXT_VIEW: AskQuestionViewModel = {
   ...DEMO_ASK_QUESTION_VIEW,
   display: {

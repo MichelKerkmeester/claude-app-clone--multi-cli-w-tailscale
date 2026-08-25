@@ -1,11 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Bounded Effort Catalog
 // ───────────────────────────────────────────────────────────────────
-// The single source for visible and accessible effort copy. Seven known
-// IDs carry exact local labels and descriptions; anything else renders
-// As a bounded ordinal derived from its position in the host-advertised
-// List, so raw host IDs can never reach copy. The host's advertised
-// Order and subset are always preserved by callers, never re-sorted here.
+// Bounded effort copy: known IDs get exact labels; unknowns become ordinals, never raw host IDs.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. KNOWN EFFORT IDS
@@ -87,22 +83,18 @@ export const effortStrings = {
 // 4. LEVEL LOOKUP AND FORMATTERS
 // ───────────────────────────────────────────────────────────────────
 
-/** Catalog lookup only; null for IDs this client does not know. */
+/** Known ID lookup; null when the client has no local label. */
 export function effortLevelInfo(level: string): EffortLevelInfo | null {
   return EFFORT_CATALOG[level] ?? null;
 }
 
-/** One-based position of a level within the host-advertised list, or null. */
+/** One-based index in the host-advertised list, or null. */
 export function effortOrdinal(level: string, advertised: readonly string[]): number | null {
   const index = advertised.indexOf(level);
   return index === -1 ? null : index + 1;
 }
 
-/**
- * Visible name for one advertised level: the exact local label for known
- * IDs, or a bounded ordinal built from its position in the advertised
- * List. A raw host ID can never pass through this formatter.
- */
+/** Row label: exact for known IDs, else bounded ordinal — never a raw host ID. */
 export function effortRowName(level: string, advertised: readonly string[]): string {
   const known = EFFORT_CATALOG[level];
   if (known !== undefined) return known.label;
@@ -110,20 +102,12 @@ export function effortRowName(level: string, advertised: readonly string[]): str
   return ordinal === null ? effortStrings.unknownLevel : `${effortStrings.unknownLevel} ${ordinal}`;
 }
 
-/**
- * Bounded description for one advertised level. Known IDs use the exact
- * Local description; unknown IDs get one generic local line and never
- * Echo host text.
- */
+/** Row description: exact for known IDs; generic local line for unknowns. */
 export function effortRowDescription(level: string): string {
   return EFFORT_CATALOG[level]?.description ?? effortStrings.unknownDescription;
 }
 
-/**
- * Compact readout for a confirmed value: the exact local label, a bounded
- * Ordinal for unknown-but-advertised IDs, or an em dash when there is no
- * Confirmed value (or it is absent from the advertised list).
- */
+/** Compact confirmed readout: known label, bounded ordinal, or em dash. */
 export function effortTriggerText(
   level: string | null | undefined,
   advertised: readonly string[],

@@ -41,8 +41,7 @@
 
   // @ds surface: transcript-block — one message block; each kind is its own state seam below.
   // @ds guardrail: the kind switch, collapsibility, role and header decisions are presentation logic that must stay in lockstep with the block model; not designer-editable.
-  // Routine evidence collapses to a recoverable disclosure; high-signal blocks
-  // (text, plan, diffs, and tool errors) stay expanded and prominent.
+  // Routine evidence collapses; text, plan, diffs, and tool errors stay expanded.
   const blockDisplay = $derived.by(() => {
     switch (block.kind) {
       // @ds state: text — user bubble vs assistant serif prose via the role class.
@@ -89,9 +88,7 @@
   });
 
   const roleClass = $derived(block.kind === 'text' ? ` block-role-${block.role ?? 'assistant'}` : '');
-  // Text turns imply role by placement and typography, while collapsible evidence owns its labelled trigger.
-  // The label/timestamp header is reserved for promoted standalone blocks.
-  // When `bare`, the block sits inside an Activity disclosure, so it shows its label directly.
+  // Text uses role/typography; evidence uses its trigger; bare blocks show label inline; others get header.
   const showHeader = $derived(
     block.kind !== 'file_diff' &&
       block.kind !== 'file_preview' &&

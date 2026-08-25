@@ -60,9 +60,7 @@
   // 4. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // Host-confirmed selection only; Bits RadioGroup writes the clicked value, so a
-  // Local copy is restored to the host-confirmed level after every change
-  // (non-optimistic, never an empty selection flash while a request is in flight).
+  // Bits RadioGroup writes locally; mirror host level (non-optimistic, no empty flash).
   const hostValue = $derived(confirmed ?? '');
 
   // ───────────────────────────────────────────────────────────────────

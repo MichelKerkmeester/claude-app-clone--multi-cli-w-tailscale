@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import MarkdownPreview from './markdown-preview.svelte';
 import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Reuse the frozen inline-text fixture so the bounded renderer exercises real content.
-// Empty, whitespace, and find states remain explicit input boundaries.
+// Frozen inline-text fixture — bounded renderer with empty, whitespace, and find boundaries.
 const MARKDOWN_BLOCK = DEMO_TEXT_CODE_SHARE_BLOCKS.find(
   (block) => block.mimeType === 'text/markdown',
 );

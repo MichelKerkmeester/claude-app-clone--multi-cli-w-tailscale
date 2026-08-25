@@ -72,20 +72,16 @@
   // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // Popover open state; bind:open keeps the local copy in sync while onOpenChange
-  // Reports every transition to the host (non-optimistic, host-confirmed).
+  // Bits Popover open is mirrored locally; host hears every transition.
   let open = $state(false);
   let contentEl = $state<HTMLElement | null>(null);
   let toolsDialogEl = $state<HTMLElement | null>(null);
 
-  // Hand-rolled FileTrigger parity: a hidden input per action, clicked by its
-  // Paired button; the input delivers the selection then resets value='' so a
-  // Repeated pick of the same file still fires onchange.
+  // Hidden file inputs reset value='' so repeat picks of the same file still fire onchange.
   let photoLibraryInput = $state<HTMLInputElement | null>(null);
   let takePhotoInput = $state<HTMLInputElement | null>(null);
 
-  // Data-focus-visible on the .tools-checkbox label mirrors react-aria's focus
-  // Ring, bridged from the visually-hidden input that actually holds focus.
+  // Bridge focus-visible from the hidden checkbox input to its label.
   let checkboxFocusVisible = $state(false);
 
   // ───────────────────────────────────────────────────────────────────

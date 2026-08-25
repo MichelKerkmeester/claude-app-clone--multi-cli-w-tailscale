@@ -7,7 +7,7 @@ import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 
 import PlanReadyCard from './card-plan-ready.svelte';
 
-// Keep the card's ready state grounded in the DTO shape and a real demo timestamp.
+// Demo DTO shape + timestamp fixtures.
 const DEMO_PLAN_ARTIFACT = {
   planId: 'plan_demo_todos',
   planRevision: 1,
@@ -34,7 +34,7 @@ type Story = StoryObj<typeof meta>;
 export const Ready: Story = {
   args: {
     artifact: DEMO_PLAN_ARTIFACT,
-    // The card must stay tied to a live host snapshot, never a cached value.
+    // Requires a live host snapshot, not cache.
     isLive: true,
     isNewest: true,
     canReview: true,
@@ -45,7 +45,7 @@ export const Ready: Story = {
 export const WaitingForLiveConfirmation: Story = {
   args: {
     ...Ready.args,
-    // Without a live binding, the CTA fails closed and explains why review is unavailable.
+    // No binding: CTA fails closed.
     canReview: false,
   },
 };

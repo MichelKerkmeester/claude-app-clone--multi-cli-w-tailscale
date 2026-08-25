@@ -1,6 +1,4 @@
-// Shared artifact-viewer types keep the Provider, Host, and Status chain acyclic in the Svelte port.
-// Type-only imports erased the React back-edge, but per-file Svelte modules keep that boundary fragile.
-// Keeping the types here changes no runtime behaviour or rendered output.
+// Shared types keep the Provider/Host/Status chain acyclic across Svelte modules.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS

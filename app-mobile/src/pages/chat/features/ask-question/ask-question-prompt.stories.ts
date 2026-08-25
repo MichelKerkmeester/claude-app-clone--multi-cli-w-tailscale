@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import AskQuestionPrompt from './ask-question-prompt.svelte';
 import type { AskQuestionViewModel } from './ask-question-types.js';
 
-// Re-host the demo ask-question display values (verbatim from the frozen
-// DEMO_ASK_QUESTION_DISPLAY in $shared/data/demo.ts) — nothing is invented.
+// Verbatim demo display values from $shared/data/demo.ts.
 const DEMO_ASK_QUESTION_VIEW: AskQuestionViewModel = {
   type: 'session.ask-question.display',
   sessionId: 'demo-session-refactor',

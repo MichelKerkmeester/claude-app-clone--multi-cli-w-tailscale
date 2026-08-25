@@ -8,7 +8,6 @@ import type { SessionListState, ConnectionPhase } from '$shared/state/state.js';
 import { demoPostJson, DEMO_IDENTITY } from '$shared/fixtures/demo.js';
 import Home from './screen-home.svelte';
 
-// Reuse the demo roster shape so each Home story exercises a real session-list state.
 const DEMO_SESSIONS = demoPostJson('/api/sessions', {}) as {
   sessions: readonly SessionCardDto[];
 };

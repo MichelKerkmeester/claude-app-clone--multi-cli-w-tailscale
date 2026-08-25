@@ -16,8 +16,7 @@ import type {
 import { rankHostCommands, type RankedHostCommand } from '$shared/commands/rank-host-commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Derive every panel story from the real ranker and state machine so rows and copy stay authoritative.
-// A null anchor isolates the surface without inventing a composer tray.
+// Real ranker + state machine fixtures; null anchor isolates the surface.
 const DEMO_COMMANDS = (
   demoPostJson('/api/commands/list', {}) as {
     commands: readonly CommandDescriptorDto[];

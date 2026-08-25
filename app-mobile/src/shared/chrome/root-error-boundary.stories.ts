@@ -7,9 +7,7 @@ import { createRawSnippet } from 'svelte';
 
 import RootErrorBoundary from './root-error-boundary.svelte';
 
-// RootErrorBoundary wraps the app shell in an <svelte:boundary>; build the children
-// Snippet with `createRawSnippet` so no wrapper .svelte file is needed.
-// This story covers the normal pass-through state: children render untouched and no error is thrown.
+// `createRawSnippet` avoids a wrapper .svelte for the pass-through story.
 const children = createRawSnippet(() => ({
   render: () => '<p style="padding:2rem">The app shell renders here.</p>',
 }));

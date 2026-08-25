@@ -182,7 +182,7 @@
     ],
     "causal_summary": "Reverse the co-located .css extraction: each component's rules move back into its .svelte scoped <style> block, so a component is one file again — markup, its own Svelte-scoped CSS, and logic. app.css stays the global layer. Proven value-identical by the token-identity gate.",
     "created_at": "2026-08-24T18:32:22.667Z",
-    "last_save_at": "2026-08-24T18:38:55.772Z",
+    "last_save_at": "2026-08-25T04:09:46.083Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:ab9679bbaefe592824ea39f8867e404cd427ab25a046d74e7bfd3b68f24cd119",
+    "source_fingerprint": "sha256:bda4af26c4fb60677c80de0a2093f31771486fd8efb0aa5a4a25c733422d55b0",
     "source_doc_hashes": {
-      "spec.md": "c40a1057470272592e3cacd88a583a2c211765401fe300832ba7c99c13699281",
-      "plan.md": "1334e5d0e1fd510b4663150e47865b44a926a6fd1bf60786d3edbfe095f4b5f3",
-      "tasks.md": "dd713361012a42eaa65616ad29032a73f80d0bed6aec99509bece73365edc8d9",
-      "checklist.md": "fdbe421b919e6e8b023dd3c3286fec60531f2ed9de406d9e9da5f391fc351692",
-      "implementation-summary.md": "626a29ba6639c831a0565a0ef6c789d12304cc3b282753159ad69681339a6e77"
+      "spec.md": "7f415fa791ff697bb597566288846845289f1c7050b53e10870063ad53fb9cfb",
+      "plan.md": "90e61e31dfaafe4cee3bc4f110d7c0b92c27577d514b72a8168c68593e14113f",
+      "tasks.md": "3569339186fbcfb9f8b63ce289aa2aa00aef6a71c43d9ac8e53c56ce71ec988e",
+      "checklist.md": "bc28471b972a26c1ec6b5d9e0c44bd0e510e4238761b2a167a983ed0a0c7b14b",
+      "implementation-summary.md": "474ca5e4919c038200bbacd734baf6e6a3f50ce0f0b55a4ac29949536e12843e"
     },
     "last_active_child_id": null,
     "last_active_at": null

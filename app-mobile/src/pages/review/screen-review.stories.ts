@@ -7,7 +7,6 @@ import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 import Review from './screen-review.svelte';
 
-// Reuse the demo session roster so focus stories exercise the real approval lookup and empty state.
 const DEMO_SESSIONS = demoPostJson('/api/sessions', {}) as {
   sessions: readonly SessionCardDto[];
 };

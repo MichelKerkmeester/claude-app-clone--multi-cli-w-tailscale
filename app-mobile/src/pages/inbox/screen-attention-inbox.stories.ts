@@ -5,7 +5,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import AttentionInbox from './screen-attention-inbox.svelte';
 
-// Leave fetching and callbacks internal so the story exercises the real empty-state fallback.
 const noop = (): void => {};
 
 const meta = {

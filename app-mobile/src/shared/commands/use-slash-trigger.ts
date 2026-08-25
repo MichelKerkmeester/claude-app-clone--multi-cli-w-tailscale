@@ -1,11 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Leading-Slash Trigger Predicate (pure)
 // ───────────────────────────────────────────────────────────────────
-// Derives whether the composer draft is in a slash-command token. The
-// Predicate is a pure function of draft, caret, selection, focus, IME
-// Composition, and the Escape dismissal latch; it performs no transport,
-// Filtering, or state mutation, so the inline surface can re-evaluate it
-// After every committed input without side effects.
+// Pure slash-token predicate from draft, caret, focus, IME, and Escape dismissal latch.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. TYPE DEFINITIONS
@@ -19,8 +15,7 @@ export interface SlashTriggerInput {
   /** True while an IME composition is active; parsing is frozen then. */
   readonly isComposing: boolean;
   /**
-   * The exact draft/caret signature dismissed with Escape, or null. Any
-   * Change to the draft or caret reopens the panel.
+   * Draft/caret signature dismissed with Escape; any change reopens the panel.
    */
   readonly dismissedSignature: string | null;
 }
@@ -51,7 +46,7 @@ export function deriveSlashTrigger(input: SlashTriggerInput): SlashTriggerState 
   if (!isFocused || isComposing || draft.length === 0 || draft.charAt(0) !== '/') {
     return INACTIVE;
   }
-  // The panel only follows a collapsed caret inside the first token.
+  // Panel follows a collapsed caret inside the first token only.
   if (selectionStart !== selectionEnd) return INACTIVE;
   const caret = selectionStart;
   if (caret < 0) return INACTIVE;

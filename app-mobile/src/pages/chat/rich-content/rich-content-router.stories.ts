@@ -14,7 +14,6 @@ import {
   type NormalizedTranscriptBlock,
 } from './normalize-transcript-blocks.js';
 
-// Reuse normalized demo fixtures so every router story exercises a real transcript state.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [
@@ -48,7 +47,6 @@ const meta = {
   title: 'Rich Content/RichContentRouter',
   component: RichContentRouter,
   tags: ['autodocs'],
-  // Provide the viewer context so open actions use the same handoff as the live surface.
   decorators: [() => ({ Component: ArtifactViewerProvider })],
 } satisfies Meta<typeof RichContentRouter>;
 

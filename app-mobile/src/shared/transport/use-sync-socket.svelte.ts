@@ -1,17 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Read-Only Sync Socket Lifecycle (Svelte runes)
 // ───────────────────────────────────────────────────────────────────
-// Runes port of the React Session view's big sync-socket `useEffect`
-// (App.tsx 1142-1283). The three persistent refs (cursor / frame /
-// `pendingMessages`) become factory-scope plain closure `let` trackers.
-// They are imperative and must never trigger reactivity, exactly like
-// `useRuntime` control handles. The effect registers exactly the four
-// The truly-reactive deps from React's dep array (sessionId, cache,
-// The cacheResumeGeneration and todoRefreshGeneration values are read at the
-// Top of the effect body. Dispatch fns and runtimeControls are plain
-// Non-reactive inputs. Numeric literals, navigator.onLine guards, event
-// Names, reducer action types, and the `as ConnectionAction` cast remain
-// Verbatim; all effects flow through the dispatch* reducers.
+// Runes port of the session sync-socket effect; imperative trackers stay off `$state`.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -120,17 +110,13 @@ export function useSyncSocket(deps: {
     invalidatePlan?: (validity: 'superseded' | 'invalid') => void;
   };
 }): void {
-  // Imperative trackers — plain closure `let`, never `$state`: they must
-  // Not trigger reactivity. React `xRef.current` → bare `x`.
+  // Imperative trackers — never `$state` (React ref.current → bare closure `let`).
   let cursor: SyncCursor | null = null;
   let frame: number | null = null;
   let pendingMessages: Array<{ readonly message: SyncMessage; readonly at: string }> = [];
 
   $effect(() => {
-    // Register the four truly-reactive deps (React dep array: cache,
-    // CacheResumeGeneration, sessionId, todoRefreshGeneration). The two
-    // Generation getters are touch-only — their values are unused, same
-    // As React re-running on a state bump.
+    // Four reactive deps; generation getters are touch-only like React's dep bump.
     const sessionId = deps.getSessionId();
     const cache = deps.getCache();
     deps.getCacheResumeGeneration();
@@ -139,9 +125,7 @@ export function useSyncSocket(deps: {
     const { dispatchConnection, dispatchTranscript, dispatchTodoProjection, runtimeControls } =
       deps;
 
-    // Dispatch* reduce their $state (read + write). The header comment intends only the four deps
-    // Above to be reactive, but tracking these sync dispatch calls leaks transcript/todo state in
-    // As deps, so the effect re-runs on its own writes → effect_update_depth_exceeded. Untrack them.
+    // untrack dispatch* to avoid effect_update_depth_exceeded on own writes.
     untrack(() => {
       dispatchTranscript({ type: 'select', sessionId });
       dispatchTodoProjection({ type: 'select', sessionId });
@@ -286,7 +270,7 @@ export function useSyncSocket(deps: {
           noteRelayHeartbeat();
           openedSocket.addEventListener('close', (event) => {
             if (stopped) return;
-            // 4003 means the relay revoked authorization; retrying cannot restore it, so stop and surface re-enrollment.
+            // 4003: authorization revoked — stop and surface re-enrollment.
             if (event.code === 4003) {
               stopForRevocation();
               return;
@@ -294,7 +278,7 @@ export function useSyncSocket(deps: {
             if (openedSocket !== socket) return;
             socket = null;
             clearSessionRefreshTimer();
-            // 4001 means the relay's session timer expired; reconnect now because backoff only delays the inevitable refresh.
+            // 4001: session timer expired — reconnect now, not after backoff.
             if (event.code === 4001) {
               connect('expired');
               return;
@@ -338,9 +322,7 @@ export function useSyncSocket(deps: {
           }, Math.min(1_000 * 2 ** retryCount, 15_000));
         });
     };
-    // Connect() synchronously dispatchConnection({connecting}) — untrack so the effect does not
-    // Take `connection` as a dep and re-fire on the status it just wrote (async retries via
-    // SetTimeout already runs outside tracking).
+    // untrack initial connect so `connection` is not an effect dep.
     untrack(() => connect('initial'));
 
     // ───────────────────────────────────────────────────────────────────

@@ -1,11 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Canonical Slash Command Insertion (pure)
 // ───────────────────────────────────────────────────────────────────
-// The one text mutation shared by every discovery surface: replace the
-// Complete token range with the canonical `/${name} ` and record the
-// Revision binding. The draft update is synchronous and controlled; caret
-// Placement, focus restoration, and the "Not sent" announcement follow the
-// Returned offsets. The function performs no network work.
+// Shared slash insertion: replace token range, record binding; no network work.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -58,11 +54,7 @@ export function insertSlashCommand(input: InsertSlashCommandInput): InsertSlashC
 // 4. BINDING RETENTION
 // ───────────────────────────────────────────────────────────────────
 
-/**
- * Retain a binding only while the command-name token is untouched. Editing
- * The token itself clears the binding; edits anywhere after the trailing
- * Boundary (arguments) retain it.
- */
+/** Retain binding while the command token is untouched; edits after the boundary keep it. */
 export function bindingAfterDraftChange(input: {
   readonly previousDraft: string;
   readonly nextDraft: string;

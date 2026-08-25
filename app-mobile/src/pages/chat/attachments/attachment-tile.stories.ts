@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import AttachmentTile from './attachment-tile.svelte';
 import type { AttachmentDraftItem } from './attachment-state.js';
 
-// Cover each tile status without a provider so preview, validation, and rejection states stay isolated.
-// The 1x1 image is UI scaffolding, not application data.
+// Each tile status in isolation — 1x1 image is UI scaffolding, not app data.
 const TRANSPARENT_PIXEL =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 

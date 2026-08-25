@@ -203,9 +203,7 @@
     margin-top: var(--space-4);
   }
 
-  /* .enrollment-actions button, .scan-button base — split: the button
-     child-primitive part stays global (see header comment); the scan-button own-element part
-     moves here scoped. */
+  /* Scan button scoped here; shared button primitive rules stay global. */
   .scan-button {
     display: inline-flex;
     min-height: 2.9rem;

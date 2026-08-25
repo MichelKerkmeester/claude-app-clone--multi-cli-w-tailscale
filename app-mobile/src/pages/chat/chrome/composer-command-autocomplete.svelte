@@ -2,15 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: Inline Slash Command Autocomplete Surface
   // ───────────────────────────────────────────────────────────────────
-  // The nonmodal completion card above the composer. The textarea remains the
-  // Only editing field and keeps DOM focus; rows carry virtual focus through
-  // Aria-activedescendant and are never in the tab order. The panel derives
-  // One explicit state from the trigger predicate and the session-scoped
-  // Catalog lifecycle, renders only that state's presentation, and every
-  // Open state is fail-closed: rows are insertable only when the catalog
-  // Authority is usable, and no panel interaction ever submits, tickets, or
-  // Touches the host execution path. The panel is an overlay, so opening and
-  // Closing displace nothing.
+  // Nonmodal slash card: textarea keeps DOM focus; virtual rows; fail-closed insert-only overlay.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
@@ -112,12 +104,6 @@
    *  Can ever enable submission; insertion is the only action, and it exists only in
    *  Row-bearing states with usable authority. Restyle only the presentation it selects.
    *  @ds guardrail: state-machine — Catalog/lifecycle explicit-state derivation. */
-  /**
-   * The one state machine for the inline surface. Every catalog/lifecycle
-   * Combination maps to exactly one explicit state with fail-closed actions:
-   * No state here can ever enable submission — insertion is the only action,
-   * And it exists only in row-bearing states with usable authority.
-   */
   export function deriveSlashPanelState(input: SlashPanelDerivationInput): SlashPanelDerivation {
     const { triggerActive, draftStartsWithSlash, commitPending } = input;
     if (!triggerActive) {
@@ -130,8 +116,7 @@
     switch (input.catalogStatus) {
       case 'loading':
       case 'refreshing':
-        // A committed same-scope snapshot survives a refresh; without one the
-        // Card shows the bounded skeleton state.
+        // Refresh without a snapshot shows the skeleton state.
         return input.snapshotPresent
           ? openState('refreshing.current', true, false, 'Checking for command changes…')
           : openState('loading.initial', false, false, 'Loading available commands…');
@@ -282,8 +267,7 @@
   }: ComposerCommandAutocompleteProps = $props();
 
   const viewportAnchor = useVisualViewportAnchor(() => getAnchor());
-  // The popover anchors to the composer tray; this visual-viewport input drives only
-  // The panel's max height and is frozen wiring.
+  // Visual-viewport anchor drives panel max height only.
   // @ds guardrail: anchor — Visual-viewport anchor for the popover max height.
 
   // ───────────────────────────────────────────────────────────────────
@@ -310,8 +294,7 @@
         ? 'drafted'
         : 'closed',
   );
-  // The leading-slash trigger predicate and this closed/drafted/panel-state mapping are
-  // Frozen; restyling never changes which surface state renders.
+  // Trigger predicate and surface-state mapping are frozen.
   // @ds guardrail: trigger-predicate — Leading-slash open condition and state mapping.
 
   const maxHeight = $derived.by(() => {
@@ -348,8 +331,7 @@
   // 14. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
-  // Keep the active row visible: virtual focus must follow arrows without
-  // Scrolling the page.
+  // Scroll active row into view without moving page scroll.
   // @ds guardrail: virtual-focus — Keep the active row in view on arrow nav.
   $effect(() => {
     if (!open || activeName === null) return;
@@ -363,9 +345,7 @@
     return () => cancelAnimationFrame(frame);
   });
 
-  // State transitions announce through the composer's single atomic status
-  // Region; row-bearing states announce their result count after the
-  // Debounce so typing does not interrupt the screen reader.
+  // Status-region announcements; row counts debounced so typing does not interrupt SR.
   // @ds guardrail: announcement — Atomic status-region wiring and debounce.
   $effect(() => {
     if (!open || derivation.panelState === null) return;
@@ -402,8 +382,7 @@
   });
 </script>
 
-<!-- The popover lifecycle, outside-press dismissal, and aria/role wiring are frozen;
-     this surface only restyles the presentation the state machine selects. -->
+<!-- Popover lifecycle, dismissal, and aria wiring are frozen. -->
 <!-- @ds surface: slash-autocomplete -->
 <!-- @ds guardrail: react-aria wiring — Popover lifecycle, aria/role, virtual focus. -->
 <div class="slash-surface" data-state={surfaceState}>

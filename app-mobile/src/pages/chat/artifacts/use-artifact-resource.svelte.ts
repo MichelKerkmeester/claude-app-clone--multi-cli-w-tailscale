@@ -63,13 +63,13 @@ export interface ArtifactResourceSnapshot {
   readonly etag: string | null;
   readonly contentType: string | null;
   readonly text: string | null;
-  /** Alias used by existing text-preview controls. */
+  /** Alias for text-preview controls. */
   readonly buffer: string | null;
-  /** Verified binary bytes. The request lifecycle clears this view on release. */
+  /** Verified bytes; cleared on request release. */
   readonly bytes: Uint8Array | null;
-  /** Created only after length, digest, local hash, and image decode pass. */
+  /** Object URL only after length, digest, hash, and image decode pass. */
   readonly objectUrl: string | null;
-  /** True when the verified bounded foreground retention supplied this value. */
+  /** True when bounded foreground retention supplied the value. */
   readonly offlineLoaded?: boolean;
   readonly errorCode: ArtifactReadErrorCode | null;
   readonly reload: () => void;
@@ -404,7 +404,7 @@ export function clearArtifactFullResourceStore(): void {
   clearStore('full');
 }
 
-/** Clears every memory-only artifact blob and URL owned by the viewer layer. */
+/** Clears viewer-owned memory blobs and object URLs. */
 export function clearArtifactResourceStore(): void {
   purgeArtifactResourceStore();
 }
@@ -541,8 +541,7 @@ function releaseRequestResource(request: ActiveRequest): void {
 // 9. USE ARTIFACT RESOURCE HOOK
 // ───────────────────────────────────────────────────────────────────
 
-// This Svelte runes hook preserves the React lifecycle: getter thunks stay reactive.
-// Refs become closure state, effects clean up on rerun/destroy, and retry keys reset in a keyed effect.
+// Getter thunks stay reactive; refs, effects, and retry keys mirror the ported React lifecycle.
 export function useArtifactResource(
   getSessionId: () => string | null,
   getBlock: () => ArtifactResourceBlock | null,

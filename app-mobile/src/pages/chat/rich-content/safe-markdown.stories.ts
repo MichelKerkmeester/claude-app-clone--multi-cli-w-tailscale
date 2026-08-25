@@ -12,7 +12,6 @@ import {
   type NormalizedProseBlock,
 } from './normalize-transcript-blocks.js';
 
-// Reuse normalized prose fixtures so plain and bidirectional text exercise the real canonical source.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

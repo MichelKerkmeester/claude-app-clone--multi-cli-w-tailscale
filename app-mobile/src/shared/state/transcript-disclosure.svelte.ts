@@ -4,8 +4,7 @@
 
 import { SvelteMap } from 'svelte/reactivity';
 
-// Keep disclosure state at the protocol block boundary because virtualized rows
-// are remounted as they leave and re-enter the viewport.
+// Disclosure at block id because virtualized rows remount across viewport churn.
 const openByBlockId = new SvelteMap<string, boolean>();
 
 export interface TranscriptDisclosureState {

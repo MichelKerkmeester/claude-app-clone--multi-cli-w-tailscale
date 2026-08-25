@@ -140,8 +140,7 @@
   $effect(() => {
     if (previousSession !== sessionId) {
       previousSession = sessionId;
-      // The clearStoredDraft dispatches (reduces draftState); untrack so this effect depends only on
-      // The sessionId (React's dep) and does not re-trigger on the draftState it just wrote.
+      // untrack(clearStoredDraft) — depend on sessionId only, not draftState this effect writes.
       untrack(() => clearStoredDraft());
     }
   });
@@ -149,8 +148,7 @@
   $effect(() => {
     const modelChanged = previousModelCanViewPhotos !== modelCanViewPhotos;
     previousModelCanViewPhotos = modelCanViewPhotos;
-    // React deps here were [modelCanViewPhotos, mediaAvailable]. Every dispatch() reduces
-    // The draftState (reads AND writes it), so tracking these calls makes the effect re-run on its own write and crash the Session view. Read the two real deps in tracked scope, then untrack the state mutations.
+    // untrack mutations — dispatch reduces draftState; tracking them re-runs and crashes Session view.
     const available = mediaAvailable;
     untrack(() => {
       if (!available) {

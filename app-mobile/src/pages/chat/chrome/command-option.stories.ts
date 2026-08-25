@@ -9,8 +9,7 @@ import CommandOption from './command-option.svelte';
 import { rankHostCommands, type RankedHostCommand } from '$shared/commands/rank-host-commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Use the deterministic ranker and demo command rows so each story reflects real ranking output.
-// The demo catalog has no disabled command, so the disabled-row state is intentionally omitted.
+// Demo catalog + ranker; no disabled row (catalog has none).
 const DEMO_COMMANDS = (
   demoPostJson('/api/commands/list', {}) as {
     commands: readonly CommandDescriptorDto[];
@@ -61,7 +60,7 @@ export const Inactive: Story = {
 export const Matched: Story = {
   args: {
     ...Active.args,
-    // A name-prefix query keeps the matched graphemes and row order grounded in the real ranker.
+    // Prefix query exercises real ranker match highlighting.
     command: itemByQuery(FILTERED_BY_PL, 'plan'),
     active: true,
   },

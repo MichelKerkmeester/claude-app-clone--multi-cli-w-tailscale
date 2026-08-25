@@ -7,7 +7,7 @@ import type { PlanArtifactDto } from '@pi-remote/pi-rpc-protocol';
 
 import PlanReviewSheet from './sheet-plan-review.svelte';
 
-// Keep the review sheet grounded in a valid plan DTO so the real modal content renders through its portal.
+// Valid plan DTO for real modal content.
 const DEMO_PLAN_ARTIFACT = {
   planId: 'plan_demo_todos',
   planRevision: 1,
@@ -48,7 +48,7 @@ export const Open: Story = {
 export const Executing: Story = {
   args: {
     ...baseArgs,
-    // The execute CTA must fail closed while its execution lease is in flight.
+    // Execute CTA fails closed while lease is in flight.
     isExecuting: true,
   },
 };

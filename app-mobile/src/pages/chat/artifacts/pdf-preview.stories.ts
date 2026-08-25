@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import PdfPreview from './pdf-preview.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Reuse the frozen PDF fixtures so readiness and withholding exercise guarded bytes.
-// Safety attestation stays tied to those fixtures rather than invented payloads.
+// Frozen PDF fixtures — guarded bytes and safety attestation provenance.
 const SAFE_BLOCK = DEMO_IMAGE_PDF_BLOCKS.find((block) => block.id === 'blk-pdf-safe');
 if (SAFE_BLOCK === undefined) {
   throw new Error('No safe PDF fixture found in DEMO_IMAGE_PDF_BLOCKS.');

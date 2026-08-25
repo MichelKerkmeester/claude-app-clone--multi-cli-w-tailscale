@@ -46,8 +46,7 @@ export interface TextSpan {
 
 let pdfJsPromise: Promise<PdfJsModule> | null = null;
 
-// Shared worker/canvas counts back getPdfPreviewRuntimeMetrics as a leak detector.
-// The Svelte split keeps both counters in one object so PdfPage and PdfPreview mutate the same state.
+// Shared counters let PdfPage and PdfPreview mutate one leak-detector object.
 export const pdfPreviewMetrics = { liveWorkers: 0, liveCanvases: 0 };
 
 export function getPdfPreviewRuntimeMetrics(): {

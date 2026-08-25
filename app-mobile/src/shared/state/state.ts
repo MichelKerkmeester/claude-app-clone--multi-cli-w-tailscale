@@ -49,9 +49,7 @@ export const DEFAULT_MEDIA_CAPABILITY_OFF: Pick<RuntimeMediaCapabilityDto, 'enab
 // ───────────────────────────────────────────────────────────────────
 // 3. COMPOSER KEYBOARD PREFERENCE
 // ───────────────────────────────────────────────────────────────────
-// A preference, not a mode state: it only gates whether the composer
-// Intercepts Shift+Tab. It never changes host authority and cannot enable
-// Any mutation by itself.
+// Preference gates composer Shift+Tab only; it never changes host authority.
 
 const COMPOSER_SHIFT_TAB_KEY = 'pi-remote.composer-shift-tab';
 

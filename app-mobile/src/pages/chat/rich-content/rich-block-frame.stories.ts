@@ -14,8 +14,7 @@ import {
   type NormalizedProseBlock,
 } from './normalize-transcript-blocks.js';
 
-// Reuse normalized demo fixtures so the shared frame stories exercise real command and prose content.
-// Raw snippets keep the story focused on frame chrome without adding wrapper components.
+// Normalized fixtures + raw snippets keep stories on frame chrome only.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

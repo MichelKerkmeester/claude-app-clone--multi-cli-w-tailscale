@@ -56,7 +56,7 @@
      Decomposed into this scoped block; .todo-projection-block is owned solely by this component so it moves
      with it. Values unchanged. -->
 <style>
-  /* The todo projection is a transcript annotation, not an editable task surface. */
+  /* Read-only transcript annotation — not an editable task surface. */
   /* @ds surface: todos — the read-only todo projection panel (pi's plan). */
   /* @ds guardrail: READ-ONLY projection — the phone NEVER mutates pi's task list. The grouped
      sections and per-task states come from the projection only; edit styling, never the model. */

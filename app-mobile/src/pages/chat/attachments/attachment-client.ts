@@ -290,8 +290,7 @@ export async function cancelAttachmentReservation(
       signal,
     );
   } catch {
-    // Cancellation is best effort after the local generation has been invalidated.
-    // The relay TTL and lifecycle reaper remain the authoritative cleanup path.
+    // Best-effort after invalidation; relay TTL is the authoritative cleanup.
   }
 }
 

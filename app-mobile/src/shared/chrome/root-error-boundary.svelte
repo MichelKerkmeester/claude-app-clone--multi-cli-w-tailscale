@@ -21,8 +21,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   function onerror(error: unknown): void {
-    // Surface the throwing error so the test can spy on it. The component stack
-    // Is valuable for diagnosis but does not belong in durable comments.
+    // Surface the error for test spies; omit component stacks from durable comments.
     console.error('Pi Remote failed to render.', error);
   }
 

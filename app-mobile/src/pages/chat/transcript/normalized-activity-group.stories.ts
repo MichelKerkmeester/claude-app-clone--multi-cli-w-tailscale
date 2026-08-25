@@ -8,8 +8,6 @@ import {
   type NormalizedActivityBlock,
 } from '../rich-content/normalize-transcript-blocks.js';
 
-// Reuse frozen rich-content fixtures through the real normalizer so the disclosure story exercises genuine activity grouping.
-// The grouped content therefore stays tied to actual blocks.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

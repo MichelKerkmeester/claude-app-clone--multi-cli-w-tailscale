@@ -2,9 +2,7 @@
 // MODULE: Artifact Viewer History
 // ───────────────────────────────────────────────────────────────────
 
-// The framework-agnostic controller stays separate from the Svelte wrapper.
-// The wrapper creates it once per component and disposes it through effect cleanup.
-// This preserves the React useRef/useEffect lifecycle.
+// Framework-agnostic controller; the Svelte wrapper creates once and disposes via effect cleanup.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. HISTORY KEY AND CONTROLLER TYPES

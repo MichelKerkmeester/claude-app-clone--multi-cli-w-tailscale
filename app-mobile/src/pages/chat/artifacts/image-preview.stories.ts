@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import ImagePreview from './image-preview.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Reuse the frozen image fixtures so ready and corrupt stories exercise the guarded byte path.
-// Decode failure remains tied to a real fixture rather than an invented payload.
+// Frozen image fixtures — guarded byte path and real decode-failure fixture.
 const READY_BLOCK = DEMO_IMAGE_PDF_BLOCKS.find((block) => block.id === 'blk-image-ready');
 if (READY_BLOCK === undefined) {
   throw new Error('No ready image fixture found in DEMO_IMAGE_PDF_BLOCKS.');

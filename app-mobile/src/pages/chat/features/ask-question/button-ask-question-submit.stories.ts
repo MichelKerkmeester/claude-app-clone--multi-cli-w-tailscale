@@ -15,6 +15,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Smoke story: a single-prop guarded one-use submit button.
+// Single-prop smoke story.
 export const Enabled: Story = { args: { disabled: false } };
 export const Disabled: Story = { args: { disabled: true } };

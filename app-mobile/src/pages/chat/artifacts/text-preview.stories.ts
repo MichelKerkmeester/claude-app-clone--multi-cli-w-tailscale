@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import TextPreview from './text-preview.svelte';
 import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Reuse frozen inline-text fixtures so ready and empty states exercise real content.
-// Whitespace and Markdown remain explicit input boundaries.
+// Frozen inline-text fixtures — ready, empty, whitespace, and Markdown boundaries.
 function inlineText(mimeType: 'text/plain' | 'text/markdown'): string {
   const block = DEMO_TEXT_CODE_SHARE_BLOCKS.find((candidate) => candidate.mimeType === mimeType);
   if (block === undefined || block.content.kind !== 'inline-text') {

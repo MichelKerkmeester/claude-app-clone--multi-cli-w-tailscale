@@ -1,12 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Composer-Scoped Plan Mode Keyboard Shortcuts
 // ───────────────────────────────────────────────────────────────────
-// `Shift+Tab` toggles mode only while the composer textarea is focused,
-// The CLI-style preference is on, no overlay is open, and the runtime is
-// Connected, ready, idle, and settled. Bare `Tab` and outside-composer
-// `Shift+Tab` are never touched, and `⌘⇧M` opens the mode menu without
-// Changing mode. The returned handler reports whether it consumed the
-// Key; the caller runs it before its own key handling.
+// Shift+Tab toggles mode only in focused composer when preference, overlay, and runtime gates pass.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -58,8 +53,7 @@ export function createPlanModeShortcut(
   return (event: KeyboardEvent): boolean => {
     if (event.isComposing || event.repeat || event.defaultPrevented) return false;
     if (event.altKey) return false;
-    // Composer scope: the textarea must hold real focus. This keeps the
-    // Guard self-contained no matter where the handler is attached.
+    // Composer must hold focus so the guard stays self-contained.
     if (document.activeElement !== options.getComposer()) return false;
 
     const isShiftTab = event.key === 'Tab' && event.shiftKey && !event.metaKey && !event.ctrlKey;
@@ -74,15 +68,13 @@ export function createPlanModeShortcut(
     const authority = modeAuthority(runtime);
 
     if (isMetaShiftM) {
-      // Opening the menu is read-only, so it only needs the overlay guard;
-      // A disabled control cannot be opened this way either.
+      // Menu open is read-only; overlay and delivery gates still apply.
       if (overlayOpen || runtime.status !== 'ready' || runtime.deliveryUnknown) return false;
       onOpenMenu();
       return true;
     }
 
-    // Shift+Tab: the full fail-closed guard chain. Any guard failing means
-    // The key keeps its ordinary browser reverse-tab behavior.
+    // Any failed guard leaves normal reverse-tab behavior.
     if (!enabled) return false;
     if (overlayOpen) return false;
     if (connection !== 'live') return false;
@@ -103,7 +95,7 @@ export function createPlanModeShortcut(
         onAnnounce('Plan execution is in progress.');
         return true;
       default:
-        // No host-confirmed mode: leave browser reverse-tab alone.
+        // No confirmed mode: do not intercept reverse-tab.
         return false;
     }
   };

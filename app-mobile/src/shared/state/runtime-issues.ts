@@ -1,11 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Bounded Runtime Issue Copy
 // ───────────────────────────────────────────────────────────────────
-// The browser may never render host or transport text. Every runtime
-// Failure maps to one code from the protocol allowlist, and every code
-// Maps to exactly one bounded copy plus recovery classification. Formatters accept
-// Only these codes, so raw status, bodies, server reasons, host reasons,
-// And RPC reasons can never reach visible or assistive copy.
+// Runtime failures map to allowlisted codes with bounded copy — never host or transport text.
 
 import type { RuntimeIssueCode } from '@pi-remote/pi-rpc-protocol';
 

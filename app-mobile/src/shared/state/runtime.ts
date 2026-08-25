@@ -1,13 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Non-Optimistic Runtime Control State Machine
 // ───────────────────────────────────────────────────────────────────
-// The browser enforces the synthesis lifecycle at its final mutation
-// Boundary. Three buckets stay separate: the host-confirmed snapshot
-// (`state`, which only ever changes to a value Pi confirmed), the pending
-// Intent (`pending`, shown as applying but never committed), and the
-// Bounded issue state (`issue`, redacted local copy only). The complete
-// State table lives in `phase`; `status` is the coarse projection the
-// Legacy control surfaces already understand.
+// Host-confirmed snapshot, pending intent, and issue state stay separate; `phase` is the full table, `status` is legacy projection.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -38,10 +32,7 @@ import {
 export type RuntimeStatus = 'checking' | 'ready' | 'pending' | 'stale' | 'error';
 
 // ── Plan-mode authority projection ────────────────────────────────────────────
-// The browser models mode authority as INDEPENDENT fields, never one `isPlan`
-// Flag: the host-confirmed mode, the client's pending transition intent, the
-// Delivery verdict, the structured plan phase, the host runtime revision, and
-// The turn state each come from a different source and fail closed separately.
+// Mode authority is independent fields (confirmed mode, intent, delivery, plan phase, revision, turn) — never one `isPlan` flag.
 
 /** The host-confirmed mode. Only a host snapshot can move this value. */
 export type ConfirmedMode = 'build' | 'plan' | 'executing-plan' | 'unknown';
@@ -192,8 +183,7 @@ export type RuntimeAction =
 export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): RuntimeUiState {
   switch (action.type) {
     case 'checking':
-      // A read-only hydrate begins. Confirmed state and a terminal
-      // Delivery-unknown block survives until a successful hydrate clears it.
+      // Hydrate start: terminal delivery-unknown survives until a successful hydrate clears it.
       return {
         ...current,
         status: 'checking',
@@ -214,7 +204,7 @@ export function runtimeReducer(current: RuntimeUiState, action: RuntimeAction): 
         error: runtimeIssueMessage(action.issueCode),
       };
     case 'control-start':
-      // No state mutation here — the chosen control shows pending, nothing commits.
+      // Pending UI only; nothing commits here.
       return {
         ...current,
         status: 'pending',
@@ -251,7 +241,7 @@ function hydrate(
   models: RuntimeModelCatalogDto,
   planBinding?: RuntimePlanBinding | null,
 ): RuntimeUiState {
-  // A mutation in flight keeps the machine pending; confirmed data still updates.
+  // In-flight mutation keeps phase pending; confirmed snapshot still updates.
   const plan = hydratePlan(current, state, planBinding);
   const phase =
     current.pending === null && current.executePending !== true
@@ -278,7 +268,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
   const outcome = response.outcome;
   switch (outcome.status) {
     case 'accepted':
-      // The check moves only when the accepted response supplies the new host state.
+      // Accepted only when the response carries the new host state.
       const acceptedExecution = current.executePending === true;
       return {
         ...current,
@@ -295,7 +285,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
         executionError: null,
       };
     case 'stale':
-      // The host's current authoritative state replaces our stale view; retry is user-initiated.
+      // Host snapshot replaces stale view; retry is user-initiated.
       return {
         ...current,
         status: 'stale',
@@ -348,7 +338,7 @@ function settle(current: RuntimeUiState, response: RuntimeControlResponse): Runt
       };
     }
     case 'delivery-unknown':
-      // Terminal: reconcile before any retry; never auto-repeat the mutation.
+      // Terminal: reconcile before retry; never auto-repeat the mutation.
       return {
         ...current,
         status: 'error',
@@ -651,12 +641,7 @@ export function runtimePhaseIsRepairable(phase: RuntimePhase): boolean {
   return issueCode !== null && runtimeIssueRepairable(issueCode);
 }
 
-/**
- * The one authority projection every mode surface reads. Everything is
- * Derived straight from the committed host snapshot and the pending intent;
- * No optimistic value can leak in because `state` only ever changes to a
- * Value the host confirmed.
- */
+/** Mode authority from host snapshot and pending intent only — no optimistic leakage. */
 export function modeAuthority(runtime: RuntimeUiState): ModeAuthority {
   const state = runtime.state;
   const transition: ModeTransition =
@@ -699,11 +684,7 @@ export interface RuntimeControls {
   readonly executePlan?: (selectedApproachId?: string) => Promise<RuntimeControlResponse | null>;
 }
 
-// The mutation lane fails closed outside settled ready authority. Streaming is
-// Deliberately absent: the host-gated model switch stays legal while streaming,
-// And the streaming capability check below blocks everything else. Repairability
-// Governs which recovery affordances are offered, never whether a mutation is
-// Allowed: a phase that may clear on its own has not cleared yet.
+// Mutation lane fails closed outside settled authority; repairability governs affordances, not permission.
 export const BLOCKED_MUTATION_PHASES: ReadonlySet<RuntimePhase> = new Set([
   'checking',
   'pending',
@@ -720,11 +701,7 @@ export const BLOCKED_MUTATION_PHASES: ReadonlySet<RuntimePhase> = new Set([
 export const HYDRATE_TIMEOUT_MS = 8_000;
 export const MUTATION_DEADLINE_MS = 10_000;
 
-/**
- * Bounded announcement copy for the one document-level polite atomic status
- * Region. Every branch comes from the local catalog; raw host or transport
- * Text can never reach assistive copy through this path.
- */
+/** Bounded polite status copy from the local catalog — never raw host or transport text. */
 export function runtimeAnnouncement(runtime: RuntimeUiState): string {
   switch (runtime.phase) {
     case 'checking':
@@ -766,10 +743,7 @@ export function runtimeAnnouncement(runtime: RuntimeUiState): string {
 // 8. HYDRATION AND TRANSPORT ADAPTERS
 // ───────────────────────────────────────────────────────────────────
 
-/**
- * Prefer the bounded reconcile snapshot; compose it from the two read-only
- * Endpoints when the transport does not expose the reconcile function.
- */
+/** Prefer reconcile snapshot; else compose from the two read-only endpoints. */
 interface RuntimeHydration {
   readonly snapshot: RuntimeSnapshotDto;
   readonly planBinding: RuntimePlanBinding | null;
@@ -881,8 +855,7 @@ function snapshotTransport(): ((signal: AbortSignal) => Promise<RuntimeSnapshotD
     if (typeof candidate !== 'function') return null;
     return candidate as (signal: AbortSignal) => Promise<RuntimeSnapshotDto>;
   } catch {
-    // Transports that do not expose the reconcile snapshot fall back to the
-    // Two read-only endpoints.
+    // Fall back to the two read-only endpoints when reconcile snapshot is unavailable.
     return null;
   }
 }
@@ -896,11 +869,7 @@ interface RelayIssueShape {
   readonly retryAfterMs: number | null;
 }
 
-/**
- * Only an allowlisted issue code on a thrown error may drive issue state.
- * The shape is validated rather than the class so every transport normalizes
- * Identically; retry metadata stays clamped to the bounded window.
- */
+/** Allowlisted issue codes only; retry metadata clamped to the bounded window. */
 export function runtimeIssueFrom(error: unknown): RelayIssueShape | null {
   if (typeof error !== 'object' || error === null) return null;
   const candidate = error as { readonly issueCode?: unknown; readonly retryAfterMs?: unknown };

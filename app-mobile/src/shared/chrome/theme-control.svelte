@@ -61,7 +61,7 @@
 <!-- @ds surface: theme-switcher — segmented theme selector. react-aria owns selection. -->
 <div class="theme-control" role="group" aria-label="Color theme">
   <!-- @ds guardrail: react-aria ToggleButton wiring (isSelected/onChange/aria-label) — not designer-editable. -->
-  <!-- Nest the options so the segmented control keeps its fitting width at 390px; the wrapper is presentational. -->
+  <!-- Inner wrapper keeps the segmented control fitting at 390px. -->
   <div>
     {#each themes as theme (theme)}
       <button

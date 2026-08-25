@@ -5,7 +5,6 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import EmptyState from './empty-state.svelte';
 
-// Cover the empty and error states with the component's real prop contract and no invented copy.
 const meta = {
   title: 'Views/EmptyState',
   component: EmptyState,

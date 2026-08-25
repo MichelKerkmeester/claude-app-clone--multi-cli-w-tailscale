@@ -268,7 +268,7 @@
   :global(.session-card::after) {
     position: absolute;
     top: 0;
-    /* Symmetric right:0/left:0 → logical inline span (equivalent in any locale). */
+    /* Logical inline span via inset-inline (locale-neutral). */
     inset-inline: 0;
     height: 2px;
     background: var(--accent);

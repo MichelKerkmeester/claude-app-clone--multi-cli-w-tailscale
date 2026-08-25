@@ -1,10 +1,6 @@
 <script lang="ts">
   // @ds route: +layout — app shell: owns cross-route state and the connection/auth/theme/push lifecycle.
-  // The app shell: it owns the cross-route state (via the app-state store),
-  // runs the connection/auth/theme/push lifecycle, and renders the auth gate
-  // and the Review/Inbox overlays above the routed page. Ported from React's
-  // `App` component; the selected session id now comes from the SvelteKit route
-  // rather than a hand-rolled history listener, so the router owns the URL.
+  // Cross-route state, auth/theme/push lifecycle, overlays; session id comes from the router URL.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
@@ -14,10 +10,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  // The frozen global stylesheet: foundation (@theme, @font-face, the three
-  // data-theme token blocks, resets) plus the not-yet-decomposed component
-  // rules. It shrinks toward the pure foundation as surfaces move to scoped
-  // <style> blocks.
+  // Global foundation + not-yet-decomposed rules; shrinks as surfaces move to scoped styles.
   import '../app.css';
 
   import {
@@ -52,11 +45,10 @@
   // 3. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // The selected session lives in the URL: `/session/<id>` → that id, anything
-  // else → none. This replaces React's selectedSessionId useState + popstate.
+  // `/session/<id>` selects a session; everything else clears selection.
   const selectedSessionId = $derived($page.params.id ?? null);
 
-  // The global bar yields to the quiet SessionHeader once a live session shows.
+  // Hide the global bar once a live session owns the chrome.
   const inSession = $derived(
     app.authReady && !app.reviewOpen && !app.inboxOpen && selectedSessionId !== null,
   );
@@ -69,9 +61,7 @@
     window.dispatchEvent(new Event(name));
   }
 
-  // Every session switch (navigate, back/forward, or a resolved deep-link)
-  // announces once so artifact viewers can tear down. Seeded with the mount
-  // value so it never fires on first paint.
+  // Announce session switches so artifact viewers tear down; seeded to skip first paint.
   let previousSessionId = untrack(() => selectedSessionId);
 
   // ───────────────────────────────────────────────────────────────────
@@ -142,8 +132,7 @@
 
   // ── Lifecycle effects (ported from App's useEffects) ──────────────────────
 
-  // Theme: data-theme on <html>, the theme-color meta, persistence, and a
-  // prefers-color-scheme listener that repaints theme-color while on 'system'.
+  // Theme on <html>, theme-color meta, persistence, and system-scheme listener.
   $effect(() => {
     const theme = app.theme;
     const root = document.documentElement;
@@ -173,11 +162,7 @@
     app.authAttempt;
     let stopped = false;
     if (!navigator.onLine) return;
-    // This effect must mirror React's [authAttempt] deps. dispatchConnection READS `connection`
-    // to reduce it, so tracking this call makes `connection` a dependency — and the async
-    // 'connecting' dispatch below then re-invalidates the effect, whose cleanup flips `stopped`
-    // and cancels the in-flight establishSession, so authReady never sticks. untrack keeps the
-    // only real dependency `authAttempt`.
+    // untrack dispatchConnection: tracking `connection` would cancel establishSession mid-flight.
     untrack(() => app.dispatchConnection({ type: 'authenticating' }));
     void establishSession()
       .then((identity) => {
@@ -217,10 +202,7 @@
     if (!app.authReady) return;
     const currentSessionId = selectedSessionId;
     const controller = new AbortController();
-    // Mirror React's [authReady, selectedSessionId] deps. dispatchSessions READS `sessions` to
-    // reduce it, so tracking this call makes `sessions` a dependency — and the async 'loaded'
-    // dispatch then re-invalidates the effect, which re-aborts and re-fetches in a loop, leaving
-    // the roster oscillating loading↔loaded and never settling. untrack keeps the real deps only.
+    // untrack dispatchSessions: tracking `sessions` would loop fetch abort/restart.
     untrack(() => app.dispatchSessions({ type: 'loading' }));
     void fetchSessions(controller.signal)
       .then((items) => {
@@ -250,9 +232,7 @@
     window.addEventListener('online', onOnline);
     window.addEventListener('offline', onOffline);
 
-    // Deep-link resolution: a cold load on /attention/<id> is handled by that
-    // route, but the app-lock / revoked lifecycle events still flow through here.
-    // Service worker only in production; the shell path is served by the build.
+    // /attention/<id> resolves on its route; app-lock/revoke events still land here.
     if (import.meta.env.PROD && 'serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         void navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' });

@@ -1,12 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Deterministic Host Command Ranking (pure)
 // ───────────────────────────────────────────────────────────────────
-// Local-only filtering over the relay-filtered catalog. Comparison text is
-// Normalized for case, diacritics, and Unicode without ever changing the
-// Canonical host string that is displayed or inserted. Exact tiers win over
-// Prefixes, prefixes over substrings, and host order breaks every tie.
-// Nothing here performs transport, history, or edit-distance correction: a
-// Plausible typo simply matches nothing.
+// Local catalog ranking: normalized match tiers; host order breaks ties; no transport or fuzzy correction.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -64,8 +59,7 @@ const TIER_INDEX = new Map(TIER_ORDER.map((tier, index) => [tier, index]));
 export interface RankedHostCommand extends CommandDescriptorDto {
   /** The best tier this row matched, or host-order for an empty query. */
   readonly matchTier: HostCommandMatchTier;
-  /** Matching grapheme ranges within the canonical name; empty when only
-   * Aliases, descriptions, or hints matched. */
+  /** Empty when only aliases, descriptions, or hints matched. */
   readonly matchRanges: readonly GraphemeRange[];
 }
 
@@ -302,7 +296,7 @@ function compareRanked(
   const tierDelta = (TIER_INDEX.get(a.matchTier) ?? 0) - (TIER_INDEX.get(b.matchTier) ?? 0);
   if (tierDelta !== 0) return tierDelta;
   if (a.matchTier === 'subsequence' && b.matchTier === 'subsequence') {
-    // Penalize gaps: a tighter subsequence outranks a scattered one.
+    // Tighter subsequence (fewer gaps) outranks a scattered match.
     const gapDelta = subsequenceGap(a) - subsequenceGap(b);
     if (gapDelta !== 0) return gapDelta;
   }

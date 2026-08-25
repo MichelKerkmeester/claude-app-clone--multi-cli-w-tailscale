@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import AskQuestionOptionList from './ask-question-option-list.svelte';
 import type { AskQuestionViewModel } from './ask-question-types.js';
 
-// Reuse the demo display so list stories exercise the real option and selection shapes.
+// Demo display fixtures for list stories.
 const DEMO_ASK_QUESTION_VIEW: AskQuestionViewModel = {
   type: 'session.ask-question.display',
   sessionId: 'demo-session-refactor',
@@ -40,7 +40,7 @@ const DEMO_ASK_QUESTION_VIEW: AskQuestionViewModel = {
   requiresReadOnlyHint: true,
 };
 
-// Keep the single-choice story aligned with the card's selection derivation.
+// Matches the card's single-choice derivation.
 const SINGLE_VIEW: AskQuestionViewModel = {
   ...DEMO_ASK_QUESTION_VIEW,
   selectionMode: 'single',

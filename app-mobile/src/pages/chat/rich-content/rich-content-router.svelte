@@ -25,7 +25,6 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
-  // These pure guards are exported for transcript projection and security tests.
   export function isNormalizedRichContentBlock(value: unknown): value is NormalizedTranscriptBlock {
     if (typeof value !== 'object' || value === null) return false;
     const kind = (value as { readonly kind?: unknown }).kind;

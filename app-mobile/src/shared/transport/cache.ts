@@ -1,15 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Pi Remote Web Read-Only Cache
 // ───────────────────────────────────────────────────────────────────
-// INVARIANT: this cache may render history but can never enable mode
-// Controls. It stores only session cards and transcript blocks — never
-// Runtime state, mode, tickets, revisions, or todo projections — and the
-// App's mode authority comes exclusively from a live read-only hydrate,
-// So a cached Build or Plan can never be presented as current authority.
-// Todo projections are read-only host data and are intentionally kept in
-// Memory only: persistence would expand the surface for stale content
-// And would not survive the redaction boundary in either browser storage
-// Or service-worker storage.
+// History-only cache: no runtime/mode/tickets; todo projections stay in memory only.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS

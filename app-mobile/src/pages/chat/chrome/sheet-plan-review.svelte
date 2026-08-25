@@ -74,8 +74,7 @@
   // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
-  // Copy is restored to the host value after every change (non-optimistic).
+  // Bits Dialog writes locally; mirror host open after every change.
   const hostOpen = $derived(isOpen);
 
   // ───────────────────────────────────────────────────────────────────

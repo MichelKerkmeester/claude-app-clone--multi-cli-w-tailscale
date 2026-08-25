@@ -12,8 +12,6 @@ import {
   DEMO_ARTIFACT_BLOCKS,
 } from '$shared/fixtures/demo.js';
 
-// Reuse frozen fixtures through the real parser so each block-kind story exercises actual display data.
-// The plan-todo shape is omitted rather than fabricated.
 const RAW_BLOCKS: readonly Record<string, unknown>[] = [
   ...DEMO_RICH_CONTENT_BLOCKS,
   ...DEMO_RICH_RELEASE_BLOCKS,

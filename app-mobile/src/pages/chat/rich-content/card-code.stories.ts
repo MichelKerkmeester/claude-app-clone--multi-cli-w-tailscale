@@ -12,7 +12,7 @@ import {
   type NormalizedCodeBlock,
 } from './normalize-transcript-blocks.js';
 
-// Reuse normalized demo fixtures so the story exercises a real code block and its declared state.
+// Normalized demo fixtures.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

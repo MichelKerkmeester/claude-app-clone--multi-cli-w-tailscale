@@ -8,8 +8,7 @@ import AttachmentRail from './attachment-rail.svelte';
 import AttachmentDraftProvider from './attachment-draft-provider.svelte';
 import AttachmentDraftStoryHost from './attachment-draft-story-host.svelte';
 
-// Exercise the context-only rail with a real provider and staged files rather than fabricated props.
-// The decorator order keeps Provider > Host > rail, matching Storybook's outermost-last behavior.
+// Context-only rail via Provider > Host; staged files, not fabricated props.
 const meta: Meta<typeof AttachmentRail> = {
   title: 'Attachments/AttachmentRail',
   component: AttachmentRail,

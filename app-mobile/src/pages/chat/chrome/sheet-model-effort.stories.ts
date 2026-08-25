@@ -17,7 +17,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Reuse reducer and demo catalog fixtures so the open sheet shows real model and effort authority.
+// Reducer + demo catalog fixtures.
 const DEMO_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;

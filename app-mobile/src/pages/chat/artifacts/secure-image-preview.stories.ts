@@ -8,8 +8,7 @@ import SecureImagePreview from './secure-image-preview.svelte';
 import type { ImagePan } from './secure-image-preview.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Build the object URL from frozen demo bytes so the story exercises the guarded image path.
-// Callbacks remain inert because the component is prop-only.
+// Demo-byte object URL exercises the guarded path; callbacks stay inert (prop-only).
 const READY_BLOCK = DEMO_IMAGE_PDF_BLOCKS.find((block) => block.id === 'blk-image-ready');
 if (READY_BLOCK === undefined) {
   throw new Error('No ready image fixture found in DEMO_IMAGE_PDF_BLOCKS.');

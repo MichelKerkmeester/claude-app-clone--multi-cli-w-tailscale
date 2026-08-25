@@ -3,8 +3,6 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import RuntimeStatusRegion from './runtime-status-region.svelte';
 import { INITIAL_RUNTIME_STATE, type RuntimeUiState } from '$shared/state/runtime.js';
 
-// Reuse the initial runtime state so each story selects a declared phase.
-// The single polite live region then exposes bounded announcement copy.
 const meta = {
   title: 'Transcript/RuntimeStatusRegion',
   component: RuntimeStatusRegion,

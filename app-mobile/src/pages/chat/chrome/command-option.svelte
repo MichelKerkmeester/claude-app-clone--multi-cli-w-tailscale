@@ -2,14 +2,7 @@
   // ───────────────────────────────────────────────────────────────────
   // MODULE: Slash Command Option (safe text-only row)
   // ───────────────────────────────────────────────────────────────────
-  // One text-only listbox option. The canonical name is isolated LTR and
-  // Never translated, matched graphemes are emphasized structurally, and
-  // Every other line renders authoritative relay metadata as plain text.
-  // Rows are never focusable, never nest interactive descendants, and a
-  // Press only ever completes as an insertion request for an enabled row —
-  // Disabled rows surface their disclosed reason instead. Any control or
-  // Bidi-override character that somehow reaches the client is replaced for
-  // Display only; insertion always uses the canonical DTO string.
+  // Text-only listbox row: LTR canonical name, virtual focus, insertion-only press; unsafe chars are display-escaped.
 
   // ───────────────────────────────────────────────────────────────────
   // 1. IMPORTS
@@ -94,8 +87,7 @@
   /** A pointer drag farther than this cancels activation (no accidental tap-drag inserts). */
   const DRAG_SLOP_PX = 10;
 
-  // Non-reactive press tracking: a re-render must not reset the origin or the
-  // Drag-cancel flag mid-gesture (useRef equivalent).
+  // Non-reactive press tracking so re-renders do not reset mid-gesture.
   let pressOrigin: { x: number; y: number } | null = null;
   let dragged = false;
 
@@ -112,8 +104,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   const onPointerDown = (event: PointerEvent) => {
-    // Focus stays in the textarea: no focus steal, no text selection, no
-    // Long-press context menu, no iOS callout.
+    // preventDefault keeps focus in the textarea (no steal, selection, or iOS callout).
     event.preventDefault();
     pressOrigin = { x: event.clientX, y: event.clientY };
     dragged = false;
@@ -139,8 +130,7 @@
       return;
     }
     pressOrigin = null;
-    // A completed row press is only ever an insertion request for an enabled row
-    // (or a disclosed-reason announcement for a disabled one); it never submits.
+    // Press requests insertion or a disabled reason; never submission.
     // @ds guardrail: fail-closed — Press requests insertion, never submission.
     if (command.enabled) {
       onInsert(command.name);
@@ -151,7 +141,7 @@
 
 </script>
 
-<!-- This row only restyles; its role, aria wiring, and virtual-focus hook are frozen. -->
+<!-- Role, aria wiring, and virtual-focus hook are frozen. -->
 <!-- @ds surface: slash-autocomplete -->
 <!-- @ds guardrail: React-aria wiring — Option role, aria-selected/aria-disabled, data-focused virtual focus, and the focus-preserving press path. -->
 

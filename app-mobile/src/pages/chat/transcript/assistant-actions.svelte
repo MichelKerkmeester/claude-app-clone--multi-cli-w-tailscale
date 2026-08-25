@@ -3,8 +3,7 @@
   // MODULE: ASSISTANT ACTIONS
   // ───────────────────────────────────────────────────────────────────
 
-  /** Under-answer actions. Capability-gated and honest: Copy renders only where the Clipboard
-   * API exists, and Share only where Web Share does — no decorative or disabled fake actions. */
+  /** Copy/Share only when the platform APIs exist — no fake disabled actions. */
   export interface AssistantActionsProps {
     readonly text: string;
   }
@@ -103,7 +102,7 @@
      by this component so they move with it. Native div/button elements stay scoped. Values
      unchanged. -->
 <style>
-  /* Under-answer action row — quiet monochrome, like the Claude app. */
+  /* Quiet under-answer action row. */
   /* @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. */
   .turn-actions {
     display: flex;

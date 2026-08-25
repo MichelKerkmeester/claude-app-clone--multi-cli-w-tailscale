@@ -1,13 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Visual-Viewport Anchor (keyboard-safe)
 // ───────────────────────────────────────────────────────────────────
-// Keeps the inline completion surface inside the visible area while the
-// Software keyboard is up. All measurements run through requestAnimationFrame
-// So resize/scroll storms from the visual viewport, rotation, keyboard
-// Language changes, and PWA foregrounding settle into one repaint; the hook
-// Never scrolls the page, so the transcript and composer never move. The
-// Measured height is mirrored into --visual-viewport-height for CSS that
-// Cannot read the API directly.
+// Keyboard-safe anchor: rAF-batched visual-viewport measurements; mirrors height into --visual-viewport-height.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. PUBLIC CONSTANTS AND RESULT TYPE
@@ -31,8 +25,7 @@ export function useVisualViewportAnchor(
 ): VisualViewportAnchorResult {
   let viewportHeightPx = $state<number | null>(null);
   let anchorTopPx = $state<number | null>(null);
-  // The measured values are mirrored so subscribers outside this hook can
-  // Read the current budget without re-rendering.
+  // Mirror measurements for subscribers without forcing re-renders.
   let lastValues = { height: 0, anchorTop: 0 };
 
   $effect(() => {
@@ -79,13 +72,10 @@ export function useVisualViewportAnchor(
       if (document.visibilityState === 'visible') schedule();
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
-    // An installed PWA restored from the iOS page cache fires pageshow
-    // Without a visual-viewport resize; the anchor budget must remeasure
-    // So the panel never renders against a stale height.
+    // PWA pageshow without resize still needs a remeasure.
     window.addEventListener('pageshow', schedule);
 
-    // The first measurement runs immediately so the panel never renders
-    // Against a stale budget.
+    // Immediate first measure so the panel never uses a stale budget.
     schedule();
 
     return () => {

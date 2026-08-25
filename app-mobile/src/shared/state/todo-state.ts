@@ -34,10 +34,7 @@ export interface TodoProjectionState {
   readonly refreshing: boolean;
   readonly needsRefresh: boolean;
   /**
-   * One concise polite announcement per change. The string is empty until the
-   * Next applicable diff, and the live region only speaks when the value is
-   * Non-empty. Timestamps, provenance, and group counts are exposed through
-   * The panel itself, never here.
+   * One concise polite announcement per change; empty until the next applicable diff.
    */
   readonly announcement: string;
 }
@@ -165,10 +162,7 @@ function applySnapshot(
   projection: TodoProjectionV1,
   anchorSeq: number,
 ): TodoProjectionState {
-  // A plan-identity change replaces the prior projection; a same-plan snapshot
-  // With a newer revision also replaces. A same-plan snapshot whose incoming
-  // Revision is not strictly newer is stale and is discarded without mutating
-  // The rendered view.
+  // Plan change or newer same-plan revision replaces; stale revisions are discarded.
   const planChanged = state.projection === null || state.projection.planId !== projection.planId;
   if (!planChanged && state.projection !== null && state.projection.revision >= projection.revision) {
     return state;

@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import ArtifactDetails, { type ArtifactDetailsModel } from './artifact-details.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Reuse the frozen image fixture so the details reflect real dimensions and byte lengths.
-// Revision and redaction state stay tied to the fixture rather than invented metadata.
+// Frozen image fixture — real dimensions, bytes, revision, and redaction metadata.
 const IMAGE_BLOCK = DEMO_IMAGE_PDF_BLOCKS.find((block) => block.renderer === 'image');
 if (IMAGE_BLOCK === undefined) {
   throw new Error('No image fixture found in DEMO_IMAGE_PDF_BLOCKS.');

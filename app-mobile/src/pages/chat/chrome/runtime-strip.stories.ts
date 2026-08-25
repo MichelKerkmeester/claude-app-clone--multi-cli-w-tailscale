@@ -17,7 +17,7 @@ import {
 } from '$shared/state/runtime.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Feed the strip real reducer snapshots so ready and streaming states stay host-confirmed.
+// Reducer snapshots for host-confirmed strip states.
 const IDLE_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -85,7 +85,7 @@ export const Running: Story = {
 export const Plan: Story = {
   args: {
     ...Idle.args,
-    // Derive the plan story from the host-shaped snapshot so no mode copy is invented.
+    // Host snapshot with mode plan.
     controls: makeRuntimeControls(
       hydratedRuntime({ ...IDLE_STATE, mode: 'plan' }),
     ),
@@ -95,7 +95,7 @@ export const Plan: Story = {
 export const Checking: Story = {
   args: {
     ...Idle.args,
-    // The real initial state before the first host snapshot commits.
+    // Pre-hydration initial state.
     controls: makeRuntimeControls(INITIAL_RUNTIME_STATE),
   },
 };

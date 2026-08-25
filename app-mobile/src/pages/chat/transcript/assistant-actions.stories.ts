@@ -8,8 +8,6 @@ import {
   type NormalizedProseBlock,
 } from '../rich-content/normalize-transcript-blocks.js';
 
-// Reuse normalized assistant prose so the action story tests canonical source text.
-// The capability-gated row therefore needs no invented content.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

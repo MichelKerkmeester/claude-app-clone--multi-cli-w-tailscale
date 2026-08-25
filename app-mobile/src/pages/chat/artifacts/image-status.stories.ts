@@ -10,8 +10,7 @@ import ImageStatus, {
   type InboundImageLifecycleState,
 } from './image-status.svelte';
 
-// Reuse the frozen lifecycle vocabulary so stories cover declared visible states.
-// The byte-reading stage stays registry-only and action callbacks remain inert.
+// Frozen lifecycle vocabulary; byte-reading stays registry-only with inert callbacks.
 function statusStory(state: InboundImageLifecycleState): StoryObj<typeof meta> {
   return { args: { state, onAction: () => {} } };
 }

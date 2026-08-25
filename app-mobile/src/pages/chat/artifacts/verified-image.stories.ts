@@ -8,8 +8,7 @@ import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 import VerifiedImage from './verified-image.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Rebuild the private ready-image fixture from exported demo bytes so stories exercise verification.
-// Lifecycle pinning and aspect ratio remain tied to the real thumbnail.
+// Demo-byte ready-image fixture — verification, lifecycle pinning, real thumbnail aspect.
 function requireImageBytes(): {
   readonly digest: string;
   readonly byteLength: number;

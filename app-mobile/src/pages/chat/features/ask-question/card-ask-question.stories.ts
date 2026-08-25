@@ -7,7 +7,7 @@ import type { AskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
 
 import AskQuestionCard from './card-ask-question.svelte';
 
-// Reuse the demo transcript shape so lifecycle stories exercise the real loading and status paths.
+// Demo transcript shape for lifecycle stories.
 const DEMO_ASK_QUESTION_BLOCK: AskQuestionTranscriptMeta = {
   id: 'ask_block_001',
   revision: 1,

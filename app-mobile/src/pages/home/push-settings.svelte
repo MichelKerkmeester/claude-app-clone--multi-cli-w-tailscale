@@ -136,9 +136,7 @@
     font-size: 0.82rem;
   }
 
-  /* .push-settings h2 / .push-settings p — solo occurrences extracted from the shared
-     .section-heading h2, .push-settings h2 / .section-heading p, .push-settings p groups;
-     the shared groups stay global. */
+  /* Heading typography split from shared global groups. */
   .push-settings h2 {
     margin: 0;
     font-size: clamp(1.4rem, 3vw, 2rem);
@@ -154,9 +152,7 @@
     line-height: 1.55;
   }
 
-  /* Button primitive outputs (subscribe / disable) — :global so Svelte scoping cannot
-     drop the child-component element. The shared grouped hover override
-     stays global. */
+  /* :global on Button children so scoped CSS cannot drop primitive output. */
   :global(.push-settings > button),
   :global(.push-disable) {
     min-height: 2.75rem;
@@ -229,9 +225,7 @@
     transform: translateX(0.95rem);
   }
 
-  /* [role='switch']:focus-visible — solo occurrence extracted from the shared focus-visible
-     group; the shared group stays global. A native <button> supplies
-     the :focus-visible the CSS keys on (no [data-hovered] on the switch). */
+  /* Switch focus ring — solo rule extracted from shared focus-visible group. */
   :global([role='switch']:focus-visible) {
     outline: 3px solid var(--focus);
     outline-offset: 3px;

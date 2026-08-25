@@ -12,7 +12,7 @@ import {
   type NormalizedCommandBlock,
 } from './normalize-transcript-blocks.js';
 
-// Reuse normalized demo fixtures so each command lifecycle story reflects real output states.
+// Normalized demo fixtures.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

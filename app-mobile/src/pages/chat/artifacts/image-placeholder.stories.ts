@@ -11,8 +11,7 @@ import {
   type InboundImageLifecycleState,
 } from './image-status.svelte';
 
-// Reuse the frozen lifecycle vocabulary so placeholder stories cover declared states.
-// Image bytes and aspect-ratio metadata are not fabricated.
+// Frozen lifecycle vocabulary — no fabricated bytes or aspect-ratio metadata.
 const ASPECT_RATIO = 1;
 
 function placeholderStory(state: InboundImageLifecycleState): StoryObj<typeof ImagePlaceholder> {

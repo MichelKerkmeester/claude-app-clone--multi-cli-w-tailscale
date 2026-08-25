@@ -111,7 +111,7 @@
   function onScroll(): void {
     const element = scrollEl;
     if (element === null) return;
-    // The reader owns the live edge, so new blocks follow only when the viewport is near the bottom.
+    // Follow new blocks only when the viewport is near the bottom.
     const nearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 96;
     atLiveEdge = nearBottom;
     if (nearBottom) newAway = 0;
@@ -133,8 +133,7 @@
     insertTodoProjectionItem(groupNormalizedTranscript(normalizedBlocks, blocks), blocks, todoProjection),
   );
   const turnStartIds = $derived.by(() => {
-    // Mark the first block of each turn after the first so a boundary rule can space each turn.
-    // The derivation never mutates or drops a block.
+    // First block of each turn after the first — spacing boundary only; never mutates blocks.
     const turns = groupBlocksIntoTurns(blocks);
     return new Set(turns.slice(1).map((turn) => turn.blocks[0]?.id));
   });
@@ -179,12 +178,11 @@
       ...blocks.map((block) => block.id),
       ...normalizedBlocks.map((block) => block.blockId),
     ]);
-    // The full transcript owns block lifetime; virtual rows may disappear without losing it.
+    // Virtual rows are ephemeral; the full transcript owns block lifetime.
     pruneTranscriptDisclosureState(disclosureBlockIds);
   });
 
-  // Reapply options because the store captures them at creation. Untracked `get()` prevents store emissions from setOptions from retriggering this effect.
-  // Svelte's safe_not_equal treats object values as changed, so tracking `$virtualizer` here would loop.
+  // Virtualizer store captures options at creation; untrack get() and `$virtualizer` to avoid loops.
   $effect(() => {
     const count = renderItems.length;
     const el = scrollEl;

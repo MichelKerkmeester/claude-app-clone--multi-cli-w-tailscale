@@ -10,8 +10,7 @@ import ArtifactViewerProvider from './artifact-viewer-provider.svelte';
 import type { InboundImageLifecycleState } from './image-status.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Rebuild the private ready-image fixture from exported demo bytes so stories exercise context wiring.
-// Lifecycle states stay tied to real identity and payload data.
+// Demo-byte ready-image fixture — real identity, payload, and lifecycle wiring.
 function requireImageBytes(): {
   readonly digest: string;
   readonly byteLength: number;

@@ -6,9 +6,7 @@
   import { runtimeAnnouncement, type RuntimeUiState } from '$shared/state/runtime.js';
 
   /**
-   * This is the one document-level polite atomic runtime status region.
-   * Confirmations and failures use it so announcements survive sheet dismissal
-   * Without competing live regions, copy remains bounded local text.
+   * Document-level polite atomic runtime status — survives sheet dismissal without competing regions.
    */
   export interface RuntimeStatusRegionProps {
     readonly runtime: RuntimeUiState;

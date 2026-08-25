@@ -11,11 +11,7 @@ import {
 } from '$shared/state/state.js';
 import Chat from './screen-chat.svelte';
 
-// Re-host the demo session and its transcript through the relay's real
-// /api/sessions + /api/sessions/:id/transcript shapes so every Chat arg is
-// sourced from demo.ts — nothing is invented. The TranscriptState is built by
-// running the real transcriptReducer ('select' then 'page'), exactly the path
-// useSyncSocket takes when the fixture page loads.
+// Demo session + transcript via real reducer path (select → page), matching useSyncSocket.
 const DEMO_SESSIONS = demoPostJson('/api/sessions', {}) as {
   sessions: readonly SessionCardDto[];
 };

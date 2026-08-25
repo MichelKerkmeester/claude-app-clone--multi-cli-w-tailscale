@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import UnsupportedPreview from './unsupported-preview.svelte';
 import { DEMO_ARTIFACT_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Reuse the frozen unsupported fixture so the notice exercises real renderer provenance.
-// Display-name fallback text remains tied to that fixture.
+// Frozen unsupported fixture — real renderer provenance and display-name fallback.
 const UNSUPPORTED_BLOCK = DEMO_ARTIFACT_BLOCKS.find((block) => block.renderer === 'unsupported');
 if (UNSUPPORTED_BLOCK === undefined) {
   throw new Error('No unsupported fixture found in DEMO_ARTIFACT_BLOCKS.');

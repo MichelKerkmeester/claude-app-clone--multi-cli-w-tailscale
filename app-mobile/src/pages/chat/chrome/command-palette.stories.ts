@@ -13,8 +13,7 @@ import type {
 } from '$shared/commands/commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Reuse the demo command catalog so ready/loading stories exercise the real snapshot shape.
-// The combobox opens from input focus, so the story leaves that interaction intact.
+// Demo catalog fixtures; combobox opens on input focus.
 const DEMO_COMMANDS = (
   demoPostJson('/api/commands/list', {}) as {
     commands: readonly CommandDescriptorDto[];

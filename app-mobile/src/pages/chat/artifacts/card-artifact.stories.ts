@@ -9,8 +9,7 @@ import ArtifactCard from './card-artifact.svelte';
 import ArtifactViewerProvider from './artifact-viewer-provider.svelte';
 import { DEMO_DIFF_FIXTURE } from '$shared/fixtures/demo.js';
 
-// Reuse the frozen diff fixture so the card story exercises real patch provenance.
-// The viewer context seam stays visible without invented transcript metadata.
+// Frozen diff fixture — real patch provenance via viewer context, no invented metadata.
 const DEMO_DIFF_BLOCK: FileDiffBlock = Object.freeze({
   kind: 'file_diff',
   id: DEMO_DIFF_FIXTURE.blockId,

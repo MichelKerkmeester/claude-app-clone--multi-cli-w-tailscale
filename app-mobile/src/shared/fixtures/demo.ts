@@ -1,15 +1,7 @@
 // ───────────────────────────────────────────────────────────────────
 // MODULE: Pi Remote Local Preview (offline demo)
 // ───────────────────────────────────────────────────────────────────
-// Durable WHY: previewing the mobile chat surface on this Mac (iOS
-// Simulator or a browser) needs the app past enrollment and populated
-// With a representative session, but no live relay or pi is available
-// Off the tailnet. This module answers the relay's read + control
-// Endpoints with in-memory fixtures so the four controls, transcript,
-// And design system are all exercisable. It is inert unless the build
-// Carries VITE_PI_DEMO=1 AND the client opts in with ?demo=1, and it
-// Never speaks to the relay — the fake data lives only in this tab, so
-// The real deployment's authority and redaction are untouched.
+// Offline preview fixtures when VITE_PI_DEMO=1 and ?demo=1; never speaks to the relay.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS
@@ -194,10 +186,7 @@ const DEMO_TODO_TASKS: TodoProjectionV1['tasks'] = [
 let cachedEnabled: boolean | null = null;
 
 /**
- * Preview is double-gated: the build must define VITE_PI_DEMO=1 (so a normal
- * Production build strips this path) and the client must pass ?demo=1 once.
- * The opt-in is persisted so the installed PWA — which relaunches at "/" and
- * Loses the query string — stays in preview until ?demo=0 clears it.
+ * Double-gated: build flag VITE_PI_DEMO=1 plus ?demo=1; persisted so PWA relaunch without query stays in preview.
  */
 export function isDemoMode(): boolean {
   if (import.meta.env.VITE_PI_DEMO !== '1') return false;
@@ -266,9 +255,7 @@ const DEMO_INBOUND_MEDIA_BLOCK = {
   content: { kind: 'none' },
 } as const;
 
-// A representative completed turn: user request, then the agent's thinking,
-// Tool calls, a file diff, prose, and usage — so evidence collapse, turn
-// Grouping, the diff renderer, and the prose treatment are all visible.
+// Representative turn: evidence collapse, diff renderer, and prose treatment.
 const REFACTOR_BLOCKS = [
   {
     ...base('blk-001', 1, 9),
@@ -1232,17 +1219,14 @@ const COMMANDS = [
   requiresConfirmation: false,
 }));
 
-// The catalog revision identifies the host's model membership, which the demo
-// Fixture never changes, so it stays constant while the runtime revision
-// Advances with every accepted control mutation.
+// Catalog revision is fixed in the demo; runtime revision advances on control commits.
 const CATALOG_REVISION = 1;
 
 // ───────────────────────────────────────────────────────────────────
 // 13. RUNTIME CONTROL SIMULATION
 // ───────────────────────────────────────────────────────────────────
 
-// Mutable per-session runtime so the Model/Effort/Build·Plan controls actually
-// Move and stick under the non-optimistic reducer (revision advances on commit).
+// Mutable per-session runtime so Model/Effort/Plan controls stick under the non-optimistic reducer.
 interface DemoRuntime {
   revision: number;
   model: AvailableModelDto;
@@ -1252,8 +1236,7 @@ interface DemoRuntime {
 
 const runtimeBySession = new Map<string, DemoRuntime>();
 
-// One-use model-switch tickets mirror the relay's ticket authority: a ticket is
-// Minted per set_model intent and consumed (or expired) when control presents it.
+// One-use model tickets mirror relay authority: minted per set_model, consumed on present.
 interface DemoRuntimeTicket {
   readonly sessionId: string;
   readonly expectedRevision: number;
@@ -1356,8 +1339,7 @@ function applyControl(
 
 const TRANSCRIPT_PATH = /^\/api\/sessions\/([^/]+)\/transcript$/;
 
-/** Fixture responses keyed by relay path. Unknown paths resolve to {} so
- * Best-effort effects (push foreground, attention) neither throw nor act. */
+/** Unknown paths return {} so best-effort effects neither throw nor act. */
 export function demoPostJson(path: string, body: unknown): unknown {
   const request = (body ?? {}) as Record<string, unknown>;
 
@@ -1557,9 +1539,7 @@ interface FakeSocketListeners {
   [type: string]: Array<(event: unknown) => void>;
 }
 
-/** A WebSocket-shaped stub. It emits one empty-envelope delta so the
- * Connection reducer flips to "live" (enabling the composer) without
- * Disturbing the transcript already loaded from the fixture page. */
+/** WebSocket stub: one empty delta flips connection to live without disturbing the fixture transcript. */
 export function demoSocket(sessionId: string, onMessage: (message: unknown) => void): WebSocket {
   const listeners: FakeSocketListeners = {};
   const transcriptCoversThrough = blocksFor(sessionId).length;
@@ -1605,7 +1585,7 @@ export function demoSocket(sessionId: string, onMessage: (message: unknown) => v
       for (const callback of listeners.close ?? []) callback({});
     },
     send() {
-      // Preview stream is read-only; nothing is sent upstream.
+      // Preview stream is read-only.
     },
   } as unknown as WebSocket;
 }

@@ -9,8 +9,7 @@ import InboundImageBlockView from './inbound-image-block-view.svelte';
 import ArtifactViewerProvider from './artifact-viewer-provider.svelte';
 import { DEMO_IMAGE_PDF_BLOCKS, demoArtifactBytes } from '$shared/fixtures/demo.js';
 
-// Rebuild private inbound-image fixtures as exported blocks so stories exercise the same context.
-// Viewer wiring stays tied to real identities and payloads rather than invented data.
+// Exported inbound-image blocks — real identity, payload, and viewer wiring.
 function requireImageBytes(): {
   readonly digest: string;
   readonly byteLength: number;

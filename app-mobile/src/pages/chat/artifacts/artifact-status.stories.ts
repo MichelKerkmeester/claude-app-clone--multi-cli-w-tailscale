@@ -10,8 +10,7 @@ import type { ArtifactViewerPhase } from './types.js';
 import { catalogSurfaceById } from '$shared/catalog/catalog-registry.js';
 import { DEMO_DIFF_FIXTURE, DEMO_ARTIFACT_STATES_FIXTURE } from '$shared/fixtures/demo.js';
 
-// Reuse catalog-declared status values so the a11y vocabulary and demo subset stay tied to the registry.
-// Fixture-only values cannot silently diverge.
+// Catalog-declared status values only — fixture provenance stays tied to the registry.
 const SURFACE = catalogSurfaceById('artifact-status');
 if (SURFACE === undefined) {
   throw new Error('The artifact-status surface is missing from the catalog registry.');
@@ -21,8 +20,7 @@ const STATUSES = SURFACE.states as readonly ArtifactResourceStatus[];
 const PHASE: ArtifactViewerPhase = 'viewer-ready';
 const SUBJECT = DEMO_DIFF_FIXTURE.summary;
 
-// Keep the demo selector referenced so fixture provenance remains visible to the story.
-void DEMO_ARTIFACT_STATES_FIXTURE;
+void DEMO_ARTIFACT_STATES_FIXTURE; // keeps demo-selector fixture provenance referenced
 
 function statusStory(status: ArtifactResourceStatus): StoryObj<typeof meta> {
   return { args: { phase: PHASE, status, subject: SUBJECT } };

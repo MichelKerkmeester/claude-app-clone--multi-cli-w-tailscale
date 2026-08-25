@@ -20,7 +20,7 @@
   // 3. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
-  // The pure reconciliation helper is exported for deterministic streaming tests.
+  // Exported for deterministic streaming tests.
   export function reconcileCommandSnapshot(
     previous: CommandSnapshot | null,
     block: NormalizedCommandBlock,

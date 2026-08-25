@@ -12,7 +12,6 @@ import {
   type NormalizedCommandBlock,
 } from './normalize-transcript-blocks.js';
 
-// Reuse normalized fixture metadata so relay, cache, and absent-redaction states stay real.
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [

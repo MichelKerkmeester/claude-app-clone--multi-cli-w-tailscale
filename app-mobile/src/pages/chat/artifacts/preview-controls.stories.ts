@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import PreviewControls from './preview-controls.svelte';
 import { DEMO_DIFF_FIXTURE, DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Reuse frozen fixtures so each toolbar story exercises real find/share data.
-// The aria contract stays visible while callbacks remain inert.
+// Frozen fixtures for toolbar stories; aria contract visible, callbacks inert.
 const FIND_TERM = 'expiresAt';
 const SHARE_BLOCK = DEMO_TEXT_CODE_SHARE_BLOCKS[0];
 if (SHARE_BLOCK === undefined) {

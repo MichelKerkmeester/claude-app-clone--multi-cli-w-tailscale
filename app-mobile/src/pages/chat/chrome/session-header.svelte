@@ -40,8 +40,7 @@
     return option === 'system' ? 'Auto' : option === 'light' ? 'Light' : 'Dark';
   }
 
-  // Plain theme buttons do not emit react-aria data-hovered / data-focus-visible;
-  // Pointer + focus-visible hooks match the Button primitive's interaction actions.
+  // Plain buttons lack react-aria interaction attrs; bridge hover/focus-visible manually.
   function onChromePointerEnter(event: PointerEvent): void {
     if (event.pointerType === 'touch') return;
     (event.currentTarget as HTMLElement).setAttribute('data-hovered', 'true');

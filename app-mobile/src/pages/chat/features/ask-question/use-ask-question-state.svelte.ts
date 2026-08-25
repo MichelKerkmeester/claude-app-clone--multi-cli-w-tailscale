@@ -128,8 +128,7 @@ export function validateAskQuestionAnswer(
   if (new TextEncoder().encode(freeText).byteLength > 8 * 1_024) {
     return { valid: false, message: 'Keep the response within the protocol limit.' };
   }
-  // The protocol guard rejects controls and bidi overrides before hashing or handoff.
-  // Keep the same structural rule local so the user can correct it without a round trip.
+  // Mirror protocol control/bidi guard locally so users can fix input without a round trip.
   // eslint-disable-next-line no-control-regex
   if (/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(freeText)) {
     return { valid: false, message: 'Use plain text without control characters.' };

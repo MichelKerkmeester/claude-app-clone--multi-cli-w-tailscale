@@ -53,8 +53,7 @@
   // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // Host-confirmed mode only; Bits MenuItem has no selection to bind, so a local
-  // Copy is restored to the host value after every activation (non-optimistic).
+  // Bits MenuItem has no selection binding; mirror host mode after activation.
   const hostMode = $derived(confirmedMode);
 
   // ───────────────────────────────────────────────────────────────────

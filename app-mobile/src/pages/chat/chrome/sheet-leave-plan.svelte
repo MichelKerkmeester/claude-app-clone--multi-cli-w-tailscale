@@ -50,8 +50,7 @@
 
   const isPlanReady = $derived(variant === 'plan-ready' || planReady);
 
-  // Host-confirmed open only; Bits Dialog writes false on dismiss, so a local
-  // Copy is restored to the host value after every change (non-optimistic).
+  // Bits Dialog writes locally; mirror host open after every change.
   const hostOpen = $derived(isOpen);
 
   // ───────────────────────────────────────────────────────────────────
@@ -67,9 +66,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   const restoreTriggerFocus = () => {
-    // The modal restores focus on its own; this timer covers paths where the
-    // Previously focused menu row has unmounted, so the mode button is the
-    // Deterministic landing spot.
+    // Fallback focus when the menu row has unmounted.
     window.setTimeout(() => triggerRef?.focus({ preventScroll: true }), 0);
   };
 

@@ -9,8 +9,7 @@ import {
   type NormalizedCommandBlock,
 } from '../rich-content/normalize-transcript-blocks.js';
 
-// Reuse frozen command fixtures through the real normalizer so the disclosure summary and body reflect a completed command.
-// CreateRawSnippet avoids a wrapper component.
+// Normalized command fixture + raw snippet (no wrapper component).
 const NORMALIZED = normalizeTranscriptBlocks({
   sessionId: 'demo-session-triage',
   blocks: [
@@ -38,7 +37,7 @@ function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// Mirror Block's tool output markup so the disclosure story tests the same body shape.
+// Same body markup as Block tool output.
 function evidenceSnippet(content: string) {
   return createRawSnippet(() => ({
     render: () => `<pre>${escapeHtml(content)}</pre>`,

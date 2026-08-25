@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import AskQuestionStatus from './ask-question-status.svelte';
 import type { AskQuestionFormState } from './ask-question-types.js';
 
-// Cover each status phase with a real form-state shape and an allowlisted error reason.
+// Each status phase uses a real form-state shape.
 const formState = (phase: AskQuestionFormState['phase'], errorReason: AskQuestionFormState['errorReason'] = null): AskQuestionFormState => ({
   phase,
   selectedOptionIds: [],

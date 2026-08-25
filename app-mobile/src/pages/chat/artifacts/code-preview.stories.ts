@@ -7,8 +7,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 import CodePreview from './code-preview.svelte';
 import { DEMO_TEXT_CODE_SHARE_BLOCKS } from '$shared/fixtures/demo.js';
 
-// Reuse the frozen inline-text fixture so highlight, wrap, and live-edge stories exercise real source.
-// Language values stay tied to the fixture rather than invented content.
+// Frozen inline-text fixture for highlight, wrap, live-edge, and language provenance.
 const CODE_BLOCK = DEMO_TEXT_CODE_SHARE_BLOCKS.find((block) => block.renderer === 'code');
 if (CODE_BLOCK === undefined || CODE_BLOCK.content.kind !== 'inline-text') {
   throw new Error('No inline-text code fixture found in DEMO_TEXT_CODE_SHARE_BLOCKS.');

@@ -24,7 +24,7 @@ import type {
 } from '$shared/commands/commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
-// Reuse reducer, command, and attachment fixtures so composer stories exercise real authority and capability shapes.
+// Reducer + command + attachment fixtures for real authority/capability shapes.
 const DEMO_STATE = (
   demoPostJson('/api/runtime/state', { sessionId: 'demo-session-refactor' }) as {
     state: RuntimeStateDto;
@@ -91,7 +91,7 @@ const setPrompt = (_updater: (current: string) => string): void => undefined;
 const onInsertCommand = (_name: string, _binding: SelectedCommandBinding): void => undefined;
 
 const baseArgs = {
-  // Keep recovery state isolated from the real demo session.
+  // Isolated recovery session id.
   sessionId: 'storybook-composer',
   prompt: '',
   setPrompt,
@@ -132,7 +132,7 @@ export const Idle: Story = { args: { ...baseArgs } };
 export const WithMedia: Story = {
   args: {
     ...baseArgs,
-    // Enable the media affordance only in the story that supplies its capability.
+    // Story supplies media capability when enabling the affordance.
     mediaCapability: { enabled: true, imageIn: true },
   },
 };

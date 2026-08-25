@@ -7,8 +7,7 @@ import type { TodoProjectionV1 } from '@pi-remote/pi-rpc-protocol';
 
 import TodoPanel from './todo-panel.svelte';
 
-// Use the empty projection because task rows are intentionally unavailable in the demo catalog.
-// The wrapper owns the unsupported projection-null state, so this story stays focused on the panel.
+// Empty demo projection; wrapper owns unsupported-null state.
 const EMPTY_PROJECTION: TodoProjectionV1 = {
   planId: 'plan_demo_todos',
   source: 'pi',

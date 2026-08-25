@@ -1,7 +1,4 @@
-// The in-memory document projection consumed by RichContentRouter and the read-only
-// Adapter/security tests. Ported from the React rich-content/F6ViewerAdapter.tsx: the
-// Render-prop component and the useF6ViewerAdapter / useReconcileF6Viewer hooks were dead
-// (no importer) and are dropped; RichContentRouter carries the open/reconcile handoff inline.
+// In-memory artifact projection for RichContentRouter; dead React hooks were dropped.
 
 // ───────────────────────────────────────────────────────────────────
 // 1. IMPORTS

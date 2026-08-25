@@ -18,9 +18,9 @@
   export interface InboundImageCardProps {
     readonly block: InboundImageBlock;
     readonly sessionId: string;
-    /** Used by the local fixture to hold a specific lifecycle state in place. */
+    /** Fixture-only lifecycle pin. */
     readonly state?: InboundImageLifecycleState;
-    /** Real transcript cards begin ready blocks in the deferred state. */
+    /** Real cards defer ready blocks until inline-ready. */
     readonly deferReady?: boolean;
     readonly onAction?: (action: InboundImageStatusAction) => void;
   }

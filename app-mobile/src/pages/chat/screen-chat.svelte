@@ -188,9 +188,7 @@
   // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
-  // Visibility/online listeners: reconcile runtime + catalog when the tab
-  // returns to the foreground or the network comes back online. The refresh
-  // handles are stable plain closures, so this effect runs once on mount.
+  // Foreground/online: refresh runtime + catalog once on mount (stable closure deps).
   $effect(() => {
     const reconcileRuntime = () => {
       if (document.visibilityState === 'visible') void runtimeControls.refresh('foreground');
@@ -212,13 +210,7 @@
     };
   });
 
-  // A binding is only valid for the exact scope it was created in; any
-  // session, host-epoch, or revision change clears it so Send must
-  // re-resolve. The session guard runs on the same commit as the switch so
-  // another session can never retain this session's binding, even for one
-  // render. Tracks snapshot + sessionId ONLY; the binding self-read is
-  // untracked (reproduces React setBinding(current => …) which reads current
-  // without a dep — failing to untrack causes an infinite effect loop).
+  // Clear binding when session, host epoch, or revision drifts; untrack avoids an infinite loop.
   $effect(() => {
     const snapshot = commandCatalog.snapshot;
     const sid = sessionId;
@@ -230,11 +222,7 @@
     });
   });
 
-  // The sync stream reaching live is read-only refresh authority. While the
-  // initial hydrate is still checking, that hydrate already covers the moment.
-  // Tracks connection ONLY; runtime.phase is untracked (React dep array is
-  // [connection, refresh], NOT runtime.phase — tracking phase would re-hydrate
-  // on every sync message, a regression).
+  // Refresh runtime on live; untrack phase so sync messages do not re-hydrate every tick.
   $effect(() => {
     const c = connection;
     if (c === 'live' && untrack(() => runtimeControls.runtime.phase) !== 'checking') {
@@ -242,8 +230,7 @@
     }
   });
 
-  // Bounded revalidation progress for one explicit slash Send; the flag is
-  // local state only and never carries command content.
+  // Local flag only — bounded revalidation progress for one slash Send.
   $effect(() =>
     installCacheRevalidation(() => {
       cacheResumeGeneration += 1;
@@ -254,18 +241,14 @@
   // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
-  // One shared sheet per session view: the header opens the model section,
-  // RuntimeStrip the effort section, and focus returns to whichever trigger
-  // opened it. The sheet holds no committed runtime state itself.
+  // One sheet; header opens model, RuntimeStrip opens effort; focus returns to the opener.
   function openSheet(section: EffortSheetSection, triggerEl: HTMLButtonElement | null) {
     activeSheetTrigger = triggerEl;
     sheetSection = section;
     sheetOpen = true;
   }
 
-  // Draft edits re-evaluate the binding: token edits clear it, argument edits
-  // retain it. The OLD draft is captured before the write so
-  // bindingAfterDraftChange sees the same previousDraft React did.
+  // Capture previousDraft before write so bindingAfterDraftChange matches React semantics.
   function handleDraftChange(value: string) {
     const previousDraft = prompt;
     prompt = value;
@@ -332,11 +315,7 @@
       .finally(() => (sendingPrompt = false));
   }
 
-  // One explicit slash Send: revalidate the current binding, spend one
-  // fresh ticket and one expected-revision envelope, and reconcile without
-  // retry. Every failure preserves the drafted message, clears the unsafe
-  // binding (so the next Send requires reselection), and maps to bounded
-  // local copy; a stale race additionally refreshes the catalog.
+  // One slash Send: revalidate binding, spend ticket + revision; fail closed, no retry.
   function sendSlashDraft() {
     const message = prompt.trim();
     if (binding === null || slashSubmitting || message.length === 0 || !canSubmit) return;
@@ -354,9 +333,6 @@
     })
       .then((outcome) => {
         if (outcome.status === 'accepted') {
-          // Optimistic transcript behavior applies only after the host
-          // accepted the explicit submission; the authoritative block lands
-          // directly.
           dispatchTranscript({
             type: 'promptAccepted',
             sessionId,
@@ -368,8 +344,7 @@
           binding = null;
           return;
         }
-        // Fail closed: keep the draft, drop the unsafe binding, and never
-        // retry. A stale race also refreshes the catalog for reselection.
+        // Fail closed: keep draft, drop binding; stale also refreshes catalog.
         binding = null;
         if (outcome.code === 'stale') void commandCatalog.refresh('manual');
         promptError = slashFailureMessage(outcome.code);
@@ -377,8 +352,7 @@
       .finally(() => (slashSubmitting = false));
   }
 
-  // SessionComposer types setPrompt as a FUNCTIONAL updater; pass a wrapper
-  // that applies the updater to the local prompt state.
+  // SessionComposer expects a functional updater wrapper around local prompt state.
   const setPromptComposer = (updater: (current: string) => string) => {
     prompt = updater(prompt);
   };

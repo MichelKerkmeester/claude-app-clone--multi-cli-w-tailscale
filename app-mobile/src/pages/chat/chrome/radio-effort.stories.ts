@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import EffortRadioGroup from './radio-effort.svelte';
 
-// Reuse host-advertised effort levels so every story reflects a real catalog shape.
+// Host-advertised effort level fixtures.
 const DEMO_LEVELS: readonly string[] = ['off', 'high', 'max'];
 const DEMO_CONFIRMED = 'high';
 

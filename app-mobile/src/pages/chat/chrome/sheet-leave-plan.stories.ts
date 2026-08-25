@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/sveltekit';
 
 import LeavePlanSheet from './sheet-leave-plan.svelte';
 
-// Keep the confirmation sheet open so the story exercises its real portal and explicit callbacks.
+// Sheet stays open to exercise portal + callbacks.
 const noop = (): void => {};
 
 const baseArgs = {
@@ -31,7 +31,7 @@ export const Mode: Story = {
 export const PlanReady: Story = {
   args: {
     ...baseArgs,
-    // The plan-ready variant proves the safer copy without changing the authority path.
+    // Plan-ready variant; same authority path.
     variant: 'plan-ready',
     onLeaveWithoutRunning: noop,
   },

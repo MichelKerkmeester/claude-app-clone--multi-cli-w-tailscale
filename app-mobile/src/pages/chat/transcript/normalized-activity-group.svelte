@@ -30,14 +30,13 @@
   const disclosure = createTranscriptDisclosureBinding(() => {
     const firstBlock = blocks[0];
     if (firstBlock === undefined) {
-      // An empty group has no stable protocol key, so the binding intentionally falls back to local state.
+      // Empty groups lack a protocol key; fall back to local disclosure state.
       return undefined;
     }
     return firstBlock.blockId;
   });
 
-  // The wrapper does not forward trigger class/aria, and Bits does not emit react-aria's data-expanded/data-hovered.
-  // The button therefore sets both attributes explicitly from its state.
+  // Bits does not emit data-expanded/data-hovered; set both on the trigger explicitly.
   let triggerButton = $state<HTMLButtonElement | null>(null);
 
   // ───────────────────────────────────────────────────────────────────

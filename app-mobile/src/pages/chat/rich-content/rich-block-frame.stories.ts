@@ -50,13 +50,13 @@ function escapeHtml(value: string): string {
 
 function preSnippet(text: string) {
   return createRawSnippet(() => ({
-    render: () => `<pre class="rich-shell-well"><code>${escapeHtml(text)}</code></pre>`,
+    render: () => `<pre class="rich--shell-well"><code>${escapeHtml(text)}</code></pre>`,
   }));
 }
 
 function paragraphSnippet(text: string) {
   return createRawSnippet(() => ({
-    render: () => `<p class="block-copy quiet-copy">${escapeHtml(text)}</p>`,
+    render: () => `<p class="block--copy quiet-copy">${escapeHtml(text)}</p>`,
   }));
 }
 

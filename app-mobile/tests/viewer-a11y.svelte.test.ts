@@ -24,7 +24,7 @@ afterEach(() => {
   window.history.replaceState({}, '', '/');
   vi.restoreAllMocks();
   document.documentElement.removeAttribute('data-artifact-viewer-open');
-  document.getElementById('artifact-viewer-privacy-curtain')?.remove();
+  document.getElementById('artifact-viewer--privacy-curtain')?.remove();
 });
 
 // ───────────────────────────────────────────────────────────────────
@@ -47,19 +47,19 @@ describe('artifact viewer a11y contract', () => {
   it('opens a labelled dialog, focuses the heading, nests overlay > modal > dialog', async () => {
     render(ArtifactViewerHarness);
     await openViewer();
-    const overlay = document.querySelector('.artifact-viewer-overlay');
+    const overlay = document.querySelector('.artifact-viewer--overlay');
     expect(overlay).not.toBeNull();
     expect(overlay).toHaveAttribute('data-artifact-state', 'ready-diff');
     // The CSS depends on this exact nesting (e.g. the privacy-covered selector).
-    expect(overlay?.querySelector('.artifact-viewer-modal .artifact-viewer-dialog')).not.toBeNull();
+    expect(overlay?.querySelector('.artifact-viewer--modal .artifact-viewer--dialog')).not.toBeNull();
     expect(document.documentElement.dataset.artifactViewerOpen).toBe('true');
     expect(screen.getByRole('status')).toHaveTextContent('Redacted file diff ready.');
-    expect(document.querySelector('.artifact-diff-preview')?.textContent).toBe('@@ a11y\n-old\n+new');
+    expect(document.querySelector('.artifact-diff--preview')?.textContent).toBe('@@ a11y\n-old\n+new');
   });
 
   it('closes via the Close button, restoring transcript scroll and trigger focus', async () => {
     render(ArtifactViewerHarness);
-    const scroll = document.querySelector<HTMLElement>('.transcript-scroll');
+    const scroll = document.querySelector<HTMLElement>('.transcript--scroll');
     if (scroll === null) throw new Error('transcript scroll missing');
     scroll.scrollTop = 137;
     const trigger = await openViewer();

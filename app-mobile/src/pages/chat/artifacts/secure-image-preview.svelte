@@ -69,14 +69,14 @@
 
 {#if objectUrl === null}
   <section class="image-preview" aria-label="Sanitized image preview" data-image-state="loading">
-    <p class="artifact-preview-message" role="status">Loading sanitized image.</p>
+    <p class="artifact-preview--message" role="status">Loading sanitized image.</p>
   </section>
 {:else}
   <section class="image-preview" aria-label="Sanitized image preview" data-image-state={imageState}>
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
-      class="image-preview-stage"
+      class="image-preview--stage"
       role="group"
       tabindex="0"
       aria-label="Image zoom and pan surface"
@@ -127,7 +127,7 @@
       onpointerleave={stopPan}
     >
       <img
-        class="image-preview-image"
+        class="image-preview--image"
         src={objectUrl}
         {alt}
         draggable={false}

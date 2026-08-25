@@ -1,6 +1,6 @@
 <script lang="ts">
   // Renders the provider around two inbound-image trigger buttons nested in a
-  // transcript-scroll > Typed-transcript region. Mirrors the React OpenButtons
+  // transcript--scroll > Typed-transcript region. Mirrors the React OpenButtons
   // + <ArtifactViewerProvider> wrapper.
   import type { InboundImageReadyBlock } from '@pi-remote/pi-rpc-protocol';
 
@@ -17,7 +17,7 @@
 </script>
 
 <ArtifactViewerProvider>
-  <div class="transcript-scroll">
+  <div class="transcript--scroll">
     <div aria-label="Typed transcript" tabindex="-1">
       <InboundImageOpenButtonsChild {first} {second} />
     </div>

@@ -27,23 +27,23 @@
 <!-- @ds surface: artifact-header — the viewer heading + close chrome. -->
 <!-- @ds slot: heading-group (kicker · title · revision) | close — the header regions. -->
 <!-- @ds guardrail: do-not-edit — The heading focus target (tabindex=-1) and the close aria-label are frozen. -->
-<header class="artifact-viewer-header">
-  <div class="artifact-viewer-heading-group">
-    <span class="artifact-viewer-kicker">{kindLabel}</span>
+<header class="artifact-viewer--header">
+  <div class="artifact-viewer--heading-group">
+    <span class="artifact-viewer--eyebrow">{kindLabel}</span>
     <h2
       bind:this={headingRef}
-      id="artifact-viewer-title"
+      id="artifact-viewer--title"
       tabindex="-1"
-      class="artifact-viewer-title"
+      class="artifact-viewer--title"
       dir="auto"
     >{title}</h2>
     {#if revision !== null}
-      <span class="artifact-viewer-revision" dir="ltr">Exact revision {revision}</span>
+      <span class="artifact-viewer--revision" dir="ltr">Exact revision {revision}</span>
     {/if}
   </div>
   <button
     type="button"
-    class="artifact-viewer-close"
+    class="artifact-viewer--close"
     aria-label={`Close ${title.toLocaleLowerCase()} viewer`}
     use:hover
     use:focusVisible
@@ -55,14 +55,14 @@
   </button>
 </header>
 
-<!-- @ds surface: artifact-viewer-revision — the exact-revision line in the viewer header. Decomposed into this scoped block;
+<!-- @ds surface: artifact-viewer--revision — the exact-revision line in the viewer header. Decomposed into this scoped block;
      single-component (only ArtifactHeader renders it). The rest of the header chrome
-     (artifact-viewer-header/heading-group/kicker/title/close) is shared with AttachmentPreviewDialog
+     (artifact-viewer--header/heading-group/kicker/title/close) is shared with AttachmentPreviewDialog
      and stays in the global sheet (→ app.css at cutover). Dark re-ink via :global(:root[data-theme]).
      Literal hex preserved. Values unchanged. -->
 <style>
   /* @ds slot: revision — the exact-revision provenance line (LTR-isolated). */
-  .artifact-viewer-revision {
+  .artifact-viewer--revision {
     max-inline-size: 100%;
     overflow-wrap: anywhere;
     color: #6c6a65;
@@ -74,7 +74,7 @@
   }
 
   /* @ds state: dark — dark-theme re-ink (foreign ancestor via :global). */
-  :global(:root[data-theme='dark']) .artifact-viewer-revision {
+  :global(:root[data-theme='dark']) .artifact-viewer--revision {
     color: #9f998f;
   }
 </style>

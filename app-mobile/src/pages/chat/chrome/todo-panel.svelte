@@ -130,7 +130,7 @@
     return (node: HTMLElement) => {
       const button = node.parentElement;
       if (!(button instanceof HTMLButtonElement)) return;
-      button.classList.add('todo-section-trigger');
+      button.classList.add('todo-section--trigger');
       button.setAttribute('aria-label', label);
       const hoverAct = hover(button);
       const pressAct = press(button);
@@ -141,7 +141,7 @@
         destroyAction(pressAct);
         destroyAction(focusVisibleAct);
         destroyAction(focusedAct);
-        button.classList.remove('todo-section-trigger');
+        button.classList.remove('todo-section--trigger');
         button.removeAttribute('aria-label');
       };
     };
@@ -157,22 +157,22 @@
   data-todo-all-done={model.allDone ? 'true' : 'false'}
 >
   <!-- @ds slot: header — sticky panel header; heading + progress-count + refresh control. -->
-  <header class="todo-panel-header">
+  <header class="todo-panel--header">
     <!-- @ds slot: heading — the provenance eyebrow + read-only label. -->
-    <div class="todo-panel-heading">
-      <p class="todo-provenance">pi's plan · todo</p>
+    <div class="todo-panel--heading">
+      <p class="todo--provenance">pi's plan · todo</p>
       <!-- @ds slot: read-only-label — the "Read-only host projection" note. -->
-      <p class="todo-read-only-label">Read-only host projection</p>
+      <p class="todo--read-only-label">Read-only host projection</p>
     </div>
     <!-- @ds slot: progress-count — the done/total counter. -->
-    <span class="todo-progress-count" aria-label="{model.doneCount} of {model.totalCount} tasks done">
+    <span class="todo-progress--count" aria-label="{model.doneCount} of {model.totalCount} tasks done">
       {model.doneCount}/{model.totalCount}
     </span>
     <!-- @ds slot: refresh — the react-aria Button that refreshes the read-only projection. -->
     <!-- @ds guardrail: react-aria Button wiring (type, aria-label, disabled, onPress) — Not designer-editable. -->
     <Button
       type="button"
-      class="todo-refresh"
+      class="todo--refresh"
       aria-label="Refresh pi todos"
       disabled={refreshing || onRefresh === undefined}
       onclick={() => {
@@ -188,7 +188,7 @@
   <!-- @ds slot: progress-hairline — the done/total progress bar. -->
   {#if model.progressPercent !== null}
     <div
-      class="todo-progress-hairline"
+      class="todo-progress--hairline"
       role="progressbar"
       aria-label="Todo progress"
       aria-valuemin={0}
@@ -200,33 +200,33 @@
   {/if}
   <!-- @ds slot: sync-note · @ds state: syncing — note shown while the read-only view refreshes. -->
   {#if needsRefresh}
-    <p class="todo-sync-note" role="status">
+    <p class="todo--sync-note" role="status">
       The last verified plan is shown while the read-only view refreshes.
     </p>
   {/if}
   <!-- @ds slot: body — the panel content area; all-done / empty / sectioned-rows states below. -->
-  <div class="todo-panel-body">
+  <div class="todo-panel--body">
     {#if model.allDone}
       <!-- @ds state: all-done — every task done; a quiet summary line replaces the rows. -->
-      <p class="todo-all-done" role="status">
+      <p class="todo--all-done" role="status">
         All done · {model.doneCount}/{model.totalCount}
       </p>
     {:else if model.totalCount === 0}
       <!-- @ds state: empty — no tasks in pi's current plan. -->
-      <p class="todo-empty-line">No tasks in pi's current plan.</p>
+      <p class="todo--empty-line">No tasks in pi's current plan.</p>
     {:else}
       {#each model.sections as section (`${projection.planId}-${section.state}`)}
         <!-- @ds slot: section — one state's task rows in a collapsible Disclosure; section state read from
              `data-todo-state` (pending · active/in-progress · done). -->
         <Collapsible
-          class="todo-state-section"
+          class="todo-state--section"
           data-todo-state={section.state}
           bind:open={openByState[section.state]}
         >
           {#snippet trigger()}
             <!-- @ds slot: section-trigger — the section header; chevron + label + count. -->
             <span
-              class="todo-section-chevron"
+              class="todo-section--chevron"
               aria-hidden="true"
               {@attach attachSectionTrigger(
                 `${section.label}, ${section.count} ${section.count === 1 ? 'task' : 'tasks'}`,
@@ -235,25 +235,25 @@
               ›
             </span>
             <span>{section.label}</span>
-            <span class="todo-section-count">{section.count}</span>
+            <span class="todo-section--count">{section.count}</span>
           {/snippet}
-          <div class="todo-section-panel">
+          <div class="todo-section--panel">
             {#each section.groups as group, groupIndex (`${projection.planId}-${section.state}-${group.group ?? 'ungrouped'}-${groupIndex}`)}
-              <div class="todo-group-run">
+              <div class="todo-group--run">
                 {#if group.group !== null}
-                  <h4 class="todo-group-heading">{group.group}</h4>
+                  <h4 class="todo-group--heading">{group.group}</h4>
                 {/if}
-                <ul class="todo-task-list" aria-label="{section.label} tasks">
+                <ul class="todo-task--list" aria-label="{section.label} tasks">
                   {#each group.tasks as task (task.id)}
                     <!-- @ds slot: row — one task; state read from `data-todo-task-state` (pending · active/in-progress · done). -->
                     <li
-                      class="todo-task-row"
+                      class="todo-task--row"
                       data-todo-task-id={task.id}
                       data-todo-task-state={task.state}
                       data-todo-task-revision={task.revision}
                     >
-                      <!-- @ds slot: glyph — the per-state marker; variants via .todo-state-glyph-{state}. -->
-                      <span class="todo-state-glyph todo-state-glyph-{task.state}" aria-hidden="true">
+                      <!-- @ds slot: glyph — the per-state marker; variants via .todo-state-icon--{state}. -->
+                      <span class="todo-state-icon todo-state-icon--{task.state}" aria-hidden="true">
                         <svg viewBox="0 0 16 16" focusable="false">
                           {#if task.state === 'pending' || task.state === 'active'}
                             <rect x="3.5" y="3.5" width="9" height="9" rx="1.25" />
@@ -264,10 +264,10 @@
                           {/if}
                         </svg>
                       </span>
-                      <span class="todo-task-title" dir="auto">{task.title}</span>
-                      <span class="todo-task-state">{TODO_STATE_LABELS[task.state]}</span>
+                      <span class="todo-task--title" dir="auto">{task.title}</span>
+                      <span class="todo-task--state">{TODO_STATE_LABELS[task.state]}</span>
                       {#if task.updatedAt !== null}
-                        <time class="todo-task-updated-at" datetime={task.updatedAt} title={task.updatedAt}>
+                        <time class="todo-task--updated-at" datetime={task.updatedAt} title={task.updatedAt}>
                           {relativeTimestamp(task.updatedAt)}
                         </time>
                       {/if}
@@ -283,13 +283,13 @@
   </div>
   <!-- @ds slot: provenance-updated — the relative "Updated …" timestamp. -->
   {#if projection.updatedAt !== null}
-    <time class="todo-updated-label" datetime={projection.updatedAt} title={projection.updatedAt}>
+    <time class="todo--updated-label" datetime={projection.updatedAt} title={projection.updatedAt}>
       Updated {relativeTimestamp(projection.updatedAt, locale, now)}
     </time>
   {/if}
   <!-- @ds guardrail: literal sr-only polite live region — Never layout space, focus, or scroll. -->
   {#if announcement !== ''}
-    <div class="todo-live-region sr-only" role="status" aria-live="polite" aria-atomic="true">
+    <div class="todo--live-region sr-only" role="status" aria-live="polite" aria-atomic="true">
       {announcement}
     </div>
   {/if}
@@ -325,7 +325,7 @@
   }
 
   /* @ds slot: header — sticky panel header; heading + progress-count + refresh control. */
-  .todo-panel-header {
+  .todo-panel--header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
@@ -340,24 +340,24 @@
   }
 
   /* @ds slot: heading — the provenance eyebrow + read-only label. */
-  .todo-panel-heading {
+  .todo-panel--heading {
     display: grid;
     min-inline-size: 0;
     gap: 0.15rem;
   }
 
   /* @ds slot: provenance · @ds slot: read-only-label · @ds slot: progress-count · @ds slot: sync-note · @ds slot: empty-line · @ds slot: all-done — shared margin reset. */
-  .todo-provenance,
-  .todo-read-only-label,
-  .todo-progress-count,
-  .todo-sync-note,
-  .todo-empty-line,
-  .todo-all-done {
+  .todo--provenance,
+  .todo--read-only-label,
+  .todo-progress--count,
+  .todo--sync-note,
+  .todo--empty-line,
+  .todo--all-done {
     margin: 0;
   }
 
   /* @ds slot: provenance — the "pi's plan · todo" eyebrow. */
-  .todo-provenance {
+  .todo--provenance {
     color: var(--ink);
     font-family: var(--font-display);
     font-size: 1.05rem;
@@ -365,17 +365,17 @@
   }
 
   /* @ds slot: read-only-label · @ds slot: sync-note · @ds state: syncing · @ds slot: empty-line · @ds state: empty — quiet meta + status lines. */
-  .todo-read-only-label,
-  .todo-sync-note,
-  .todo-empty-line,
-  .todo-updated-label {
+  .todo--read-only-label,
+  .todo--sync-note,
+  .todo--empty-line,
+  .todo--updated-label {
     color: var(--ink-muted);
     font-size: 0.78rem;
     line-height: 1.45;
   }
 
   /* @ds slot: progress-count — the done/total counter. */
-  .todo-progress-count {
+  .todo-progress--count {
     color: var(--ink);
     font-size: 0.82rem;
     font-variant-numeric: tabular-nums;
@@ -383,8 +383,8 @@
   }
 
   /* @ds slot: refresh · @ds slot: section-trigger — the shared 44px interactive base. */
-  :global(.todo-refresh),
-  :global(.todo-section-trigger) {
+  :global(.todo--refresh),
+  :global(.todo-section--trigger) {
     min-inline-size: 44px;
     min-block-size: 44px;
     border: 0;
@@ -396,7 +396,7 @@
   }
 
   /* @ds slot: refresh — refreshes the read-only projection. */
-  :global(.todo-refresh) {
+  :global(.todo--refresh) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -407,7 +407,7 @@
     font-size: 0.78rem;
   }
 
-  :global(.todo-refresh svg) {
+  :global(.todo--refresh svg) {
     inline-size: 1rem;
     block-size: 1rem;
     fill: none;
@@ -418,35 +418,35 @@
   }
 
   /* @ds state: hover · pressed — refresh + section triggers. */
-  :global(.todo-refresh[data-hovered]),
-  :global(.todo-refresh[data-pressed]),
-  :global(.todo-section-trigger[data-hovered]),
-  :global(.todo-section-trigger[data-pressed]) {
+  :global(.todo--refresh[data-hovered]),
+  :global(.todo--refresh[data-pressed]),
+  :global(.todo-section--trigger[data-hovered]),
+  :global(.todo-section--trigger[data-pressed]) {
     background: var(--canvas-subtle);
   }
 
   /* @ds guardrail: focus-visible — The shared AA focus ring across refresh + section triggers. */
-  :global(.todo-refresh[data-focus-visible]),
-  :global(.todo-section-trigger[data-focus-visible]) {
+  :global(.todo--refresh[data-focus-visible]),
+  :global(.todo-section--trigger[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
   /* @ds state: disabled — refresh fails back to a quiet, parked control. */
-  :global(.todo-refresh[data-disabled]) {
+  :global(.todo--refresh[data-disabled]) {
     cursor: default;
     opacity: 0.65;
   }
 
   /* @ds slot: progress-hairline — the done/total progress bar (aria progressbar is guarded). */
-  .todo-progress-hairline {
+  .todo-progress--hairline {
     block-size: 3px;
     overflow: hidden;
     border-radius: 999px;
     background: var(--line-hairline);
   }
 
-  .todo-progress-hairline > span {
+  .todo-progress--hairline > span {
     display: block;
     block-size: 100%;
     border-radius: inherit;
@@ -455,25 +455,25 @@
   }
 
   /* @ds slot: body — the panel content area; all-done / empty / sectioned-rows states below. */
-  .todo-panel-body {
+  .todo-panel--body {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-2);
   }
 
   /* @ds slot: rows — a collapsible state group; section state via data-todo-state (pending · in-progress · done). */
-  :global(.todo-state-section) {
+  :global(.todo-state--section) {
     min-inline-size: 0;
     border-block-start: 1px solid var(--line);
   }
 
-  :global(.todo-state-section > h2),
-  :global(.todo-state-section > h3) {
+  :global(.todo-state--section > h2),
+  :global(.todo-state--section > h3) {
     margin: 0;
   }
 
   /* @ds slot: section-trigger — the section header; chevron + label + count. */
-  :global(.todo-section-trigger) {
+  :global(.todo-section--trigger) {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     inline-size: 100%;
@@ -487,36 +487,36 @@
   }
 
   /* @ds slot: section-chevron — the collapse/expand chevron. */
-  .todo-section-chevron {
+  .todo-section--chevron {
     color: var(--ink-muted);
     font-size: 1rem;
     transform: rotate(90deg);
   }
 
   /* @ds state: collapsed — closed section chevron. */
-  :global(.todo-section-trigger[aria-expanded='false'] .todo-section-chevron) {
+  :global(.todo-section--trigger[aria-expanded='false'] .todo-section--chevron) {
     transform: none;
   }
 
   /* @ds slot: section-count — the per-section task count. */
-  .todo-section-count {
+  .todo-section--count {
     min-inline-size: 1.5rem;
     color: var(--ink-muted);
     font-variant-numeric: tabular-nums;
     text-align: end;
   }
 
-  .todo-section-panel,
-  .todo-group-run {
+  .todo-section--panel,
+  .todo-group--run {
     min-inline-size: 0;
   }
 
-  .todo-group-run + .todo-group-run {
+  .todo-group--run + .todo-group--run {
     margin-block-start: var(--space-2);
   }
 
   /* @ds slot: group-heading — a named group label inside a section. */
-  .todo-group-heading {
+  .todo-group--heading {
     margin: 0;
     padding: var(--space-1) 0 var(--space-1) 1.75rem;
     color: var(--ink-muted);
@@ -526,7 +526,7 @@
   }
 
   /* @ds slot: rows — the task row list. */
-  .todo-task-list {
+  .todo-task--list {
     display: grid;
     min-inline-size: 0;
     margin: 0;
@@ -535,7 +535,7 @@
   }
 
   /* @ds slot: row — one task; state read from data-todo-task-state (pending · active/in-progress · done). */
-  .todo-task-row {
+  .todo-task--row {
     display: grid;
     grid-template-columns: 1.1rem minmax(0, 1fr) auto;
     min-inline-size: 0;
@@ -546,12 +546,12 @@
     border-block-start: 1px solid var(--line);
   }
 
-  .todo-task-list > .todo-task-row:first-child {
+  .todo-task--list > .todo-task--row:first-child {
     border-block-start: 0;
   }
 
-  /* @ds slot: glyph — the per-state marker; variants via .todo-state-glyph-{state}. */
-  .todo-state-glyph {
+  /* @ds slot: glyph — the per-state marker; variants via .todo-state-icon--{state}. */
+  .todo-state-icon {
     display: inline-grid;
     inline-size: 1rem;
     block-size: 1rem;
@@ -559,7 +559,7 @@
     color: var(--ink);
   }
 
-  .todo-state-glyph svg {
+  .todo-state-icon svg {
     inline-size: 100%;
     block-size: 100%;
     fill: none;
@@ -570,18 +570,18 @@
   }
 
   /* @ds state: in-progress (active) — the running/highlighted task marker. */
-  .todo-state-glyph-active svg {
+  .todo-state-icon--active svg {
     fill: var(--accent);
     stroke: var(--ink);
   }
 
   /* @ds state: done — the completed task marker. */
-  .todo-state-glyph-done svg {
+  .todo-state-icon--done svg {
     stroke-width: 2;
   }
 
   /* @ds slot: title — the task title copy. */
-  .todo-task-title {
+  .todo-task--title {
     min-inline-size: 0;
     color: var(--ink);
     font-size: 0.86rem;
@@ -591,7 +591,7 @@
   }
 
   /* @ds slot: task-state — the localized state label. */
-  .todo-task-state {
+  .todo-task--state {
     color: var(--ink-muted);
     font-size: 0.72rem;
     line-height: 1.35;
@@ -599,7 +599,7 @@
   }
 
   /* @ds slot: updated-at — the per-task relative timestamp. */
-  .todo-task-updated-at {
+  .todo-task--updated-at {
     grid-column: 2 / -1;
     color: var(--ink-muted);
     font-size: 0.68rem;
@@ -609,7 +609,7 @@
   }
 
   /* @ds state: all-done — every task done; a quiet glowing summary line. */
-  .todo-all-done {
+  .todo--all-done {
     padding-block: var(--space-3);
     color: var(--ink);
     font-family: var(--font-display);
@@ -617,12 +617,12 @@
   }
 
   /* @ds slot: provenance-updated — the relative "Updated …" timestamp. */
-  .todo-updated-label {
+  .todo--updated-label {
     justify-self: end;
   }
 
   /* @ds guardrail: sr-only polite live region — Must never take layout space, move focus, or scroll. */
-  .todo-live-region {
+  .todo--live-region {
     /* The live region is purely a screen-reader polite queue; it must never
        take layout space, never move focus, and never cause a scroll. */
     position: absolute;
@@ -642,24 +642,24 @@
       padding: var(--space-3);
     }
 
-    .todo-panel-header {
+    .todo-panel--header {
       grid-template-columns: minmax(0, 1fr) auto;
     }
 
-    :global(.todo-refresh) {
+    :global(.todo--refresh) {
       grid-column: 1 / -1;
       inline-size: 100%;
     }
 
-    .todo-task-row {
+    .todo-task--row {
       grid-template-columns: 1.1rem minmax(0, 1fr);
     }
 
-    .todo-task-state {
+    .todo-task--state {
       grid-column: 2;
     }
 
-    .todo-task-updated-at {
+    .todo-task--updated-at {
       grid-column: 2 / -1;
     }
   }
@@ -671,21 +671,21 @@
       container-type: inline-size;
     }
 
-    .todo-task-title {
+    .todo-task--title {
       overflow-wrap: anywhere;
       word-break: break-word;
     }
   }
 
-  :global([dir='rtl']) .todo-section-chevron {
+  :global([dir='rtl']) .todo-section--chevron {
     transform: rotate(-90deg);
   }
 
-  :global([dir='rtl'] .todo-section-trigger[aria-expanded='false'] .todo-section-chevron) {
+  :global([dir='rtl'] .todo-section--trigger[aria-expanded='false'] .todo-section--chevron) {
     transform: none;
   }
 
-  :global([dir='rtl']) .todo-progress-hairline > span {
+  :global([dir='rtl']) .todo-progress--hairline > span {
     transform-origin: inline-end;
   }
 
@@ -706,7 +706,7 @@
       scroll-behavior: auto;
     }
 
-    .todo-progress-hairline > span {
+    .todo-progress--hairline > span {
       transition: none !important;
     }
   }

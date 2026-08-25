@@ -123,7 +123,7 @@
   --danger-soft: #f4e7e4;
   --focus: #121212;
 /* @ds edit: tokens — the --diff-add / --diff-remove component tokens drive the add/remove tints
-   consumed by .artifact-diff-add and .artifact-diff-remove (dark and system-dark remap the same names). */
+   consumed by .artifact-diff--add and .artifact-diff--remove (dark and system-dark remap the same names). */
 
   --diff-add: #e4eee7;
   --diff-remove: #f3e5e2;
@@ -339,7 +339,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds end surface: topbar */
 /* @ds surface: chrome-button — shared quiet transparent chrome button (nav/back/theme). */
 .nav-button,
-.theme-option,
+.theme--option,
 .back-button {
   min-height: 2.75rem;
   padding-inline: var(--space-3);
@@ -359,7 +359,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: hover */
 .nav-button[data-hovered],
 .back-button[data-hovered],
-.theme-option[data-hovered] {
+.theme--option[data-hovered] {
   background: var(--surface-muted);
   color: var(--ink);
 }
@@ -370,7 +370,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds surface: theme-switcher — segmented theme selector (ToggleButton group). */
 
 /* @ds state: default */
-.theme-option {
+.theme--option {
   min-height: 2.25rem;
   padding-inline: 0.65rem;
   font-size: 0.68rem;
@@ -380,7 +380,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds end surface: theme-switcher */
 
 /* @ds surface: status — DOCUMENTED CONVENTION (no shared class): the status/badge families recur across
-   the connection status-pill, the runtime/mode glyphs, the artifact resource-status, the slash-panel
+   the connection status--pill, the runtime/mode glyphs, the artifact resource-status, the slash--panel
    header states, and the file-preview availability — each rendered per-surface today. Physical
    unification onto one shared badge class is a follow-up; the resolved rules here stay as-is. */
 /* @ds state: idle · loading · stalled · ready · empty · offline · stale · denied · expired · missing ·
@@ -388,27 +388,27 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds guardrail: do-not-edit — the per-surface STATE MACHINES and status-TEXT sources are off-limits to
    a designer edit: presentation/style is editable here; the state logic and status copy are not. */
 /* @ds slot: status — connection-phase readout in the topbar. */
-/* @ds surface: status-pill — connection-phase status. */
+/* @ds surface: status--pill — connection-phase status. */
 
 /* @ds slot: dot */
 
 /* @ds state: live */
 
 /* @ds state: pulsing — transitional connection phases (and running glyphs). */
-.status-authenticating i,
-.status-connecting i,
-.status-reconnecting i,
-.state-running .state-icon,
-.agent-running .state-icon {
+.status--authenticating i,
+.status--connecting i,
+.status--reconnecting i,
+.state--running .state--icon,
+.agent--running .state--icon {
   animation: signal-pulse 1.4s ease-in-out infinite;
 }
 
 /* @ds state: error */
-.status-error,
-.state-interrupted {
+.status--error,
+.state--interrupted {
   color: var(--danger);
 }
-/* @ds end surface: status-pill */
+/* @ds end surface: status--pill */
 
 /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
 /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
@@ -417,7 +417,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds slot: kicker — shared section eyebrow across surfaces. */
-.surface-kicker {
+.surface--eyebrow {
   margin: 0 0 var(--space-3);
   color: var(--accent-ink);
   font-size: 0.72rem;
@@ -427,8 +427,8 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds surface: home-view — hero, session roster, device footer, push settings. */
-/* @ds state: loading · empty · error · stale — via shared empty-state,
-.inbox-heading h1{
+/* @ds state: loading · empty · error · stale — via shared empty--state,
+.inbox--heading h1{
   max-width: 13ch;
   margin: 0;
   color: var(--ink);
@@ -444,8 +444,8 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds slot: sessions — recent-sessions section. */
 
 .section-heading,
-.session-title,
-.session-toolbar {
+.session--title,
+.session--toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -479,36 +479,36 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: stale */
 /* @ds end surface: freshness */
 
-/* @ds slot: session-grid — the session card roster. */
+/* @ds slot: session--grid — the session card roster. */
 
 /* @ds surface: status — per-session runtime glyph joining the shared vocabulary (idle · running). */
 /* @ds surface: session-state-icon — per-session status glyph. */
 /* @ds state: running */
-.state-running {
+.state--running {
   color: var(--accent-ink);
 }
 /* @ds state: idle */
-.state-idle {
+.state--idle {
   color: var(--success);
 }
 
 /* @ds slot: icon */
 /* @ds end surface: session-state-icon */
 
-/* @ds slot: open-arrow — session-card affordance. */
+/* @ds slot: open-arrow — session--card affordance. */
 
 /* @ds slot: device — device-key footer (logout · revoke). */
 
-/* @ds surface: push-settings — device notification preferences. */
+/* @ds surface: push--settings — device notification preferences. */
 /* @ds state: loading · disabled · off · on — support check, relay-off, enable CTA{
   background: var(--accent-strong);
   color: white;
 }
 
-/* @ds end surface: enrollment-view */
-/* @ds surface: review-view, inbox-view — routed list surfaces sharing the back-bar. */
+/* @ds end surface: enrollment--view */
+/* @ds surface: review--view, inbox--view — routed list surfaces sharing the back-bar. */
 /* @ds slot: toolbar — back-bar (back · count). */
-.session-toolbar {
+.session--toolbar {
   margin-bottom: clamp(2rem, 7vw, 4rem);
 }
 
@@ -522,20 +522,20 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds end surface: back-button */
 
 /* @ds slot: count — pending/awaiting badge. */
-.review-count {
+.review--count {
   color: var(--warning);
   font-size: 0.72rem;
   font-weight: 700;
 }
-.inbox-heading {
+.inbox--heading {
   max-width: 58rem;
   padding-bottom: clamp(2.5rem, 7vw, 5rem);
 }
-.inbox-heading h1 {
+.inbox--heading h1 {
   max-width: 15ch;
   font-size: clamp(2.8rem, 7vw, 5.6rem);
 }
-.inbox-heading > p:last-child {
+.inbox--heading > p:last-child {
   max-width: 43rem;
   margin: var(--space-6) 0 0;
   color: var(--ink-secondary);
@@ -564,14 +564,14 @@ button[data-pressed]:not([data-disabled]) {
   color: var(--warning);
 }
 
-.attention-card > span:not(.attention-icon) {
+.attention--card > span:not(.attention--icon) {
   font-size: 0.9rem;
   font-weight: 700;
 }
 
-/* @ds surface: empty-state — empty/unavailable list state. */
-/* @ds state: empty-transcript — the TranscriptList "no blocks yet" message. */
-.empty-state{
+/* @ds surface: empty--state — empty/unavailable list state. */
+/* @ds state: empty--transcript — the TranscriptList "no blocks yet" message. */
+.empty--state{
   padding: clamp(3rem, 8vw, 6rem) var(--space-4);
   border: 1px dashed var(--line-strong);
   border-radius: var(--radius-lg);
@@ -580,7 +580,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds slot: glyph */
-.empty-glyph {
+.empty--icon {
   display: inline-grid;
   width: 3rem;
   height: 3rem;
@@ -593,27 +593,27 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds slot: title */
-.empty-state h3 {
+.empty--state h3 {
   margin: var(--space-4) 0 var(--space-2);
   color: var(--ink);
   font-size: 1.15rem;
 }
 
 /* @ds slot: body */
-.empty-state p {
+.empty--state p {
   max-width: 32rem;
   margin: 0 auto;
   line-height: 1.6;
 }
-/* @ds end surface: empty-state */
+/* @ds end surface: empty--state */
 
-.session-title {
+.session--title {
   align-items: end;
   padding-bottom: var(--space-6);
   border-bottom: 1px solid var(--line-strong);
 }
 
-.session-title h1 {
+.session--title h1 {
   margin: 0;
   font-size: clamp(2.25rem, 6vw, 4.25rem);
   font-weight: 650;
@@ -630,13 +630,13 @@ button[data-pressed]:not([data-disabled]) {
   background: var(--surface-muted);
 }
 
-/* @ds surface: status — runtime/mode status glyph (idle · running via .agent-running), part of the
+/* @ds surface: status — runtime/mode status glyph (idle · running via .agent--running), part of the
    shared status vocabulary. */
-.agent-state-icon {
+.agent-state--icon {
   color: var(--ink-muted);
 }
 
-.agent-running .agent-state-icon {
+.agent--running .agent-state--icon {
   color: var(--accent-ink);
 }
 
@@ -676,7 +676,7 @@ button[data-pressed]:not([data-disabled]) {
    disabled while the composer is busy or syncing (plus a non-live connection). */
 
 /* @ds slot: tools-trigger — the "+" popover trigger. */
-.composer-plus {
+.composer--plus {
   display: grid;
   place-items: center;
   width: 2.5rem;
@@ -692,7 +692,7 @@ button[data-pressed]:not([data-disabled]) {
 /* ── Persistent Plan mode control (immediately after "+") ────────────
    One 44px tab stop with a host-confirmed label. Plan is conveyed
    redundantly (lock glyph + words), never by clay alone. */
-/* @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. */
+/* @ds surface: plan-mode--button — persistent host-confirmed mode control + menu trigger. */
 /* @ds state: chart — the ModePresentationKind set. The default chrome carries
    checking · build · running · stale · offline · forbidden · unsupported ·
    extension-error · delivery-unknown · unavailable; plan / executing / applying
@@ -715,12 +715,12 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: applying — a mode change is in flight. */
 
 /* @ds slot: label — bounded, ellipsis-capped visible label. */
-/* @ds end surface: plan-mode-button */
+/* @ds end surface: plan-mode--button */
 
 /* The two-row mode menu: focus movement only, activation alone reports. */
 /* @ds surface: plan-mode-menu — the exact two-row Build / Plan picker. */
 /* @ds slot: popover — floating placement chrome + raised elevation. */
-/* @ds surface: overlay — plan-mode-popover is an INSTANCE of the shared overlay
+/* @ds surface: overlay — plan-mode--popover is an INSTANCE of the shared overlay
    primitive (a raised panel over its anchored trigger). Physical unification
    of the per-surface overlay chrome is a documented follow-up. */
 
@@ -746,8 +746,8 @@ button[data-pressed]:not([data-disabled]) {
 /* Keyboard preference row in the tools popover. */
 
 /* ── Leave plan mode confirmation sheet ────────────────────────────── */
-/* @ds surface: leave-plan-sheet — confirmation before Plan → Build expands host authority. */
-/* @ds surface: overlay — leave-plan-sheet is an INSTANCE of the shared overlay
+/* @ds surface: leave-plan--sheet — confirmation before Plan → Build expands host authority. */
+/* @ds surface: overlay — leave-plan--sheet is an INSTANCE of the shared overlay
    primitive (backdrop → raised panel → header/body/actions). Physical unification
    of the per-surface overlay chrome is a documented follow-up. */
 /* @ds slot: overlay — fixed scrim + bottom-sheet placement.
@@ -776,10 +776,10 @@ button[data-pressed]:not([data-disabled]) {
    mode / plan-ready variant. */
 
 /* @ds state: focus-visible */
-/* @ds end surface: leave-plan-sheet */
+/* @ds end surface: leave-plan--sheet */
 
 /* ── Live plan review ───────────────────────────────────────────────── */
-/* @ds surface: plan-ready-card — live validated plan summary + review entry. */
+/* @ds surface: plan-ready--card — live validated plan summary + review entry. */
 /* @ds state: reviewable — renders only when the artifact is live, newest and valid. */
 
 /* @ds slot: header — title + check mark; shared with plan-review-sheet. */
@@ -807,7 +807,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: waiting-for-live-confirmation — review CTA disabled until the
    host binds the plan. */
 
-/* @ds end surface: plan-ready-card */
+/* @ds end surface: plan-ready--card */
 
 /* @ds surface: plan-review-sheet — modal review of the plan; the only atomic execute path. */
 /* @ds surface: overlay — plan-review-sheet is an INSTANCE of the shared overlay
@@ -852,7 +852,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds edit: motion — reduced-motion: review-sheet entry disabled. */
 @media (prefers-reduced-motion: reduce) {
-  .plan-review-modal {
+  .plan-review--modal {
     animation: none;
   }
 }
@@ -999,7 +999,7 @@ button[data-pressed]:not([data-disabled]) {
 /* Local photo draft: a compact, horizontal rail that never becomes a second editor. */
 
 /* @ds surface: rich-content-cards — the rich-content card group: command/output,
-   code, and text-artifact cards, their shared rich-block-frame, and the prose
+   code, and text-artifact cards, their shared rich-block--frame, and the prose
    rendered by the safe-Markdown renderer. Rules below already read semantic
    tokens; these @ds labels make each presentational seam and every state explicit. */
 /* Rich content release hardening: bounded reading surfaces keep text selectable,
@@ -1007,14 +1007,14 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds guardrail: do-not-edit — bounded reading surfaces must never overflow the
    page horizontally; the minimum inline size is a shared invariant across the
    cards and the read-only regions they render. */
-.rich-block-frame,
-.rich-block-content,
-.rich-prose-block,
+.rich-block--frame,
+.rich-block--content,
+.rich--prose-block,
 .safe-markdown,
-.safe-markdown-fallback,
-.artifact-viewer-dialog,
-.artifact-viewer-content,
-.artifact-preview-region {
+.safe-markdown--fallback,
+.artifact-viewer--dialog,
+.artifact-viewer--content,
+.artifact-preview--region {
   min-inline-size: 0;
   max-inline-size: 100%;
 }
@@ -1023,9 +1023,9 @@ button[data-pressed]:not([data-disabled]) {
    safe-Markdown output. */
 /* @ds guardrail: do-not-edit — unicode-bidi: plaintext keeps directional text
    stable and un-clickable-into; do not weaken. */
-.rich-prose-block,
+.rich--prose-block,
 .safe-markdown,
-.safe-markdown-fallback {
+.safe-markdown--fallback {
   direction: auto;
   text-align: start;
   unicode-bidi: plaintext;
@@ -1033,31 +1033,31 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds guardrail: do-not-edit — scrollable code/text wells contain their own
    overscroll so panning never chains to the page. */
-.rich-shell-well,
-.artifact-diff-preview{
+.rich--shell-well,
+.artifact-diff--preview{
   overscroll-behavior: contain;
 }
-.artifact-diff-preview{
+.artifact-diff--preview{
   overflow-anchor: none;
 }
 
 /* @ds guardrail: do-not-edit — >=44px interactive targets (WCAG). The Copy/Open
    card actions and the viewer controls all share this floor. */
-.rich-block-action,
-.artifact-control-button,
-.artifact-stale-action,
-.artifact-jump-latest {
+.rich-block--action,
+.artifact--control-button,
+.artifact--stale-action,
+.artifact--jump-latest {
   min-block-size: 44px;
   min-inline-size: 44px;
 }
 
 /* @ds guardrail: do-not-edit — canonical focus-visible ring for card actions and
    viewer controls. Presentational a11y invariant; never colour-only. */
-.rich-block-action:focus-visible,
-.artifact-control-button:focus-visible,
-.artifact-stale-action:focus-visible,
-.artifact-jump-latest:focus-visible,
-.artifact-find-control input:focus-visible {
+.rich-block--action:focus-visible,
+.artifact--control-button:focus-visible,
+.artifact--stale-action:focus-visible,
+.artifact--jump-latest:focus-visible,
+.artifact-find--control input:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
   box-shadow: 0 0 0 5px var(--accent);
@@ -1078,7 +1078,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds edit: layout — viewer full-frame safe-area gutters (bottom/left/right). */
 
-.artifact-viewer-modal {
+.artifact-viewer--modal {
   padding-block-end: max(var(--space-4), env(safe-area-inset-bottom, 0px));
   padding-inline: max(var(--space-3), env(safe-area-inset-left, 0px))
     max(var(--space-3), env(safe-area-inset-right, 0px));
@@ -1086,7 +1086,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds edit: layout — content capped to the visual viewport, minus the safe areas. */
 
-.artifact-viewer-content {
+.artifact-viewer--content {
   max-block-size: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
 
@@ -1095,27 +1095,27 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds edit: layout — narrow reflow of the cards at <=20rem: card padding,
    header/actions/status stacking, and full-width actions. */
 @media (max-width: 20rem) {
-  .rich-block-frame {
+  .rich-block--frame {
     padding: var(--space-3);
   }
 
-  .rich-block-header,
-  .rich-block-actions,
-  .rich-command-region-heading {
+  .rich-block--header,
+  .rich-block--actions,
+  .rich-command-region--heading {
     align-items: stretch;
   }
 
-  .rich-block-actions {
+  .rich-block--actions {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .rich-block-action,
-  .artifact-jump-latest {
+  .rich-block--action,
+  .artifact--jump-latest {
     inline-size: 100%;
   }
 
-  .artifact-viewer-modal {
+  .artifact-viewer--modal {
     padding-inline: var(--space-2);
   }
 }
@@ -1124,15 +1124,15 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds edit: layout — short-landscape reflow: cards compact their vertical rhythm. */
 
 @media (orientation: landscape) and (max-height: 30rem) {
-  .artifact-viewer-modal {
+  .artifact-viewer--modal {
     max-block-size: 100dvh;
   }
 
-  .artifact-viewer-content {
+  .artifact-viewer--content {
     max-block-size: 76dvh;
   }
 
-  .rich-block-frame {
+  .rich-block--frame {
     margin-block: var(--space-2);
   }
 }
@@ -1143,20 +1143,20 @@ button[data-pressed]:not([data-disabled]) {
    their transition/scroll motion. */
 
 @media (prefers-reduced-motion: reduce) {
-  .rich-block-action,
-  .artifact-control-button,
-  .artifact-stale-action,
-  .artifact-jump-latest,
-  .artifact-code-preview {
+  .rich-block--action,
+  .artifact--control-button,
+  .artifact--stale-action,
+  .artifact--jump-latest,
+  .artifact-code--preview {
     transition-duration: 100ms;
     scroll-behavior: auto;
   }
 }
 
-/* @ds surface: rich-block-frame — shared chrome for every rich card: header,
+/* @ds surface: rich-block--frame — shared chrome for every rich card: header,
    content column, and footer action row. */
 /* @ds edit: layout — card geometry, padding, radius, shadow, frame width. */
-.rich-block-frame {
+.rich-block--frame {
   min-inline-size: 0;
   inline-size: 100%;
   margin-block: var(--space-3);
@@ -1185,7 +1185,7 @@ button[data-pressed]:not([data-disabled]) {
    content is already redacted read-only; never remove or restyle it away. */
 
 /* @ds slot: content — the card body holding the per-card preview regions. */
-.rich-block-content {
+.rich-block--content {
   min-inline-size: 0;
 }
 
@@ -1198,7 +1198,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: copy — success · failure · unavailable are behavioural states driven
    by clipboard availability and result; the affordance chrome is this base. */
 /* @ds guardrail: do-not-edit — >=44px target floor and the base chrome. */
-.rich-block-action {
+.rich-block--action {
   min-inline-size: 44px;
   min-block-size: 44px;
   padding-inline: var(--space-3);
@@ -1213,14 +1213,14 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds state: hover — react-aria data-hovered press/pointer feedback on card actions. */
 /* @ds guardrail: do-not-edit — reads react-aria's data-hovered attribute. */
-.rich-block-action[data-hovered] {
+.rich-block--action[data-hovered] {
   background: var(--accent-soft);
   color: var(--accent-ink);
 }
 
 /* @ds slot: command / output / code well — mono well shared by the command and
    the diff preview; no horizontal page overflow (scrolls inside its own box). */
-.rich-shell-well {
+.rich--shell-well {
   min-inline-size: 0;
   margin: 0;
   padding: var(--space-3);
@@ -1261,14 +1261,14 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds guardrail: do-not-edit — this is the presentation of already-sanitized
    Markdown; the allowlist and scheme-filtering live in SafeMarkdown.tsx. */
 .safe-markdown,
-.safe-markdown-fallback {
+.safe-markdown--fallback {
   min-inline-size: 0;
   color: var(--ink);
   font: 1rem/1.55 var(--font-display);
   overflow-wrap: anywhere;
 }
 
-/* @ds slot: safe-markdown-code — neutralizes the inline-chip chrome inside a
+/* @ds slot: safe-markdown--code — neutralizes the inline-chip chrome inside a
    fenced block. */
 
 /* @ds slot: prose-table — table rhythm, borders{
@@ -1279,7 +1279,7 @@ button[data-pressed]:not([data-disabled]) {
    full-width action buttons. */
 @media (max-width: 27rem) {
 
-  .rich-block-action {
+  .rich-block--action {
     flex: 1 1 10rem;
   }
 }
@@ -1290,7 +1290,7 @@ button[data-pressed]:not([data-disabled]) {
    (close · escape · history · edge-back · voiceover-scrub) drive the chrome rendered here. */
 /* @ds guardrail: do-not-edit — the light reading surface's background and ink are frozen. */
 
-.artifact-viewer-modal {
+.artifact-viewer--modal {
   background: #ffffff;
   color: #24221f;
 }
@@ -1299,23 +1299,23 @@ button[data-pressed]:not([data-disabled]) {
    inline size so no rule overflows the frame.
    @ds edit: layout — shared zero inline floor for the viewer frame. */
 
-.artifact-viewer-dialog,
-.artifact-viewer-header,
-.artifact-viewer-heading-group,
-.artifact-viewer-content,
-.artifact-preview-region {
+.artifact-viewer--dialog,
+.artifact-viewer--header,
+.artifact-viewer--heading-group,
+.artifact-viewer--content,
+.artifact-preview--region {
   min-inline-size: 0;
 }
 
 /* @ds slot: header — the viewer heading row (wraps at narrow widths). */
 
-.artifact-viewer-header {
+.artifact-viewer--header {
   flex-wrap: wrap;
 }
 
 /* @ds slot: heading-group — kicker · title · revision cluster. */
 
-.artifact-viewer-heading-group {
+.artifact-viewer--heading-group {
   flex: 1 1 12rem;
 }
 
@@ -1326,7 +1326,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: body — scroll column; horizontal overflow hidden so previews pan inside. */
 
-.artifact-viewer-content {
+.artifact-viewer--content {
   overflow-x: hidden;
   overscroll-behavior: contain;
 }
@@ -1337,9 +1337,9 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds guardrail: do-not-edit — >=44px interactive targets (WCAG); unit chrome shared by the
    toolbar labels, controls, and the stale-action. */
 
-.artifact-preview-controls span,
-.artifact-control-button,
-.artifact-stale-action {
+.artifact-preview--controls span,
+.artifact--control-button,
+.artifact--stale-action {
   min-block-size: 44px;
   border: 1px solid #6c6a65;
   border-radius: 0.5rem;
@@ -1354,17 +1354,17 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: action — a toolbar button / stale-action base chrome. */
 
-.artifact-control-button,
-.artifact-stale-action {
+.artifact--control-button,
+.artifact--stale-action {
   padding-inline: 0.75rem;
   cursor: pointer;
 }
 
 /* @ds state: hover · pressed — react-aria [aria-pressed='true'] and pointer feedback. */
 
-.artifact-control-button:hover,
-.artifact-control-button[aria-pressed='true'],
-.artifact-stale-action:hover {
+.artifact--control-button:hover,
+.artifact--control-button[aria-pressed='true'],
+.artifact--stale-action:hover {
   border-color: #b85f42;
   background: #f3e4de;
 }
@@ -1372,9 +1372,9 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: focus-visible — toolbar ring, light. */
 /* @ds guardrail: do-not-edit — never colour-only focus. */
 
-.artifact-control-button:focus-visible,
-.artifact-stale-action:focus-visible,
-.artifact-find-control input:focus-visible {
+.artifact--control-button:focus-visible,
+.artifact--stale-action:focus-visible,
+.artifact-find--control input:focus-visible {
   outline: 3px solid #24221f;
   outline-offset: 2px;
 }
@@ -1382,7 +1382,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds surface: find — the in-preview search control. */
 /* @ds slot: find-control — search input field chrome. */
 
-.artifact-find-control {
+.artifact-find--control {
   display: inline-flex;
   min-block-size: 44px;
   flex: 1 1 10rem;
@@ -1400,7 +1400,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: find-input — the text entry field (transparent over the field chrome). */
 
-.artifact-find-control input {
+.artifact-find--control input {
   min-inline-size: 0;
   inline-size: 100%;
   min-block-size: 32px;
@@ -1414,15 +1414,15 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: selection — text selection tint inside the reading surface. */
 /* @ds guardrail: do-not-edit — the reading surface keeps selection; never un-selectable. */
 
-.artifact-viewer-content ::selection,
-.artifact-viewer-content ::-moz-selection {
+.artifact-viewer--content ::selection,
+.artifact-viewer--content ::-moz-selection {
   background: #f3e4de;
   color: #24221f;
 }
 
 /* @ds state: find-match — the active search match readback. */
 
-.artifact-find-match {
+.artifact-find--match {
   background: #f3e4de;
   color: #24221f;
 }
@@ -1471,7 +1471,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds surface: diff-preview — the unified-diff read well. */
 /* @ds guardrail: do-not-edit — fixed ltr, isolate bidi, selectable,
-.artifact-empty-preview {
+.artifact--empty-preview {
   max-inline-size: 100%;
   margin: 0;
   padding: 1rem;
@@ -1488,19 +1488,19 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds edit: layout — narrow reflow of the viewer header and controls at <=30rem. */
 
 @media (max-width: 30rem) {
-  .artifact-viewer-header {
+  .artifact-viewer--header {
     align-items: stretch;
   }
 
-  .artifact-viewer-heading-group {
+  .artifact-viewer--heading-group {
     flex-basis: 100%;
   }
 
-  .artifact-viewer-close {
+  .artifact-viewer--close {
     margin-inline-start: auto;
   }
 
-  .artifact-find-control {
+  .artifact-find--control {
     flex-basis: 100%;
     min-inline-size: 0;
   }
@@ -1510,42 +1510,42 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: dark — remaps the reading surfaces and controls to the dark palette.
    @ds guardrail: do-not-edit — dark reading surfaces stay fully opaque and legible. */
 
-:root[data-theme='dark'] .artifact-viewer-modal,
-:root[data-theme='dark'] .artifact-empty-preview,
-:root[data-theme='dark'] .artifact-find-control,
-:root[data-theme='dark'] .artifact-control-button,
-:root[data-theme='dark'] .artifact-stale-action {
+:root[data-theme='dark'] .artifact-viewer--modal,
+:root[data-theme='dark'] .artifact--empty-preview,
+:root[data-theme='dark'] .artifact-find--control,
+:root[data-theme='dark'] .artifact--control-button,
+:root[data-theme='dark'] .artifact--stale-action {
   background: #2d2a26;
   color: #f8f8f6;
 }
 
-:root[data-theme='dark'] .artifact-control-button:hover,
-:root[data-theme='dark'] .artifact-control-button[aria-pressed='true'],
-:root[data-theme='dark'] .artifact-stale-action:hover,
-:root[data-theme='dark'] .artifact-find-match {
+:root[data-theme='dark'] .artifact--control-button:hover,
+:root[data-theme='dark'] .artifact--control-button[aria-pressed='true'],
+:root[data-theme='dark'] .artifact--stale-action:hover,
+:root[data-theme='dark'] .artifact-find--match {
   background: #3a2720;
   color: #f8f8f6;
 }
 
-:root[data-theme='dark'] .artifact-control-button:focus-visible,
-:root[data-theme='dark'] .artifact-stale-action:focus-visible,
-:root[data-theme='dark'] .artifact-find-control input:focus-visible {
+:root[data-theme='dark'] .artifact--control-button:focus-visible,
+:root[data-theme='dark'] .artifact--stale-action:focus-visible,
+:root[data-theme='dark'] .artifact-find--control input:focus-visible {
   outline-color: #f8f8f6;
 }
 
-:root[data-theme='dark'] .artifact-find-control input {
+:root[data-theme='dark'] .artifact-find--control input {
   color: #f8f8f6;
 }
 
-:root[data-theme='dark'] .artifact-viewer-content ::selection,
-:root[data-theme='dark'] .artifact-viewer-content ::-moz-selection {
+:root[data-theme='dark'] .artifact-viewer--content ::selection,
+:root[data-theme='dark'] .artifact-viewer--content ::-moz-selection {
   background: #3a2720;
   color: #f8f8f6;
 }
 
 /* @ds end surface: artifact-viewer */
 /* @ds slot: primary-action — the single circular morphing disc (send/steer/stop/sending). */
-.composer-primary {
+.composer--primary {
   display: grid;
   place-items: center;
   width: 2.5rem;
@@ -1560,12 +1560,12 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* @ds state: send · steer — the morphing primary disc; steer shares this form. */
-.composer-primary.is-send {
+.composer--primary.is-send {
   background: var(--accent);
   color: #fff;
 }
 
-.composer-primary.is-send[data-hovered] {
+.composer--primary.is-send[data-hovered] {
   background: var(--accent-strong);
 }
 
@@ -1573,7 +1573,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds state: stopping · sending-inhibit — the disc's disabled affordance. */
 
-.composer-later {
+.composer--later {
   min-height: 2.25rem;
   padding-inline: var(--space-3);
   border: 1px solid var(--line);
@@ -1585,7 +1585,7 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
-.composer-plan-chip {
+.composer--plan-pill {
   padding: var(--space-1) var(--space-3);
   border-radius: 999px;
   background: var(--accent-soft);
@@ -1608,20 +1608,20 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds guardrail: reduced-motion keeps the shared spinner static — never remove. */
 @media (prefers-reduced-motion: reduce) {
 
-  .plan-mode-button,
-  .leave-plan-sheet {
+  .plan-mode--button,
+  .leave-plan--sheet {
     transition: none;
   }
 }
 
 /* Tools popover: model, effort, Build/Plan, and commands — one tap from "+". */
 
-.tools-group {
+.tools--group {
   display: grid;
   gap: var(--space-1);
 }
 
-.tools-label {
+.tools--label {
   color: var(--ink-muted);
   font-size: 0.68rem;
   font-weight: 680;
@@ -1713,24 +1713,24 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .model-sheet-overlay,
-  .model-sheet-overlay[data-exiting],
-  .model-sheet-modal,
-  .model-sheet-modal.is-dragging,
-  .model-sheet-modal.is-snapping,
-  .model-sheet-overlay[data-exiting] .model-sheet-modal,
-  .model-sheet-skeleton,
-  .effort-spinner,
-  .effort-state-confirmed {
+  .model-sheet--overlay,
+  .model-sheet--overlay[data-exiting],
+  .model-sheet--modal,
+  .model-sheet--modal.is-dragging,
+  .model-sheet--modal.is-snapping,
+  .model-sheet--overlay[data-exiting] .model-sheet--modal,
+  .model-sheet--skeleton,
+  .effort--spinner,
+  .effort-state--confirmed {
     animation: none;
   }
 
-  .model-sheet-modal,
-  .model-sheet-modal.is-dragging,
-  .model-sheet-modal.is-snapping,
-  .model-sheet-overlay[data-exiting] .model-sheet-modal,
-  .model-sheet-overlay button:active:not(:disabled),
-  .model-sheet-overlay button[data-pressed]:not([data-disabled]) {
+  .model-sheet--modal,
+  .model-sheet--modal.is-dragging,
+  .model-sheet--modal.is-snapping,
+  .model-sheet--overlay[data-exiting] .model-sheet--modal,
+  .model-sheet--overlay button:active:not(:disabled),
+  .model-sheet--overlay button[data-pressed]:not([data-disabled]) {
     transform: none;
     transition: none;
   }
@@ -1768,7 +1768,7 @@ button[data-pressed]:not([data-disabled]) {
    document so "back" keeps pointing at the section that precedes it. */
 
 /* ── Runtime strip: composer-adjacent confirmed readouts + shared trigger ── */
-/* @ds surface: runtime-strip — host-backed readout + controls strip. */
+/* @ds surface: runtime--strip — host-backed readout + controls strip. */
 
 /* @ds slot: readout — confirmed model / effort readout. */
 
@@ -1794,13 +1794,13 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds end surface: build-plan-toggle */
 
 /* @ds slot: status — applied runtime status hint. */
-/* @ds end surface: runtime-strip */
+/* @ds end surface: runtime--strip */
 
 /* Narrow widths give the mode control its own toolbar row above the
    textarea: the left group wraps so the label never truncates Plan ·
    read-only and the primary action stays on the first row. */
 
-/* @ds surface: session-view — in-session composition root (header · statusline · transcript · composer). */
+/* @ds surface: session--view — in-session composition root (header · statusline · transcript · composer). */
 /* @ds state: active · stale — reconnecting readout; error via inline-alert. */
 
 /* @ds slot: label — session status text. */
@@ -1810,7 +1810,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: running */
 
 /* Popover sheets + every react-aria dropdown (Select / ComboBox / Dialog). */
-/* @ds end surface: session-view */
+/* @ds end surface: session--view */
 /* @ds surface: session-sheet — in-session overflow popover (nav · theme){
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -1858,7 +1858,7 @@ button[data-pressed]:not([data-disabled]) {
   font-weight: 640;
 }
 
-.tools-select > button {
+.tools--select > button {
   display: flex;
   width: 100%;
   min-height: 2.5rem;
@@ -1884,10 +1884,10 @@ button[data-pressed]:not([data-disabled]) {
 
 /* Reader-controlled live edge: a pill to jump to the newest blocks when scrolled up. */
 /* @ds surface: transcript-list — the virtualized transcript list and its live-edge controls. */
-/* @ds slot: scroll-to-latest — pill, shown only away from the live edge. */
+/* @ds slot: scroll--to-latest — pill, shown only away from the live edge. */
 /* @ds state: not-live-edge */
 
-/* @ds slot: scroll-badge — new-message count pill. */
+/* @ds slot: scroll--badge — new-message count pill. */
 
 /* @ds slot: scroll-region — the scrollable clip of the virtual list. */
 
@@ -1899,9 +1899,9 @@ button[data-pressed]:not([data-disabled]) {
 /* Timeline rail removed — conversation hierarchy comes from turn boundaries,
    compact user bubbles, and borderless assistant prose. */
 
-/* @ds state: turn-start — hairline + breathing room before each new prompt. */
+/* @ds state: turn--start — hairline + breathing room before each new prompt. */
 
-/* @ds surface: transcript-block — one message block; each kind is a state seam below. */
+/* @ds surface: transcript--block — one message block; each kind is a state seam below. */
 
 /* @ds state: text */
 
@@ -1910,8 +1910,8 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds slot: header-time — mono timestamp. */
 
 /* @ds slot: copy — the plain prose/artifact body of a block. */
-.block-copy,
-.diff-summary {
+.block--copy,
+.diff--summary {
   max-width: var(--reading-width);
   margin: 0;
   padding: var(--space-4) var(--space-6) var(--space-6);
@@ -1921,14 +1921,14 @@ button[data-pressed]:not([data-disabled]) {
   overflow-wrap: anywhere;
 }
 
-.block-text .block-copy {
+.block--text .block--copy {
   color: var(--ink);
   font-size: 1rem;
 }
 
 /* @ds state: text-user — compact, trailing-aligned bubble. */
 
-.block-role-user .block-copy {
+.block-role--user .block--copy {
   padding: var(--space-2) var(--space-4);
   color: var(--ink);
   font-size: 1rem;
@@ -1937,13 +1937,13 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds state: text-assistant — borderless serif prose reply. */
 
-.block-role-assistant > header {
+.block-role--assistant > header {
   padding-inline: 0;
   border-bottom: none;
 }
 
 /* Assistant answers read as editorial serif prose — the biggest Claude-quality signal. */
-.block-role-assistant .block-copy {
+.block-role--assistant .block--copy {
   max-width: var(--reading-width);
   padding: 0;
   color: var(--ink);
@@ -1952,11 +1952,11 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.62;
 }
 
-.block-role-assistant {
+.block-role--assistant {
   padding-block: var(--space-2);
 }
 
-.inbound-image-well {
+.inbound-image--well {
   position: relative;
   display: grid;
   min-block-size: 180px;
@@ -1971,15 +1971,15 @@ button[data-pressed]:not([data-disabled]) {
   contain: paint;
 }
 
-:root[data-theme='dark'] .inbound-image-well {
+:root[data-theme='dark'] .inbound-image--well {
   background: var(--surface-code);
 }
 
-.inbound-image-well[data-no-pixels='true'] {
+.inbound-image--well[data-no-pixels='true'] {
   color: var(--ink-muted);
 }
 
-.inbound-image-placeholder-pattern {
+.inbound-image--placeholder-pattern {
   inline-size: 2.25rem;
   block-size: 2.25rem;
   border: 1px solid var(--line-strong);
@@ -1998,14 +1998,14 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* Under-answer action row — quiet monochrome, like the Claude app. */
-/* @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. */
+/* @ds surface: turn--actions — Copy / Share answer actions + inline glyphs. */
 
 /* @ds slot: action — a Copy / Share answer button. */
 
 /* @ds state: hover */
 
 /* @ds state: focus-visible */
-/* @ds end surface: turn-actions */
+/* @ds end surface: turn--actions */
 
 /* @ds state: thinking · unknown — softened plain copy shared by these block kinds. */
 .quiet-copy {
@@ -2043,29 +2043,29 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds state: tool_result+error — danger output. */
 
-.diff-summary {
+.diff--summary {
   padding-bottom: var(--space-3);
   color: var(--ink);
   font-weight: 650;
 }
 
-.diff-patch {
+.diff--patch {
   display: block;
   padding: var(--space-3) 0 !important;
 }
 
-.diff-patch > span {
+.diff--patch > span {
   display: block;
   min-height: 1.55em;
   padding-inline: var(--space-6);
 }
 
-.diff-patch .diff-add {
+.diff--patch .diff--add {
   background: color-mix(in oklch, var(--diff-add) 90%, transparent);
   color: oklch(0.82 0.08 153);
 }
 
-.diff-patch .diff-remove {
+.diff--patch .diff--remove {
   background: color-mix(in oklch, var(--diff-remove) 90%, transparent);
   color: oklch(0.82 0.08 25);
 }
@@ -2091,8 +2091,8 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: glyph-icon · close-icon — shared 1.35rem stroke geometry. */
 
-.artifact-card-glyph svg,
-.artifact-viewer-close svg {
+.artifact-card--icon svg,
+.artifact-viewer--close svg {
   inline-size: 1.35rem;
   block-size: 1.35rem;
   fill: none;
@@ -2124,7 +2124,7 @@ button[data-pressed]:not([data-disabled]) {
    reason (close · escape · history · edge-back · voiceover-scrub) drive the chrome rendered here. */
 /* @ds guardrail: do-not-edit — the overlay scrim never lets the transcript bleed through. */
 
-.artifact-viewer-overlay {
+.artifact-viewer--overlay {
   position: fixed;
   z-index: 110;
   inset: 0;
@@ -2140,7 +2140,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds slot: modal — the frame card.
    @ds edit: layout — frame width, max block-size, and the author palette. */
 
-.artifact-viewer-modal {
+.artifact-viewer--modal {
   inline-size: min(100%, 48rem);
   max-inline-size: 100%;
   max-block-size: var(--visual-viewport-height, 100dvh);
@@ -2152,7 +2152,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds slot: dialog — grid rows (header · status · body) with safe-area gutters.
    @ds edit: layout — full-frame padding with safe-area insets; rows auto · auto · 1fr. */
 
-.artifact-viewer-dialog {
+.artifact-viewer--dialog {
   display: grid;
   min-inline-size: 0;
   min-block-size: 100%;
@@ -2167,7 +2167,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: header — the heading + close chrome. */
 
-.artifact-viewer-header {
+.artifact-viewer--header {
   display: flex;
   min-inline-size: 0;
   align-items: flex-start;
@@ -2179,7 +2179,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: heading-group — kicker · title · revision cluster. */
 
-.artifact-viewer-heading-group {
+.artifact-viewer--heading-group {
   display: grid;
   min-inline-size: 0;
   gap: var(--space-2);
@@ -2187,7 +2187,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: kicker — the artifact-kind eyebrow. */
 
-.artifact-viewer-kicker {
+.artifact-viewer--eyebrow {
   color: var(--accent-ink);
   font-size: 0.68rem;
   font-weight: 700;
@@ -2197,7 +2197,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: title — display-serif artifact title. */
 
-.artifact-viewer-title {
+.artifact-viewer--title {
   max-inline-size: 100%;
   margin: 0;
   overflow-wrap: anywhere;
@@ -2208,7 +2208,7 @@ button[data-pressed]:not([data-disabled]) {
   line-height: 1.15;
 }
 
-.artifact-viewer-title:focus-visible {
+.artifact-viewer--title:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 4px;
 }
@@ -2216,7 +2216,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds slot: close — the dismiss button (44px round).
    @ds guardrail: do-not-edit — the close control's 44px target is WCAG-frozen. */
 
-.artifact-viewer-close {
+.artifact-viewer--close {
   display: grid;
   inline-size: 44px;
   block-size: 44px;
@@ -2230,11 +2230,11 @@ button[data-pressed]:not([data-disabled]) {
   cursor: pointer;
 }
 
-.artifact-viewer-close[data-hovered] {
+.artifact-viewer--close[data-hovered] {
   background: var(--accent-soft);
 }
 
-.artifact-viewer-close[data-focus-visible] {
+.artifact-viewer--close[data-focus-visible] {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
@@ -2252,7 +2252,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: body — scroll column; previews pan inside (no page overflow). */
 
-.artifact-viewer-content {
+.artifact-viewer--content {
   display: grid;
   min-inline-size: 0;
   min-block-size: 0;
@@ -2265,7 +2265,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: summary — the viewer's descriptor prose (capped to a reading measure). */
 
-.artifact-viewer-summary {
+.artifact-viewer--summary {
   max-inline-size: 66ch;
   margin: 0;
   overflow-wrap: anywhere;
@@ -2309,7 +2309,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: Image (loading · ready · corrupt · too-large) — [data-image-state] drives each. */
 /* @ds guardrail: do-not-edit — the object-URL lifecycle and zoom clamp are frozen. */
 
-.image-preview-stage {
+.image-preview--stage {
   display: grid;
   min-block-size: 15rem;
   place-items: center;
@@ -2323,7 +2323,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds slot: image — the decoded image (non-draggable).
    @ds guardrail: do-not-edit — user-select/drag disabled so the layer is handoff-only. */
 
-.image-preview-image {
+.image-preview--image {
   display: block;
   max-inline-size: 100%;
   max-block-size: min(70vh, 42rem);
@@ -2335,7 +2335,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds slot: message — a quiet secondary read line. */
 
-.artifact-preview-message {
+.artifact-preview--message {
   margin: 0;
   color: var(--ink-secondary);
   line-height: 1.5;
@@ -2353,7 +2353,7 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds edit: layout — dvh fallback caps the modal to the visual-viewport height. */
 
 @supports not (height: 100dvh) {
-  .artifact-viewer-modal {
+  .artifact-viewer--modal {
     max-block-size: var(--visual-viewport-height, 100vh);
   }
 }
@@ -2362,12 +2362,12 @@ button[data-pressed]:not([data-disabled]) {
 
 @media (max-width: 24rem) {
 
-  .artifact-viewer-dialog {
+  .artifact-viewer--dialog {
     padding-inline: max(var(--space-3), env(safe-area-inset-left))
       max(var(--space-3), env(safe-area-inset-right));
   }
 
-  .artifact-viewer-title {
+  .artifact-viewer--title {
     font-size: 1.45rem;
   }
 }
@@ -2377,10 +2377,10 @@ button[data-pressed]:not([data-disabled]) {
 
 @media (prefers-reduced-motion: reduce) {
   .artifact-card,
-  .artifact-viewer-overlay,
-  .artifact-viewer-modal,
-  .artifact-viewer-close,
-  .image-preview-image {
+  .artifact-viewer--overlay,
+  .artifact-viewer--modal,
+  .artifact-viewer--close,
+  .image-preview--image {
     animation: none;
     transition: none;
   }
@@ -2390,15 +2390,15 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: usage — input/output/cost grid. */
 
 /* Inline streaming marker: a small pulsing cue attached under the active answer. */
-/* @ds state: streaming · @ds slot: streaming-marker — the "Working…" live cue. */
+/* @ds state: streaming · @ds slot: streaming--marker — the "Working…" live cue. */
 
-/* @ds slot: streaming-glyph — pulsing dots. */
+/* @ds slot: streaming--icon — pulsing dots. */
 
-/* @ds slot: streaming-label */
+/* @ds slot: streaming--label */
 
 /* @ds guardrail: streaming reduced-motion — a11y invariant; do not remove. */
 
-/* @ds surface: activity-group — grouped bare evidence blocks in one quiet disclosure. */
+/* @ds surface: activity--group — grouped bare evidence blocks in one quiet disclosure. */
 
 /* @ds slot: panel-body — the DisclosurePanel content stack of an evidence disclosure. */
 
@@ -2423,15 +2423,15 @@ button[data-pressed]:not([data-disabled]) {
 
 @media (max-width: 52rem) {
 
-  .wordmark-copy,
-  .status-pill {
+  .wordmark--copy,
+  .status--pill {
     display: none;
   }
 
-  .theme-option:nth-child(2)::before {
+  .theme--option:nth-child(2)::before {
     content: '☀';
   }
-  .theme-option:nth-child(3)::before {
+  .theme--option:nth-child(3)::before {
     content: '●';
   }
 }
@@ -2443,12 +2443,12 @@ button[data-pressed]:not([data-disabled]) {
   }
 
   .section-heading,
-  .session-title{
+  .session--title{
     align-items: stretch;
     flex-direction: column;
   }
 
-  .session-title {
+  .session--title {
     gap: var(--space-6);
   }
 
@@ -2456,10 +2456,10 @@ button[data-pressed]:not([data-disabled]) {
     align-self: start;
   }
 
-  .block-copy,
-  .diff-summary,
-  .plan-list,
-  .transcript-block pre {
+  .block--copy,
+  .diff--summary,
+  .plan--list,
+  .transcript--block pre {
     padding-inline: var(--space-4);
   }
 }
@@ -2484,7 +2484,7 @@ button[data-pressed]:not([data-disabled]) {
     transition-duration: 0.01ms !important;
   }
 
-  .session-card[data-hovered] {
+  .session--card[data-hovered] {
     transform: none;
   }
 }
@@ -2508,7 +2508,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* @ds end surface: slash-autocomplete */
 
-/* @ds surface: status — slash-panel header states map loading · ready..empty · ready..stale-offline ·
+/* @ds surface: status — slash--panel header states map loading · ready..empty · ready..stale--offline ·
    error..denied onto the shared families. */
 /* @ds slot: header — the panel's status / error / empty-catalog copy line. */
 /* @ds state: loading.initial · ready.emptyCatalog · ready.noMatches ·
@@ -2545,16 +2545,16 @@ button[data-pressed]:not([data-disabled]) {
 /* @ds state: retry-hovered — the revalidate affordance's hover wash. */
 
 @media (prefers-reduced-motion: reduce) {
-  .slash-option,
-  .slash-retry {
+  .slash--option,
+  .slash--retry {
     transition: none;
   }
 }
 
 /* The completion card is an overlay above the composer: while it is open it
-   must never sit under the scroll-to-latest pill, and the pill stays out of
+   must never sit under the scroll--to-latest pill, and the pill stays out of
    the accessibility tree while hidden. */
-body:has(.slash-panel) .scroll-to-latest {
+body:has(.slash--panel) .scroll--to-latest {
   visibility: hidden;
   pointer-events: none;
 }
@@ -2573,16 +2573,16 @@ body:has(.slash-panel) .scroll-to-latest {
 /* @ds guardrail: do-not-edit — the high-contrast re-render is an accessibility guarantee; never drop
    the border/outline carry for interactive and raised surfaces. */
 @media (prefers-contrast: more) {
-  .composer-tray,
-  .composer-plus,
-  .composer-primary.is-stop,
-  .plan-mode-button,
-  .plan-mode-popover,
-  .leave-plan-sheet,
-  .session-card,
-  .approval-card,
-  .attention-card,
-  .slash-panel {
+  .composer--tray,
+  .composer--plus,
+  .composer--primary.is-stop,
+  .plan-mode--button,
+  .plan-mode--popover,
+  .leave-plan--sheet,
+  .session--card,
+  .approval--card,
+  .attention--card,
+  .slash--panel {
     border-color: var(--line-strong);
   }
 }
@@ -2595,29 +2595,29 @@ body:has(.slash-panel) .scroll-to-latest {
 /* @ds guardrail: do-not-edit — forced-colors yield is an accessibility guarantee; never restore a
    hard-coded surface/ink over the system scheme. */
 @media (forced-colors: active) {
-  .composer-tray,
-  .composer-plus,
-  .composer-primary.is-stop,
-  .plan-mode-button,
-  .plan-mode-popover,
-  .plan-mode-row,
-  .leave-plan-sheet,
-  .leave-plan-stay,
-  .leave-plan-switch,
-  .session-card,
-  .approval-card,
-  .attention-card,
-  .slash-panel {
+  .composer--tray,
+  .composer--plus,
+  .composer--primary.is-stop,
+  .plan-mode--button,
+  .plan-mode--popover,
+  .plan-mode--row,
+  .leave-plan--sheet,
+  .leave-plan--stay,
+  .leave-plan--switch,
+  .session--card,
+  .approval--card,
+  .attention--card,
+  .slash--panel {
     border-color: CanvasText;
   }
 
-  .slash-panel,
-  .slash-option {
+  .slash--panel,
+  .slash--option {
     background: Canvas;
     color: CanvasText;
   }
 
-  .composer-primary.is-stop {
+  .composer--primary.is-stop {
     border: 1px solid CanvasText;
     background: Canvas;
     color: CanvasText;
@@ -2672,29 +2672,29 @@ select:focus-visible,
 }
 
 /* @ds edit: layout — ≥44px interactive targets (WCAG); the mode button shares the composer bar group. */
-.composer-plus,
-.composer-primary,
-.plan-mode-button,
-.composer-later {
+.composer--plus,
+.composer--primary,
+.plan-mode--button,
+.composer--later {
   min-inline-size: 44px;
   min-block-size: 44px;
 }
 
-.composer-plus,
-.composer-primary {
+.composer--plus,
+.composer--primary {
   inline-size: 44px;
   block-size: 44px;
 }
 
-/* @ds slot: label — lets the button label shrink; see plan-mode-button. */
+/* @ds slot: label — lets the button label shrink; see plan-mode--button. */
 
 /* Clay is an accent, not the foreground for normal-size action labels. */
-.composer-primary.is-send{
+.composer--primary.is-send{
   background: var(--ink);
   color: var(--ink-inverse);
 }
 
-.composer-primary.is-send[data-hovered]{
+.composer--primary.is-send[data-hovered]{
   background: var(--surface-muted);
   color: var(--ink);
 }
@@ -2715,13 +2715,13 @@ select:focus-visible,
 
   button:active:not(:disabled),
   button[data-pressed]:not([data-disabled]),
-  .session-card[data-hovered],
-  .model-sheet-modal,
-  .model-sheet-modal.is-dragging,
-  .model-sheet-modal.is-snapping,
-  .plan-review-modal,
+  .session--card[data-hovered],
+  .model-sheet--modal,
+  .model-sheet--modal.is-dragging,
+  .model-sheet--modal.is-snapping,
+  .plan-review--modal,
   [role='switch'][data-selected] .switch-track > span,
-  .evidence-trigger[data-expanded] .evidence-chevron {
+  .evidence--trigger[data-expanded] .evidence--chevron {
     transform: none !important;
   }
 }
@@ -2733,7 +2733,7 @@ select:focus-visible,
 /* @ds edit: layout — full-frame 100svh/dvh overlay; overflow clipped and self-contained. */
 /* @ds guardrail: do-not-edit — the opaque scrim is the privacy cover; never transparent. */
 
-.artifact-viewer-overlay {
+.artifact-viewer--overlay {
   inline-size: 100%;
   block-size: 100svh;
   block-size: 100dvh;
@@ -2747,7 +2747,7 @@ select:focus-visible,
 /* @ds slot: modal — the frame card (full frame height, overflow closed).
    @ds edit: layout — frame sizing; max 48rem wide, 100dvh tall. */
 
-.artifact-viewer-modal {
+.artifact-viewer--modal {
   inline-size: min(100%, 48rem);
   max-inline-size: 100%;
   block-size: 100%;
@@ -2759,7 +2759,7 @@ select:focus-visible,
 /* @ds slot: dialog — full-frame scroll column with safe-area gutters.
    @ds edit: layout — all-padding safe-area gutters; overflow contained. */
 
-.artifact-viewer-dialog {
+.artifact-viewer--dialog {
   min-inline-size: 0;
   min-block-size: 100%;
   max-block-size: 100%;
@@ -2773,7 +2773,7 @@ select:focus-visible,
 
 /* @ds slot: header — title rail + close (grid: title 1fr, close auto). */
 
-.artifact-viewer-header {
+.artifact-viewer--header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
@@ -2783,9 +2783,9 @@ select:focus-visible,
 
 /* @ds slot: heading-group · title · revision — wrap-safe text cluster. */
 
-.artifact-viewer-heading-group,
-.artifact-viewer-title,
-.artifact-viewer-revision {
+.artifact-viewer--heading-group,
+.artifact-viewer--title,
+.artifact-viewer--revision {
   min-inline-size: 0;
   overflow-wrap: anywhere;
 }
@@ -2798,7 +2798,7 @@ select:focus-visible,
 
 /* @ds slot: body — preview scroll region; contained overscroll. */
 
-.artifact-viewer-content {
+.artifact-viewer--content {
   min-inline-size: 0;
   min-block-size: 0;
   overscroll-behavior: contain;
@@ -2809,7 +2809,7 @@ select:focus-visible,
 /* @ds edit: layout — stage min/max height within the visual viewport. */
 /* @ds guardrail: do-not-edit — touch-action none keeps pan gesture-contained. */
 
-.image-preview-stage {
+.image-preview--stage {
   min-block-size: min(60svh, 32rem);
   min-block-size: min(60dvh, 32rem);
   max-block-size: 100%;
@@ -2822,17 +2822,17 @@ select:focus-visible,
 /* @ds slot: image — non-draggable decoder output.
    @ds guardrail: do-not-edit — user-select/drag disabled; layer is handoff-only. */
 
-.image-preview-image {
+.image-preview--image {
   user-select: none;
   -webkit-user-drag: none;
 }
 
 /* @ds guardrail: do-not-edit — >=44px WCAG target floor for every viewer control. */
 
-.artifact-control-button,
-.artifact-viewer-close,
-.artifact-stale-action,
-.artifact-image-pan-controls button {
+.artifact--control-button,
+.artifact-viewer--close,
+.artifact--stale-action,
+.artifact--image-pan-controls button {
   min-inline-size: 44px;
   min-block-size: 44px;
 }
@@ -2840,23 +2840,23 @@ select:focus-visible,
 /* @ds state: privacy-covered — the dialog is hidden under the opaque curtain. */
 /* @ds guardrail: do-not-edit — content must never be visible during the privacy cover. */
 
-.artifact-viewer-overlay[data-privacy-covered='true'] .artifact-viewer-dialog {
+.artifact-viewer--overlay[data-privacy-covered='true'] .artifact-viewer--dialog {
   visibility: hidden;
 }
 
 /* @ds edit: layout — narrow header reflow: title rail + fixed 44px close column. */
 
 @media (max-width: 30rem) {
-  .artifact-viewer-header {
+  .artifact-viewer--header {
     grid-template-columns: minmax(0, 1fr) 44px;
   }
 
-  .artifact-viewer-close {
+  .artifact-viewer--close {
     grid-column: 2;
     grid-row: 1;
   }
 
-  .artifact-viewer-dialog {
+  .artifact-viewer--dialog {
     padding-inline-start: max(var(--space-3), env(safe-area-inset-left, 0px));
     padding-inline-end: max(var(--space-3), env(safe-area-inset-right, 0px));
   }
@@ -2866,14 +2866,14 @@ select:focus-visible,
 /* @ds guardrail: do-not-edit — explicit high-contrast re-render is frozen. */
 
 @media (prefers-contrast: more) {
-  .artifact-viewer-dialog,
-  .artifact-viewer-dialog button,
-  .artifact-viewer-dialog input,
-  .artifact-viewer-dialog [role='group'] {
+  .artifact-viewer--dialog,
+  .artifact-viewer--dialog button,
+  .artifact-viewer--dialog input,
+  .artifact-viewer--dialog [role='group'] {
     border-color: CanvasText;
   }
 
-  .artifact-viewer-dialog :is(button, input, [tabindex='0']):focus-visible {
+  .artifact-viewer--dialog :is(button, input, [tabindex='0']):focus-visible {
     outline: 3px solid CanvasText;
     outline-offset: 3px;
   }
@@ -2883,11 +2883,11 @@ select:focus-visible,
 /* @ds guardrail: do-not-edit — reduced-motion must never re-enable the entrance animation. */
 
 @media (prefers-reduced-motion: reduce) {
-  .artifact-viewer-overlay,
-  .artifact-viewer-modal,
-  .artifact-viewer-dialog,
-  .artifact-viewer-close,
-  .image-preview-image {
+  .artifact-viewer--overlay,
+  .artifact-viewer--modal,
+  .artifact-viewer--dialog,
+  .artifact-viewer--close,
+  .image-preview--image {
     animation: none !important;
     transition: none !important;
 /* @ds end surface: artifact-viewer */

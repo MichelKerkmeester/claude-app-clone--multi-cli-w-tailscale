@@ -69,7 +69,7 @@ export function useAskQuestionKeyboardNavigation(
       status.setAttribute('aria-atomic', 'true');
     }
 
-    const fieldset = card.querySelector<HTMLElement>('.ask-question-options');
+    const fieldset = card.querySelector<HTMLElement>('.ask-question--options');
     if (fieldset !== null) {
       fieldset.setAttribute('role', 'group');
       fieldset.setAttribute('aria-labelledby', current.optionsLabelId);
@@ -80,7 +80,7 @@ export function useAskQuestionKeyboardNavigation(
     }
 
     const optionButtons = Array.from(
-      card.querySelectorAll<HTMLButtonElement>('.ask-question-option-row'),
+      card.querySelectorAll<HTMLButtonElement>('.ask-question-option--row'),
     );
     const activeOptions = optionButtons.filter((button) => !button.disabled);
     const focusedOption = activeOptions.find((button) => button === document.activeElement);
@@ -96,7 +96,7 @@ export function useAskQuestionKeyboardNavigation(
     optionButtons.forEach((button) => {
       button.tabIndex =
         current.enabled && !current.terminal && activeOptions[rovingIndex] === button ? 0 : -1;
-      const description = button.querySelector<HTMLElement>('.ask-question-option-description');
+      const description = button.querySelector<HTMLElement>('.ask-question-option--description');
       if (description === null) {
         button.removeAttribute('aria-describedby');
         return;
@@ -109,7 +109,7 @@ export function useAskQuestionKeyboardNavigation(
     const textControl = card.querySelector<HTMLTextAreaElement | HTMLInputElement>(
       '.ask-question-free-text textarea, .ask-question-free-text input',
     );
-    const count = card.querySelector<HTMLElement>('.ask-question-free-text-count');
+    const count = card.querySelector<HTMLElement>('.ask-question-free-text--count');
     if (count !== null) count.id = `${current.statusId}-count`;
     if (textControl !== null) {
       textControl.setAttribute('aria-required', String(current.freeTextRequired));
@@ -144,12 +144,12 @@ export function useAskQuestionKeyboardNavigation(
     };
 
     const activeOptions = (): HTMLButtonElement[] =>
-      Array.from(card.querySelectorAll<HTMLButtonElement>('.ask-question-option-row')).filter(
+      Array.from(card.querySelectorAll<HTMLButtonElement>('.ask-question-option--row')).filter(
         (button) => !button.disabled,
       );
 
     const setRovingOption = (selected: HTMLButtonElement): void => {
-      for (const option of card.querySelectorAll<HTMLButtonElement>('.ask-question-option-row')) {
+      for (const option of card.querySelectorAll<HTMLButtonElement>('.ask-question-option--row')) {
         option.tabIndex = option === selected && !option.disabled ? 0 : -1;
       }
     };
@@ -166,12 +166,12 @@ export function useAskQuestionKeyboardNavigation(
       ) ?? undefined;
 
     const getSubmit = (): HTMLButtonElement | undefined =>
-      card.querySelector<HTMLButtonElement>('.ask-question-submit:not(:disabled)') ?? undefined;
+      card.querySelector<HTMLButtonElement>('.ask-question--submit:not(:disabled)') ?? undefined;
 
     const onFocusIn = (event: FocusEvent): void => {
       const target = event.target;
       if (!(target instanceof HTMLElement) || !card.contains(target)) return;
-      const option = target.closest<HTMLButtonElement>('.ask-question-option-row');
+      const option = target.closest<HTMLButtonElement>('.ask-question-option--row');
       if (option !== null && card.contains(option)) {
         lastFocusedInCard = option;
         setRovingOption(option);
@@ -201,7 +201,7 @@ export function useAskQuestionKeyboardNavigation(
       const target = event.target;
       if (!(target instanceof HTMLElement) || !card.contains(target)) return;
 
-      const option = target.closest<HTMLButtonElement>('.ask-question-option-row');
+      const option = target.closest<HTMLButtonElement>('.ask-question-option--row');
       if (option !== null && card.contains(option)) {
         if (option.disabled) return;
         const optionsInCard = activeOptions();
@@ -263,7 +263,7 @@ export function useAskQuestionKeyboardNavigation(
         return;
       }
 
-      const submit = target.closest<HTMLButtonElement>('.ask-question-submit');
+      const submit = target.closest<HTMLButtonElement>('.ask-question--submit');
       if (submit === null || !card.contains(submit)) return;
       if (event.key === 'Tab' && event.shiftKey) {
         moveTo(event, getTextControl() ?? activeOptions().at(-1));
@@ -305,7 +305,7 @@ export function useAskQuestionKeyboardNavigation(
     const firstStop =
       activeAnswerStops(card)[0] ??
       card.querySelector<HTMLElement>(
-        '.ask-question-free-text textarea:not(:disabled), .ask-question-free-text input:not(:disabled), .ask-question-submit:not(:disabled)',
+        '.ask-question-free-text textarea:not(:disabled), .ask-question-free-text input:not(:disabled), .ask-question--submit:not(:disabled)',
       );
     if (firstStop === null || firstStop === undefined) return;
 
@@ -341,14 +341,14 @@ export function useAskQuestionKeyboardNavigation(
 function activeAnswerStops(card: HTMLElement): AnswerStop[] {
   return Array.from(
     card.querySelectorAll<AnswerStop>(
-      '.ask-question-option-row:not(:disabled), .ask-question-free-text textarea:not(:disabled), .ask-question-free-text input:not(:disabled), .ask-question-submit:not(:disabled)',
+      '.ask-question-option--row:not(:disabled), .ask-question-free-text textarea:not(:disabled), .ask-question-free-text input:not(:disabled), .ask-question--submit:not(:disabled)',
     ),
   );
 }
 
 function isAnswerStop(element: HTMLElement): element is AnswerStop {
   return element.matches(
-    '.ask-question-option-row, .ask-question-free-text textarea, .ask-question-free-text input, .ask-question-submit',
+    '.ask-question-option--row, .ask-question-free-text textarea, .ask-question-free-text input, .ask-question--submit',
   );
 }
 

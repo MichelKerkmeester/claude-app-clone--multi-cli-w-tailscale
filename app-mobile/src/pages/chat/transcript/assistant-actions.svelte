@@ -28,14 +28,14 @@
     typeof navigator !== 'undefined' && typeof (navigator as Navigator).share === 'function';
 </script>
 
-<!-- @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. -->
+<!-- @ds surface: turn--actions — Copy / Share answer actions + inline glyphs. -->
 {#if canCopy || canShare}
-  <div class="turn-actions">
+  <div class="turn--actions">
     {#if canCopy}
       <!-- @ds guardrail: aria-label + clipboard handler — not designer-editable. -->
       <button
         type="button"
-        class="turn-action"
+        class="turn--action"
         aria-label={copied ? 'Answer copied' : 'Copy answer'}
         onclick={() => {
           void navigator.clipboard
@@ -74,7 +74,7 @@
       <!-- @ds guardrail: aria-label + share handler — not designer-editable. -->
       <button
         type="button"
-        class="turn-action"
+        class="turn--action"
         aria-label="Share answer"
         onclick={() => {
           void (navigator as Navigator).share({ text }).catch(() => undefined);
@@ -97,21 +97,21 @@
   </div>
 {/if}
 
-<!-- @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. Decomposed into this scoped block;
-     turn-actions / turn-action and their hover/focus-visible states are owned solely
+<!-- @ds surface: turn--actions — Copy / Share answer actions + inline glyphs. Decomposed into this scoped block;
+     turn--actions / turn--action and their hover/focus-visible states are owned solely
      by this component so they move with it. Native div/button elements stay scoped. Values
      unchanged. -->
 <style>
   /* Quiet under-answer action row. */
-  /* @ds surface: turn-actions — Copy / Share answer actions + inline glyphs. */
-  .turn-actions {
+  /* @ds surface: turn--actions — Copy / Share answer actions + inline glyphs. */
+  .turn--actions {
     display: flex;
     gap: var(--space-1);
     margin-top: var(--space-2);
   }
 
   /* @ds slot: action — a Copy / Share answer button. */
-  .turn-action {
+  .turn--action {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
@@ -127,15 +127,15 @@
   }
 
   /* @ds state: hover */
-  .turn-action:hover {
+  .turn--action:hover {
     background: var(--surface-muted);
     color: var(--ink-secondary);
   }
 
   /* @ds state: focus-visible */
-  .turn-action:focus-visible {
+  .turn--action:focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
-  /* @ds end surface: turn-actions */
+  /* @ds end surface: turn--actions */
 </style>

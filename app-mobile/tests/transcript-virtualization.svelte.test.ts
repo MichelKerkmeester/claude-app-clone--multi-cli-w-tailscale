@@ -46,7 +46,7 @@ function textBlocks(count: number): readonly DisplayTranscriptBlock[] {
 // ───────────────────────────────────────────────────────────────────
 
 function isScrollViewport(element: HTMLElement): boolean {
-  return element.classList?.contains('transcript-scroll') === true;
+  return element.classList?.contains('transcript--scroll') === true;
 }
 
 // ───────────────────────────────────────────────────────────────────
@@ -113,12 +113,12 @@ describe('transcript virtualization', () => {
     });
 
     await waitFor(() => {
-      expect(document.querySelector('.transcript-virtual')).not.toBeNull();
+      expect(document.querySelector('.transcript--virtual')).not.toBeNull();
     });
 
     // A spacer covering only the rendered window would make the scrollbar lie
     // about how much transcript exists behind it.
-    const spacer = document.querySelector('.transcript-virtual') as HTMLElement;
+    const spacer = document.querySelector('.transcript--virtual') as HTMLElement;
     expect(Number.parseFloat(spacer.style.height)).toBeGreaterThan(VIEWPORT_HEIGHT);
   });
 });

@@ -63,14 +63,14 @@
   };
 </script>
 
-<!-- @ds surface: enrollment-view — first-run device binding. States: idle · busy · error · authenticating. -->
+<!-- @ds surface: enrollment--view — first-run device binding. States: idle · busy · error · authenticating. -->
 <!-- @ds guardrail: enrollment/auth wiring (enrollDevice · establishSession · scanQrImage · submit · onChange) — Not designer-editable. -->
-<main class="enrollment-view">
-  <section class="enrollment-card">
-    <div class="surface-symbol" aria-hidden="true">
+<main class="enrollment--view">
+  <section class="enrollment--card">
+    <div class="surface--symbol" aria-hidden="true">
       π
     </div>
-    <p class="surface-kicker">Private device enrollment</p>
+    <p class="surface--eyebrow">Private device enrollment</p>
     <h1>Bind this phone once</h1>
     <p>
       Scan or paste the relay's short-lived QR data. This device creates its own key and starts
@@ -84,7 +84,7 @@
       spellcheck="false"
       placeholder="Paste QR data"
     ></textarea>
-    <div class="enrollment-actions">
+    <div class="enrollment--actions">
       <label class="scan-button">
         Scan image
         <input
@@ -114,26 +114,26 @@
   </section>
 </main>
 
-<!-- @ds surface: enrollment-view — first-run device binding. Decomposed into this scoped block;
-     enrollment-view / enrollment-card / surface-symbol / scan-button / enrollment-actions are owned
-     solely by this component so they move with it. The .enrollment-actions button child-primitive
+<!-- @ds surface: enrollment--view — first-run device binding. Decomposed into this scoped block;
+     enrollment--view / enrollment--card / surface--symbol / scan-button / enrollment--actions are owned
+     solely by this component so they move with it. The .enrollment--actions button child-primitive
      selectors and their shared grouped/state overrides (composer/approval/push)
      stay global in app.css — the shared overrides change the effective background/color, so moving
-     only the enrollment-specific button rules would diverge from the original cascade. .surface-kicker
+     only the enrollment-specific button rules would diverge from the original cascade. .surface--eyebrow
      (shared by review/home/inbox/plan surfaces), .barrier-note (shared by the session surface), and
      .inline-alert (shared by the composer) are shared by 2+ components and stay global. Values unchanged. -->
 <style>
-  /* @ds surface: enrollment-view — first-run device binding. */
+  /* @ds surface: enrollment--view — first-run device binding. */
   /* @ds edit: layout — full-frame centring + safe gutters. */
   /* @ds state: idle · busy · error · authenticating — binding lifecycle. */
-  .enrollment-view {
+  .enrollment--view {
     display: grid;
     min-height: calc(100dvh - 4.25rem);
     padding: clamp(1rem, 6vw, 4rem) var(--page-gutter);
     place-items: center;
   }
 
-  .enrollment-card {
+  .enrollment--card {
     width: min(100%, 42rem);
     padding: clamp(1.5rem, 5vw, 3.5rem);
     border-radius: var(--radius-lg);
@@ -142,7 +142,7 @@
   }
 
   /* @ds slot: symbol — the π mark. */
-  .surface-symbol {
+  .surface--symbol {
     display: grid;
     width: 3rem;
     height: 3rem;
@@ -155,7 +155,7 @@
     font-weight: 700;
   }
 
-  .enrollment-card h1 {
+  .enrollment--card h1 {
     max-width: 11ch;
     margin: 0;
     color: var(--ink);
@@ -166,21 +166,21 @@
     text-wrap: balance;
   }
 
-  .enrollment-card > p:not(.surface-kicker) {
+  .enrollment--card > p:not(.surface--eyebrow) {
     max-width: 34rem;
     margin: var(--space-6) 0;
     color: var(--ink-secondary);
     line-height: 1.65;
   }
 
-  .enrollment-card > label {
+  .enrollment--card > label {
     display: block;
     margin-bottom: var(--space-2);
     font-size: 0.78rem;
     font-weight: 680;
   }
 
-  .enrollment-card textarea {
+  .enrollment--card textarea {
     width: 100%;
     min-height: 8rem;
     resize: vertical;
@@ -195,7 +195,7 @@
   }
 
   /* @ds slot: actions — scan + enroll controls. */
-  .enrollment-actions {
+  .enrollment--actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -229,7 +229,7 @@
   }
 
   @media (max-width: 39rem) {
-    .enrollment-actions {
+    .enrollment--actions {
       align-items: stretch;
       flex-direction: column;
     }
@@ -244,5 +244,5 @@
       min-height: 44px;
     }
   }
-  /* @ds end surface: enrollment-view */
+  /* @ds end surface: enrollment--view */
 </style>

@@ -17,13 +17,13 @@
   let { state }: AskQuestionStatusProps = $props();
 
   const message = $derived(safeAskQuestionStatusMessage(state.phase, state.errorReason));
-  const statusClass = $derived(state.phase === 'error' ? 'ask-question-status-error' : '');
+  const statusClass = $derived(state.phase === 'error' ? 'ask-question-status--error' : '');
 </script>
 
 <!-- @ds slot: status — the live form-state line; phases sent (✓) · error (!) · idle (•). -->
 <div class={`ask-question-status ${statusClass}`} role="status" aria-live="polite">
   <!-- @ds slot: status-mark — the per-phase glyph. -->
-  <span class="ask-question-status-mark" aria-hidden="true">
+  <span class="ask-question-status--mark" aria-hidden="true">
     {state.phase === 'answered-immutable' ? '✓' : state.phase === 'error' ? '!' : '•'}
   </span>
   <span>{message}</span>
@@ -44,7 +44,7 @@
   }
 
   /* @ds slot: status-mark — the per-phase glyph (sent ✓ · error ! · idle •). */
-  .ask-question-status-mark {
+  .ask-question-status--mark {
     display: inline-grid;
     flex: 0 0 1.25rem;
     block-size: 1.25rem;
@@ -57,12 +57,12 @@
   }
 
   /* @ds state: sent — answered-and-immutable; the status tints to accent (the card sets the state class). */
-  :global(.ask-question-card-answered-immutable) .ask-question-status {
+  :global(.ask-question-card--answered-immutable) .ask-question-status {
     color: var(--accent-ink);
   }
 
   /* @ds state: error — the status line signals a failed state. */
-  .ask-question-status-error {
+  .ask-question-status--error {
     color: var(--accent-ink);
   }
 </style>

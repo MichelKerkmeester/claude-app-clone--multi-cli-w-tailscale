@@ -219,23 +219,23 @@
 </script>
 
 <!-- @ds surface: transcript-list — the virtualized typed-transcript list and its live-edge
-     controls (scroll-to-latest pill + badge, streaming marker, sr-only announcer). -->
+     controls (scroll--to-latest pill + badge, streaming marker, sr-only announcer). -->
 <!-- @ds guardrail: virtualization, turn-grouping, block normalization, and streaming state
      below (hooks, effects, measurement, scroll and announce handlers) are not designer-editable. -->
 {#if blocks.length === 0 && todoProjection.projection === null}
-  <!-- @ds state: empty-transcript — shown when there are no blocks and no todo projection. -->
-  <div class="empty-transcript">No transcript blocks are available yet.</div>
+  <!-- @ds state: empty--transcript — shown when there are no blocks and no todo projection. -->
+  <div class="empty--transcript">No transcript blocks are available yet.</div>
 {:else}
   <!-- @ds slot: frame — labelled, focussable transcript region. -->
-  <section class="transcript-frame" aria-label="Typed transcript" tabindex={-1}>
+  <section class="transcript--frame" aria-label="Typed transcript" tabindex={-1}>
     <!-- @ds guardrail: sr-only polite live announcer — Not designer-editable. -->
     <div class="sr-only" aria-live="polite" aria-atomic="true">
       {announcement}
     </div>
     <!-- @ds slot: scroll-region — the scrollable clip of the virtual list. -->
-    <div class="transcript-scroll" bind:this={scrollEl} onscroll={onScroll}>
+    <div class="transcript--scroll" bind:this={scrollEl} onscroll={onScroll}>
       <div
-        class="transcript-virtual"
+        class="transcript--virtual"
         style="height: {$virtualizer.getTotalSize() + (running ? 72 : 0)}px"
       >
         {#each $virtualizer.getVirtualItems() as virtualItem (renderItems[virtualItem.index]?.id ?? virtualItem.key)}
@@ -250,7 +250,7 @@
             {@const isTurnStart = leadId !== undefined && turnStartIds.has(leadId)}
             <!-- @ds guardrail: virtualized row — MeasureElement + translateY come from the virtualizer. -->
             <div
-              class={isTurnStart ? 'virtual-row turn-start' : 'virtual-row'}
+              class={isTurnStart ? 'virtual-row turn--start' : 'virtual-row'}
               data-index={virtualItem.index}
               style="transform: translateY({virtualItem.start}px)"
               {@attach (node) => { $virtualizer.measureElement(node); }}
@@ -266,7 +266,7 @@
               {:else if item.kind === 'activity'}
                 <NormalizedActivityGroup blocks={item.blocks} />
               {:else if item.kind === 'inbound-stack'}
-                <div class="inbound-image-stack">
+                <div class="inbound-image--stack">
                   {#each item.blocks as block (block.blockId)}
                     <NormalizedTranscriptBlockView
                       {block}
@@ -289,30 +289,30 @@
             </div>
           {/if}
         {/each}
-        <!-- @ds state: streaming — @ds slot: streaming-marker. -->
+        <!-- @ds state: streaming — @ds slot: streaming--marker. -->
         {#if running}
           <div
-            class="streaming-marker"
+            class="streaming--marker"
             role="status"
             aria-live="polite"
             aria-atomic="true"
             style="transform: translateY({$virtualizer.getTotalSize()}px)"
           >
-            <span class={isStalled ? 'streaming-glyph is-stalled' : 'streaming-glyph'} aria-hidden="true">
+            <span class={isStalled ? 'streaming--icon is-stalled' : 'streaming--icon'} aria-hidden="true">
               <i></i>
               <i></i>
               <i></i>
             </span>
-            <span class="streaming-label">{isStalled ? 'No new activity for a while' : 'Working…'}</span>
+            <span class="streaming--label">{isStalled ? 'No new activity for a while' : 'Working…'}</span>
           </div>
         {/if}
       </div>
     </div>
-    <!-- @ds state: not-live-edge — @ds slot: scroll-to-latest pill + count badge. -->
+    <!-- @ds state: not-live-edge — @ds slot: scroll--to-latest pill + count badge. -->
     {#if !atLiveEdge}
       <button
         type="button"
-        class="scroll-to-latest"
+        class="scroll--to-latest"
         onclick={followToBottom}
         aria-label={newAway > 0
           ? `Jump to ${newAway} new message${newAway === 1 ? '' : 's'}`
@@ -329,7 +329,7 @@
           />
         </svg>
         {#if newAway > 0}
-          <span class="scroll-badge">{newAway}</span>
+          <span class="scroll--badge">{newAway}</span>
         {/if}
       </button>
     {/if}
@@ -337,16 +337,16 @@
 {/if}
 
 <!-- @ds surface: transcript-list — the virtualized typed-transcript list and its live-edge controls.
-     Decomposed into this scoped block; transcript-frame/scroll/virtual, virtual-row (+turn-start),
-     streaming-marker/glyph/label, scroll-to-latest (+hover), scroll-badge, and inbound-image-stack
+     Decomposed into this scoped block; transcript--frame/scroll/virtual, virtual-row (+turn--start),
+     streaming--marker/glyph/label, scroll--to-latest (+hover), scroll--badge, and inbound-image--stack
      are owned solely by this component so they move with it (scoped). .sr-only is a shared a11y
-     util and .empty-state,.empty-transcript is a shared empty-state group, so both stay global in
-     app.css. The body:has(.slash-panel) .scroll-to-latest override is body-rooted and couples to
-     the slash-panel surface, so it is wrapped in :global. Values unchanged. -->
+     util and .empty--state,.empty--transcript is a shared empty--state group, so both stay global in
+     app.css. The body:has(.slash--panel) .scroll--to-latest override is body-rooted and couples to
+     the slash--panel surface, so it is wrapped in :global. Values unchanged. -->
 <style>
-  /* @ds surface: empty-state — empty/unavailable list state. */
-  /* @ds state: empty-transcript — the TranscriptList "no blocks yet" message. */
-  .empty-transcript {
+  /* @ds surface: empty--state — empty/unavailable list state. */
+  /* @ds state: empty--transcript — the TranscriptList "no blocks yet" message. */
+  .empty--transcript {
     padding: clamp(3rem, 8vw, 6rem) var(--space-4);
     border: 1px dashed var(--line-strong);
     border-radius: var(--radius-lg);
@@ -355,21 +355,21 @@
   }
 
   /* @ds slot: frame — transcript region wrapper (positioning only). */
-  .transcript-frame {
+  .transcript--frame {
     position: relative;
     margin-top: var(--space-6);
   }
 
   /* The rail stays absent; turn boundaries provide conversation hierarchy. */
-  .transcript-frame::before {
+  .transcript--frame::before {
     content: none;
   }
 
   /* Reader-controlled live edge: a pill to jump to the newest blocks when scrolled up. */
   /* @ds surface: transcript-list — the virtualized transcript list and its live-edge controls. */
-  /* @ds slot: scroll-to-latest — pill, shown only away from the live edge. */
+  /* @ds slot: scroll--to-latest — pill, shown only away from the live edge. */
   /* @ds state: not-live-edge */
-  .scroll-to-latest {
+  .scroll--to-latest {
     position: absolute;
     bottom: var(--space-4);
     left: 50%;
@@ -388,7 +388,7 @@
     cursor: pointer;
   }
 
-  .scroll-to-latest:hover {
+  .scroll--to-latest:hover {
     background: var(--surface-muted);
   }
 
@@ -397,12 +397,12 @@
      without a real backdrop blur a translucent button would sit over unblurred transcript
      text, hurting the legibility of both. */
   @supports (backdrop-filter: blur(12px)) {
-    .scroll-to-latest {
+    .scroll--to-latest {
       background: color-mix(in oklch, var(--surface-raised) 88%, transparent);
       backdrop-filter: blur(12px);
     }
 
-    .scroll-to-latest:hover {
+    .scroll--to-latest:hover {
       background: color-mix(in oklch, var(--surface-muted) 88%, transparent);
     }
   }
@@ -412,16 +412,16 @@
      an opaque surface and carries the stronger border the app's other raised surfaces use. */
   /* @ds guardrail: do-not-edit — The opaque high-contrast fallback is an accessibility guarantee; translucent surfaces must not survive prefers-contrast: more. */
   @media (prefers-contrast: more) {
-    .scroll-to-latest,
-    .scroll-to-latest:hover {
+    .scroll--to-latest,
+    .scroll--to-latest:hover {
       border-color: var(--line-strong);
       background: var(--surface-raised);
       backdrop-filter: none;
     }
   }
 
-  /* @ds slot: scroll-badge — new-message count pill. */
-  .scroll-badge {
+  /* @ds slot: scroll--badge — new-message count pill. */
+  .scroll--badge {
     position: absolute;
     top: -0.35rem;
     right: -0.35rem;
@@ -438,7 +438,7 @@
   }
 
   /* @ds slot: scroll-region — the scrollable clip of the virtual list. */
-  .transcript-scroll {
+  .transcript--scroll {
     height: min(70dvh, 54rem);
     overflow: auto;
     overscroll-behavior: contain;
@@ -447,14 +447,14 @@
 
   /* @ds slot: virtual-list — reserves total height; rows are absolutely positioned below. */
   /* @ds guardrail: virtualization layout — Measured rows; do not change row height math. */
-  .transcript-virtual {
+  .transcript--virtual {
     position: relative;
     width: 100%;
   }
 
   /* @ds guardrail: virtual row + streaming marker share the measured absolute row slot. */
   .virtual-row,
-  .streaming-marker {
+  .streaming--marker {
     position: absolute;
     top: 0;
     left: 0;
@@ -468,22 +468,22 @@
     content: none;
   }
 
-  /* @ds state: turn-start — hairline + breathing room before each new prompt. */
-  .virtual-row.turn-start {
+  /* @ds state: turn--start — hairline + breathing room before each new prompt. */
+  .virtual-row.turn--start {
     margin-top: var(--space-6);
     padding-top: var(--space-6);
     border-top: 1px solid var(--line);
   }
 
-  .inbound-image-stack {
+  .inbound-image--stack {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-3);
   }
 
   /* Inline streaming marker: a small pulsing cue attached under the active answer. */
-  /* @ds state: streaming · @ds slot: streaming-marker — the "Working…" live cue. */
-  .streaming-marker {
+  /* @ds state: streaming · @ds slot: streaming--marker — the "Working…" live cue. */
+  .streaming--marker {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -491,15 +491,15 @@
     padding-inline: 0;
   }
 
-  /* @ds slot: streaming-glyph — pulsing dots. */
-  .streaming-glyph {
+  /* @ds slot: streaming--icon — pulsing dots. */
+  .streaming--icon {
     display: inline-flex;
     align-items: center;
     gap: 0.22rem;
     color: var(--accent);
   }
 
-  .streaming-glyph i {
+  .streaming--icon i {
     width: 0.3rem;
     height: 0.3rem;
     border-radius: 50%;
@@ -507,21 +507,21 @@
     animation: working-wave 1.1s ease-in-out infinite;
   }
 
-  .streaming-glyph i:nth-child(2) {
+  .streaming--icon i:nth-child(2) {
     animation-delay: 120ms;
   }
 
-  .streaming-glyph i:nth-child(3) {
+  .streaming--icon i:nth-child(3) {
     animation-delay: 240ms;
   }
 
   /* @ds state: stalled — static dots avoid suggesting active progress after a long silence. */
-  .streaming-glyph.is-stalled i {
+  .streaming--icon.is-stalled i {
     animation: none;
   }
 
-  /* @ds slot: streaming-label */
-  .streaming-label {
+  /* @ds slot: streaming--label */
+  .streaming--label {
     color: var(--ink-muted);
     font-size: 0.85rem;
     font-weight: 550;
@@ -529,20 +529,20 @@
 
   /* @ds guardrail: streaming reduced-motion — A11y invariant; do not remove. */
   @media (prefers-reduced-motion: reduce) {
-    .streaming-glyph i {
+    .streaming--icon i {
       animation: none;
     }
   }
 
   /* The completion card is an overlay above the composer: while it is open it
-     must never sit under the scroll-to-latest pill, and the pill stays out of
+     must never sit under the scroll--to-latest pill, and the pill stays out of
      the accessibility tree while hidden. */
-  :global(body:has(.slash-panel) .scroll-to-latest) {
+  :global(body:has(.slash--panel) .scroll--to-latest) {
     visibility: hidden;
     pointer-events: none;
   }
 
-  .scroll-badge {
+  .scroll--badge {
     background: var(--accent-soft);
     color: var(--accent-ink);
   }

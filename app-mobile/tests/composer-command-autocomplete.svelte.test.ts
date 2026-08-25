@@ -12,16 +12,16 @@
 // accidentally enable — and the interaction tests below pin that to the DOM.
 //
 // CSS-source assertions: the React oracle read app-mobile/src/style.css and
-// matched the frozen slash-panel tokens, the visual-viewport bounds, the
-// ≥44px row targets, the scroll-to-latest hiding rule, the reduced-motion
+// matched the frozen slash--panel tokens, the visual-viewport bounds, the
+// ≥44px row targets, the scroll--to-latest hiding rule, the reduced-motion
 // zeroing, and the focused-row ink rail. In the Svelte app style.css is being
 // retired: the component-scoped rules (--slash-* aliases, panel layout,
-// .slash-option, .slash-retry, [data-focused]) now live in the owning
+// .slash--option, .slash--retry, [data-focused]) now live in the owning
 // components' <style> blocks (ComposerCommandAutocomplete.svelte /
 // CommandOption.svelte), and the global theme palette + cross-component
 // grouped selectors (the frozen light/dark hex tokens, the
-// body:has(.slash-panel) .scroll-to-latest rule, and the shared
-// prefers-reduced-motion .slash-option/.slash-retry group) live in
+// body:has(.slash--panel) .scroll--to-latest rule, and the shared
+// prefers-reduced-motion .slash--option/.slash--retry group) live in
 // app-mobile/src/app.css. Each readFileSync('app-mobile/src/style.css') is
 // repointed to read the actual owning files; the matched rule text and
 // values are unchanged. style.css is never imported.
@@ -369,7 +369,7 @@ describe('ComposerCommandAutocomplete rendering', () => {
     });
     const { container } = render(ComposerCommandAutocomplete, { props });
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-    expect(container.querySelector('.slash-surface')).toHaveAttribute('data-state', 'closed');
+    expect(container.querySelector('.slash--surface')).toHaveAttribute('data-state', 'closed');
   });
 
   it('drafted: the surface marker shows the composer state, no panel', () => {
@@ -383,7 +383,7 @@ describe('ComposerCommandAutocomplete rendering', () => {
         }),
       },
     );
-    expect(container.querySelector('.slash-surface')).toHaveAttribute('data-state', 'drafted');
+    expect(container.querySelector('.slash--surface')).toHaveAttribute('data-state', 'drafted');
   });
 
   it('loading.initial: anchored card, three static skeletons, no listbox', async () => {
@@ -400,10 +400,10 @@ describe('ComposerCommandAutocomplete rendering', () => {
     await tick();
     expect(screen.getByText('Loading available commands…')).toBeInTheDocument();
     // The card portals to the body; skeletons live inside it.
-    expect(document.querySelectorAll('.slash-skeleton')).toHaveLength(3);
-    expect(document.querySelector('.slash-skeletons')).toHaveAttribute('aria-hidden', 'true');
+    expect(document.querySelectorAll('.slash--skeleton')).toHaveLength(3);
+    expect(document.querySelector('.slash--skeletons')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-    expect(document.querySelector('.slash-surface')).toHaveAttribute('data-state', 'loading.initial');
+    expect(document.querySelector('.slash--surface')).toHaveAttribute('data-state', 'loading.initial');
   });
 
   it('ready.unfiltered: labeled listbox, options in host order, first enabled row active', async () => {
@@ -429,7 +429,7 @@ describe('ComposerCommandAutocomplete rendering', () => {
     renderPanel({ items, activeName: 'plan' });
     await tick();
     const option = screen.getByRole('option');
-    const matches = option.querySelectorAll('.slash-match');
+    const matches = option.querySelectorAll('.slash--match');
     expect([...matches].map((strong) => strong.textContent).join('')).toBe('pl');
     expect(option.querySelector('.slash-name')?.textContent).toBe('/plan');
   });
@@ -527,7 +527,7 @@ describe('ComposerCommandAutocomplete rendering', () => {
   it('the card is nonmodal: portalled above the anchor, no dialog role, no focusable wrapper', async () => {
     renderPanel({ activeName: 'plan' });
     await tick();
-    const panel = document.querySelector('.slash-panel');
+    const panel = document.querySelector('.slash--panel');
     expect(panel).not.toBeNull();
     // isNonModal means the surrounding page stays accessible to assistive
     // technology: no role=dialog, no aria-modal, and the panel is not in
@@ -559,10 +559,10 @@ describe('CommandOption: safe text-only rows', () => {
     expect(name).toHaveAttribute('dir', 'ltr');
     expect(name).toHaveAttribute('translate', 'no');
     expect(name?.textContent).toBe('/plan');
-    expect(option.querySelector('.slash-hint')?.textContent).toBe('[mode]');
-    expect(option.querySelector('.slash-desc')?.textContent).toBe('Toggle plan mode');
+    expect(option.querySelector('.slash--hint')?.textContent).toBe('[mode]');
+    expect(option.querySelector('.slash--desc')?.textContent).toBe('Toggle plan mode');
     expect(option.querySelector('.slash-source')?.textContent).toBe('Extension');
-    expect(option.querySelector('.slash-confirm')?.textContent).toBe('Asks first');
+    expect(option.querySelector('.slash--confirm')?.textContent).toBe('Asks first');
   });
 
   it('disabled rows replace the description with the disclosed reason and cannot activate', async () => {
@@ -580,10 +580,10 @@ describe('CommandOption: safe text-only rows', () => {
     const option = screen.getByRole('option');
     expect(option).toHaveAttribute('aria-disabled', 'true');
     expect(option).not.toHaveAttribute('aria-selected');
-    expect(option.querySelector('.slash-disabled-reason')?.textContent).toBe(
+    expect(option.querySelector('.slash--disabled-reason')?.textContent).toBe(
       'Unavailable: demo fixture',
     );
-    expect(option.querySelector('.slash-desc')).toBeNull();
+    expect(option.querySelector('.slash--desc')).toBeNull();
     fireEvent.click(option);
     expect(onInsert).not.toHaveBeenCalled();
     expect(onDisabledPress).toHaveBeenCalledWith('Unavailable: demo fixture');
@@ -659,8 +659,8 @@ describe('applied panel styling stays inside the frozen system', () => {
   // Repointed from app-mobile/src/style.css (being retired). The component-
   // scoped panel/option rules now live in the owning components' <style>
   // blocks; the global theme palette and cross-component grouped selectors
-  // (body:has(.slash-panel) .scroll-to-latest, the shared reduced-motion
-  // .slash-option/.slash-retry group) live in app-mobile/src/app.css. The
+  // (body:has(.slash--panel) .scroll--to-latest, the shared reduced-motion
+  // .slash--option/.slash--retry group) live in app-mobile/src/app.css. The
   // matched rule text and values are unchanged.
   const css = [
     readFileSync('app-mobile/src/app.css', 'utf8'),
@@ -690,22 +690,22 @@ describe('applied panel styling stays inside the frozen system', () => {
   });
 
   it('keeps rows at ≥44px targets with contained scrolling and pan-y touch', () => {
-    expect(css).toMatch(/\.slash-option \{[^}]*min-block-size: 56px/u);
+    expect(css).toMatch(/\.slash--option \{[^}]*min-block-size: 56px/u);
     expect(css).toMatch(/touch-action: pan-y/u);
     expect(css).toMatch(/overscroll-behavior: contain/u);
-    expect(css).toMatch(/\.slash-retry[^{]*\{[^}]*min-block-size: 44px/u);
+    expect(css).toMatch(/\.slash--retry[^{]*\{[^}]*min-block-size: 44px/u);
   });
 
-  it('hides the scroll-to-latest pill while the panel is open', () => {
-    expect(css).toMatch(/body:has\(\.slash-panel\) \.scroll-to-latest \{[^}]*visibility: hidden/u);
+  it('hides the scroll--to-latest pill while the panel is open', () => {
+    expect(css).toMatch(/body:has\(\.slash--panel\) \.scroll--to-latest \{[^}]*visibility: hidden/u);
   });
 
   it('zeroes all motion under reduced motion', () => {
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[^}]*\.slash-option,\n  \.slash-retry \{[^}]*transition: none/u);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[^}]*\.slash--option,\n  \.slash--retry \{[^}]*transition: none/u);
   });
 
   it('the focused row is identifiable without color (ink rail plus outline)', () => {
-    expect(css).toMatch(/\.slash-option\[data-focused\] \{[^}]*border-inline-start-color: var\(--slash-ink\)/u);
+    expect(css).toMatch(/\.slash--option\[data-focused\] \{[^}]*border-inline-start-color: var\(--slash-ink\)/u);
     expect(css).toMatch(/outline: 2px solid var\(--slash-ink\)/u);
   });
 });

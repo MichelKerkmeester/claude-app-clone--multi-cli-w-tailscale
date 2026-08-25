@@ -50,12 +50,12 @@
   function attachEvidenceTrigger(node: HTMLElement): (() => void) | void {
     const button = node.parentElement;
     if (!(button instanceof HTMLButtonElement)) return;
-    button.classList.add('evidence-trigger');
+    button.classList.add('evidence--trigger');
     triggerButton = button;
     const hoverAct = hover(button);
     return () => {
       hoverAct?.destroy?.();
-      button.classList.remove('evidence-trigger');
+      button.classList.remove('evidence--trigger');
       if (triggerButton === button) triggerButton = null;
     };
   }
@@ -66,20 +66,20 @@
 <Collapsible bind:open={disclosure.open}>
   {#snippet trigger()}
     <!-- @ds guardrail: react-aria Disclosure wiring (expansion + trigger slot + aria) — not designer-editable. -->
-    <span class="evidence-chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>
-    <span class="evidence-summary">{summary}</span>
+    <span class="evidence--chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>
+    <span class="evidence--summary">{summary}</span>
   {/snippet}
   {@render children()}
 </Collapsible>
 
 <!-- @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. Decomposed into this scoped block;
-     evidence-trigger is a Collapsible.Trigger primitive so its class and react-aria/runtime data-attributes use
-     :global so Svelte scoping cannot drop them. evidence-chevron/evidence-summary are shared with
+     evidence--trigger is a Collapsible.Trigger primitive so its class and react-aria/runtime data-attributes use
+     :global so Svelte scoping cannot drop them. evidence--chevron/evidence--summary are shared with
      NormalizedActivityGroup and stay global here. Values unchanged. -->
 <style>
   /* Quiet self-describing disclosure beside prose. */
   /* @ds surface: evidence-disclosure — routine evidence Disclosure trigger + panel. */
-  :global(.evidence-trigger) {
+  :global(.evidence--trigger) {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
@@ -94,12 +94,12 @@
   }
 
   /* @ds state: hover */
-  :global(.evidence-trigger[data-hovered] .evidence-summary) {
+  :global(.evidence--trigger[data-hovered] .evidence--summary) {
     color: var(--ink-secondary);
   }
 
   /* @ds slot: chevron */
-  :global(.evidence-chevron) {
+  :global(.evidence--chevron) {
     display: inline-block;
     font-size: 1rem;
     line-height: 1;
@@ -107,7 +107,7 @@
   }
 
   /* @ds state: expanded */
-  :global(.evidence-trigger[data-expanded] .evidence-chevron) {
+  :global(.evidence--trigger[data-expanded] .evidence--chevron) {
     transform: rotate(90deg);
   }
   /* @ds end surface: evidence-disclosure */

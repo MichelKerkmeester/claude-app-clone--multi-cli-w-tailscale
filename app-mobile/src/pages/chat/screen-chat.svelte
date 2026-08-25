@@ -358,9 +358,9 @@
   };
 </script>
 
-<!-- @ds surface: session-view — in-session composition root (header · statusline · transcript · composer). -->
+<!-- @ds surface: session--view — in-session composition root (header · statusline · transcript · composer). -->
 <!-- @ds guardrail: connection / transcript / sync / composer logic — not designer-editable. -->
-<main class="session-view">
+<main class="session--view">
   <RuntimeStatusRegion runtime={runtimeControls.runtime} />
   <RuntimeModeAnnouncer runtime={runtimeControls.runtime} {connection} />
   <SessionHeader
@@ -374,11 +374,11 @@
     onOpenModelSheet={() => openSheet('model', headerTrigger)}
     bind:modelTriggerRef={headerTrigger}
   />
-  <div class="session-statusline" role="status" aria-live="polite">
-    <span class={`agent-dot agent-${status}`} aria-hidden="true">
+  <div class="session--statusline" role="status" aria-live="polite">
+    <span class={`agent--dot agent--${status}`} aria-hidden="true">
       <SessionStateIcon {status} />
     </span>
-    <span class="session-status-label">{sessionStatusLabel(status)}</span>
+    <span class="session--status-label">{sessionStatusLabel(status)}</span>
     {#if transcript.updatedAt !== null}
       <span class="session-status-time">
         · {isStale ? 'reconnecting' : relativeTime(transcript.updatedAt)}
@@ -510,35 +510,35 @@
   />
 </main>
 
-<!-- @ds surface: session-view — in-session composition root (header · statusline · transcript · composer).
-     Decomposed into this scoped block; session-statusline / session-status-label / agent-dot and the
-     agent-dot.agent-running variant are owned solely by this component (rendered directly) so they
-     move with it. session-view stays global (shared grouped routed-frame selector with home/review/inbox);
+<!-- @ds surface: session--view — in-session composition root (header · statusline · transcript · composer).
+     Decomposed into this scoped block; session--statusline / session--status-label / agent--dot and the
+     agent--dot.agent--running variant are owned solely by this component (rendered directly) so they
+     move with it. session--view stays global (shared grouped routed-frame selector with home/review/inbox);
      inline-alert / barrier-note stay global (shared by 2+ surfaces: enrollment/review/inbox/push/composer);
-     the .agent-running .state-icon pulsing group stays global (shared with the agent-row surface).
+     the .agent--running .state--icon pulsing group stays global (shared with the agent-row surface).
      Values unchanged. -->
 <style>
   /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
   /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
-  .session-view {
+  .session--view {
     padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
   }
 
   @media (max-width: 39rem) {
-    .session-view {
+    .session--view {
       padding-top: var(--space-6);
     }
   }
 
   /* @ds edit: layout — safe inline gutters for the routed surfaces. */
-  .session-view {
+  .session--view {
     padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
     padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
   }
 
-  /* @ds surface: session-view — in-session composition root (header · statusline · transcript · composer). */
+  /* @ds surface: session--view — in-session composition root (header · statusline · transcript · composer). */
   /* @ds state: active · stale — reconnecting readout; error via inline-alert. */
-  .session-statusline {
+  .session--statusline {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -549,12 +549,12 @@
   }
 
   /* @ds slot: label — session status text. */
-  .session-status-label {
+  .session--status-label {
     font-weight: 600;
   }
 
   /* @ds slot: dot — session-agent status glyph. */
-  .agent-dot {
+  .agent--dot {
     display: inline-grid;
     place-items: center;
     width: 0.95rem;
@@ -563,8 +563,8 @@
   }
 
   /* @ds state: running */
-  .agent-dot.agent-running {
+  .agent--dot.agent--running {
     color: var(--accent);
   }
-  /* @ds end surface: session-view */
+  /* @ds end surface: session--view */
 </style>

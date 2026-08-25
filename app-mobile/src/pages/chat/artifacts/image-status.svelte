@@ -215,11 +215,11 @@
     aria-atomic="true"
     aria-busy={definition.ariaBusy || undefined}
   >
-    {#if copy !== null}<span class="inbound-image-status-copy">{copy}</span>{/if}
+    {#if copy !== null}<span class="inbound-image-status--copy">{copy}</span>{/if}
     {#if definition.actions.length > 0}
-      <div class="inbound-image-status-actions">
+      <div class="inbound-image-status--actions">
         {#each definition.actions as action (action)}
-          <button type="button" class="inbound-image-status-action" disabled={disabled.has(action)} onclick={() => onAction?.(action)}>{ACTION_LABELS[action]}</button>
+          <button type="button" class="inbound-image-status--action" disabled={disabled.has(action)} onclick={() => onAction?.(action)}>{ACTION_LABELS[action]}</button>
         {/each}
       </div>
     {/if}
@@ -242,19 +242,19 @@
   }
 
   /* @ds slot: status-copy — the human-readable state description. */
-  .inbound-image-status-copy {
+  .inbound-image-status--copy {
     overflow-wrap: anywhere;
   }
 
   /* @ds slot: status-actions — the action button row (retry · reveal · …). */
-  .inbound-image-status-actions {
+  .inbound-image-status--actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
   }
 
   /* @ds slot: status-action — one lifecycle action; ≥44px target. */
-  .inbound-image-status-action {
+  .inbound-image-status--action {
     min-block-size: 44px;
     min-inline-size: 44px;
     padding: var(--space-2) var(--space-3);
@@ -268,18 +268,18 @@
   }
 
   /* @ds state: hover — the action under pointer hover. */
-  .inbound-image-status-action:hover:not(:disabled) {
+  .inbound-image-status--action:hover:not(:disabled) {
     background: var(--accent-soft);
   }
 
   /* @ds guardrail: focus-visible — The AA focus ring on a status action. */
-  .inbound-image-status-action:focus-visible {
+  .inbound-image-status--action:focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
 
   /* @ds state: disabled — the action fails-closed to reduced emphasis. */
-  .inbound-image-status-action:disabled {
+  .inbound-image-status--action:disabled {
     cursor: default;
     opacity: 0.55;
   }

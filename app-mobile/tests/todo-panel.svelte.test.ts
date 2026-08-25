@@ -95,7 +95,7 @@ describe('read-only todo panel', () => {
     expect(screen.getByRole('heading', { name: 'State' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Protocol' })).toBeInTheDocument();
     expect(
-      [...container.querySelectorAll('.todo-task-title')].map((node) => node.textContent),
+      [...container.querySelectorAll('.todo-task--title')].map((node) => node.textContent),
     ).toEqual([
       'Map transcript placement',
       'Write the panel shell',
@@ -149,8 +149,8 @@ describe('read-only todo panel', () => {
     );
 
     expect(screen.getByText('All done · 8/8')).toBeInTheDocument();
-    expect(container.querySelector('.todo-task-list')).toBeNull();
-    expect(container.querySelector('.todo-state-section')).toBeNull();
+    expect(container.querySelector('.todo-task--list')).toBeNull();
+    expect(container.querySelector('.todo-state--section')).toBeNull();
     expect(container.querySelector('[data-todo-panel]')).toHaveAttribute(
       'data-todo-all-done',
       'true',
@@ -206,11 +206,11 @@ describe('read-only todo panel', () => {
   it('renders the live region only when an announcement is present and never moves focus', async () => {
     const view = render(TodoPanel, { props: { projection: projection() } });
 
-    expect(view.container.querySelector('.todo-live-region')).toBeNull();
+    expect(view.container.querySelector('.todo--live-region')).toBeNull();
 
     await view.rerender({ projection: projection(), announcement: 'Title task_a is now doing.' });
 
-    const region = view.container.querySelector('.todo-live-region');
+    const region = view.container.querySelector('.todo--live-region');
     expect(region).not.toBeNull();
     expect(region).toHaveAttribute('aria-live', 'polite');
     expect(region).toHaveAttribute('aria-atomic', 'true');
@@ -300,7 +300,7 @@ describe('read-only todo panel', () => {
     document.documentElement.setAttribute('dir', 'rtl');
     try {
       const { container } = render(TodoPanel, { props: { projection: projection(), onRefresh: vi.fn() } });
-      const titles = [...container.querySelectorAll('.todo-task-title')].map(
+      const titles = [...container.querySelectorAll('.todo-task--title')].map(
         (node) => node.textContent,
       );
       expect(titles).toEqual([
@@ -333,7 +333,7 @@ describe('read-only todo panel', () => {
     const { container } = render(TodoPanel, { props: { projection: wrapped, onRefresh: vi.fn() } });
     const panel = container.querySelector('[data-todo-panel]') as HTMLElement;
     expect(panel).toBeTruthy();
-    const titles = [...container.querySelectorAll('.todo-task-title')] as HTMLElement[];
+    const titles = [...container.querySelectorAll('.todo-task--title')] as HTMLElement[];
     for (const title of titles) {
       expect(title.getAttribute('dir')).toBe('auto');
     }
@@ -342,10 +342,10 @@ describe('read-only todo panel', () => {
 
   it('renders the panel header as sticky and the live region off the document flow', () => {
     const { container } = render(TodoPanel, { props: { projection: projection(), onRefresh: vi.fn() } });
-    const header = container.querySelector('.todo-panel-header') as HTMLElement;
-    const liveRegion = container.querySelector('.todo-live-region') as HTMLElement | null;
+    const header = container.querySelector('.todo-panel--header') as HTMLElement;
+    const liveRegion = container.querySelector('.todo--live-region') as HTMLElement | null;
     expect(header).toBeTruthy();
-    expect(header.classList.contains('todo-panel-header')).toBe(true);
+    expect(header.classList.contains('todo-panel--header')).toBe(true);
     expect(liveRegion).toBeNull();
   });
 
@@ -370,13 +370,13 @@ describe('read-only todo panel', () => {
 
   it('honors a 44-pt minimum height on every task row and every named control', () => {
     const { container } = render(TodoPanel, { props: { projection: projection(), onRefresh: vi.fn() } });
-    const rows = [...container.querySelectorAll('.todo-task-row')];
+    const rows = [...container.querySelectorAll('.todo-task--row')];
     expect(rows.length).toBeGreaterThan(0);
     for (const row of rows) {
-      expect(row.classList.contains('todo-task-row')).toBe(true);
+      expect(row.classList.contains('todo-task--row')).toBe(true);
     }
-    const refresh = container.querySelector('.todo-refresh');
-    const sectionTrigger = container.querySelector('.todo-section-trigger');
+    const refresh = container.querySelector('.todo--refresh');
+    const sectionTrigger = container.querySelector('.todo-section--trigger');
     expect(refresh).toBeTruthy();
     expect(sectionTrigger).toBeTruthy();
   });

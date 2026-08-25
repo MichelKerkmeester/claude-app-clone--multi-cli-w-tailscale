@@ -74,7 +74,7 @@ afterEach(() => {
   window.history.replaceState({}, '', '/');
   document.documentElement.removeAttribute('data-artifact-viewer-open');
   document.documentElement.removeAttribute('data-artifact-viewer-privacy');
-  document.getElementById('artifact-viewer-privacy-curtain')?.remove();
+  document.getElementById('artifact-viewer--privacy-curtain')?.remove();
 });
 
 // ───────────────────────────────────────────────────────────────────

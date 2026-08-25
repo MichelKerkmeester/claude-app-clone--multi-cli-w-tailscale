@@ -62,7 +62,7 @@
   <button
     bind:this={previewButtonRef}
     type="button"
-    class="attachment-tile-preview"
+    class="attachment-tile--preview"
     data-attachment-id={item.id}
     aria-label={`Preview ${item.label}`}
     aria-posinset={position}
@@ -73,7 +73,7 @@
     onclick={() => onOpen(item.id, previewButtonRef)}
   >
     {#if unavailable}
-      <span class="attachment-tile-unavailable">Photo · preview unavailable</span>
+      <span class="attachment-tile--unavailable">Photo · preview unavailable</span>
     {:else}
       <img
         src={previewUrl}
@@ -83,11 +83,11 @@
         }}
       />
     {/if}
-    <span class="attachment-tile-name">{item.label}</span>
+    <span class="attachment-tile--name">{item.label}</span>
   </button>
   <button
     type="button"
-    class="attachment-tile-remove"
+    class="attachment-tile--remove"
     aria-label={`Remove ${item.label}`}
     data-hit-target="44"
     use:hover
@@ -97,7 +97,7 @@
   >
     <span aria-hidden="true">×</span>
   </button>
-  <span class="attachment-tile-status" aria-live="polite">{attachmentStatusLabel(item)}</span>
+  <span class="attachment-tile--status" aria-live="polite">{attachmentStatusLabel(item)}</span>
 </div>
 
 <!-- @ds surface: attachment-tile — the draft photo tile; preview button, remove control, sr-only status.
@@ -112,7 +112,7 @@
     block-size: 64px;
   }
 
-  .attachment-tile-preview {
+  .attachment-tile--preview {
     position: relative;
     display: grid;
     inline-size: 64px;
@@ -130,24 +130,24 @@
     cursor: pointer;
   }
 
-  .attachment-tile-preview img {
+  .attachment-tile--preview img {
     display: block;
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
   }
 
-  .attachment-tile-preview:global([data-hovered]),
-  .attachment-tile-preview:global([data-pressed]) {
+  .attachment-tile--preview:global([data-hovered]),
+  .attachment-tile--preview:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
-  .attachment-tile-preview:global([data-focus-visible]) {
+  .attachment-tile--preview:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 3px;
   }
 
-  .attachment-tile-name {
+  .attachment-tile--name {
     position: absolute;
     inset-block-end: 0;
     inset-inline: 0;
@@ -162,7 +162,7 @@
     white-space: nowrap;
   }
 
-  .attachment-tile-unavailable {
+  .attachment-tile--unavailable {
     max-inline-size: 100%;
     padding: 3px;
     color: var(--ink-muted);
@@ -171,7 +171,7 @@
     text-align: center;
   }
 
-  .attachment-tile-remove {
+  .attachment-tile--remove {
     position: absolute;
     z-index: 1;
     inset-block-start: -10px;
@@ -190,22 +190,22 @@
     cursor: pointer;
   }
 
-  .attachment-tile-remove span {
+  .attachment-tile--remove span {
     font-size: 1.25rem;
     line-height: 1;
   }
 
-  .attachment-tile-remove:global([data-hovered]),
-  .attachment-tile-remove:global([data-pressed]) {
+  .attachment-tile--remove:global([data-hovered]),
+  .attachment-tile--remove:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
-  .attachment-tile-remove:global([data-focus-visible]) {
+  .attachment-tile--remove:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
 
-  .attachment-tile-status {
+  .attachment-tile--status {
     position: absolute;
     inline-size: 1px;
     block-size: 1px;
@@ -215,8 +215,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .attachment-tile-preview,
-    .attachment-tile-remove {
+    .attachment-tile--preview,
+    .attachment-tile--remove {
       transition: none;
     }
   }

@@ -19,7 +19,7 @@
   // 2. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: push-settings — device notification preferences. States: loading · disabled · off · on.
+  // @ds surface: push--settings — device notification preferences. States: loading · disabled · off · on.
   // @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — Not designer-editable.
   let config = $state<PushConfig | null>(null);
   let error = $state<string | null>(null);
@@ -42,11 +42,11 @@
   const ATTENTION_CLASSES = ['needs_input', 'finished', 'error'] as const;
 </script>
 
-<!-- @ds surface: push-settings — device notification preferences. States: loading · disabled · off · on. -->
+<!-- @ds surface: push--settings — device notification preferences. States: loading · disabled · off · on. -->
 <!-- @ds guardrail: push fetch / subscribe / unsubscribe / preference handlers — Not designer-editable. -->
-<section class="push-settings">
+<section class="push--settings">
   <div>
-    <p class="surface-kicker">This device</p>
+    <p class="surface--eyebrow">This device</p>
     <h2>Attention hints</h2>
     <p>
       Notifications never contain session content or actions. The inbox is always the fallback.
@@ -91,7 +91,7 @@
     </div>
     <!-- @ds guardrail: push unsubscribe onPress handler — Not designer-editable. -->
     <Button
-      class="push-disable"
+      class="push--disable"
       onclick={() => {
         void unsubscribeFromPush()
           .then(() => (config = { ...config!, preferences: null }))
@@ -103,20 +103,20 @@
   {/if}
 </section>
 
-<!-- @ds surface: push-settings — device notification preferences. Decomposed into this scoped block;
-     push-settings / preference-grid / switch-track and their switch state rules are owned solely
+<!-- @ds surface: push--settings — device notification preferences. Decomposed into this scoped block;
+     push--settings / preference-grid / switch-track and their switch state rules are owned solely
      by this component so they move with it. The hand-rolled switch renders the original
      [role='switch'] + [data-selected] + .switch-track structure the frozen CSS targets, so the
      switch state selectors stay :global at the attribute compounds and scoped at the .switch-track
-     class. Button primitive outputs (.push-settings > button / .push-disable) use :global so Svelte
-     scoping cannot drop the child-component element. .surface-kicker (shared by review/home/inbox/
+     class. Button primitive outputs (.push--settings > button / .push--disable) use :global so Svelte
+     scoping cannot drop the child-component element. .surface--eyebrow (shared by review/home/inbox/
      plan surfaces) and .inline-alert (shared by the composer) are shared by 2+ components and stay
-     global in app.css. The .push-settings h2 / .push-settings p solo occurrences are extracted
+     global in app.css. The .push--settings h2 / .push--settings p solo occurrences are extracted
      from the shared .section-heading groups; the shared groups stay global. Values unchanged. -->
 <style>
-  /* @ds surface: push-settings — device notification preferences. */
+  /* @ds surface: push--settings — device notification preferences. */
   /* @ds state: loading · disabled · off · on — support check, relay-off, enable CTA, preference grid. */
-  .push-settings {
+  .push--settings {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
@@ -127,24 +127,24 @@
     background: var(--surface-muted);
   }
 
-  .push-settings .surface-kicker {
+  .push--settings .surface--eyebrow {
     margin-bottom: var(--space-2);
   }
 
-  .push-settings > span {
+  .push--settings > span {
     color: var(--ink-secondary);
     font-size: 0.82rem;
   }
 
   /* Heading typography split from shared global groups. */
-  .push-settings h2 {
+  .push--settings h2 {
     margin: 0;
     font-size: clamp(1.4rem, 3vw, 2rem);
     font-weight: 650;
     letter-spacing: -0.025em;
   }
 
-  .push-settings p {
+  .push--settings p {
     max-width: 34rem;
     margin: var(--space-2) 0 0;
     color: var(--ink-muted);
@@ -153,8 +153,8 @@
   }
 
   /* :global on Button children so scoped CSS cannot drop primitive output. */
-  :global(.push-settings > button),
-  :global(.push-disable) {
+  :global(.push--settings > button),
+  :global(.push--disable) {
     min-height: 2.75rem;
     padding-inline: var(--space-4);
     border: 0;
@@ -167,12 +167,12 @@
     cursor: pointer;
   }
 
-  :global(.push-settings > button[data-hovered]) {
+  :global(.push--settings > button[data-hovered]) {
     background: var(--accent-strong);
     color: white;
   }
 
-  :global(.push-settings .push-disable) {
+  :global(.push--settings .push--disable) {
     justify-self: end;
     background: transparent;
     color: var(--danger);
@@ -232,7 +232,7 @@
   }
 
   @media (max-width: 39rem) {
-    .push-settings {
+    .push--settings {
       grid-template-columns: 1fr;
     }
 
@@ -240,7 +240,7 @@
       justify-content: start;
     }
 
-    :global(.push-settings .push-disable) {
+    :global(.push--settings .push--disable) {
       justify-self: start;
     }
   }
@@ -252,5 +252,5 @@
       transform: none !important;
     }
   }
-  /* @ds end surface: push-settings */
+  /* @ds end surface: push--settings */
 </style>

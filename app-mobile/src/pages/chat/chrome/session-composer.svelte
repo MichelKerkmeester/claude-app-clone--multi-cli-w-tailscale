@@ -533,15 +533,15 @@
      presentation-only; the keyboard-anchor vars (--visual-viewport-height / --trigger-width)
      feed layout unchanged. -->
 <!-- @ds guardrail: Send / steer / stop / snapshot / prompt-submission and the keyboard anchoring hook stay fenced; presentation may not reach past them. -->
-<div class="composer-region">
+<div class="composer--region">
   {#if promptError !== null}<div class="inline-alert">{promptError}</div>{/if}
-  <p class="composer-disclaimer">{disclaimer}</p>
+  <p class="composer--disclaimer">{disclaimer}</p>
   <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
     {announcement}
   </div>
   <form
     bind:this={trayEl}
-    class={`composer-tray${trayOutlineClass}`}
+    class={`composer--tray${trayOutlineClass}`}
     onsubmit={(event) => {
       event.preventDefault();
       submit();
@@ -549,7 +549,7 @@
   >
     {#if mediaAvailable}<AttachmentRail />{/if}
     {#if mediaAvailable && attachmentDraft.blockingMessage !== null}
-      <p class="attachment-draft-message" aria-live="polite">
+      <p class="attachment--draft-message" aria-live="polite">
         {attachmentDraft.blockingMessage}
       </p>
     {/if}
@@ -584,7 +584,7 @@
     <textarea
       bind:this={textareaEl}
       id="session-prompt"
-      class="composer-input"
+      class="composer--input"
       aria-label="Message Pi"
       aria-autocomplete="list"
       aria-expanded={effectivePanelOpen ? true : undefined}
@@ -623,8 +623,8 @@
       }
       {placeholder}
     ></textarea>
-    <div class="composer-bar">
-      <div class="composer-left">
+    <div class="composer--bar">
+      <div class="composer--left">
         <ComposerTools
           {runtimeControls}
           {catalog}
@@ -648,12 +648,12 @@
           bind:buttonRef={modeButtonEl}
         />
       </div>
-      <div class="composer-right">
+      <div class="composer--right">
         <!-- @ds slot: interrupt-action — the stop control stays available without replacing the draft action. -->
         {#if running && connection === 'live'}
           <Button
             type="button"
-            class="composer-primary is-stop"
+            class="composer--primary is-stop"
             aria-label="Stop the current turn"
             onclick={stopRun}
             disabled={stopping || connection !== 'live'}
@@ -665,7 +665,7 @@
         {#if running && (hasText || hasAttachments) && !slashDraft}
           <Button
             type="button"
-            class="composer-later"
+            class="composer--later"
             onclick={() => {
               if (hasAttachments) attachmentSubmission.submit('followUp');
               else sendPrompt('followUp');
@@ -678,7 +678,7 @@
         {#if effectivePanelOpen}
           <Button
             type="button"
-            class="composer-primary is-send"
+            class="composer--primary is-send"
             aria-label="Insert command"
             disabled={!activeRow}
             onpointerdown={(event) => event.preventDefault()}
@@ -691,7 +691,7 @@
         {:else if slashDraft}
           <Button
             type="submit"
-            class="composer-primary is-send"
+            class="composer--primary is-send"
             aria-label="Send command"
             disabled={!effectiveSlashSendable}
           >
@@ -700,7 +700,7 @@
         {:else if !running || hasText || hasAttachments}
           <Button
             type="submit"
-            class="composer-primary is-send"
+            class="composer--primary is-send"
             aria-label={running ? 'Steer the current turn' : 'Send message'}
             disabled={!canSendMessage || attachmentSubmission.busy}
           >
@@ -752,7 +752,7 @@
     height="20"
     aria-hidden="true"
     focusable="false"
-    class="composer-spinner"
+    class="composer--spinner"
   >
     <circle
       cx="12"
@@ -773,10 +773,10 @@
   </svg>
 {/snippet}
 
-<!-- @ds surface: composer — the input island. Decomposed into this scoped block; the composer-region /
-     composer-disclaimer / composer-input / composer-bar / composer-left / composer-right /
-     attachment-draft-message owned rules move with it. Child-primitive classes
-     (composer-tray / composer-primary / composer-later / composer-spinner) and the shared 44px
+<!-- @ds surface: composer — the input island. Decomposed into this scoped block; the composer--region /
+     composer--disclaimer / composer--input / composer--bar / composer--left / composer--right /
+     attachment--draft-message owned rules move with it. Child-primitive classes
+     (composer--tray / composer--primary / composer--later / composer--spinner) and the shared 44px
      target / prefers-contrast / forced-colors / reduced-motion / clay-override / safe-area
      groups stay GLOBAL in app.css (they are shared grouped selectors — moving them into scope
      would reverse the cascade against those global overrides). Values unchanged. -->
@@ -785,7 +785,7 @@
   /* @ds edit: layout — sticky bottom-anchor + canvas fade; the keyboard-anchor
      --visual-viewport-height var feeds the anchor and stays the layout input. */
   /* @ds guardrail: do-not-edit — presentation of the viewer-open state; keep the blur/inert pair. */
-  .composer-region {
+  .composer--region {
     position: sticky;
     z-index: 5;
     bottom: 0;
@@ -800,7 +800,7 @@
 
   /* @ds surface: composer — the input island. */
   /* @ds edit: layout — tray geometry; safe gutters are token-driven. */
-  .composer-tray {
+  .composer--tray {
     display: grid;
     gap: var(--space-1);
     padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
@@ -811,12 +811,12 @@
   }
 
   /* Dashed Plan outline: host-confirmed only; execution is solid. */
-  .composer-tray.is-plan-mode {
+  .composer--tray.is-plan-mode {
     border-style: dashed;
     border-color: var(--line-strong);
   }
 
-  .composer-tray.is-executing-mode {
+  .composer--tray.is-executing-mode {
     border-color: var(--line-strong);
   }
 
@@ -824,17 +824,17 @@
      With viewport-fit=cover the layout extends under the notch and rounded
      corners in landscape; interactive islands keep clear of the insets while
      portrait (all-zero insets) renders exactly as before. */
-  .composer-tray {
+  .composer--tray {
     margin-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
   }
 
-  .composer-tray {
+  .composer--tray {
     min-inline-size: 0;
     margin-inline-start: max(0px, env(safe-area-inset-left, 0px));
     margin-inline-end: max(0px, env(safe-area-inset-right, 0px));
   }
 
-  .composer-disclaimer {
+  .composer--disclaimer {
     margin: 0;
     padding-inline: var(--space-2);
     color: var(--ink-muted);
@@ -843,7 +843,7 @@
   }
 
   /* @ds slot: input — the single editing field; colour/type stay token-driven. */
-  .composer-input {
+  .composer--input {
     width: 100%;
     min-height: 1.75rem;
     max-height: 140px;
@@ -857,36 +857,36 @@
     resize: none;
   }
 
-  .composer-input:focus {
+  .composer--input:focus {
     outline: none;
   }
 
   /* @ds state: awaitingSnapshot · sendingPrompt · slashSubmitting — the input is
      disabled while the composer is busy or syncing (plus a non-live connection). */
-  .composer-input:disabled {
+  .composer--input:disabled {
     cursor: not-allowed;
     opacity: 0.55;
   }
 
-  .composer-input::placeholder {
+  .composer--input::placeholder {
     color: var(--ink-muted);
   }
 
-  .composer-bar {
+  .composer--bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
   }
 
-  .composer-left,
-  .composer-right {
+  .composer--left,
+  .composer--right {
     display: flex;
     align-items: center;
     gap: var(--space-2);
   }
 
-  .attachment-draft-message {
+  .attachment--draft-message {
     margin: 0;
     padding-inline: var(--space-2);
     color: var(--ink-muted);
@@ -897,7 +897,7 @@
 
   /* @ds slot: primary-action — the single circular morphing disc (send/steer/sending).
      The class is passed to the Button primitive, so Svelte cannot hash it → :global. */
-  :global(.composer-primary) {
+  :global(.composer--primary) {
     display: grid;
     place-items: center;
     width: 2.5rem;
@@ -912,34 +912,34 @@
   }
 
   /* @ds state: send · steer — the morphing primary disc; steer shares this form. */
-  :global(.composer-primary.is-send) {
+  :global(.composer--primary.is-send) {
     background: var(--accent);
     color: #fff;
   }
 
-  :global(.composer-primary.is-send[data-hovered]) {
+  :global(.composer--primary.is-send[data-hovered]) {
     background: var(--accent-strong);
   }
 
   /* @ds state: stop — the interrupt disc for a running turn. */
-  :global(.composer-primary.is-stop) {
+  :global(.composer--primary.is-stop) {
     background: var(--action-bg);
     color: var(--action-fg);
   }
 
   /* @ds state: stopping · sending-inhibit — the disc's disabled affordance. */
-  :global(.composer-primary[data-disabled]) {
+  :global(.composer--primary[data-disabled]) {
     cursor: not-allowed;
     opacity: 0.4;
   }
 
-  :global(.composer-primary[data-focus-visible]) {
+  :global(.composer--primary[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
   /* @ds state: later — the secondary "send after this turn" affordance (Button primitive → :global). */
-  :global(.composer-later) {
+  :global(.composer--later) {
     min-height: 2.25rem;
     padding-inline: var(--space-3);
     border: 1px solid var(--line);
@@ -951,7 +951,7 @@
     cursor: pointer;
   }
 
-  :global(.composer-later[data-disabled]) {
+  :global(.composer--later[data-disabled]) {
     cursor: not-allowed;
     opacity: 0.4;
   }
@@ -959,13 +959,13 @@
   /* @ds surface: spinner — shared inline pending/busy indicator. */
   /* @ds state: sending · slashSubmitting — the disc's busy form.
      The SpinnerGlyph <svg> is rendered by this component → normally scoped. */
-  .composer-spinner {
+  .composer--spinner {
     animation: composer-spin 0.8s linear infinite;
   }
 
   /* @ds guardrail: reduced-motion keeps the shared spinner static — Never remove. */
   @media (prefers-reduced-motion: reduce) {
-    .composer-spinner {
+    .composer--spinner {
       animation: none;
     }
   }
@@ -974,12 +974,12 @@
      textarea: the left group wraps so the label never truncates Plan ·
      read-only and the primary action stays on the first row. */
   @media (max-width: 400px) {
-    .composer-bar {
+    .composer--bar {
       flex-wrap: wrap;
       row-gap: var(--space-1);
     }
 
-    .composer-left {
+    .composer--left {
       flex-wrap: wrap;
       row-gap: var(--space-1);
     }
@@ -987,13 +987,13 @@
 
   /* @ds edit: layout — narrow reflow of the composer bar + ready/review card + sheets. */
   @media (max-width: 27rem) {
-    .composer-bar {
+    .composer--bar {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
     }
 
-    .composer-left {
+    .composer--left {
       min-inline-size: 0;
       flex-wrap: wrap;
     }

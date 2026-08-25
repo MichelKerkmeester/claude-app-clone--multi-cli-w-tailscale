@@ -25,13 +25,13 @@
 
 {#if redaction !== null && redaction.fieldsRedacted >= 1}
   {@const categories = [...new Set(redaction.reasons.map(redactionCategory))]}
-  <span class="rich-redaction-badge" title="Sensitive values were redacted">
+  <span class="rich--redaction-badge" title="Sensitive values were redacted">
     Redacted{categories.length > 0 ? ` · ${categories.join(' · ')}` : ''}
   </span>
 {/if}
 
 <style>
-  .rich-redaction-badge {
+  .rich--redaction-badge {
     padding: 0.2rem 0.45rem;
     border: 1px solid var(--line-strong);
     border-radius: 999px;

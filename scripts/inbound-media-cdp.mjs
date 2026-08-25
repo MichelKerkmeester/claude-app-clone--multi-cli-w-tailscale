@@ -194,7 +194,7 @@ async function waitForUnsupportedRow(client) {
     `(() => {
       const target = document.querySelector('[data-unsupported-kind="inbound_image"]');
       if (target !== null) return true;
-      const scroll = document.querySelector('.transcript-scroll');
+      const scroll = document.querySelector('.transcript--scroll');
       if (scroll === null) return false;
       scroll.scrollTop = Math.min(
         scroll.scrollHeight,
@@ -211,7 +211,7 @@ async function waitForInboundCard(client) {
     `(() => {
       const target = document.querySelector('[data-inbound-image-card="true"]');
       if (target !== null) return true;
-      const scroll = document.querySelector('.transcript-scroll');
+      const scroll = document.querySelector('.transcript--scroll');
       if (scroll === null) return false;
       scroll.scrollTop = Math.min(
         scroll.scrollHeight,
@@ -245,12 +245,12 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
     url: `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=${encodeURIComponent(demoFixture)}${requestedState === null ? '' : `&state=${encodeURIComponent(requestedState)}`}`,
   });
   await waitForPage(client, 'document.readyState === "complete"');
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await evaluate(
     client,
     `localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   if (fixture === 'inbound-media') await waitForUnsupportedRow(client);
   else await waitForInboundCard(client);
   if (fixture === 'viewer-ready') {
@@ -258,14 +258,14 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
       client,
       `document.querySelector('[data-inbound-image-card="true"] button, [data-inbound-image-card="true"] [role="button"]')?.click()`,
     );
-    await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") !== null');
+    await waitForPage(client, 'document.querySelector(".artifact-viewer--dialog") !== null');
   }
 
   const state = await evaluate(
     client,
     `(() => {
       const root = document.documentElement;
-      const scroll = document.querySelector('.transcript-scroll');
+      const scroll = document.querySelector('.transcript--scroll');
       const controls = [...document.querySelectorAll('button, [role="button"]')]
         .map((node) => node.textContent ?? '')
         .filter((text) => /enable.*inbound|inbound.*enable|capture image|publish image|view inbound image|share inbound image/i.test(text));
@@ -278,19 +278,19 @@ async function exercise(client, theme, fixture, requestedState, outputPath, view
         clientWidth: root.clientWidth,
         scrollWidth: root.scrollWidth,
         transcript: scroll !== null,
-        activity: document.querySelectorAll('.activity-group').length,
-        disclosures: document.querySelectorAll('.evidence-trigger').length,
+        activity: document.querySelectorAll('.activity--group').length,
+        disclosures: document.querySelectorAll('.evidence--trigger').length,
         unsupported: unsupported !== null,
         unsupportedText: unsupported?.textContent ?? '',
         cardState: card?.getAttribute('data-image-state'),
         cardText: card?.textContent ?? '',
         cardButtonCount: cardButton.length,
         cardHasVerifiedImage: card?.querySelector('[data-verified-image="true"]') !== null,
-        viewerOpen: document.querySelector('.artifact-viewer-dialog') !== null,
-        viewerState: document.querySelector('.artifact-viewer-overlay')?.getAttribute('data-artifact-state'),
-        viewerHasClose: [...document.querySelectorAll('.artifact-viewer-dialog button, .artifact-viewer-dialog [role="button"]')]
+        viewerOpen: document.querySelector('.artifact-viewer--dialog') !== null,
+        viewerState: document.querySelector('.artifact-viewer--overlay')?.getAttribute('data-artifact-state'),
+        viewerHasClose: [...document.querySelectorAll('.artifact-viewer--dialog button, .artifact-viewer--dialog [role="button"]')]
           .some((node) => /close/i.test(node.getAttribute('aria-label') ?? node.textContent ?? '')),
-        viewerForbiddenControls: [...document.querySelectorAll('.artifact-viewer-dialog button, .artifact-viewer-dialog a')]
+        viewerForbiddenControls: [...document.querySelectorAll('.artifact-viewer--dialog button, .artifact-viewer--dialog a')]
           .map((node) => node.getAttribute('aria-label') ?? node.textContent ?? '')
           .filter((text) => /export|capture|re-send|share|save|copy|download|public url/i.test(text)),
         imageElements: document.querySelectorAll('img, canvas, video, audio').length,
@@ -382,7 +382,7 @@ async function exerciseEndToEnd(client, theme, outputPath, viewportWidth) {
       client,
       `(() => {
         const root = document.documentElement;
-        const scroll = document.querySelector('.transcript-scroll');
+        const scroll = document.querySelector('.transcript--scroll');
         const imageCard = document.querySelector('[data-inbound-image-card="true"]');
         return {
           viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
@@ -390,8 +390,8 @@ async function exerciseEndToEnd(client, theme, outputPath, viewportWidth) {
           clientWidth: root.clientWidth,
           scrollWidth: root.scrollWidth,
           transcript: scroll !== null,
-          activity: document.querySelectorAll('.activity-group').length,
-          disclosures: document.querySelectorAll('.evidence-trigger').length,
+          activity: document.querySelectorAll('.activity--group').length,
+          disclosures: document.querySelectorAll('.evidence--trigger').length,
           state: imageCard?.getAttribute('data-image-state'),
           cardPixels: imageCard?.querySelectorAll('img, canvas, video, audio').length ?? 0,
           enablingControls: [...document.querySelectorAll('button, [role="button"]')]
@@ -422,19 +422,19 @@ async function exerciseEndToEnd(client, theme, outputPath, viewportWidth) {
         client,
         `document.querySelector('[data-inbound-image-card="true"] button, [data-inbound-image-card="true"] [role="button"]')?.click()`,
       );
-      await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") !== null');
+      await waitForPage(client, 'document.querySelector(".artifact-viewer--dialog") !== null');
       await evaluate(client, "window.dispatchEvent(new Event('pi-remote:privacy-cover'))");
       await waitForPage(
         client,
-        `document.documentElement.dataset.artifactViewerPrivacy === 'covered' && document.querySelector('#artifact-viewer-privacy-curtain') !== null`,
+        `document.documentElement.dataset.artifactViewerPrivacy === 'covered' && document.querySelector('#artifact-viewer--privacy-curtain') !== null`,
       );
       const privacy = await evaluate(
         client,
         `(() => ({
           covered: document.documentElement.dataset.artifactViewerPrivacy === 'covered',
-          curtain: document.querySelector('#artifact-viewer-privacy-curtain') !== null,
-          viewerCovered: document.querySelector('.artifact-viewer-overlay')?.getAttribute('data-privacy-covered') === 'true',
-          imageSources: [...document.querySelectorAll('.artifact-viewer-dialog img, [data-verified-image="true"]')]
+          curtain: document.querySelector('#artifact-viewer--privacy-curtain') !== null,
+          viewerCovered: document.querySelector('.artifact-viewer--overlay')?.getAttribute('data-privacy-covered') === 'true',
+          imageSources: [...document.querySelectorAll('.artifact-viewer--dialog img, [data-verified-image="true"]')]
             .some((image) => image.hasAttribute('src') || image.hasAttribute('srcset')),
         }))()`,
       );
@@ -458,12 +458,12 @@ async function navigateDemo(client, theme, state) {
     url: `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=inline-card&state=${encodeURIComponent(state)}`,
   });
   await waitForPage(client, 'document.readyState === "complete"');
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await evaluate(
     client,
     `localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
 }
 
 // ───────────────────────────────────────────────────────────────────

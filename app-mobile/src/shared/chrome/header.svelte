@@ -56,12 +56,12 @@
     <span class="pi-mark" aria-hidden="true">
       π
     </span>
-    <span class="wordmark-copy">
+    <span class="wordmark--copy">
       <strong>Pi Remote</strong>
       <small>Private relay</small>
     </span>
   </Button>
-  <div class="topbar-actions">
+  <div class="topbar--actions">
     <!-- @ds slot: nav-inbox -->
     {#if reviewAvailable}
       <Button class="nav-button" onclick={onInbox}>
@@ -80,9 +80,9 @@
 </header>
 
 <!-- @ds surface: topbar — global chrome header for the non-session surfaces. Decomposed into this scoped block;
-     topbar, pi-mark, wordmark-copy and topbar-actions are owned solely by this component so they move
+     topbar, pi-mark, wordmark--copy and topbar--actions are owned solely by this component so they move
      with it. .wordmark and .nav-button are on the Button primitive so they use :global. The grouped
-     .nav-button, .theme-option, .back-button base + hover rules, the grouped .wordmark-copy, .status-pill
+     .nav-button, .theme--option, .back-button base + hover rules, the grouped .wordmark--copy, .status--pill
      @media (max-width: 52rem) rule, and the grouped .topbar, .session-header safe-gutter rule stay GLOBAL
      in app.css (unchanged) so their byte-for-byte structure is preserved. Values unchanged. -->
 <style>
@@ -135,25 +135,25 @@
     font-weight: 700;
   }
 
-  .wordmark-copy {
+  .wordmark--copy {
     display: grid;
     gap: 0.05rem;
   }
 
-  .wordmark-copy strong {
+  .wordmark--copy strong {
     font-size: 0.86rem;
     font-weight: 700;
     letter-spacing: -0.01em;
   }
 
-  .wordmark-copy small {
+  .wordmark--copy small {
     color: var(--ink-muted);
     font-size: 0.67rem;
     font-weight: 550;
   }
 
   /* @ds slot: nav — Inbox · Review actions; theme-toggle and status slots are shared surfaces below. */
-  .topbar-actions {
+  .topbar--actions {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -173,7 +173,7 @@
       padding-inline: var(--space-3);
     }
 
-    .topbar-actions {
+    .topbar--actions {
       gap: var(--space-1);
     }
 

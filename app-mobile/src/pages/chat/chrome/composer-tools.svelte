@@ -158,7 +158,7 @@
       <Button
         {...props}
         aria-haspopup={undefined}
-        class="composer-plus"
+        class="composer--plus"
         data-attachment-plus={mediaAvailable ? true : undefined}
         aria-label={mediaAvailable ? 'Add photo, mode, or command' : 'Mode and commands'}
       >
@@ -167,7 +167,7 @@
     {/snippet}
   </Popover.Trigger>
   <Popover.Content
-    class="composer-tools-popover"
+    class="composer-tools--popover"
     side="top"
     align="start"
     bind:ref={contentEl}
@@ -193,11 +193,11 @@
       bind:this={toolsDialogEl}
     >
       {#if mediaAvailable}
-        <section class="tools-group tools-photo-group" aria-labelledby="photo-tools-label">
-          <span class="tools-label" id="photo-tools-label">
+        <section class="tools--group tools-photo-group" aria-labelledby="photo-tools-label">
+          <span class="tools--label" id="photo-tools-label">
             Photos
           </span>
-          <div class="tools-photo-actions">
+          <div class="tools--photo-actions">
             <input
               bind:this={photoLibraryInput}
               type="file"
@@ -206,7 +206,7 @@
               onchange={onFileChange}
               style="display:none"
             />
-            <Button class="tools-action" onclick={openPhotoLibrary}>Photo Library</Button>
+            <Button class="tools--action" onclick={openPhotoLibrary}>Photo Library</Button>
             <input
               bind:this={takePhotoInput}
               type="file"
@@ -215,17 +215,17 @@
               onchange={onFileChange}
               style="display:none"
             />
-            <Button class="tools-action" onclick={openTakePhoto}>Take Photo</Button>
+            <Button class="tools--action" onclick={openTakePhoto}>Take Photo</Button>
           </div>
-          <p class="tools-disclosure">
+          <p class="tools--disclosure">
             Photos stay on this iPhone until Send. Pi and its model provider receive a
             prepared copy.
           </p>
         </section>
-        <div class="tools-divider"></div>
+        <div class="tools--divider"></div>
       {/if}
-      <section class="tools-group">
-        <span class="tools-label">Commands</span>
+      <section class="tools--group">
+        <span class="tools--label">Commands</span>
         <CommandPalette
           {catalog}
           onInsert={onInsert}
@@ -233,10 +233,10 @@
         />
       </section>
 
-      <section class="tools-group">
-        <span class="tools-label">Keyboard</span>
+      <section class="tools--group">
+        <span class="tools--label">Keyboard</span>
         <label
-          class="tools-checkbox"
+          class="tools--checkbox"
           data-selected={shiftTabEnabled ? true : undefined}
           data-focus-visible={checkboxFocusVisible ? true : undefined}
         >
@@ -266,7 +266,7 @@
         </label>
       </section>
 
-      <span class="tools-status" role="status" aria-live="polite">
+      <span class="tools--status" role="status" aria-live="polite">
         {statusHint(runtime.status, runtime.pending !== null)}
       </span>
     </div>
@@ -283,17 +283,17 @@
 </Popover.Root>
 
 <!-- @ds surface: composer-tools — the "+" tools popover. Decomposed into this scoped block;
-     composer-tools / tools-checkbox / tools-photo-actions / tools-action / tools-disclosure /
-     tools-divider / tools-status / composer-plus are owned solely by this component so they
-     move with it. Shared .tools-group / .tools-label (also used by SessionHeader) and the
-     shared grouped selectors .session-sheet-popover, .composer-tools-popover and the
-     .composer-plus members of the prefers-contrast / forced-colors / 44px-target groups stay
+     composer-tools / tools--checkbox / tools--photo-actions / tools--action / tools--disclosure /
+     tools--divider / tools--status / composer--plus are owned solely by this component so they
+     move with it. Shared .tools--group / .tools--label (also used by SessionHeader) and the
+     shared grouped selectors .session--sheet-popover, .composer-tools--popover and the
+     .composer--plus members of the prefers-contrast / forced-colors / 44px-target groups stay
      GLOBAL in app.css. Child-primitive classes and react-aria/runtime data-attributes use
      :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>
   /* @ds surface: session-sheet — in-session overflow popover (nav · theme), shared chrome with the composer toolset. */
   /* @ds slot: tools-popover — the "+" popover chrome; shared with the session-sheet surface. */
-  :global(.composer-tools-popover) {
+  :global(.composer-tools--popover) {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     background: var(--surface-raised);
@@ -301,7 +301,7 @@
   }
 
   /* @ds slot: tools-trigger — the "+" popover trigger. */
-  :global(.composer-plus) {
+  :global(.composer--plus) {
     display: grid;
     place-items: center;
     width: 2.5rem;
@@ -314,18 +314,18 @@
     cursor: pointer;
   }
 
-  :global(.composer-plus[data-hovered]),
-  :global(.composer-plus[data-pressed]) {
+  :global(.composer--plus[data-hovered]),
+  :global(.composer--plus[data-pressed]) {
     background: var(--surface-muted);
   }
 
-  :global(.composer-plus[data-focus-visible]) {
+  :global(.composer--plus[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
   /* Keyboard preference row in the tools popover. */
-  .tools-checkbox {
+  .tools--checkbox {
     display: flex;
     min-block-size: 44px;
     align-items: center;
@@ -335,7 +335,7 @@
     cursor: pointer;
   }
 
-  :global(.tools-checkbox .react-aria-Checkbox-indicator) {
+  :global(.tools--checkbox .react-aria-Checkbox-indicator) {
     display: grid;
     flex: none;
     width: 1.25rem;
@@ -347,23 +347,23 @@
     color: var(--ink-inverse);
   }
 
-  :global(.tools-checkbox[data-selected] .react-aria-Checkbox-indicator) {
+  :global(.tools--checkbox[data-selected] .react-aria-Checkbox-indicator) {
     border-color: var(--ink);
     background: var(--ink);
   }
 
-  :global(.tools-checkbox[data-focus-visible] .react-aria-Checkbox-indicator) {
+  :global(.tools--checkbox[data-focus-visible] .react-aria-Checkbox-indicator) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
-  .tools-photo-actions {
+  .tools--photo-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-2);
   }
 
-  :global(.tools-action) {
+  :global(.tools--action) {
     min-block-size: 44px;
     padding-inline: var(--space-2);
     border: 1px solid var(--control-border);
@@ -375,12 +375,12 @@
     cursor: pointer;
   }
 
-  :global(.tools-action[data-hovered]),
-  :global(.tools-action[data-pressed]) {
+  :global(.tools--action[data-hovered]),
+  :global(.tools--action[data-pressed]) {
     background: var(--accent-soft);
   }
 
-  .tools-disclosure {
+  .tools--disclosure {
     margin: var(--space-1) 0 0;
     color: var(--ink-muted);
     font-family: var(--font-display);
@@ -388,13 +388,13 @@
     line-height: 1.35;
   }
 
-  .tools-divider {
+  .tools--divider {
     block-size: 1px;
     background: var(--line);
   }
 
   @media (max-width: 20rem) {
-    .tools-photo-actions {
+    .tools--photo-actions {
       grid-template-columns: minmax(0, 1fr);
     }
   }
@@ -408,7 +408,7 @@
     outline: none;
   }
 
-  .tools-status {
+  .tools--status {
     min-height: 1rem;
     color: var(--ink-muted);
     font-size: 0.72rem;

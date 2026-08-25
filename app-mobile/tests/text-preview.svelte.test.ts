@@ -36,7 +36,7 @@ describe('TextPreview', () => {
     selection?.addRange(range);
     expect(selection?.toString()).toBe(text);
     expect(preview).toHaveClass('is-wrapped');
-    expect(preview.querySelectorAll('.artifact-find-match')).toHaveLength(2);
+    expect(preview.querySelectorAll('.artifact-find--match')).toHaveLength(2);
   });
 
   it.each([

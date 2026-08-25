@@ -45,7 +45,7 @@ describe('AttachmentPreviewDialog', () => {
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'Photo 1' })).toHaveFocus(),
     );
-    expect(document.querySelector('.attachment-preview-canvas')).toBeInTheDocument();
+    expect(document.querySelector('.attachment-preview--canvas')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Close preview' })).toBeInTheDocument();
     // react-aria's Modal sandbox aria-hides the rail so the React oracle's
     // global getByRole('Remove Photo 1') resolves to the dialog's control

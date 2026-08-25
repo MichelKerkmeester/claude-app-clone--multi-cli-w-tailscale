@@ -18,5 +18,5 @@
   };
 </script>
 
-<textarea class="composer-input" aria-label="Message Pi"></textarea>
+<textarea class="composer--input" aria-label="Message Pi"></textarea>
 <button type="button" onclick={(event) => viewer.openDiff(DIFF, event.currentTarget)}>Open a11y diff</button>

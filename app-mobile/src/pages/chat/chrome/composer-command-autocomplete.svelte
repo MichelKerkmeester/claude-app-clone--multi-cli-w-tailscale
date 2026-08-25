@@ -385,12 +385,12 @@
 <!-- Popover lifecycle, dismissal, and aria wiring are frozen. -->
 <!-- @ds surface: slash-autocomplete -->
 <!-- @ds guardrail: react-aria wiring — Popover lifecycle, aria/role, virtual focus. -->
-<div class="slash-surface" data-state={surfaceState}>
+<div class="slash--surface" data-state={surfaceState}>
   {#if open && derivation.panelOpen}
-    <div class="slash-panel" bind:this={panelRef} style={panelStyle}>
+    <div class="slash--panel" bind:this={panelRef} style={panelStyle}>
       {#if derivation.message !== null}
         <!-- @ds slot: header — the panel's status / error / empty-catalog copy line. -->
-        <div class={hasError ? 'slash-status is-error' : 'slash-status'}>
+        <div class={hasError ? 'slash--status is-error' : 'slash--status'}>
           {derivation.message}
         </div>
       {/if}
@@ -400,7 +400,7 @@
           role="listbox"
           id={SLASH_LISTBOX_ID}
           aria-label="Available host commands"
-          class="slash-list"
+          class="slash--list"
         >
           {#each items as item (item.name)}
             <CommandOption
@@ -414,23 +414,23 @@
       {/if}
       {#if derivation.panelState === 'loading.initial'}
         <!-- @ds state: loading.initial — bounded skeleton rows. -->
-        <div class="slash-skeletons" aria-hidden="true">
-          <div class="slash-skeleton"></div>
-          <div class="slash-skeleton"></div>
-          <div class="slash-skeleton"></div>
+        <div class="slash--skeletons" aria-hidden="true">
+          <div class="slash--skeleton"></div>
+          <div class="slash--skeleton"></div>
+          <div class="slash--skeleton"></div>
         </div>
       {/if}
-      <div class="slash-footer">
+      <div class="slash--footer">
         <!-- @ds slot: footer-hint — the running hint and retry affordance. -->
         {#if runningNote}
-          <span class="slash-running-note">
+          <span class="slash--running-note">
             Pi is running — insertion stays local, nothing is sent.
           </span>
         {/if}
         {#if derivation.canRetry}
           <Button
             type="button"
-            class="slash-retry"
+            class="slash--retry"
             disabled={catalog.status === 'refreshing'}
             onpointerdown={(event) => event.preventDefault()}
             onclick={onRetry}
@@ -444,19 +444,19 @@
 </div>
 
 <!-- @ds surface: slash-autocomplete — the inline autocomplete card. Decomposed into this scoped block;
-     slash-surface / panel / list / status / skeleton / footer / retry are owned solely by this
+     slash--surface / panel / list / status / skeleton / footer / retry are owned solely by this
      component so they move with it. Child-primitive retry classes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->
 <style>
   /* @ds state: closed · drafted — surface-level open conditions. The state
      attribute drives which presentation the surface renders. */
-  .slash-surface {
+  .slash--surface {
     display: contents;
   }
 
   /* @ds surface: slash-autocomplete — the inline autocomplete card and the
      command palette share this surface name. */
-  .slash-panel {
+  .slash--panel {
     /* @ds edit: tokens — component tokens. Each is a thin alias to a semantic role,
        so this surface retints by editing the role it points at (primitive → semantic
        → component). Edit them here instead of on :root. */
@@ -489,7 +489,7 @@
      dark semantic roles here. The ui-accent points at --accent-ink, not --accent-strong,
      because --accent-strong carries no dark override and would not match the dark
      UI accent. */
-  :global(:root[data-theme='dark']) .slash-panel {
+  :global(:root[data-theme='dark']) .slash--panel {
     --slash-raised: var(--surface);
     --slash-ink: var(--ink);
     --slash-muted: var(--ink-muted);
@@ -502,7 +502,7 @@
     /* @ds edit: tokens — theme remap, system-dark. Dark semantic roles again, driven
        by the OS-dark signal; ui-accent resolves to --accent-ink for the same reason
        as the explicit dark block. */
-    :global(:root[data-theme='system']) .slash-panel {
+    :global(:root[data-theme='system']) .slash--panel {
       --slash-raised: var(--surface);
       --slash-ink: var(--ink);
       --slash-muted: var(--ink-muted);
@@ -514,13 +514,13 @@
 
   /* @ds end surface: slash-autocomplete */
 
-  /* @ds surface: status — slash-panel header states map loading · ready..empty · ready..stale-offline ·
+  /* @ds surface: status — slash--panel header states map loading · ready..empty · ready..stale--offline ·
      error..denied onto the shared families. */
   /* @ds slot: header — the panel's status / error / empty-catalog copy line. */
   /* @ds state: loading.initial · ready.emptyCatalog · ready.noMatches ·
      ready.staleOffline · session.running — copy-led panel states; the loading
      and empty/no-match guards render header copy before any rows. */
-  .slash-status {
+  .slash--status {
     padding: 8px 12px;
     color: var(--slash-muted);
     font-size: 0.78rem;
@@ -529,7 +529,7 @@
 
   /* @ds state: error.noSnapshot · error.hostUnavailable · error.forbidden ·
      error.incompatible — fail-closed error copy, accent-tinted. */
-  .slash-status.is-error {
+  .slash--status.is-error {
     color: var(--slash-accent);
     font-weight: 600;
   }
@@ -540,7 +540,7 @@
   /* @ds slot: option-list — the scrollable listbox of command rows. */
   /* @ds state: ready.unfiltered · ready.filtered · refreshing.current ·
      ready.staleOffline · session.running — the row-bearing panel states. */
-  .slash-list {
+  .slash--list {
     flex: 0 1 auto;
     min-block-size: 0;
     overflow-y: auto;
@@ -552,20 +552,20 @@
   }
 
   /* @ds state: loading.initial — bounded skeleton rows before the first snapshot. */
-  .slash-skeletons {
+  .slash--skeletons {
     display: grid;
     gap: 4px;
     padding: 4px;
   }
 
-  .slash-skeleton {
+  .slash--skeleton {
     block-size: 56px;
     border-radius: 10px;
     background: color-mix(in srgb, var(--slash-ink) 7%, transparent);
   }
 
   /* @ds slot: footer-hint — the footer with the running hint and retry affordance. */
-  .slash-footer {
+  .slash--footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -573,14 +573,14 @@
     padding: 4px 4px 0;
   }
 
-  .slash-running-note {
+  .slash--running-note {
     padding-inline: 8px;
     color: var(--slash-muted);
     font-size: 11px;
     line-height: 16px;
   }
 
-  :global(.slash-retry) {
+  :global(.slash--retry) {
     min-block-size: 44px;
     min-inline-size: 44px;
     padding-inline: 14px;
@@ -597,17 +597,17 @@
   }
 
   /* @ds state: retry-hovered — the revalidate affordance's hover wash. */
-  :global(.slash-retry[data-hovered]) {
+  :global(.slash--retry[data-hovered]) {
     background: color-mix(in srgb, var(--slash-selection) 60%, var(--slash-raised));
   }
 
-  :global(.slash-retry[data-disabled]) {
+  :global(.slash--retry[data-disabled]) {
     cursor: not-allowed;
     opacity: 0.55;
   }
 
   /* @ds edit: layout — installed-PWA popover bounds clear the device insets. */
-  .slash-panel {
+  .slash--panel {
     inline-size: var(
       --trigger-width,
       min(calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)), 40rem)
@@ -619,14 +619,14 @@
      system scheme (Canvas / CanvasText / Highlight). */
   /* @ds guardrail: do-not-edit — Forced-colors yield is an accessibility guarantee; never restore a hard-coded surface/ink over the system scheme. */
   @media (forced-colors: active) {
-    :global(.slash-retry) {
+    :global(.slash--retry) {
       border: 1px solid CanvasText;
       background: Canvas;
       color: Highlight;
     }
 
-    .slash-status.is-error,
-    .slash-running-note {
+    .slash--status.is-error,
+    .slash--running-note {
       color: CanvasText;
     }
   }

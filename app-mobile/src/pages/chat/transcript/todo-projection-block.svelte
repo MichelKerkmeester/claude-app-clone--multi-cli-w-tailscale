@@ -36,7 +36,7 @@
 
 <!-- @ds slot: projection-block — mount wrapper for the read-only todo projection inside a transcript. -->
 {#if state.availability === 'available' && state.projection !== null}
-  <article class="todo-projection-block" data-todo-projection-block="true">
+  <article class="todo--projection-block" data-todo-projection-block="true">
     {#key state.projection.planId}
       <TodoPanel
         projection={state.projection}
@@ -53,14 +53,14 @@
 {/if}
 
 <!-- @ds slot: projection-block — mount wrapper for the read-only todo projection inside a transcript.
-     Decomposed into this scoped block; .todo-projection-block is owned solely by this component so it moves
+     Decomposed into this scoped block; .todo--projection-block is owned solely by this component so it moves
      with it. Values unchanged. -->
 <style>
   /* Read-only transcript annotation — not an editable task surface. */
   /* @ds surface: todos — the read-only todo projection panel (pi's plan). */
   /* @ds guardrail: READ-ONLY projection — the phone NEVER mutates pi's task list. The grouped
      sections and per-task states come from the projection only; edit styling, never the model. */
-  .todo-projection-block {
+  .todo--projection-block {
     min-inline-size: 0;
     overflow: visible;
   }

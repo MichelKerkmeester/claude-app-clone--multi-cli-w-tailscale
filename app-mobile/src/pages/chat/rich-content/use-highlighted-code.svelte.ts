@@ -44,8 +44,8 @@ export type HighlightTokenKind =
   | 'boolean'
   | 'tag'
   | 'heading'
-  | 'diff-add'
-  | 'diff-remove'
+  | 'diff--add'
+  | 'diff--remove'
   | 'ansi';
 
 export interface HighlightToken {
@@ -232,8 +232,8 @@ function isHighlightToken(value: unknown): value is HighlightToken {
       token.kind === 'boolean' ||
       token.kind === 'tag' ||
       token.kind === 'heading' ||
-      token.kind === 'diff-add' ||
-      token.kind === 'diff-remove' ||
+      token.kind === 'diff--add' ||
+      token.kind === 'diff--remove' ||
       token.kind === 'ansi')
   );
 }

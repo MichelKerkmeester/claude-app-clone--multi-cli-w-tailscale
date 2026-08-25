@@ -207,12 +207,12 @@ async function scrollUntilSelector(client, selector, text = null, requireNoActio
   return waitForPage(
     client,
     `(() => {
-      const scroll = document.querySelector('.transcript-scroll');
+      const scroll = document.querySelector('.transcript--scroll');
       const target = [...document.querySelectorAll(${JSON.stringify(selector)})]
         .find((node) => ${JSON.stringify(text)} === null || node.textContent?.includes(${JSON.stringify(text)}));
       if (
         target !== undefined &&
-        (!${JSON.stringify(requireNoActions)} || target.querySelectorAll('.rich-block-action').length === 0)
+        (!${JSON.stringify(requireNoActions)} || target.querySelectorAll('.rich-block--action').length === 0)
       ) return true;
       if (scroll === null) return false;
       scroll.scrollTop = Math.min(
@@ -228,8 +228,8 @@ async function scrollUntilCommandStatus(client, status, direction) {
   await waitForPage(
     client,
     `(() => {
-      const scroll = document.querySelector('.transcript-scroll');
-      const hasStatus = [...document.querySelectorAll('.rich-command-card .rich-block-status')]
+      const scroll = document.querySelector('.transcript--scroll');
+      const hasStatus = [...document.querySelectorAll('.rich-command-card .rich-block--status')]
         .some((node) => node.textContent?.includes(${JSON.stringify(status)}));
       if (hasStatus) return true;
       if (scroll === null) return false;
@@ -249,30 +249,30 @@ async function waitForProcessExit(process) {
 
 async function exerciseLegacyActivity(client, theme, outputPath, viewportWidth) {
   await navigate(client, `${DEV_URL}/session/demo-session-refactor?demo=1`);
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await evaluate(
     client,
     `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await waitForPage(
     client,
-    'document.querySelector(".activity-group") !== null && document.querySelector(".block-text") !== null',
+    'document.querySelector(".activity--group") !== null && document.querySelector(".block--text") !== null',
   );
 
   const state = await evaluate(
     client,
     `(() => {
       const root = document.documentElement;
-      const scroll = document.querySelector('.transcript-scroll');
+      const scroll = document.querySelector('.transcript--scroll');
       return {
         viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
         theme: root.dataset.theme,
         clientWidth: root.clientWidth,
         scrollWidth: root.scrollWidth,
-        activity: document.querySelectorAll('.activity-group').length,
-        prose: document.querySelectorAll('.transcript-block.block-text .block-copy').length,
-        evidence: document.querySelectorAll('.evidence-trigger').length,
+        activity: document.querySelectorAll('.activity--group').length,
+        prose: document.querySelectorAll('.transcript--block.block--text .block--copy').length,
+        evidence: document.querySelectorAll('.evidence--trigger').length,
         composer: document.querySelector('[aria-label="Message Pi"]') !== null,
         legacyRichCards: document.querySelectorAll('.block-text_artifact, [data-rich-content], .file-preview-card').length,
         transcriptScroll: scroll !== null,
@@ -314,19 +314,19 @@ async function exerciseLegacyActivity(client, theme, outputPath, viewportWidth) 
 
 async function exerciseRichCore(client, theme, outputPath, viewportWidth) {
   await navigate(client, `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=rich-core`);
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await evaluate(
     client,
     `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await scrollUntilCommandStatus(client, 'Running', 'up');
 
   const initial = await evaluate(
     client,
     `(() => {
-      const scroll = document.querySelector('.transcript-scroll');
-      const actions = [...document.querySelectorAll('.rich-block-action')];
+      const scroll = document.querySelector('.transcript--scroll');
+      const actions = [...document.querySelectorAll('.rich-block--action')];
       const bounds = actions.map((action) => {
         const rect = action.getBoundingClientRect();
         return { width: rect.width, height: rect.height };
@@ -391,7 +391,7 @@ async function exerciseRichCore(client, theme, outputPath, viewportWidth) {
     })()`,
   );
   if (!opened) throw new Error('Rich core Open full screen action was not found.');
-  await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") !== null');
+  await waitForPage(client, 'document.querySelector(".artifact-viewer--dialog") !== null');
   const openedState = await evaluate(
     client,
     `window.history.state?.__piRemoteArtifactBlockId ?? null`,
@@ -399,18 +399,18 @@ async function exerciseRichCore(client, theme, outputPath, viewportWidth) {
   if (typeof openedState !== 'string' || openedState.length === 0) {
     throw new Error('F6 history did not contain the opaque rich block id.');
   }
-  await evaluate(client, `document.querySelector('.artifact-viewer-close')?.click()`);
-  await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") === null');
+  await evaluate(client, `document.querySelector('.artifact-viewer--close')?.click()`);
+  await waitForPage(client, 'document.querySelector(".artifact-viewer--dialog") === null');
 
   await evaluate(
     client,
-    `document.querySelectorAll('.evidence-trigger').forEach((trigger) => {
+    `document.querySelectorAll('.evidence--trigger').forEach((trigger) => {
       if (trigger.getAttribute('aria-expanded') !== 'true') trigger.click();
     })`,
   );
   const malformedLegacyFound = await scrollUntilSelector(
     client,
-    '.rich-activity-card',
+    '.rich--activity-card',
     'legacy content remains read-only',
     true,
   );
@@ -418,7 +418,7 @@ async function exerciseRichCore(client, theme, outputPath, viewportWidth) {
     client,
     `(() => {
       const root = document.documentElement;
-      const actions = [...document.querySelectorAll('.rich-block-action')];
+      const actions = [...document.querySelectorAll('.rich-block--action')];
       return {
         viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
         clientWidth: root.clientWidth,
@@ -465,12 +465,12 @@ async function exerciseRichCore(client, theme, outputPath, viewportWidth) {
 
 async function exerciseRichRelease(client, theme, outputPath, viewportWidth) {
   await navigate(client, `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=rich-release`);
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await evaluate(
     client,
     `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await scrollUntilCommandStatus(client, 'Connection lost', 'down');
   await waitForPage(
     client,
@@ -481,8 +481,8 @@ async function exerciseRichRelease(client, theme, outputPath, viewportWidth) {
     client,
     `(() => {
       const root = document.documentElement;
-      const actions = [...document.querySelectorAll('.rich-block-action')];
-      const rows = [...document.querySelectorAll('.transcript-block')];
+      const actions = [...document.querySelectorAll('.rich-block--action')];
+      const rows = [...document.querySelectorAll('.transcript--block')];
       return {
         viewportWidth: Math.round(window.visualViewport?.width ?? window.innerWidth),
         theme: root.dataset.theme,
@@ -490,7 +490,7 @@ async function exerciseRichRelease(client, theme, outputPath, viewportWidth) {
         scrollWidth: root.scrollWidth,
         commandCards: document.querySelectorAll('.rich-command-card').length,
         codeCards: document.querySelectorAll('.rich-code-card').length,
-        textCards: document.querySelectorAll('.rich-text-artifact-card, .rich-prose-block').length,
+        textCards: document.querySelectorAll('.rich-text-artifact-card, .rich--prose-block').length,
         hasFailure: document.body.textContent?.includes('Failed') ?? false,
         hasTruncation: document.body.textContent?.includes('Upstream truncated') ?? false,
         hasStaleCache: document.body.textContent?.includes('Stale cache') ?? false,
@@ -549,12 +549,12 @@ async function exerciseRichRelease(client, theme, outputPath, viewportWidth) {
     })()`,
   );
   if (!opened) throw new Error('Rich release running-tail viewer action was not found.');
-  await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") !== null');
+  await waitForPage(client, 'document.querySelector(".artifact-viewer--dialog") !== null');
   const viewerState = await evaluate(
     client,
     `(() => {
-      const dialog = document.querySelector('.artifact-viewer-dialog');
-      const viewer = document.querySelector('.artifact-code-preview');
+      const dialog = document.querySelector('.artifact-viewer--dialog');
+      const viewer = document.querySelector('.artifact-code--preview');
       const activeInside = dialog?.contains(document.activeElement) ?? false;
       if (!(viewer instanceof HTMLElement)) return { activeInside, scrollHeight: 0, clientHeight: 0 };
       viewer.scrollTop = 0;
@@ -570,25 +570,25 @@ async function exerciseRichRelease(client, theme, outputPath, viewportWidth) {
   if (viewerState.scrollHeight <= viewerState.clientHeight) {
     throw new Error('Rich release running-tail viewer was not scrollable.');
   }
-  await waitForPage(client, 'document.querySelector(".artifact-jump-latest") !== null');
-  await evaluate(client, `document.querySelector('.artifact-jump-latest')?.click()`);
+  await waitForPage(client, 'document.querySelector(".artifact--jump-latest") !== null');
+  await evaluate(client, `document.querySelector('.artifact--jump-latest')?.click()`);
   await waitForPage(
     client,
-    'document.querySelector(".artifact-code-viewer")?.getAttribute("data-live-edge") === "true"',
+    'document.querySelector(".artifact-code--viewer")?.getAttribute("data-live-edge") === "true"',
   );
-  await evaluate(client, `document.querySelector('.artifact-viewer-close')?.click()`);
-  await waitForPage(client, 'document.querySelector(".artifact-viewer-dialog") === null');
+  await evaluate(client, `document.querySelector('.artifact-viewer--close')?.click()`);
+  await waitForPage(client, 'document.querySelector(".artifact-viewer--dialog") === null');
 
   const scaled = await evaluate(
     client,
     `(() => {
       document.documentElement.style.fontSize = '200%';
       const root = document.documentElement;
-      const actionBounds = [...document.querySelectorAll('.rich-block-action')].map((action) => {
+      const actionBounds = [...document.querySelectorAll('.rich-block--action')].map((action) => {
         const rect = action.getBoundingClientRect();
         return { width: rect.width, height: rect.height };
       });
-      const reducedMotionDuration = getComputedStyle(document.querySelector('.rich-block-action') ?? root).transitionDuration;
+      const reducedMotionDuration = getComputedStyle(document.querySelector('.rich-block--action') ?? root).transitionDuration;
       return {
         clientWidth: root.clientWidth,
         scrollWidth: root.scrollWidth,

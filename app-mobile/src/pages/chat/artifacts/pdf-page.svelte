@@ -131,36 +131,36 @@
   });
 </script>
 
-<article class="pdf-preview-page" data-pdf-page={pageNumber} aria-label={`Page ${pageNumber}`} style:min-height={viewportSize.height > 0 ? `${viewportSize.height}px` : undefined}>
-  <div class="pdf-preview-canvas-wrap" style:width={viewportSize.width ? `${viewportSize.width}px` : undefined}>
+<article class="pdf-preview--page" data-pdf-page={pageNumber} aria-label={`Page ${pageNumber}`} style:min-height={viewportSize.height > 0 ? `${viewportSize.height}px` : undefined}>
+  <div class="pdf-preview--canvas-wrap" style:width={viewportSize.width ? `${viewportSize.width}px` : undefined}>
     <canvas bind:this={canvasEl} aria-label={`Rendered PDF page ${pageNumber}`}></canvas>
     {#if textLayerSafe && spans.length > 0}
-      <div class="pdf-text-layer" aria-label={`Selectable text for page ${pageNumber}`}>{#each spans as span (span.key)}<span class={findTerm.trim().length > 0 && span.text.toLocaleLowerCase().includes(findTerm.trim().toLocaleLowerCase()) ? 'pdf-text-match' : undefined}>{span.text}</span>{/each}</div>
+      <div class="pdf-text--layer" aria-label={`Selectable text for page ${pageNumber}`}>{#each spans as span (span.key)}<span class={findTerm.trim().length > 0 && span.text.toLocaleLowerCase().includes(findTerm.trim().toLocaleLowerCase()) ? 'pdf-text--match' : undefined}>{span.text}</span>{/each}</div>
     {/if}
   </div>
 </article>
 
-<!-- @ds surface: pdf-preview-page — one rendered PDF page: canvas + selectable text overlay.
+<!-- @ds surface: pdf-preview--page — one rendered PDF page: canvas + selectable text overlay.
      Decomposed into this scoped block; single-component. The text layer is Svelte-rendered (literal spans),
      the canvas is a literal element, so the descendant selectors scope plainly. The shared .pdf-page /
      .pdf-preview-shared classes stay global (→ app.css at cutover). Values unchanged. -->
 <style>
   /* @ds slot: page — one PDF page, centered in the scroll column. */
-  .pdf-preview-page {
+  .pdf-preview--page {
     display: grid;
     min-inline-size: 0;
     place-items: start center;
   }
 
   /* @ds slot: canvas-wrap — the raised canvas frame that the text layer overlays. */
-  .pdf-preview-canvas-wrap {
+  .pdf-preview--canvas-wrap {
     position: relative;
     max-inline-size: 100%;
     background: var(--surface-raised);
     box-shadow: var(--shadow-raised);
   }
 
-  .pdf-preview-canvas-wrap canvas {
+  .pdf-preview--canvas-wrap canvas {
     display: block;
     max-inline-size: 100%;
     block-size: auto;
@@ -168,7 +168,7 @@
 
   /* @ds slot: text-layer — the invisible selectable text overlay aligned to the canvas. */
   /* @ds guardrail: do-not-edit — transparent text keeps selection/find working without repainting glyphs. */
-  .pdf-text-layer {
+  .pdf-text--layer {
     position: absolute;
     inset: 0;
     overflow: hidden;
@@ -178,14 +178,14 @@
     white-space: pre-wrap;
   }
 
-  .pdf-text-layer span {
+  .pdf-text--layer span {
     display: inline;
     color: transparent;
     font-size: 1rem;
   }
 
   /* @ds state: find-match — a matched text run tints under the transparent layer. */
-  .pdf-text-layer .pdf-text-match {
+  .pdf-text--layer .pdf-text--match {
     background: var(--accent-soft);
     color: var(--ink);
   }

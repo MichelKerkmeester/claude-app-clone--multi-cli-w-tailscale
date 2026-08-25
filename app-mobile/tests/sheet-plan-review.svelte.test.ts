@@ -127,7 +127,7 @@ describe('PlanReviewSheet', () => {
       if (path === 'escape') {
         await user.keyboard('{Escape}');
       } else if (path === 'backdrop') {
-        const overlay = document.querySelector('.plan-review-overlay');
+        const overlay = document.querySelector('.plan-review--overlay');
         if (!(overlay instanceof HTMLElement)) throw new Error('review overlay missing');
         await user.click(overlay);
       } else if (path === 'browser back') {

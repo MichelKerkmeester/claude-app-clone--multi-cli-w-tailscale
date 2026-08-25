@@ -49,8 +49,8 @@
     sessionId: string | null,
   ): ArtifactPreview {
     const scrollContainer =
-      trigger?.closest<HTMLElement>('.transcript-scroll') ??
-      document.querySelector<HTMLElement>('.transcript-scroll');
+      trigger?.closest<HTMLElement>('.transcript--scroll') ??
+      document.querySelector<HTMLElement>('.transcript--scroll');
     const transcriptRegion =
       trigger?.closest<HTMLElement>('[aria-label="Typed transcript"]') ??
       document.querySelector<HTMLElement>('[aria-label="Typed transcript"]');
@@ -115,7 +115,7 @@
     }
   }
 
-  const PRIVACY_CURTAIN_ID = 'artifact-viewer-privacy-curtain';
+  const PRIVACY_CURTAIN_ID = 'artifact-viewer--privacy-curtain';
 
   function showPrivacyCurtain(): void {
     if (typeof document === 'undefined') return;
@@ -123,7 +123,7 @@
     if (document.getElementById(PRIVACY_CURTAIN_ID) !== null) return;
     const curtain = document.createElement('div');
     curtain.id = PRIVACY_CURTAIN_ID;
-    curtain.className = 'artifact-viewer-privacy-curtain';
+    curtain.className = 'artifact-viewer--privacy-curtain';
     curtain.setAttribute('aria-hidden', 'true');
     document.body?.append(curtain);
   }
@@ -138,7 +138,7 @@
     if (typeof document === 'undefined') return;
     if (open) {
       document.documentElement.dataset.artifactViewerOpen = 'true';
-      document.querySelector<HTMLElement>('.composer-region textarea, .composer-input')?.blur();
+      document.querySelector<HTMLElement>('.composer--region textarea, .composer--input')?.blur();
     } else {
       delete document.documentElement.dataset.artifactViewerOpen;
     }
@@ -147,7 +147,7 @@
   function purgeViewerPixelNodes(): void {
     if (typeof document === 'undefined') return;
     for (const image of document.querySelectorAll<HTMLImageElement>(
-      '.artifact-viewer-dialog img, [data-verified-image="true"]',
+      '.artifact-viewer--dialog img, [data-verified-image="true"]',
     )) {
       image.removeAttribute('src');
       image.removeAttribute('srcset');
@@ -471,7 +471,7 @@
   /* @ds slot: privacy-curtain — opaque cover shown on dismissal while content unmounts. */
   /* @ds state: privacy-covered — the curtain is fully opaque and pointer-blocking. */
   /* @ds guardrail: do-not-edit — z-index 10000 opaque cover; the privacy invariant. */
-  :global(.artifact-viewer-privacy-curtain) {
+  :global(.artifact-viewer--privacy-curtain) {
     position: fixed;
     z-index: 10000;
     inset: 0;

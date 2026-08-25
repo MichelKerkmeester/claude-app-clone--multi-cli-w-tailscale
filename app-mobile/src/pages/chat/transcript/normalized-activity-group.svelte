@@ -57,27 +57,27 @@
   function attachEvidenceTrigger(node: HTMLElement): (() => void) | void {
     const button = node.parentElement;
     if (!(button instanceof HTMLButtonElement)) return;
-    button.classList.add('evidence-trigger');
+    button.classList.add('evidence--trigger');
     triggerButton = button;
     const hoverAct = hover(button);
     return () => {
       hoverAct?.destroy?.();
-      button.classList.remove('evidence-trigger');
+      button.classList.remove('evidence--trigger');
       if (triggerButton === button) triggerButton = null;
     };
   }
 </script>
 
-<!-- @ds surface: activity-group — grouped bare evidence surface. -->
+<!-- @ds surface: activity--group — grouped bare evidence surface. -->
 <!-- @ds surface: evidence-disclosure — grouped activity disclosure. -->
-<div class="activity-group">
+<div class="activity--group">
   <!-- @ds guardrail: react-aria Disclosure wiring — not designer-editable. -->
   <Collapsible bind:open={disclosure.open}>
     {#snippet trigger()}
-      <span class="evidence-chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>
-      <span class="evidence-summary">{normalizedActivitySummary(blocks)}</span>
+      <span class="evidence--chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>
+      <span class="evidence--summary">{normalizedActivitySummary(blocks)}</span>
     {/snippet}
-    <div class="activity-stack">
+    <div class="activity--stack">
       {#each blocks as block (block.blockId)}
         <RichContentRouter {block} />
       {/each}
@@ -85,21 +85,21 @@
   </Collapsible>
 </div>
 
-<!-- @ds surface: activity-group — grouped bare evidence surface. Decomposed into this scoped block;
-     activity-group/activity-stack are owned solely by this component so they move with it (scoped).
-     evidence-trigger/chevron/summary are shared with CollapsedEvidence and stay :global there
+<!-- @ds surface: activity--group — grouped bare evidence surface. Decomposed into this scoped block;
+     activity--group/activity--stack are owned solely by this component so they move with it (scoped).
+     evidence--trigger/chevron/summary are shared with CollapsedEvidence and stay :global there
      (CollapsedEvidence.svelte's scoped style block); they are not redefined here to avoid duplicate global CSS.
      Values unchanged. -->
 <style>
-  /* @ds surface: activity-group — grouped bare evidence blocks in one quiet disclosure. */
-  .activity-group {
+  /* @ds surface: activity--group — grouped bare evidence blocks in one quiet disclosure. */
+  .activity--group {
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
     background: var(--surface);
   }
 
   /* @ds slot: panel-body — the DisclosurePanel content stack of an evidence disclosure. */
-  .activity-stack {
+  .activity--stack {
     display: grid;
     gap: var(--space-2);
     padding: 0 var(--space-3) var(--space-3);

@@ -20,7 +20,7 @@
 </script>
 
 {#if demoInboundMediaCapabilityOff()}
-  <p class="block-copy quiet-copy" data-unsupported-kind="inbound_image">
+  <p class="block--copy quiet-copy" data-unsupported-kind="inbound_image">
     A redacted “inbound_image” block cannot be displayed by this client.
   </p>
 {:else}

@@ -5,7 +5,7 @@
 
 <ArtifactViewerProvider>
   <section aria-label="Typed transcript" tabindex="-1">
-    <div class="transcript-scroll">
+    <div class="transcript--scroll">
       <ArtifactViewerTrigger />
     </div>
   </section>

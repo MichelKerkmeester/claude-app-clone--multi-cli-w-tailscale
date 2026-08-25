@@ -157,17 +157,17 @@
 <!-- @ds state: loading · ready · corrupt · too-large — [data-image-state] drives each. -->
 <!-- @ds guardrail: do-not-edit — Object-URL lifecycle, byte/dimension bounds, zoom clamping, and pointer-pan capture are frozen; image verification stays in the resource hook. -->
 <section class="image-preview" aria-label="Sanitized image preview" data-image-state={imageState}>
-  <div class="image-preview-controls" role="group" aria-label="Image zoom controls">
-    <button type="button" class="artifact-control-button" onclick={() => setBoundedZoom(zoom - 1)} disabled={zoom <= IMAGE_PREVIEW_MIN_ZOOM}>Zoom out</button>
-    <button type="button" class="artifact-control-button" onclick={() => setBoundedZoom(IMAGE_PREVIEW_MIN_ZOOM)} disabled={zoom === IMAGE_PREVIEW_MIN_ZOOM && pan.x === 0 && pan.y === 0}>Fit</button>
-    <button type="button" class="artifact-control-button" onclick={() => setBoundedZoom(zoom + 1)} disabled={zoom >= IMAGE_PREVIEW_MAX_ZOOM}>Zoom in</button>
+  <div class="image-preview--controls" role="group" aria-label="Image zoom controls">
+    <button type="button" class="artifact--control-button" onclick={() => setBoundedZoom(zoom - 1)} disabled={zoom <= IMAGE_PREVIEW_MIN_ZOOM}>Zoom out</button>
+    <button type="button" class="artifact--control-button" onclick={() => setBoundedZoom(IMAGE_PREVIEW_MIN_ZOOM)} disabled={zoom === IMAGE_PREVIEW_MIN_ZOOM && pan.x === 0 && pan.y === 0}>Fit</button>
+    <button type="button" class="artifact--control-button" onclick={() => setBoundedZoom(zoom + 1)} disabled={zoom >= IMAGE_PREVIEW_MAX_ZOOM}>Zoom in</button>
   </div>
-  {#if message !== null}<p class="artifact-preview-message" role="alert">{message}</p>{/if}
-  {#if imageState === 'loading'}<p class="artifact-preview-message" role="status">Loading sanitized image.</p>{/if}
+  {#if message !== null}<p class="artifact-preview--message" role="alert">{message}</p>{/if}
+  {#if imageState === 'loading'}<p class="artifact-preview--message" role="status">Loading sanitized image.</p>{/if}
   {#if imageState === 'ready' && objectUrl !== null}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      class="image-preview-stage"
+      class="image-preview--stage"
       ondblclick={() => setBoundedZoom(zoom === IMAGE_PREVIEW_MIN_ZOOM ? 2 : IMAGE_PREVIEW_MIN_ZOOM)}
       onpointerdown={(event) => {
         if (event.pointerType !== 'mouse' && zoom > IMAGE_PREVIEW_MIN_ZOOM) {
@@ -180,18 +180,18 @@
       onpointercancel={stopPan}
       onpointerleave={stopPan}
     >
-      <img class="image-preview-image" src={objectUrl} alt={block.altText ?? 'Sanitized image preview'} draggable={false} style:transform={`translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`} />
+      <img class="image-preview--image" src={objectUrl} alt={block.altText ?? 'Sanitized image preview'} draggable={false} style:transform={`translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`} />
     </div>
   {/if}
 </section>
 
-<!-- @ds surface: image-preview-controls — the image zoom toolbar. Decomposed into this scoped block;
-     single-component (ImagePreview). The image display classes (image-preview / image-preview-image /
-     image-preview-stage) are shared with SecureImagePreview and stay global (→ app.css at cutover); the
-     toolbar buttons carry the shared .artifact-control-button, also global. Values unchanged. -->
+<!-- @ds surface: image-preview--controls — the image zoom toolbar. Decomposed into this scoped block;
+     single-component (ImagePreview). The image display classes (image-preview / image-preview--image /
+     image-preview--stage) are shared with SecureImagePreview and stay global (→ app.css at cutover); the
+     toolbar buttons carry the shared .artifact--control-button, also global. Values unchanged. -->
 <style>
   /* @ds slot: image-controls — the zoom/pan toolbar row. */
-  .image-preview-controls {
+  .image-preview--controls {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);

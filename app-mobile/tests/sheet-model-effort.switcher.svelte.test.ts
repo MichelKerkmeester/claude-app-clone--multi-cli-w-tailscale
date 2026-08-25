@@ -235,7 +235,7 @@ describe('ModelEffortSheet (model section)', () => {
     expect(current).toHaveAccessibleName(
       'Alpha Current, alpha, alpha-current, Reasoning, Available, Current',
     );
-    const currentId = current.querySelector('.model-sheet-row-id');
+    const currentId = current.querySelector('.model-sheet-row--id');
     expect(currentId).toHaveAttribute('dir', 'ltr');
     expect(currentId).toHaveAttribute('translate', 'no');
     // The Svelte search input is a plain <input> (role textbox), not a
@@ -260,7 +260,7 @@ describe('ModelEffortSheet (model section)', () => {
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
     // In bits-ui, Dialog.Content is the overlay (role="dialog") and the modal
     // is a child, not an ancestor — querySelector, not closest.
-    const modal = screen.getByRole('dialog').querySelector('.model-sheet-modal');
+    const modal = screen.getByRole('dialog').querySelector('.model-sheet--modal');
     const list = screen.getByRole('listbox', { name: 'Available models' });
     expect(modal).not.toBeNull();
     expect(getComputedStyle(modal as Element).maxWidth).toBe('100vw');
@@ -322,19 +322,19 @@ describe('ModelEffortSheet (model section)', () => {
     expect(screen.getByRole('button', { name: 'Close sheet' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
     fireEvent.keyDown(target, { key: 'Escape' });
-    const overlay = document.querySelector<HTMLElement>('.model-sheet-overlay');
+    const overlay = document.querySelector<HTMLElement>('.model-sheet--overlay');
     if (overlay === null) throw new Error('Expected sheet overlay');
     await user.click(overlay);
-    fireEvent.pointerDown(screen.getByTestId('model-sheet-drag-region'), {
+    fireEvent.pointerDown(screen.getByTestId('model-sheet--drag-region'), {
       pointerId: 1,
       clientY: 0,
       button: 0,
     });
-    fireEvent.pointerMove(screen.getByTestId('model-sheet-drag-region'), {
+    fireEvent.pointerMove(screen.getByTestId('model-sheet--drag-region'), {
       pointerId: 1,
       clientY: 400,
     });
-    fireEvent.pointerUp(screen.getByTestId('model-sheet-drag-region'), {
+    fireEvent.pointerUp(screen.getByTestId('model-sheet--drag-region'), {
       pointerId: 1,
       clientY: 400,
     });
@@ -349,7 +349,7 @@ describe('ModelEffortSheet (model section)', () => {
   it('dismisses only from a qualifying header swipe and snaps shorter travel back', async () => {
     const onOpenChange = vi.fn();
     await openSheet({ catalog: models(7), onOpenChange });
-    const modal = document.querySelector<HTMLElement>('.model-sheet-modal');
+    const modal = document.querySelector<HTMLElement>('.model-sheet--modal');
     if (modal === null) throw new Error('Expected sheet modal');
     vi.spyOn(modal, 'getBoundingClientRect').mockReturnValue({
       x: 0,
@@ -362,7 +362,7 @@ describe('ModelEffortSheet (model section)', () => {
       height: 500,
       toJSON: () => ({}),
     });
-    const dragRegion = screen.getByTestId('model-sheet-drag-region');
+    const dragRegion = screen.getByTestId('model-sheet--drag-region');
 
     fireEvent.pointerDown(dragRegion, { pointerId: 2, clientY: 20, button: 0 });
     fireEvent.pointerMove(dragRegion, { pointerId: 2, clientY: 80 });
@@ -399,7 +399,7 @@ describe('ModelEffortSheet (model section)', () => {
     await openSheet({ catalog: models(8) });
     const dialog = screen.getByRole('dialog');
     // In bits-ui, the modal is a child of Dialog.Content, not an ancestor.
-    const modal = dialog.querySelector<HTMLElement>('.model-sheet-modal');
+    const modal = dialog.querySelector<HTMLElement>('.model-sheet--modal');
     const list = screen.getByRole('listbox');
     if (modal === null) throw new Error('Expected sheet modal');
 
@@ -425,7 +425,7 @@ describe('ModelEffortSheet (model section)', () => {
 
     // CSS-source assertions repointed from style.css to ModelEffortSheet.svelte's
     // scoped <style> block; same rule text/values.
-    expect(SHEET_CSS).toMatch(/\.model-sheet-row-id[\s\S]*?unicode-bidi: isolate;/u);
+    expect(SHEET_CSS).toMatch(/\.model-sheet-row--id[\s\S]*?unicode-bidi: isolate;/u);
     expect(SHEET_CSS).toMatch(
       /max-block-size: calc\(var\(--visual-viewport-height, 100dvh\) \* 0\.75\);/u,
     );
@@ -434,10 +434,10 @@ describe('ModelEffortSheet (model section)', () => {
       /\.model-sheet-row\[data-focus-visible\][\s\S]*?outline-width: 2px;\s*outline-offset: 2px;/u,
     );
     expect(SHEET_CSS).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.model-sheet-overlay button:active[\s\S]*?transform: none/u,
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.model-sheet--overlay button:active[\s\S]*?transform: none/u,
     );
-    expect(SHEET_CSS).toMatch(/\.model-sheet-skeleton\s*\{[\s\S]*?animation: none/u);
-    expect(SHEET_CSS).toMatch(/\.model-sheet-modal,[\s\S]*?\{[\s\S]*?animation: none/u);
+    expect(SHEET_CSS).toMatch(/\.model-sheet--skeleton\s*\{[\s\S]*?animation: none/u);
+    expect(SHEET_CSS).toMatch(/\.model-sheet--modal,[\s\S]*?\{[\s\S]*?animation: none/u);
     document.documentElement.style.removeProperty('zoom');
   });
 
@@ -661,8 +661,8 @@ describe('ModelEffortSheet (model section)', () => {
 
     const view = render(SessionHeader, { props: headerProps(readyRuntime(models(7))) });
     await user.click(screen.getByRole('button', { name: /Model, Alpha Current, alpha/ }));
-    expect(document.querySelector('.session-model-name')).toHaveTextContent('Alpha Current');
-    expect(document.querySelector('.session-effort-name')).toHaveTextContent('High');
+    expect(document.querySelector('.session-model--name')).toHaveTextContent('Alpha Current');
+    expect(document.querySelector('.session--effort-name')).toHaveTextContent('High');
     view.rerender(
       headerProps({
         ...readyRuntime(models(7)),
@@ -671,8 +671,8 @@ describe('ModelEffortSheet (model section)', () => {
       }),
     );
     await tick();
-    expect(document.querySelector('.session-model-name')).toHaveTextContent('Alpha Current');
-    expect(document.querySelector('.session-effort-name')).toHaveTextContent('High');
+    expect(document.querySelector('.session-model--name')).toHaveTextContent('Alpha Current');
+    expect(document.querySelector('.session--effort-name')).toHaveTextContent('High');
     view.rerender(
       headerProps(
         readyRuntime(models(7), {
@@ -684,8 +684,8 @@ describe('ModelEffortSheet (model section)', () => {
       ),
     );
     await tick();
-    expect(document.querySelector('.session-model-name')).toHaveTextContent('Beta Next');
-    expect(document.querySelector('.session-effort-name')).toHaveTextContent('Max');
+    expect(document.querySelector('.session-model--name')).toHaveTextContent('Beta Next');
+    expect(document.querySelector('.session--effort-name')).toHaveTextContent('Max');
     view.rerender(
       headerProps(
         readyRuntime(models(7), {
@@ -702,7 +702,7 @@ describe('ModelEffortSheet (model section)', () => {
     // CSS-source assertion repointed from style.css to SessionHeader.svelte's
     // scoped <style> block; same rule text/value.
     expect(HEADER_CSS).toMatch(
-      /\.session-model-name[\s\S]*?animation: model-header-accepted 150ms/u,
+      /\.session-model--name[\s\S]*?animation: model-header-accepted 150ms/u,
     );
   });
 });

@@ -60,8 +60,8 @@
 <!-- @ds guardrail: staleness derivation + select/revoke/logout handlers — Not designer-editable. -->
 <main class="home-view">
   <section class="hero">
-    <div class="hero-copy-block">
-      <p class="surface-kicker">Private relay</p>
+    <div class="hero-copy--block">
+      <p class="surface--eyebrow">Private relay</p>
       <h1>Your agents, within reach</h1>
       <p class="hero-copy">
         Follow redacted Pi activity from this device. Actions stay read-only until an exact
@@ -69,14 +69,14 @@
       </p>
     </div>
     <div class="relay-orbit" aria-hidden="true">
-      <span class="orbit-core">π</span>
-      <span class="orbit-node orbit-node-one"></span>
-      <span class="orbit-node orbit-node-two"></span>
-      <span class="orbit-node orbit-node-three"></span>
+      <span class="orbit--core">π</span>
+      <span class="orbit-node orbit-node--one"></span>
+      <span class="orbit-node orbit-node--two"></span>
+      <span class="orbit-node orbit-node--three"></span>
     </div>
   </section>
 
-  <section class="session-section" aria-labelledby="session-heading">
+  <section class="session--section" aria-labelledby="session-heading">
     <div class="section-heading">
       <div>
         <h2 id="session-heading">Recent sessions</h2>
@@ -87,16 +87,16 @@
     {#if sessions.items.length === 0}
       <EmptyState loading={sessions.phase === 'loading'} error={sessions.error} />
     {:else}
-      <div class="session-grid">
+      <div class="session--grid">
         {#each sessions.items as session (session.id)}
           <!-- @ds guardrail: session open onPress → onSelect route — Not designer-editable. -->
-          <Button class="session-card" onclick={() => onSelect(session.id)}>
-            <span class={`session-state state-${session.status}`}>
+          <Button class="session--card" onclick={() => onSelect(session.id)}>
+            <span class={`session--state state--${session.status}`}>
               <SessionStateIcon status={session.status} />
               {sessionStatusLabel(session.status)}
             </span>
             <strong>{compactId(session.id)}</strong>
-            <span class="session-meta">
+            <span class="session--meta">
               {session.messageCount} blocks <i aria-hidden="true"></i> {relativeTime(session.updatedAt)}
             </span>
             <span class="open-arrow" aria-hidden="true">
@@ -121,24 +121,24 @@
 </main>
 
 <!-- @ds surface: home-view — hero, session roster, device footer, push settings. Decomposed into this scoped block;
-     hero / hero-copy-block / hero-copy / relay-orbit(+::before/::after) / orbit-core / orbit-node(+one/two/three)
-     / session-section / section-heading(solo) / session-grid / session-state / session-meta(+i) / open-arrow
-     / device-footer(+>div) are owned solely by this component so they move with it. .session-card and
+     hero / hero-copy--block / hero-copy / relay-orbit(+::before/::after) / orbit--core / orbit-node(+one/two/three)
+     / session--section / section-heading(solo) / session--grid / session--state / session--meta(+i) / open-arrow
+     / device-footer(+>div) are owned solely by this component so they move with it. .session--card and
      .device-footer button (Button primitive prop-class + data-hovered/data-focus-visible) are reproduced as
-     :global(...) top-level selectors so Svelte scoping cannot drop them; the .session-card > strong and
-     .session-card[data-hovered|data-focus-visible] .open-arrow descendants keep the primitive ancestor
+     :global(...) top-level selectors so Svelte scoping cannot drop them; the .session--card > strong and
+     .session--card[data-hovered|data-focus-visible] .open-arrow descendants keep the primitive ancestor
      :global and Home's own element scoped. .home-view (routed-frame group with session/review/inbox),
-     .surface-kicker (shared kicker), the .hero h1 base group (shared with review/inbox/enrollment h1),
-     .section-heading / .section-heading h2 / .section-heading p groups (shared with session-title /
-     session-toolbar / push-settings), the .state-running / .state-idle / .state-interrupted color rules and
-     the .state-running .state-icon / .agent-running .state-icon pulsing group (shared with the agent-row
+     .surface--eyebrow (shared kicker), the .hero h1 base group (shared with review/inbox/enrollment h1),
+     .section-heading / .section-heading h2 / .section-heading p groups (shared with session--title /
+     session--toolbar / push--settings), the .state--running / .state--idle / .state--interrupted color rules and
+     the .state--running .state--icon / .agent--running .state--icon pulsing group (shared with the agent-row
      surface, already left global by SessionStateIcon.svelte), and the shared prefers-contrast /
-     forced-colors / reduced-motion .session-card groups stay GLOBAL in app.css (unchanged). The
+     forced-colors / reduced-motion .session--card groups stay GLOBAL in app.css (unchanged). The
      @media .section-heading .freshness variant lives in Freshness.svelte. The orbit is static (no
      @keyframes). Values unchanged. -->
 <style>
   /* @ds surface: home-view — hero, session roster, device footer, push settings. */
-  /* @ds state: loading · empty · error · stale — via shared empty-state, inline-alert and freshness surfaces. */
+  /* @ds state: loading · empty · error · stale — via shared empty--state, inline-alert and freshness surfaces. */
   .hero {
     position: relative;
     display: grid;
@@ -149,7 +149,7 @@
     overflow: hidden;
   }
 
-  .hero-copy-block {
+  .hero-copy--block {
     position: relative;
     z-index: 1;
     max-width: 43rem;
@@ -191,7 +191,7 @@
     background: var(--accent-soft);
   }
 
-  .orbit-core {
+  .orbit--core {
     position: absolute;
     z-index: 1;
     inset: 41%;
@@ -215,21 +215,21 @@
     box-shadow: 0 0 0 1px var(--accent);
   }
 
-  .orbit-node-one {
+  .orbit-node--one {
     top: 8%;
     left: 38%;
   }
-  .orbit-node-two {
+  .orbit-node--two {
     right: 8%;
     bottom: 31%;
   }
-  .orbit-node-three {
+  .orbit-node--three {
     bottom: 17%;
     left: 14%;
   }
 
   /* @ds slot: sessions — recent-sessions section. */
-  .session-section {
+  .session--section {
     padding-top: var(--space-8);
     border-top: 1px solid var(--line-strong);
   }
@@ -239,14 +239,14 @@
     margin-bottom: var(--space-6);
   }
 
-  /* @ds slot: session-grid — the session card roster. */
-  .session-grid {
+  /* @ds slot: session--grid — the session card roster. */
+  .session--grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
     gap: var(--space-3);
   }
 
-  :global(.session-card) {
+  :global(.session--card) {
     position: relative;
     display: grid;
     min-height: 11rem;
@@ -265,7 +265,7 @@
       transform var(--duration-fast) var(--ease-out);
   }
 
-  :global(.session-card::after) {
+  :global(.session--card::after) {
     position: absolute;
     top: 0;
     /* Logical inline span via inset-inline (locale-neutral). */
@@ -277,17 +277,17 @@
     transition: opacity var(--duration-fast) ease;
   }
 
-  :global(.session-card[data-hovered]) {
+  :global(.session--card[data-hovered]) {
     border-color: var(--line-strong);
     background: var(--surface-raised);
     transform: translateY(-2px);
   }
 
-  :global(.session-card[data-hovered]::after) {
+  :global(.session--card[data-hovered]::after) {
     opacity: 1;
   }
 
-  .session-state {
+  .session--state {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -296,7 +296,7 @@
     font-weight: 680;
   }
 
-  :global(.session-card > strong) {
+  :global(.session--card > strong) {
     align-self: end;
     padding-top: var(--space-4);
     overflow-wrap: anywhere;
@@ -306,7 +306,7 @@
     letter-spacing: -0.02em;
   }
 
-  .session-meta {
+  .session--meta {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -315,14 +315,14 @@
     font-weight: 550;
   }
 
-  .session-meta i {
+  .session--meta i {
     width: 0.2rem;
     height: 0.2rem;
     border-radius: 50%;
     background: var(--line-strong);
   }
 
-  /* @ds slot: open-arrow — session-card affordance. */
+  /* @ds slot: open-arrow — session--card affordance. */
   .open-arrow {
     position: absolute;
     right: var(--space-4);
@@ -334,8 +334,8 @@
     transition: opacity var(--duration-fast) ease;
   }
 
-  :global(.session-card[data-hovered]) .open-arrow,
-  :global(.session-card[data-focus-visible]) .open-arrow {
+  :global(.session--card[data-hovered]) .open-arrow,
+  :global(.session--card[data-focus-visible]) .open-arrow {
     opacity: 1;
   }
 
@@ -382,7 +382,7 @@
       opacity: 0.7;
     }
 
-    .hero-copy-block {
+    .hero-copy--block {
       max-width: 75%;
     }
   }
@@ -394,7 +394,7 @@
       padding-bottom: var(--space-12);
     }
 
-    .hero-copy-block {
+    .hero-copy--block {
       max-width: 100%;
     }
 
@@ -410,7 +410,7 @@
       opacity: 0.45;
     }
 
-    :global(.session-card) {
+    :global(.session--card) {
       min-height: 9.5rem;
     }
 
@@ -426,7 +426,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.session-card[data-hovered]) {
+    :global(.session--card[data-hovered]) {
       transform: none;
     }
   }

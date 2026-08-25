@@ -688,21 +688,21 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="artifact-viewer-overlay"
+    class="artifact-viewer--overlay"
     data-artifact-state={viewerState}
     data-privacy-covered={viewerState === 'privacy-covered' ? 'true' : undefined}
     onclick={onOverlayPointer}
   >
-    <div class="artifact-viewer-modal">
+    <div class="artifact-viewer--modal">
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
       <div
-        class="artifact-viewer-dialog"
+        class="artifact-viewer--dialog"
         role="dialog"
         tabindex="-1"
         aria-label={inbound !== null
           ? 'Image preview viewer'
           : `${title === 'File diff' ? 'File diff' : 'File preview'} viewer`}
-        aria-describedby="artifact-viewer-summary"
+        aria-describedby="artifact-viewer--summary"
         bind:this={dialogEl}
         onkeydown={onDialogKeydown}
         onpointerdown={onPointerDown}
@@ -724,8 +724,8 @@
           announcement={statusAnnouncement}
           terminalMessage={terminal}
         />
-        <div class="artifact-viewer-content">
-          <p id="artifact-viewer-summary" class="artifact-viewer-summary" dir="auto">{#if inMemory !== null}{inMemory.summary}{:else if inbound !== null}{`${inbound.artifact.full.mediaType} · ${inbound.artifact.full.width} × ${inbound.artifact.full.height} · Redacted`}{:else if descriptor === null}{legacyDiff?.summary ?? 'Unverified preview source'}{:else}{`${descriptor.mimeType} · ${descriptor.completeness === 'excerpt' ? 'Excerpt' : 'Complete'} · ${descriptor.redaction === 'applied' ? 'Redacted' : 'Relay-sanitized'}`}{/if}</p>
+        <div class="artifact-viewer--content">
+          <p id="artifact-viewer--summary" class="artifact-viewer--summary" dir="auto">{#if inMemory !== null}{inMemory.summary}{:else if inbound !== null}{`${inbound.artifact.full.mediaType} · ${inbound.artifact.full.width} × ${inbound.artifact.full.height} · Redacted`}{:else if descriptor === null}{legacyDiff?.summary ?? 'Unverified preview source'}{:else}{`${descriptor.mimeType} · ${descriptor.completeness === 'excerpt' ? 'Excerpt' : 'Complete'} · ${descriptor.redaction === 'applied' ? 'Redacted' : 'Relay-sanitized'}`}{/if}</p>
           <PreviewControls
             kind={kind === 'pdf' ? 'text' : (kind ?? 'text')}
             {wrap}
@@ -765,7 +765,7 @@
           {#if descriptor !== null && resourceSnapshot.status === 'stale'}
             <button
               type="button"
-              class="artifact-stale-action"
+              class="artifact--stale-action"
               onclick={() => {
                 announcement = 'Requesting the same exact revision again.';
                 resourceReloadFn();
@@ -774,7 +774,7 @@
               View latest
             </button>
           {/if}
-          <div class="artifact-preview-region">
+          <div class="artifact-preview--region">
             {#if inMemory !== null}
               {#if inMemory.renderer === 'text'}
                 <TextPreview
@@ -810,7 +810,7 @@
                   onStateChange={onRendererStatus}
                 />
               {:else if resourceSnapshot.status === 'loading' || resourceSnapshot.status === 'stalled' || thumbnailSnapshot.status === 'loading' || thumbnailSnapshot.status === 'stalled'}
-                <div class="artifact-loading-preview" aria-hidden="true">
+                <div class="artifact--loading-preview" aria-hidden="true">
                   <span></span>
                   <span></span>
                   <span></span>
@@ -844,7 +844,7 @@
                 />
               </div>
             {:else if !descriptorResourceReady && (descriptorStatusArg === 'loading' || descriptorStatusArg === 'stalled' || descriptorStatusArg === 'idle')}
-              <div class="artifact-loading-preview" aria-hidden="true">
+              <div class="artifact--loading-preview" aria-hidden="true">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -909,14 +909,14 @@
      Values unchanged. -->
 <style>
   /* @ds slot: preview-region — the bounded body that hosts the active preview. */
-  .artifact-preview-region {
+  .artifact-preview--region {
     min-inline-size: 0;
     max-inline-size: 100%;
     unicode-bidi: plaintext;
   }
 
   /* @ds slot: loading-preview — the three-bar skeleton shown while a preview resolves. */
-  .artifact-loading-preview {
+  .artifact--loading-preview {
     display: grid;
     gap: 0.7rem;
     min-block-size: 8rem;
@@ -926,7 +926,7 @@
     border-radius: 0.5rem;
   }
 
-  .artifact-loading-preview span {
+  .artifact--loading-preview span {
     display: block;
     block-size: 0.8rem;
     border-radius: 0.25rem;
@@ -934,16 +934,16 @@
     opacity: 0.45;
   }
 
-  .artifact-loading-preview span:nth-child(2) {
+  .artifact--loading-preview span:nth-child(2) {
     inline-size: 80%;
   }
 
-  .artifact-loading-preview span:nth-child(3) {
+  .artifact--loading-preview span:nth-child(3) {
     inline-size: 60%;
   }
 
   /* @ds slot: stale-action — the "View latest" control for a stale exact revision; native pseudo-states. */
-  .artifact-stale-action {
+  .artifact--stale-action {
     min-block-size: 44px;
     min-inline-size: 44px;
     border: 1px solid #6c6a65;
@@ -958,36 +958,36 @@
   }
 
   /* @ds state: hover — stale action under pointer hover. */
-  .artifact-stale-action:hover {
+  .artifact--stale-action:hover {
     border-color: #b85f42;
     background: #f3e4de;
   }
 
   /* @ds guardrail: focus-visible — The AA focus ring on the stale action. */
-  .artifact-stale-action:focus-visible {
+  .artifact--stale-action:focus-visible {
     outline: 3px solid #24221f;
     outline-offset: 2px;
     box-shadow: 0 0 0 5px var(--accent);
   }
 
   /* @ds state: dark — dark-theme re-inks (foreign ancestor via :global). */
-  :global(:root[data-theme='dark']) .artifact-stale-action {
+  :global(:root[data-theme='dark']) .artifact--stale-action {
     background: #2d2a26;
     color: #f8f8f6;
   }
 
-  :global(:root[data-theme='dark']) .artifact-stale-action:hover {
+  :global(:root[data-theme='dark']) .artifact--stale-action:hover {
     background: #3a2720;
     color: #f8f8f6;
   }
 
-  :global(:root[data-theme='dark']) .artifact-stale-action:focus-visible {
+  :global(:root[data-theme='dark']) .artifact--stale-action:focus-visible {
     outline-color: #f8f8f6;
   }
 
   /* @ds guardrail: do-not-edit — reduced-motion bounds the stale-action transition. */
   @media (prefers-reduced-motion: reduce) {
-    .artifact-stale-action {
+    .artifact--stale-action {
       transition-duration: 100ms;
       scroll-behavior: auto;
     }

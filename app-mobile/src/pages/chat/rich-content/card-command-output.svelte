@@ -166,7 +166,7 @@
   <!-- @ds guardrail: do-not-edit — The exact-copy clipboard boundary; Open is a pass-through with no fetch/endpoint/ticket/download/host-file read. -->
   {#if feedback.canCopy && command !== null}
     <button
-      class="rich-block-action"
+      class="rich-block--action"
       use:hover
       aria-label={feedback.actionLabel('command')}
       onclick={() => feedback.copy('command', command)}
@@ -174,14 +174,14 @@
   {/if}
   {#if feedback.canCopy && output !== null}
     <button
-      class="rich-block-action"
+      class="rich-block--action"
       use:hover
       aria-label={feedback.actionLabel(outputUnit)}
       onclick={() => feedback.copy(outputUnit, output)}
     >{feedback.actionLabel(outputUnit)}</button>
   {/if}
   {#if canOpen && onOpen !== undefined}
-    <button class="rich-block-action" use:hover bind:this={openButton} onclick={() => onOpen?.(openButton)}
+    <button class="rich-block--action" use:hover bind:this={openButton} onclick={() => onOpen?.(openButton)}
       >Open full screen</button>
   {/if}
 {/snippet}
@@ -203,22 +203,22 @@
   <!-- @ds slot: command — labelled command region. -->
   <section class="rich-command-region" aria-labelledby={`${block.blockId}-command`}>
     <h4 id={`${block.blockId}-command`}>Command</h4>
-    <pre class="rich-shell-well"><code>{command ?? 'Waiting for command'}</code></pre>
+    <pre class="rich--shell-well"><code>{command ?? 'Waiting for command'}</code></pre>
   </section>
   <!-- @ds slot: output — labelled output region. -->
   <section class="rich-command-region" aria-labelledby={`${block.blockId}-output`}>
-    <div class="rich-command-region-heading">
+    <div class="rich-command-region--heading">
       <h4 id={`${block.blockId}-output`}>Output</h4>
-      {#if clippedLines > 0}<span class="rich-clipped-count">{clippedLines} earlier lines clipped</span>{/if}
+      {#if clippedLines > 0}<span class="rich--clipped-count">{clippedLines} earlier lines clipped</span>{/if}
     </div>
     <!-- @ds state: running-tail — data-tail-first anchors the newest output at the
          bottom while a command streams; completed output is read top-down.
          @ds guardrail: do-not-edit — The data attribute and tail window are behavior owned by the running/streaming model. -->
-    <pre class="rich-shell-well rich-output-preview" data-tail-first="true"><code>{previewLines.length > 0 ? previewLines.join('\n') : 'No output yet'}</code></pre>
-    <p class="rich-output-meta">{outputLines.length} lines · {outputCompletenessText(block.outputCompleteness)}{showingLastTrustworthySnapshot ? ' · Last trustworthy redacted snapshot' : ''}</p>
+    <pre class="rich--shell-well rich-output--preview" data-tail-first="true"><code>{previewLines.length > 0 ? previewLines.join('\n') : 'No output yet'}</code></pre>
+    <p class="rich-output--meta">{outputLines.length} lines · {outputCompletenessText(block.outputCompleteness)}{showingLastTrustworthySnapshot ? ' · Last trustworthy redacted snapshot' : ''}</p>
   </section>
   <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
-  <p class="rich-copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
+  <p class="rich--copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
 
 <style>
@@ -230,7 +230,7 @@
   }
 
   /* @ds slot: output-heading — Output title + earlier-lines-clipped count row. */
-  .rich-command-region-heading {
+  .rich-command-region--heading {
     justify-content: space-between;
     margin-block-end: var(--space-2);
   }
@@ -241,18 +241,18 @@
   }
 
   /* @ds slot: output-preview — tail-window preview of command output. */
-  .rich-output-preview {
+  .rich-output--preview {
     block-size: 8.5rem;
     contain: content;
   }
 
   /* @ds slot: labels — clipped-count and output-meta share muted small type. */
-  .rich-clipped-count {
+  .rich--clipped-count {
     color: var(--ink-muted);
     font-size: 0.75rem;
   }
 
-  .rich-output-meta {
+  .rich-output--meta {
     margin: var(--space-2) 0 0;
     color: var(--ink-muted);
     font-size: 0.75rem;
@@ -261,7 +261,7 @@
   /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
      polite live region whose text carries the outcome; the presence styles are this. */
   /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
-  .rich-copy-status {
+  .rich--copy-status {
     min-block-size: 1.25rem;
     margin: var(--space-2) 0 0;
     color: var(--ink-muted);

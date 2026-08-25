@@ -34,8 +34,8 @@ export type HighlightTokenKind =
   | 'boolean'
   | 'tag'
   | 'heading'
-  | 'diff-add'
-  | 'diff-remove'
+  | 'diff--add'
+  | 'diff--remove'
   | 'ansi';
 
 export interface HighlightToken {
@@ -412,8 +412,8 @@ function tokenizeDiff(source: string): readonly HighlightToken[] {
     }
     const kind = DIFF_LINE_PATTERN.test(line)
       ? line.startsWith('+')
-        ? 'diff-add'
-        : 'diff-remove'
+        ? 'diff--add'
+        : 'diff--remove'
       : 'plain';
     appendToken(tokens, line, kind);
   }

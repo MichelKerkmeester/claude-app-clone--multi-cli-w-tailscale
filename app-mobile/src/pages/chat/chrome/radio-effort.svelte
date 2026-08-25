@@ -98,7 +98,7 @@
 <!-- @ds state: group aria-busy / pending-effort — set while a request is in flight. -->
 <!-- @ds guardrail: do-not-edit — React-aria RadioGroup wiring: aria-labelledby, aria-describedby, data-pending, and isReadOnly while pending. -->
 <RadioGroup
-  class="effort-radio-group"
+  class="effort-radio--group"
   aria-labelledby={labelledBy}
   aria-describedby={describedBy}
   data-pending={isPending ? 'true' : undefined}
@@ -127,12 +127,12 @@
       data-selected={effortValue === level ? true : undefined}
       {@attach attachRowInteractions}
     >
-      <span class="effort-radio-row-main">
-        <span class="effort-radio-row-label">{name}</span>
+      <span class="effort-radio-row--main">
+        <span class="effort-radio-row--label">{name}</span>
       </span>
-      <span class="effort-radio-row-states">
+      <span class="effort-radio-row--states">
         {#if isConfirmed}
-          <span class="effort-state-confirmed">
+          <span class="effort-state--confirmed">
             <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
               <path
                 d="m3 8 3 3 7-7"
@@ -147,8 +147,8 @@
           </span>
         {/if}
         {#if isRequested}
-          <span class="effort-state-requested">
-            <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" class="effort-spinner">
+          <span class="effort-state--requested">
+            <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" class="effort--spinner">
               <circle
                 cx="12"
                 cy="12"
@@ -170,7 +170,7 @@
           </span>
         {/if}
       </span>
-      <span id={descriptionId} class="effort-radio-row-description">
+      <span id={descriptionId} class="effort-radio-row--description">
         {description}{isRequested ? ` ${applyingEffortMessage(level, levels)}` : ''}
       </span>
     </RadioGroupItem>
@@ -178,14 +178,14 @@
 </RadioGroup>
 
 <!-- @ds slot: effort-group — the controlled list of effort radio rows. Decomposed into this scoped block;
-     effort-radio-group / effort-radio-row and their states are owned solely by this component so they
+     effort-radio--group / effort-radio-row and their states are owned solely by this component so they
      move with it. Child-primitive classes and react-aria/runtime data-attributes use :global so
      Svelte scoping cannot drop them. Values unchanged. -->
 <style>
   /* @ds slot: effort-group — the controlled list of effort radio rows. */
   /* @ds state: group aria-busy — while a set-thinking-level mutation is in flight the
      group is read-only (still focusable) and marked busy. */
-  :global(.effort-radio-group) {
+  :global(.effort-radio--group) {
     display: grid;
     min-inline-size: 0;
     gap: 2px;
@@ -231,25 +231,25 @@
     opacity: 0.72;
   }
 
-  .effort-radio-row-main,
-  .effort-radio-row-states {
+  .effort-radio-row--main,
+  .effort-radio-row--states {
     display: flex;
     min-inline-size: 0;
     align-items: center;
   }
 
-  .effort-radio-row-main {
+  .effort-radio-row--main {
     flex-wrap: wrap;
     gap: 0.2rem var(--space-2);
   }
 
-  .effort-radio-row-label {
+  .effort-radio-row--label {
     overflow-wrap: anywhere;
     font-size: 0.95rem;
     font-weight: 650;
   }
 
-  .effort-radio-row-states {
+  .effort-radio-row--states {
     justify-content: flex-end;
     gap: 0.35rem;
     color: var(--model-sheet-accent);
@@ -258,7 +258,7 @@
   }
 
   /* @ds state: effort-confirmed — ✓ on the settled row. */
-  .effort-state-confirmed {
+  .effort-state--confirmed {
     display: inline-flex;
     align-items: center;
     gap: 0.2rem;
@@ -268,18 +268,18 @@
 
   /* @ds state: effort-requested — in-flight application spinner; also the visual for
      the group's pending-effort / aria-busy window. */
-  .effort-state-requested {
+  .effort-state--requested {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
     white-space: nowrap;
   }
 
-  :global(.effort-spinner) {
+  :global(.effort--spinner) {
     animation: composer-spin 0.8s linear infinite;
   }
 
-  .effort-radio-row-description {
+  .effort-radio-row--description {
     grid-column: 1 / -1;
     color: var(--model-sheet-muted);
     font-size: 0.72rem;
@@ -289,9 +289,9 @@
   /* Muted copy on the soft selection wash drops below 4.5:1 in the bone
      theme, so selected/focused/hovered rows promote descriptions and IDs
      to the ink token; the accent states column already passes there. */
-  :global(.effort-radio-row[data-hovered]) .effort-radio-row-description,
-  :global(.effort-radio-row[data-focused]) .effort-radio-row-description,
-  :global(.effort-radio-row[data-selected]) .effort-radio-row-description {
+  :global(.effort-radio-row[data-hovered]) .effort-radio-row--description,
+  :global(.effort-radio-row[data-focused]) .effort-radio-row--description,
+  :global(.effort-radio-row[data-selected]) .effort-radio-row--description {
     color: var(--model-sheet-ink);
   }
 

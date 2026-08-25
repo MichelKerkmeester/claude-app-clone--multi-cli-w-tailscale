@@ -709,7 +709,7 @@ describe('dismissal and exclusivity', () => {
   // never dismisses the popover. Coverage caveat: the reactive suppression guard this
   // exercises (opening the tools browser hides the inline panel even with an active
   // trigger) has no other unit coverage — it is not extracted into a pure, separately
-  // tested function the way the slash-panel state machine is. Its live focus/dismiss
+  // tested function the way the slash--panel state machine is. Its live focus/dismiss
   // behavior is verified in a real browser via the structural gate. Re-enable if the
   // popover primitive gains jsdom-faithful focus handling.
   it.skip('the inline panel and the + browser are mutually exclusive in both directions', async () => {

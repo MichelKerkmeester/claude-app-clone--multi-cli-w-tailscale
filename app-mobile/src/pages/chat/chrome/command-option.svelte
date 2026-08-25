@@ -153,51 +153,51 @@
   aria-selected={command.enabled ? active : undefined}
   aria-disabled={command.enabled ? undefined : true}
   data-focused={active || undefined}
-  class="slash-option"
+  class="slash--option"
   onpointerdown={onPointerDown}
   onmousedown={onMouseDown}
   onpointermove={onPointerMove}
   onclick={onClick}
 >
   <!-- @ds slot: label — the command name, match emphasis, and argument hint. -->
-  <span class="slash-name-line">
+  <span class="slash-name--line">
     <bdi dir="ltr" translate="no" class="slash-name"
       >{'/'}{#each graphemes as grapheme, index (`${index}-${grapheme}`)}{#if matched(index)}<strong
-          class="slash-match">{grapheme}</strong
+          class="slash--match">{grapheme}</strong
         >{:else}<span>{grapheme}</span>{/if}{/each}</bdi
     >
     {#if command.argumentHint !== null && command.argumentHint !== undefined}
-      <span class="slash-hint" dir="auto">
+      <span class="slash--hint" dir="auto">
         {command.argumentHint}
       </span>
     {/if}
   </span>
   {#if command.enabled}
     {#if command.description !== null}
-      <span class="slash-desc" dir="auto">
+      <span class="slash--desc" dir="auto">
         {command.description}
       </span>
     {/if}
   {:else}
     <!-- @ds state: disabled-with-reason — a disabled row surfaces its disclosed reason. -->
-    <span class="slash-disabled-reason" dir="auto">
+    <span class="slash--disabled-reason" dir="auto">
       {command.disabledReason !== null ? command.disabledReason : 'Unavailable: not disclosed'}
     </span>
   {/if}
   <!-- @ds slot: binding — the authoritative source binding and confirmation hint. -->
-  <span class="slash-meta">
+  <span class="slash--meta">
     <span class="slash-source">{sourceLabel(command.source)}</span>
-    {#if command.requiresConfirmation}<span class="slash-confirm">Asks first</span>{/if}
+    {#if command.requiresConfirmation}<span class="slash--confirm">Asks first</span>{/if}
   </span>
 </div>
 
 <!-- @ds surface: slash-autocomplete — one text-only listbox option. Decomposed into this scoped block;
-     slash-option / name / match / hint / desc / meta and their states are owned solely by this
+     slash--option / name / match / hint / desc / meta and their states are owned solely by this
      component so they move with it. Values unchanged. -->
 <style>
   /* @ds slot: label — the option row and its name/match/argument-hint lines. */
   /* @ds state: enabled — an insertable row; default row presentation. */
-  .slash-option {
+  .slash--option {
     display: grid;
     gap: 2px;
     min-block-size: 56px;
@@ -214,7 +214,7 @@
 
   /* @ds state: active — the virtual-focus row (aria-activedescendant). Not
      colour-only: it keeps its ink rail plus outline. */
-  .slash-option[data-focused] {
+  .slash--option[data-focused] {
     background: var(--slash-selection);
     border-inline-start-color: var(--slash-ink);
     outline: 2px solid var(--slash-ink);
@@ -222,11 +222,11 @@
   }
 
   /* @ds state: disabled-with-reason — a row that only offers its disclosed reason. */
-  .slash-option[aria-disabled='true'] {
+  .slash--option[aria-disabled='true'] {
     cursor: default;
   }
 
-  .slash-name-line {
+  .slash-name--line {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -242,15 +242,15 @@
     letter-spacing: -0.01em;
   }
 
-  .slash-match {
+  .slash--match {
     font-weight: 700;
   }
 
-  .slash-option[aria-disabled='true'] .slash-name {
+  .slash--option[aria-disabled='true'] .slash-name {
     color: var(--slash-muted);
   }
 
-  .slash-hint {
+  .slash--hint {
     color: var(--slash-muted);
     font-size: 12px;
     line-height: 17px;
@@ -259,8 +259,8 @@
 
   /* @ds slot: label · disabled-reason — the row's secondary line: a description
      on enabled rows, the disclosed reason on disabled rows. */
-  .slash-desc,
-  .slash-disabled-reason {
+  .slash--desc,
+  .slash--disabled-reason {
     overflow-wrap: anywhere;
     font-family: var(--font-display);
     font-size: 13px;
@@ -269,7 +269,7 @@
   }
 
   /* @ds slot: binding — the authoritative source binding and confirmation hint. */
-  .slash-meta {
+  .slash--meta {
     display: flex;
     flex-wrap: wrap;
     gap: 4px 10px;
@@ -278,7 +278,7 @@
     color: var(--slash-muted);
   }
 
-  .slash-confirm {
+  .slash--confirm {
     color: var(--slash-accent);
     font-weight: 650;
   }
@@ -287,7 +287,7 @@
      otherwise implies with fill, using the frozen tokens unchanged. */
    /* @ds guardrail: do-not-edit — The high-contrast re-render is an accessibility guarantee; never drop the border/outline carry for interactive and raised surfaces. */
   @media (prefers-contrast: more) {
-    .slash-option[data-focused] {
+    .slash--option[data-focused] {
       outline-width: 3px;
     }
   }
@@ -296,7 +296,7 @@
      system scheme (Canvas / CanvasText / Highlight). */
    /* @ds guardrail: do-not-edit — Forced-colors yield is an accessibility guarantee; never restore a hard-coded surface/ink over the system scheme. */
   @media (forced-colors: active) {
-    .slash-option[data-focused] {
+    .slash--option[data-focused] {
       outline: 2px solid Highlight;
       outline-offset: -2px;
       border-inline-start-color: Highlight;

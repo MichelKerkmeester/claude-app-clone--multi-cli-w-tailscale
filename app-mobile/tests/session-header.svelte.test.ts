@@ -110,8 +110,8 @@ describe('SessionHeader', () => {
     const trigger = screen.getByRole('button', {
       name: 'Model, DeepSeek Flash, deepseek, Thinking effort, High',
     });
-    expect(trigger.querySelector('.session-model-name')).toHaveTextContent('DeepSeek Flash');
-    expect(trigger.querySelector('.session-effort-name')).toHaveTextContent('High');
+    expect(trigger.querySelector('.session-model--name')).toHaveTextContent('DeepSeek Flash');
+    expect(trigger.querySelector('.session--effort-name')).toHaveTextContent('High');
   });
 
   it('opens the shared sheet at the model section and mirrors open state on the trigger', async () => {

@@ -191,7 +191,7 @@
   <!-- @ds state: loading — the display is being fetched; no interactive controls yet. -->
   <article
     bind:this={cardEl}
-    class="ask-question-card ask-question-card-loading"
+    class="ask-question-card ask-question-card--loading"
     data-ask-question-card="true"
     role="status"
     aria-live="polite"
@@ -203,7 +203,7 @@
 {:else}
   <article
     bind:this={cardEl}
-    class={`ask-question-card ask-question-card-${effectivePhase}`}
+    class={`ask-question-card ask-question-card--${effectivePhase}`}
     data-ask-question-card="true"
     data-ask-question-phase={effectivePhase}
     role="region"
@@ -217,14 +217,14 @@
     <AskQuestionPrompt {viewModel} />
     <!-- @ds slot: read-only-hint — note shown while this authenticated read-only session gates answers. -->
     {#if viewModel.requiresReadOnlyHint}
-      <p class="ask-question-read-only-hint">
+      <p class="ask-question--read-only-hint">
         Answers are sent only while this authenticated read-only session is active.
       </p>
     {/if}
     <!-- @ds slot: form — answer controls; the guarded one-use submit mutation is not editable. -->
     {#if !terminal}
       <form
-        class="ask-question-form"
+        class="ask-question--form"
         aria-describedby={statusId}
         onsubmit={(event) => {
           event.preventDefault();
@@ -252,7 +252,7 @@
         {#if validationVisible}
           <p
             id={errorId}
-            class="ask-question-validation"
+            class="ask-question--validation"
             role="alert"
             aria-live="assertive"
             aria-atomic="true"
@@ -268,11 +268,11 @@
     <AskQuestionStatus state={effectiveState} />
     <!-- @ds state: sent — answer accepted by Pi; the immutable ✓ line. -->
     {#if effectiveState.phase === 'answered-immutable' && effectiveState.errorReason === null}
-      <p class="ask-question-answered-line" aria-hidden="true">Answer accepted by Pi.</p>
+      <p class="ask-question--answered-line" aria-hidden="true">Answer accepted by Pi.</p>
     {/if}
     <!-- @ds slot: read-only-hint — reconnect note shown when the session cannot answer. -->
     {#if !canAnswer && !terminal}
-      <p class="ask-question-read-only-hint">Reconnect before submitting an answer.</p>
+      <p class="ask-question--read-only-hint">Reconnect before submitting an answer.</p>
     {/if}
   </article>
 {/if}
@@ -299,7 +299,7 @@
   }
 
   /* @ds state: submitting — progress bar over the card while the guarded submit is in flight. */
-  .ask-question-card-submitting::before {
+  .ask-question-card--submitting::before {
     position: absolute;
     inset-block-start: -1px;
     inset-inline-start: 0;
@@ -329,13 +329,13 @@
   }
 
   /* @ds state: loading — display fetch in progress; no interactive controls yet. */
-  .ask-question-card-loading {
+  .ask-question-card--loading {
     min-block-size: 2rem;
     border-color: var(--line);
   }
 
   /* @ds slot: read-only-hint · @ds state: read-only — note when this authenticated read-only session gates answers. */
-  .ask-question-read-only-hint {
+  .ask-question--read-only-hint {
     max-inline-size: var(--reading-width);
     margin: 0;
     color: var(--ink-muted);
@@ -344,14 +344,14 @@
   }
 
   /* @ds slot: form — the answer controls column; the guarded one-use submit lives here. */
-  .ask-question-form {
+  .ask-question--form {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-4);
   }
 
   /* @ds slot: validation · @ds state: error — the assertive alert for a validation problem. */
-  .ask-question-validation {
+  .ask-question--validation {
     margin: 0;
     color: var(--accent-ink);
     font-size: 0.82rem;
@@ -359,7 +359,7 @@
   }
 
   /* @ds slot: answered-line · @ds state: sent — the "Answer accepted by Pi." line (accent-inked). */
-  .ask-question-answered-line {
+  .ask-question--answered-line {
     margin: 0;
     color: var(--accent-ink);
     font-family: var(--font-display);
@@ -380,7 +380,7 @@
       transition: none !important;
     }
 
-    .ask-question-card-submitting::before {
+    .ask-question-card--submitting::before {
       display: none;
       animation: none !important;
     }

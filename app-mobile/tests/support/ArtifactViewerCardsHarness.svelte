@@ -23,7 +23,7 @@
 
 <ArtifactViewerProvider>
   <section aria-label="Typed transcript" tabindex="-1">
-    <div class="transcript-scroll" style="height: 300px; overflow: auto;">
+    <div class="transcript--scroll" style="height: 300px; overflow: auto;">
       <ArtifactCard block={first} />
       <ArtifactCard block={second} />
     </div>

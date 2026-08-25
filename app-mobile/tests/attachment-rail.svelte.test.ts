@@ -6,7 +6,7 @@
 //
 // CSS-source assertions: the React oracle read app-mobile/src/style.css and
 // matched the `.attachment-rail { … max-inline-size:100%; overflow-x:auto }`
-// rule and the `@media (max-width:20rem) … .attachment-preview-dialog` rule.
+// rule and the `@media (max-width:20rem) … .attachment-preview--dialog` rule.
 // In the Svelte app that CSS lives in the component's SCOPED <style>, and
 // style.css is being retired, so each assertion is repointed to read the
 // scoped <style> of the owning component — AttachmentRail.svelte for the rail
@@ -95,7 +95,7 @@ describe('AttachmentRail', () => {
     );
     expect(
       readFileSync('app-mobile/src/pages/chat/attachments/dialog-attachment-preview.svelte', 'utf8'),
-    ).toMatch(/@media \(max-width: 20rem\)[\s\S]*?\.attachment-preview-dialog/u);
+    ).toMatch(/@media \(max-width: 20rem\)[\s\S]*?\.attachment-preview--dialog/u);
   });
 
   it('is absent when the host capability is off', () => {

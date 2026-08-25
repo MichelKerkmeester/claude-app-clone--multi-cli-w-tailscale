@@ -146,35 +146,35 @@
     {...(canOpen ? { onOpen: (trigger?: HTMLButtonElement | null) => open(block, trigger ?? null) } : {})}
   />
 {:else if block.kind === 'prose'}
-  <div class={`rich-prose-block block-role-${block.role ?? 'assistant'}`}>
+  <div class={`rich--prose-block block-role--${block.role ?? 'assistant'}`}>
     <SafeMarkdown source={block.canonicalSource} ariaLabel="Transcript response" />
   </div>
 {:else if block.kind === 'activity'}
   <RichBlockFrame
     title={activityTitle(block.sourceBlock)}
     metadata={[block.sourceBlock.kind]}
-    class="rich-activity-card"
+    class="rich--activity-card"
   >
-    <p class="block-copy quiet-copy">{activitySource(block.sourceBlock)}</p>
+    <p class="block--copy quiet-copy">{activitySource(block.sourceBlock)}</p>
   </RichBlockFrame>
 {:else if block.kind === 'diff'}
   {@const source = block.sourceBlock as DisplayTranscriptBlock & { readonly patch?: unknown }}
   <RichBlockFrame title="File diff" eyebrow="Diff" class="rich-diff-card">
-    <pre class="rich-shell-well">{typeof source.patch === 'string' ? source.patch : 'Diff unavailable'}</pre>
+    <pre class="rich--shell-well">{typeof source.patch === 'string' ? source.patch : 'Diff unavailable'}</pre>
   </RichBlockFrame>
 {:else if block.kind === 'fallback'}
-  <RichBlockFrame title="Unsupported block" class="rich-fallback-card">
-    <p class="block-copy quiet-copy">This redacted “{block.originalKind}” block cannot be displayed by this client.</p>
+  <RichBlockFrame title="Unsupported block" class="rich--fallback-card">
+    <p class="block--copy quiet-copy">This redacted “{block.originalKind}” block cannot be displayed by this client.</p>
   </RichBlockFrame>
 {/if}
 
-<!-- @ds surface: rich-prose-block — the plain-prose / safe-Markdown read-out block. Decomposed into this scoped block;
-     the selectors it was grouped with (safe-markdown*, rich-block-frame, artifact-viewer*)
+<!-- @ds surface: rich--prose-block — the plain-prose / safe-Markdown read-out block. Decomposed into this scoped block;
+     the selectors it was grouped with (safe-markdown*, rich-block--frame, artifact-viewer*)
      stay with their own components. Values unchanged; the bidi-plaintext guardrail is preserved. -->
 <style>
   /* @ds slot: prose — bidirectional-safe plain-text read-out; capped to reading width. */
   /* @ds guardrail: do-not-edit — Unicode-bidi: plaintext keeps directional text stable and un-clickable-into; do not weaken. */
-  .rich-prose-block {
+  .rich--prose-block {
     min-inline-size: 0;
     max-inline-size: var(--reading-width);
     direction: auto;
@@ -187,11 +187,11 @@
   /* @ds state: malformed-fallback — unsupported/undisplayable blocks present as a
      quiet card without card chrome. */
   /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
-  :global(.rich-fallback-card) {
+  :global(.rich--fallback-card) {
     box-shadow: none;
   }
 
-  :global(.rich-activity-card) {
+  :global(.rich--activity-card) {
     box-shadow: none;
   }
 </style>

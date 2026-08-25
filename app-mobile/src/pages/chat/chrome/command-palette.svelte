@@ -107,7 +107,7 @@
   bind:value={selected}
   onValueChange={onSelectedChange}
 >
-  <div class="command-palette">
+  <div class="command--palette">
     <Combobox.Input>
       {#snippet child({ props })}
         <input
@@ -133,7 +133,7 @@
         <Combobox.Viewport class="react-aria-ListBox">
           {#if ranked.items.length === 0}
             <!-- @ds state: ready.emptyCatalog — no ranked commands; fail-closed empty copy. -->
-            <span class="command-empty">No commands</span>
+            <span class="command--empty">No commands</span>
           {:else}
             {#each ranked.items as item (item.name)}
               <!-- @ds slot: label — the command name and its description line. -->
@@ -150,9 +150,9 @@
                     data-focused={highlighted ? true : undefined}
                     data-hovered={highlighted ? true : undefined}
                   >
-                    <span class="command-name">/{item.name}</span>
+                    <span class="command--name">/{item.name}</span>
                     {#if item.description !== null}
-                      <span class="command-desc">{item.description}</span>
+                      <span class="command--desc">{item.description}</span>
                     {/if}
                   </div>
                 {/snippet}
@@ -166,7 +166,7 @@
 </Combobox.Root>
 
 <!-- @ds surface: slash-autocomplete — the command palette. Decomposed into this scoped block;
-     command-palette / command-empty / command-name / command-desc have no owned
+     command--palette / command--empty / command--name / command--desc have no owned
      declarations in the original stylesheet (they inherit the shared overlay
      primitives). Shared .react-aria-Popover / .react-aria-ListBox /
      .react-aria-ListBoxItem stay GLOBAL — they style every react-aria dropdown
@@ -175,7 +175,7 @@
 <style>
   /* @ds surface: slash-autocomplete — the inline autocomplete card and the
      command palette share this surface name. */
-  /* `.command-palette`, `.command-empty`, `.command-name`, and `.command-desc`
+  /* `.command--palette`, `.command--empty`, `.command--name`, and `.command--desc`
      carry structure only; the original stylesheet has no owned declarations
      for them. Shared overlay primitives stay in app.css:
      .react-aria-Popover, .react-aria-ListBox, .react-aria-ListBoxItem. */

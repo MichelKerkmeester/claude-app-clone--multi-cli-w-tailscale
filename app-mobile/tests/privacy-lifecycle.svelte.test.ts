@@ -89,7 +89,7 @@ afterEach(() => {
   vi.restoreAllMocks();
   window.history.replaceState({}, '', '/');
   document.documentElement.removeAttribute('data-artifact-viewer-privacy');
-  document.getElementById('artifact-viewer-privacy-curtain')?.remove();
+  document.getElementById('artifact-viewer--privacy-curtain')?.remove();
 });
 
 // ───────────────────────────────────────────────────────────────────
@@ -117,7 +117,7 @@ describe('privacy lifecycle', () => {
       await screen.findByRole('dialog');
       window.dispatchEvent(new Event(eventName));
       expect(document.documentElement.dataset.artifactViewerPrivacy).toBe('covered');
-      expect(document.getElementById('artifact-viewer-privacy-curtain')).not.toBeNull();
+      expect(document.getElementById('artifact-viewer--privacy-curtain')).not.toBeNull();
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     }
   });
@@ -129,11 +129,11 @@ describe('privacy lifecycle', () => {
     const descriptor = Object.getOwnPropertyDescriptor(document, 'visibilityState');
     Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
     document.dispatchEvent(new Event('visibilitychange'));
-    expect(document.getElementById('artifact-viewer-privacy-curtain')).not.toBeNull();
+    expect(document.getElementById('artifact-viewer--privacy-curtain')).not.toBeNull();
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     if (descriptor === undefined) delete (document as { visibilityState?: unknown }).visibilityState;
     else Object.defineProperty(document, 'visibilityState', descriptor);
-    expect(document.getElementById('artifact-viewer-privacy-curtain')).toBeNull();
+    expect(document.getElementById('artifact-viewer--privacy-curtain')).toBeNull();
   });
 
   it('revokes active object URLs when transcript supersession arrives', async () => {

@@ -88,7 +88,7 @@ describe('viewer history and focus ownership', () => {
     // Capture both trigger refs before opening — the open viewer aria-hides the background, so a later role query can't resolve them.
     const openFirst = screen.getByRole('button', { name: 'Open first' });
     const openSecond = screen.getByRole('button', { name: 'Open second' });
-    const scroll = document.querySelector<HTMLElement>('.transcript-scroll');
+    const scroll = document.querySelector<HTMLElement>('.transcript--scroll');
     expect(scroll).not.toBeNull();
     if (scroll === null) return;
     scroll.scrollTop = 120;

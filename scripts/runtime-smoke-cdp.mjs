@@ -239,7 +239,7 @@ const SURFACES = {
   },
   session: async (client) => {
     await gotoDemoHome(client);
-    await waitFor(client, `document.querySelector('.session-card') !== null`);
+    await waitFor(client, `document.querySelector('.session--card') !== null`);
     const sid = await evaluate(
       client,
       `(async () => { try { const m = await import('/src/relay.ts'); const items = await m.fetchSessions(); return items?.[0]?.id ?? null; } catch { return null; } })()`,

@@ -106,13 +106,13 @@
   }
 </script>
 
-<!-- @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. -->
+<!-- @ds surface: plan-mode--button — persistent host-confirmed mode control + menu trigger. -->
 <!-- @ds guardrail: do-not-edit — The aria-keyshortcuts effect and MenuTrigger/Button React-aria wiring (isDisabled, aria-label, onOpenChange, ref) are not designer-editable. -->
 <!-- @ds state: host presentation kind — the is-${kind} class drives the css seam. -->
 <!-- @ds guardrail: do-not-edit — MenuTrigger/Button React-aria wiring; opening the menu moves focus only and never reports a mode. -->
 <Menu bind:open={menuOpen} onOpenChange={onMenuOpenChange}>
   <MenuTrigger
-    class={`plan-mode-button is-${presentation.kind}`}
+    class={`plan-mode--button ${presentation.kind === 'applying' ? 'is-applying' : `is-${presentation.kind}`}`}
     type="button"
     aria-label={presentation.accessibleName}
     aria-keyshortcuts="Shift+Tab Meta+Shift+M"
@@ -132,7 +132,7 @@
       {@render warningGlyph()}
     {/if}
     <!-- @ds slot: label — bounded visible label. -->
-    <span class="plan-mode-label">{presentation.label}</span>
+    <span class="plan-mode--label">{presentation.label}</span>
   </MenuTrigger>
   <!-- @ds guardrail: do-not-edit — onSelect routes only an activated row: Plan is an immediate request, Build opens the leave confirmation rather than mutating. -->
   <PlanModeMenu
@@ -207,22 +207,22 @@
   </svg>
 {/snippet}
 
-<!-- @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. Decomposed into this scoped block;
-     plan-mode-button / plan-mode-label are owned solely by this component so they move with it.
+<!-- @ds surface: plan-mode--button — persistent host-confirmed mode control + menu trigger. Decomposed into this scoped block;
+     plan-mode--button / plan-mode--label are owned solely by this component so they move with it.
      Child-primitive classes and react-aria/runtime data-attributes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->
 <style>
   /* ── Persistent Plan mode control (immediately after "+") ────────────
      One 44px tab stop with a host-confirmed label. Plan is conveyed
      redundantly (lock glyph + words), never by clay alone. */
-  /* @ds surface: plan-mode-button — persistent host-confirmed mode control + menu trigger. */
+  /* @ds surface: plan-mode--button — persistent host-confirmed mode control + menu trigger. */
   /* @ds state: chart — the ModePresentationKind set. The default chrome carries
      checking · build · running · stale · offline · forbidden · unsupported ·
      extension-error · delivery-unknown · unavailable; plan / executing / applying
      have dedicated states below. Disabling is driven by the fail-closed
      presentation kind, never by this class. */
   /* @ds state: default */
-  :global(.plan-mode-button) {
+  :global(.plan-mode--button) {
     display: inline-flex;
     min-inline-size: 44px;
     min-block-size: 44px;
@@ -245,82 +245,82 @@
   }
 
   /* @ds state: hover · pressed */
-  :global(.plan-mode-button[data-hovered]),
-  :global(.plan-mode-button[data-pressed]) {
+  :global(.plan-mode--button[data-hovered]),
+  :global(.plan-mode--button[data-pressed]) {
     background: var(--surface-muted);
   }
 
   /* @ds state: focus-visible */
-  :global(.plan-mode-button[data-focus-visible]) {
+  :global(.plan-mode--button[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
   /* @ds state: disabled */
-  :global(.plan-mode-button[data-disabled]) {
+  :global(.plan-mode--button[data-disabled]) {
     cursor: default;
     opacity: 0.85;
   }
 
   /* @ds state: plan — host-confirmed Plan; lock glyph + words, never clay alone. */
-  :global(.plan-mode-button.is-plan) {
+  :global(.plan-mode--button.is-plan) {
     border-color: var(--line-strong);
     background: var(--accent-soft);
     color: var(--accent-ink);
   }
 
   /* @ds state: plan · hover · pressed */
-  :global(.plan-mode-button.is-plan[data-hovered]),
-  :global(.plan-mode-button.is-plan[data-pressed]) {
+  :global(.plan-mode--button.is-plan[data-hovered]),
+  :global(.plan-mode--button.is-plan[data-pressed]) {
     background: var(--accent-soft);
   }
 
   /* @ds state: executing — plan execution in progress; rows stay disabled. */
-  :global(.plan-mode-button.is-executing) {
+  :global(.plan-mode--button.is-executing) {
     border-color: var(--line-strong);
     color: var(--ink);
   }
 
   /* @ds state: applying — a mode change is in flight. */
-  :global(.plan-mode-button.is-applying) .plan-mode-label {
+  :global(.plan-mode--button.is-applying) .plan-mode--label {
     color: var(--ink-muted);
   }
 
   /* @ds slot: label — bounded, ellipsis-capped visible label. */
-  .plan-mode-label {
+  .plan-mode--label {
     max-inline-size: 11rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  /* @ds end surface: plan-mode-button */
+  /* @ds end surface: plan-mode--button */
 
   /* Narrow widths give the mode control its own toolbar row above the
      textarea: the left group wraps so the label never truncates Plan ·
      read-only and the primary action stays on the first row. */
   @media (max-width: 400px) {
-    :global(.plan-mode-button) {
+    :global(.plan-mode--button) {
       flex: 1 1 auto;
     }
 
-    .plan-mode-label {
+    .plan-mode--label {
       max-inline-size: none;
     }
   }
 
-  /* @ds slot: label — lets the button label shrink; see plan-mode-button. */
-  .plan-mode-label {
+  /* @ds slot: label — lets the button label shrink; see plan-mode--button. */
+  .plan-mode--label {
     min-inline-size: 0;
   }
 
   /* @ds edit: layout — narrow reflow of the composer bar + ready/review card + sheets. */
   @media (max-width: 27rem) {
-    :global(.plan-mode-button) {
+    :global(.plan-mode--button) {
       min-inline-size: 44px;
       flex: 1 1 9rem;
     }
 
-    .plan-mode-label {
+    .plan-mode--label {
       max-inline-size: none;
       overflow: visible;
       text-overflow: clip;

@@ -694,7 +694,7 @@
        Bits Overlay/Content are siblings, so the overlay class lives on Content and the
        modal/dialog nest inside — the original overlay → modal → dialog box tree. -->
   <SheetContent
-    class="model-sheet-overlay"
+    class="model-sheet--overlay"
     id="model-effort-dialog"
     aria-labelledby="model-effort-title"
     trapFocus={true}
@@ -707,30 +707,30 @@
   >
     <!-- @ds slot: panel — the Modal raised surface. -->
     <div
-      class={`model-sheet-modal${isDragging ? ' is-dragging' : ''}${isSnapping ? ' is-snapping' : ''}`}
+      class={`model-sheet--modal${isDragging ? ' is-dragging' : ''}${isSnapping ? ' is-snapping' : ''}`}
       style="--model-sheet-drag-offset: {dragOffset}px; max-width: 100vw; overflow-x: hidden"
       {@attach attachModal}
     >
-      <div class="model-sheet-dialog" {@attach attachDialog}>
-        <div class="model-sheet-content" onkeydowncapture={handleSheetKeyDown}>
+      <div class="model-sheet--dialog" {@attach attachDialog}>
+        <div class="model-sheet--content" onkeydowncapture={handleSheetKeyDown}>
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <!-- @ds slot: drag-handle — grabber + swipe region. @ds guardrail: do-not-edit — Pointer swipe handlers. -->
           <div
-            class="model-sheet-drag-region"
-            data-testid="model-sheet-drag-region"
+            class="model-sheet--drag-region"
+            data-testid="model-sheet--drag-region"
             onpointerdown={beginSwipe}
             onpointermove={moveSwipe}
             onpointerup={(event) => endSwipe(event, true)}
             onpointercancel={(event) => endSwipe(event, false)}
           >
-            <div class="model-sheet-grabber" aria-hidden="true"></div>
+            <div class="model-sheet--handle" aria-hidden="true"></div>
             <!-- @ds slot: header -->
-            <header class="model-sheet-header">
-              <SheetTitle id="model-effort-title" class="model-sheet-title">
+            <header class="model-sheet--header">
+              <SheetTitle id="model-effort-title" class="model-sheet--title">
                 {section === 'model' ? strings.title : effortStrings.thinkingEffort}
               </SheetTitle>
               <SheetClose
-                class="model-sheet-close"
+                class="model-sheet--close"
                 aria-label={effortStrings.closeSheet}
                 disabled={isCommitting}
                 data-disabled={isCommitting ? 'true' : undefined}
@@ -752,13 +752,13 @@
 
           {#if section === 'model'}
             {#if streamingBlocked}
-              <p class="model-sheet-policy">{strings.streamingBlocked}</p>
+              <p class="model-sheet--policy">{strings.streamingBlocked}</p>
             {/if}
 
             {#if runtime.catalogPhase === 'opening' && runtime.models.length === 0}
-              <div class="model-sheet-skeletons" aria-label={strings.loading} aria-busy="true">
+              <div class="model-sheet--skeletons" aria-label={strings.loading} aria-busy="true">
                 {#each [0, 1, 2, 3] as index (index)}
-                  <div class="model-sheet-skeleton"></div>
+                  <div class="model-sheet--skeleton"></div>
                 {/each}
               </div>
             {:else if showSearch}
@@ -766,7 +766,7 @@
                    @ds guardrail: do-not-edit — Autocomplete/SearchField wiring. -->
               <div class="model-sheet-search">
                 <label for="model-sheet-search-input">{strings.searchLabel}</label>
-                <div class="model-sheet-search-control">
+                <div class="model-sheet-search--control">
                   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                     <circle
                       cx="11"
@@ -816,7 +816,7 @@
                     onkeydown={onSearchKeyDown}
                   />
                   <Button
-                    class="model-sheet-search-clear"
+                    class="model-sheet-search--clear"
                     aria-label={strings.clearSearch}
                     style="min-block-size: 44px"
                     onclick={() => {
@@ -834,13 +834,13 @@
             {/if}
 
             {@render catalogStatus()}
-            <p class={`model-sheet-mutation${runtime.deliveryUnknown ? ' is-barrier' : ''}`}>
+            <p class={`model-sheet--mutation${runtime.deliveryUnknown ? ' is-barrier' : ''}`}>
               {mutationMessage ||
                 (runtime.catalogPhase === 'refreshing' ? strings.refreshing : '')}
             </p>
             <div class="model-sheet-nav">
               <Button
-                class="model-sheet-nav-button"
+                class="model-sheet-nav--button"
                 onclick={() => (section = 'effort')}
                 style="min-block-size: 44px"
               >
@@ -864,9 +864,9 @@
               </Button>
             </div>
             <!-- @ds slot: footer -->
-            <footer class="model-sheet-footer">
+            <footer class="model-sheet--footer">
               <Button
-                class="model-sheet-cancel"
+                class="model-sheet--cancel"
                 onclick={close}
                 disabled={isCommitting}
                 style="min-block-size: 48px"
@@ -874,7 +874,7 @@
                 {strings.cancel}
               </Button>
               <Button
-                class="model-sheet-switch"
+                class="model-sheet--switch"
                 onclick={() => void commit()}
                 disabled={!canCommit}
                 style="min-block-size: 48px"
@@ -886,16 +886,16 @@
             <!-- @ds slot: effort-group — the effort section of the sheet (effort-open). -->
             <!-- @ds state: group aria-busy / pending-effort — while a request is in flight. -->
             <!-- @ds guardrail: do-not-edit — Effort radio group wiring. -->
-            <section class="effort-sheet-section" aria-label={effortStrings.thinkingEffort}>
+            <section class="effort-sheet--section" aria-label={effortStrings.thinkingEffort}>
               {#if effortStatus !== null}
-                <p id="effort-sheet-status" class="effort-sheet-status">
+                <p id="effort-sheet--status" class="effort-sheet--status">
                   {effortStatus}
                 </p>
               {/if}
               {#if showReconcile}
                 <div class="effort-sheet-reconcile">
                   <Button
-                    class="effort-sheet-reconcile-button"
+                    class="effort-sheet-reconcile--button"
                     onclick={() => void runtimeControls.refresh('manual')}
                     style="min-block-size: 44px"
                   >
@@ -904,7 +904,7 @@
                 </div>
               {/if}
               {#if levels.length > 0}
-                <div class="effort-radio-scroll">
+                <div class="effort-radio--scroll">
                   <EffortRadioGroup
                     {levels}
                     confirmed={confirmedEffort}
@@ -912,14 +912,14 @@
                     isPending={anyPending}
                     isDisabled={effortGroupDisabled}
                     labelledBy="model-effort-title"
-                    {...(effortStatus === null ? {} : { describedBy: 'effort-sheet-status' })}
+                    {...(effortStatus === null ? {} : { describedBy: 'effort-sheet--status' })}
                     onSelect={requestEffort}
                   />
                 </div>
               {/if}
               <div class="effort-sheet-nav">
                 <Button
-                  class="effort-sheet-nav-button"
+                  class="effort-sheet-nav--button"
                   onclick={() => (section = 'model')}
                   style="min-block-size: 44px"
                 >
@@ -953,16 +953,16 @@
 {#snippet modelList()}
   {@const rows = catalog.groups.reduce((count, group) => count + group.models.length, 0)}
   {#if runtime.models.length === 0}
-    <p class="model-sheet-empty">{strings.noModels}</p>
+    <p class="model-sheet--empty">{strings.noModels}</p>
   {:else if rows === 0 && catalog.retiredCurrent === null}
-    <p class="model-sheet-empty">{noModelMatchMessage(displayModel(deferredQuery))}</p>
+    <p class="model-sheet--empty">{noModelMatchMessage(displayModel(deferredQuery))}</p>
   {:else}
     <!-- @ds slot: model-list — catalog rows on the model-open section. -->
     <div
       role="listbox"
       id={MODEL_LISTBOX_ID}
       aria-label={strings.availableModels}
-      class="model-sheet-list"
+      class="model-sheet--list"
       style="overflow-x: hidden; overscroll-behavior-y: contain"
       tabindex={showSearch ? -1 : 0}
       onkeydown={onListKeyDown}
@@ -1036,15 +1036,15 @@
     }}
     {@attach attachRowInteractions}
   >
-    <span class="model-sheet-row-main">
-      <span class="model-sheet-row-label">{displayModel(model.label)}</span>
-      <span class="model-sheet-row-id" dir="ltr" translate="no">
+    <span class="model-sheet-row--main">
+      <span class="model-sheet-row--label">{displayModel(model.label)}</span>
+      <span class="model-sheet-row--id" dir="ltr" translate="no">
         {displayModel(model.id)}
       </span>
     </span>
-    <span class="model-sheet-row-states">
+    <span class="model-sheet-row--states">
       {#if isCurrent}
-        <span class="model-state-current">
+        <span class="model-state--current">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
             <path
               d="m3 8 3 3 7-7"
@@ -1059,15 +1059,15 @@
         </span>
       {/if}
       {#if isDraft}
-        <span class="model-state-selected">{strings.selected}</span>
+        <span class="model-state--selected">{strings.selected}</span>
       {/if}
     </span>
-    <span id={descriptionId} class="model-sheet-row-description">
+    <span id={descriptionId} class="model-sheet-row--description">
       <span>{displayModel(model.provider)}</span>
       {#each capabilities as capability (capability)}
         <span>{capability}</span>
       {/each}
-      <span class={reason === null ? 'sr-only' : 'model-state-unavailable'}>
+      <span class={reason === null ? 'sr-only' : 'model-state--unavailable'}>
         {reason ?? strings.available}
       </span>
       {#if isApplying}
@@ -1079,16 +1079,16 @@
 
 {#snippet catalogStatus()}
   {#if runtime.catalogPhase === 'offline'}
-    <p class="model-sheet-catalog-state">{strings.offline}</p>
+    <p class="model-sheet--catalog-state">{strings.offline}</p>
   {:else if runtime.catalogPhase === 'unreachable'}
-    <div class="model-sheet-catalog-state">
+    <div class="model-sheet--catalog-state">
       {strings.unreachable}
       <Button onclick={() => void runtimeControls.refresh('manual')} style="min-block-size: 44px">
         {strings.retryRefresh}
       </Button>
     </div>
   {:else if runtime.catalogPhase === 'access_denied'}
-    <div class="model-sheet-catalog-state">
+    <div class="model-sheet--catalog-state">
       {strings.accessExpired}
       <Button onclick={() => void runtimeControls.refresh('manual')} style="min-block-size: 44px">
         {strings.reconnect}
@@ -1100,7 +1100,7 @@
 <!-- @ds surface: model-effort-sheet — the model picker + effort sheet overlay. Decomposed into this scoped block;
      model-effort-sheet owned rules and this sheet's owned members of mixed pairs move with it.
      Shared overlay/modal chrome (.react-aria-Popover, system-wide prefers-reduced-motion grouping
-     .model-sheet-modal with plan-review-modal / session-card) stays global. Effort radio-group
+     .model-sheet--modal with plan-review--modal / session--card) stays global. Effort radio-group
      rules stay with EffortRadioGroup.svelte. Child-primitive classes and react-aria/runtime
      data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->
 <style>
@@ -1110,7 +1110,7 @@
      Physical unification of the per-surface overlay chrome is a documented follow-up. */
   /* @ds slot: backdrop — the ModalOverlay scrim + placement. */
   /* The model catalog is host-authored; the sheet can only request a host-authorized change. */
-  :global(.model-sheet-overlay) {
+  :global(.model-sheet--overlay) {
     /* @ds edit: tokens — component tokens. Each is a thin alias to a semantic role,
        so this surface retints by editing the role it points at (primitive → semantic
        → component). Edit them here instead of on :root. */
@@ -1134,7 +1134,7 @@
 
   /* @ds state: exiting — backdrop fade-out while the overlay unmounts. */
    /* @ds guardrail: do-not-edit — The data-exiting / drag / snap choreography is driven by the modal exit and swipe-dismiss handlers; dismissal semantics never change here. */
-  :global(.model-sheet-overlay[data-exiting]) {
+  :global(.model-sheet--overlay[data-exiting]) {
     animation: model-sheet-backdrop-out 220ms ease-in;
   }
 
@@ -1142,7 +1142,7 @@
      dark semantic roles here. The ui-accent points at --accent-ink, not --accent-strong,
      because --accent-strong carries no dark override and would not match the dark
      UI accent. */
-  :global(:root[data-theme='dark'] .model-sheet-overlay) {
+  :global(:root[data-theme='dark'] .model-sheet--overlay) {
     --model-sheet-raised: var(--surface);
     --model-sheet-ink: var(--ink);
     --model-sheet-muted: var(--ink-muted);
@@ -1155,7 +1155,7 @@
     /* @ds edit: tokens — theme remap, system-dark. Dark semantic roles again, driven
        by the OS-dark signal; ui-accent resolves to --accent-ink for the same reason
        as the explicit dark block. */
-    :global(:root[data-theme='system'] .model-sheet-overlay) {
+    :global(:root[data-theme='system'] .model-sheet--overlay) {
       --model-sheet-raised: var(--surface);
       --model-sheet-ink: var(--ink);
       --model-sheet-muted: var(--ink-muted);
@@ -1172,7 +1172,7 @@
      stays the layout input for swipe-dismiss. */
   /* @ds state: opening · open — entry rise/settle, then rest; exiting, dragging and
      snapping are separate state rules below. */
-  .model-sheet-modal {
+  .model-sheet--modal {
     inline-size: min(92vw, 24rem);
     max-inline-size: 100vw;
     max-block-size: calc(var(--visual-viewport-height, 100dvh) * 0.75);
@@ -1185,24 +1185,24 @@
   }
 
   /* @ds state: dragging — free drag while a swipe is in flight. */
-  .model-sheet-modal.is-dragging {
+  .model-sheet--modal.is-dragging {
     animation: none;
     transition: none;
   }
 
   /* @ds state: snapping — settle back to rest after a swipe. */
-  .model-sheet-modal.is-snapping {
+  .model-sheet--modal.is-snapping {
     transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   /* @ds state: exiting — panel slides down + fades while the overlay unmounts. */
-  :global(.model-sheet-overlay[data-exiting]) .model-sheet-modal {
+  :global(.model-sheet--overlay[data-exiting]) .model-sheet--modal {
     animation: model-sheet-out 220ms ease-in;
   }
 
   /* @ds edit: layout — sheet body column with symmetric block-end and intentionally
      asymmetric inline safe-area insets (left/right preserved). */
-  .model-sheet-dialog {
+  .model-sheet--dialog {
     display: flex;
     min-inline-size: 0;
     max-block-size: inherit;
@@ -1214,23 +1214,23 @@
     font-family: var(--font-sans);
   }
 
-  .model-sheet-content {
+  .model-sheet--content {
     display: contents;
   }
 
   /* @ds slot: drag-handle — grabber + swipe surface. */
-  .model-sheet-drag-region {
+  .model-sheet--drag-region {
     flex: 0 0 auto;
     cursor: grab;
     touch-action: none;
     user-select: none;
   }
 
-  .model-sheet-drag-region:active {
+  .model-sheet--drag-region:active {
     cursor: grabbing;
   }
 
-  .model-sheet-grabber {
+  .model-sheet--handle {
     inline-size: 36px;
     block-size: 4px;
     flex: 0 0 auto;
@@ -1242,7 +1242,7 @@
   }
 
   /* @ds slot: header */
-  .model-sheet-header {
+  .model-sheet--header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1251,7 +1251,7 @@
     padding-inline: var(--space-4);
   }
 
-  :global(.model-sheet-title) {
+  :global(.model-sheet--title) {
     margin: 0;
     color: var(--model-sheet-ink);
     font-family: var(--font-display);
@@ -1260,7 +1260,7 @@
     line-height: 1.2;
   }
 
-  :global(.model-sheet-close) {
+  :global(.model-sheet--close) {
     display: grid;
     inline-size: 44px;
     block-size: 44px;
@@ -1274,39 +1274,39 @@
     cursor: pointer;
   }
 
-  :global(.model-sheet-close[data-hovered]),
-  :global(.model-sheet-cancel[data-hovered]) {
+  :global(.model-sheet--close[data-hovered]),
+  :global(.model-sheet--cancel[data-hovered]) {
     background: var(--model-sheet-selection);
   }
 
   /* @ds slot: status-lines — policy, catalog state, mutation, and empty copy. */
   /* @ds state: model-open — the model picker panel. */
-  .model-sheet-policy,
-  .model-sheet-catalog-state,
-  .model-sheet-mutation,
-  .model-sheet-empty {
+  .model-sheet--policy,
+  .model-sheet--catalog-state,
+  .model-sheet--mutation,
+  .model-sheet--empty {
     margin: 0;
     color: var(--model-sheet-muted);
     font-size: 0.875rem;
     line-height: 1.45;
   }
 
-  .model-sheet-policy,
-  .model-sheet-catalog-state,
-  .model-sheet-mutation {
+  .model-sheet--policy,
+  .model-sheet--catalog-state,
+  .model-sheet--mutation {
     padding-block: 0.5rem;
     padding-inline: var(--space-4);
   }
 
   /* @ds state: terminal-blocked — streaming or delivery barrier seam. */
-  .model-sheet-policy,
-  .model-sheet-mutation.is-barrier {
+  .model-sheet--policy,
+  .model-sheet--mutation.is-barrier {
     border-block: 1px solid var(--model-sheet-ui-accent);
     background: var(--model-sheet-selection);
     color: var(--model-sheet-accent);
   }
 
-  .model-sheet-catalog-state :global(button) {
+  .model-sheet--catalog-state :global(button) {
     min-block-size: 44px;
     border: 0;
     background: transparent;
@@ -1328,7 +1328,7 @@
     font-weight: 620;
   }
 
-  .model-sheet-search-control {
+  .model-sheet-search--control {
     display: flex;
     min-inline-size: 0;
     min-block-size: 44px;
@@ -1352,12 +1352,12 @@
     font-size: 1rem;
   }
 
-  .model-sheet-search-control:focus-within {
+  .model-sheet-search--control:focus-within {
     outline: 2px solid var(--model-sheet-ui-accent);
     outline-offset: 2px;
   }
 
-  :global(.model-sheet-search-clear) {
+  :global(.model-sheet-search--clear) {
     min-inline-size: 44px;
     min-block-size: 44px;
     align-self: stretch;
@@ -1369,7 +1369,7 @@
   }
 
   /* @ds slot: model-list — catalog rows, on the model-open section. */
-  .model-sheet-list {
+  .model-sheet--list {
     display: grid;
     min-inline-size: 0;
     flex: 1 1 auto;
@@ -1382,13 +1382,13 @@
     outline: none;
   }
 
-  .model-sheet-list .react-aria-ListBoxSection {
+  .model-sheet--list .react-aria-ListBoxSection {
     display: grid;
     min-inline-size: 0;
     gap: 2px;
   }
 
-  .model-sheet-list .react-aria-Header {
+  .model-sheet--list .react-aria-Header {
     padding-block: 0.5rem 0.25rem;
     padding-inline: var(--space-2);
     color: var(--model-sheet-muted);
@@ -1425,14 +1425,14 @@
   }
 
   :global(.model-sheet-row[data-focus-visible]),
-  :global(.model-sheet-close[data-focus-visible]),
-  :global(.model-sheet-cancel[data-focus-visible]),
-  :global(.model-sheet-switch[data-focus-visible]),
-  :global(.model-sheet-search-clear[data-focus-visible]),
-  :global(.model-sheet-nav-button[data-focus-visible]),
-  :global(.effort-sheet-nav-button[data-focus-visible]),
-  :global(.effort-sheet-reconcile-button[data-focus-visible]),
-  .model-sheet-catalog-state :global(button[data-focus-visible]) {
+  :global(.model-sheet--close[data-focus-visible]),
+  :global(.model-sheet--cancel[data-focus-visible]),
+  :global(.model-sheet--switch[data-focus-visible]),
+  :global(.model-sheet-search--clear[data-focus-visible]),
+  :global(.model-sheet-nav--button[data-focus-visible]),
+  :global(.effort-sheet-nav--button[data-focus-visible]),
+  :global(.effort-sheet-reconcile--button[data-focus-visible]),
+  .model-sheet--catalog-state :global(button[data-focus-visible]) {
     outline-color: var(--model-sheet-ui-accent);
     outline-style: solid;
     outline-width: 2px;
@@ -1445,26 +1445,26 @@
     opacity: 0.72;
   }
 
-  .model-sheet-row-main,
-  .model-sheet-row-states,
-  .model-sheet-row-description {
+  .model-sheet-row--main,
+  .model-sheet-row--states,
+  .model-sheet-row--description {
     display: flex;
     min-inline-size: 0;
     align-items: center;
   }
 
-  .model-sheet-row-main {
+  .model-sheet-row--main {
     flex-wrap: wrap;
     gap: 0.2rem var(--space-2);
   }
 
-  .model-sheet-row-label {
+  .model-sheet-row--label {
     overflow-wrap: anywhere;
     font-size: 0.98rem;
     font-weight: 650;
   }
 
-  .model-sheet-row-id {
+  .model-sheet-row--id {
     overflow: hidden;
     max-inline-size: 100%;
     color: var(--model-sheet-muted);
@@ -1474,7 +1474,7 @@
     unicode-bidi: isolate;
   }
 
-  .model-sheet-row-states {
+  .model-sheet-row--states {
     justify-content: flex-end;
     gap: 0.35rem;
     color: var(--model-sheet-accent);
@@ -1482,15 +1482,15 @@
     font-weight: 700;
   }
 
-  .model-state-current,
-  .model-state-selected {
+  .model-state--current,
+  .model-state--selected {
     display: inline-flex;
     align-items: center;
     gap: 0.2rem;
     white-space: nowrap;
   }
 
-  .model-sheet-row-description {
+  .model-sheet-row--description {
     grid-column: 1 / -1;
     flex-wrap: wrap;
     gap: 0.2rem 0.55rem;
@@ -1499,36 +1499,36 @@
     line-height: 1.35;
   }
 
-  .model-state-unavailable {
+  .model-state--unavailable {
     color: var(--model-sheet-accent);
     font-weight: 650;
   }
 
-  .model-sheet-empty {
+  .model-sheet--empty {
     min-block-size: 9rem;
     padding: var(--space-6) var(--space-4);
     text-align: center;
   }
 
-  .model-sheet-skeletons {
+  .model-sheet--skeletons {
     display: grid;
     gap: var(--space-2);
     padding: var(--space-3);
   }
 
-  .model-sheet-skeleton {
+  .model-sheet--skeleton {
     min-block-size: 64px;
     border-radius: 14px;
     background: var(--model-sheet-selection);
     animation: model-sheet-pulse 1.2s ease-in-out infinite alternate;
   }
 
-  .model-sheet-mutation {
+  .model-sheet--mutation {
     min-block-size: 2.5rem;
   }
 
   /* @ds slot: footer */
-  .model-sheet-footer {
+  .model-sheet--footer {
     display: grid;
     flex: 0 0 auto;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
@@ -1538,8 +1538,8 @@
     border-block-start: 1px solid color-mix(in srgb, var(--model-sheet-muted) 35%, transparent);
   }
 
-  :global(.model-sheet-cancel),
-  :global(.model-sheet-switch) {
+  :global(.model-sheet--cancel),
+  :global(.model-sheet--switch) {
     min-inline-size: 0;
     min-block-size: 48px;
     border-radius: 12px;
@@ -1548,13 +1548,13 @@
     overflow-wrap: anywhere;
   }
 
-  :global(.model-sheet-cancel) {
+  :global(.model-sheet--cancel) {
     border: 1px solid var(--model-sheet-muted);
     background: transparent;
     color: var(--model-sheet-ink);
   }
 
-  :global(.model-sheet-switch) {
+  :global(.model-sheet--switch) {
     border: 1px solid var(--model-sheet-ui-accent);
     background: var(--model-sheet-ink);
     color: var(--model-sheet-raised);
@@ -1562,9 +1562,9 @@
 
   /* @ds state: committing / disabled — model & effort actions locked while a request
      is in flight or change authority is blocked. */
-  :global(.model-sheet-switch[data-disabled]),
-  :global(.model-sheet-cancel[data-disabled]),
-  :global(.model-sheet-close[data-disabled]) {
+  :global(.model-sheet--switch[data-disabled]),
+  :global(.model-sheet--cancel[data-disabled]),
+  :global(.model-sheet--close[data-disabled]) {
     cursor: default;
     opacity: 0.5;
   }
@@ -1610,16 +1610,16 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.model-sheet-overlay),
-    :global(.model-sheet-overlay[data-exiting]),
-    :global(.model-sheet-overlay[data-exiting]) .model-sheet-modal,
-    .model-sheet-skeleton {
+    :global(.model-sheet--overlay),
+    :global(.model-sheet--overlay[data-exiting]),
+    :global(.model-sheet--overlay[data-exiting]) .model-sheet--modal,
+    .model-sheet--skeleton {
       animation: none;
     }
 
-    :global(.model-sheet-overlay[data-exiting]) .model-sheet-modal,
-    :global(.model-sheet-overlay) :global(button):active:not(:disabled),
-    :global(.model-sheet-overlay) :global(button[data-pressed]):not([data-disabled]) {
+    :global(.model-sheet--overlay[data-exiting]) .model-sheet--modal,
+    :global(.model-sheet--overlay) :global(button):active:not(:disabled),
+    :global(.model-sheet--overlay) :global(button[data-pressed]):not([data-disabled]) {
       transform: none;
       transition: none;
     }
@@ -1636,7 +1636,7 @@
 
   /* ── Effort section: one full-width radio row per host-advertised level ── */
   /* @ds state: effort-open — the sheet draws its effort section. */
-  .effort-sheet-section {
+  .effort-sheet--section {
     display: flex;
     min-inline-size: 0;
     min-block-size: 0;
@@ -1645,7 +1645,7 @@
   }
 
   /* @ds state: pending-effort — the status line reporting the in-flight effort request. */
-  .effort-sheet-status {
+  .effort-sheet--status {
     flex: 0 0 auto;
     margin: 0;
     padding-block: 0.5rem;
@@ -1660,7 +1660,7 @@
     padding-inline: var(--space-4);
   }
 
-  :global(.effort-sheet-reconcile-button) {
+  :global(.effort-sheet-reconcile--button) {
     min-block-size: 44px;
     border: 0;
     background: transparent;
@@ -1670,7 +1670,7 @@
     text-underline-offset: 0.15em;
   }
 
-  .effort-radio-scroll {
+  .effort-radio--scroll {
     min-inline-size: 0;
     min-block-size: 0;
     flex: 1 1 auto;
@@ -1684,12 +1684,12 @@
   /* Muted copy on the soft selection wash drops below 4.5:1 in the bone
      theme, so selected/focused/hovered rows promote descriptions and IDs
      to the ink token; the accent states column already passes there. */
-  :global(.model-sheet-row[data-hovered]) .model-sheet-row-id,
-  :global(.model-sheet-row[data-hovered]) .model-sheet-row-description,
-  :global(.model-sheet-row[data-focused]) .model-sheet-row-id,
-  :global(.model-sheet-row[data-focused]) .model-sheet-row-description,
-  :global(.model-sheet-row[data-selected]) .model-sheet-row-id,
-  :global(.model-sheet-row[data-selected]) .model-sheet-row-description {
+  :global(.model-sheet-row[data-hovered]) .model-sheet-row--id,
+  :global(.model-sheet-row[data-hovered]) .model-sheet-row--description,
+  :global(.model-sheet-row[data-focused]) .model-sheet-row--id,
+  :global(.model-sheet-row[data-focused]) .model-sheet-row--description,
+  :global(.model-sheet-row[data-selected]) .model-sheet-row--id,
+  :global(.model-sheet-row[data-selected]) .model-sheet-row--description {
     color: var(--model-sheet-ink);
   }
 
@@ -1709,8 +1709,8 @@
     padding-inline: var(--space-4);
   }
 
-  :global(.model-sheet-nav-button),
-  :global(.effort-sheet-nav-button) {
+  :global(.model-sheet-nav--button),
+  :global(.effort-sheet-nav--button) {
     display: inline-flex;
     min-block-size: 44px;
     align-items: center;
@@ -1724,26 +1724,26 @@
     cursor: pointer;
   }
 
-  :global(.model-sheet-nav-button[data-hovered]),
-  :global(.effort-sheet-nav-button[data-hovered]) {
+  :global(.model-sheet-nav--button[data-hovered]),
+  :global(.effort-sheet-nav--button[data-hovered]) {
     color: var(--model-sheet-ink);
   }
 
   /* Section nav arrows are physical drawings; mirror them under an RTL
      document so "back" keeps pointing at the section that precedes it. */
-  :global([dir='rtl'] .model-sheet-nav-button svg),
-  :global([dir='rtl'] .effort-sheet-nav-button svg) {
+  :global([dir='rtl'] .model-sheet-nav--button svg),
+  :global([dir='rtl'] .effort-sheet-nav--button svg) {
     transform: scaleX(-1);
   }
 
   @media (max-width: 360px) {
-    .model-sheet-header,
+    .model-sheet--header,
     .model-sheet-search,
-    .model-sheet-policy,
-    .model-sheet-catalog-state,
-    .model-sheet-mutation,
-    .model-sheet-footer,
-    .effort-sheet-status,
+    .model-sheet--policy,
+    .model-sheet--catalog-state,
+    .model-sheet--mutation,
+    .model-sheet--footer,
+    .effort-sheet--status,
     .effort-sheet-reconcile,
     .effort-sheet-nav {
       padding-inline: var(--space-3);

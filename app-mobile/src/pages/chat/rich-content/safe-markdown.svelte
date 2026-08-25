@@ -398,7 +398,7 @@
 {#if ast === null}
   <!-- @ds guardrail: do-not-edit — The fail-closed fallback renders rejected source verbatim and marks the canonical source for exact copying. -->
   <div
-    class={`${classes} safe-markdown-fallback`}
+    class={`${classes} safe-markdown--fallback`}
     aria-label={ariaLabel}
     dir="auto"
     data-control-presentation={controlPresentation.changed ? 'readonly' : undefined}
@@ -431,15 +431,15 @@
           </tbody>
         </table>
       {:else if node.kind === 'code'}
-        <pre class="safe-markdown-code" data-language={node.language ?? undefined}><code>{node.source}</code></pre>
+        <pre class="safe-markdown--code" data-language={node.language ?? undefined}><code>{node.source}</code></pre>
       {/if}
     {/each}
   </div>
 {/if}
 
 <style>
-  /* @ds slot: safe-markdown-fallback — the fail-closed verbatim read-out. */
-  .safe-markdown-fallback[data-control-presentation='readonly'] {
+  /* @ds slot: safe-markdown--fallback — the fail-closed verbatim read-out. */
+  .safe-markdown--fallback[data-control-presentation='readonly'] {
     border-inline-start: 3px solid var(--accent-strong);
     padding-inline-start: var(--space-3);
     overflow-wrap: anywhere;
@@ -448,7 +448,7 @@
   /* @ds slot: safe-markdown — the safe-Markdown renderer's prose output. */
   /* @ds guardrail: do-not-edit — This is presentation for already-sanitized Markdown; allowlisting and scheme filtering remain in the module script. */
   .safe-markdown,
-  .safe-markdown-fallback {
+  .safe-markdown--fallback {
     min-inline-size: 0;
     color: var(--ink);
     font: 1rem/1.55 var(--font-display);
@@ -490,8 +490,8 @@
     font-size: 0.88em;
   }
 
-  /* @ds slot: safe-markdown-code — fenced code block rendered by SafeMarkdown. */
-  .safe-markdown-code {
+  /* @ds slot: safe-markdown--code — fenced code block rendered by SafeMarkdown. */
+  .safe-markdown--code {
     max-inline-size: 100%;
     margin-block: 0 var(--space-3);
     padding: var(--space-3);
@@ -504,9 +504,9 @@
     white-space: pre;
   }
 
-  /* @ds slot: safe-markdown-code — neutralizes the inline-chip chrome inside a
+  /* @ds slot: safe-markdown--code — neutralizes the inline-chip chrome inside a
      fenced block. */
-  .safe-markdown-code code {
+  .safe-markdown--code code {
     padding: 0;
     background: transparent;
   }

@@ -113,7 +113,7 @@ describe('PdfPreview', () => {
       target: { value: 'safe' },
     });
     expect(onFindTermChange).toHaveBeenCalledWith('safe');
-    expect(Number(document.querySelector('.pdf-preview-scroll')?.dataset.pdfRenderedPages)).toBeLessThanOrEqual(3);
+    expect(Number(document.querySelector('.pdf-preview--scroll')?.dataset.pdfRenderedPages)).toBeLessThanOrEqual(3);
     expect(pagesAround(1, 500)).toEqual([1, 2]);
   });
 
@@ -133,7 +133,7 @@ describe('PdfPreview', () => {
         'withheld',
       ),
     );
-    expect(document.querySelector('.pdf-text-layer')).toBeNull();
+    expect(document.querySelector('.pdf-text--layer')).toBeNull();
     expect(screen.queryByText(/could not be attested safe/i)).toBeInTheDocument();
   });
 

@@ -66,23 +66,23 @@
       };
     }}
   >
-    <span class="artifact-card-glyph" aria-hidden="true">
+    <span class="artifact-card--icon" aria-hidden="true">
       <svg viewBox="0 0 24 24" focusable="false">
         <path d="M5 7h14M5 12h14M5 17h8" />
         <path d="M16 15v6M13 18h6" />
       </svg>
     </span>
-    <span class="artifact-card-body">
-      <span class="artifact-card-meta">
+    <span class="artifact-card--body">
+      <span class="artifact-card--meta">
         <span>File preview</span>
         <span>{stateLabel}</span>
       </span>
-      <span class="artifact-card-summary">{block.displayName}</span>
+      <span class="artifact-card--summary">{block.displayName}</span>
       <span class="artifact-card-peek" aria-label="Preview metadata">
         {metadata}
       </span>
     </span>
-    <span class="artifact-card-open" aria-hidden="true">
+    <span class="artifact-card--open" aria-hidden="true">
       Open
     </span>
   </Button>

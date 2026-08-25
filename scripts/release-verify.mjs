@@ -98,7 +98,7 @@ const boundaryGates = [
       release.includes("PI_REMOTE_MEDIA_ENABLED: '0'"),
       cdp.includes("fixture === 'end-to-end'"),
       cdp.includes("'pi-remote:privacy-cover'"),
-      cdp.includes("artifact-viewer-privacy-curtain"),
+      cdp.includes("artifact-viewer--privacy-curtain"),
       indexHtml.includes("img-src 'self' blob:") && indexHtml.includes("connect-src 'self'"),
       indexHtml.includes("object-src 'none'"),
       serviceWorker.includes("url.pathname.startsWith('/api/artifacts/')"),

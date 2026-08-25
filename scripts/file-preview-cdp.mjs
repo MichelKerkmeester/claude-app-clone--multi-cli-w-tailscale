@@ -255,7 +255,7 @@ async function exerciseFixture(client, theme, outputPath, viewportWidth) {
         scrollWidth: root.scrollWidth,
         dialog: document.querySelector('[role="dialog"]') !== null,
         close: document.querySelector('[aria-label="Close file diff viewer"]') !== null,
-        patch: document.querySelector('.artifact-diff-preview') !== null,
+        patch: document.querySelector('.artifact-diff--preview') !== null,
       };
     })()`,
   );
@@ -293,21 +293,21 @@ async function exerciseFixture(client, theme, outputPath, viewportWidth) {
 
 async function exerciseArtifactStates(client, theme, outputPath, viewportWidth) {
   await navigate(client, `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=artifact-states`);
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   const themeReload = client.waitForEvent('Page.loadEventFired');
   await runtimeEvaluate(
     client,
     `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
   await themeReload;
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await waitForPage(
     client,
-    '(() => { const scroll = document.querySelector(".transcript-scroll"); if (scroll === null) return false; scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); return document.querySelector(".file-preview-card") !== null; })()',
+    '(() => { const scroll = document.querySelector(".transcript--scroll"); if (scroll === null) return false; scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); return document.querySelector(".file-preview-card") !== null; })()',
   );
   await waitForPage(
     client,
-    '(() => { const scroll = document.querySelector(".transcript-scroll"); if (scroll !== null) { scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); } return document.querySelector(".file-preview-card[data-preview-state=ready]") !== null && document.querySelector(".file-preview-card[data-preview-state=withheld]") !== null; })()',
+    '(() => { const scroll = document.querySelector(".transcript--scroll"); if (scroll !== null) { scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); } return document.querySelector(".file-preview-card[data-preview-state=ready]") !== null && document.querySelector(".file-preview-card[data-preview-state=withheld]") !== null; })()',
   );
 
   const state = await runtimeEvaluate(
@@ -348,29 +348,29 @@ async function exerciseArtifactStates(client, theme, outputPath, viewportWidth) 
 
 async function exerciseTextCodeShare(client, theme, outputPath, viewportWidth) {
   await navigate(client, `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=text-code-share`);
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   const themeReload = client.waitForEvent('Page.loadEventFired');
   await runtimeEvaluate(
     client,
     `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
   await themeReload;
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await waitForPage(
     client,
-    '(() => { const scroll = document.querySelector(".transcript-scroll"); if (scroll !== null) { scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); } return document.querySelectorAll(".file-preview-card .artifact-card").length >= 3; })()',
+    '(() => { const scroll = document.querySelector(".transcript--scroll"); if (scroll !== null) { scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); } return document.querySelectorAll(".file-preview-card .artifact-card").length >= 3; })()',
   );
   await runtimeEvaluate(
     client,
     'document.querySelectorAll(".file-preview-card .artifact-card")[0]?.click()',
   );
-  await waitForPage(client, 'document.querySelector(".artifact-text-preview") !== null');
+  await waitForPage(client, 'document.querySelector(".artifact-text--preview") !== null');
 
   const textState = await runtimeEvaluate(
     client,
     `(() => {
       const root = document.documentElement;
-      const text = document.querySelector('.artifact-text-preview');
+      const text = document.querySelector('.artifact-text--preview');
       return {
         selectable: text !== null && getComputedStyle(text).userSelect !== 'none',
         find: document.querySelector('[type="search"]') !== null,
@@ -402,14 +402,14 @@ async function exerciseTextCodeShare(client, theme, outputPath, viewportWidth) {
     client,
     'document.querySelectorAll(".file-preview-card .artifact-card")[2]?.click()',
   );
-  await waitForPage(client, 'document.querySelector(".artifact-code-preview") !== null');
+  await waitForPage(client, 'document.querySelector(".artifact-code--preview") !== null');
 
   const state = await runtimeEvaluate(
     client,
     `(() => {
       const root = document.documentElement;
-      const source = document.querySelector('.artifact-code-source');
-      const gutter = document.querySelector('.artifact-code-gutter');
+      const source = document.querySelector('.artifact-code--source');
+      const gutter = document.querySelector('.artifact-code--gutter');
       const visualWidth = window.visualViewport?.width ?? window.innerWidth;
       return {
         viewportWidth: Math.round(visualWidth),
@@ -452,17 +452,17 @@ async function exerciseImagePdfRelease(client, theme, outputPath, viewportWidth)
     client,
     `${DEV_URL}/session/demo-session-refactor?demo=1&fixture=image-pdf-release`,
   );
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   const themeReload = client.waitForEvent('Page.loadEventFired');
   await runtimeEvaluate(
     client,
     `localStorage.removeItem('pi-remote.read-only.v1'); localStorage.setItem('pi-remote.theme', ${JSON.stringify(theme)}); location.reload();`,
   );
   await themeReload;
-  await waitForPage(client, 'document.querySelector(".transcript-scroll") !== null');
+  await waitForPage(client, 'document.querySelector(".transcript--scroll") !== null');
   await waitForPage(
     client,
-    '(() => { const scroll = document.querySelector(".transcript-scroll"); if (scroll !== null) { scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); } return document.querySelectorAll(".file-preview-card").length >= 7; })()',
+    '(() => { const scroll = document.querySelector(".transcript--scroll"); if (scroll !== null) { scroll.scrollTop = 1_000_000; scroll.dispatchEvent(new Event("scroll")); } return document.querySelectorAll(".file-preview-card").length >= 7; })()',
   );
 
   const cards = await runtimeEvaluate(
@@ -494,7 +494,7 @@ async function exerciseImagePdfRelease(client, theme, outputPath, viewportWidth)
   if (!imageState.zoomOut || !imageState.fit || !imageState.zoomIn) {
     throw new Error('Image fixture did not expose visible zoom alternatives.');
   }
-  await runtimeEvaluate(client, 'document.querySelector(".artifact-viewer-close")?.click()');
+  await runtimeEvaluate(client, 'document.querySelector(".artifact-viewer--close")?.click()');
   await waitForPage(client, 'document.querySelector("[role=dialog]") === null');
 
   await runtimeEvaluate(
@@ -504,16 +504,16 @@ async function exerciseImagePdfRelease(client, theme, outputPath, viewportWidth)
   await waitForPage(client, 'document.querySelector(".pdf-preview") !== null');
   await waitForPage(
     client,
-    'document.querySelector(".pdf-preview[data-pdf-state=ready]") !== null && document.querySelector(".pdf-text-layer") !== null && document.querySelector(".pdf-preview-scroll")?.dataset.pdfRenderedPages !== undefined',
+    'document.querySelector(".pdf-preview[data-pdf-state=ready]") !== null && document.querySelector(".pdf-text--layer") !== null && document.querySelector(".pdf-preview--scroll")?.dataset.pdfRenderedPages !== undefined',
   );
   const pdfState = await runtimeEvaluate(
     client,
     `(() => {
       const root = document.documentElement;
-      const pages = Number(document.querySelector('.pdf-preview-scroll')?.dataset.pdfRenderedPages ?? 0);
+      const pages = Number(document.querySelector('.pdf-preview--scroll')?.dataset.pdfRenderedPages ?? 0);
       return {
         pages,
-        textLayer: document.querySelector('.pdf-text-layer') !== null,
+        textLayer: document.querySelector('.pdf-text--layer') !== null,
         previous: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Previous'),
         next: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Next'),
         fit: [...document.querySelectorAll('button')].some((button) => button.textContent === 'Fit width'),
@@ -543,7 +543,7 @@ async function exerciseImagePdfRelease(client, theme, outputPath, viewportWidth)
     );
   }
 
-  await runtimeEvaluate(client, 'document.querySelector(".artifact-viewer-close")?.click()');
+  await runtimeEvaluate(client, 'document.querySelector(".artifact-viewer--close")?.click()');
   await waitForPage(client, 'document.querySelector("[role=dialog]") === null');
   await runtimeEvaluate(
     client,
@@ -553,8 +553,8 @@ async function exerciseImagePdfRelease(client, theme, outputPath, viewportWidth)
   const unsafe = await runtimeEvaluate(
     client,
     `(() => ({
-      textLayer: document.querySelector('.pdf-text-layer') !== null,
-      message: document.querySelector('.artifact-unsupported-preview')?.textContent ?? '',
+      textLayer: document.querySelector('.pdf-text--layer') !== null,
+      message: document.querySelector('.artifact--unsupported-preview')?.textContent ?? '',
     }))()`,
   );
   if (unsafe.textLayer || !unsafe.message.toLowerCase().includes('withheld')) {

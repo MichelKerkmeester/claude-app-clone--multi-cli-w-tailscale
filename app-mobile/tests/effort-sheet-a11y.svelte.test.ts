@@ -261,7 +261,7 @@ describe('semantic labelling and description associations', () => {
 
     const group = screen.getByRole('radiogroup');
     expect(group).toHaveAttribute('aria-labelledby', 'model-effort-title');
-    expect(group).toHaveAttribute('aria-describedby', 'effort-sheet-status');
+    expect(group).toHaveAttribute('aria-describedby', 'effort-sheet--status');
     expect(group).toHaveAccessibleDescription('The host runtime changed. Refreshed.');
 
     for (const radio of screen.getAllByRole('radio')) {
@@ -350,7 +350,7 @@ describe('state fixtures and non-color indicators', () => {
     expect(confirmedRow).toHaveTextContent('Confirmed');
 
     expect(pendingRow).toHaveClass('is-requested');
-    expect(pendingRow.querySelector('.effort-spinner')).not.toBeNull();
+    expect(pendingRow.querySelector('.effort--spinner')).not.toBeNull();
     expect(pendingRow).toHaveTextContent('Applying');
     expect(pendingRow).not.toHaveAttribute('data-selected');
 
@@ -400,21 +400,21 @@ describe('state fixtures and non-color indicators', () => {
 
   it('applies the frozen light and dark tokens to the sheet surface', async () => {
     expect(SHEET_CSS).toMatch(
-      /\.model-sheet-overlay \{[\s\S]*?--model-sheet-raised: var\(--surface\);[\s\S]*?--model-sheet-ink: var\(--ink\);[\s\S]*?--model-sheet-ui-accent: var\(--accent-strong\);/u,
+      /\.model-sheet--overlay \{[\s\S]*?--model-sheet-raised: var\(--surface\);[\s\S]*?--model-sheet-ink: var\(--ink\);[\s\S]*?--model-sheet-ui-accent: var\(--accent-strong\);/u,
     );
     expect(SHEET_CSS).toMatch(
-      /:root\[data-theme='dark'\] \.model-sheet-overlay \{[\s\S]*?--model-sheet-raised: var\(--surface\);[\s\S]*?--model-sheet-ink: var\(--ink\);[\s\S]*?--model-sheet-ui-accent: var\(--accent-ink\);/u,
+      /:root\[data-theme='dark'\] \.model-sheet--overlay \{[\s\S]*?--model-sheet-raised: var\(--surface\);[\s\S]*?--model-sheet-ink: var\(--ink\);[\s\S]*?--model-sheet-ui-accent: var\(--accent-ink\);/u,
     );
 
     const light = await renderEffortSheet(readyRuntime());
-    expect(document.querySelector('.model-sheet-overlay')).not.toBeNull();
+    expect(document.querySelector('.model-sheet--overlay')).not.toBeNull();
     expect(screen.getByRole('radio', { name: 'High, Confirmed' })).toBeChecked();
     light.view.unmount();
     cleanup();
 
     document.documentElement.setAttribute('data-theme', 'dark');
     const dark = await renderEffortSheet(readyRuntime());
-    expect(document.querySelector('.model-sheet-overlay')).not.toBeNull();
+    expect(document.querySelector('.model-sheet--overlay')).not.toBeNull();
     expect(screen.getByRole('radio', { name: 'High, Confirmed' })).toBeChecked();
     dark.view.unmount();
   });
@@ -428,7 +428,7 @@ describe('reflow, touch targets, and logical layout', () => {
     );
     const dialog = screen.getByRole('dialog');
     // In bits-ui, the modal is a child of Dialog.Content, not an ancestor.
-    const modal = dialog.querySelector<HTMLElement>('.model-sheet-modal');
+    const modal = dialog.querySelector<HTMLElement>('.model-sheet--modal');
     const group = screen.getByRole('radiogroup');
     if (modal === null) throw new Error('Expected sheet modal');
 
@@ -463,12 +463,12 @@ describe('reflow, touch targets, and logical layout', () => {
   it('uses logical properties and mirrors section arrows under RTL', async () => {
     expect(EFFORT_CSS).toMatch(/\.effort-radio-row \{[\s\S]*?padding-inline: var\(--space-3\);/u);
     expect(SHEET_CSS).toMatch(
-      /\.model-sheet-dialog \{[\s\S]*?padding-inline: env\(safe-area-inset-left\) env\(safe-area-inset-right\);/u,
+      /\.model-sheet--dialog \{[\s\S]*?padding-inline: env\(safe-area-inset-left\) env\(safe-area-inset-right\);/u,
     );
     expect(SHEET_CSS).toMatch(
-      /\[dir='rtl'\] \.model-sheet-nav-button svg,[\s\S]*?transform: scaleX\(-1\);/u,
+      /\[dir='rtl'\] \.model-sheet-nav--button svg,[\s\S]*?transform: scaleX\(-1\);/u,
     );
-    expect(SHEET_CSS).toMatch(/\.model-sheet-policy,[\s\S]*?border-block: 1px solid/u);
+    expect(SHEET_CSS).toMatch(/\.model-sheet--policy,[\s\S]*?border-block: 1px solid/u);
 
     document.documentElement.setAttribute('dir', 'rtl');
     const harness = await renderEffortSheet(readyRuntime());
@@ -481,9 +481,9 @@ describe('reflow, touch targets, and logical layout', () => {
   it('keeps browser text inflation enabled and scrolls internally at large text', () => {
     expect(APP_CSS).not.toMatch(/text-size-adjust:\s*none/gu);
     expect(SHEET_CSS).toMatch(/\.model-sheet-search input \{[\s\S]*?font-size: 1rem;/u);
-    expect(EFFORT_CSS).toMatch(/\.effort-radio-row-label \{[\s\S]*?overflow-wrap: anywhere;/u);
-    expect(SHEET_CSS).toMatch(/\.effort-radio-scroll \{[\s\S]*?overflow-y: auto;/u);
-    expect(SHEET_CSS).toMatch(/\.effort-sheet-section \{[\s\S]*?flex: 1 1 auto;/u);
+    expect(EFFORT_CSS).toMatch(/\.effort-radio-row--label \{[\s\S]*?overflow-wrap: anywhere;/u);
+    expect(SHEET_CSS).toMatch(/\.effort-radio--scroll \{[\s\S]*?overflow-y: auto;/u);
+    expect(SHEET_CSS).toMatch(/\.effort-sheet--section \{[\s\S]*?flex: 1 1 auto;/u);
     expect(SHEET_CSS).toMatch(
       /max-block-size: calc\(var\(--visual-viewport-height, 100dvh\) \* 0\.75\);/u,
     );
@@ -502,21 +502,21 @@ describe('reduced motion removes transforms, springs, stagger, and spinners', ()
       throw new Error('Expected the sheet reduced-motion block');
     }
     const block = APP_CSS.slice(blockStart, pulseStart);
-    expect(block).toMatch(/\.effort-spinner,[\s\S]*?animation: none/u);
-    expect(block).toMatch(/\.effort-state-confirmed[\s\S]*?animation: none/u);
-    expect(block).toMatch(/\.model-sheet-skeleton,[\s\S]*?animation: none/u);
+    expect(block).toMatch(/\.effort--spinner,[\s\S]*?animation: none/u);
+    expect(block).toMatch(/\.effort-state--confirmed[\s\S]*?animation: none/u);
+    expect(block).toMatch(/\.model-sheet--skeleton,[\s\S]*?animation: none/u);
     expect(block).toMatch(
-      /\.model-sheet-modal,[\s\S]*?transform: none;\s*transition: none;/u,
+      /\.model-sheet--modal,[\s\S]*?transform: none;\s*transition: none;/u,
     );
     expect(block).toMatch(
-      /\.model-sheet-overlay button:active:not\(:disabled\),[\s\S]*?transform: none/u,
+      /\.model-sheet--overlay button:active:not\(:disabled\),[\s\S]*?transform: none/u,
     );
     expect(APP_CSS).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?animation-duration: 0\.01ms !important;/u,
     );
-    expect(SHEET_CSS).toMatch(/\.model-sheet-overlay \{[\s\S]*?--model-sheet-ink: var\(--ink\);/u);
+    expect(SHEET_CSS).toMatch(/\.model-sheet--overlay \{[\s\S]*?--model-sheet-ink: var\(--ink\);/u);
     expect(SHEET_CSS).toMatch(
-      /:root\[data-theme='dark'\] \.model-sheet-overlay \{[\s\S]*?--model-sheet-ink: var\(--ink\);/u,
+      /:root\[data-theme='dark'\] \.model-sheet--overlay \{[\s\S]*?--model-sheet-ink: var\(--ink\);/u,
     );
   });
 });

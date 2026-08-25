@@ -63,18 +63,18 @@
   }
 </script>
 
-<!-- @ds surface: inbox-view — attention signals. States: empty · error. -->
+<!-- @ds surface: inbox--view — attention signals. States: empty · error. -->
 <!-- @ds guardrail: inbox fetch + open handlers — Not designer-editable. -->
-<main class="inbox-view">
-  <div class="session-toolbar">
+<main class="inbox--view">
+  <div class="session--toolbar">
     <!-- @ds surface: back-button — quiet back arrow. react-aria Button wiring guarded. -->
     <Button class="back-button" onclick={onBack}>
       Back to sessions
     </Button>
-    <span class="review-count">{items.length} signals</span>
+    <span class="review--count">{items.length} signals</span>
   </div>
-  <section class="inbox-heading">
-    <p class="surface-kicker">Attention inbox</p>
+  <section class="inbox--heading">
+    <p class="surface--eyebrow">Attention inbox</p>
     <h1>Only what needs you</h1>
     <p>
       Signals carry no session content. Opening one reauthenticates and fetches current relay
@@ -84,21 +84,21 @@
   {#if error !== null}
     <div class="inline-alert">{error}</div>
   {/if}
-  <section class="attention-list" aria-live="polite">
+  <section class="attention--list" aria-live="polite">
     {#if items.length === 0}
-      <div class="empty-state">
-        <span class="empty-glyph" aria-hidden="true">✓</span>
+      <div class="empty--state">
+        <span class="empty--icon" aria-hidden="true">✓</span>
         <h3>No attention needed</h3>
         <p>This inbox remains available even when notifications are denied.</p>
       </div>
     {:else}
       {#each items as item (item.lookupId)}
         <Button
-          class={`attention-card attention-${item.attentionClass}`}
+          class={`attention--card attention--${item.attentionClass}`}
           disabled={opening === item.lookupId}
           onclick={() => openItem(item)}
         >
-          <span class="attention-icon" aria-hidden="true">
+          <span class="attention--icon" aria-hidden="true">
             {attentionIcon(item.attentionClass)}
           </span>
           <span>{attentionLabel(item.attentionClass)}</span>
@@ -112,34 +112,34 @@
   </section>
 </main>
 
-<!-- @ds surface: inbox-view — attention signals. Decomposed into this scoped block; inbox-heading,
-     attention-list and attention-icon are owned solely by this component so they move with it.
-     .inbox-heading h1 carries the full merged declaration set from the shared hero/review/inbox/
+<!-- @ds surface: inbox--view — attention signals. Decomposed into this scoped block; inbox--heading,
+     attention--list and attention--icon are owned solely by this component so they move with it.
+     .inbox--heading h1 carries the full merged declaration set from the shared hero/review/inbox/
      enrollment h1 group plus the review/inbox h1 override group;
-     the .enrollment-card h1 half of the first group is owned by Enrollment.svelte and is not
-     reproduced here. .attention-card and its .attention-{needs_input,finished,error} state
+     the .enrollment--card h1 half of the first group is owned by Enrollment.svelte and is not
+     reproduced here. .attention--card and its .attention-{needs_input,finished,error} state
      variants live on the Button primitive, so the original top-level selectors are reproduced with
-     :global(...) and their directly-rendered span/time/strong descendants stay scoped. .inbox-view
+     :global(...) and their directly-rendered span/time/strong descendants stay scoped. .inbox--view
      (shared page-scaffold group with home/session/review at 479-484, 7003-7008, 7532-7538),
-     .attention-card inside the prefers-contrast / forced-colors shared groups (7455, 7483),
-     .session-toolbar / .back-button / .review-count (shared with Review), .inline-alert (composer),
-     .surface-kicker (many), and .empty-state / .empty-glyph (Review/Home) are shared by 2+
+     .attention--card inside the prefers-contrast / forced-colors shared groups (7455, 7483),
+     .session--toolbar / .back-button / .review--count (shared with Review), .inline-alert (composer),
+     .surface--eyebrow (many), and .empty--state / .empty--icon (Review/Home) are shared by 2+
      components and stay global in app.css. Values unchanged. -->
 <style>
   /* @ds surface: routed-frame — shared page scaffold for home / session / review / inbox roots. */
   /* @ds edit: layout — page gutter + safe bottom inset shared by routed surfaces. */
-  .inbox-view {
+  .inbox--view {
     padding: var(--space-8) var(--page-gutter) max(var(--space-16), env(safe-area-inset-bottom));
   }
 
-  /* @ds surface: inbox-heading — inbox surface intro (states: empty · error). */
+  /* @ds surface: inbox--heading — inbox surface intro (states: empty · error). */
   /* @ds slot: heading — surface title + description. */
-  .inbox-heading {
+  .inbox--heading {
     max-width: 58rem;
     padding-bottom: clamp(2.5rem, 7vw, 5rem);
   }
 
-  .inbox-heading h1 {
+  .inbox--heading h1 {
     max-width: 15ch;
     margin: 0;
     color: var(--ink);
@@ -150,7 +150,7 @@
     text-wrap: balance;
   }
 
-  .inbox-heading > p:last-child {
+  .inbox--heading > p:last-child {
     max-width: 43rem;
     margin: var(--space-6) 0 0;
     color: var(--ink-secondary);
@@ -158,12 +158,12 @@
     line-height: 1.65;
   }
 
-  .attention-list {
+  .attention--list {
     display: grid;
     gap: var(--space-4);
   }
 
-  .attention-icon {
+  .attention--icon {
     display: grid;
     width: 2.4rem;
     height: 2.4rem;
@@ -174,7 +174,7 @@
     font-weight: 750;
   }
 
-  :global(.attention-card) {
+  :global(.attention--card) {
     display: grid;
     grid-template-columns: 2.5rem 1fr auto;
     align-items: center;
@@ -192,64 +192,64 @@
       background-color var(--duration-fast) ease;
   }
 
-  :global(.attention-card[data-hovered]) {
+  :global(.attention--card[data-hovered]) {
     border-color: var(--line-strong);
     background: var(--surface-raised);
   }
 
-  :global(.attention-card > span:not(.attention-icon)) {
+  :global(.attention--card > span:not(.attention--icon)) {
     font-size: 0.9rem;
     font-weight: 700;
   }
 
-  :global(.attention-card time) {
+  :global(.attention--card time) {
     color: var(--ink-muted);
     font-size: 0.7rem;
     font-weight: 600;
   }
 
-  :global(.attention-card strong) {
+  :global(.attention--card strong) {
     grid-column: 2 / -1;
     color: var(--ink-secondary);
     font-size: 0.78rem;
     font-weight: 600;
   }
 
-  :global(.attention-needs_input) .attention-icon {
+  :global(.attention--needs_input) .attention--icon {
     background: var(--warning-soft);
     color: var(--warning);
   }
 
-  :global(.attention-finished) .attention-icon {
+  :global(.attention--finished) .attention--icon {
     background: var(--success-soft);
     color: var(--success);
   }
 
-  :global(.attention-error) .attention-icon {
+  :global(.attention--error) .attention--icon {
     background: var(--danger-soft);
     color: var(--danger);
   }
 
   @media (max-width: 39rem) {
-    .inbox-view {
+    .inbox--view {
       padding-top: var(--space-6);
     }
 
-    :global(.attention-card) {
+    :global(.attention--card) {
       grid-template-columns: 2.5rem 1fr;
     }
 
-    :global(.attention-card time) {
+    :global(.attention--card time) {
       grid-column: 2;
     }
 
-    :global(.attention-card strong) {
+    :global(.attention--card strong) {
       grid-column: 2;
     }
   }
 
   /* @ds edit: layout — safe inline gutters for the routed surfaces. */
-  .inbox-view {
+  .inbox--view {
     padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
     padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
   }

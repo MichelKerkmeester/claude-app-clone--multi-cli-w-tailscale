@@ -120,25 +120,25 @@
 {#if draft.mediaAvailable && item !== null}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="artifact-viewer-overlay attachment-preview-overlay" onclick={onOverlayPointer}>
-    <div class="artifact-viewer-modal attachment-preview-modal">
+  <div class="artifact-viewer--overlay attachment-preview-overlay" onclick={onOverlayPointer}>
+    <div class="artifact-viewer--modal attachment-preview-modal">
       <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
       <div
-        class="artifact-viewer-dialog attachment-preview-dialog"
+        class="artifact-viewer--dialog attachment-preview--dialog"
         role="dialog"
         tabindex="-1"
         aria-label="Photo preview"
         bind:this={dialogEl}
         onkeydown={onDialogKeydown}
       >
-        <header class="artifact-viewer-header attachment-preview-header">
-          <div class="artifact-viewer-heading-group">
-            <span class="artifact-viewer-kicker">Local photo</span>
-            <h2 bind:this={headingEl} tabindex="-1" class="artifact-viewer-title">{item.label}</h2>
+        <header class="artifact-viewer--header attachment-preview-header">
+          <div class="artifact-viewer--heading-group">
+            <span class="artifact-viewer--eyebrow">Local photo</span>
+            <h2 bind:this={headingEl} tabindex="-1" class="artifact-viewer--title">{item.label}</h2>
           </div>
           <button
             type="button"
-            class="artifact-viewer-close"
+            class="artifact-viewer--close"
             aria-label="Close preview"
             use:hover
             use:focusVisible
@@ -147,24 +147,24 @@
             <span aria-hidden="true">×</span>
           </button>
         </header>
-        <div class="artifact-viewer-content attachment-preview-content">
-          <p class="artifact-viewer-summary">Local-only preview. No copy has been sent.</p>
-          <div class="attachment-preview-actions" role="group" aria-label="Photo actions">
+        <div class="artifact-viewer--content attachment-preview--content">
+          <p class="artifact-viewer--summary">Local-only preview. No copy has been sent.</p>
+          <div class="attachment-preview--actions" role="group" aria-label="Photo actions">
             <button
               type="button"
-              class="attachment-preview-remove"
+              class="attachment-preview--remove"
               use:hover
               use:press
               use:focusVisible
               onclick={remove}
             >Remove {item.label}</button>
           </div>
-          <div class="attachment-preview-canvas">
+          <div class="attachment-preview--canvas">
             {#if unavailable}
-              <p class="attachment-preview-unavailable" role="status">Photo · preview unavailable</p>
+              <p class="attachment-preview--unavailable" role="status">Photo · preview unavailable</p>
             {:else}
               <img
-                class="attachment-preview-image"
+                class="attachment-preview--image"
                 src={previewUrl}
                 alt={`${item.label} preview`}
                 onerror={() => {
@@ -179,24 +179,24 @@
   </div>
 {/if}
 
-<!-- @ds surface: attachment-preview-dialog — local-photo preview; reuses the artifact-viewer modal
+<!-- @ds surface: attachment-preview--dialog — local-photo preview; reuses the artifact-viewer modal
      chrome (those .artifact-viewer-* rules stay in app.css).
      The react-aria [data-hovered]/[data-pressed]/[data-focus-visible] states on the remove control are
      preserved by the use:hover/use:press/use:focusVisible actions (touch-aware; plain :hover would stick
      after a tap); the reused close control carries use:hover/use:focusVisible for the same reason. The
      scoped remove-control attr rules use :global([data-*]) so Svelte keeps them. Values unchanged. -->
 <style>
-  .attachment-preview-content {
+  .attachment-preview--content {
     align-content: stretch;
   }
 
-  .attachment-preview-actions {
+  .attachment-preview--actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
   }
 
-  .attachment-preview-remove {
+  .attachment-preview--remove {
     min-block-size: 44px;
     padding-inline: var(--space-3);
     border: 1px solid var(--control-border);
@@ -207,17 +207,17 @@
     cursor: pointer;
   }
 
-  .attachment-preview-remove:global([data-hovered]),
-  .attachment-preview-remove:global([data-pressed]) {
+  .attachment-preview--remove:global([data-hovered]),
+  .attachment-preview--remove:global([data-pressed]) {
     background: var(--accent-soft);
   }
 
-  .attachment-preview-remove:global([data-focus-visible]) {
+  .attachment-preview--remove:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
 
-  .attachment-preview-canvas {
+  .attachment-preview--canvas {
     display: grid;
     min-inline-size: 0;
     min-block-size: min(60dvh, 38rem);
@@ -229,14 +229,14 @@
     background: var(--canvas);
   }
 
-  .attachment-preview-image {
+  .attachment-preview--image {
     display: block;
     max-inline-size: 100%;
     max-block-size: min(58dvh, 36rem);
     object-fit: contain;
   }
 
-  .attachment-preview-unavailable {
+  .attachment-preview--unavailable {
     max-inline-size: 28ch;
     margin: 0;
     color: var(--ink-muted);
@@ -247,25 +247,25 @@
   }
 
   @media (max-width: 40rem) {
-    .attachment-preview-canvas {
+    .attachment-preview--canvas {
       min-block-size: min(52dvh, 28rem);
     }
   }
 
   @media (max-width: 20rem) {
-    .attachment-preview-dialog {
+    .attachment-preview--dialog {
       padding-inline: max(var(--space-3), env(safe-area-inset-left))
         max(var(--space-3), env(safe-area-inset-right));
     }
 
-    .attachment-preview-canvas {
+    .attachment-preview--canvas {
       min-block-size: 12rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .attachment-preview-remove,
-    .attachment-preview-image {
+    .attachment-preview--remove,
+    .attachment-preview--image {
       transition: none;
     }
   }

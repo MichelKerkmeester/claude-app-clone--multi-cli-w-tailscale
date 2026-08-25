@@ -14,7 +14,7 @@
 </script>
 
 <div
-  class="inbound-image-well inbound-image-well-placeholder"
+  class="inbound-image--well inbound-image-well-placeholder"
   data-image-well="placeholder"
   data-image-state={state}
   data-no-pixels="true"
@@ -23,5 +23,5 @@
     : undefined}
   aria-hidden="true"
 >
-  <span class="inbound-image-placeholder-pattern"></span>
+  <span class="inbound-image--placeholder-pattern"></span>
 </div>

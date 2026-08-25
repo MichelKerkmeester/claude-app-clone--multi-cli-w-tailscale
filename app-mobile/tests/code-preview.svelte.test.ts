@@ -31,8 +31,8 @@ describe('CodePreview', () => {
       props: { text: source, language: 'typescript', enableHighlighting: false },
     });
     const preview = screen.getByLabelText('Code preview');
-    const code = preview.querySelector('.artifact-code-source');
-    const gutter = preview.querySelector('.artifact-code-gutter');
+    const code = preview.querySelector('.artifact-code--source');
+    const gutter = preview.querySelector('.artifact-code--gutter');
     expect(code?.textContent).toBe(source);
     expect(gutter?.textContent).toBe('12');
     expect(gutter).toHaveAttribute('aria-hidden', 'true');
@@ -75,9 +75,9 @@ describe('CodePreview', () => {
     // textContent is '12 ' + source rather than '12' + source. The behavior
     // under test — the source stays intact and the two matches are marked —
     // is asserted via the gutter, the verbatim source, and the match count.
-    expect(preview.querySelector('.artifact-code-gutter')?.textContent).toBe('12');
+    expect(preview.querySelector('.artifact-code--gutter')?.textContent).toBe('12');
     expect(preview.textContent).toContain(source);
-    expect(preview.querySelectorAll('.artifact-find-match')).toHaveLength(2);
+    expect(preview.querySelectorAll('.artifact-find--match')).toHaveLength(2);
   });
 
   it('stops following after upward scroll and exposes a jump-to-latest action', async () => {

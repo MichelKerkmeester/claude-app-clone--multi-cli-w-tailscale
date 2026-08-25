@@ -80,14 +80,14 @@
   <!-- @ds guardrail: do-not-edit — The exact-copy clipboard boundary; Open is a pass-through with no fetch/endpoint/ticket/download/host-file read. -->
   {#if feedback.canCopy}
     <button
-      class="rich-block-action"
+      class="rich-block--action"
       use:hover
       aria-label={feedback.actionLabel('code')}
       onclick={() => feedback.copy('code', block.canonicalSource)}
     >{feedback.actionLabel('code')}</button>
   {/if}
   {#if canOpen}
-    <button class="rich-block-action" use:hover bind:this={openButton} onclick={() => onOpen?.(openButton)}
+    <button class="rich-block--action" use:hover bind:this={openButton} onclick={() => onOpen?.(openButton)}
       >Open full screen</button>
   {/if}
 {/snippet}
@@ -109,17 +109,17 @@
 >
   <!-- @ds slot: code-preview — horizontally panning viewport; code scrolls inside
        its own box and never overflows the page. -->
-  <div class="rich-code-preview" data-code-pan="true">
+  <div class="rich--code-preview" data-code-pan="true">
     <!-- @ds state: code — plaintext-first; data-highlight-status (plain · pending ·
          highlighted) advances with the worker.
          @ds guardrail: do-not-edit — The status attribute and token rendering are behavior owned by the highlight lifecycle. -->
     <pre aria-label={`${block.languageLabel} code preview`}><code data-highlight-status={highlighted.current.status}>{#if previewTokens === null}{preview}{:else}{#each previewTokens as token, index (index)}<span class={`rich-code-token is-${token.kind}`}>{token.text}</span>{/each}{/if}</code></pre>
   </div>
   {#if lines.length > PREVIEW_LINES}
-    <p class="rich-continuation">{lines.length - PREVIEW_LINES} more lines</p>
+    <p class="rich--continuation">{lines.length - PREVIEW_LINES} more lines</p>
   {/if}
   <!-- @ds guardrail: do-not-edit — Polite live region announcing Copy outcomes. -->
-  <p class="rich-copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
+  <p class="rich--copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
 </RichBlockFrame>
 
 <style>
@@ -129,7 +129,7 @@
   /* @ds state: code — plaintext-first; progressively highlighted via the
      data-highlight-status hook (plain · pending · highlighted). */
   /* @ds guardrail: do-not-edit — panning previews do not shift scroll anchoring. */
-  .rich-code-preview {
+  .rich--code-preview {
     max-block-size: 228px;
     min-inline-size: 0;
     overflow-x: auto;
@@ -139,7 +139,7 @@
   }
 
   /* @ds slot: code well — the code lines scroll inside this mono well. */
-  .rich-code-preview pre {
+  .rich--code-preview pre {
     inline-size: max-content;
     min-inline-size: 100%;
     margin: 0;
@@ -153,7 +153,7 @@
   }
 
   /* @ds slot: labels — code continuation caption (muted small type). */
-  .rich-continuation {
+  .rich--continuation {
     margin: var(--space-2) 0 0;
     color: var(--ink-muted);
     font-size: 0.75rem;
@@ -162,7 +162,7 @@
   /* @ds state: copy — success · failure · unavailable. The Copy announcer line is a
      polite live region whose text carries the outcome; the presence styles are this. */
   /* @ds guardrail: do-not-edit — role="status" aria-live="polite" live region. */
-  .rich-copy-status {
+  .rich--copy-status {
     min-block-size: 1.25rem;
     margin: var(--space-2) 0 0;
     color: var(--ink-muted);

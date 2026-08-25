@@ -39,7 +39,7 @@
   // 3. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // @ds surface: transcript-block — one message block; each kind is its own state seam below.
+  // @ds surface: transcript--block — one message block; each kind is its own state seam below.
   // @ds guardrail: the kind switch, collapsibility, role and header decisions are presentation logic that must stay in lockstep with the block model; not designer-editable.
   // Routine evidence collapses; text, plan, diffs, and tool errors stay expanded.
   const blockDisplay = $derived.by(() => {
@@ -87,7 +87,7 @@
     }
   });
 
-  const roleClass = $derived(block.kind === 'text' ? ` block-role-${block.role ?? 'assistant'}` : '');
+  const roleClass = $derived(block.kind === 'text' ? ` block-role--${block.role ?? 'assistant'}` : '');
   // Text uses role/typography; evidence uses its trigger; bare blocks show label inline; others get header.
   const showHeader = $derived(
     block.kind !== 'file_diff' &&
@@ -101,14 +101,14 @@
 
 {#snippet blockContent()}
   {#if block.kind === 'text'}
-    <p class="block-copy">{block.text}</p>
+    <p class="block--copy">{block.text}</p>
   {:else if block.kind === 'text_artifact'}
-    <pre class="block-copy">{block.source}</pre>
+    <pre class="block--copy">{block.source}</pre>
   {:else if block.kind === 'thinking'}
-    <p class="block-copy quiet-copy">{block.summary}</p>
+    <p class="block--copy quiet-copy">{block.summary}</p>
   {:else if block.kind === 'plan'}
-    <!-- @ds slot: checklist — the plan-list row grid; each row exposes a pending/done state below. -->
-    <ul class="plan-list">
+    <!-- @ds slot: checklist — the plan--list row grid; each row exposes a pending/done state below. -->
+    <ul class="plan--list">
       {#each block.items as item, index (`${block.id}-${index}`)}
         <!-- @ds state: pending (○) · done (✓) — the `done` class selects the item state; the -->
         <!--   The inline glyph and text below are rendered by this branch. -->
@@ -139,8 +139,8 @@
       </span>
     </div>
   {:else if block.kind === 'attachment'}
-    <div class="redacted-attachment-card" role="status">
-      <span class="redacted-attachment-glyph" aria-hidden="true">
+    <div class="redacted-attachment--card" role="status">
+      <span class="redacted-attachment--icon" aria-hidden="true">
         ◇
       </span>
       <div>
@@ -149,7 +149,7 @@
           Photo {block.ordinal} was delivered without keeping image content in this transcript.
         </p>
       </div>
-      <span class="redacted-attachment-status">
+      <span class="redacted-attachment--status">
         {block.status === 'delivered' ? 'Delivered' : 'Delivery unknown'}
       </span>
     </div>
@@ -163,13 +163,13 @@
       principal={askQuestionPrincipal}
     />
   {:else if block.kind === 'unknown'}
-    <p class="block-copy quiet-copy" data-unsupported-kind={block.originalKind}>
+    <p class="block--copy quiet-copy" data-unsupported-kind={block.originalKind}>
       A redacted “{block.originalKind}” block cannot be displayed by this client.
     </p>
   {/if}
 {/snippet}
 
-<article class={`transcript-block block-${block.kind}${roleClass}${bare ? ' block-bare' : ''}`}>
+<article class={`transcript--block block--${block.kind}${roleClass}${bare ? ' block--bare' : ''}`}>
   <!-- @ds slot: header — block label + timestamp. -->
   {#if showHeader}
     <header>
@@ -188,20 +188,20 @@
   <!--   (code, command output, text artifacts) slots onto a block; not rendered here yet. -->
 </article>
 
-<!-- @ds surface: transcript-block — one message block; each kind is a state seam below.
-     Decomposed into this scoped block; the block-owned article/header/copy-grid/plan-list/usage/
-     redacted-attachment selectors move scoped here. block-copy, quiet-copy, and the solo
+<!-- @ds surface: transcript--block — one message block; each kind is a state seam below.
+     Decomposed into this scoped block; the block-owned article/header/copy-grid/plan--list/usage/
+     redacted-attachment selectors move scoped here. block--copy, quiet-copy, and the solo
      block-role-* rules stay global (shared with RichContentRouter and InboundImageBlockView).
      Values unchanged. -->
 <style>
   /* Ask-question answers stay in the transcript; the host remains the only authority. */
-  .block-ask-question {
+  .block--ask-question {
     overflow: visible;
     border: 0;
     background: transparent;
   }
 
-  .redacted-attachment-card {
+  .redacted-attachment--card {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: var(--space-3);
@@ -213,7 +213,7 @@
     background: var(--surface-raised);
   }
 
-  .redacted-attachment-glyph {
+  .redacted-attachment--icon {
     display: grid;
     inline-size: 2.5rem;
     block-size: 2.5rem;
@@ -225,12 +225,12 @@
     font-size: 1.2rem;
   }
 
-  .redacted-attachment-card strong {
+  .redacted-attachment--card strong {
     color: var(--ink);
     font-size: 0.9rem;
   }
 
-  .redacted-attachment-card p {
+  .redacted-attachment--card p {
     margin: 2px 0 0;
     color: var(--ink-muted);
     font-family: var(--font-display);
@@ -238,7 +238,7 @@
     line-height: 1.4;
   }
 
-  .redacted-attachment-status {
+  .redacted-attachment--status {
     color: var(--ink-muted);
     font-size: 0.72rem;
     font-weight: 650;
@@ -246,17 +246,17 @@
   }
 
   @media (max-width: 40rem) {
-    .redacted-attachment-card {
+    .redacted-attachment--card {
       grid-template-columns: auto minmax(0, 1fr);
     }
 
-    .redacted-attachment-status {
+    .redacted-attachment--status {
       grid-column: 2;
     }
   }
 
-  /* @ds surface: transcript-block — one message block; each kind is a state seam below. */
-  .transcript-block {
+  /* @ds surface: transcript--block — one message block; each kind is a state seam below. */
+  .transcript--block {
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
@@ -264,17 +264,17 @@
   }
 
   /* @ds state: text */
-  .block-text {
+  .block--text {
     border-color: color-mix(in oklch, var(--accent) 30%, var(--line));
     background: var(--surface-raised);
   }
 
-  .block-text:has(header span:first-child) {
+  .block--text:has(header span:first-child) {
     scroll-margin-block: 6rem;
   }
 
   /* @ds slot: header — block label + timestamp row. */
-  .transcript-block > header {
+  .transcript--block > header {
     display: flex;
     justify-content: space-between;
     gap: var(--space-3);
@@ -287,19 +287,19 @@
   }
 
   /* @ds slot: header-time — mono timestamp. */
-  .transcript-block > header time {
+  .transcript--block > header time {
     font-family: var(--font-mono);
     font-size: 0.64rem;
     font-variant-numeric: tabular-nums;
   }
 
-  .block-text > header span,
-  .block-plan > header span {
+  .block--text > header span,
+  .block--plan > header span {
     color: var(--accent-ink);
   }
 
   /* @ds state: text-user — compact, trailing-aligned bubble. */
-  .transcript-block.block-role-user {
+  .transcript--block.block-role--user {
     width: fit-content;
     max-width: min(82%, 46ch);
     margin-inline-start: auto;
@@ -309,7 +309,7 @@
   }
 
   /* @ds state: text-assistant — borderless serif prose reply. */
-  .transcript-block.block-role-assistant {
+  .transcript--block.block-role--assistant {
     border: none;
     border-radius: 0;
     background: transparent;
@@ -319,7 +319,7 @@
   /* @ds state: plan — checklist items. */
   /* @ds guardrail: the item `done` state comes from the plan block model; done derivation and
      plan-mode gating live in the model/reducer, never in a style edit. */
-  .plan-list {
+  .plan--list {
     display: grid;
     gap: var(--space-3);
     margin: 0;
@@ -328,7 +328,7 @@
   }
 
   /* @ds state: pending — an open (○) item; the glyph renders in `li > span`. */
-  .plan-list li {
+  .plan--list li {
     display: grid;
     grid-template-columns: 1.4rem 1fr;
     align-items: start;
@@ -337,25 +337,25 @@
   }
 
   /* @ds slot: glyph — the ✓/○ marker. */
-  .plan-list li > span {
+  .plan--list li > span {
     color: var(--accent-ink);
     font-weight: 700;
   }
 
   /* @ds state: done — a completed (✓) item. */
-  .plan-list .done {
+  .plan--list .done {
     color: var(--ink-muted);
   }
 
   /* @ds state: done · glyph — the ✓ marker switches to success. */
-  .plan-list .done > span {
+  .plan--list .done > span {
     color: var(--success);
   }
 
   /* @ds end surface: plan-todo */
 
   /* @ds state: tool_call · tool_result — monospace output (danger variant below). */
-  .transcript-block pre {
+  .transcript--block pre {
     max-height: 26rem;
     margin: 0;
     padding: var(--space-4) var(--space-6);
@@ -370,13 +370,13 @@
   }
 
   /* @ds state: tool_result+error — danger output. */
-  .transcript-block .error-output {
+  .transcript--block .error-output {
     color: oklch(0.82 0.1 25);
   }
 
   /* ── Read-only artifact card and viewer ──────────────────────────────── */
   /* @ds state: file_diff — diff card (the rich-content card seam slots here). */
-  .transcript-block.block-file_diff {
+  .transcript--block.block--file_diff {
     overflow: visible;
     border: 0;
     background: transparent;
@@ -409,13 +409,13 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .transcript-block.block-bare {
+  .transcript--block.block--bare {
     border: none;
     border-radius: 0;
     background: transparent;
   }
 
-  .block-bare > header {
+  .block--bare > header {
     padding-inline: 0;
   }
 

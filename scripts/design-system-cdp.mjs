@@ -227,7 +227,7 @@ async function exerciseDefaultSurface(client, theme, outputPath, viewportWidth) 
   );
   await navigate(client, `${DEV_URL}/`);
   await waitForPage(client, 'document.querySelector(".home-view") !== null');
-  await waitForPage(client, 'document.querySelector(".session-card") !== null');
+  await waitForPage(client, 'document.querySelector(".session--card") !== null');
 
   const state = await evaluate(
     client,

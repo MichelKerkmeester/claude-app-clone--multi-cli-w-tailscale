@@ -38,7 +38,7 @@
       oninput={(event) => onChange(event.currentTarget.value)}
     ></textarea>
     {#if viewModel.display.freeText.maxLength !== undefined}
-      <span class="ask-question-free-text-count">
+      <span class="ask-question-free-text--count">
         {value.length}/{viewModel.display.freeText.maxLength}
       </span>
     {/if}
@@ -93,7 +93,7 @@
     opacity: 0.58;
   }
 
-  .ask-question-free-text-count {
+  .ask-question-free-text--count {
     justify-self: end;
     color: var(--ink-muted);
     font-size: 0.72rem;

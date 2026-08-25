@@ -112,7 +112,7 @@ afterEach(() => {
   vi.restoreAllMocks();
   window.history.replaceState({}, '', '/');
   document.documentElement.removeAttribute('data-artifact-viewer-open');
-  document.getElementById('artifact-viewer-privacy-curtain')?.remove();
+  document.getElementById('artifact-viewer--privacy-curtain')?.remove();
 });
 
 // ───────────────────────────────────────────────────────────────────
@@ -167,7 +167,7 @@ describe('ArtifactViewer', () => {
     renderCards();
 
     const { dialog } = await openFirst();
-    const patch = dialog.querySelector('.artifact-diff-preview');
+    const patch = dialog.querySelector('.artifact-diff--preview');
     expect(patch).not.toBeNull();
     expect(patch?.textContent).toBe(FIRST.patch);
     expect(screen.getByRole('button', { name: 'Close file diff viewer' })).toBeInTheDocument();
@@ -188,12 +188,12 @@ describe('ArtifactViewer', () => {
     expect(Object.isFrozen(api?.preview?.source ?? null)).toBe(true);
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(webSocketSpy).not.toHaveBeenCalled();
-    expect(document.querySelector('.artifact-diff-preview')?.textContent).toBe(FIRST.patch);
+    expect(document.querySelector('.artifact-diff--preview')?.textContent).toBe(FIRST.patch);
   });
 
   it('restores transcript scroll and originating focus after Close', async () => {
     renderCards();
-    const scroll = document.querySelector('.transcript-scroll');
+    const scroll = document.querySelector('.transcript--scroll');
     if (!(scroll instanceof HTMLElement)) throw new Error('transcript scroll missing');
     scroll.scrollTop = 137;
 
@@ -270,11 +270,11 @@ describe('ArtifactViewer', () => {
     api.openDiff(SECOND, secondTrigger);
     await waitFor(() => {
       expect(document.querySelector('[data-artifact-state="ready-diff"]')).not.toBeNull();
-      expect(document.querySelector('.artifact-viewer-summary')).toHaveTextContent(
+      expect(document.querySelector('.artifact-viewer--summary')).toHaveTextContent(
         'Second redacted diff',
       );
     });
-    expect(document.querySelector('.artifact-viewer-summary')).not.toHaveTextContent(
+    expect(document.querySelector('.artifact-viewer--summary')).not.toHaveTextContent(
       'First redacted diff',
     );
   });

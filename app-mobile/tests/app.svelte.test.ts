@@ -589,7 +589,7 @@ it('renders one todo panel at its sync position through the real Session and sta
   expect(screen.getByText('Render through Session state')).toBeVisible();
   expect(
     container
-      .querySelector('.activity-group')
+      .querySelector('.activity--group')
       ?.contains(container.querySelector('[data-todo-panel]')),
   ).toBe(false);
 
@@ -714,7 +714,7 @@ it('preserves long translated order and safe error associations under RTL and la
     expect(root).toHaveAttribute('dir', 'rtl');
     expect(option.textContent).toContain(longDisplay.display.options[0]?.label);
     expect(
-      [...region.querySelectorAll('.ask-question-option-row')].map((row) => row.textContent),
+      [...region.querySelectorAll('.ask-question-option--row')].map((row) => row.textContent),
     ).toEqual([expect.stringContaining('exceptionally long translated answer label')]);
 
     await user.type(textarea, ' ');

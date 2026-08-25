@@ -26,10 +26,10 @@
 
 {#if viewModel.display.options.length > 0}
   <!-- @ds slot: options — the choice fieldset; legend + the stacked option-row list. -->
-  <fieldset class="ask-question-options" {disabled}>
+  <fieldset class="ask-question--options" {disabled}>
     <legend>{selectionLabel}</legend>
     <!-- @ds slot: option-list — the stacked option rows. -->
-    <div class="ask-question-option-list">
+    <div class="ask-question-option--list">
       {#each viewModel.display.options as option (option.id)}
         <AskQuestionOptionRow
           {option}
@@ -46,14 +46,14 @@
 <!-- @ds surface: ask-question option-list — the choice fieldset + stacked rows (rows are a child component). Decomposed into this scoped block; values unchanged. -->
 <style>
   /* @ds slot: options — the choice fieldset. */
-  .ask-question-options {
+  .ask-question--options {
     min-inline-size: 0;
     margin: 0;
     padding: 0;
     border: 0;
   }
 
-  .ask-question-options legend {
+  .ask-question--options legend {
     margin-block-end: var(--space-2);
     color: var(--ink-muted);
     font-size: 0.78rem;
@@ -61,7 +61,7 @@
   }
 
   /* @ds slot: option-list — the stacked option rows. */
-  .ask-question-option-list {
+  .ask-question-option--list {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-2);

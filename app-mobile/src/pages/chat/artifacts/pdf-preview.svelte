@@ -216,30 +216,30 @@
 <!-- @ds state: loading · ready · corrupt · too-large · withheld — [data-pdf-state] each. -->
 <!-- @ds guardrail: do-not-edit — The worker disables annotations/XFA, pages and canvases stay bounded, and text renders only after relay attestation. -->
 <section class="pdf-preview" aria-label="Sanitized PDF preview" data-pdf-state={pdfState}>
-  <div class="pdf-preview-controls" role="group" aria-label="PDF controls">
-    <button type="button" class="artifact-control-button" onclick={() => (currentPage = Math.max(1, currentPage - 1))} disabled={currentPage <= 1 || pageCount === 0}>Previous</button>
-    <span class="pdf-page-indicator" aria-live="polite">{pageCount === 0 ? 'Page —' : `Page ${currentPage} of ${pageCount}`}</span>
-    <button type="button" class="artifact-control-button" onclick={() => (currentPage = Math.min(pageCount, currentPage + 1))} disabled={pageCount === 0 || currentPage >= pageCount}>Next</button>
-    <button type="button" class="artifact-control-button" onclick={() => { fitWidth = true; zoom = 1; }}>Fit width</button>
-    <button type="button" class="artifact-control-button" onclick={() => { fitWidth = false; zoom = clampZoom(zoom - 0.25); }} disabled={zoom <= PDF_PREVIEW_MIN_ZOOM && !fitWidth}>Zoom out</button>
-    <button type="button" class="artifact-control-button" onclick={() => { fitWidth = false; zoom = clampZoom(zoom + 0.25); }} disabled={zoom >= PDF_PREVIEW_MAX_ZOOM}>Zoom in</button>
+  <div class="pdf-preview--controls" role="group" aria-label="PDF controls">
+    <button type="button" class="artifact--control-button" onclick={() => (currentPage = Math.max(1, currentPage - 1))} disabled={currentPage <= 1 || pageCount === 0}>Previous</button>
+    <span class="pdf--page-indicator" aria-live="polite">{pageCount === 0 ? 'Page —' : `Page ${currentPage} of ${pageCount}`}</span>
+    <button type="button" class="artifact--control-button" onclick={() => (currentPage = Math.min(pageCount, currentPage + 1))} disabled={pageCount === 0 || currentPage >= pageCount}>Next</button>
+    <button type="button" class="artifact--control-button" onclick={() => { fitWidth = true; zoom = 1; }}>Fit width</button>
+    <button type="button" class="artifact--control-button" onclick={() => { fitWidth = false; zoom = clampZoom(zoom - 0.25); }} disabled={zoom <= PDF_PREVIEW_MIN_ZOOM && !fitWidth}>Zoom out</button>
+    <button type="button" class="artifact--control-button" onclick={() => { fitWidth = false; zoom = clampZoom(zoom + 0.25); }} disabled={zoom >= PDF_PREVIEW_MAX_ZOOM}>Zoom in</button>
     {#if block.textLayerSafe === true}
-      <label class="artifact-find-control">
+      <label class="artifact-find--control">
         <span>Search</span>
         <input type="search" value={findTerm} oninput={(event) => onFindTermChange?.(event.currentTarget.value)} aria-label="Search verified PDF text" />
       </label>
     {/if}
   </div>
-  {#if message !== null}<p class="artifact-preview-message" role="alert">{message}</p>{/if}
-  {#if pdfState === 'loading'}<p class="artifact-preview-message" role="status">Loading controlled PDF pages.</p>{/if}
-  <div bind:this={scrollEl} class="pdf-preview-scroll" onscroll={onScroll} data-pdf-rendered-pages={visiblePages.length}>{#if pdfState === 'ready' && pdfDocument !== null}{@const readyDocument = pdfDocument}{#each visiblePages as pageNumber (`${block.revision}-${pageNumber}-${scale}`)}<PdfPage pdfDocument={readyDocument} pageNumber={pageNumber} scale={scale} textLayerSafe={block.textLayerSafe === true} findTerm={findTerm} onStateChange={onPageState} />{/each}{/if}</div>
+  {#if message !== null}<p class="artifact-preview--message" role="alert">{message}</p>{/if}
+  {#if pdfState === 'loading'}<p class="artifact-preview--message" role="status">Loading controlled PDF pages.</p>{/if}
+  <div bind:this={scrollEl} class="pdf-preview--scroll" onscroll={onScroll} data-pdf-rendered-pages={visiblePages.length}>{#if pdfState === 'ready' && pdfDocument !== null}{@const readyDocument = pdfDocument}{#each visiblePages as pageNumber (`${block.revision}-${pageNumber}-${scale}`)}<PdfPage pdfDocument={readyDocument} pageNumber={pageNumber} scale={scale} textLayerSafe={block.textLayerSafe === true} findTerm={findTerm} onStateChange={onPageState} />{/each}{/if}</div>
 </section>
 
 <!-- @ds surface: pdf-preview — the controlled PDF.js reader shell: controls, page indicator, and the
      page scroll column (individual pages are the PdfPage child). Decomposed into this scoped block; all
-     single-component and static. .pdf-preview-controls was grouped with the different
-     .image-preview-controls (ImagePreview) — only the pdf slice moves here. The shared .pdf-page /
-     .pdf-preview-shared and the .artifact-control-button / .artifact-find-control on the toolbar stay
+     single-component and static. .pdf-preview--controls was grouped with the different
+     .image-preview--controls (ImagePreview) — only the pdf slice moves here. The shared .pdf-page /
+     .pdf-preview-shared and the .artifact--control-button / .artifact-find--control on the toolbar stay
      global (→ app.css at cutover). Literal hex preserved. Values unchanged. -->
 <style>
   /* @ds slot: pdf-preview — the reader shell. */
@@ -250,7 +250,7 @@
   }
 
   /* @ds slot: pdf-controls — the PDF toolbar row. */
-  .pdf-preview-controls {
+  .pdf-preview--controls {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
@@ -258,7 +258,7 @@
   }
 
   /* @ds slot: page-indicator — the "Page N of M" read-out. */
-  .pdf-page-indicator {
+  .pdf--page-indicator {
     min-block-size: 2.75rem;
     padding-inline: var(--space-2);
     color: var(--ink-secondary);
@@ -267,7 +267,7 @@
 
   /* @ds slot: page-scroll — the bounded, contained page scroll column. */
   /* @ds guardrail: do-not-edit — Bounded reading well; overscroll contained so panning never chains. */
-  .pdf-preview-scroll {
+  .pdf-preview--scroll {
     display: grid;
     min-block-size: 12rem;
     max-block-size: min(70vh, 48rem);

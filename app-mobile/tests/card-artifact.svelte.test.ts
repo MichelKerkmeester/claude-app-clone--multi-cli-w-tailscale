@@ -59,7 +59,7 @@ describe('ArtifactCard', () => {
   it('keeps the six-line peek noninteractive and preserves diff prefixes', () => {
     renderCard();
 
-    const lines = document.querySelectorAll('.artifact-card-peek-line');
+    const lines = document.querySelectorAll('.artifact-card-peek--line');
     expect(lines).toHaveLength(6);
     expect(lines[1]).toHaveTextContent('-old');
     expect(lines[2]).toHaveTextContent('+new');

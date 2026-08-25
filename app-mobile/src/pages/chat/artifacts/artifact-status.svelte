@@ -98,9 +98,9 @@
 
 <!-- @ds surface: artifact-status — the polite status + assertive terminal-alert live regions. -->
 <!-- @ds guardrail: do-not-edit — The status and alert live regions use fixed roles, live settings, and atomic announcements as the accessibility contract. -->
-<div class="artifact-viewer-status" role="status" aria-live="polite" aria-atomic="true">{announcedMessage}</div>
+<div class="artifact-viewer--status" role="status" aria-live="polite" aria-atomic="true">{announcedMessage}</div>
 {#if terminalMessage !== null}
-  <div class="artifact-viewer-terminal-alert" role="alert" aria-live="assertive" aria-atomic="true">{terminalMessage}</div>
+  <div class="artifact-viewer--terminal-alert" role="alert" aria-live="assertive" aria-atomic="true">{terminalMessage}</div>
 {/if}
 
 <!-- @ds surface: artifact-status — the polite status + assertive terminal-alert live regions.
@@ -108,7 +108,7 @@
      (sr-only) pattern. Values unchanged. -->
 <style>
   /* @ds slot: status — the polite status live region. */
-  .artifact-viewer-status {
+  .artifact-viewer--status {
     min-block-size: 2.75rem;
     padding-block: var(--space-3);
     color: var(--ink-muted);
@@ -118,7 +118,7 @@
 
   /* @ds slot: terminal-alert — the visually-hidden assertive alert live region. */
   /* @ds guardrail: do-not-edit — Visually hidden but present for assistive tech; this is the announcement contract. */
-  .artifact-viewer-terminal-alert {
+  .artifact-viewer--terminal-alert {
     position: absolute;
     width: 1px;
     height: 1px;

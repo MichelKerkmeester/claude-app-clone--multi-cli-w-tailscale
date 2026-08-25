@@ -248,24 +248,24 @@ describe('ask-question accessibility palette and state contract', () => {
 
   it('uses carbon selected rows, clay focus rings, and safe responsive primitives', () => {
     expect(STYLE).toMatch(
-      /\.ask-question-option-row\[aria-pressed='true'\][\s\S]*?background: var\(--surface-code\);[\s\S]*?color: var\(--ink-inverse\);/u,
+      /\.ask-question-option--row\[aria-pressed='true'\][\s\S]*?background: var\(--surface-code\);[\s\S]*?color: var\(--ink-inverse\);/u,
     );
     expect(STYLE).toMatch(
-      /\.ask-question-option-row:focus-visible[\s\S]*?outline: 3px solid var\(--accent-ink\);[\s\S]*?box-shadow: 0 0 0 1px var\(--surface-raised\);/u,
+      /\.ask-question-option--row:focus-visible[\s\S]*?outline: 3px solid var\(--accent-ink\);[\s\S]*?box-shadow: 0 0 0 1px var\(--surface-raised\);/u,
     );
     expect(STYLE).toMatch(/\.ask-question-card[\s\S]*?max-inline-size: 100%;/u);
     expect(STYLE).toMatch(/\.ask-question-free-text textarea[\s\S]*?scroll-margin-block:/u);
-    expect(STYLE).toMatch(/\.ask-question-option-row[\s\S]*?min-block-size: 44px;/u);
-    expect(STYLE).toMatch(/\.ask-question-submit[\s\S]*?min-block-size: 44px;/u);
+    expect(STYLE).toMatch(/\.ask-question-option--row[\s\S]*?min-block-size: 44px;/u);
+    expect(STYLE).toMatch(/\.ask-question--submit[\s\S]*?min-block-size: 44px;/u);
     expect(STYLE).not.toMatch(
-      /\.ask-question-option-row\[aria-pressed='true'\]\s*\{[^}]*background: var\(--accent\);/u,
+      /\.ask-question-option--row\[aria-pressed='true'\]\s*\{[^}]*background: var\(--accent\);/u,
     );
   });
 
   it('removes ask-question progress motion without removing status text', () => {
-    expect(STYLE).toMatch(/\.ask-question-card-submitting::before[\s\S]*?animation:/u);
+    expect(STYLE).toMatch(/\.ask-question-card--submitting::before[\s\S]*?animation:/u);
     expect(STYLE).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.ask-question-card-submitting::before[\s\S]*?display: none;/u,
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.ask-question-card--submitting::before[\s\S]*?display: none;/u,
     );
     expect(STYLE).toMatch(/\.ask-question-status[\s\S]*?line-height: 1\.4;/u);
   });
@@ -282,18 +282,18 @@ describe('todo projection accessibility and frozen visual contract', () => {
     const panelRule = STYLE.match(/\.todo-panel\s*\{[^}]*\}/u)?.[0] ?? '';
     expect(panelRule).toContain('background: transparent;');
     expect(panelRule).not.toContain('box-shadow');
-    expect(STYLE).toMatch(/\.todo-progress-hairline > span[\s\S]*?background: var\(--accent\);/u);
-    expect(STYLE).toMatch(/\.todo-progress-count[\s\S]*?color: var\(--ink\);/u);
-    expect(STYLE).toMatch(/\.todo-task-state[\s\S]*?color: var\(--ink-muted\);/u);
+    expect(STYLE).toMatch(/\.todo-progress--hairline > span[\s\S]*?background: var\(--accent\);/u);
+    expect(STYLE).toMatch(/\.todo-progress--count[\s\S]*?color: var\(--ink\);/u);
+    expect(STYLE).toMatch(/\.todo-task--state[\s\S]*?color: var\(--ink-muted\);/u);
   });
 
   it('keeps controls and static rows at least 44px with carbon focus', () => {
     expect(STYLE).toMatch(
-      /\.todo-refresh,[\s\S]*?\.todo-section-trigger[\s\S]*?min-inline-size: 44px;[\s\S]*?min-block-size: 44px;/u,
+      /\.todo--refresh,[\s\S]*?\.todo-section--trigger[\s\S]*?min-inline-size: 44px;[\s\S]*?min-block-size: 44px;/u,
     );
-    expect(STYLE).toMatch(/\.todo-task-row[\s\S]*?min-block-size: 44px;/u);
+    expect(STYLE).toMatch(/\.todo-task--row[\s\S]*?min-block-size: 44px;/u);
     expect(STYLE).toMatch(
-      /\.todo-refresh\[data-focus-visible\],[\s\S]*?outline: 2px solid var\(--focus\);/u,
+      /\.todo--refresh\[data-focus-visible\],[\s\S]*?outline: 2px solid var\(--focus\);/u,
     );
   });
 
@@ -301,9 +301,9 @@ describe('todo projection accessibility and frozen visual contract', () => {
     const panelRule = STYLE.match(/\.todo-panel\s*\{[^}]*\}/u)?.[0] ?? '';
     expect(panelRule).toContain('env(safe-area-inset-bottom)');
     expect(STYLE).toMatch(
-      /\.todo-panel-header[\s\S]*?position: sticky;[\s\S]*?inset-block-start: 0;/u,
+      /\.todo-panel--header[\s\S]*?position: sticky;[\s\S]*?inset-block-start: 0;/u,
     );
-    expect(STYLE).toMatch(/\.todo-live-region[\s\S]*?position: absolute;[\s\S]*?clip: rect/u);
+    expect(STYLE).toMatch(/\.todo--live-region[\s\S]*?position: absolute;[\s\S]*?clip: rect/u);
   });
 
   it('removes pulse and layout transitions under reduced motion and stops the live region from scrolling', () => {
@@ -311,16 +311,16 @@ describe('todo projection accessibility and frozen visual contract', () => {
       /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.todo-panel \*[\s\S]*?animation: none !important;[\s\S]*?transition: none !important;[\s\S]*?transform: none !important;/u,
     );
     expect(STYLE).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.todo-progress-hairline > span[\s\S]*?transition: none !important;/u,
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.todo-progress--hairline > span[\s\S]*?transition: none !important;/u,
     );
   });
 
   it('mirrors the chevron and progress origin in RTL without inverting row order', () => {
     expect(STYLE).toMatch(
-      /\[dir='rtl'\][\s\S]*?\.todo-section-chevron[\s\S]*?transform: rotate\(-90deg\);/u,
+      /\[dir='rtl'\][\s\S]*?\.todo-section--chevron[\s\S]*?transform: rotate\(-90deg\);/u,
     );
     expect(STYLE).toMatch(
-      /\[dir='rtl'\][\s\S]*?\.todo-progress-hairline > span[\s\S]*?transform-origin: inline-end;/u,
+      /\[dir='rtl'\][\s\S]*?\.todo-progress--hairline > span[\s\S]*?transform-origin: inline-end;/u,
     );
   });
 });
@@ -330,19 +330,19 @@ describe('plan-mode hardening style contract', () => {
     expect(STYLE).toMatch(/min-width: 320px/u);
     expect(STYLE).toMatch(/@media \(max-width: 27rem\)/u);
     expect(STYLE).toMatch(
-      /\.composer-plus,[\s\S]*?\.composer-primary,[\s\S]*?min-inline-size: 44px;[\s\S]*?min-block-size: 44px;/u,
+      /\.composer--plus,[\s\S]*?\.composer--primary,[\s\S]*?min-inline-size: 44px;[\s\S]*?min-block-size: 44px;/u,
     );
-    expect(STYLE).toMatch(/\.plan-ready-review[^}]*?min-block-size: 44px;/u);
+    expect(STYLE).toMatch(/\.plan-ready--review[^}]*?min-block-size: 44px;/u);
   });
 
   it('uses carbon-contrast boundaries and never raw clay as a plan focus ring', () => {
     expect(STYLE).toMatch(
-      /\.plan-mode-button\.is-plan \{[\s\S]*?border-color: var\(--line-strong\);[\s\S]*?color: var\(--accent-ink\);/u,
+      /\.plan-mode--button\.is-plan \{[\s\S]*?border-color: var\(--line-strong\);[\s\S]*?color: var\(--accent-ink\);/u,
     );
     expect(STYLE).toMatch(
-      /\.composer-tray\.is-plan-mode \{[\s\S]*?border-color: var\(--line-strong\);/u,
+      /\.composer--tray\.is-plan-mode \{[\s\S]*?border-color: var\(--line-strong\);/u,
     );
-    const focusRule = STYLE.match(/\.plan-mode-button\[data-focus-visible\]\s*\{[^}]*\}/u)?.[0];
+    const focusRule = STYLE.match(/\.plan-mode--button\[data-focus-visible\]\s*\{[^}]*\}/u)?.[0];
     expect(focusRule).toContain('outline: 2px solid var(--focus);');
     expect(focusRule).not.toContain('var(--accent)');
   });
@@ -350,7 +350,7 @@ describe('plan-mode hardening style contract', () => {
   it('isolates prose direction and LTR revision values', () => {
     expect(STYLE).toMatch(/\[dir='auto'\][\s\S]*?unicode-bidi: plaintext;/u);
     expect(STYLE).toMatch(
-      /\.plan-review-revision,[\s\S]*?direction: ltr;[\s\S]*?unicode-bidi: isolate;/u,
+      /\.plan-review--revision,[\s\S]*?direction: ltr;[\s\S]*?unicode-bidi: isolate;/u,
     );
   });
 

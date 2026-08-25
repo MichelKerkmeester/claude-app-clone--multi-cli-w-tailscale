@@ -173,7 +173,7 @@
 
 <div
   bind:this={wellEl}
-  class={showPixels ? 'inbound-image-well inbound-image-well-ready' : 'inbound-image-well'}
+  class={showPixels ? 'inbound-image--well inbound-image-well-ready' : 'inbound-image--well'}
   data-image-well={showPixels ? 'verified' : 'placeholder'}
   data-verified-image={showPixels ? 'true' : undefined}
   data-image-state={lifecycleState ?? stateForResourceStatus(resource.current.status) ?? 'deferred'}
@@ -183,7 +183,7 @@
 >
   {#if showPixels}
     <img
-      class="inbound-image-thumbnail"
+      class="inbound-image--thumbnail"
       src={resource.current.objectUrl}
       alt=""
       draggable={false}
@@ -194,16 +194,16 @@
       }}
     />
   {:else}
-    <span class="inbound-image-placeholder-pattern"></span>
+    <span class="inbound-image--placeholder-pattern"></span>
   {/if}
 </div>
 
-<!-- @ds surface: inbound-image-thumbnail — the decoded inbound image inside the well. Decomposed into this scoped block;
-     the well itself (.inbound-image-well) is shared with ImagePlaceholder and stays global.
+<!-- @ds surface: inbound-image--thumbnail — the decoded inbound image inside the well. Decomposed into this scoped block;
+     the well itself (.inbound-image--well) is shared with ImagePlaceholder and stays global.
      Values unchanged. -->
 <style>
   /* @ds slot: thumbnail — the contained, non-interactive decoded image. */
-  .inbound-image-thumbnail {
+  .inbound-image--thumbnail {
     display: block;
     inline-size: 100%;
     block-size: 100%;

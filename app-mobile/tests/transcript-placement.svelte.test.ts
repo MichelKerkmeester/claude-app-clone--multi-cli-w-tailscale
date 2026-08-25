@@ -173,7 +173,7 @@ describe('transcript inline image placement', () => {
     await waitFor(() =>
       expect(container.querySelectorAll('[data-inbound-image-card="true"]')).toHaveLength(4),
     );
-    const activity = container.querySelector('.activity-group');
+    const activity = container.querySelector('.activity--group');
     const cards = [...container.querySelectorAll('[data-inbound-image-card="true"]')];
     const toolImage = cards[0] ?? null;
     const assistantImage = cards[2] ?? null;
@@ -183,11 +183,11 @@ describe('transcript inline image placement', () => {
     expect(activity?.contains(toolImage)).toBe(false);
 
     const stack = toolImage?.parentElement?.parentElement;
-    expect(stack).toHaveClass('inbound-image-stack');
+    expect(stack).toHaveClass('inbound-image--stack');
     expect(stack?.querySelectorAll('[data-inbound-image-card="true"]')).toHaveLength(2);
-    expect(container.querySelectorAll('.inbound-image-stack')).toHaveLength(2);
-    expect(container.querySelectorAll('.turn-actions')).toHaveLength(1);
-    const actions = container.querySelector('.turn-actions');
+    expect(container.querySelectorAll('.inbound-image--stack')).toHaveLength(2);
+    expect(container.querySelectorAll('.turn--actions')).toHaveLength(1);
+    const actions = container.querySelector('.turn--actions');
     expect(actions).not.toBeNull();
     expect(
       assistantImage?.compareDocumentPosition(actions as Node) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -211,18 +211,18 @@ describe('transcript inline image placement', () => {
     });
     const { container } = rendered;
 
-    const marker = container.querySelector('.streaming-marker');
-    const label = container.querySelector('.streaming-label');
+    const marker = container.querySelector('.streaming--marker');
+    const label = container.querySelector('.streaming--label');
     expect(marker).toHaveAttribute('role', 'status');
     expect(marker).toHaveAttribute('aria-live', 'polite');
     expect(marker).toHaveAttribute('aria-atomic', 'true');
     expect(label).toHaveTextContent('Working…');
-    expect(container.querySelector('.streaming-glyph')).not.toHaveClass('is-stalled');
+    expect(container.querySelector('.streaming--icon')).not.toHaveClass('is-stalled');
 
     await vi.advanceTimersByTimeAsync(1_000);
 
     expect(label?.textContent).not.toBe('Working…');
-    expect(container.querySelector('.streaming-glyph')).toHaveClass('is-stalled');
+    expect(container.querySelector('.streaming--icon')).toHaveClass('is-stalled');
     rendered.unmount();
     expect(vi.getTimerCount()).toBe(0);
   });

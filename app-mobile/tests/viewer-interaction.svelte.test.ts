@@ -43,7 +43,7 @@ afterEach(() => {
   window.history.replaceState({}, '', '/');
   vi.restoreAllMocks();
   document.documentElement.removeAttribute('data-artifact-viewer-open');
-  document.getElementById('artifact-viewer-privacy-curtain')?.remove();
+  document.getElementById('artifact-viewer--privacy-curtain')?.remove();
 });
 
 // ───────────────────────────────────────────────────────────────────
@@ -54,7 +54,7 @@ describe('viewer interaction ownership', () => {
   it('blurs the composer, focuses the heading, and restores scroll and trigger focus', async () => {
     const historyBack = vi.spyOn(window.history, 'back').mockImplementation(() => undefined);
     render(ViewerInteractionHarness, { props: { block: DIFF } });
-    const scroll = document.querySelector<HTMLElement>('.transcript-scroll');
+    const scroll = document.querySelector<HTMLElement>('.transcript--scroll');
     const composer = screen.getByRole('textbox', { name: 'Message Pi' });
     const trigger = screen.getByRole('button', { name: 'Open interaction diff' });
     if (scroll === null) throw new Error('scroll container missing');
@@ -95,7 +95,7 @@ describe('viewer interaction ownership', () => {
     await fireEvent.click(trigger);
     await screen.findByRole('dialog');
     await waitFor(() =>
-      expect(document.querySelector('.artifact-viewer-overlay')).toHaveAttribute(
+      expect(document.querySelector('.artifact-viewer--overlay')).toHaveAttribute(
         'data-artifact-state',
         'ready-diff',
       ),

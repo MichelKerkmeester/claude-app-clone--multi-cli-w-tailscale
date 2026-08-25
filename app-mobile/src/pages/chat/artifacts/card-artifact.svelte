@@ -64,22 +64,22 @@
   use:focusVisible
   onclick={() => viewer?.openDiff(block, buttonRef)}
 >
-  <span class="artifact-card-glyph" aria-hidden="true">
+  <span class="artifact-card--icon" aria-hidden="true">
     <svg viewBox="0 0 24 24" focusable="false">
       <path d="M5 7h14M5 12h14M5 17h8" />
       <path d="M16 15v6M13 18h6" />
     </svg>
   </span>
-  <span class="artifact-card-body">
-    <span class="artifact-card-meta">
+  <span class="artifact-card--body">
+    <span class="artifact-card--meta">
       <span>File diff</span>
       <span>Read-only</span>
     </span>
-    <span class="artifact-card-summary">{block.summary}</span>
+    <span class="artifact-card--summary">{block.summary}</span>
     <!-- @ds slot: peek — the clipped 6-line diff preview (mayReorder content only). -->
-    <span class="artifact-card-peek" aria-label="Diff preview">{#each peekLines as line, index}<span class="artifact-card-peek-line">{line || ' '}{index < peekLines.length - 1 ? '\n' : ''}</span>{/each}</span>
+    <span class="artifact-card-peek" aria-label="Diff preview">{#each peekLines as line, index}<span class="artifact-card-peek--line">{line || ' '}{index < peekLines.length - 1 ? '\n' : ''}</span>{/each}</span>
   </span>
-  <span class="artifact-card-open" aria-hidden="true">Open</span>
+  <span class="artifact-card--open" aria-hidden="true">Open</span>
 </button>
 
 <!-- @ds surface: artifact-card — the read-only in-transcript diff card. Decomposed into this scoped block;
@@ -123,7 +123,7 @@
   }
 
   /* @ds slot: glyph — the artifact-type glyph chip. */
-  .artifact-card-glyph {
+  .artifact-card--icon {
     display: grid;
     inline-size: 2.75rem;
     block-size: 2.75rem;
@@ -134,7 +134,7 @@
   }
 
   /* @ds slot: glyph-icon — 1.35rem stroke geometry (the viewer close icon reuses this in app.css). */
-  .artifact-card-glyph svg {
+  .artifact-card--icon svg {
     inline-size: 1.35rem;
     block-size: 1.35rem;
     fill: none;
@@ -145,14 +145,14 @@
   }
 
   /* @ds slot: body — meta · summary · peek column. */
-  .artifact-card-body {
+  .artifact-card--body {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-2);
   }
 
   /* @ds slot: meta — uppercase fact chips. */
-  .artifact-card-meta {
+  .artifact-card--meta {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
@@ -164,14 +164,14 @@
   }
 
   /* @ds slot: meta-sep — the '/' separator between fact chips. */
-  .artifact-card-meta span + span::before {
+  .artifact-card--meta span + span::before {
     margin-inline-end: var(--space-2);
     content: '/';
     color: var(--line-strong);
   }
 
   /* @ds slot: summary — the artifact's display-name read-out. */
-  .artifact-card-summary {
+  .artifact-card--summary {
     overflow-wrap: anywhere;
     color: var(--ink);
     font-family: var(--font-display);
@@ -199,7 +199,7 @@
   }
 
   /* @ds slot: peek-line — one clipped, ellipsized peek row. */
-  .artifact-card-peek-line {
+  .artifact-card-peek--line {
     display: block;
     min-inline-size: 0;
     overflow: hidden;
@@ -207,7 +207,7 @@
   }
 
   /* @ds slot: open — the trailing "Open" handoff affordance. */
-  .artifact-card-open {
+  .artifact-card--open {
     min-block-size: 2.75rem;
     padding-block: 0.7rem;
     color: var(--accent-ink);
@@ -223,12 +223,12 @@
       padding: var(--space-3);
     }
 
-    .artifact-card-glyph {
+    .artifact-card--icon {
       inline-size: 2.25rem;
       block-size: 2.25rem;
     }
 
-    .artifact-card-open {
+    .artifact-card--open {
       display: none;
     }
   }

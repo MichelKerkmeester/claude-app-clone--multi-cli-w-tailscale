@@ -194,11 +194,11 @@
 </script>
 
 {#snippet cardBody()}
-  <div class="inbound-image-card-body">
-    <div class="inbound-image-identity" dir="auto">
-      <div class="inbound-image-title-wrap">
+  <div class="inbound-image-card--body">
+    <div class="inbound-image--identity" dir="auto">
+      <div class="inbound-image-title--wrap">
         <strong class="inbound-image-title">{block.displayName}</strong>
-        <span class="inbound-image-metadata">{#each metadata as item}<span>{#if item.startsWith('Revision ')}<bdi dir="ltr">{item}</bdi>{:else}{item}{/if}</span>{/each}</span>
+        <span class="inbound-image--metadata">{#each metadata as item}<span>{#if item.startsWith('Revision ')}<bdi dir="ltr">{item}</bdi>{:else}{item}{/if}</span>{/each}</span>
       </div>
     </div>
     {#if renderVerified}
@@ -233,7 +233,7 @@
     <button
       bind:this={buttonRef}
       type="button"
-      class="inbound-image-card-button"
+      class="inbound-image-card--button"
       aria-label={cardAccessibleName(block)}
       aria-haspopup="dialog"
       use:hover
@@ -260,8 +260,8 @@
      use:hover/use:press/use:focusVisible actions and scoped as :global([data-*]). The card owns the
      [data-image-state] state; the well and placeholder-pattern it re-inks are rendered by child
      components (VerifiedImage / ImagePlaceholder), so those descendants are matched with :global(...).
-     The @keyframes moves with the card so Svelte renames both together. The base .inbound-image-well /
-     .inbound-image-placeholder-pattern rules are shared by two children and stay global. Values unchanged. -->
+     The @keyframes moves with the card so Svelte renames both together. The base .inbound-image--well /
+     .inbound-image--placeholder-pattern rules are shared by two children and stay global. Values unchanged. -->
 <style>
   /* @ds surface: inbound-image-card — the inbound-image card frame; fades in on mount. */
   .inbound-image-card {
@@ -276,7 +276,7 @@
 
   /* @ds slot: open-button — the full-card open affordance; pan-y keeps vertical scroll, and the
      drag/callout suppression keeps the image un-liftable. */
-  .inbound-image-card-button {
+  .inbound-image-card--button {
     display: block;
     inline-size: 100%;
     min-block-size: 44px;
@@ -298,23 +298,23 @@
   }
 
   /* @ds state: hover — react-aria data-hovered accent tint (via use:hover). */
-  .inbound-image-card-button:global([data-hovered]) {
+  .inbound-image-card--button:global([data-hovered]) {
     background: var(--accent-soft);
   }
 
   /* @ds state: pressed — react-aria data-pressed; subtle press-scale (via use:press). */
-  .inbound-image-card-button:global([data-pressed]) {
+  .inbound-image-card--button:global([data-pressed]) {
     transform: scale(0.985);
   }
 
   /* @ds guardrail: focus-visible — inset canonical focus ring (via use:focusVisible). */
-  .inbound-image-card-button:global([data-focus-visible]) {
+  .inbound-image-card--button:global([data-focus-visible]) {
     outline: 3px solid var(--focus);
     outline-offset: -3px;
   }
 
   /* @ds slot: body — the padded card interior. */
-  .inbound-image-card-body {
+  .inbound-image-card--body {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-3);
@@ -322,7 +322,7 @@
   }
 
   /* @ds slot: identity — the title + metadata header row. */
-  .inbound-image-identity {
+  .inbound-image--identity {
     display: flex;
     min-block-size: 44px;
     min-inline-size: 0;
@@ -330,7 +330,7 @@
   }
 
   /* @ds slot: title-wrap — the stacked title + metadata column. */
-  .inbound-image-title-wrap {
+  .inbound-image-title--wrap {
     display: grid;
     min-inline-size: 0;
     gap: var(--space-1);
@@ -346,7 +346,7 @@
   }
 
   /* @ds slot: metadata — the fact chips (revision · size · …). */
-  .inbound-image-metadata {
+  .inbound-image--metadata {
     display: flex;
     min-inline-size: 0;
     flex-wrap: wrap;
@@ -357,21 +357,21 @@
     line-height: 1.333;
   }
 
-  .inbound-image-metadata span {
+  .inbound-image--metadata span {
     overflow-wrap: anywhere;
   }
 
   /* @ds state: privacy-covered · revoked — the card re-inks its (child-rendered) well to the opaque
      privacy cover. The well is rendered by VerifiedImage/ImagePlaceholder, so it is matched globally. */
-  .inbound-image-card[data-image-state='privacy-covered'] :global(.inbound-image-well),
-  .inbound-image-card[data-image-state='revoked'] :global(.inbound-image-well) {
+  .inbound-image-card[data-image-state='privacy-covered'] :global(.inbound-image--well),
+  .inbound-image-card[data-image-state='revoked'] :global(.inbound-image--well) {
     border-color: var(--ink);
     background: var(--ink);
   }
 
   /* @ds state: privacy-covered · revoked — the placeholder pattern is hidden under the privacy cover. */
-  .inbound-image-card[data-image-state='privacy-covered'] :global(.inbound-image-placeholder-pattern),
-  .inbound-image-card[data-image-state='revoked'] :global(.inbound-image-placeholder-pattern) {
+  .inbound-image-card[data-image-state='privacy-covered'] :global(.inbound-image--placeholder-pattern),
+  .inbound-image-card[data-image-state='revoked'] :global(.inbound-image--placeholder-pattern) {
     display: none;
   }
 
@@ -393,7 +393,7 @@
       transition: opacity 100ms linear !important;
     }
 
-    .inbound-image-card-button:global([data-pressed]) {
+    .inbound-image-card--button:global([data-pressed]) {
       transform: none !important;
     }
   }

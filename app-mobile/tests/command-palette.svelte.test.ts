@@ -92,7 +92,7 @@ function catalogState(commands: readonly CommandDescriptorDto[]): HostCommandCat
 function optionNames(): readonly (string | null)[] {
   return screen
     .getAllByRole('option')
-    .map((option) => option.querySelector('.command-name')?.textContent ?? null);
+    .map((option) => option.querySelector('.command--name')?.textContent ?? null);
 }
 
 // Open the command listbox. The React oracle clicks the "Show commands" trigger;
@@ -188,7 +188,7 @@ describe('CommandPalette', () => {
     await screen.findByRole('option', { name: /plan/ });
     for (const option of screen.getAllByRole('option')) {
       expect(option.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0);
-      expect(option.querySelector('.command-name')?.textContent).toMatch(/^\/[a-z]+$/u);
+      expect(option.querySelector('.command--name')?.textContent).toMatch(/^\/[a-z]+$/u);
     }
   });
 

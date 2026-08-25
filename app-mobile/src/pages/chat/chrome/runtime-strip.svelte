@@ -95,18 +95,18 @@
   }
 </script>
 
-<!-- @ds surface: runtime-strip — host-backed readout + controls strip. -->
-<div class="runtime-strip" role="group" aria-label="Runtime controls">
+<!-- @ds surface: runtime--strip — host-backed readout + controls strip. -->
+<div class="runtime--strip" role="group" aria-label="Runtime controls">
   <!-- @ds slot: model-readout — confirmed model readout. -->
   <span class="runtime-readout runtime-model-readout">
-    <span class="runtime-readout-label">Model</span>
-    <span class="runtime-readout-value">{modelLabel}</span>
+    <span class="runtime-readout--label">Model</span>
+    <span class="runtime-readout--value">{modelLabel}</span>
   </span>
 
   <!-- @ds surface: effort-trigger — opens the shared model/effort sheet. -->
   <!-- @ds guardrail: react-aria Button wiring (ref, aria-haspopup/expanded, onPress) — Not designer-editable. -->
   <Button
-    class="runtime-effort-trigger"
+    class="runtime--effort-trigger"
     aria-label={effortTriggerName(effortText)}
     aria-haspopup="dialog"
     aria-expanded={sheetOpen}
@@ -120,8 +120,8 @@
       };
     }}
   >
-    <span class="runtime-readout-label">Effort</span>
-    <span class="runtime-readout-value">{effortText}</span>
+    <span class="runtime-readout--label">Effort</span>
+    <span class="runtime-readout--value">{effortText}</span>
     <!-- @ds slot: chevron-up — inline glyph; strokes inherit currentColor. -->
     <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
       <path
@@ -140,7 +140,7 @@
   <!-- @ds state: build · plan — selection is disabled while the authority is not ready; the
       label never precedes host confirmation (non-optimistic). -->
   <ToggleGroup
-    class="runtime-control runtime-mode"
+    class="runtime--control runtime--mode"
     aria-label="Build or Plan"
     bind:value={modeValue}
     onValueChange={onModeChange}
@@ -168,18 +168,18 @@
   <!-- @ds slot: status — applied runtime status hint. -->
   <!-- @ds state: checking · applying · stale · error — the runtime status hint. -->
   <!-- @ds guardrail: do-not-edit — role="status" + aria-live="polite" live region. -->
-  <span class="runtime-status" role="status" aria-live="polite">
+  <span class="runtime--status" role="status" aria-live="polite">
     {statusHint(runtime.status, runtime.pending !== null)}
   </span>
 </div>
 
-<!-- @ds surface: runtime-strip — host-backed readout + controls strip. Decomposed into this scoped block;
+<!-- @ds surface: runtime--strip — host-backed readout + controls strip. Decomposed into this scoped block;
      effort-trigger and build-plan-toggle are owned solely by this component so they move with it.
      Child-primitive classes and react-aria/runtime data-attributes use :global so Svelte scoping
      cannot drop them. Values unchanged. -->
 <style>
-  /* @ds surface: runtime-strip — host-backed readout + controls strip. */
-  .runtime-strip {
+  /* @ds surface: runtime--strip — host-backed readout + controls strip. */
+  .runtime--strip {
     display: flex;
     min-inline-size: 0;
     align-items: center;
@@ -201,7 +201,7 @@
   }
 
   /* @ds slot: readout-label */
-  .runtime-readout-label {
+  .runtime-readout--label {
     color: var(--ink-muted);
     font-size: 0.65rem;
     font-weight: 650;
@@ -210,14 +210,14 @@
   }
 
   /* @ds slot: readout-value */
-  .runtime-readout-value {
+  .runtime-readout--value {
     color: var(--ink-secondary);
     font-weight: 620;
   }
 
   /* @ds surface: effort-trigger — opens the shared model/effort sheet. */
   /* @ds state: default */
-  :global(.runtime-effort-trigger) {
+  :global(.runtime--effort-trigger) {
     display: inline-flex;
     min-inline-size: 44px;
     min-block-size: 44px;
@@ -232,19 +232,19 @@
   }
 
   /* @ds state: hover */
-  :global(.runtime-effort-trigger[data-hovered]) {
+  :global(.runtime--effort-trigger[data-hovered]) {
     background: var(--surface-muted);
   }
 
   /* @ds state: focus-visible */
-  :global(.runtime-effort-trigger[data-focus-visible]) {
+  :global(.runtime--effort-trigger[data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
   /* @ds end surface: effort-trigger */
 
   /* @ds surface: build-plan-toggle — the Build / Plan segmented toggle. */
-  :global(.runtime-control.runtime-mode) {
+  :global(.runtime--control.runtime--mode) {
     display: inline-flex;
     padding: 0.2rem;
     border: 1px solid var(--line);
@@ -253,7 +253,7 @@
   }
 
   /* @ds state: default */
-  :global(.runtime-mode .react-aria-ToggleButton) {
+  :global(.runtime--mode .react-aria-ToggleButton) {
     min-block-size: 2rem;
     padding-inline: 0.7rem;
     border: 0;
@@ -266,22 +266,22 @@
   }
 
   /* @ds state: selected */
-  :global(.runtime-mode .react-aria-ToggleButton[data-selected]) {
+  :global(.runtime--mode .react-aria-ToggleButton[data-selected]) {
     background: var(--ink);
     color: var(--ink-inverse);
   }
 
   /* @ds state: disabled */
-  :global(.runtime-mode .react-aria-ToggleButton[data-disabled]) {
+  :global(.runtime--mode .react-aria-ToggleButton[data-disabled]) {
     cursor: default;
     opacity: 0.5;
   }
   /* @ds end surface: build-plan-toggle */
 
   /* @ds slot: status — applied runtime status hint. */
-  .runtime-status {
+  .runtime--status {
     min-block-size: 1rem;
     white-space: nowrap;
   }
-  /* @ds end surface: runtime-strip */
+  /* @ds end surface: runtime--strip */
 </style>

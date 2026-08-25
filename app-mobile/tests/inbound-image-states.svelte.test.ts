@@ -146,7 +146,7 @@ describe('inbound image lifecycle states', () => {
         expect(card).not.toHaveTextContent(/couldn’t|unavailable|error|failed/i);
       }
       if (definition.ariaBusy) expect(card).toHaveAttribute('aria-busy', 'true');
-      const actionButtons = [...(card?.querySelectorAll('.inbound-image-status-action') ?? [])];
+      const actionButtons = [...(card?.querySelectorAll('.inbound-image-status--action') ?? [])];
       expect(actionButtons.map((button) => button.textContent)).toEqual(
         definition.actions.map((action) => ACTION_LABEL[action]),
       );

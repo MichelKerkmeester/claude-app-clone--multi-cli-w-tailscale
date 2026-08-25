@@ -15,22 +15,22 @@
 </script>
 
 <!-- @ds slot: prompt — the question eyebrow + display headline. -->
-<div class="ask-question-prompt">
+<div class="ask-question--prompt">
   <!-- @ds slot: kicker — the "Pi asks" eyebrow. -->
-  <p class="ask-question-kicker">Pi asks</p>
+  <p class="ask-question--eyebrow">Pi asks</p>
   <h2>{viewModel.display.prompt}</h2>
 </div>
 
 <!-- @ds surface: ask-question prompt — eyebrow + display headline. Decomposed into this scoped block; values unchanged. -->
 <style>
   /* @ds slot: prompt — the question eyebrow + display headline. */
-  .ask-question-prompt {
+  .ask-question--prompt {
     display: grid;
     gap: var(--space-1);
   }
 
   /* @ds slot: kicker — the "Pi asks" eyebrow. */
-  .ask-question-kicker {
+  .ask-question--eyebrow {
     margin: 0;
     color: var(--accent-ink);
     font-size: 0.7rem;
@@ -39,7 +39,7 @@
     text-transform: uppercase;
   }
 
-  .ask-question-prompt h2 {
+  .ask-question--prompt h2 {
     max-inline-size: var(--reading-width);
     margin: 0;
     font-family: var(--font-display);

@@ -39,7 +39,7 @@
 {#if draft.mediaAvailable && draft.state.items.length > 0}
   <ol class="attachment-rail" aria-label={`Draft photos, ${draft.state.items.length} items`}>
     {#each draft.state.items as item, index (item.id)}
-      <li class="attachment-rail-item">
+      <li class="attachment-rail--item">
         <AttachmentTile
           {item}
           previewUrl={draft.getObjectUrl(item.id)}
@@ -72,7 +72,7 @@
     scrollbar-width: thin;
   }
 
-  .attachment-rail-item {
+  .attachment-rail--item {
     position: relative;
     flex: 0 0 64px;
     min-inline-size: 64px;

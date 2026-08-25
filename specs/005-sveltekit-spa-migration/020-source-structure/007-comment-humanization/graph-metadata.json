@@ -88,10 +88,10 @@
       "spec.md",
       "goal.md"
     ],
-    "source_fingerprint": "sha256:9a11daa50813e8cf0ab6ab094229be724cda218ed76f2bed772303a59ffc4cd2",
+    "source_fingerprint": "sha256:a85fb3894935181fd1ccb11490aded17e0f080cc19c340400f28d4e65fcfbc17",
     "source_doc_hashes": {
       "spec.md": "8289cbc4979896ca05f28596b908a6fd36b5b2fed6fd5aeb17222a397c3f90fd",
-      "goal.md": "3c3355b5e2347c8d87230f5b7c804fa28085fee5bcb3e1ca95469703af8ae584"
+      "goal.md": "dca310bb300af90cd247ae933d8807a25dc7bedf5675287e4a2ebadd5dfea6c8"
     },
     "last_active_child_id": "005-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention",
     "last_active_at": "2026-08-25T19:25:28.000Z"

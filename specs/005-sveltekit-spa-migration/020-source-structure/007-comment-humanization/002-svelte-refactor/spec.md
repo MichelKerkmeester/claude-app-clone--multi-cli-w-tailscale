@@ -51,17 +51,19 @@ matches.
 <!-- ANCHOR:scope -->
 ## 3. SCOPE
 
-**In scope:** the inline comments of every `.svelte` file under `app-mobile/src/**` (and any `.svelte` in
-Storybook/catalog surfaces) — retire `@ds`, add the module header, add `<!-- section -->` markup labels,
-add per-part purpose comments, keep the `MODULE:` and numbered section banners, and convert
-`@ds guardrail: do-not-edit` to the greppable "Do not edit — <why>" note. Re-anchor
-`scripts/naming/scan-comments.mjs` so its guardrail-fence counter reads the new do-not-edit marker instead
-of `@ds guardrail:`, keeping the fence-count invariant (≥ the prior 277). Update
-`scripts/naming/verify-comment-only.mjs` / any `@ds`-aware scan in lockstep.
+**In scope (full @ds retirement — 1632 lines):** the comments of every `.svelte` file (1018 lines / 95
+files), `app.css` (605 lines), and the 3 `.ts` files (9 lines) under `app-mobile/src/**` — retire every
+`@ds` marker, add the module header (`.svelte`/`.ts`), add `<!-- section -->` markup labels, add per-part
+purpose comments, keep the `MODULE:` and numbered section banners. Convert `app.css`'s design-system seams
+(`@ds edit: tokens|layout`, `@ds surface/slot/state/variant`, `@ds theme`) to natural notes that keep the
+editability meaning as durable WHY, and every `@ds guardrail: do-not-edit` (in any file) to the greppable
+"Do not edit — <why>" note. Re-anchor `scripts/naming/scan-comments.mjs` so its guardrail-fence counter
+reads the new do-not-edit marker instead of `@ds guardrail:`, keeping the fence-count invariant (≥ the
+prior 277). Update `scripts/naming/verify-comment-only.mjs` / any `@ds`-aware scan in lockstep.
 
-**Out of scope:** any non-comment edit to a `.svelte` file; `.ts`/`.css` comment style (unless a shared
-scan forces a lockstep touch); the skill (phases 1 and 3); the historical changelogs; app behaviour,
-routing, a11y contracts, and rendered values.
+**Out of scope:** any non-comment edit (no CSS rule, value, selector, markup, or logic change — every
+`@ds` is a comment, so retirement is comment-only); the skill (phases 1 and 3); the historical
+changelogs; app behaviour, routing, a11y contracts, and rendered values.
 <!-- /ANCHOR:scope -->
 
 ---
@@ -71,9 +73,9 @@ routing, a11y contracts, and rendered values.
 
 - **REQ-001** — Every `.svelte` file's non-comment content is byte-identical before and after (comment-span
   strip + hash per file); the change is comment-only.
-- **REQ-002** — No `@ds` marker remains in any `.svelte` source; every file carries the natural convention
-  (module header where a `<script module>` exists, markup section labels, per-part purpose comments), and
-  the numbered section banners are intact.
+- **REQ-002** — No `@ds` marker remains in any `.svelte`, `app.css`, or `.ts` source; every file carries
+  the natural convention (module header where a module scope exists, markup section labels, per-part
+  purpose comments, app.css seams as natural notes), and the numbered section banners are intact.
 - **REQ-003** — The frozen-seam safety net is preserved: every `@ds guardrail: do-not-edit` becomes a
   greppable do-not-edit note, and `scan-comments.mjs` counts them so the fence total is ≥ the prior 277 —
   no frozen seam silently dropped.
@@ -86,7 +88,7 @@ routing, a11y contracts, and rendered values.
 <!-- ANCHOR:success-criteria -->
 ## 5. SUCCESS CRITERIA
 
-1. `grep -rl '@ds' app-mobile/src --include='*.svelte'` returns nothing; the convention is applied everywhere.
+1. `grep -rl '@ds' app-mobile/src` returns nothing (`.svelte`, `app.css`, and `.ts` all clean); the convention is applied everywhere.
 2. Every file passes the non-comment byte-identical check; banners intact.
 3. The do-not-edit fence count is ≥ 277 under the re-anchored gate; token-identity 0-diff; `test:web` green.
 <!-- /ANCHOR:success-criteria -->

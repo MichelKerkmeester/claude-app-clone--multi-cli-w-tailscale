@@ -1,6 +1,6 @@
 # GOAL — Comment humanization (retire @ds, human-voice comments)
 
-**Objective.** Make every `.svelte` file in the Mobile CLI client readable and editable by a non-engineer: retire the `@ds` marker grammar for natural, concise, human-voice comments, and teach the new convention in the surface skill. Comment-only in source. Approved reference: `app-mobile/src/pages/chat/screen-chat.svelte`.
+**Objective.** Make the Mobile CLI client readable and editable by a non-engineer: retire the `@ds` marker grammar for natural, concise, human-voice comments **everywhere it appears** — `.svelte` (1018 lines / 95 files), `app.css` (605 lines), and `.ts` (9 lines / 3 files) — and teach the new convention in the surface skill. Comment-only in source (every `@ds` is a comment). Approved reference: `app-mobile/src/pages/chat/screen-chat.svelte`.
 
 **The convention.** Keep the `MODULE:` banner and the numbered ALL-CAPS box-drawing section banners (`// 1. IMPORTS` … 67-dash). Add: a plain-English header on each `<script module>` island; an `<!-- section -->` label on each markup region; a one-line human-voice purpose comment on each function, effect, and rule. Replace `@ds guardrail: do-not-edit` with a natural, consistent, still-greppable "Do not edit — <why>" note. Retire all other `@ds` markers (surface/slot/state/variant/edit/catalog/theme) to plain prose, keeping load-bearing semantics as durable WHY.
 
@@ -13,7 +13,7 @@
 
 **Phases — sequential, barrier-verified between each.**
 1. **Skill first** — Update `sk-code-mobile-cli`: rewrite `comment-grammar.md`, retire `ds-grammar.md`, restate `editability-guardrails.md` around the greppable do-not-edit note; strip `@ds` authoring from every live reference/asset; update `SKILL.md` §2b/§3b + `README.md`; changelog + version bump. Land via isolated Public worktree (three pre-push gates, `SPECKIT_ALLOW_REMOTE_PUSH=1`). Barrier: `scan-skill-references` broken:0, router-sync bijection, drift-guard packet-delta 0, skill loads.
-2. **Refactor all** — Apply the convention to every `.svelte` file, comment-only. Re-anchor `scripts/naming/scan-comments.mjs` onto the new do-not-edit marker so the frozen-seam fence count is preserved, not lost. Barrier per file: non-comment content byte-identical (comment-span strip + hash). Suite: `@ds` count 0 in `.svelte`; banners intact; do-not-edit fences ≥ prior 277; token-identity 0-diff (65 tokens × 3 themes); `test:web` green.
+2. **Refactor all** — Apply the convention to every `.svelte` file, `app.css`, and the 3 `.ts` files, comment-only (1632 `@ds` lines). Convert `app.css`'s `@ds edit`/`@ds theme`/`@ds surface` seams to natural notes and every `@ds guardrail: do-not-edit` to the greppable "Do not edit — <why>" note. Re-anchor `scripts/naming/scan-comments.mjs` onto the new marker so the frozen-seam fence count is preserved, not lost. Barrier per file: non-comment content byte-identical (comment-span strip + hash). Suite: `@ds` count 0 in `.svelte`/`.css`/`.ts`; banners intact; do-not-edit fences ≥ prior 277; token-identity 0-diff (65 tokens × 3 themes); `test:web` green.
 3. **Reverify skill** — Re-read the skill against the shipped `.svelte` reality and the edge cases phase 2 surfaced; fix drift; bump version if changed.
 
 **Queued (autonomous).**

@@ -1,0 +1,9 @@
+{"type":"iteration","iteration":1,"run":1,"mode":"research","target_agent":"deep-research","agent_definition_loaded":true,"resolved_route":"Resolved route: mode=research target_agent=deep-research","newInfoRatio":0.92,"status":"complete","focus":"Mobile Agent Session History card model, grouping, peek, search, and resume","findingsCount":6,"keyQuestions":["What session-list/card model best improves selection?","Which message-level chat affordances are portable?","Which composer patterns are portable?","Which streaming patterns remain fail-closed?","Which findings need host fields?"],"answeredQuestions":["Mobile history card and list model"],"durationMs":0,"timestamp":"2026-08-26T04:48:00Z","sessionId":"fanout-luna-1787718935950-gxg4a7","generation":1,"executor":{"kind":"cli-codex","model":"gpt-5.6-luna","reasoningEffort":"medium","sandboxMode":"workspace-write"},"ruledOut":["client-derived titles or previews","copying host-specific resumeCommand"]}
+{"type":"finding","id":"f-luna-001-001","label":"Host-scanned card projects title, preview, agent, count, time","iteration":1}
+{"type":"finding","id":"f-luna-001-002","label":"Filter, scope, sort, and grouping are deterministic views","iteration":1}
+{"type":"finding","id":"f-luna-001-003","label":"Bounded expand-in-place preview","iteration":1}
+{"type":"finding","id":"f-luna-001-004","label":"Single-flight nested resume","iteration":1}
+{"type":"finding","id":"f-luna-001-005","label":"Pull-to-refresh host snapshot request","iteration":1}
+{"type":"finding","id":"f-luna-001-006","label":"Search requires authoritative fields","iteration":1}
+{"type":"ruled_out","direction":"client-derived titles or previews","reason":"Would invent session truth not supplied by the host","iteration":1}
+{"type":"ruled_out","direction":"copying host-specific resumeCommand","reason":"Orca CLI command is not a portable Pi session action","iteration":1}

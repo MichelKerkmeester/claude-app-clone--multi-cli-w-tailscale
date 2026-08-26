@@ -1,0 +1,51 @@
+{
+  "type": "iteration",
+  "iteration": 14,
+  "run": 14,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "status": "complete",
+  "executor": {
+    "kind": "cli-cursor",
+    "model": "cursor-grok-4.6-xhigh"
+  },
+  "timestamp": "2026-08-26T05:14:00Z",
+  "newInfoRatio": 0.58,
+  "focus": "In-chat conversation actions rename pin archive export new",
+  "findingsCount": 3,
+  "noveltyJustification": "Confirms absence of in-chat action chrome; CLI verbs vs UI; New Workspace vs New session.",
+  "keyQuestions": [
+    "q-home-parallel-sessions",
+    "q-composer-input"
+  ],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Porting an orca native-chat overflow menu for rename/archive",
+      "reason": "No such menu; Electron context menu copies pane ids",
+      "evidence": "specs/context/orca-main/src/renderer/src/components/native-chat/use-native-chat-context-menu.tsx:60:80"
+    }
+  ],
+  "graphEvents": [
+    {
+      "type": "node",
+      "id": "f-iter014-slash",
+      "kind": "FINDING",
+      "label": "Rename/archive/new are Codex CLI catalog strings"
+    },
+    {
+      "type": "edge",
+      "id": "e-iter014-slash-q1",
+      "source": "f-iter014-slash",
+      "target": "q-home-parallel-sessions",
+      "relation": "ANSWERS"
+    }
+  ]
+}

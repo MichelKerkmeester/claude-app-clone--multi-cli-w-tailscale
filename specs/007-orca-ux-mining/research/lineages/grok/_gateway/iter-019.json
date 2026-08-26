@@ -1,0 +1,52 @@
+{
+  "type": "iteration",
+  "iteration": 19,
+  "run": 19,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "status": "complete",
+  "executor": {
+    "kind": "cli-cursor",
+    "model": "cursor-grok-4.6-xhigh"
+  },
+  "timestamp": "2026-08-26T05:19:00Z",
+  "newInfoRatio": 0.42,
+  "focus": "Electron unread join vs Inbox; home needs-you without a new field",
+  "findingsCount": 3,
+  "noveltyJustification": "Inbox-join path may avoid an attention field; unread≠working restated as a hard rule.",
+  "keyQuestions": [
+    "q-home-parallel-sessions"
+  ],
+  "answeredQuestions": [
+    "q-home-parallel-sessions"
+  ],
+  "ruledOut": [
+    {
+      "approach": "Treating status=running as unread",
+      "reason": "Orca unread is done/blocked/waiting",
+      "evidence": "iter 3 useActivityUnreadCount"
+    }
+  ],
+  "graphEvents": [
+    {
+      "type": "node",
+      "id": "f-iter019-join",
+      "kind": "FINDING",
+      "label": "Home unread can join Inbox tickets onto session ids"
+    },
+    {
+      "type": "edge",
+      "id": "e-iter019-join-q1",
+      "source": "f-iter019-join",
+      "target": "q-home-parallel-sessions",
+      "relation": "ANSWERS"
+    }
+  ]
+}

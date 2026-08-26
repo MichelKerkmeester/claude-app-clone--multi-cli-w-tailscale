@@ -1,0 +1,50 @@
+{
+  "type": "iteration",
+  "iteration": 11,
+  "run": 11,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "status": "complete",
+  "executor": {
+    "kind": "cli-cursor",
+    "model": "cursor-grok-4.6-xhigh"
+  },
+  "timestamp": "2026-08-26T05:11:00Z",
+  "newInfoRatio": 0.76,
+  "focus": "Permission overlay heuristic TUI vs structured approval",
+  "findingsCount": 3,
+  "noveltyJustification": "First pass on permission heuristic vs envelope; distinct from AskUserQuestion wizard.",
+  "keyQuestions": [
+    "q-session-chat-nav"
+  ],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Client-side regex over last assistant bubble as approval truth",
+      "reason": "No structured permission event; false positives send unsolicited TUI keys",
+      "evidence": "specs/context/orca-main/mobile/src/session/mobile-native-chat-permission.ts:1:15"
+    }
+  ],
+  "graphEvents": [
+    {
+      "type": "node",
+      "id": "f-iter011-heur",
+      "kind": "FINDING",
+      "label": "Permission cards often parsed from TUI text"
+    },
+    {
+      "type": "edge",
+      "id": "e-iter011-heur-q5",
+      "source": "f-iter011-heur",
+      "target": "q-session-chat-nav",
+      "relation": "ANSWERS"
+    }
+  ]
+}

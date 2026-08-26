@@ -1,0 +1,26 @@
+{
+  "level": "2",
+  "specFolder": "007-orca-ux-mining/001-tested-seams",
+  "description": "Extract the six view-logic seams \u2014 home filter/sort/group, session-card projection, message grouping, draft reconciliation, id+epoch scope-guard, and stale-deca",
+  "keywords": [
+    "extract",
+    "six",
+    "view-logic",
+    "seams",
+    "home",
+    "filter",
+    "sort",
+    "group",
+    "session-card",
+    "projection",
+    "message"
+  ],
+  "lastUpdated": "2026-08-26T05:54:46.000Z",
+  "specId": "001",
+  "folderSlug": "tested-seams",
+  "parentChain": [
+    "007-orca-ux-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

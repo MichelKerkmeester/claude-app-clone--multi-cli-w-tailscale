@@ -1,0 +1,2 @@
+{"event":"progress","label":"luna","at":"2026-08-26T04:28:09.604Z","duration_ms":145377,"gauges":{"lag":1,"pending":0,"failed":0}}
+{"event":"stopped","signal":"SIGTERM","at":"2026-08-26T04:28:09.605Z","gauges":{"lag":1,"pending":0,"failed":0}}

@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-ux-mining/002-home-selection/001-list-behavior",
+  "spec_folder": "007-orca-ux-mining/002-home-selection/001-list-behavior",
+  "parent_id": "007-orca-ux-mining/002-home-selection",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "plan",
+      "home",
+      "session",
+      "list",
+      "interaction",
+      "state",
+      "machine",
+      "verified",
+      "orca",
+      "synthesis",
+      "recency-sort",
+      "roster"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Plan the home session list's interaction and state machine from the verified orca synthesis: recency-sort the roster by updatedAt (1.1), pull-to-refresh that keeps the last-good snapshot on failure (1.2), a four-kind list state machine \u2014 loading \u00b7 error+retry \u00b7 host-too-old \u00b7 ready \u2014 that keeps old data on refetch (1.9), a reserved resume slot filled from cache and inert until live (1.10), single-flight Open that disables every open while one launch is in flight (1.11), and the five-way haptics taxonomy (1.12). Every item reads existing SessionCardDto fields or is pure interaction \u2014 all \u2705 drop-in, blocked on no host field. Behaviour-preserving where CSS is touched, proven by token-identity 0-diff, test:web green, and a11y-parity. Plan only.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:45f83800a48dcc41ffcb4a9dbc9b71594b1062463e5ebe747c42627c4dd12075",
+    "source_doc_hashes": {
+      "spec.md": "9cf79fcb92ef093b88b11bf4f32bfa5ef2e622ce1b505649434c23cf37a335c2",
+      "plan.md": "4fbafb07bf072c7a7f86069e49aa4818bd1a469f330e10e09d279d19444044cb",
+      "tasks.md": "1516afe9380093c2095ac8cee55032ec195f084ebc94846c2a6314eb4dd5766c",
+      "checklist.md": "1dca537d5853459656473dadc505c37ac1316546f9418a5f80167dfbfe22578a",
+      "implementation-summary.md": "86aeb8efbff55dc682876214ace9a85890b22928ff4e5354c9802da8b812ff3d"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

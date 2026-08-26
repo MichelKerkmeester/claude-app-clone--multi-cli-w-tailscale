@@ -1,0 +1,52 @@
+{
+  "type": "iteration",
+  "iteration": 12,
+  "run": 12,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "status": "complete",
+  "executor": {
+    "kind": "cli-cursor",
+    "model": "cursor-grok-4.6-xhigh"
+  },
+  "timestamp": "2026-08-26T05:12:00Z",
+  "newInfoRatio": 0.7,
+  "focus": "Electron prompt-history vs mobile composer",
+  "findingsCount": 3,
+  "noveltyJustification": "First Electron-vs-mobile composer delta; locates prompt history as desktop-only local stack.",
+  "keyQuestions": [
+    "q-composer-input"
+  ],
+  "answeredQuestions": [
+    "q-composer-input"
+  ],
+  "ruledOut": [
+    {
+      "approach": "Treat mobile native-chat as the source for up-arrow prompt history",
+      "reason": "Mobile has no HistoryState; ArrowUp is Send",
+      "evidence": "specs/context/orca-main/src/renderer/src/components/native-chat/native-chat-composer-state.ts:183:211"
+    }
+  ],
+  "graphEvents": [
+    {
+      "type": "node",
+      "id": "f-iter012-hist",
+      "kind": "FINDING",
+      "label": "Electron local sent-stack; mobile has none"
+    },
+    {
+      "type": "edge",
+      "id": "e-iter012-hist-q4",
+      "source": "f-iter012-hist",
+      "target": "q-composer-input",
+      "relation": "ANSWERS"
+    }
+  ]
+}

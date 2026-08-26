@@ -1,0 +1,42 @@
+{
+  "type": "iteration",
+  "iteration": 2,
+  "run": 2,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "newInfoRatio": 0.88,
+  "status": "complete",
+  "focus": "Orca mobile home Resume + worktree list pin/group/sort/attention",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "findingsCount": 6,
+  "noveltyJustification": "Home vs History split, inert Resume, host pin overlay, attention-order sort, and nested agent-dot vocabulary are new versus iteration 1.",
+  "keyQuestions": ["q-home-parallel-sessions", "q-card-content-model"],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Treat New Workspace as our home new-session control",
+      "reason": "Creates an IDE worktree, not a Pi chat session",
+      "evidence": "specs/context/orca-main/mobile/src/components/MobileHomeQuickActions.tsx:97"
+    },
+    {
+      "approach": "Device-only pin set without host isPinned",
+      "reason": "Mutable session truth; orca pins via worktree.set plus local overlay",
+      "evidence": "specs/context/orca-main/mobile/app/h/[hostId]/index.tsx:573:597"
+    }
+  ],
+  "graphEvents": [
+    {"type": "node", "id": "f-iter002-resume", "kind": "FINDING", "label": "Home Resume is inert last-visited worktree slot"},
+    {"type": "node", "id": "f-iter002-pin", "kind": "FINDING", "label": "Pin is host worktree.set plus local overlay"},
+    {"type": "node", "id": "f-iter002-attention", "kind": "FINDING", "label": "Attention sort and nested agent dots"},
+    {"type": "edge", "id": "e-iter002-resume-q1", "source": "f-iter002-resume", "target": "q-home-parallel-sessions", "relation": "ANSWERS"},
+    {"type": "edge", "id": "e-iter002-pin-q1", "source": "f-iter002-pin", "target": "q-home-parallel-sessions", "relation": "ANSWERS"}
+  ],
+  "executor": {"kind": "cli-cursor", "model": "cursor-grok-4.6-xhigh"},
+  "timestamp": "2026-08-26T04:52:00Z"
+}

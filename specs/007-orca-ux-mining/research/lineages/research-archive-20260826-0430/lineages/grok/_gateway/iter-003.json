@@ -1,0 +1,38 @@
+{
+  "type": "iteration",
+  "iteration": 3,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "newInfoRatio": 0.84,
+  "status": "complete",
+  "focus": "Electron parallel-agent rows: state dots, unvisited, unread, compact summary",
+  "sessionId": "fanout-grok-1787717167874-ti5kfp",
+  "runId": "fanout-grok-1787717167874-ti5kfp",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787717167874-ti5kfp",
+  "findingsCount": 5,
+  "noveltyJustification": "Desktop state-dot vocabulary, ack-based unvisited, sessionBoundary unread exclusion, compact agent summary — new versus mobile history/home.",
+  "keyQuestions": ["q-home-parallel-sessions", "q-card-content-model"],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Treat status=running as unread",
+      "reason": "Orca unread is done/blocked/waiting, not working",
+      "evidence": "specs/context/orca-main/src/renderer/src/components/activity/useActivityUnreadCount.ts:33:35"
+    },
+    {
+      "approach": "Fuse agent identity icon with status glyph",
+      "reason": "Orca keeps who vs what as two glyphs",
+      "evidence": "specs/context/orca-main/src/renderer/src/components/AgentStateDot.tsx:7:16"
+    }
+  ],
+  "graphEvents": [
+    {"type":"node","id":"f-iter003-dot","kind":"FINDING","label":"State glyph column with permission=Needs attention"},
+    {"type":"node","id":"f-iter003-unread","kind":"FINDING","label":"Unread is done/blocked/waiting minus sessionBoundary"},
+    {"type":"edge","id":"e-iter003-dot-q1","source":"f-iter003-dot","target":"q-home-parallel-sessions","relation":"ANSWERS"},
+    {"type":"edge","id":"e-iter003-unread-q1","source":"f-iter003-unread","target":"q-home-parallel-sessions","relation":"ANSWERS"}
+  ],
+  "executor": { "kind": "cli-cursor", "model": "cursor-grok-4.6-xhigh" }
+}

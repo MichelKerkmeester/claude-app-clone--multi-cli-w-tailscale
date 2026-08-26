@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-ux-mining/002-home-selection",
+  "spec_folder": "007-orca-ux-mining/002-home-selection",
+  "parent_id": "007-orca-ux-mining",
+  "children_ids": [
+    "007-orca-ux-mining/002-home-selection/001-list-behavior",
+    "007-orca-ux-mining/002-home-selection/002-list-organization",
+    "007-orca-ux-mining/002-home-selection/003-card-polish"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "nested",
+      "phase",
+      "parent",
+      "biggest-leverage",
+      "orca-mining",
+      "area",
+      "home",
+      "session",
+      "list",
+      "groups",
+      "home-selection",
+      "recommendations"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. PHASE DOCUMENTATION MAP",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. INVARIANTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. CROSS-REFERENCES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Nested phase parent for the biggest-leverage orca-mining area: the home session list.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:d09a96dc7737c945e408d3605663885a6120db694e69681fa0b01d2c9d826093",
+    "source_doc_hashes": {
+      "spec.md": "e2e3b4d6570691480db11da0c92f465b774e40f20eac4a3d8b4f626a21196724"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

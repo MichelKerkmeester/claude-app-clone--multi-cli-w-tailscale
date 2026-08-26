@@ -1,0 +1,27 @@
+{
+  "level": "2",
+  "specFolder": "007-orca-ux-mining/002-home-selection/003-card-polish",
+  "description": "Plan the per-card presentation and content from the verified orca synthesis. The \u2705 set ships now: relabel 'blocks'\u2192'messages' + a real ISO datetime + absolute-t",
+  "keywords": [
+    "plan",
+    "per-card",
+    "presentation",
+    "content",
+    "verified",
+    "orca",
+    "synthesis",
+    "set",
+    "ships",
+    "now",
+    "relabel"
+  ],
+  "lastUpdated": "2026-08-26T05:54:46.000Z",
+  "specId": "003",
+  "folderSlug": "card-polish",
+  "parentChain": [
+    "007-orca-ux-mining",
+    "002-home-selection"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

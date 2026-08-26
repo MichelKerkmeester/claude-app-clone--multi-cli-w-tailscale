@@ -1,0 +1,25 @@
+{
+  "type": "event",
+  "event": "synthesis_complete",
+  "mode": "research",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "totalIterations": 20,
+  "answeredCount": 5,
+  "totalQuestions": 5,
+  "stopReason": "maxIterationsReached",
+  "timestamp": "2026-08-26T05:08:00Z",
+  "executor": {
+    "kind": "cli-cursor",
+    "model": "cursor-grok-4.6-xhigh"
+  },
+  "skipped": [
+    "generate-context.js (lineage write-surface)",
+    "validate.sh (lineage write-surface)",
+    "spec.md generated-fence writeback (outside lineages/grok)",
+    "git write/checkout/commit"
+  ]
+}

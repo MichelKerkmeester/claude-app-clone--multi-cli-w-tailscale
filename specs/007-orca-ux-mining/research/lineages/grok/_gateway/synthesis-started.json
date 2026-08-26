@@ -1,0 +1,15 @@
+{
+  "stem": "deep_research.synthesis_started",
+  "scope": {
+    "runId": "fanout-grok-1787718935950-gxg4a7",
+    "lineageId": "grok"
+  },
+  "data": {
+    "admittedLedgerRevision": "ledger-revision-20",
+    "selectedClaimVersionSetDigest": "e535834a7ae650b782b592e3227dd0b004c67badd59b6e8c18aa3c6c51046a0d",
+    "synthesisPolicyDigest": "d697c9fb0320266eddfe23b486d4a03b24195033110f6b53ac0aa0fd37cc70d4",
+    "reportRevision": "report-revision-1",
+    "unresolvedClaimIds": [],
+    "contestedClaimIds": []
+  }
+}

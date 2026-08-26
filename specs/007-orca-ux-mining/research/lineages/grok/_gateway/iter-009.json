@@ -1,0 +1,50 @@
+{
+  "type": "iteration",
+  "iteration": 9,
+  "run": 9,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "status": "complete",
+  "executor": {
+    "kind": "cli-cursor",
+    "model": "cursor-grok-4.6-xhigh"
+  },
+  "timestamp": "2026-08-26T05:09:00Z",
+  "newInfoRatio": 0.74,
+  "focus": "In-chat nav jump-to-latest load-earlier chat/terminal view lock settle",
+  "findingsCount": 5,
+  "noveltyJustification": "FAB vs per-turn arrow split, hasMore pagination, view-mode fail-closed, 600ms lock settle are new versus streaming iteration.",
+  "keyQuestions": [
+    "q-session-chat-nav"
+  ],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Copying terminal/chat dual view as a home-screen pattern",
+      "reason": "We have no PTY",
+      "evidence": "specs/context/orca-main/mobile/src/session/use-mobile-session-view-mode.ts:47:49"
+    }
+  ],
+  "graphEvents": [
+    {
+      "type": "node",
+      "id": "f-iter009-live",
+      "kind": "FINDING",
+      "label": "Live-edge atBottom plus jump-to-latest FAB"
+    },
+    {
+      "type": "edge",
+      "id": "e-iter009-live-q5",
+      "source": "f-iter009-live",
+      "target": "q-session-chat-nav",
+      "relation": "ANSWERS"
+    }
+  ]
+}

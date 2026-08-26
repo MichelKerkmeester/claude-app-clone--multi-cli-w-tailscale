@@ -1,0 +1,41 @@
+{
+  "type": "iteration",
+  "iteration": 3,
+  "run": 3,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "newInfoRatio": 0.84,
+  "status": "complete",
+  "focus": "Electron parallel-agent rows: state dots, unvisited, unread, compact summary",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "findingsCount": 5,
+  "noveltyJustification": "Desktop unread definition, sessionBoundary exclusion, ack-unvisited, and host-side title chain are new versus mobile home/history.",
+  "keyQuestions": ["q-home-parallel-sessions", "q-card-content-model"],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Treat status=running as unread",
+      "reason": "Orca unread is done/blocked/waiting, not working",
+      "evidence": "specs/context/orca-main/src/renderer/src/components/activity/useActivityUnreadCount.ts:33:35"
+    },
+    {
+      "approach": "Fuse agent-row titles from client-side prompt prefixes",
+      "reason": "Orca strips dispatch preambles and prefers tab/orchestration names",
+      "evidence": "specs/context/orca-main/src/renderer/src/lib/agent-row-primary-text.ts:48:66"
+    }
+  ],
+  "graphEvents": [
+    {"type": "node", "id": "f-iter003-unread", "kind": "FINDING", "label": "Unread is done/blocked/waiting excluding sessionBoundary"},
+    {"type": "node", "id": "f-iter003-title", "kind": "FINDING", "label": "Titles are host conversation names not preamble slices"},
+    {"type": "edge", "id": "e-iter003-unread-q1", "source": "f-iter003-unread", "target": "q-home-parallel-sessions", "relation": "ANSWERS"},
+    {"type": "edge", "id": "e-iter003-title-q2", "source": "f-iter003-title", "target": "q-card-content-model", "relation": "ANSWERS"}
+  ],
+  "executor": {"kind": "cli-cursor", "model": "cursor-grok-4.6-xhigh"},
+  "timestamp": "2026-08-26T04:54:00Z"
+}

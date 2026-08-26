@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-ux-mining/007-host-requests",
+  "spec_folder": "007-orca-ux-mining/007-host-requests",
+  "parent_id": "007-orca-ux-mining",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "cross-team",
+      "request",
+      "relay",
+      "host",
+      "team",
+      "read-only",
+      "fields",
+      "rpcs",
+      "orca",
+      "recommendations",
+      "need",
+      "minimum"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "A cross-team request to the relay/host team for the read-only fields and RPCs the \u26a0\ufe0f orca recommendations need: the minimum home-card bundle (title, lastMessagePreview, agent, attention), the optional/product-gated fields (queued/subagent counts or resumable, redacted projectLabel/cwd/branch, pinned + pin RPC, capped previewMessages[], hasMore page token), and the chat RPCs (@-file-search, image-paste upload lease, dictation/STT, typed approval envelope). Each entry gives the wire shape, the exact UI it unlocks in a named consuming phase, the fail-closed fallback until it lands, and its orca wire-compat note. Implements no client code; it is the buildable-when-the-host-ships contract.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:e14617a02fd46c8306410ebe95b5538362c2dbfb34a54d603a0a282f78853ff0",
+    "source_doc_hashes": {
+      "spec.md": "167575ced2ddb60e1c2a92b063226f8e7a393694fd6890062a3a8c42cecfdb53",
+      "plan.md": "1c726f9ab0ec7677cc6addbaa2cebba27f95321c6f67821dfab1982199a332f4",
+      "tasks.md": "f7b2f37564f58c2d1143dd8b4b99e369ea678b15db30c71e5bf4b41c5db9ed56",
+      "checklist.md": "a0280b305fbfaf1771f0d41b7bfa7290907db7eacb90037dff96dfa616634001",
+      "implementation-summary.md": "b5c4d6223178c6e1e578857445365281d4267facf7b3cc04917bc0f624c880dd"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

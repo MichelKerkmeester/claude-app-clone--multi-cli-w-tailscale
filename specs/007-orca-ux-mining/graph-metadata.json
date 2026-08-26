@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-ux-mining",
+  "spec_folder": "007-orca-ux-mining",
+  "parent_id": null,
+  "children_ids": [
+    "007-orca-ux-mining/001-tested-seams",
+    "007-orca-ux-mining/002-home-selection",
+    "007-orca-ux-mining/003-chat-message",
+    "007-orca-ux-mining/004-composer",
+    "007-orca-ux-mining/005-streaming-ask",
+    "007-orca-ux-mining/006-navigation",
+    "007-orca-ux-mining/007-host-requests"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "phase",
+      "parent",
+      "implementing",
+      "verified",
+      "portability-checked",
+      "recommendations",
+      "orca",
+      "deep-research",
+      "run",
+      "research",
+      "sveltekit",
+      "mobile"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. PHASE DOCUMENTATION MAP",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. INVARIANTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. CROSS-REFERENCES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase parent for implementing the ~48 verified, portability-checked recommendations from the orca deep-research run (research/research.md) into the SvelteKit mobile client. Grouped into phases by area and ordered by leverage and dependency: a tested pure-function foundation, home session-selection UX, chat message/transcript UX, composer UX, streaming and ask/permission hardening, navigation correctness, and a host-protocol request spec for the items that need new host fields. Every ported idea stays host-authoritative and fail-closed; nothing implements until the operator says go.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:177500c9d0d953a466da09138b7290596215738c2715a2e5b367fd31c033695b",
+    "source_doc_hashes": {
+      "spec.md": "ac0feef6d2960272703dc5e264a52956357c231ecdb45085980df3b8f5aace80",
+      "research/research.md": "01d03754fced5214c41cef91e18aa5099f9e626f39a492ca18509e54ac8e9d93"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

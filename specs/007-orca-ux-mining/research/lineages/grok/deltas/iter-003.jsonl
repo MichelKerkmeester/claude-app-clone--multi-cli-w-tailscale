@@ -1,0 +1,48 @@
+{
+  "type": "iteration",
+  "iteration": 3,
+  "run": 3,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "newInfoRatio": 0.84,
+  "status": "complete",
+  "focus": "Electron parallel-agent rows: state dots, unvisited, unread, compact summary",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "findingsCount": 5,
+  "noveltyJustification": "Desktop unread definition, sessionBoundary exclusion, ack-unvisited, and host-side title chain are new versus mobile home/history.",
+  "keyQuestions": ["q-home-parallel-sessions", "q-card-content-model"],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Treat status=running as unread",
+      "reason": "Orca unread is done/blocked/waiting, not working",
+      "evidence": "specs/context/orca-main/src/renderer/src/components/activity/useActivityUnreadCount.ts:33:35"
+    },
+    {
+      "approach": "Fuse agent-row titles from client-side prompt prefixes",
+      "reason": "Orca strips dispatch preambles and prefers tab/orchestration names",
+      "evidence": "specs/context/orca-main/src/renderer/src/lib/agent-row-primary-text.ts:48:66"
+    }
+  ],
+  "graphEvents": [
+    {"type": "node", "id": "f-iter003-unread", "kind": "FINDING", "label": "Unread is done/blocked/waiting excluding sessionBoundary"},
+    {"type": "node", "id": "f-iter003-title", "kind": "FINDING", "label": "Titles are host conversation names not preamble slices"},
+    {"type": "edge", "id": "e-iter003-unread-q1", "source": "f-iter003-unread", "target": "q-home-parallel-sessions", "relation": "ANSWERS"},
+    {"type": "edge", "id": "e-iter003-title-q2", "source": "f-iter003-title", "target": "q-card-content-model", "relation": "ANSWERS"}
+  ],
+  "executor": {"kind": "cli-cursor", "model": "cursor-grok-4.6-xhigh"},
+  "timestamp": "2026-08-26T04:54:00Z"
+}
+{"type":"finding","id":"f-iter003-unread","severity":"P1","label":"Unread is done/blocked/waiting excluding sessionBoundary; working is not unread","iteration":3}
+{"type":"finding","id":"f-iter003-dot","severity":"P2","label":"History rows omit resting done dots; only live attention states get a glyph","iteration":3}
+{"type":"finding","id":"f-iter003-title","severity":"P1","label":"Titles come from conversation name/orchestration/task preview, never dispatch preamble","iteration":3}
+{"type":"finding","id":"f-iter003-compact","severity":"P2","label":"Nested agent activate stopPropagation and mark-visit by paneKey","iteration":3}
+{"type":"finding","id":"f-iter003-meta","severity":"P2","label":"Electron history meta: msgs, subagents, Not saved, datetime time, model","iteration":3}
+{"type":"ruled_out","direction":"Treat running as unread","reason":"Orca unread is done/blocked/waiting","iteration":3}
+{"type":"ruled_out","direction":"Client-side prompt-prefix titles","reason":"Host strips preamble and prefers tab names","iteration":3}

@@ -1,0 +1,24 @@
+{
+  "level": "3",
+  "specFolder": "007-orca-ux-mining",
+  "description": "Phase parent for implementing the ~48 verified, portability-checked recommendations from the orca deep-research run (research/research.md) into the",
+  "keywords": [
+    "phase",
+    "parent",
+    "implementing",
+    "verified",
+    "portability-checked",
+    "recommendations",
+    "orca",
+    "deep-research",
+    "run",
+    "research",
+    "sveltekit"
+  ],
+  "lastUpdated": "2026-08-26T05:54:46.000Z",
+  "specId": "007",
+  "folderSlug": "orca-ux-mining",
+  "parentChain": [],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

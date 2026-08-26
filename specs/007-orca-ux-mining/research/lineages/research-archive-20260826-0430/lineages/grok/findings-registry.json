@@ -1,0 +1,45 @@
+{
+  "openQuestions": [
+    {
+      "id": "q-home-parallel-sessions",
+      "text": "How does orca list, group, sort, filter, and badge parallel sessions on mobile home and Electron sidebar, and which of those affordances can sit on our existing SessionCardDto?",
+      "origin": "analyst-strategy",
+      "status": "open"
+    },
+    {
+      "id": "q-card-content-model",
+      "text": "Exactly which fields does an orca session card show, how are human titles/summaries/previews derived, and which map to our DTO vs a new host field?",
+      "origin": "analyst-strategy",
+      "status": "open"
+    },
+    {
+      "id": "q-message-level-chat",
+      "text": "What message-level chat affordances exist (menu, copy, reply/quote, edit-and-resend, regenerate, search, turn nav), and which are portable under host-authoritative/fail-closed?",
+      "origin": "analyst-strategy",
+      "status": "open"
+    },
+    {
+      "id": "q-composer-input",
+      "text": "What composer patterns (attachments, paste-image, voice, @-mentions, slash/command-arg UI, prompt history) can we copy without the client owning session truth?",
+      "origin": "analyst-strategy",
+      "status": "open"
+    },
+    {
+      "id": "q-session-chat-nav",
+      "text": "How do session-to-chat transitions, peek/preview, resume markers, tabs, and back-swipe work, and what is view-only versus a new host field?",
+      "origin": "analyst-strategy",
+      "status": "open"
+    }
+  ],
+  "resolvedQuestions": [],
+  "keyFindings": [],
+  "ruledOutDirections": [],
+  "metrics": {
+    "iterationsCompleted": 0,
+    "openQuestions": 5,
+    "resolvedQuestions": 0,
+    "keyFindings": 0,
+    "convergenceScore": 0,
+    "coverageBySources": {}
+  }
+}

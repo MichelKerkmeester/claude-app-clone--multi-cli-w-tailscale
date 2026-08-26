@@ -1,0 +1,31 @@
+{"event":"started","label":"grok","index":0,"attempt":1,"at":"2026-08-26T04:04:33.813Z","gauges":{"lag":2,"pending":1,"failed":0,"oldest_pending_lag_ms":1}}
+{"event":"budget_cap_exceeded","label":"grok","at":"2026-08-26T04:04:33.815Z","severity":"error","stop_reasons":["max_cost_units_per_lineage"],"upper_bound":{"max_cost_units_per_lineage":72,"cost_units_per_iteration":1,"iterations":20,"total_attempts":6,"estimated_cost_units":120},"gauges":{"lag":2,"pending":1,"failed":0,"oldest_pending_lag_ms":1}}
+{"event":"started","label":"luna","index":1,"attempt":1,"at":"2026-08-26T04:04:33.815Z","gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"budget_cap_exceeded","label":"luna","at":"2026-08-26T04:04:33.815Z","severity":"error","stop_reasons":["max_cost_units_per_lineage"],"upper_bound":{"max_cost_units_per_lineage":72,"cost_units_per_iteration":1,"iterations":20,"total_attempts":6,"estimated_cost_units":120},"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"failed","label":"grok","index":0,"attempt":1,"at":"2026-08-26T04:04:33.816Z","duration_ms":2,"terminal":true,"error":{"name":"Error","message":"lineage grok exceeds configured budget cap: 120 > 72 cost units","failure_class":"exit","retry_verdict":"fatal","retryable":false,"exit_code":0,"timed_out":false,"salvage":null},"gauges":{"lag":1,"pending":0,"failed":1}}
+{"event":"failed","label":"luna","index":1,"attempt":1,"at":"2026-08-26T04:04:33.816Z","duration_ms":1,"terminal":true,"error":{"name":"Error","message":"lineage luna exceeds configured budget cap: 120 > 72 cost units","failure_class":"exit","retry_verdict":"fatal","retryable":false,"exit_code":0,"timed_out":false,"salvage":null},"gauges":{"lag":0,"pending":0,"failed":2}}
+{"event":"started","label":"grok","index":0,"attempt":1,"at":"2026-08-26T04:06:07.876Z","gauges":{"lag":2,"pending":1,"failed":0,"oldest_pending_lag_ms":1}}
+{"event":"started","label":"luna","index":1,"attempt":1,"at":"2026-08-26T04:09:19.761Z","gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:12:27.473Z","duration_ms":379591,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:12:27.473Z","duration_ms":187627,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:13:27.475Z","duration_ms":439593,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:13:27.476Z","duration_ms":247630,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:14:27.477Z","duration_ms":499595,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:14:27.478Z","duration_ms":307632,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:15:27.478Z","duration_ms":559596,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:15:27.479Z","duration_ms":367633,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:16:27.479Z","duration_ms":619597,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:16:27.480Z","duration_ms":427634,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:17:27.479Z","duration_ms":679597,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:17:27.480Z","duration_ms":487634,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:18:27.480Z","duration_ms":739598,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:18:27.481Z","duration_ms":547635,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:19:27.480Z","duration_ms":799598,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:19:27.481Z","duration_ms":607635,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:20:27.482Z","duration_ms":859600,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:20:27.482Z","duration_ms":667636,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"grok","at":"2026-08-26T04:21:27.483Z","duration_ms":919601,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"progress","label":"luna","at":"2026-08-26T04:21:27.484Z","duration_ms":727638,"gauges":{"lag":2,"pending":0,"failed":0}}
+{"event":"orphan_requeued","label":"grok","index":0,"started_at_iso":"2026-08-26T04:06:07.876Z","at":"2026-08-26T04:25:44.143Z","status":"requeued"}
+{"event":"orphan_requeued","label":"luna","index":1,"started_at_iso":"2026-08-26T04:09:19.761Z","at":"2026-08-26T04:25:44.143Z","status":"requeued"}
+{"event":"started","label":"luna","index":0,"attempt":1,"at":"2026-08-26T04:25:44.144Z","gauges":{"lag":1,"pending":0,"failed":0}}

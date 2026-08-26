@@ -1,0 +1,51 @@
+{
+  "type": "iteration",
+  "iteration": 7,
+  "run": 7,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "status": "complete",
+  "executor": {
+    "kind": "cli-cursor",
+    "model": "cursor-grok-4.6-xhigh"
+  },
+  "timestamp": "2026-08-26T05:07:00Z",
+  "newInfoRatio": 0.8,
+  "focus": "Streaming pending working indicator input lock drafts",
+  "findingsCount": 5,
+  "noveltyJustification": "Streaming gate vs tab peek, pending image splice, working-vs-streaming split, lease lock.",
+  "keyQuestions": [
+    "q-session-chat-nav",
+    "q-composer-input"
+  ],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Client-invented typing indicator without host agentWorking",
+      "reason": "Orca uses host working flag plus gated streaming bubble",
+      "evidence": "specs/context/orca-main/mobile/src/session/MobileNativeChatView.tsx:51:56"
+    }
+  ],
+  "graphEvents": [
+    {
+      "type": "node",
+      "id": "f-iter007-stream",
+      "kind": "FINDING",
+      "label": "Synthetic streaming bubble gated and throttled"
+    },
+    {
+      "type": "edge",
+      "id": "e-iter007-stream-q5",
+      "source": "f-iter007-stream",
+      "target": "q-session-chat-nav",
+      "relation": "ANSWERS"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "type": "iteration",
+  "iteration": 10,
+  "run": 10,
+  "mode": "research",
+  "target_agent": "deep-research",
+  "agent_definition_loaded": true,
+  "resolved_route": "Resolved route: mode=research target_agent=deep-research",
+  "sessionId": "fanout-grok-1787718935950-gxg4a7",
+  "runId": "fanout-grok-1787718935950-gxg4a7",
+  "lineageId": "grok",
+  "parentSessionId": "fanout-grok-1787718935950-gxg4a7",
+  "generation": 1,
+  "status": "complete",
+  "executor": {
+    "kind": "cli-cursor",
+    "model": "cursor-grok-4.6-xhigh"
+  },
+  "timestamp": "2026-08-26T05:10:00Z",
+  "newInfoRatio": 0.78,
+  "focus": "@-file search RPC and AskUserQuestion wizard",
+  "findingsCount": 3,
+  "noveltyJustification": "First pass on files.searchPaths stale-safe search and index-based Ask wizard.",
+  "keyQuestions": [
+    "q-composer-input"
+  ],
+  "answeredQuestions": [],
+  "ruledOut": [
+    {
+      "approach": "Device filesystem listing for @-mentions",
+      "reason": "Client must not walk laptop disk",
+      "evidence": "specs/context/orca-main/mobile/src/session/use-mobile-native-chat-file-search.ts:48:125"
+    }
+  ],
+  "graphEvents": [
+    {
+      "type": "node",
+      "id": "f-iter010-files",
+      "kind": "FINDING",
+      "label": "Debounced host path search with legacy files.list fallback"
+    },
+    {
+      "type": "edge",
+      "id": "e-iter010-files-q4",
+      "source": "f-iter010-files",
+      "target": "q-composer-input",
+      "relation": "ANSWERS"
+    }
+  ]
+}

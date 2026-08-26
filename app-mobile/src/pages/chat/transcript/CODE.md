@@ -114,9 +114,11 @@ exercise the corresponding component with real display or normalized fixtures.
 | `block.stories.ts` | Stories for user and assistant text, artifacts, tools, errors, unknown blocks and file preview states. |
 | `card-file-preview.svelte` | Shows file preview metadata and opens an available artifact viewer. |
 | `card-file-preview.stories.ts` | Stories for ready, withheld, missing, denied and unsupported preview states. |
-| `collapsed-evidence.svelte` | Reusable disclosure for routine evidence content. |
+| `collapsed-evidence.svelte` | Native one-line fold wrapper for routine evidence content. |
 | `collapsed-evidence.stories.ts` | Stories for collapsed tool calls and tool results. |
-| `normalized-activity-group.svelte` | Collapses a consecutive activity run and renders its normalized children. |
+| `menu-transcript-action.svelte` | Body-portal transcript action menu with disabled-row hints. |
+| `menu-transcript-action.stories.ts` | Story for mixed available and disabled transcript actions. |
+| `normalized-activity-group.svelte` | Projects consecutive activity into flat call↔result folds. |
 | `normalized-activity-group.stories.ts` | Story for a normalized activity run. |
 | `normalized-transcript-block-view.svelte` | Dispatches a normalized block to the standard block view or rich-content router. |
 | `normalized-transcript-block-view.stories.ts` | Stories for normalized prose, code, text artifacts, commands, activity and fallback blocks. |
@@ -124,9 +126,20 @@ exercise the corresponding component with real display or normalized fixtures.
 | `runtime-status-region.stories.ts` | Stories for checking, streaming, pending, accepted, stale and unsupported runtime phases. |
 | `todo-projection-block.svelte` | Mounts an available read-only todo projection inside the transcript. |
 | `todo-projection-block.stories.ts` | Stories for waiting and unsupported todo projection states. |
+| `tool-fold.svelte` | Native `<details>` one-line tool fold with an in-flight label. |
+| `tool-fold.stories.ts` | Stories for completed and in-flight grep folds. |
+| `tool-run-pairing.ts` | Pairs tool calls with results; unpaired calls stay in-flight. |
+| `transcript-find-bar.svelte` | Snapshot-scoped find chrome with wraparound and a role-tagged snippet. |
+| `transcript-find-bar.stories.ts` | Stories for a current match and an empty result. |
+| `transcript-find-context.svelte.ts` | Shares the active find term with mounted rows. |
+| `transcript-find-index.ts` | Flat line index, match cursor, and `<mark>` split helpers. |
 | `transcript-helpers.ts` | Defines render-item types, sequence grouping, turn grouping, todo insertion and activity labels. |
-| `transcript-list.svelte` | Owns normalization, virtual rows, live-edge scrolling and row dispatch. |
+| `transcript-list.svelte` | Owns normalization, virtual rows, find, live-edge scrolling and row dispatch. |
 | `transcript-list.stories.ts` | Stories for virtualized, live-edge and empty transcript states. |
+| `transcript-load-panel.svelte` | Named loading, missing, unsupported and error transcript states. |
+| `transcript-load-panel.stories.ts` | Stories for the four unresolved load states. |
+| `transcript-load-state.ts` | Derives the five-state load taxonomy and held-thread retention. |
+| `transcript-selection.ts` | Scopes copy selection to the transcript root. |
 | `CODE.md` | This code-folder map. |
 
 ---
@@ -135,7 +148,9 @@ exercise the corresponding component with real display or normalized fixtures.
 
 | File | Responsibility |
 |---|---|
-| [`transcript-list.svelte`](./transcript-list.svelte) | Accepts the host props, normalizes blocks, builds render items, maintains the virtualizer and handles scroll and arrival effects. |
+| [`transcript-list.svelte`](./transcript-list.svelte) | Accepts the host props, normalizes blocks, builds render items, maintains the virtualizer, and owns find, turn-scroll and scoped copy. |
+| [`transcript-find-index.ts`](./transcript-find-index.ts) | Builds the snapshot line index and wraparound cursor used by the find bar. |
+| [`transcript-load-state.ts`](./transcript-load-state.ts) | Derives loading, ok, missing, unsupported and error without inventing host fields. |
 | [`transcript-helpers.ts`](./transcript-helpers.ts) | Groups activity and inbound image runs, aligns normalized blocks to turns, adds answer actions and inserts a todo projection at its sequence anchor. |
 | [`normalized-transcript-block-view.svelte`](./normalized-transcript-block-view.svelte) | Sends fallback and file-diff display blocks to [`block.svelte`](./block.svelte) and sends rich kinds to [rich-content-router.svelte](../rich-content/rich-content-router.svelte). |
 | [`block.svelte`](./block.svelte) | Owns display-block labels, collapsibility and standard block markup. It delegates artifacts, inbound images and questions to sibling feature folders. |

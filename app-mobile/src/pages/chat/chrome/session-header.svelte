@@ -25,6 +25,11 @@
     readonly onOpenModelSheet: () => void;
     /** Attached to the readout trigger so the sheet can restore focus to it. */
     modelTriggerRef?: HTMLButtonElement | null;
+    readonly sessionId?: string;
+    readonly slashCommandNames?: readonly string[];
+    readonly onRefreshSession?: () => void;
+    readonly onOpenTranscript?: () => void;
+    readonly onForwardSlash?: (name: string) => void;
   }
 
   // ───────────────────────────────────────────────────────────────────
@@ -32,6 +37,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   const THEME_OPTIONS = ['system', 'light', 'dark'] as const;
+  const SESSION_SLASH_COMMANDS = ['rename', 'archive', 'new', 'fork'] as const;
 
   // ───────────────────────────────────────────────────────────────────
   // 4. HELPERS
@@ -76,6 +82,7 @@
   import { Popover } from 'bits-ui';
   import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
   import Button from '$shared/primitives/button/button.svelte';
+  import { useCopyFeedback } from '../rich-content/use-copy-feedback.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 6. PROPS
@@ -91,6 +98,11 @@
     sheetOpen,
     onOpenModelSheet,
     modelTriggerRef = $bindable(null),
+    sessionId = '',
+    slashCommandNames = [],
+    onRefreshSession,
+    onOpenTranscript,
+    onForwardSlash,
   }: SessionHeaderProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
@@ -100,6 +112,7 @@
   let overflowOpen = $state(false);
   let overflowContentEl = $state<HTMLElement | null>(null);
   let overflowDialogEl = $state<HTMLElement | null>(null);
+  const copyFeedback = useCopyFeedback();
 
   // ───────────────────────────────────────────────────────────────────
   // 8. DERIVED STATE
@@ -112,6 +125,7 @@
   const effortText = $derived(
     effortTriggerText(snapshot?.thinkingLevel, snapshot?.availableThinkingLevels ?? []),
   );
+  const availableSlash = $derived(new Set(slashCommandNames));
 
   // ───────────────────────────────────────────────────────────────────
   // 9. EFFECTS
@@ -268,6 +282,74 @@
               </button>
             {/each}
           </div>
+        </section>
+        <section class="tools--group">
+          <span class="tools--label">Session</span>
+          <div class="overflow--nav">
+            <Button
+              class="overflow--item"
+              disabled={onOpenTranscript === undefined}
+              onclick={() => {
+                onOpenTranscript?.();
+                overflowOpen = false;
+              }}
+            >
+              Open transcript
+              {#if onOpenTranscript === undefined}
+                <span class="overflow--hint">Unavailable in this view</span>
+              {/if}
+            </Button>
+            <Button
+              class="overflow--item"
+              disabled={sessionId.length === 0 || !copyFeedback.canCopy}
+              onclick={() => {
+                if (sessionId.length === 0) return;
+                copyFeedback.copy('session-id', sessionId);
+              }}
+            >
+              {copyFeedback.copiedUnit === 'session-id' && !copyFeedback.copyFailed
+                ? 'Copied'
+                : 'Copy session id'}
+              {#if sessionId.length === 0}
+                <span class="overflow--hint">No session id</span>
+              {:else if !copyFeedback.canCopy}
+                <span class="overflow--hint">Clipboard unavailable</span>
+              {/if}
+            </Button>
+            <Button
+              class="overflow--item"
+              disabled={onRefreshSession === undefined}
+              onclick={() => {
+                onRefreshSession?.();
+                overflowOpen = false;
+              }}
+            >
+              Refresh session
+              {#if onRefreshSession === undefined}
+                <span class="overflow--hint">Unavailable in this view</span>
+              {/if}
+            </Button>
+            {#each SESSION_SLASH_COMMANDS as name (name)}
+              {@const available = availableSlash.has(name)}
+              <Button
+                class="overflow--item"
+                disabled={!available || onForwardSlash === undefined}
+                onclick={() => {
+                  if (!available) return;
+                  onForwardSlash?.(name);
+                  overflowOpen = false;
+                }}
+              >
+                /{name}
+                {#if !available}
+                  <span class="overflow--hint">Not available from the host</span>
+                {/if}
+              </Button>
+            {/each}
+          </div>
+          {#if copyFeedback.announcement.length > 0}
+            <p class="sr-only" role="status" aria-live="polite">{copyFeedback.announcement}</p>
+          {/if}
         </section>
       </div>
       <button
@@ -462,8 +544,10 @@
   /* This slot: nav-item */
   :global(.overflow--item) {
     display: flex;
+    flex-direction: column;
     min-height: 2.5rem;
-    align-items: center;
+    align-items: flex-start;
+    gap: 0.15rem;
     padding: var(--space-2) var(--space-3);
     border: 0;
     border-radius: var(--radius-control);
@@ -477,5 +561,17 @@
   /* This state: hover */
   :global(.overflow--item[data-hovered]) {
     background: var(--surface-muted);
+  }
+
+  :global(.overflow--item[data-disabled]) {
+    color: var(--ink-muted);
+    cursor: default;
+  }
+
+  .overflow--hint {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
   }
 </style>

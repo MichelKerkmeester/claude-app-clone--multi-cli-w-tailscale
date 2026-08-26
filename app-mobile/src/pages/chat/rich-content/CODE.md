@@ -56,6 +56,7 @@ transcript surface. No branch fetches a host file or reconstructs redacted input
 normalization and policy
   normalize-transcript-blocks.ts
   safe-markdown.svelte
+  prose-link.ts
   use-highlighted-code.svelte.ts
   highlight.worker.ts
 
@@ -105,6 +106,7 @@ The folder is flat. This inventory names every direct file other than the README
 | [`f6-viewer-adapter.ts`](./f6-viewer-adapter.ts) | Projects rich cards into in-memory artifact documents. |
 | [`highlight.worker.ts`](./highlight.worker.ts) | Tokenizes allowlisted source in a Web Worker. |
 | [`normalize-transcript-blocks.ts`](./normalize-transcript-blocks.ts) | Normalizes revisions, fenced code, long text, shell pairs and fallback blocks. |
+| [`prose-link.ts`](./prose-link.ts) | Classifies http(s) URLs versus file-path tokens; never opens a local path. |
 | [`redaction-badge.svelte`](./redaction-badge.svelte) | Shows redaction categories for protected fields. |
 | [`redaction-badge.stories.ts`](./redaction-badge.stories.ts) | Exercises command, cache and no-redaction states. |
 | [`rich-block-frame.svelte`](./rich-block-frame.svelte) | Provides shared rich-card header, content and action chrome. |
@@ -138,7 +140,7 @@ The folder is flat. This inventory names every direct file other than the README
 |---|---|
 | Input | The transcript supplies protocol or display blocks. The normalizer retains the latest revision for each block identity. |
 | Source policy | Optimistic input becomes a fallback block. Cached input keeps its cache provenance and is labeled by the relevant card. |
-| Markdown | [`safe-markdown.svelte`](./safe-markdown.svelte) is the only sanctioned path for transcript prose. It emits text-only link labels and never emits anchors. |
+| Markdown | [`safe-markdown.svelte`](./safe-markdown.svelte) is the only sanctioned path for transcript prose. It emits http(s) anchors that open externally and keeps file-path tokens inert. |
 | Redaction | Command and output metadata is merged into the normalized block and displayed by [`redaction-badge.svelte`](./redaction-badge.svelte). |
 | Highlighting | Only allowlisted languages within 20,000 characters and 1,000 lines enter the Worker. A response must match request id, revision id, content hash and source length. |
 | Viewer | [`f6-viewer-adapter.ts`](./f6-viewer-adapter.ts) creates an in-memory document. The router delegates it to the existing artifacts viewer without a fetch, ticket, download or host-file read. |

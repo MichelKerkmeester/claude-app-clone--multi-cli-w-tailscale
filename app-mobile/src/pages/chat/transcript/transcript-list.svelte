@@ -63,6 +63,7 @@
   import { createVirtualizer } from '@tanstack/svelte-virtual';
   import { EMPTY_TODO_PROJECTION_STATE } from '$shared/state/state.js';
   import { pruneTranscriptDisclosureState } from '$shared/state/transcript-disclosure.svelte.js';
+  import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
   import { normalizeTranscriptBlocks } from '../rich-content/normalize-transcript-blocks.js';
   import { groupBlocksIntoTurns } from '$shared/state/turns.js';
   import { groupNormalizedTranscript, insertTodoProjectionItem } from './transcript-helpers.js';
@@ -70,6 +71,25 @@
   import NormalizedActivityGroup from './normalized-activity-group.svelte';
   import NormalizedTranscriptBlockView from './normalized-transcript-block-view.svelte';
   import AssistantActions from './assistant-actions.svelte';
+  import TranscriptFindBar from './transcript-find-bar.svelte';
+  import MenuTranscriptAction from './menu-transcript-action.svelte';
+  import {
+    buildTranscriptFindIndex,
+    createFindCursor,
+    currentFindMatch,
+    matchFindQuery,
+    nextFindMatch,
+    prevFindMatch,
+    type FindCursor,
+  } from './transcript-find-index.js';
+  import { setTranscriptFindContext } from './transcript-find-context.svelte.js';
+  import { readTranscriptSelection } from './transcript-selection.js';
+  import {
+    decideHoldToSelectCoach,
+    markHoldToSelectCoachShown,
+    readHoldToSelectCoachShown,
+    useCopyFeedback,
+  } from '../rich-content/use-copy-feedback.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
@@ -93,11 +113,27 @@
   // ───────────────────────────────────────────────────────────────────
 
   let scrollEl = $state<HTMLDivElement | null>(null);
+  let frameEl = $state<HTMLElement | null>(null);
   let previousCount = blocks.length;
   let announcement = $state('');
   let atLiveEdge = $state(true);
   let newAway = $state(0);
   let stallClock = $state(Date.now());
+  let findOpen = $state(false);
+  let findQuery = $state('');
+  let findMatchIndex = $state(0);
+  const findContext = $state({ term: '' });
+  setTranscriptFindContext(findContext);
+  const copyFeedback = useCopyFeedback();
+  let menuOpen = $state(false);
+  let menuX = $state(0);
+  let menuY = $state(0);
+  let menuTargetText = $state('');
+  let menuTargetCode = $state('');
+  let coachHint = $state('');
+  let longPressTimer = $state<number | null>(null);
+  let dragCopied = false;
+  let dragSelected = false;
 
   // ───────────────────────────────────────────────────────────────────
   // 7. HANDLERS
@@ -120,6 +156,150 @@
     if (nearBottom) newAway = 0;
   }
 
+  function scrollTurnToTop(index: number): void {
+    const api = untrack(() => get(virtualizer));
+    if (typeof api.scrollToIndex === 'function') {
+      api.scrollToIndex(index, { align: 'start' });
+    }
+  }
+
+  function scrollFindMatch(cursor: FindCursor): void {
+    const match = currentFindMatch(cursor);
+    if (match === null) return;
+    const snippet = findIndex.snippets[match.snippetIndex];
+    if (snippet === undefined) return;
+    const api = untrack(() => get(virtualizer));
+    if (typeof api.scrollToIndex === 'function') {
+      api.scrollToIndex(snippet.rowIndex, { align: 'start' });
+    }
+  }
+
+  function openFind(): void {
+    findOpen = true;
+  }
+
+  function closeFind(): void {
+    findOpen = false;
+    findQuery = '';
+    findMatchIndex = 0;
+    findContext.term = '';
+  }
+
+  function onFindQueryChange(value: string): void {
+    findQuery = value;
+  }
+
+  function goFindNext(): void {
+    const next = nextFindMatch(findCursor);
+    findMatchIndex = next.matchIndex;
+    scrollFindMatch(next);
+  }
+
+  function goFindPrev(): void {
+    const prev = prevFindMatch(findCursor);
+    findMatchIndex = prev.matchIndex;
+    scrollFindMatch(prev);
+  }
+
+  function messageTextFromItem(index: number): { text: string; code: string } {
+    const item = renderItems[index];
+    if (item === undefined) return { text: '', code: '' };
+    if (item.kind === 'actions') return { text: item.text, code: '' };
+    if (item.kind === 'block' && item.block.kind === 'prose') {
+      return { text: item.block.canonicalSource, code: '' };
+    }
+    if (item.kind === 'block' && item.block.kind === 'code') {
+      return { text: '', code: item.block.canonicalSource };
+    }
+    if (item.kind === 'block' && item.block.kind === 'fallback' && item.block.sourceBlock.kind === 'text') {
+      return { text: item.block.sourceBlock.text, code: '' };
+    }
+    return { text: '', code: '' };
+  }
+
+  function openActionMenu(clientX: number, clientY: number, target: EventTarget | null): void {
+    const row = target instanceof Element ? target.closest('[data-index]') : null;
+    const index = row === null ? -1 : Number(row.getAttribute('data-index'));
+    const extracted = Number.isFinite(index) ? messageTextFromItem(index) : { text: '', code: '' };
+    menuTargetText = extracted.text;
+    menuTargetCode = extracted.code;
+    menuX = clientX;
+    menuY = clientY;
+    menuOpen = true;
+  }
+
+  function onFrameContextMenu(event: MouseEvent): void {
+    event.preventDefault();
+    openActionMenu(event.clientX, event.clientY, event.target);
+  }
+
+  let pressX = 0;
+  let pressY = 0;
+
+  function clearLongPress(): void {
+    if (longPressTimer !== null) {
+      window.clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  }
+
+  function onFramePointerDown(event: PointerEvent): void {
+    dragCopied = false;
+    dragSelected = false;
+    clearLongPress();
+    if (event.target instanceof Element && event.target.closest('button, input, a, summary, textarea')) {
+      return;
+    }
+    pressX = event.clientX;
+    pressY = event.clientY;
+    const target = event.target;
+    longPressTimer = window.setTimeout(() => {
+      openActionMenu(pressX, pressY, target);
+    }, 500);
+  }
+
+  function onFramePointerMove(event: PointerEvent): void {
+    if (longPressTimer === null) return;
+    if (Math.hypot(event.clientX - pressX, event.clientY - pressY) > 10) {
+      clearLongPress();
+    }
+  }
+
+  function onFramePointerUp(event: PointerEvent): void {
+    clearLongPress();
+    const selected = readTranscriptSelection(frameEl);
+    dragSelected = selected.inside && selected.text.length > 0;
+    const moved = Math.hypot(event.clientX - pressX, event.clientY - pressY) > 8;
+    if (!moved) return;
+    const hint = decideHoldToSelectCoach({
+      copied: dragCopied,
+      selected: dragSelected,
+      alreadyShown: readHoldToSelectCoachShown(),
+    });
+    if (hint !== null) {
+      coachHint = hint;
+      markHoldToSelectCoachShown();
+    }
+  }
+
+  function onMenuSelect(id: string): void {
+    if (id === 'copy-selection') {
+      const selected = readTranscriptSelection(frameEl);
+      if (!selected.inside || selected.text.length === 0) return;
+      dragCopied = true;
+      copyFeedback.copy('selection', selected.text);
+    } else if (id === 'copy-message') {
+      if (menuTargetText.length === 0) return;
+      dragCopied = true;
+      copyFeedback.copy('message', menuTargetText);
+    } else if (id === 'copy-code') {
+      if (menuTargetCode.length === 0) return;
+      dragCopied = true;
+      copyFeedback.copy('code', menuTargetCode);
+    }
+    menuOpen = false;
+  }
+
   // ───────────────────────────────────────────────────────────────────
   // 8. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
@@ -135,10 +315,50 @@
   const renderItems = $derived.by(() =>
     insertTodoProjectionItem(groupNormalizedTranscript(normalizedBlocks, blocks), blocks, todoProjection),
   );
+  const findIndex = $derived(buildTranscriptFindIndex(blocks, renderItems));
+  const findMatches = $derived(matchFindQuery(findIndex, findQuery));
+  const findCursor = $derived.by((): FindCursor => ({
+    matches: findMatches,
+    matchCount: findMatches.length,
+    matchIndex: findMatchIndex,
+  }));
+  const findSnippet = $derived.by(() => {
+    const match = currentFindMatch(findCursor);
+    if (match === null) return null;
+    return findIndex.snippets[match.snippetIndex] ?? null;
+  });
+  const actionRows = $derived.by(() => {
+    const selected = readTranscriptSelection(frameEl);
+    const selectionDisabled = !selected.inside || selected.text.length === 0;
+    return [
+      {
+        id: 'copy-selection',
+        label: 'Copy selection',
+        disabled: selectionDisabled,
+        hint: selected.text.length === 0 ? 'Nothing selected' : 'Selection is outside this transcript',
+      },
+      {
+        id: 'copy-message',
+        label: 'Copy message',
+        disabled: menuTargetText.length === 0,
+        hint: 'No message text here',
+      },
+      {
+        id: 'copy-code',
+        label: 'Copy code',
+        disabled: menuTargetCode.length === 0,
+        hint: 'No code in this row',
+      },
+    ];
+  });
   const turnStartIds = $derived.by(() => {
     // First block of each turn after the first — spacing boundary only; never mutates blocks.
     const turns = groupBlocksIntoTurns(blocks);
     return new Set(turns.slice(1).map((turn) => turn.blocks[0]?.id));
+  });
+  const turnLeadIds = $derived.by(() => {
+    const turns = groupBlocksIntoTurns(blocks);
+    return new Set(turns.map((turn) => turn.blocks[0]?.id));
   });
   const mostRecentBlockAt = $derived.by(() => {
     let latest = Number.NEGATIVE_INFINITY;
@@ -201,6 +421,21 @@
     });
   });
 
+  // Reset the cursor on a new query; scroll uses the virtualizer, not browser find.
+  $effect(() => {
+    const matches = findMatches;
+    const query = findQuery;
+    const open = findOpen;
+    untrack(() => {
+      const cursor = createFindCursor(matches);
+      findMatchIndex = cursor.matchIndex;
+      findContext.term = open ? query : '';
+      if (open && cursor.matchCount > 0) {
+        scrollFindMatch(cursor);
+      }
+    });
+  });
+
   // Do not edit — live-edge auto-scroll effect + sr-only block-arrival announcements — Not designer-editable.
   $effect(() => {
     if (blocks.length > previousCount) {
@@ -234,11 +469,50 @@
   <div class="empty--transcript">No transcript blocks are available yet.</div>
 {:else}
   <!-- This slot: frame — labelled, focussable transcript region. -->
-  <section class="transcript--frame" aria-label="Typed transcript" tabindex={-1}>
+  <section
+    class="transcript--frame"
+    bind:this={frameEl}
+    aria-label="Typed transcript"
+    tabindex={-1}
+    oncontextmenu={onFrameContextMenu}
+    onpointerdown={onFramePointerDown}
+    onpointermove={onFramePointerMove}
+    onpointerup={onFramePointerUp}
+    onpointercancel={clearLongPress}
+  >
     <!-- Do not edit — sr-only polite live announcer — Not designer-editable. -->
     <div class="sr-only" aria-live="polite" aria-atomic="true">
       {announcement}
     </div>
+    {#if copyFeedback.announcement.length > 0}
+      <div class="sr-only" role="status" aria-live="polite">{copyFeedback.announcement}</div>
+    {/if}
+    {#if coachHint.length > 0}
+      <p class="transcript--coach" role="status" aria-live="polite">{coachHint}</p>
+    {/if}
+    <button
+      type="button"
+      class="transcript--find-toggle"
+      use:hover
+      use:press
+      use:focusVisible
+      aria-expanded={findOpen}
+      aria-controls={findOpen ? 'transcript-find-input' : undefined}
+      onclick={() => (findOpen ? closeFind() : openFind())}
+    >
+      Find
+    </button>
+    {#if findOpen}
+      <TranscriptFindBar
+        query={findQuery}
+        cursor={findCursor}
+        snippet={findSnippet}
+        onQueryChange={onFindQueryChange}
+        onNext={goFindNext}
+        onPrev={goFindPrev}
+        onClose={closeFind}
+      />
+    {/if}
     <!-- This slot: scroll-region — the scrollable clip of the virtual list. -->
     <div class="transcript--scroll" bind:this={scrollEl} onscroll={onScroll}>
       <div
@@ -255,6 +529,7 @@
                   ? item.kind === 'block' ? item.block.sourceBlockId : item.sourceBlockId
                   : item.blocks[0]?.sourceBlockId}
             {@const isTurnStart = leadId !== undefined && turnStartIds.has(leadId)}
+            {@const isTurnLead = leadId !== undefined && turnLeadIds.has(leadId)}
             <!-- Do not edit — virtualized row — MeasureElement + translateY come from the virtualizer. -->
             <div
               class={isTurnStart ? 'virtual-row turn--start' : 'virtual-row'}
@@ -262,6 +537,19 @@
               style="transform: translateY({virtualItem.start}px)"
               {@attach (node) => { $virtualizer.measureElement(node); }}
             >
+              {#if isTurnLead}
+                <button
+                  type="button"
+                  class="turn--scroll"
+                  use:hover
+                  use:press
+                  use:focusVisible
+                  aria-label="Scroll this message to top"
+                  onclick={() => scrollTurnToTop(virtualItem.index)}
+                >
+                  ↑
+                </button>
+              {/if}
               {#if item.kind === 'todo'}
                 <TodoProjectionBlock
                   state={item.state}
@@ -340,6 +628,16 @@
         {/if}
       </button>
     {/if}
+    <MenuTranscriptAction
+      open={menuOpen}
+      x={menuX}
+      y={menuY}
+      rows={actionRows}
+      onSelect={onMenuSelect}
+      onClose={() => {
+        menuOpen = false;
+      }}
+    />
   </section>
 {/if}
 
@@ -371,6 +669,41 @@
   /* The rail stays absent; turn boundaries provide conversation hierarchy. */
   .transcript--frame::before {
     content: none;
+  }
+
+  .transcript--find-toggle,
+  .turn--scroll {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink-secondary);
+    font-size: 0.8rem;
+    font-weight: 550;
+    cursor: pointer;
+  }
+
+  .transcript--find-toggle:global([data-hovered]),
+  .turn--scroll:global([data-hovered]) {
+    background: var(--surface-muted);
+  }
+
+  .transcript--find-toggle:global([data-focus-visible]),
+  .turn--scroll:global([data-focus-visible]) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .transcript--find-toggle {
+    margin-bottom: var(--space-2);
+  }
+
+  .transcript--coach {
+    margin: 0 0 var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.8rem;
   }
 
   /* Reader-controlled live edge: a pill to jump to the newest blocks when scrolled up. */

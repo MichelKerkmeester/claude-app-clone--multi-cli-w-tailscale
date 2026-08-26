@@ -23,6 +23,8 @@
   import { formatNumber, formatCost, formatTime } from '$shared/format/format.js';
   import CollapsedEvidence from './collapsed-evidence.svelte';
   import FilePreviewCard from './card-file-preview.svelte';
+  import { findParts } from './transcript-find-index.js';
+  import { getTranscriptFindContext } from './transcript-find-context.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
@@ -98,12 +100,15 @@
       (bare ? block.kind !== 'text' : block.kind !== 'text' && !blockDisplay.collapsible),
   );
   const renderAsDisclosure = $derived(blockDisplay.collapsible && !bare);
+  const find = getTranscriptFindContext();
+  const findTerm = $derived(find.term);
+  const callInFlight = $derived(block.kind === 'tool_call');
 </script>
 
 <!-- Component content -->
 {#snippet blockContent()}
   {#if block.kind === 'text'}
-    <p class="block--copy">{block.text}</p>
+    <p class="block--copy">{#each findParts(block.text, findTerm) as part, partIndex (partIndex)}{#if part.mark}<mark class="artifact-find--match">{part.text}</mark>{:else}{part.text}{/if}{/each}</p>
   {:else if block.kind === 'text_artifact'}
     <pre class="block--copy">{block.source}</pre>
   {:else if block.kind === 'thinking'}
@@ -180,7 +185,7 @@
     </header>
   {/if}
   {#if renderAsDisclosure}
-    <CollapsedEvidence blockId={block.id} summary={blockDisplay.label}>
+    <CollapsedEvidence blockId={block.id} summary={blockDisplay.label} inFlight={callInFlight}>
       {@render blockContent()}
     </CollapsedEvidence>
   {:else}

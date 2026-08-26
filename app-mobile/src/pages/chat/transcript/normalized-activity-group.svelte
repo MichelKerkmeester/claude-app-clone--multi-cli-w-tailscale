@@ -12,11 +12,11 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import Collapsible from '$shared/primitives/disclosure/collapsible.svelte';
-  import { hover } from '$shared/primitives/a11y/interactions.js';
+  import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
   import { createTranscriptDisclosureBinding } from '$shared/state/transcript-disclosure.svelte.js';
-  import { normalizedActivitySummary } from './transcript-helpers.js';
   import RichContentRouter from '../rich-content/rich-content-router.svelte';
+  import ToolFold from './tool-fold.svelte';
+  import { pairActivityRuns } from './tool-run-pairing.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
@@ -25,90 +25,112 @@
   let { blocks }: NormalizedActivityGroupProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. LOCAL STATE
+  // 3. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  const disclosure = createTranscriptDisclosureBinding(() => {
-    const firstBlock = blocks[0];
-    if (firstBlock === undefined) {
-      // Empty groups lack a protocol key; fall back to local disclosure state.
-      return undefined;
+  const runs = $derived(pairActivityRuns(blocks));
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
+  // Toggle every run through the shared disclosure map so remounts keep the state.
+  function toggleAll(): void {
+    const anyOpen = runs.some((run) => createTranscriptDisclosureBinding(() => run.id).open);
+    for (const run of runs) {
+      createTranscriptDisclosureBinding(() => run.id).open = !anyOpen;
     }
-    return firstBlock.blockId;
-  });
-
-  // Bits does not emit data-expanded/data-hovered; set both on the trigger explicitly.
-  let triggerButton = $state<HTMLButtonElement | null>(null);
-
-  // ───────────────────────────────────────────────────────────────────
-  // 4. EFFECTS
-  // ───────────────────────────────────────────────────────────────────
-
-  // Keep this effect synchronized with the state it observes.
-  $effect(() => {
-    const button = triggerButton;
-    if (button === null) return;
-    if (disclosure.open) button.setAttribute('data-expanded', 'true');
-    else button.removeAttribute('data-expanded');
-  });
-
-  // ───────────────────────────────────────────────────────────────────
-  // 5. HANDLERS
-  // ───────────────────────────────────────────────────────────────────
-
-  // Keep attach evidence trigger focused on its single responsibility.
-  function attachEvidenceTrigger(node: HTMLElement): (() => void) | void {
-    const button = node.parentElement;
-    if (!(button instanceof HTMLButtonElement)) return;
-    button.classList.add('evidence--trigger');
-    triggerButton = button;
-    const hoverAct = hover(button);
-    return () => {
-      hoverAct?.destroy?.();
-      button.classList.remove('evidence--trigger');
-      if (triggerButton === button) triggerButton = null;
-    };
   }
 </script>
 
-<!-- Component content -->
-<!-- Activity group -->
-<!-- This surface: activity--group — grouped bare evidence surface. -->
-<!-- Evidence disclosure -->
-<!-- This surface: evidence-disclosure — grouped activity disclosure. -->
+<!-- section: flat tool runs -->
 <div class="activity--group">
-  <!-- Do not edit — react-aria Disclosure wiring — not designer-editable. -->
-  <Collapsible bind:open={disclosure.open}>
-    {#snippet trigger()}
-      <span class="evidence--chevron" aria-hidden="true" {@attach attachEvidenceTrigger}>›</span>
-      <span class="evidence--summary">{normalizedActivitySummary(blocks)}</span>
-    {/snippet}
-    <div class="activity--stack">
-      {#each blocks as block (block.blockId)}
-        <RichContentRouter {block} />
-      {/each}
+  {#if runs.length > 1}
+    <button
+      type="button"
+      class="activity--toggle"
+      use:hover
+      use:press
+      use:focusVisible
+      onclick={toggleAll}
+    >
+      Expand all
+    </button>
+  {/if}
+  {#each runs as run (run.id)}
+    <div class="tool-run">
+      <ToolFold blockId={run.id} summary={run.summary} inFlight={run.inFlight}>
+        <div class="activity--stack">
+          {#each run.blocks as block (block.blockId)}
+            <RichContentRouter {block} />
+          {/each}
+        </div>
+      </ToolFold>
+      <button
+        type="button"
+        class="tool-run--file"
+        use:hover
+        use:press
+        use:focusVisible
+        disabled
+        aria-disabled="true"
+      >
+        Open file
+        <span class="tool-run--hint">Unavailable without a host artifact</span>
+      </button>
     </div>
-  </Collapsible>
+  {/each}
 </div>
 
-<!-- Activity group -->
-<!-- This surface: activity--group — grouped bare evidence surface. Decomposed into this scoped block;
-     activity--group/activity--stack are owned solely by this component so they move with it (scoped).
-     evidence--trigger/chevron/summary are shared with CollapsedEvidence and stay :global there
-     (CollapsedEvidence.svelte's scoped style block); they are not redefined here to avoid duplicate global CSS.
-     Values unchanged. -->
 <style>
-  /* This surface: activity--group — grouped bare evidence blocks in one quiet disclosure. */
+  /* ───────────────────────────────────────────────────────────────────
+     1. ACTIVITY GROUP
+  ─────────────────────────────────────────────────────────────────── */
+  /* Flat one-line runs; grouping is a projection of host blocks only. */
   .activity--group {
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    background: var(--surface);
+    min-inline-size: 0;
   }
 
-  /* This slot: panel-body — the DisclosurePanel content stack of an evidence disclosure. */
+  .activity--toggle,
+  .tool-run--file {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: 44px;
+    min-inline-size: 44px;
+    padding: var(--space-1) var(--space-2);
+    border: 0;
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .activity--toggle:global([data-hovered]),
+  .tool-run--file:global([data-hovered]) {
+    color: var(--ink-secondary);
+  }
+
+  .activity--toggle:global([data-focus-visible]),
+  .tool-run--file:global([data-focus-visible]) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .tool-run--file:disabled {
+    cursor: default;
+  }
+
+  .tool-run--hint {
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+    font-weight: 550;
+  }
+
   .activity--stack {
     display: grid;
     gap: var(--space-2);
-    padding: 0 var(--space-3) var(--space-3);
   }
 </style>

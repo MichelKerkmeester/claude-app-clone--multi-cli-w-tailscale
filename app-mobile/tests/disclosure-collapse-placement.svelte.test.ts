@@ -150,7 +150,7 @@ describe('transcript disclosure persistence', () => {
     );
     const cardButton = screen.getByRole('button', { name: /Open screenshot preview/i });
     const disclosure = document.querySelector('.activity--group');
-    const trigger = disclosure?.querySelector('.evidence--trigger');
+    const trigger = disclosure?.querySelector('.tool-fold--summary');
     expect(trigger).not.toBeNull();
 
     await user.click(trigger as HTMLElement);

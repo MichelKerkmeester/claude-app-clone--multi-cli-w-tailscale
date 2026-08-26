@@ -13,7 +13,7 @@ redaction metadata visible.
 
 The folder also decides what text can become markup. Prose always goes through
 `safe-markdown.svelte`. That renderer accepts a small Markdown grammar and emits text, headings,
-lists, tables, quotes and code blocks without creating arbitrary HTML or links.
+lists, tables, quotes, code blocks, and http(s) links. File-path tokens stay inert.
 
 ### Key Statistics
 
@@ -121,7 +121,7 @@ badge and safety parser aligned when a policy changes.
 | What You See | Cause | Fix |
 |---|---|---|
 | Prose appears as a verbatim fallback | Raw HTML, unsafe URL scheme, control character, bidirectional control or malformed fenced Markdown failed the safety gate. | Treat the source as text. Fix the producer or keep the visible fallback rather than enabling raw HTML. |
-| A link is not clickable | SafeMarkdown preserves the label as text and does not emit anchors. | Use the original transcript context or a trusted application action. |
+| A file path is not clickable | File-path tokens stay inert unless the host supplies an artifact reference. | Open the artifact viewer when a host reference is present; a local path is never resolved. |
 | Code is plain text | The language is unsupported, the source exceeds a limit or a Worker is unavailable. | Read the plaintext preview. Highlighting is an enhancement, not the source of truth. |
 | A command shows only recent lines | The card intentionally previews the output tail. | Open the in-memory artifact when available. |
 | A card shows stale cache or connection lost | The source is cached or the last known command was running when the connection ended. | Treat the preview as the last trustworthy snapshot. |

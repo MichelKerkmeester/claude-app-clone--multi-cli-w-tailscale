@@ -3,6 +3,8 @@
   // This surface: safe-markdown — renders already-redacted Markdown to safe prose.
   // Do not edit — This module is the read-only sanitization boundary; the allowlist, URL/scheme filtering, and character escaping are frozen and NOT designer-editable.
 
+  import { classifyProseLink } from './prose-link.js';
+
   // ───────────────────────────────────────────────────────────────────
   // 1. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
@@ -48,7 +50,13 @@
     | { readonly kind: 'code'; readonly text: string }
     | { readonly kind: 'strong'; readonly text: string }
     | { readonly kind: 'em'; readonly text: string }
-    | { readonly kind: 'del'; readonly text: string };
+    | { readonly kind: 'del'; readonly text: string }
+    | {
+        readonly kind: 'link';
+        readonly text: string;
+        readonly href: string;
+        readonly mode: 'external' | 'unavailable';
+      };
 
   // ───────────────────────────────────────────────────────────────────
   // 2. CONSTANTS
@@ -84,6 +92,10 @@
   const BIDI_CONTROL_PATTERN = new RegExp(`[${BIDI_CONTROL_CLASS}]`, 'gu');
   const ASCII_CONTROL_PATTERN = new RegExp(`[${ASCII_CONTROL_CLASS}]`, 'gu');
   const FENCE_PATTERN = /^ {0,3}(`{3,}|~{3,})([^\r\n]*)\r?$/u;
+  // Module LRU for parsed markdown. A reactive map would write during $derived.
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- parse cache is not UI state
+  const PARSE_CACHE = new Map<string, readonly SafeMarkdownNode[] | null>();
+  const PARSE_CACHE_LIMIT = 256;
 
   // ───────────────────────────────────────────────────────────────────
   // 3. HELPERS
@@ -91,6 +103,18 @@
 
   // Do not edit — parseSafeMarkdown is the fail-closed AST boundary: unsafe input returns null and SafeMarkdown falls back to escaped verbatim text.
   export function parseSafeMarkdown(source: string): readonly SafeMarkdownNode[] | null {
+    const cached = PARSE_CACHE.get(source);
+    if (cached !== undefined) return cached;
+    const parsed = parseSafeMarkdownUncached(source);
+    PARSE_CACHE.set(source, parsed);
+    if (PARSE_CACHE.size > PARSE_CACHE_LIMIT) {
+      const oldest = PARSE_CACHE.keys().next().value;
+      if (oldest !== undefined) PARSE_CACHE.delete(oldest);
+    }
+    return parsed;
+  }
+
+  function parseSafeMarkdownUncached(source: string): readonly SafeMarkdownNode[] | null {
     if (isUnsafeMarkdown(source)) return null;
     const lines = source.split(/\r?\n/u);
     const nodes: SafeMarkdownNode[] = [];
@@ -223,7 +247,19 @@
         parts.push({ kind: 'text', text: alt });
       } else {
         const labelEnd = token.indexOf(']');
-        parts.push({ kind: 'text', text: token.slice(1, labelEnd) });
+        const destStart = token.indexOf('(', labelEnd);
+        const destEnd = token.lastIndexOf(')');
+        const label = token.slice(1, labelEnd);
+        const rawDest =
+          destStart >= 0 && destEnd > destStart ? token.slice(destStart + 1, destEnd).trim() : '';
+        const dest = rawDest.replace(/^<|>$/u, '');
+        const classified = classifyProseLink(dest);
+        parts.push({
+          kind: 'link',
+          text: label,
+          href: classified.destination,
+          mode: classified.kind === 'external-url' ? 'external' : 'unavailable',
+        });
       }
       remaining = remaining.slice(start + token.length);
     }
@@ -376,6 +412,11 @@
 </script>
 
 <script lang="ts">
+  import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
+  import { findParts } from '../transcript/transcript-find-index.js';
+  import { getTranscriptFindContext } from '../transcript/transcript-find-context.svelte.js';
+  import { useCopyFeedback } from './use-copy-feedback.svelte.js';
+
   interface Props {
     source: string;
     class?: string;
@@ -388,19 +429,25 @@
 
   let { source, class: className = '', ariaLabel = 'Formatted text' }: Props = $props();
 
+  const feedback = useCopyFeedback();
+  const find = getTranscriptFindContext();
+
   // ───────────────────────────────────────────────────────────────────
   // 5. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const ast = $derived(parseSafeMarkdown(source));
   const classes = $derived(`safe-markdown${className.length > 0 ? ` ${className}` : ''}`);
+  const findTerm = $derived(find.term);
   const controlPresentation = $derived.by(() =>
     ast === null ? presentInvisibleCharacters(source) : { value: source, changed: false },
   );
 </script>
 
 <!-- Component content -->
-{#snippet inline(text: string)}{#each renderInlineParts(text) as part, i (i)}{#if part.kind === 'code'}<code>{part.text}</code>{:else if part.kind === 'strong'}<strong>{part.text}</strong>{:else if part.kind === 'em'}<em>{part.text}</em>{:else if part.kind === 'del'}<del>{part.text}</del>{:else}{part.text}{/if}{/each}{/snippet}
+{#snippet marked(text: string)}{#each findParts(text, findTerm) as part, partIndex (partIndex)}{#if part.mark}<mark class="artifact-find--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{/snippet}
+
+{#snippet inline(text: string)}{#each renderInlineParts(text) as part, i (i)}{#if part.kind === 'code'}<code>{@render marked(part.text)}</code>{:else if part.kind === 'strong'}<strong>{@render marked(part.text)}</strong>{:else if part.kind === 'em'}<em>{@render marked(part.text)}</em>{:else if part.kind === 'del'}<del>{@render marked(part.text)}</del>{:else if part.kind === 'link'}{#if part.mode === 'external'}<a class="safe-markdown--link" href={part.href} target="_blank" rel="external noopener noreferrer">{@render marked(part.text)}</a>{:else}<span class="safe-markdown--unavailable" title="Link unavailable" aria-disabled="true">{@render marked(part.text)}</span>{/if}{:else}{@render marked(part.text)}{/if}{/each}{/snippet}
 
 {#if ast === null}
   <!-- Do not edit — The fail-closed fallback renders rejected source verbatim and marks the canonical source for exact copying. -->
@@ -433,14 +480,31 @@
           </thead>
           <tbody>
             {#each node.rows as row, rowIndex (rowIndex)}
-              <tr>{#each node.headings as _heading, columnIndex (columnIndex)}<td>{@render inline(row[columnIndex] ?? '')}</td>{/each}</tr>
+              <tr>{#each node.headings as heading, columnIndex (`${rowIndex}:${columnIndex}:${heading}`)}<td>{@render inline(row[columnIndex] ?? '')}</td>{/each}</tr>
             {/each}
           </tbody>
         </table>
       {:else if node.kind === 'code'}
-        <pre class="safe-markdown--code" data-language={node.language ?? undefined}><code>{node.source}</code></pre>
+        <div class="safe-markdown--fence">
+          {#if feedback.canCopy}
+            <button
+              type="button"
+              class="safe-markdown--copy"
+              class:is-copied={feedback.copiedUnit === `fence-${index}` && !feedback.copyFailed}
+              use:hover
+              use:press
+              use:focusVisible
+              aria-label={feedback.actionLabel('code')}
+              onclick={() => feedback.copy(`fence-${index}`, node.source)}
+            >{feedback.copiedUnit === `fence-${index}` && !feedback.copyFailed ? 'Copied' : 'Copy'}</button>
+          {/if}
+          <pre class="safe-markdown--code" data-language={node.language ?? undefined}><code>{node.source}</code></pre>
+        </div>
       {/if}
     {/each}
+    {#if feedback.canCopy && feedback.announcement.length > 0}
+      <p class="safe-markdown--copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
+    {/if}
   </div>
 {/if}
 
@@ -533,5 +597,63 @@
     border: 1px solid var(--line);
     text-align: start;
     vertical-align: top;
+  }
+
+  /* This slot: fence — copy sits above the well so the confirm does not shift the source. */
+  .safe-markdown--fence {
+    position: relative;
+    margin-block: 0 var(--space-3);
+  }
+
+  .safe-markdown--fence .safe-markdown--code {
+    margin-block: 0;
+  }
+
+  .safe-markdown--copy {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    margin-bottom: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    font-weight: 550;
+    cursor: pointer;
+  }
+
+  .safe-markdown--copy:global([data-hovered]) {
+    background: var(--surface-muted);
+    color: var(--ink-secondary);
+  }
+
+  .safe-markdown--copy:global([data-focus-visible]) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .safe-markdown--copy.is-copied {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+
+  .safe-markdown--copy-status {
+    min-block-size: 1.25rem;
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+  }
+
+  /* http(s) only; path tokens use the unavailable span and never become hrefs. */
+  .safe-markdown--link {
+    color: var(--accent-ink);
+    text-decoration: underline;
+  }
+
+  .safe-markdown--unavailable {
+    color: var(--ink-muted);
+    text-decoration: underline dotted;
+    cursor: default;
   }
 </style>

@@ -1,19 +1,19 @@
 {
   "level": "2",
   "specFolder": "007-orca-nodeterm-ux-mining/003-chat-message",
-  "description": "Port orca's verified message-level chat affordances into the SvelteKit mobile transcript: a per-turn scroll-to-top arrow, an in-transcript per-fence copy-code b",
+  "description": "Shipped orca message-level transcript affordances into the SvelteKit mobile client: per-turn scroll-to-top, per-fence copy, tint confirm, native tool folds, sco",
   "keywords": [
-    "port",
+    "shipped",
     "orca",
-    "verified",
     "message-level",
-    "chat",
+    "transcript",
     "affordances",
     "sveltekit",
     "mobile",
-    "transcript",
+    "client",
     "per-turn",
-    "scroll-to-top"
+    "scroll-to-top",
+    "per-fence"
   ],
   "lastUpdated": "2026-08-26T05:54:46.000Z",
   "specId": "003",

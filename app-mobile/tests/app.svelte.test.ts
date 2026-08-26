@@ -580,11 +580,15 @@ it('renders one todo panel at its sync position through the real Session and sta
     content.indexOf('After the todo projection'),
   );
 
-  const activityTrigger = screen.getByRole('button', { name: /Worked · 1 tool/u });
-  await userEvent.click(activityTrigger);
-  expect(activityTrigger).toHaveAttribute('aria-expanded', 'true');
-  await userEvent.click(activityTrigger);
-  expect(activityTrigger).toHaveAttribute('aria-expanded', 'false');
+  const activityTrigger = container.querySelector('.tool-fold--summary');
+  expect(activityTrigger).not.toBeNull();
+  const fold = activityTrigger?.closest('details');
+  expect(fold).not.toBeNull();
+  expect(fold?.open).toBe(false);
+  await userEvent.click(activityTrigger as HTMLElement);
+  expect(fold?.open).toBe(true);
+  await userEvent.click(activityTrigger as HTMLElement);
+  expect(fold?.open).toBe(false);
   expect(container.querySelectorAll('[data-todo-projection-block]')).toHaveLength(1);
   expect(screen.getByText('Render through Session state')).toBeVisible();
   expect(

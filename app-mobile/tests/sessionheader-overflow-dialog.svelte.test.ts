@@ -7,7 +7,7 @@
 // ───────────────────────────────────────────────────────────────────
 
 import type { RuntimeStateDto } from '@pi-remote/pi-rpc-protocol';
-import { cleanup, render, screen, within } from '@testing-library/svelte';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -67,11 +67,21 @@ function renderHeader({
   onInbox = vi.fn(),
   onReview = vi.fn(),
   onThemeChange = vi.fn(),
+  sessionId,
+  slashCommandNames,
+  onRefreshSession,
+  onOpenTranscript,
+  onForwardSlash,
 }: {
   readonly theme?: ThemePreference;
   readonly onInbox?: ReturnType<typeof vi.fn>;
   readonly onReview?: ReturnType<typeof vi.fn>;
   readonly onThemeChange?: ReturnType<typeof vi.fn>;
+  readonly sessionId?: string;
+  readonly slashCommandNames?: readonly string[];
+  readonly onRefreshSession?: ReturnType<typeof vi.fn>;
+  readonly onOpenTranscript?: ReturnType<typeof vi.fn>;
+  readonly onForwardSlash?: ReturnType<typeof vi.fn>;
 } = {}) {
   render(SessionHeader, {
     props: {
@@ -84,10 +94,15 @@ function renderHeader({
       sheetOpen: false,
       onOpenModelSheet: vi.fn(),
       modelTriggerRef: null,
+      ...(sessionId === undefined ? {} : { sessionId }),
+      ...(slashCommandNames === undefined ? {} : { slashCommandNames }),
+      ...(onRefreshSession === undefined ? {} : { onRefreshSession }),
+      ...(onOpenTranscript === undefined ? {} : { onOpenTranscript }),
+      ...(onForwardSlash === undefined ? {} : { onForwardSlash }),
     },
   });
 
-  return { onInbox, onReview, onThemeChange };
+  return { onInbox, onReview, onThemeChange, onRefreshSession, onOpenTranscript, onForwardSlash };
 }
 
 async function openOverflow() {
@@ -234,5 +249,28 @@ describe('SessionHeader overflow dialog', () => {
 
     expect(dialog).toContainElement(document.activeElement);
     expect(themeButtons).toContain(document.activeElement);
+  });
+
+  it('forwards host slash commands and copies the opaque session id', async () => {
+    const onForwardSlash = vi.fn();
+    const onRefreshSession = vi.fn();
+    const onOpenTranscript = vi.fn();
+    renderHeader({
+      sessionId: 'session_local',
+      slashCommandNames: ['rename', 'fork'],
+      onForwardSlash,
+      onRefreshSession,
+      onOpenTranscript,
+    });
+    const { dialog, user } = await openOverflow();
+
+    expect(within(dialog).getByRole('button', { name: /\/archive/ })).toBeDisabled();
+    await user.click(within(dialog).getByRole('button', { name: /Copy session id/ }));
+    await waitFor(() => {
+      expect(within(dialog).getByRole('status')).toHaveTextContent('Copied 13 chars');
+    });
+
+    await user.click(within(dialog).getByRole('button', { name: /^\/rename$/ }));
+    expect(onForwardSlash).toHaveBeenCalledWith('rename');
   });
 });

@@ -1,16 +1,16 @@
 ---
 title: "Phase 3 — Chat message & transcript interactions"
-description: "Port orca's verified message-level chat affordances into the SvelteKit mobile transcript: a per-turn scroll-to-top arrow, an in-transcript per-fence copy-code button, whole-message copy with a non-shifting tint confirm, tool-run folding into flat expandable lines, scoped selection-copy, a safe session action sheet (open / copy-id / refresh + forward existing host slash-commands only), and authorized file-link routing through the existing artifact viewer. Every affordance is a pure interaction/layout over bytes already on screen or an existing host command lane; the client owns no editable session truth. The ❌ set (regenerate, reply-quote, edit-resend, reactions, per-message menu, in-chat search) is recorded as backlog exclusions. Plan only — no implementation until the operator says go."
-contextType: "planning"
+description: "Shipped orca message-level transcript affordances into the SvelteKit mobile client: per-turn scroll-to-top, per-fence copy, tint confirm, native tool folds, scoped selection-copy, a host-only session action sheet, http(s) vs inert file-path links, snapshot find bar, and five-state load. The ❌ 3.7 set except in-conversation search stays backlog."
+contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/003-chat-message"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Folded nodeterm ND-4.1-4.8 into the chat message/transcript scope note"
-    next_safe_action: "On operator go, implement PHASE 1 setup for the message-interaction seams"
+    last_updated_at: "2026-08-26T22:10:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Shipped find bar, five-state load, copy receipts, and native tool folds"
+    next_safe_action: "None — snapshot find stays local until a host search RPC lands"
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -29,7 +29,7 @@ _memory:
 |---|---|
 | Parent | `007-orca-nodeterm-ux-mining` |
 | Level | 2 |
-| Status | Planned (no implementation until the operator says "go") |
+| Status | Implemented |
 | Recs covered | 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7 (exclusions), 6.6; nodeterm ND-4.1-4.8 (ND-4.1 fills 3.7 gap, ND-4.7 supersedes 5.8) |
 | Constraint | Host-authoritative, fail-closed — the client owns no editable session metadata |
 | Barrier | fail-closed (no client-owned session truth) + token-identity 0-diff + a11y-parity preserved + test:web green + every task → a rec |

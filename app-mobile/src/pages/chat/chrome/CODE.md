@@ -126,7 +126,7 @@ The folder is flat. The direct-file inventory below includes each component, log
 | [`runtime-strip.stories.ts`](./runtime-strip.stories.ts) | Stories for runtime status and mode states. |
 | [`session-composer.svelte`](./session-composer.svelte) | Owns prompt input, IME, send, stop, retry, command and attachment wiring. |
 | [`session-composer.stories.ts`](./session-composer.stories.ts) | Stories for composer drafts, errors, running and command states. |
-| [`session-header.svelte`](./session-header.svelte) | Renders back, inbox, review, theme and model entry controls. |
+| [`session-header.svelte`](./session-header.svelte) | Renders back, model entry, overflow navigation, theme, and session actions. |
 | [`session-header.stories.ts`](./session-header.stories.ts) | Stories for header navigation and runtime states. |
 | [`sheet-leave-plan.svelte`](./sheet-leave-plan.svelte) | Confirms the authority-expanding Plan to Build path. |
 | [`sheet-leave-plan.stories.ts`](./sheet-leave-plan.stories.ts) | Stories for mode and ready-plan variants. |

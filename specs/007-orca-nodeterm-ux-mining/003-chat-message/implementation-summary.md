@@ -1,16 +1,16 @@
 ---
-title: "Phase 3 implementation summary — chat message/transcript interactions (planned)"
-description: "PLANNED stub for the message-level chat affordances (recs 3.1-3.6, 6.6) with the 3.7 exclusions: a per-turn scroll arrow, per-fence copy-code, a non-shifting whole-message tint confirm, flat tool-run folding, scoped selection-copy, a safe session action sheet that only dispatches existing host slash-commands, and file-link routing through the existing artifact viewer with an inert fallback. Nothing is implemented; implementation is deferred until the operator says go."
-contextType: "planning"
+title: "Phase 3 implementation summary — chat message/transcript interactions (IMPLEMENTED)"
+description: "Shipped the transcript find bar, five-state load taxonomy, quantified copy receipts, http(s) vs file-path prose links, native tool folds, scoped selection copy, and a session action sheet that only forwards host slash-commands. Status Implemented."
+contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/003-chat-message"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Extended the PLANNED stub with nodeterm ND-4.1-4.8 affordances"
-    next_safe_action: "Await operator go, then implement PHASE 1 setup"
+    last_updated_at: "2026-08-26T22:10:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Shipped find bar, five-state load, copy receipts, and native tool folds"
+    next_safe_action: "None — snapshot find stays local until a host search RPC lands"
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,9 +27,9 @@ _memory:
 |---|---|
 | Parent | `007-orca-nodeterm-ux-mining` |
 | Level | 2 |
-| Status | Planned |
+| Status | Implemented |
 | Requirements planned | REQ-001 … REQ-009 |
-| State | Implementation deferred until the operator says go |
+| Host dependency | Partial — snapshot search and file-path artifact refs stay inert until host RPCs land |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -37,29 +37,29 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing yet — this is a plan. When implemented, the phase will add orca's verified message-level affordances
-to the transcript: a per-turn "scroll this message to top" arrow (3.1) distinct from the jump-to-latest FAB;
-an in-transcript per-fence copy-code button on the prose fences `safe-markdown.svelte` renders (3.2); a
-non-shifting tint / icon-swap confirm on the whole-message prose Copy (3.3); tool-run folding recast into
-flat `▸ ToolName` lines with call↔result pairing (3.4); scoped selection-copy anchored inside the transcript
-root (3.5); a safe session action sheet with open / copy-id / refresh that forwards only existing host
-slash-commands (3.6); and file-link routing through the existing artifact viewer with an inert "unavailable"
-fallback (6.6). The ❌ set — regenerate, reply/quote, edit-and-resend, reactions, a per-message context menu,
-in-conversation search (3.7) — will be recorded as backlog exclusions, not built.
+Shipped the message-level transcript affordances over host-supplied rendered blocks. A per-turn
+scroll-to-top control on every turn lead calls the virtualizer `scrollToIndex` API and does not
+touch live-edge follow-state. Fenced prose Copy writes the fence source through
+`use-copy-feedback.svelte.ts`. Whole-message Copy uses a 700 ms non-shifting tint (`is-copied`)
+and the same quantified receipt. Tool runs render as native `<details>` one-line folds; call↔result
+pairing marks an unpaired call in-flight. Long-press / context-menu copy is gated on
+`window.getSelection()` containment inside `.transcript--frame`. The header overflow sheet offers
+open / copy-id / refresh and forwards only catalogued host slash names (`rename`, `archive`,
+`new`, `fork`) as `/${name}` drafts.
 
-The nodeterm pass (Angle 4) folds eight message-level affordances in beside the orca set. **ND-4.1
-(headline)** — a transcript-wide find bar driven by a flat line index decoupled from the virtualized
-`@tanstack/svelte-virtual` DOM, lowercased once per snapshot, `{i}/{count}` with wraparound and a role-tagged
-snippet, reusing the `<mark>` primitive; it fills the orca 3.7 in-conversation-search gap, and search beyond
-the loaded snapshot is a deferred ⚠️ host RPC. **ND-4.2/4.3** — a quantified copy receipt ("Copied N lines" /
-"N chars") and a one-owner / never-green-beside-red copy-honesty invariant with a once-per-install coach.
-**ND-4.4** — prose links split URL (open external ✅) from file path (inert unless host-referenced ⚠️, never
-resolved directly ❌) for our relay-remote (no client fs) case. **ND-4.5** — sanitize-always plus
-per-message-text memoization and raw-text-until-ready. **ND-4.6** — native `<details>` folding with null
-result = in-flight. **ND-4.7** — a 5-state (`loading|ok|missing|unsupported|error`) transcript load taxonomy
-that never renders an empty conversation for a `missing`/`unsupported`/`error` read and never blanks a
-reloaded thread, superseding orca 5.8. **ND-4.8** — a body-portal, edge-flipped action menu with
-disabled-plus-hint rows, SAFE read-only actions only.
+The find bar is a flat `SearchSnippet[]` index lowercased once per snapshot. `{i}/{count}` chrome
+wraps with Enter / Shift+Enter / Esc. `next()` / `prev()` scroll `@tanstack/svelte-virtual` to an
+off-screen match and reuse `<mark class="artifact-find--match">`. Search is snapshot-scoped only.
+
+Copy receipts strip one trailing newline, then report `Copied N lines` or `Copied N chars`, or
+null on empty. Failure owns the confirm slot — never a green receipt beside a red failure. http(s)
+prose links open externally (`rel="external noopener noreferrer"`). File-path tokens stay inert
+unless a host artifact ref exists; `file:` / `blob:` / unsafe schemes never become hrefs.
+`screen-chat.svelte` derives `loading | ok | missing | unsupported | error`; missing / unsupported
+/ error never render as an empty conversation; held blocks keep a rendered thread across reload.
+
+**Backlog exclusion (rec 3.7).** regenerate, reply/quote, edit-and-resend, reactions, and a
+per-message mutation menu were not built. In-conversation search is filled by the find bar.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -67,16 +67,15 @@ disabled-plus-hint rows, SAFE read-only actions only.
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-Not yet delivered. The planned approach builds each affordance as pure interaction or layout over the
-existing projection so no second source of truth appears. Copy paths reuse `use-copy-feedback.svelte.ts`; the
-per-turn scroll uses `scrollIntoView` within `.transcript--scroll`; the flat tool-run recast keeps the
-existing grouping helper and only changes presentation; selection-copy gates on
-`window.getSelection()` containment within `.transcript--frame`; the session action sheet dispatches through
-the existing `sendSlashDraft` host lane and reuses the `sheet-model-effort.svelte` pattern; file-links route
-to `getOptionalArtifactViewer().openInMemory` / `openDiff` only for a host-supplied stable reference. Two ⚠️
-edges (a real host-title rename RPC, a new authorized artifact reference) will ship as fail-closed fallbacks
-with a pointer to `007-host-requests`. Proof will be a fail-closed review, token-identity 0-diff, an
-a11y-parity check, and `test:web` — all from the final state.
+Pure seams first: `transcript-find-index.ts`, `transcript-load-state.ts`, `prose-link.ts`,
+`tool-run-pairing.ts`, `transcript-selection.ts`, and `copiedReceipt` in
+`use-copy-feedback.svelte.ts`. The virtualized list owns find, turn-scroll, long-press menu, and
+scoped copy. Load taxonomy is view state in `screen-chat.svelte` (`heldBlocks` via
+`nextHeldTranscriptBlocks`) — the transcript reducer was not given a second source of truth. File
+open stays disabled until a host artifact ref exists. Session actions dispatch through the existing
+slash draft lane. Proof from the final state: `npm run typecheck` 0 errors, `npm run test:web`
+svelte 75 files / 591 passed + 3 skipped and logic 32 files / 313 passed, eslint 0 on changed
+`.svelte`/`.ts` files, and `run-source-gates.sh` all PASS (token-identity 35 goldens).
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -89,14 +88,16 @@ a11y-parity check, and `test:web` — all from the final state.
 copies the opaque id verbatim; refresh re-requests the host snapshot. A SvelteKit pencil that PATCHes a local
 title is ❌ and out of scope. A real title-rename RPC is requested in `007-host-requests`.
 
-**REC 6.6 routes only host-referenced artifacts.** `safe-markdown.svelte` already renders prose links as
-inert plain text; the plan makes that inert state explicit ("unavailable") and routes a tap through the
-artifact viewer only when the host supplies a stable reference. A markdown path / local URI / image URL is
-never treated as permission; a NEW authorized reference is a host field deferred to `007-host-requests`.
+**REC 6.6 routes only host-referenced artifacts.** `classifyProseLink` splits http(s) (open external)
+from file-path tokens (inert "unavailable"). A markdown path / local URI / image URL is never treated
+as permission. A NEW authorized reference is a host field deferred to `007-host-requests`.
 
-**REC 3.4 is layout only.** The flat tool-run recast keeps the existing grouping and disclosure roles; the
-call↔result pairing and in-flight marker derive from the projection, not new state, so token-identity and
-a11y-parity are preserved.
+**REC 3.4 is layout only.** The flat tool-run recast keeps grouping a pure projection; call↔result
+pairing and in-flight derive from host blocks, not new session state.
+
+**Find is snapshot-scoped.** Off-screen virtual rows are not mounted, so the index is decoupled from
+the DOM and `scrollToIndex` moves the window. Searching beyond the loaded snapshot needs a host
+search RPC / `hasMore` token, deferred to `007-host-requests`.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -104,16 +105,19 @@ a11y-parity are preserved.
 <!-- ANCHOR:verification -->
 ## VERIFICATION
 
-| Check | Planned result |
+| Check | Result |
 |---|---|
-| Fail-closed review | No client-owned session truth; selection scoped; file-links inert-or-routed (pending) |
-| token-identity (transcript) | 0-diff vs baseline across three themes (pending) |
-| a11y-parity | Preserved on every new control — label, focus, dismissal, live regions (pending) |
-| `test:web` | Green from the final state (pending) |
-| Traceability | Every task → a rec; 3.7 exclusions recorded (pending) |
-| `validate.sh --strict` | exit 0 via realpath (pending) |
-
-No check has run — implementation is deferred until the operator says go.
+| Fail-closed review | Passed — slash sheet dispatches catalog names only; selection scoped to `.transcript--frame`; file-paths inert without a host ref |
+| Find wrap + off-screen scroll | Passed — `transcript-find-bar.svelte.test.ts:102` and `transcript-find-index.test.ts:31` |
+| Five-state load | Passed — missing/unsupported/error never empty; reload holds the thread (`transcript-load-state.svelte.test.ts:79`) |
+| Copy receipts + honesty | Passed — `copy-receipt.svelte.test.ts:17` lines/chars/null; failure clears the green label |
+| URL vs file-path | Passed — `prose-link.test.ts:13`; `safe-markdown.svelte.test.ts:67` |
+| Token identity | Passed — `token-identity.mjs verify` matched all 35 `tokens.md` goldens (light/dark/system) |
+| `test:web` | Passed — svelte 75 files / 591 passed + 3 skipped; logic 32 files / 313 passed |
+| `typecheck` | Passed — 0 errors (`svelte-check` COMPLETED 1148 FILES 0 ERRORS 6 WARNINGS) |
+| scoped lint | Passed — eslint 0 on changed `.svelte`/`.ts` files (`.svelte.ts` still unparsed by root eslint) |
+| a11y-parity | Passed — find `role="search"`, menu Esc + `hideOutside`, overflow live region |
+| `validate.sh --strict` | Passed — exit 0 from realpath; Errors: 0 Warnings: 0 |
 <!-- /ANCHOR:verification -->
 
 ---
@@ -121,13 +125,11 @@ No check has run — implementation is deferred until the operator says go.
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-Two edges cannot be fully closed on the client and are deferred to `007-host-requests`: a real session-title
-rename needs a host RPC (REC 3.6 only dispatches the existing command string), and a bare prose file-link
-with no host-supplied artifact reference stays inert "unavailable" until the host publishes an authorized
-reference (REC 6.6). The ❌ set (REC 3.7) is recorded as backlog exclusions and is out of orca-copy scope —
-edit/resend and regenerate would be host operations (new turns / fork identity) needing host RPCs and
-reconciliation. From the nodeterm fold, the find bar (ND-4.1) is snapshot-scoped only — searching beyond the
-loaded transcript window needs a host search RPC / `hasMore` token (⚠️, ties orca 6.4), deferred to
-`007-host-requests`; and a prose file-path link (ND-4.4) stays inert "unavailable" until the host publishes an
-authorized artifact reference. This document is a planned stub; no completion is claimed.
+Two edges cannot be fully closed on the client and stay deferred to `007-host-requests`: a real
+session-title rename needs a host RPC (REC 3.6 only dispatches the existing command string), and a
+bare prose file-link with no host-supplied artifact reference stays inert "unavailable" until the
+host publishes an authorized reference (REC 6.6 / ND-4.4). Snapshot search does not walk unloaded
+history — a host search RPC / `hasMore` token is the remaining find-bar ⚠️. The ❌ set (REC 3.7)
+except in-conversation search remains backlog: regenerate, reply/quote, edit-and-resend, reactions,
+and a mutation-capable per-message menu. Edit/resend and regenerate would be host operations.
 <!-- /ANCHOR:limitations -->

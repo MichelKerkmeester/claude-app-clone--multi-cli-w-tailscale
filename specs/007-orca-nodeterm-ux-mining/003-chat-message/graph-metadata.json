@@ -12,18 +12,18 @@
   "derived": {
     "trigger_phrases": [],
     "key_topics": [
-      "port",
+      "shipped",
       "orca",
-      "verified",
       "message-level",
-      "chat",
+      "transcript",
       "affordances",
       "sveltekit",
       "mobile",
-      "transcript",
+      "client",
       "per-turn",
       "scroll-to-top",
-      "arrow"
+      "per-fence",
+      "copy"
     ],
     "importance_tier": "important",
     "status": "in_progress",
@@ -102,7 +102,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Port orca's verified message-level chat affordances into the SvelteKit mobile transcript: a per-turn scroll-to-top arrow, an in-transcript per-fence copy-code button, whole-message copy with a non-shifting tint confirm, tool-run folding into flat expandable lines, scoped selection-copy, a safe session action sheet (open / copy-id / refresh + forward existing host slash-commands only), and authorized file-link routing through the existing artifact viewer. Every affordance is a pure interaction/layout over bytes already on screen or an existing host command lane; the client owns no editable session truth. The \u274c set (regenerate, reply-quote, edit-resend, reactions, per-message menu, in-chat search) is recorded as backlog exclusions. Plan only \u2014 no implementation until the operator says go.",
+    "causal_summary": "Shipped orca message-level transcript affordances into the SvelteKit mobile client: per-turn scroll-to-top, per-fence copy, tint confirm, native tool folds, scoped selection-copy, a host-only session action sheet, http(s) vs inert file-path links, snapshot find bar, and five-state load. The \u274c 3.7 set except in-conversation search stays backlog.",
     "created_at": "2026-08-26T05:54:46.000Z",
     "last_save_at": "2026-08-26T05:54:46.000Z",
     "save_lineage": "graph_only",
@@ -114,13 +114,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:36ef40ca24f29b80c50709fe4253b0158704a2c123ddbc4d265730e5d6927ec9",
+    "source_fingerprint": "sha256:1f2a96a2d6859cb4244984a36b547476a5f8c49a6cc70b7d952a714695100bce",
     "source_doc_hashes": {
-      "spec.md": "224aeb033a595ee0bf2e8aa9cd3731120eb68e04e415b0442e43ee34add010e6",
-      "plan.md": "85b3430dcf62474079242657accd6b822be71c345248bbd9db7cedd7447518aa",
-      "tasks.md": "b64bfdc9144fa71780606a0382ffe42cf20a3185e4d140f4fa2361fe1da57551",
-      "checklist.md": "87bfeed6d5b5c0770105e77cfc04a7f3bbd4b94cfd1b5911c92e922fa6e9b289",
-      "implementation-summary.md": "2cbc2ae4fee60b4d12bdffb2f6f9af3392e03239a05fd2d9d5508d7ce6707d50"
+      "spec.md": "7e5cc2235e301d6a4b5c4275a39e8e788825eedc739f918bd3b1df58aa294d34",
+      "plan.md": "f3196d5fe4ac0dcfffafa4b9c248b96f4d48f90af739b01a543251cad61da899",
+      "tasks.md": "d27bdf37e3d6514b7cd6627304a7228ffde65f5860db10086f25ad41824ea6ac",
+      "checklist.md": "3d81ce60404d63b5be15147cab3bdf85488137fbdbc4dff2176bab3186cf5a60",
+      "implementation-summary.md": "24ce84abff062bd4302cce0d62c143bcf7331a4d4bde7d52ee0b29a1d2eb890f"
     },
     "last_active_child_id": null,
     "last_active_at": null

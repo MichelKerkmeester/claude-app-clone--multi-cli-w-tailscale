@@ -34,7 +34,7 @@ This is the most focus-sensitive chat sub-area. The composer keeps DOM focus dur
 | Plan mode | [`button-plan-mode.svelte`](./button-plan-mode.svelte), [`menu-plan-mode.svelte`](./menu-plan-mode.svelte) and [`plan-mode-presentation.ts`](./plan-mode-presentation.ts) keep mode labels fail-closed and route Build changes through confirmation. |
 | Model and effort | [`sheet-model-effort.svelte`](./sheet-model-effort.svelte) stages model changes and sends effort requests through [`radio-effort.svelte`](./radio-effort.svelte). |
 | Plan review | [`card-plan-ready.svelte`](./card-plan-ready.svelte), [`sheet-plan-review.svelte`](./sheet-plan-review.svelte) and [`sheet-leave-plan.svelte`](./sheet-leave-plan.svelte) separate safe review from the atomic execute or authority-expanding actions. |
-| Session framing | [`session-header.svelte`](./session-header.svelte) provides navigation and model access. [`todo-panel.svelte`](./todo-panel.svelte) shows a read-only host plan projection. |
+| Session framing | [`session-header.svelte`](./session-header.svelte) provides navigation, theme, and session actions. [`todo-panel.svelte`](./todo-panel.svelte) shows a read-only host plan projection. |
 
 ---
 

@@ -36,7 +36,7 @@ chat connection or the task state.
 | Turn navigation | User prompts, assistant replies and related evidence stay in conversational order. |
 | Evidence on demand | Thinking summaries, plans, tool calls, tool results and usage can stay compact until opened. |
 | Rich content | Code, command output, text artifacts, diffs, previews, images and unsupported blocks get an appropriate view. |
-| Reader actions | A reader can jump to the latest output and can copy or share an assistant answer when the browser provides that capability. |
+| Reader actions | A reader can find in the loaded snapshot, jump a turn to the top, jump to the latest output, and copy or share an assistant answer when the browser provides that capability. |
 | Status surfaces | A running turn shows a working marker. A todo projection and polite status announcements appear when their data is available. |
 
 The transcript keeps routine evidence visually quieter than the answer. Activity runs can be opened as

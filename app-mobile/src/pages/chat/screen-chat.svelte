@@ -87,10 +87,11 @@
   import { installCacheRevalidation } from '$shared/transport/cache.js';
   import { abortPrompt, submitPrompt } from '$shared/transport/relay.js';
   import { submitSlashDraft } from '$shared/commands/submit-slash-draft.js';
-  import { bindingMatchesSnapshot, type SelectedCommandBinding } from '$shared/commands/commands.js';
+  import { bindingMatchesSnapshot, bindingFor, type SelectedCommandBinding } from '$shared/commands/commands.js';
   import { bindingAfterDraftChange } from '$shared/commands/insert-slash-command.js';
   import { modeAuthority } from '$shared/state/runtime.js';
   import { DEFAULT_MEDIA_CAPABILITY_OFF, EMPTY_TODO_PROJECTION_STATE } from '$shared/state/state.js';
+  import type { DisplayTranscriptBlock } from '$shared/state/state.js';
   import { useRuntime } from '$shared/state/use-runtime.svelte.js';
   import { useHostCommandCatalog } from '$shared/commands/host-command-catalog.svelte.js';
   import { useSyncSocket } from '$shared/transport/use-sync-socket.svelte.js';
@@ -102,6 +103,11 @@
   import RuntimeStrip from './chrome/runtime-strip.svelte';
   import PlanReadyCard from './chrome/card-plan-ready.svelte';
   import TranscriptList from './transcript/transcript-list.svelte';
+  import TranscriptLoadPanel from './transcript/transcript-load-panel.svelte';
+  import {
+    deriveTranscriptLoadState,
+    nextHeldTranscriptBlocks,
+  } from './transcript/transcript-load-state.js';
   import SessionComposer from './chrome/session-composer.svelte';
   import PlanReviewSheet from './chrome/sheet-plan-review.svelte';
   import LeavePlanSheet from './chrome/sheet-leave-plan.svelte';
@@ -155,7 +161,9 @@
   let stripTrigger = $state<HTMLButtonElement | null>(null);
   let planReviewTrigger = $state<HTMLButtonElement | null>(null);
   let activeSheetTrigger = $state<HTMLButtonElement | null>(null);
+  let heldBlocks = $state<readonly DisplayTranscriptBlock[] | null>(null);
 
+  const SESSION_SLASH_NAMES = ['rename', 'archive', 'new', 'fork'] as const;
   const runtimeControls = useRuntime(() => sessionId);
   const commandCatalog = useHostCommandCatalog(() => sessionId, () => connection);
 
@@ -190,6 +198,19 @@
       prompt.trim().length > 0 &&
       !sendingPrompt &&
       !slashSubmitting,
+  );
+  const canDispatchSlash = $derived(
+    connection === 'live' && !transcript.awaitingSnapshot && !sendingPrompt && !slashSubmitting,
+  );
+  const slashCommandNames = $derived(
+    SESSION_SLASH_NAMES.filter((name) => bindingFor(commandCatalog.snapshot, name) !== null),
+  );
+  const transcriptLoadView = $derived(
+    deriveTranscriptLoadState({
+      transcript,
+      connection,
+      heldBlocks,
+    }),
   );
 
   // ───────────────────────────────────────────────────────────────────
@@ -246,6 +267,14 @@
       cacheResumeGeneration += 1;
     }),
   );
+
+  // Keep a rendered thread across snapshot refreshes; drop it only when the host says so.
+  $effect(() => {
+    const current = transcript;
+    untrack(() => {
+      heldBlocks = nextHeldTranscriptBlocks(current, heldBlocks);
+    });
+  });
 
   // ───────────────────────────────────────────────────────────────────
   // 6. HANDLERS
@@ -331,15 +360,14 @@
 
   // Send a slash command: revalidate the binding, spend the ticket and revision,
   // and fail closed with no retry.
-  function sendSlashDraft() {
-    const message = prompt.trim();
-    if (binding === null || slashSubmitting || message.length === 0 || !canSubmit) return;
+  function dispatchSlashDraft(draft: string, selected: SelectedCommandBinding) {
+    if (slashSubmitting || !canDispatchSlash) return;
     slashSubmitting = true;
     promptError = null;
     void submitSlashDraft({
       sessionId,
-      draft: message,
-      binding,
+      draft,
+      binding: selected,
       snapshot: commandCatalog.snapshot,
       connection,
       awaitingSnapshot: transcript.awaitingSnapshot,
@@ -367,6 +395,29 @@
       .finally(() => (slashSubmitting = false));
   }
 
+  function sendSlashDraft() {
+    const message = prompt.trim();
+    if (binding === null || message.length === 0) return;
+    dispatchSlashDraft(message, binding);
+  }
+
+  function forwardSlash(name: string) {
+    const selected = bindingFor(commandCatalog.snapshot, name);
+    if (selected === null) return;
+    dispatchSlashDraft(`/${name}`, selected);
+  }
+
+  function refreshSession() {
+    cacheResumeGeneration += 1;
+    void runtimeControls.refresh();
+    void commandCatalog.refresh('manual');
+  }
+
+  function openTranscript() {
+    const frame = document.querySelector<HTMLElement>('.transcript--frame');
+    frame?.focus();
+  }
+
   // SessionComposer expects a functional-updater wrapper around the local prompt.
   const setPromptComposer = (updater: (current: string) => string) => {
     prompt = updater(prompt);
@@ -391,6 +442,11 @@
     {sheetOpen}
     onOpenModelSheet={() => openSheet('model', headerTrigger)}
     bind:modelTriggerRef={headerTrigger}
+    {sessionId}
+    slashCommandNames={slashCommandNames}
+    onRefreshSession={refreshSession}
+    onOpenTranscript={openTranscript}
+    onForwardSlash={forwardSlash}
   />
 
   <!-- Status line: agent dot, status label, and the updated (or "reconnecting") time -->
@@ -406,11 +462,11 @@
     {/if}
   </div>
 
-  <!-- A transcript error, then the reconciliation barrier while awaiting a fresh snapshot -->
-  {#if transcript.error !== null}
+  <!-- A transcript error stays visible beside a held thread; named load states own empty reads. -->
+  {#if transcriptLoadView.showThread && transcript.error !== null}
     <div class="inline-alert">{transcript.error}</div>
   {/if}
-  {#if transcript.awaitingSnapshot}
+  {#if transcriptLoadView.showThread && transcript.awaitingSnapshot}
     <div class="barrier-note">
       Reconciliation barrier active. Waiting for a fresh snapshot.
     </div>
@@ -434,21 +490,28 @@
     }}
   />
 
-  <!-- Transcript: the message stream and its todo projection -->
+  <!-- Transcript: the message stream, a held thread across reload, or a named load state -->
   <ArtifactViewerProvider>
-    <TranscriptList
-      {sessionId}
-      blocks={transcript.blocks}
-      running={status === 'running'}
-      canAnswer={connection === 'live' && !transcript.awaitingSnapshot}
-      {askQuestionPrincipal}
-      {todoProjection}
-      onRefreshTodos={() => {
-        dispatchTodoProjection({ type: 'refreshRequested' });
-        todoRefreshGeneration += 1;
-      }}
-      onClearTodoAnnouncement={() => dispatchTodoProjection({ type: 'clearAnnouncement' })}
-    />
+    {#if transcriptLoadView.showThread}
+      <TranscriptList
+        {sessionId}
+        blocks={transcriptLoadView.blocks}
+        running={status === 'running'}
+        canAnswer={connection === 'live' && !transcript.awaitingSnapshot}
+        {askQuestionPrincipal}
+        {todoProjection}
+        onRefreshTodos={() => {
+          dispatchTodoProjection({ type: 'refreshRequested' });
+          todoRefreshGeneration += 1;
+        }}
+        onClearTodoAnnouncement={() => dispatchTodoProjection({ type: 'clearAnnouncement' })}
+      />
+    {:else}
+      <TranscriptLoadPanel
+        view={transcriptLoadView}
+        {...(transcriptLoadView.retryable ? { onRetry: refreshSession } : {})}
+      />
+    {/if}
   </ArtifactViewerProvider>
 
   <!-- Runtime strip: model and effort controls, just above the composer -->

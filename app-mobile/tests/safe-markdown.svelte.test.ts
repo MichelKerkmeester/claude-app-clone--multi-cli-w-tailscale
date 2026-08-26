@@ -63,4 +63,30 @@ describe('SafeMarkdown', () => {
     expect(parseSafeMarkdown('[unsafe](data%3Atext/html%2Cnope)')).toBeNull();
     expect(parseSafeMarkdown('<!-- remote-looking markup -->')).toBeNull();
   });
+
+  it('opens http(s) in a new tab and keeps file-path tokens inert', () => {
+    const { container } = render(SafeMarkdown, {
+      props: {
+        source: 'See [docs](https://example.com/docs) and [readme](./README.md).',
+        ariaLabel: 'Link handling',
+      },
+    });
+    const link = container.querySelector('a.safe-markdown--link');
+    expect(link).toHaveAttribute('href', 'https://example.com/docs');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'external noopener noreferrer');
+    expect(container.querySelector('a[href="./README.md"]')).toBeNull();
+    expect(container.querySelector('a[href^="file:"]')).toBeNull();
+    const unavailable = container.querySelector('span.safe-markdown--unavailable');
+    expect(unavailable).toHaveTextContent('readme');
+    expect(unavailable).toHaveAttribute('title', 'Link unavailable');
+  });
+
+  it('never turns a local URI into an openable href', () => {
+    const { container } = render(SafeMarkdown, {
+      props: { source: '[secret](file:///tmp/secret)', ariaLabel: 'Local URI' },
+    });
+    expect(container.querySelector('a')).toBeNull();
+    expect(container.querySelector('[href]')).toBeNull();
+  });
 });

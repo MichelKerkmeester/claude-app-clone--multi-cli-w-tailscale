@@ -1,16 +1,16 @@
 ---
 title: "Phase 3 plan — chat message/transcript interactions over existing seams"
-description: "How the ✅ message-level recs (3.1-3.6, 6.6) are built as pure interaction/layout over the existing transcript: reuse use-copy-feedback for copy-code and the tint confirm, add a per-turn scroll control distinct from the list FAB, recast the boxed evidence group into flat paired tool lines, scope selection-copy to the transcript root, add a safe session action sheet that only dispatches existing host slash-commands, and route file-links through the existing artifact viewer with an inert 'unavailable' fallback. Proven by fail-closed review, token-identity 0-diff, a11y-parity, and test:web — plan only until go."
-contextType: "planning"
+description: "How the ✅ message-level recs (3.1-3.6, 6.6) plus ND-4.1-4.8 were built as pure interaction/layout over the existing transcript. Proven by fail-closed review, token-identity 0-diff, a11y-parity, and test:web."
+contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/003-chat-message"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Added the find-index-decoupled-from-DOM approach for ND-4.1 over the virtual list"
-    next_safe_action: "On operator go, execute PHASE 1 setup; nothing implemented yet"
+    last_updated_at: "2026-08-26T22:10:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Shipped find bar, five-state load, copy receipts, and native tool folds"
+    next_safe_action: "None — snapshot find stays local until a host search RPC lands"
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: plan-core | v2.2 -->

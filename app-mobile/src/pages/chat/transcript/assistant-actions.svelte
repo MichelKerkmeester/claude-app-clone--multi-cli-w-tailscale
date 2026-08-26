@@ -12,43 +12,43 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 1. PROPS
+  // 1. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
+  import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
+  import { useCopyFeedback } from '../rich-content/use-copy-feedback.svelte.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 2. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   let { text }: AssistantActionsProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 2. LOCAL STATE
+  // 3. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  let copied = $state(false);
-
-  const canCopy =
-    typeof navigator !== 'undefined' && typeof navigator.clipboard?.writeText === 'function';
+  const feedback = useCopyFeedback();
   const canShare =
     typeof navigator !== 'undefined' && typeof (navigator as Navigator).share === 'function';
+  const copied = $derived(feedback.copiedUnit === 'answer' && !feedback.copyFailed);
 </script>
 
-<!-- Component content -->
-<!-- Turn actions -->
+<!-- section: turn actions -->
 <!-- This surface: turn--actions — Copy / Share answer actions + inline glyphs. -->
-{#if canCopy || canShare}
+{#if feedback.canCopy || canShare}
   <div class="turn--actions">
-    {#if canCopy}
+    {#if feedback.canCopy}
       <!-- Do not edit — aria-label + clipboard handler — not designer-editable. -->
       <button
         type="button"
         class="turn--action"
+        class:is-copied={copied}
+        use:hover
+        use:press
+        use:focusVisible
         aria-label={copied ? 'Answer copied' : 'Copy answer'}
-        onclick={() => {
-          void navigator.clipboard
-            .writeText(text)
-            .then(() => {
-              copied = true;
-              window.setTimeout(() => (copied = false), 1500);
-            })
-            .catch(() => undefined);
-        }}
+        onclick={() => feedback.copy('answer', text)}
       >
         <!-- This slot: copy-glyph — inline clipboard glyph; strokes inherit currentColor. -->
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
@@ -78,6 +78,9 @@
       <button
         type="button"
         class="turn--action"
+        use:hover
+        use:press
+        use:focusVisible
         aria-label="Share answer"
         onclick={() => {
           void (navigator as Navigator).share({ text }).catch(() => undefined);
@@ -97,14 +100,12 @@
         <span>Share</span>
       </button>
     {/if}
+    {#if feedback.canCopy}
+      <span class="turn--copy-status sr-only" role="status" aria-live="polite">{feedback.announcement}</span>
+    {/if}
   </div>
 {/if}
 
-<!-- Turn actions -->
-<!-- This surface: turn--actions — Copy / Share answer actions + inline glyphs. Decomposed into this scoped block;
-     turn--actions / turn--action and their hover/focus-visible states are owned solely
-     by this component so they move with it. Native div/button elements stay scoped. Values
-     unchanged. -->
 <style>
   /* Quiet under-answer action row. */
   /* This surface: turn--actions — Copy / Share answer actions + inline glyphs. */
@@ -130,16 +131,21 @@
     cursor: pointer;
   }
 
-  /* This state: hover */
-  .turn--action:hover {
+  /* This state: hover via the pointer-aware action, never native :hover. */
+  .turn--action:global([data-hovered]) {
     background: var(--surface-muted);
     color: var(--ink-secondary);
   }
 
+  /* This state: copied — tint only; width stays put so the row does not shift. */
+  .turn--action.is-copied {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+
   /* This state: focus-visible */
-  .turn--action:focus-visible {
+  .turn--action:global([data-focus-visible]) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
-  /* End of surface: turn--actions */
 </style>

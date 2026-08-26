@@ -44,7 +44,7 @@ describe('useCopyFeedback', () => {
     button.focus();
     fireEvent.click(button);
     await waitFor(() => expect(writeText).toHaveBeenCalledWith('exact \nsource\n'));
-    expect(screen.getByRole('status')).toHaveTextContent('Copied code');
+    expect(screen.getByRole('status')).toHaveTextContent('Copied 2 lines');
     expect(document.activeElement).toBe(button);
   });
 

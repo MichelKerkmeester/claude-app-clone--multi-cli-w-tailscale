@@ -378,4 +378,55 @@ describe('ModelEffortSheet', () => {
     await user.click(screen.getByRole('button', { name: 'Switch model' }));
     await waitFor(() => expect(controls.setModel).toHaveBeenCalledWith('beta', 'beta-next'));
   });
+
+  it('refuses commit when current baseline is null (unknown model)', async () => {
+    const noBaseline: RuntimeUiState = {
+      ...readyRuntime(),
+      state: null,
+    };
+    const controls = makeControls(noBaseline);
+    await openSheet({ controls, initialSection: 'model' });
+
+    // The Switch model button should be disabled because current is null.
+    const switchButton = screen.getByRole('button', { name: 'Switch model' });
+    expect(switchButton).toBeDisabled();
+  });
+
+  it('does not clear a staged draftKey on identical host re-report', async () => {
+    const user = userEvent.setup();
+    const controls = makeControls();
+    const onOpenChange = vi.fn();
+    const view = await openSheet({ controls, initialSection: 'model', onOpenChange });
+
+    // Stage a different model (Beta Next).
+    const target = await screen.findByRole('option', { name: /Beta Next/ });
+    await user.click(target);
+    expect(target).toHaveAttribute('aria-selected', 'true');
+
+    // Simulate a host re-report of the same current model (same identity).
+    // The runtime gets a new state object with the same model value.
+    const sameModelState: RuntimeStateDto = {
+      ...HOST_STATE,
+      revision: 5, // bump revision to simulate a re-report
+    };
+    const refreshedControls = makeControls(readyRuntime(sameModelState));
+    // Re-render the sheet with the refreshed controls, as production does.
+    view.rerender({
+      isOpen: true,
+      onOpenChange,
+      initialSection: 'model',
+      runtimeControls: refreshedControls,
+      triggerRef: null,
+    });
+
+    // The draftKey must survive the re-report — re-query the target to get a fresh
+    // DOM reference (the rerender may have replaced the old element).
+    const targetAfter = await screen.findByRole('option', { name: /Beta Next/ });
+    expect(targetAfter).toHaveAttribute('aria-selected', 'true');
+
+    // The Switch model button should still be enabled (draftKey is still set).
+    const switchButton = screen.getByRole('button', { name: 'Switch model' });
+    expect(switchButton).toBeEnabled();
+    view.unmount();
+  });
 });

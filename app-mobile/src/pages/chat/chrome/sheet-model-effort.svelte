@@ -221,7 +221,8 @@
     runtime.state?.streaming === true && !runtime.canSetModelWhileStreaming,
   );
   const canCommit = $derived(
-    draft !== null &&
+    current !== null &&
+      draft !== null &&
       draftKey !== currentKey &&
       isModelAvailable(draft) &&
       runtime.status === 'ready' &&
@@ -261,21 +262,33 @@
     sheetOpen = hostOpen;
   });
 
-  // Keep this effect synchronized with the state it observes.
+  // Reset the sheet's local state ONLY when the sheet opens. Use a manual
+  // transition flag instead of relying on the reactive value of `isOpen`
+  // so that a host re-report (which swaps the runtimeControls prop) does not
+  // wipe a staged draft or the open section.
+  let previouslyOpen = false;
   $effect(() => {
-    if (!isOpen) return;
-    section = initialSection;
-    query = '';
-    draftKey = null;
-    terminalBlocked = false;
-    mutationMessage = '';
-    announcement = '';
-    activeSearchIndex = null;
-    prevEffortPending = null;
-    dragOffset = 0;
-    isDragging = false;
-    isSnapping = false;
-    void runtimeControls.refresh('open');
+    const currentlyOpen = isOpen;
+    if (currentlyOpen && !previouslyOpen) {
+      previouslyOpen = true;
+      untrack(() => {
+        section = initialSection;
+        query = '';
+        draftKey = null;
+        terminalBlocked = false;
+        mutationMessage = '';
+        announcement = '';
+        activeSearchIndex = null;
+        prevEffortPending = null;
+        dragOffset = 0;
+        isDragging = false;
+        isSnapping = false;
+        void runtimeControls.refresh('open');
+      });
+    }
+    if (!currentlyOpen) {
+      previouslyOpen = false;
+    }
   });
 
   // Keep this effect synchronized with the state it observes.

@@ -107,6 +107,9 @@ export function commandGraphemes(text: string): readonly string[] {
 // 6. RANKING PIPELINE
 // ───────────────────────────────────────────────────────────────────
 
+/** Maximum suggestion rows returned to the autocomplete panel. */
+export const MAX_SUGGESTION_ROWS = 12;
+
 export function rankHostCommands(
   commands: readonly CommandDescriptorDto[],
   query: string,
@@ -120,7 +123,8 @@ export function rankHostCommands(
     })
     .filter((candidate): candidate is { item: RankedHostCommand; hostIndex: number } => candidate !== null)
     .sort((a, b) => compareRanked(a.item, b.item, a.hostIndex, b.hostIndex))
-    .map((candidate) => candidate.item);
+    .map((candidate) => candidate.item)
+    .slice(0, MAX_SUGGESTION_ROWS);
   return { items, activeName: chooseActiveName(items, options.activeName ?? null) };
 }
 

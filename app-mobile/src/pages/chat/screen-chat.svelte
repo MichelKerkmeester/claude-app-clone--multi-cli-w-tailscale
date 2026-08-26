@@ -550,6 +550,10 @@
       onInsertCommand={insertCommand}
       externalOverlayOpen={sheetOpen}
       {mediaCapability}
+      onOpenModelEffort={(section) => {
+        sheetSection = section;
+        sheetOpen = true;
+      }}
       onAttachmentSubmitted={() => {
         promptError = null;
         retrySubmissionId = null;

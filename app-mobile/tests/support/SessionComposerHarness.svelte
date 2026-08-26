@@ -20,8 +20,8 @@
     readonly runtimeRunning: boolean;
     readonly initialPrompt: string;
     readonly mediaCapability: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
-    readonly modelCanViewPhotos: boolean;
     readonly localFiles: readonly File[] | undefined;
+    readonly promptError?: string | null;
   }
 </script>
 
@@ -43,8 +43,8 @@
     runtimeRunning,
     initialPrompt,
     mediaCapability,
-    modelCanViewPhotos,
     localFiles,
+    promptError = null,
   }: SessionComposerHarnessProps = $props();
 
   // svelte-ignore state_referenced_locally
@@ -93,7 +93,7 @@
   awaitingSnapshot={false}
   sendingPrompt={false}
   stopping={false}
-  promptError={null}
+  {promptError}
   {runtimeControls}
   {catalog}
   {binding}

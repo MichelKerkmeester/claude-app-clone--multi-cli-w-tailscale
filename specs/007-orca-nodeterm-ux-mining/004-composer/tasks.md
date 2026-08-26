@@ -5,14 +5,11 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/004-composer"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Added a nodeterm dictation task block ND-5.1–5.9; all tasks OPEN."
-    next_safe_action: "Await operator go, then start T1.1 and the dictation seams T1.4."
-    blockers:
-      - "rec 4.2 @-file search needs a host file-search RPC (requested in 007-host-requests); T2.8 is inert until it lands."
-      - "ND-5.6 audio→host STT cap is ⚠️; inert until a host STT RPC lands (007-host-requests)."
-    completion_pct: 0
+    last_updated_at: "2026-08-26T00:00:00.000Z"
+    last_updated_by: "sk-code"
+    recent_action: "Applied review fixes: real re-report test, gated history, restore/paste tests, a11y button."
+    next_safe_action: "Commit the orca-recs slice; dictation pipeline is next."
+    completion_pct: 55
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
@@ -55,43 +52,22 @@ operator says go.
 <!-- ANCHOR:phase-2 -->
 ## PHASE 2: IMPLEMENTATION
 
-- [ ] **T2.1** [rec 4.1] In `pages/chat/chrome/session-composer.svelte`, narrow the `<textarea disabled>`
-  predicate to drop the transient locks (`sendingPrompt`, `slashSubmitting`, `attachmentSubmission.busy`) so
-  the keyboard is never yanked mid-send; keep those locks ONLY on the send gate. Confirm image-only send
-  stays valid (`canSendMessage`). Add an exact-raw-draft capture-before-clear and restore-on-host-reject hook
-  through `setPrompt`.
-- [ ] **T2.2** [rec 4.3] Cap the slash suggestion list at 12 rows before it reaches the listbox — apply in
-  `shared/commands/rank-host-commands.ts` (or at the consumer in
-  `pages/chat/chrome/composer-command-autocomplete.svelte`) — and add/confirm a test that the line-leading
-  rule in `shared/commands/use-slash-trigger.ts` never opens the panel for a `/` inside prose, with rows
-  sourced only from `catalog.commands`.
-- [ ] **T2.3** [rec 4.4] Build the prompt-history recall sheet: a new bits Sheet under
-  `pages/chat/chrome/` (patterned on `sheet-model-effort.svelte`), opened from a new action-row entry in
-  `pages/chat/chrome/composer-tools.svelte` only when the composer is empty; selecting an entry fills the
-  draft via `setPrompt` (fills, never sends). Wire the record-on-send call (T1.1 store) at the send seam in
-  `session-composer.svelte`.
-- [ ] **T2.4** [rec 4.5] Add an `onpaste` image-vs-text classifier to the `session-composer.svelte` textarea
-  that routes image blobs into the EXISTING `attachmentDraft.selectFiles` (chips already render via
-  `pages/chat/attachments/attachment-rail.svelte`; the media lease already exists in
-  `pages/chat/attachments/use-attachment-submission.svelte.ts`), active only when `mediaAvailable`. Text
-  paste stays native; no base64-in-DTO.
+- [x] **T2.1** [rec 4.1] Narrowed textarea disabled, captures draft before send, restores on reject.
+- [x] **T2.2** [rec 4.3] Cap at 12 rows via `MAX_SUGGESTION_ROWS` in `rank-host-commands.ts`. Tested.
+- [x] **T2.3** [rec 4.4] New `sheet-prompt-history.svelte`, opened from `composer-tools.svelte` when empty.
+  Fills via `setPrompt`. Record-on-send wired.
+- [x] **T2.4** [rec 4.5] `onpaste` handler on textarea routes image blobs to `attachmentDraft.selectFiles`.
+  Active only when `mediaAvailable`.
 - [ ] **T2.5** [rec 4.6] Add a dictation control (hold-vs-toggle) to the composer action row and a
   fail-closed setup sheet under `pages/chat/chrome/`; on-device Web Speech writes an editable local draft via
   `setPrompt` (confirm-before-send, same trust as typing). When speech is unavailable show the setup sheet,
   not a dead toast. Host STT stays ⚠️ (`007-host-requests`); the transcript is never host truth.
-- [ ] **T2.6** [rec 4.7] Confirm the model/effort pickers are reachable from the composer action row
-  (`pages/chat/chrome/composer-tools.svelte` "+" popover + the runtime strip) and that the send control stays
-  disabled while a host option dispatch is in flight (the `sheet-model-effort.svelte` `isCommitting` / runtime
-  `pending` gating on `canSubmit`); add the action-row affordance if missing.
-- [ ] **T2.7** [rec 4.8] In `pages/chat/chrome/sheet-model-effort.svelte`, add a baseline-known guard to
-  `canCommit` (refuse when `current = runtime.state?.model` is null), and add a regression guard/test that an
-  identical host re-report of the confirmed model/effort does not clear a staged `draftKey`. Keep the
-  host-RPC sheet; do NOT adopt orca's typed-`/model`-into-the-TUI pattern.
-- [ ] **T2.8** [rec 4.2] Author the `@`-file mention UI shape as an inert scaffold reusing the autocomplete
-  overlay (`pages/chat/chrome/composer-command-autocomplete.svelte`) and the T1.2 predicate: ~120 ms
-  debounce, ~16-row cap, generation-counter stale-safety, empty-while-in-flight, query-in → relative-paths-out
-  over a NEW host file-search RPC in `shared/commands/*`/`shared/transport/*`. No device FS walk. **BLOCKED**
-  on the host RPC (`007-host-requests`); leave inert until it lands.
+- [x] **T2.6** [rec 4.7] Model & Effort button in `composer-tools.svelte` popover, wired through to open
+  sheet. Send stays disabled during host option dispatch.
+- [x] **T2.7** [rec 4.8] `current !== null` guard in `canCommit`. Regression test: re-report does not clear
+  staged `draftKey`.
+- [x] **T2.8** [rec 4.2] @-file mention scaffold: `mention-file-search.ts` + `use-mention-search.svelte.ts`.
+  **BLOCKED** — inert without host RPC.
 
 ### Dictation pipeline (net-new from nodeterm — extends rec 4.6; no orca equivalent)
 
@@ -118,9 +94,8 @@ operator says go.
   under 400 ms cancelling quietly as an accidental tap, window blur cancelling, and STOP ≠ CANCEL. On a
   mid-dictation session switch, discard the old take (remount/retarget) so a transcript never lands in the
   wrong session's draft.
-- [ ] **T2.13** [rec 4.5 / ND-5.7] Extend the rec 4.5 paste classifier (T2.4) with a screenshot
-  MIME→extension map so a clipboard `image/png` blob is named `pasted-<ts>.png` before it enters
-  `attachmentDraft.selectFiles` (`pages/chat/attachments/*`). Reinforces orca 4.5; adds NO new host request.
+- [x] **T2.13** [rec 4.5 / ND-5.7] Screenshot MIME→extension map in `paste-utils.ts`. Clipboard image/png
+  named `pasted-<ts>.png` before selectFiles.
 - [ ] **T2.14** [rec 4.6 / ND-5.6] ⚠️ ONLY IF audio is ever shipped to a host STT RPC: cap the recording
   length below the transport single-frame budget (auto-stop fires the same transcribe+insert path, with a
   "recording capped…" notice). On-device WASM STT keeps a memory ceiling only. BLOCKED on host STT

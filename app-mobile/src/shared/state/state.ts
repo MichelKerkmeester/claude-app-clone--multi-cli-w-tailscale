@@ -71,7 +71,56 @@ export function writeComposerShiftTabPreference(enabled: boolean): void {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 4. CONNECTION STATE
+// 4. DEVICE-LOCAL PROMPT HISTORY
+// ───────────────────────────────────────────────────────────────────
+// Device-local prompt recall: newest-first, no empties, no consecutive dups.
+// Storage failure degrades to empty history — no host field.
+
+const PROMPT_HISTORY_KEY = 'pi-remote.prompt-history';
+const MAX_HISTORY = 50;
+
+/** Read stored prompt history, newest-first. Returns empty array on any failure. */
+export function readPromptHistory(): readonly string[] {
+  try {
+    const raw = window.localStorage.getItem(PROMPT_HISTORY_KEY);
+    if (raw === null) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((entry): entry is string => typeof entry === 'string');
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Record an accepted send, skipping empties and consecutive duplicates.
+ * Newest-first; storage failure degrades silently.
+ */
+export function recordPromptHistory(prompt: string): void {
+  const trimmed = prompt.trim();
+  if (trimmed.length === 0) return;
+  try {
+    const history = readPromptHistory();
+    // Skip consecutive duplicate
+    if (history.length > 0 && history[0] === trimmed) return;
+    const updated = [trimmed, ...history].slice(0, MAX_HISTORY);
+    window.localStorage.setItem(PROMPT_HISTORY_KEY, JSON.stringify(updated));
+  } catch {
+    // Storage failure degrades gracefully; history stays as-is in memory.
+  }
+}
+
+/** Clear the stored prompt history. */
+export function clearPromptHistory(): void {
+  try {
+    window.localStorage.removeItem(PROMPT_HISTORY_KEY);
+  } catch {
+    // Best-effort clear.
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 5. CONNECTION STATE
 // ───────────────────────────────────────────────────────────────────
 
 export type ConnectionPhase =
@@ -119,7 +168,7 @@ export function connectionReducer(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 5. SESSION LIST STATE
+// 6. SESSION LIST STATE
 // ───────────────────────────────────────────────────────────────────
 
 export interface SessionListState {
@@ -169,7 +218,7 @@ export function sessionListReducer(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 6. TRANSCRIPT DISPLAY TYPES
+// 7. TRANSCRIPT DISPLAY TYPES
 // ───────────────────────────────────────────────────────────────────
 
 export interface UnknownTranscriptBlock {
@@ -249,7 +298,7 @@ export type TranscriptAction =
   | { readonly type: 'error'; readonly error: string };
 
 // ───────────────────────────────────────────────────────────────────
-// 7. TRANSCRIPT REDUCER
+// 8. TRANSCRIPT REDUCER
 // ───────────────────────────────────────────────────────────────────
 
 export const EMPTY_TRANSCRIPT: TranscriptState = {
@@ -397,7 +446,7 @@ export function transcriptReducer(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 7B. SCOPE GUARD AND DRAFT RECONCILE (pure, single source of truth)
+// 8B. SCOPE GUARD AND DRAFT RECONCILE (pure, single source of truth)
 // ───────────────────────────────────────────────────────────────────
 
 /**
@@ -472,7 +521,7 @@ export function reconcilePromptRejected(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 8. DISPLAY BLOCK PARSING
+// 9. DISPLAY BLOCK PARSING
 // ───────────────────────────────────────────────────────────────────
 
 export function parseDisplayBlock(
@@ -519,7 +568,7 @@ export function filePreviewAvailability(block: FilePreviewBlock): FilePreviewAva
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 9. BLOCK NORMALIZATION HELPERS
+// 10. BLOCK NORMALIZATION HELPERS
 // ───────────────────────────────────────────────────────────────────
 
 function blocksFromEnvelopes(

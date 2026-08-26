@@ -5,13 +5,11 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/004-composer"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Added dictation barriers ND-5.1–5.9; all OPEN."
-    next_safe_action: "Await operator go; dictation barriers hold after Phase 2/3."
-    blockers:
-      - "rec 4.2 @-file search needs a host file-search RPC (requested in 007-host-requests)."
-    completion_pct: 0
+    last_updated_at: "2026-08-26T00:00:00.000Z"
+    last_updated_by: "sk-code"
+    recent_action: "Applied review fixes: real re-report test, gated history, restore/paste tests, a11y button."
+    next_safe_action: "Commit the orca-recs slice; dictation pipeline is next."
+    completion_pct: 55
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->

@@ -21,7 +21,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CommandDescriptorDto } from '@pi-remote/pi-rpc-protocol';
 
 import type { HostCommandCatalogState, ScopedCommandSnapshot, SelectedCommandBinding } from '../src/shared/commands/commands.js';
-import { INITIAL_RUNTIME_STATE } from '../src/shared/state/runtime.js';
 import SessionComposerSurface from './support/SessionComposerSurface.svelte';
 
 // ───────────────────────────────────────────────────────────────────
@@ -125,6 +124,7 @@ interface HarnessProps {
   readonly mediaCapability?: { readonly enabled: boolean; readonly imageIn: boolean } | null;
   readonly modelCanViewPhotos?: boolean;
   readonly localFiles?: readonly File[];
+  readonly promptError?: string | null;
 }
 
 // ───────────────────────────────────────────────────────────────────
@@ -152,6 +152,7 @@ function renderComposer(props: HarnessProps = {}) {
       mediaCapability: props.mediaCapability ?? null,
       modelCanViewPhotos: props.modelCanViewPhotos ?? true,
       localFiles: props.localFiles,
+      promptError: props.promptError ?? null,
     },
   });
   return { ...view, sendPrompt, sendSlashDraft, onInsertCommand, catalog };
@@ -447,7 +448,8 @@ describe('explicit slash send gating', () => {
     await tick();
     expect(composer).toHaveValue('/plan ');
     expect(screen.getByText('Checking the command with the relay…')).toBeInTheDocument();
-    expect(composer).toBeDisabled();
+    // The textarea stays editable through transient locks; only the send gate is disabled.
+    expect(composer).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
     await user.keyboard('{Enter}');
     await tick();
@@ -952,3 +954,182 @@ describe('local photo composer surface', () => {
     expect(sendPrompt).not.toHaveBeenCalled();
   });
 });
+
+// ───────────────────────────────────────────────────────────────────
+// Prompt history recording (gated by canSubmit)
+// ───────────────────────────────────────────────────────────────────
+
+describe('prompt history recording', () => {
+  it('records nothing when the send gate is closed', async () => {
+    const setItemSpy = vi.spyOn(window.localStorage, 'setItem');
+    const user = userEvent.setup();
+    renderComposer({ canSubmit: false });
+    const composer = screen.getByLabelText('Message Pi');
+    await user.type(composer, 'hello');
+    await user.keyboard('{Enter}');
+    await tick();
+
+    // The history key should not be written.
+    const historyCalls = setItemSpy.mock.calls.filter(
+      ([key]) => key === 'pi-remote.prompt-history',
+    );
+    expect(historyCalls).toHaveLength(0);
+    setItemSpy.mockRestore();
+  });
+
+  it('records exactly once when the send gate is open', async () => {
+    const setItemSpy = vi.spyOn(window.localStorage, 'setItem');
+    const user = userEvent.setup();
+    renderComposer({ canSubmit: true });
+    const composer = screen.getByLabelText('Message Pi');
+    await user.type(composer, 'hello');
+    await user.keyboard('{Enter}');
+    await tick();
+
+    // The history should be written exactly once.
+    const historyCalls = setItemSpy.mock.calls.filter(
+      ([key]) => key === 'pi-remote.prompt-history',
+    );
+    expect(historyCalls).toHaveLength(1);
+    setItemSpy.mockRestore();
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────
+// Restore-on-reject (T2.1)
+// ───────────────────────────────────────────────────────────────────
+
+describe('restore on reject', () => {
+  it('restores the exact raw draft when the host rejects the send', async () => {
+    const user = userEvent.setup();
+    const sendPrompt = vi.fn();
+    const { rerender } = renderComposer({
+      canSubmit: true,
+      initialPrompt: '  hello  ',
+      sendPrompt,
+    });
+    const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+
+    // Focus the textarea and press Enter to trigger submit() which captures the draft.
+    composer.focus();
+    await tick();
+    await user.keyboard('{Enter}');
+    await tick();
+
+    // sendPrompt should have been called once.
+    expect(sendPrompt).toHaveBeenCalledTimes(1);
+
+    // Now simulate a host reject by rerendering with promptError.
+    rerender(SessionComposerSurface, {
+      props: {
+        catalog: catalogState(),
+        sendPrompt,
+        sendSlashDraft: vi.fn(),
+        onInsertCommand: vi.fn(),
+        status: 'idle',
+        canSubmit: true,
+        binding: null,
+        slashSubmitting: false,
+        runtimeAuthority: true,
+        runtimeRunning: false,
+        initialPrompt: '  hello  ',
+        mediaCapability: null,
+        modelCanViewPhotos: true,
+        localFiles: undefined,
+        promptError: 'Host rejected',
+      },
+    });
+    await tick();
+
+    // The exact raw draft (untrimmed with spaces) should be restored.
+    expect(composer).toHaveValue('  hello  ');
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────
+// Paste handler (T2.4/T2.13)
+// ───────────────────────────────────────────────────────────────────
+
+describe('paste handler', () => {
+  it('prevents default and routes image pastes when media is available', async () => {
+    renderComposer({
+      mediaCapability: { enabled: true, imageIn: true },
+    });
+    const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+
+    const imageBlob = new Blob(['fake-image'], { type: 'image/png' });
+    const item = {
+      type: 'image/png',
+      getAsFile: () => imageBlob,
+    };
+    const clipboardData = Object.defineProperty({ getData: vi.fn() }, 'items', {
+      value: [item],
+      writable: false,
+    }) as unknown as DataTransfer;
+    const pasteEvent = new Event('paste', { bubbles: true, cancelable: true });
+    Object.defineProperty(pasteEvent, 'clipboardData', {
+      value: clipboardData,
+      configurable: true,
+    });
+    const preventDefaultSpy = vi.spyOn(pasteEvent, 'preventDefault');
+
+    composer.dispatchEvent(pasteEvent);
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
+    preventDefaultSpy.mockRestore();
+  });
+
+  it('is inert for image pastes when media is not available', async () => {
+    renderComposer({ mediaCapability: null });
+    const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+
+    const imageBlob = new Blob(['fake-image'], { type: 'image/png' });
+    const item = {
+      type: 'image/png',
+      getAsFile: () => imageBlob,
+    };
+    const clipboardData = Object.defineProperty({ getData: vi.fn() }, 'items', {
+      value: [item],
+      writable: false,
+    }) as unknown as DataTransfer;
+    const pasteEvent = new Event('paste', { bubbles: true, cancelable: true });
+    Object.defineProperty(pasteEvent, 'clipboardData', {
+      value: clipboardData,
+      configurable: true,
+    });
+    const preventDefaultSpy = vi.spyOn(pasteEvent, 'preventDefault');
+
+    composer.dispatchEvent(pasteEvent);
+
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+    preventDefaultSpy.mockRestore();
+  });
+
+  it('lets text pastes stay native (no preventDefault)', async () => {
+    renderComposer({
+      mediaCapability: { enabled: true, imageIn: true },
+    });
+    const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+
+    const item = {
+      type: 'text/plain',
+      getAsFile: () => null,
+    };
+    const clipboardData = Object.defineProperty({ getData: vi.fn() }, 'items', {
+      value: [item],
+      writable: false,
+    }) as unknown as DataTransfer;
+    const pasteEvent = new Event('paste', { bubbles: true, cancelable: true });
+    Object.defineProperty(pasteEvent, 'clipboardData', {
+      value: clipboardData,
+      configurable: true,
+    });
+    const preventDefaultSpy = vi.spyOn(pasteEvent, 'preventDefault');
+
+    composer.dispatchEvent(pasteEvent);
+
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+    preventDefaultSpy.mockRestore();
+  });
+});
+

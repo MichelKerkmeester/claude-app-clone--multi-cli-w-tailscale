@@ -48,6 +48,8 @@
     readonly onInsertCommand: (name: string, binding: SelectedCommandBinding) => void;
     /** True while an outside overlay (the shared model/effort sheet) is open. */
     readonly externalOverlayOpen?: boolean;
+    /** Request to open the model/effort picker sheet with the given initial section. */
+    readonly onOpenModelEffort?: (section: 'model' | 'effort') => void;
     /** Host capability fixture; production callers keep this disabled until enablement. */
     readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
     readonly onAttachmentSubmitted?: () => void;
@@ -86,7 +88,9 @@
   import { insertSlashCommand } from '$shared/commands/insert-slash-command.js';
   import { deriveSlashTrigger, slashDismissalSignature } from '$shared/commands/use-slash-trigger.js';
   import { modeAuthority } from '$shared/state/runtime.js';
-  import { readComposerShiftTabPreference, writeComposerShiftTabPreference } from '$shared/state/state.js';
+  import { readComposerShiftTabPreference, writeComposerShiftTabPreference, recordPromptHistory } from '$shared/state/state.js';
+  import PromptHistorySheet from './sheet-prompt-history.svelte';
+  import { fileFromClipboardBlob } from '$shared/commands/paste-utils.js';
   import { createPlanModeShortcut } from '$shared/commands/plan-mode-shortcut.js';
   import Button from '$shared/primitives/button/button.svelte';
 
@@ -119,6 +123,7 @@
     runtimeRunning,
     onInsertCommand,
     externalOverlayOpen = false,
+    onOpenModelEffort = undefined,
     mediaCapability = null,
     onAttachmentSubmitted,
   }: SessionComposerProps = $props();
@@ -132,8 +137,9 @@
   let trayEl = $state<HTMLFormElement | null>(null);
   let panelEl = $state<HTMLDivElement | null>(null);
   let modeButtonEl = $state<HTMLButtonElement | null>(null);
-  // Non-DOM ref: a plain closure variable, never reactive.
+  // Non-DOM refs: plain closure variables, never reactive.
   let pendingCaretRef: number | null = null;
+  let capturedDraftBeforeSend: string | null = null;
 
   let announcement = $state('');
   // Selection/caret facts for the slash trigger; textarea remains the only editor.
@@ -142,6 +148,7 @@
   let isComposing = $state(false);
   let dismissedSignature = $state<string | null>(null);
   let toolsOpen = $state(false);
+  let recallHistoryOpen = $state(false);
   let activeName = $state<string | null>(null);
   let commitPending = $state(false);
   // Outside dismiss re-arms on the next draft/caret/textarea interaction.
@@ -393,6 +400,23 @@
     commitPending = false;
   });
 
+  // Restore the captured draft when the host rejects the send.
+  $effect(() => {
+    if (promptError !== null && capturedDraftBeforeSend !== null) {
+      const draft = capturedDraftBeforeSend;
+      capturedDraftBeforeSend = null;
+      setPrompt(() => draft);
+    }
+  });
+
+  // Clear the captured draft when the user edits the prompt or a send succeeds.
+  $effect(() => {
+    void prompt;
+    if (promptError !== null) {
+      capturedDraftBeforeSend = null;
+    }
+  });
+
   // ───────────────────────────────────────────────────────────────────
   // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
@@ -423,6 +447,10 @@
         announcement = attachmentSubmission.state.error ?? 'Photo sending is not ready.';
       }
       return;
+    }
+    capturedDraftBeforeSend = prompt;
+    if (canSubmit) {
+      recordPromptHistory(prompt);
     }
     sendPrompt(running ? 'steer' : undefined);
   }
@@ -527,6 +555,25 @@
   // 10. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Keep handle paste focused on its single responsibility.
+  function handlePaste(event: ClipboardEvent): void {
+    if (!mediaAvailable) return; // inert without media capability
+    const items = event.clipboardData?.items;
+    if (items === undefined || items.length === 0) return;
+    const imageFiles: File[] = [];
+    for (let index = 0; index < items.length; index += 1) {
+      const item = items[index];
+      if (item === null || item === undefined || !item.type.startsWith('image/')) continue;
+      const blob = item.getAsFile();
+      if (blob === null) continue;
+      const file = fileFromClipboardBlob(blob, item.type);
+      imageFiles.push(file);
+    }
+    if (imageFiles.length === 0) return;
+    event.preventDefault();
+    attachmentDraft.selectFiles(imageFiles);
+  }
+
   // Keep grow focused on its single responsibility.
   function grow(): void {
     const element = textareaEl;
@@ -623,12 +670,10 @@
         window.setTimeout(() => (isComposing = false), 0);
       }}
       onkeydown={onKeyDown}
+      onpaste={handlePaste}
       disabled={
         connection !== 'live' ||
-        awaitingSnapshot ||
-        sendingPrompt ||
-        slashSubmitting ||
-        attachmentSubmission.busy
+        awaitingSnapshot
       }
       {placeholder}
     ></textarea>
@@ -646,6 +691,9 @@
           }}
           {shiftTabEnabled}
           onShiftTabPreferenceChange={(enabled) => (shiftTabEnabled = enabled)}
+          composerEmpty={!hasText && !hasAttachments}
+          onRecallHistory={() => { toolsOpen = false; recallHistoryOpen = true; }}
+          onOpenModelEffort={(section) => { toolsOpen = false; onOpenModelEffort?.(section); }}
         />
         <PlanModeButton
           runtime={runtimeControls.runtime}
@@ -724,6 +772,11 @@
     </div>
   </form>
   {#if mediaAvailable}<AttachmentPreviewDialog />{/if}
+  <PromptHistorySheet
+    isOpen={recallHistoryOpen}
+    onOpenChange={(open) => (recallHistoryOpen = open)}
+    onSelectHistory={(text) => setPrompt(() => text)}
+  />
   <LeavePlanSheet
     isOpen={leavePlanOpen}
     onOpenChange={(open) => (leavePlanOpen = open)}

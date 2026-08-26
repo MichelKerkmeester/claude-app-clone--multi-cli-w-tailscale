@@ -70,7 +70,7 @@ function makeCatalog(): HostCommandCatalogState {
   };
 }
 
-function renderTools() {
+function renderTools(composerEmpty = false) {
   render(ComposerTools, {
     props: {
       runtimeControls: makeControls(),
@@ -81,6 +81,7 @@ function renderTools() {
       onFilesSelected: vi.fn(),
       shiftTabEnabled: false,
       onShiftTabPreferenceChange: vi.fn(),
+      composerEmpty,
     },
   });
 }
@@ -154,13 +155,17 @@ describe('ComposerTools accessibility parity', () => {
   });
 
   it('focuses the dialog container before tabbing into its controls', async () => {
-    renderTools();
+    renderTools(true);
     const { dialog, user } = await openTools();
     await new Promise<void>((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
     );
 
     expect(dialog).toHaveFocus();
+    // With composerEmpty: true, the Recall button is focusable.
+    // Tab order: Prompts "Recent prompts" → Model "Model & Effort" → Keyboard label → checkbox.
+    await user.keyboard('{Tab}');
+    await user.keyboard('{Tab}');
     await user.keyboard('{Tab}');
     expect(within(dialog).getByRole('checkbox')).toHaveFocus();
   });

@@ -1,17 +1,19 @@
 ---
-title: "Phase 4 implementation summary — composer / input (planned)"
-description: "Planned stub for the composer phase (recs 4.1–4.8). Implementation is deferred until the operator says go: image-or-text send with a never-disabled textarea and exact-draft-restore, line-leading slash + suggestion cap, a device-local prompt-history recall sheet, paste-image classification into the existing attachment lease, on-device dictation as an editable draft, action-row option pickers, and the model/effort reconciliation bug-fixes; the ⚠️ @-file search and paste enablement are planned against 007-host-requests. No completion claims."
+title: "Phase 4 implementation summary — composer / input (defect fixes)"
+description: "Composer defect-fix pass: re-report regression test, prompt-history send gate, new test coverage, a11y button styling, coincidental a11y test fix, and cheap section-numbering/optional-prop/unused-import fixes."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/004-composer"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Folded nodeterm dictation ND-5.1–5.9 into the planned stub."
-    next_safe_action: "Await operator go, then implement dictation + recs, prove barriers."
+    last_updated_at: "2026-08-26T00:00:00.000Z"
+    last_updated_by: "sk-code"
+    recent_action: "Applied review fixes: real re-report test, gated history, restore/paste tests, a11y button."
+    next_safe_action: "Commit the orca-recs slice; dictation pipeline is next."
+    completion_pct: 55
     blockers:
-      - "rec 4.2 @-file search needs a host file-search RPC (requested in 007-host-requests)."
-    completion_pct: 0
+      - "T2.8 @-file search needs a host file-search RPC (requested in 007-host-requests)."
+      - "T2.5/T2.9-T2.12/T2.14/T2.15 dictation pipeline deferred."
+      - "T3.x verification tasks deferred."
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -28,8 +30,8 @@ _memory:
 |---|---|
 | Parent | `007-orca-nodeterm-ux-mining` |
 | Level | 2 |
-| Status | Planned |
-| Requirements | REQ-001 … REQ-008 (all planned; none shipped) |
+| Status | In progress |
+| Requirements | REQ-001 … REQ-008 (T2.x shipped: 2.1, 2.2, 2.3, 2.4, 2.6, 2.7, 2.13; T2.8 BLOCKED-inert) |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -37,34 +39,37 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing yet — implementation is deferred until the operator says go. When built, this phase will land the
-eight Angle-4 composer recommendations over the real composer files. The ✅ set will ship as pure view state
-/ interaction: image-or-text send with the `<textarea>` never disabled on a transient lock and the exact raw
-draft restored when the host rejects a send (rec 4.1); the line-leading slash rule confirmed and the
-suggestion list capped at 12, sourced from the host catalog (rec 4.3); a device-local prompt-history recall
-sheet of this session's sent prompts (rec 4.4); on-device dictation as an editable local draft with a
-fail-closed setup sheet (rec 4.6 fallback); the model/effort pickers reachable from the composer action row
-with send disabled during a host option dispatch (rec 4.7); and the model/effort-sheet reconciliation
-bug-fixes — refuse to commit with an unknown baseline, never revert a staged pick on an identical re-report
-(rec 4.8). The ⚠️ set will ship inert behind a host capability: paste-image classification into the existing
-attachment lease (rec 4.5, gated on `mediaCapability.enabled`) and the `@`-file mention UI shape over a new
-host file-search RPC (rec 4.2, deferred to `007-host-requests`).
+This pass fixes P0-P2 defects identified in an independent review of the composer slice. No new features; every change is a root-cause fix.
 
-This phase also folds in the **net-new on-device dictation pipeline** from the nodeterm pass (ND-5.1–5.9),
-extending rec 4.6 — we ship zero dictation today (confirmed negative). When built it adds a new dictation
-overlay under `pages/chat/chrome/` plus a fail-closed setup sheet: batch transcribe (record → STOP →
-transcribe once) with an RMS audio-level equalizer for live feedback, not partial text (ND-5.1); mic
-permission asked before the first record with an actionable denial + Settings deep-link, a failed start
-tearing the track down, and a secure-context requirement (ND-5.3); model-download progress, a first-class
-None/off row, and dangling-pointer heal with the model cached in IndexedDB/Cache API (ND-5.2); two capture
-modes (toggle vs hold-to-talk) with a 400 ms accidental-tap cancel, blur-cancel, and STOP ≠ CANCEL (ND-5.5);
-a mid-dictation session switch discarding the old take (ND-5.8); and a screenshot MIME→extension map added to
-the rec 4.5 paste classifier (ND-5.7). The constraint-critical rule (ND-5.4): the transcript is an editable
-draft written via `setPrompt` and routed through the normal `canSendMessage` send-gate — it never
-auto-submits. On-device STT is ✅ (client interaction); it becomes ⚠️ only if audio is shipped to a host STT
-RPC, in which case the recording length is capped below the transport frame budget (ND-5.6), inert until that
-RPC lands. Per ND-5.9, prompt-history / `@`-mentions / slash stay orca-owned (recs 4.4 / 4.2 / 4.3) and are
-recorded as exclusions, not re-proposed.
+### P0 — Re-report regression test rewritten
+`app-mobile/tests/sheet-model-effort.svelte.test.ts`: The "does not clear a staged draftKey on identical host re-report" test was a fake — it built `refreshedControls` but never re-rendered the mounted sheet, so every assertion re-checked state already true before the "re-report" line. Rewritten to actually pass the re-reported controls via `view.rerender(...)`. The test also exposed a real bug: the sheet's open-reset `$effect` re-ran on every `runtimeControls` prop change because it depended on the reactive `isOpen` value. Fixed by using a manual transition flag (`previouslyOpen`) so a host re-report no longer wipes a staged `draftKey`.
+
+**Negative control:** temporarily reverting to the naive open-reset made the test fail (`aria-selected="false"`). Restoring the transition guard made it pass. The test correctly catches T2.7 regression.
+
+### P1 — Prompt history records un-accepted sends
+`app-mobile/src/pages/chat/chrome/session-composer.svelte` `submit()`: `recordPromptHistory(prompt)` ran unconditionally before checking `canSubmit`, so no-op'd sends (e.g., typing while a prior send is in flight) still landed in localStorage history. Fixed by gating the record call with `if (canSubmit)`.
+
+**New tests:**
+- `canSubmit=false` → `localStorage.setItem` not called for `pi-remote.prompt-history`
+- `canSubmit=true` → called exactly once
+
+### P1 — Missing test coverage (T2.1 restore-on-reject, T2.4/T2.13 paste handler)
+Added 6 new tests in `app-mobile/tests/session-composer.svelte.test.ts`:
+- **Restore-on-reject:** renders with `initialPrompt`, sends, then rerenders with `promptError` — asserts the exact raw untrimmed draft is restored
+- **Paste handler (image, media available):** mocks clipboard `DataTransfer` with an image/png item, dispatches `paste` event — asserts `preventDefault` called
+- **Paste handler (image, media unavailable):** same paste but `mediaCapability=null` — asserts `preventDefault` NOT called
+- **Paste handler (text):** text/plain item with media available — asserts `preventDefault` NOT called (native paste)
+
+### P1 — Dead disabled/hover styling on "Recent prompts" button
+`app-mobile/src/pages/chat/chrome/composer-tools.svelte`: The bare native `<button disabled={!composerEmpty}>` had no `use:hover`/`use:press`/`use:focusVisible` actions, so `[data-hovered]`/`[data-pressed]`/`[data-disabled]` selectors were dead. Replaced with the shared `Button` primitive (`$shared/primitives/button/button.svelte`) which wires those actions and `data-disabled`. The `:global(.tools--recall[data-disabled])` rule already exists with `cursor: not-allowed; opacity: 0.4`.
+
+### P1 — Coincidental a11y Tab-count test
+`app-mobile/tests/composer-tools-a11y.svelte.test.ts`: `renderTools()` never passed `composerEmpty`, so it defaulted to `false` and the Recall button was disabled/out of tab order — yet the test asserted 3 extra Tab stops and passed only via bits-ui focus-trap wrapping. Fixed: `renderTools(true)` so the Recall button is actually focusable, and the tab sequence corrected to 3 Tabs to reach the checkbox.
+
+### P2 — Cheap fixes
+- `app-mobile/src/shared/state/state.ts`: Renumbered duplicate section headers (CONNECTION→5, SESSION LIST→6, TRANSCRIPT DISPLAY→7, TRANSCRIPT REDUCER→8, SCOPE GUARD→8B, DISPLAY BLOCK PARSING→9, BLOCK NORMALIZATION→10)
+- `app-mobile/src/pages/chat/chrome/composer-tools.svelte`: Made `composerEmpty` and `onRecallHistory` optional (`?`) in the interface, matching their defaulted/omitted call sites
+- `app-mobile/src/shared/commands/use-mention-search.svelte.ts`: Removed unused `searchHostFiles` import
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -72,16 +77,12 @@ recorded as exclusions, not re-proposed.
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-The shared stateless seams will be extracted first — the device-local prompt-history filter in
-`shared/state/state.ts` (beside the existing `readComposerShiftTabPreference` pattern) and the `@`-mention
-trigger predicate in `shared/commands/` (a pure sibling to `deriveSlashTrigger`) — each with a canonical
-differential test, and the composer token-identity + test:web baseline captured. Each recommendation will
-then land on its cited file around the composer's existing mutation seam without crossing it: the send gates
-already carry every lock, so rec 4.1 only narrows the `disabled` predicate, rec 4.3 only adds a cap to an
-already host-sourced list, rec 4.5 reuses the whole existing chips + media-lease pipeline, and rec 4.8 adds
-two guards to `canCommit`. The set will be proven by fail-closed inertness checks (the authoritative gate),
-token-identity on the existing composer CSS, test:web with the reconciliation regression tests, and
-a11y-parity — all from the final state.
+Each defect was fixed at its root cause in the source file, then proven by real command output:
+1. **TypeScript:** `npm run typecheck` → 0 errors
+2. **Tests:** `npm run test:web` → 599 passed, 3 skipped, 0 failures (75 test files)
+3. **Lint:** `npx eslint` on changed files → 0 new errors
+4. **Source gates:** `bash run-source-gates.sh` → all PASS
+5. **Negative control:** re-report test proven to fail when the preserve-draftKey logic is broken
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -89,28 +90,11 @@ a11y-parity — all from the final state.
 <!-- ANCHOR:decisions -->
 ## KEY DECISIONS
 
-**Keep the textarea editable through transient locks (rec 4.1).** Today the composer disables the
-`<textarea>` on `sendingPrompt`, `slashSubmitting`, and `attachmentSubmission.busy`; on iOS that yanks the
-keyboard mid-send. The plan moves those transient locks OFF the textarea and keeps them only on the send
-gate, so editing survives a send while sending itself stays correctly gated.
+**Transition flag for sheet open-reset.** The open-reset `$effect` was changed from a reactive `isOpen` dependency to a manual `previouslyOpen` flag. This is the minimal fix — the effect still runs on every render (Svelte 5 `$effect` semantics), but the reset logic only executes on the `false→true` transition. A host re-report that swaps `runtimeControls` while `isOpen` stays `true` no longer wipes `draftKey`.
 
-**Reject orca's typed-`/model`-into-the-TUI; keep our host-RPC sheet (rec 4.8).** orca's option rows are a
-terminal remote-control pattern; our `sheet-model-effort.svelte` is already the portable host-RPC equivalent.
-Only the reconciliation *bugs-to-avoid* are adopted — refuse to commit with no known baseline
-(`current === null`), and never revert a staged pick on an identical host re-report.
+**`recordPromptHistory` gated on `canSubmit`.** The existing `submit()` function already checks `canSubmit` for the text lane, `effectiveSlashSendable` for the slash lane, and `attachmentSubmission.submit()` for the attachment lane. The record gate uses `canSubmit` because it covers the text lane (the one that records history). The slash and attachment lanes do not record history (they have their own dispatch paths).
 
-**⚠️ items ship inert, never invented on the client.** `@`-file search performs no device filesystem walk and
-stays inert until a host file-search RPC lands; paste-image routes only through the existing media lease and
-does nothing when the host media capability is off; on-device dictation is an editable local draft the user
-confirms before send, never host truth. The host fields are tracked in `007-host-requests`.
-
-**Dictation is a batch transcribe with an editable-draft insertion contract (ND-5.1/ND-5.4).** nodeterm's
-verified pipeline shows an RMS audio-level equalizer during recording, not a partial transcript — no
-partial/final reconcile — and inserts the finished take via `setPrompt` with no auto-submit, routed through
-the same send-gate as typing. This is the discipline that keeps on-device STT constraint-legal under
-host-authoritative + fail-closed. Setup and permission are fail-closed (None/off row, model-not-ready states,
-ask-before-record, no dead mic). Audio→host STT stays ⚠️ (ND-5.6 transport-frame cap), deferred to
-`007-host-requests`.
+**Button primitive for "Recent prompts".** Using the shared `Button` primitive is the faithful approach — it already wires `use:hover`, `use:press`, `use:focusVisible`, and `data-disabled`, matching every other composer control. The existing `:global(.tools--recall[data-disabled])` CSS rule already provides the correct disabled affordance.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -118,17 +102,13 @@ ask-before-record, no dead mic). Audio→host STT stays ⚠️ (ND-5.6 transport
 <!-- ANCHOR:verification -->
 ## VERIFICATION
 
-| Check | Planned result |
+| Check | Result |
 |---|---|
-| Fail-closed inertness (authoritative) | Every ⚠️ affordance does nothing without its host capability — pending |
-| Dictation insertion contract (ND-5.4) | Transcript is an editable draft; never auto-submits, routes through the send-gate — pending |
-| Dictation permission/setup fail-closed (ND-5.3/5.2) | Ask-before-record, actionable denial, no dead mic, None/off row — pending |
-| Pure-seam differential + boundary tests | Prompt-history filter + `@`-trigger predicate vs canonical — pending |
-| Token identity (composer CSS) | 0 diffs on existing surfaces from the final state — pending |
-| test:web | Green, incl. send-gating, slash-panel, attachment, and rec 4.8 reconciliation suites — pending |
-| a11y-parity | Live regions, listbox aria, sheet dialog semantics, focus return preserved — pending |
-| Traceability | Every task → a rec number (4.1–4.8) — defined |
-| `validate.sh --strict` | exit 0 via realpath — pending |
+| `npm run typecheck` | 0 errors |
+| `npm run test:web` | 599 passed, 3 skipped, 0 failures (75 files) |
+| `npx eslint` on changed files | 0 new errors |
+| Source gates | all PASS |
+| Negative control (re-report test) | Fails when preserve-draftKey broken, passes when fixed |
 <!-- /ANCHOR:verification -->
 
 ---
@@ -136,13 +116,8 @@ ask-before-record, no dead mic). Audio→host STT stays ⚠️ (ND-5.6 transport
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-This is a plan, not an implementation — no code has been written and no completion is claimed. Two
-recommendations are host-blocked: rec 4.2 (`@`-file mentions) cannot function until the host publishes a
-file-search RPC, and rec 4.5 paste-upload only works when `mediaCapability.enabled` is on; both ship inert
-behind their capability rather than being invented on the client. rec 4.6 host STT stays ⚠️ — only the
-on-device editable-draft fallback ships. All three host dependencies are recorded in `007-host-requests`.
-The on-device dictation pipeline (ND-5.1–5.9) is net-new — there is no orca equivalent and no dictation in the
-client today — so it lands a whole new surface rather than a delta; its only host dependency is the ND-5.6
-audio→host-STT recording cap, which stays ⚠️ and inert until a host STT RPC lands. Implementation is deferred
-until the operator says go.
+This pass fixes defects only. The following remain deferred:
+- T2.5/T2.9-T2.12/T2.14/T2.15: Dictation pipeline (rec 4.6 / ND-5.x)
+- T2.8: @-file mentions (🚧 inert without host RPC)
+- T3.x: Verification barriers (fail-closed, a11y-parity, traceability) — these are scoped to the full phase completion
 <!-- /ANCHOR:limitations -->

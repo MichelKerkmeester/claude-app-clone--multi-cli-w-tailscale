@@ -251,3 +251,27 @@ describe('normalizeCommandText', () => {
     expect(normalizeCommandText('PLAN')).toBe('plan');
   });
 });
+
+describe('rankHostCommands cap', () => {
+  it('caps the suggestion list at 12 rows', () => {
+    const commands = Array.from({ length: 20 }, (_, index) =>
+      command(`cmd-${index + 1}`),
+    );
+    const result = rankHostCommands(commands, '');
+    expect(result.items.length).toBeLessThanOrEqual(12);
+    expect(result.items.length).toBe(12);
+  });
+
+  it('returns all rows when fewer than 12 match', () => {
+    const commands = [command('plan'), command('zap')];
+    const result = rankHostCommands(commands, '');
+    expect(result.items.length).toBe(2);
+  });
+
+  it('returns rows only from the host catalog', () => {
+    const commands = [command('plan'), command('zap'), command('alpha')];
+    const result = rankHostCommands(commands, '');
+    expect(result.items.every((item) => commands.some((c) => c.name === item.name))).toBe(true);
+    expect(result.items.length).toBe(3);
+  });
+});

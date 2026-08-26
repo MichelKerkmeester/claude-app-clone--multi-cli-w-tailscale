@@ -20,6 +20,10 @@
     readonly onFilesSelected: (files: FileList | null) => void;
     readonly shiftTabEnabled: boolean;
     readonly onShiftTabPreferenceChange: (enabled: boolean) => void;
+    /** True when the composer draft is empty (no text, no attachments). */
+    readonly composerEmpty?: boolean;
+    readonly onRecallHistory?: () => void;
+    readonly onOpenModelEffort?: (section: 'model' | 'effort') => void;
   }
 
   // ───────────────────────────────────────────────────────────────────
@@ -67,6 +71,9 @@
     onFilesSelected,
     shiftTabEnabled,
     onShiftTabPreferenceChange,
+    composerEmpty = false,
+    onRecallHistory = () => undefined,
+    onOpenModelEffort = undefined,
   }: ComposerToolsProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
@@ -241,6 +248,29 @@
           onInsert={onInsert}
           isDisabled={catalog.snapshot === null}
         />
+      </section>
+
+      <section class="tools--group">
+        <span class="tools--label">Prompts</span>
+        <Button
+          class="tools--recall"
+          disabled={!composerEmpty}
+          onclick={onRecallHistory}
+          style="min-block-size: 44px"
+        >
+          Recent prompts
+        </Button>
+      </section>
+
+      <section class="tools--group">
+        <span class="tools--label">Model</span>
+        <Button
+          class="tools--action"
+          onclick={() => onOpenModelEffort?.('model')}
+          style="min-block-size: 44px"
+        >
+          Model & Effort
+        </Button>
       </section>
 
       <section class="tools--group">
@@ -435,5 +465,31 @@
     min-height: 1rem;
     color: var(--ink-muted);
     font-size: 0.72rem;
+  }
+
+  /* Recall history button in the tools popover. */
+  :global(.tools--recall) {
+    display: flex;
+    width: 100%;
+    min-block-size: 44px;
+    align-items: center;
+    padding-inline: var(--space-2);
+    border: 1px solid var(--control-border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  :global(.tools--recall[data-hovered]),
+  :global(.tools--recall[data-pressed]) {
+    background: var(--accent-soft);
+  }
+
+  :global(.tools--recall[data-disabled]) {
+    cursor: not-allowed;
+    opacity: 0.4;
   }
 </style>

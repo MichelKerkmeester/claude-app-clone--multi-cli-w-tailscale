@@ -81,9 +81,9 @@ function makeRuntimeControls(): RuntimeControls {
 }
 
 const noop = (): void => {};
-const onInsert = (_name: string, _binding: SelectedCommandBinding): void => {};
-const onFilesSelected = (_files: FileList | null): void => {};
-const onShiftTabPreferenceChange = (_enabled: boolean): void => {};
+const onInsert: (name: string, binding: SelectedCommandBinding) => void = () => {};
+const onFilesSelected: (files: FileList | null) => void = () => {};
+const onShiftTabPreferenceChange: (enabled: boolean) => void = () => {};
 
 const baseArgs = {
   runtimeControls: makeRuntimeControls(),
@@ -94,6 +94,9 @@ const baseArgs = {
   onFilesSelected,
   shiftTabEnabled: true,
   onShiftTabPreferenceChange,
+  composerEmpty: false,
+  onRecallHistory: () => undefined,
+  onOpenModelEffort: () => undefined,
 };
 
 const meta = {

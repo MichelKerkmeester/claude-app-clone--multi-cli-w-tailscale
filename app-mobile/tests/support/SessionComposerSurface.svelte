@@ -20,6 +20,7 @@
     readonly mediaCapability: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
     readonly modelCanViewPhotos: boolean;
     readonly localFiles: readonly File[] | undefined;
+    readonly promptError?: string | null;
   }
 </script>
 
@@ -42,6 +43,7 @@
     mediaCapability,
     modelCanViewPhotos,
     localFiles,
+    promptError = null,
   }: SessionComposerSurfaceProps = $props();
 </script>
 
@@ -59,7 +61,7 @@
     {runtimeRunning}
     {initialPrompt}
     {mediaCapability}
-    {modelCanViewPhotos}
     {localFiles}
+    {promptError}
   />
 </AttachmentDraftProvider>

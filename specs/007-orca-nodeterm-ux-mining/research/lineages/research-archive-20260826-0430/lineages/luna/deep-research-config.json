@@ -1,0 +1,68 @@
+{
+  "topic": "Mine specs/context/orca-main for portable UI/UX and chat-feature logic to improve our SvelteKit mobile client, prioritising (1) user chat UX and (2) home-screen session-selection UX. The full angles, our current-state gaps, and the host-authoritative/fail-closed constraint are documented in specs/007-orca-nodeterm-ux-mining/research-angles.md — read it first. Investigate orca's mobile/ (React Native) and src/renderer/ (Electron) surfaces. For each finding, name the orca file/pattern, the concrete UX or logic to copy, how it maps onto our host-authoritative/fail-closed constraint, and a portability verdict (drop-in view affordance / needs a new host field / not portable). Weight findings toward session-selection and chat UX.",
+  "maxIterations": 20,
+  "minIterations": 3,
+  "convergenceThreshold": 0.05,
+  "antiConvergence": {
+    "convergenceMode": "default",
+    "stopPolicy": "max-iterations",
+    "divergent": {}
+  },
+  "stuckThreshold": 3,
+  "minIdeaObservations": 2,
+  "maxDurationMinutes": 240,
+  "maxToolCallsPerIteration": 12,
+  "maxMinutesPerIteration": 10,
+  "progressiveSynthesis": true,
+  "specFolder": "specs/007-orca-nodeterm-ux-mining",
+  "artifactDir": "specs/007-orca-nodeterm-ux-mining/research/lineages/luna",
+  "fanoutLineageArtifactDir": "specs/007-orca-nodeterm-ux-mining/research/lineages/luna",
+  "resource_map_present": false,
+  "resource_map": { "emit": true },
+  "createdAt": "2026-08-26T04:14:35.190Z",
+  "status": "initialized",
+  "executionMode": "auto",
+  "executor": {
+    "kind": "cli-codex",
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "max",
+    "serviceTier": null,
+    "sandboxMode": "workspace-write",
+    "timeoutSeconds": 900
+  },
+  "lineage": {
+    "sessionId": "fanout-luna-1787717167874-ti5kfp",
+    "parentSessionId": null,
+    "lineageMode": "new",
+    "allowedModes": ["new", "resume", "restart"],
+    "deferredModes": ["fork", "completed-continue"],
+    "generation": 1,
+    "continuedFromRun": null
+  },
+  "reducer": {
+    "enabled": true,
+    "version": "1.0",
+    "registryFile": "findings-registry.json",
+    "dashboardFile": "deep-research-dashboard.md",
+    "strategyFile": "deep-research-strategy.md",
+    "machineOwnedSections": [
+      "key-questions",
+      "answered-questions",
+      "what-worked",
+      "what-failed",
+      "exhausted-approaches",
+      "ruled-out-directions",
+      "divergence-frontier",
+      "next-focus"
+    ]
+  },
+  "fileProtection": {
+    "deep-research-config.json": "immutable",
+    "deep-research-state.jsonl": "append-only",
+    "deep-research-strategy.md": "mutable",
+    "deep-research-dashboard.md": "auto-generated",
+    "findings-registry.json": "auto-generated",
+    "iteration-*.md": "write-once",
+    "research.md": "mutable"
+  }
+}

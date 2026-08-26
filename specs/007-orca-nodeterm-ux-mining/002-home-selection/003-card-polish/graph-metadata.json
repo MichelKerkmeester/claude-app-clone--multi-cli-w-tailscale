@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-nodeterm-ux-mining/002-home-selection/003-card-polish",
+  "spec_folder": "007-orca-nodeterm-ux-mining/002-home-selection/003-card-polish",
+  "parent_id": "007-orca-nodeterm-ux-mining/002-home-selection",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "plan",
+      "per-card",
+      "presentation",
+      "content",
+      "verified",
+      "orca",
+      "synthesis",
+      "set",
+      "ships",
+      "now",
+      "relabel",
+      "blocks"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Plan the per-card presentation and content from the verified orca synthesis. The \u2705 set ships now: relabel 'blocks'\u2192'messages' + a real ISO datetime + absolute-time-on-tap (2.1), stale-decay a running card to a dimmed/idle look after 30 min via updatedAt without ever writing status (1.8), drop the resting-done dot reserving a live glyph for attention (1.7), and the peek-before-open accordion chrome (2.5 chrome). The \u26a0\ufe0f card-content bundle is planned UI-plus-fallback and requested in 007-host-requests: the needs-you attention badge (1.6), human title / last-message preview / agent chip (2.2), host-derived titles never client-sliced (2.3), recoverable-empty preservation (2.4), and the accordion body (2.5 body). The title-is-a-projection policy note (2.6) frames the request. Fail-closed throughout; proven by token-identity 0-diff, test:web green, and a11y-parity. Plan only.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:a02e3a971d467c9f3518da4a55520c202938a655b9170cf335229db6be48968b",
+    "source_doc_hashes": {
+      "spec.md": "aa202a700f60ec8a00611aa5767b61a7b1d72a842a8f3c1081306311a5994630",
+      "plan.md": "dbf3916d9a0e076b454c4e30450c235d0e75aacd7d99f1c83492a4300493fea5",
+      "tasks.md": "640cf320aa2f10ae0c1a6a23797f5bc0e1fb6ec2045c886a5754b8487a691830",
+      "checklist.md": "5ca710db85108222039d116335231d1d4f2dc58ef8e7f7c7cad12aff2d8c5989",
+      "implementation-summary.md": "7c3d51d6eeaddebd7d779c459e626665d14c3c0401adfc2d869b932915d685aa"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

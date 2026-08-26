@@ -1,0 +1,26 @@
+{
+  "level": "2",
+  "specFolder": "007-orca-nodeterm-ux-mining/006-navigation",
+  "description": "Carry the opaque session id raw into the router, encode it once at the router boundary, then re-validate id + epoch at the chat page before loading the transcri",
+  "keywords": [
+    "carry",
+    "opaque",
+    "session",
+    "raw",
+    "router",
+    "encode",
+    "once",
+    "boundary",
+    "then",
+    "re-validate",
+    "epoch"
+  ],
+  "lastUpdated": "2026-08-26T05:54:46.000Z",
+  "specId": "006",
+  "folderSlug": "navigation",
+  "parentChain": [
+    "007-orca-nodeterm-ux-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

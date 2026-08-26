@@ -1,0 +1,57 @@
+{
+  "topic": "Mine specs/context/orca-main for portable UI/UX and chat-feature logic to improve our SvelteKit mobile client, prioritising (1) user chat UX and (2) home-screen session-selection UX. Investigate orca's mobile/ (React Native) and src/renderer/ (Electron) surfaces. For each finding, name the orca file/pattern, the concrete UX or logic to copy, how it maps onto our host-authoritative/fail-closed constraint, and a portability verdict (drop-in view affordance / needs a new host field / not portable). Weight findings toward session-selection and chat UX.",
+  "maxIterations": 20,
+  "minIterations": 3,
+  "convergenceThreshold": 0.05,
+  "antiConvergence": {
+    "convergenceMode": "default",
+    "divergent": {},
+    "stopPolicy": "max-iterations"
+  },
+  "stuckThreshold": 3,
+  "maxDurationMinutes": 120,
+  "maxToolCallsPerIteration": 12,
+  "maxMinutesPerIteration": 10,
+  "progressiveSynthesis": true,
+  "specFolder": "specs/007-orca-nodeterm-ux-mining",
+  "resource_map_present": false,
+  "resource_map": { "emit": true },
+  "createdAt": "2026-08-26T04:46:00Z",
+  "status": "initialized",
+  "executionMode": "auto",
+  "executor": {
+    "kind": "cli-codex",
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "medium",
+    "serviceTier": null,
+    "sandboxMode": "workspace-write",
+    "timeoutSeconds": 600
+  },
+  "lineage": {
+    "sessionId": "fanout-luna-1787718935950-gxg4a7",
+    "parentSessionId": null,
+    "lineageMode": "new",
+    "generation": 1,
+    "continuedFromRun": null
+  },
+  "reducer": {
+    "enabled": true,
+    "version": "1.0",
+    "machineOwnedSections": [
+      "key-questions",
+      "answered-questions",
+      "what-worked",
+      "what-failed",
+      "exhausted-approaches",
+      "ruled-out-directions",
+      "divergence-frontier",
+      "next-focus"
+    ]
+  },
+  "writeBoundary": {
+    "artifactDir": "specs/007-orca-nodeterm-ux-mining/research/lineages/luna",
+    "externalSpecMutation": "deferred",
+    "memorySave": "skipped",
+    "gitWrites": "forbidden"
+  }
+}

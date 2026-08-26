@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-nodeterm-ux-mining/005-streaming-ask",
+  "spec_folder": "007-orca-nodeterm-ux-mining/005-streaming-ask",
+  "parent_id": "007-orca-nodeterm-ux-mining",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "harden",
+      "mature",
+      "streaming",
+      "blocking-prompt",
+      "surfaces",
+      "against",
+      "eight",
+      "verified",
+      "orca",
+      "angle-5",
+      "recommendations",
+      "keep"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Harden the mature streaming and blocking-prompt surfaces against the eight verified orca Angle-5 recommendations: keep streaming session-scoped and peek-safe, split the working dots from the streaming partial-text, reconcile the optimistic user echo by host message id, name the input-lock reasons with a settle window, verify the ask card answers by option identity with dismissal kept outside the card, render approval buttons from the host ticket under single-flight, allow one blocking prompt at a time, and name the empty/loading/error transcript copy with a single assertive send-failure channel. Every affordance reads existing DTO fields or is pure interaction; nothing owns session truth. Plan only \u2014 no implementation until the operator says go.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:95267f47a031b47766430e67313a556ab411110b9c9529c69266381a710baba1",
+    "source_doc_hashes": {
+      "spec.md": "fa7c129318a61e2f76858edf0c75d2472c512277b1adcaa700fbcffc6dc55f78",
+      "plan.md": "6bb447a7104ae83190374840d6caebea93e6b4bbc7dec4d88c307850fe0c4ae1",
+      "tasks.md": "2ea02408b8904c09508f5cccd5a65bcaea69d11c6562fb9e6a6620fdc4e3b0ea",
+      "checklist.md": "686fdd6a6a16f60397db4bf3641b6df8b4274b94f199b7ac8ca256fd362b59dc",
+      "implementation-summary.md": "a03f1d02a4c506f9c417b4752146fbd15763544bdd807332de0b6d08095e41e3"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

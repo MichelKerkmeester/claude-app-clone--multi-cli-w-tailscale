@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-nodeterm-ux-mining/002-home-selection/002-list-organization",
+  "spec_folder": "007-orca-nodeterm-ux-mining/002-home-selection/002-list-organization",
+  "parent_id": "007-orca-nodeterm-ux-mining/002-home-selection",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "plan",
+      "home",
+      "list",
+      "sectioning",
+      "filtering",
+      "verified",
+      "orca",
+      "synthesis",
+      "time-bucket",
+      "sections",
+      "counts",
+      "active"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Plan the home list's sectioning and filtering from the verified orca synthesis: time-bucket sections with counts (Active/Today/Yesterday/Older) derived from updatedAt (1.3), status filter chips over existing status (1.4), the search-box chrome with two distinct empty states (1.5, chrome \u2705 / useful query \u26a0\ufe0f), a device-local favorite as pure view-state that only reorders the local list (1.14), and the 'New session' chrome disabled-until-live (1.13, chrome \u2705 / create needs a host RPC \u26a0\ufe0f). The chrome ships now; the two \u26a0\ufe0f paths \u2014 useful search over title/preview and the create RPC \u2014 are requested in 007-host-requests and fail closed. Proven behaviour-preserving by token-identity 0-diff, test:web green, and a11y-parity. Plan only.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:b4a213a2f160259d7253f1692fccadda144fad4616b3e02e56cbe63771d128f1",
+    "source_doc_hashes": {
+      "spec.md": "4438c4044ae52f9c444858be14826a32777a8287746ea0129a57d4079804311a",
+      "plan.md": "abcfddcf840182cc78b92f8b5a599b9eaf04a3c9611c530f2e13efbe1217a3ad",
+      "tasks.md": "2eb940b80dc65d794e8ee7190f6256aac40064507bd47c19c99e8f5342290faa",
+      "checklist.md": "ffae73c3cc55be4cdf98b1ae2084a6147d5e28a1a24b8cd3cf82d2024c3b9834",
+      "implementation-summary.md": "1443837aa1e1fbd3f4be5106afdf181e37e9b62a37867db98fc5be6f76d97693"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

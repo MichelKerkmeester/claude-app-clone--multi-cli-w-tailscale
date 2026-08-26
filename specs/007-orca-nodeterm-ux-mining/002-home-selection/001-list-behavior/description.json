@@ -1,0 +1,27 @@
+{
+  "level": "2",
+  "specFolder": "007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior",
+  "description": "Plan the home session list's interaction and state machine from the verified orca synthesis: recency-sort the roster by updatedAt (1.1), pull-to-refresh that ke",
+  "keywords": [
+    "plan",
+    "home",
+    "session",
+    "list",
+    "interaction",
+    "state",
+    "machine",
+    "verified",
+    "orca",
+    "synthesis",
+    "recency-sort"
+  ],
+  "lastUpdated": "2026-08-26T05:54:46.000Z",
+  "specId": "001",
+  "folderSlug": "list-behavior",
+  "parentChain": [
+    "007-orca-nodeterm-ux-mining",
+    "002-home-selection"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

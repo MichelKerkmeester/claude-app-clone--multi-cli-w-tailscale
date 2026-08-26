@@ -1,0 +1,15 @@
+{
+  "phase": "phase_init",
+  "status": "complete",
+  "artifact_dir": "specs/007-orca-nodeterm-ux-mining/research/lineages/luna",
+  "spec_folder": "specs/007-orca-nodeterm-ux-mining",
+  "session_id": "fanout-luna-1787718935950-gxg4a7",
+  "executor": "cli-codex model=gpt-5.6-luna",
+  "loop_type": "research",
+  "stop_policy": "max-iterations",
+  "max_iterations": 20,
+  "convergence_threshold": 0.05,
+  "resolve_artifact_root": "skipped; bound directly from config.fanout_lineage_artifact_dir",
+  "late_init_spec_sync": "deferred; write surface is lineage only",
+  "initialized_at": "2026-08-26T04:46:00Z"
+}

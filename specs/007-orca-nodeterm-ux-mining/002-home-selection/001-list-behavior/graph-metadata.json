@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior",
+  "spec_folder": "007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior",
+  "parent_id": "007-orca-nodeterm-ux-mining/002-home-selection",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "plan",
+      "home",
+      "session",
+      "list",
+      "interaction",
+      "state",
+      "machine",
+      "verified",
+      "orca",
+      "synthesis",
+      "recency-sort",
+      "roster"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Plan the home session list's interaction and state machine from the verified orca synthesis: recency-sort the roster by updatedAt (1.1), pull-to-refresh that keeps the last-good snapshot on failure (1.2), a four-kind list state machine \u2014 loading \u00b7 error+retry \u00b7 host-too-old \u00b7 ready \u2014 that keeps old data on refetch (1.9), a reserved resume slot filled from cache and inert until live (1.10), single-flight Open that disables every open while one launch is in flight (1.11), and the five-way haptics taxonomy (1.12). Every item reads existing SessionCardDto fields or is pure interaction \u2014 all \u2705 drop-in, blocked on no host field. Behaviour-preserving where CSS is touched, proven by token-identity 0-diff, test:web green, and a11y-parity. Plan only.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:5308eb0321623b39e4e041a73950cff79d16aab4276a28e9feb17434f8c2f7d0",
+    "source_doc_hashes": {
+      "spec.md": "b8f7cb56804e6a6694fe1330d108c1392fac7190f7931a598fb1db1815917d38",
+      "plan.md": "72fe5dcaaf7b9d8a8932af3d70ba432ebeed653751a59c724e913ba6284b9014",
+      "tasks.md": "ebd4edc5976574b1a12c3b2e7abada7a9a42bdd87d52f544b296f173e46d06ea",
+      "checklist.md": "020f67cce10f8ef0472c8accef8798436f9165a8f0ff4ab2f747eb05a81f09e3",
+      "implementation-summary.md": "5d3eb5ccc874f58f2bff31a61f2509e8982e17330e3e5caf7af5f443bf9f2c2e"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

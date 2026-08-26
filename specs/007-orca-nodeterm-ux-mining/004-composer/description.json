@@ -1,0 +1,26 @@
+{
+  "level": "2",
+  "specFolder": "007-orca-nodeterm-ux-mining/004-composer",
+  "description": "Plan the composer-surface recommendations from the orca UX mining synthesis (recs 4.1\u20134.8) into the SvelteKit mobile client, host-authoritative and fail-closed.",
+  "keywords": [
+    "plan",
+    "composer-surface",
+    "recommendations",
+    "orca",
+    "mining",
+    "synthesis",
+    "recs",
+    "sveltekit",
+    "mobile",
+    "client",
+    "host-authoritative"
+  ],
+  "lastUpdated": "2026-08-26T05:54:46.000Z",
+  "specId": "004",
+  "folderSlug": "composer",
+  "parentChain": [
+    "007-orca-nodeterm-ux-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

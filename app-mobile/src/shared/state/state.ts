@@ -275,7 +275,8 @@ export function transcriptReducer(
         ? state
         : { ...EMPTY_TRANSCRIPT, sessionId: action.sessionId };
     case 'hydrate':
-      if (state.sessionId !== action.sessionId || state.source === 'relay') return state;
+      if (!matchesTranscriptSession(state, action.sessionId) || state.source === 'relay')
+        return state;
       return {
         sessionId: action.sessionId,
         epoch: action.epoch,
@@ -292,7 +293,7 @@ export function transcriptReducer(
       // A cache hydrate may omit volatile blocks while retaining the relay cursor. The
       // Authoritative page must still replace that history projection before sync resumes.
       if (
-        state.sessionId !== action.sessionId ||
+        !matchesTranscriptSession(state, action.sessionId) ||
         state.source === 'relay' ||
         state.awaitingSnapshot
       )
@@ -306,7 +307,7 @@ export function transcriptReducer(
         error: null,
       };
     case 'snapshot': {
-      if (state.sessionId !== action.message.sessionId) return state;
+      if (!matchesTranscriptSession(state, action.message.sessionId)) return state;
       return {
         sessionId: action.message.sessionId,
         epoch: action.message.epoch,
@@ -326,15 +327,12 @@ export function transcriptReducer(
       };
     }
     case 'delta': {
-      if (state.sessionId !== action.message.sessionId || state.awaitingSnapshot) return state;
-      if (state.epoch !== null && state.epoch !== action.message.epoch) {
-        return {
-          ...EMPTY_TRANSCRIPT,
-          sessionId: state.sessionId,
-          awaitingSnapshot: true,
-          error: 'The relay epoch changed. Waiting for an authoritative snapshot.',
-        };
-      }
+      if (
+        !matchesTranscriptSession(state, action.message.sessionId) ||
+        state.awaitingSnapshot
+      )
+        return state;
+      if (isEpochChange(state, action.message.epoch)) return epochChangeState(state);
       const incoming = blocksFromEnvelopes(
         action.message.envelopes.filter((envelope) => envelope.seq > state.coversThrough),
         action.message.sessionId,
@@ -353,7 +351,7 @@ export function transcriptReducer(
       };
     }
     case 'gap':
-      if (state.sessionId !== action.message.sessionId) return state;
+      if (!matchesTranscriptSession(state, action.message.sessionId)) return state;
       return {
         ...EMPTY_TRANSCRIPT,
         sessionId: state.sessionId,
@@ -368,36 +366,109 @@ export function transcriptReducer(
       };
     case 'promptOptimistic':
       // A submission belongs to the session that started it: a settlement
-      // Arriving after a session switch can never touch another session's
-      // Transcript rows.
-      if (state.sessionId !== action.sessionId) return state;
+      // arriving after a session switch can never touch another session's rows.
+      if (!matchesTranscriptSession(state, action.sessionId)) return state;
       return {
         ...state,
-        blocks: normalizeBlocks([...state.blocks, action.block], 'optimistic'),
-        pendingPromptIds: [...state.pendingPromptIds, action.block.id],
+        ...reconcilePromptOptimistic(state.blocks, state.pendingPromptIds, action.block),
       };
     case 'promptAccepted':
-      if (state.sessionId !== action.sessionId) return state;
+      if (!matchesTranscriptSession(state, action.sessionId)) return state;
       return {
         ...state,
-        blocks: normalizeBlocks(
-          [...state.blocks.filter((block) => block.id !== action.optimisticId), action.block],
-          'relay',
+        ...reconcilePromptAccepted(
+          state.blocks,
+          state.pendingPromptIds,
+          action.optimisticId,
+          action.block,
         ),
-        pendingPromptIds: state.pendingPromptIds.filter((id) => id !== action.optimisticId),
         source: 'relay',
         updatedAt: action.at,
       };
     case 'promptRejected':
-      if (state.sessionId !== action.sessionId) return state;
+      if (!matchesTranscriptSession(state, action.sessionId)) return state;
       return {
         ...state,
-        blocks: state.blocks.filter((block) => block.id !== action.optimisticId),
-        pendingPromptIds: state.pendingPromptIds.filter((id) => id !== action.optimisticId),
+        ...reconcilePromptRejected(state.blocks, state.pendingPromptIds, action.optimisticId),
       };
     case 'error':
       return { ...state, error: action.error };
   }
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 7B. SCOPE GUARD AND DRAFT RECONCILE (pure, single source of truth)
+// ───────────────────────────────────────────────────────────────────
+
+/**
+ * True when a sync message or prompt settlement belongs to the session this
+ * transcript is currently showing. An unselected transcript (sessionId null)
+ * matches nothing — the same fail-closed result as the old inline `null !==
+ * sessionId` guard, since a real session id is never null.
+ */
+export function matchesTranscriptSession(
+  state: TranscriptState,
+  sessionId: string,
+): boolean {
+  return state.sessionId !== null && state.sessionId === sessionId;
+}
+
+/**
+ * True when a delta arrives under an epoch the transcript has not seen.
+ * The relay changed generations, so the assembled history is invalid until
+ * an authoritative snapshot replaces it.
+ */
+export function isEpochChange(state: TranscriptState, epoch: string): boolean {
+  return state.epoch !== null && state.epoch !== epoch;
+}
+
+export function epochChangeState(state: TranscriptState): TranscriptState {
+  return {
+    ...EMPTY_TRANSCRIPT,
+    sessionId: state.sessionId,
+    awaitingSnapshot: true,
+    error: 'The relay epoch changed. Waiting for an authoritative snapshot.',
+  };
+}
+
+/** Echo an optimistic submission into the transcript as its raw draft. */
+export function reconcilePromptOptimistic(
+  blocks: readonly DisplayTranscriptBlock[],
+  pendingPromptIds: readonly string[],
+  block: TranscriptBlock,
+): Pick<TranscriptState, 'blocks' | 'pendingPromptIds'> {
+  return {
+    blocks: normalizeBlocks([...blocks, block], 'optimistic'),
+    pendingPromptIds: [...pendingPromptIds, block.id],
+  };
+}
+
+/** Settle an optimistic draft with the host's echoed block, by host id. */
+export function reconcilePromptAccepted(
+  blocks: readonly DisplayTranscriptBlock[],
+  pendingPromptIds: readonly string[],
+  optimisticId: string,
+  block: TranscriptBlock,
+): Pick<TranscriptState, 'blocks' | 'pendingPromptIds'> {
+  return {
+    blocks: normalizeBlocks(
+      [...blocks.filter((entry) => entry.id !== optimisticId), block],
+      'relay',
+    ),
+    pendingPromptIds: pendingPromptIds.filter((id) => id !== optimisticId),
+  };
+}
+
+/** Drop an optimistic draft, restoring the exact raw block it replaced. */
+export function reconcilePromptRejected(
+  blocks: readonly DisplayTranscriptBlock[],
+  pendingPromptIds: readonly string[],
+  optimisticId: string,
+): Pick<TranscriptState, 'blocks' | 'pendingPromptIds'> {
+  return {
+    blocks: blocks.filter((block) => block.id !== optimisticId),
+    pendingPromptIds: pendingPromptIds.filter((id) => id !== optimisticId),
+  };
 }
 
 // ───────────────────────────────────────────────────────────────────

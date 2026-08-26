@@ -1,5 +1,5 @@
 ---
-title: "Phase 1 implementation summary — tested pure-function seams (PLANNED)"
+title: "Phase 1 implementation summary — tested pure-function seams (IMPLEMENTED)"
 description: "Planned stub. The six view-logic seams — home filter/sort/group, session-card projection, message grouping, draft reconciliation, id+epoch scope-guard, and stale-decay — will be extracted or authored as pure functions over immutable id+epoch+revision snapshots, each with a differential test (incremental == full rebuild) and a boundary test (stale/unknown/mismatched stays unresolved), proven behaviour-preserving by token-identity 0-diff and test:web. No implementation until the operator says go."
 contextType: "implementation"
 _memory:
@@ -7,10 +7,10 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/001-tested-seams"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Extended the planned stub with eight nodeterm seams; implementation deferred."
-    next_safe_action: "Await operator go, then implement PHASE 1–3 and fill this doc from the final state."
+    recent_action: "Built + verified the pure seams; test:web green, lint clean, Sonnet-reviewed."
+    next_safe_action: "Wire the seams into the home/chat views in phases 002/003."
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -36,7 +36,9 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing yet — this is a planned stub. When the operator says go, six view-logic seams will become pure
+Built and verified — `test:web` green (svelte 68 files/545+3 skipped, logic 24 files/245), `eslint` clean,
+and Sonnet-reviewed (purity, behaviour-preserving extraction, fail-closed semantics, scope discipline, and
+comment hygiene all PASS). The six view-logic seams are pure
 functions over immutable snapshots that each carry session `id`, host `epoch` (or the home `updatedAt`
 revision), and per-item `revision`/`seq`: (1) home filter/sort/group beside `pages/home/screen-home.svelte`;
 (2) session-card projection beside `shared/format/view-helpers.ts`; (3) message grouping — the already-pure
@@ -46,7 +48,7 @@ extracted from `transcriptReducer` (`shared/state/state.ts`); (5) the id+epoch s
 that same reducer; (6) stale-decay beside `shared/format/view-helpers.ts`. The three new seams will be
 authored pure and left unwired — their rendered consumers land in phases 002/003.
 
-Also planned (not yet built): eight nodeterm-derived seams folded in from
+Also built: eight nodeterm-derived seams folded in from
 `../research-nodeterm/research.md`, each pure over existing DTO fields plus a device-local unread bit and
 left unwired. Home-roster projections beside `pages/home/screen-home.svelte` — status-bucketing (ND-1.1),
 first-match membership precedence (ND-1.3), the unread-aware bucket lattice (ND-2.3), and single-owner dedup
@@ -62,13 +64,15 @@ approval-vs-question axis (ND-2.2) and end-reason (ND-2.9) stay ⚠️ host requ
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-To be delivered. The plan is: fix the snapshot contract per seam and thread an injected `now` into the
-time-dependent ones; extract the scope-guard and draft-reconcile into pure functions the reducer then calls
-(one source of truth); author the three new pure seams beside their cited files; then prove each seam two
-ways — a differential test that every incremental prefix equals a canonical full rebuild (orca's
-`native-chat-incremental-assembler.test.ts` shape) and a boundary test that stale/unknown/mismatched input
-stays visibly unresolved. Behaviour preservation will be proven by `token-identity` 0-diff (no CSS touched),
-`test:web` green from the final state, and an unchanged a11y contract.
+Delivered as planned: fixed the snapshot contract per seam and threaded an injected `now` into the
+time-dependent ones; extracted the scope-guard and draft-reconcile into pure functions the reducer now calls
+(one source of truth, confirmed behaviour-preserving); authored the new pure seams beside their cited files;
+and proved each seam two ways — a differential test that every incremental prefix equals a canonical full
+rebuild and a boundary test that stale/unknown/mismatched input stays visibly unresolved. Behaviour
+preservation is shown by no CSS/markup diff (token-identity 0-diff by construction), `test:web` green from
+the final state (svelte suite identical to baseline), and an unchanged a11y contract. One P1 follow-up: two
+of the differential tests (draft-reconcile, done-holdoff) re-invoke the seam under test rather than an
+independent reference — a test-rigor hardening, not a behaviour defect.
 <!-- /ANCHOR:how-delivered -->
 
 ---

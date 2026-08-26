@@ -82,8 +82,9 @@ function compactId(id: string): string {
   return id.length <= 18 ? id : `${id.slice(0, 8)}…${id.slice(-6)}`;
 }
 
-function relativeTime(value: string): string {
-  const milliseconds = Date.now() - Date.parse(value);
+/** Pure relative-time label; `now` is injected so the caller owns the clock. */
+export function relativeTimeAt(value: string, now: number): string {
+  const milliseconds = now - Date.parse(value);
   if (!Number.isFinite(milliseconds)) return 'unknown time';
   const minutes = Math.max(0, Math.round(milliseconds / 60_000));
   if (minutes < 1) return 'just now';
@@ -91,6 +92,11 @@ function relativeTime(value: string): string {
   const hours = Math.round(minutes / 60);
   if (hours < 24) return `${hours}h ago`;
   return `${Math.round(hours / 24)}d ago`;
+}
+
+/** Legacy clock-reading wrapper kept for existing call sites. */
+function relativeTime(value: string): string {
+  return relativeTimeAt(value, Date.now());
 }
 
 function messageFrom(error: unknown): string {

@@ -1,17 +1,16 @@
 ---
 title: "Home card polish plan — ship the ✅ presentation set, wire the ⚠️ bundle behind a fail-closed field gate"
-description: "How card polish is built and proven: the ✅ set (relabel + datetime 2.1, stale-decay 1.8, drop resting-done dot 1.7, accordion chrome 2.5) as presentation over existing fields with pure decay/format helpers; the ⚠️ card-content bundle (attention badge 1.6, title/preview/agent 2.2/2.3, recoverable-empty 2.4, accordion body 2.5) built behind an optional-field gate that renders the enrichment when the host field is present and degrades to today's card when it is absent — each field requested in 007-host-requests. Proven by token-identity 0-diff, test:web green, and a11y-parity, with a barrier that the card never writes status and never badges a running session."
+description: "How card polish is built and proven: the ✅ set (relabel + datetime, 20-min stale-unknown look, dropped resting-done glyph, always-inline row, hue, seen-dot, two channels) as presentation over existing fields; the ⚠️ card-content bundle behind an optional-field gate that renders the enrichment when the host field is present and degrades to today's card when it is absent. Proven by token-identity 0-diff, test:web green, and a11y-parity."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/003-card-polish"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned the always-inline row and extended the field gate to the ND ⚠️ meter set."
-    next_safe_action: "Build the ✅ ND inline row and pure hue/seen-dot/decay helpers on operator go."
-    blockers:
-      - "The ⚠️ bundle (1.6/2.2/2.3/2.4/2.5-body) renders only once host fields land via 007-host-requests"
-    completion_pct: 0
+    last_updated_at: "2026-08-26T19:25:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Shipped always-inline cards with seen-dot, hue mark, and 20-min stale look"
+    next_safe_action: "None — phase implemented; gated host fields stay inert until the relay publishes them"
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: plan-core | v2.2 -->
@@ -25,13 +24,13 @@ _memory:
 ## 1. SUMMARY
 
 Ship the ✅ presentation set now as pure-helper-backed view changes over existing `SessionCardDto` fields:
-relabel + `<time datetime>` + absolute-on-tap (2.1), a pure stale-decay *look* over `updatedAt` that never
-writes `status` (1.8), the dropped resting-done dot (1.7), and the peek accordion chrome (2.5). Build the
-⚠️ card-content bundle behind a single OPTIONAL-FIELD GATE: the enrichment (attention badge, title,
-preview, agent chip, recoverable-empty, accordion body) renders only when the corresponding host field is
-present on the DTO, and degrades to today's card when it is absent. Each field is requested in
-`007-host-requests`. Prove it with `token-identity`, `test:web`, and a11y-parity, plus a barrier that no
-card writes `status` and no card ever badges a `running` session.
+relabel + `<time datetime>` + absolute-on-tap (2.1), a 20-minute stale/unknown *look* over `updatedAt` that
+never writes `status` (ND-1.6/2.1), the dropped resting-done glyph (1.7), an always-inline detail row
+(ND-3.8), hue mark, seen-dot, and two channels. Build the ⚠️ card-content bundle behind a single
+OPTIONAL-FIELD GATE: the enrichment renders only when the corresponding host field is present on the DTO,
+and degrades to today's card when it is absent. Each field is requested in `007-host-requests`. Prove it
+with `token-identity`, `test:web`, and a11y-parity, plus a barrier that no card writes `status` and no card
+ever badges a `running` session.
 <!-- /ANCHOR:summary -->
 
 ---
@@ -39,14 +38,14 @@ card writes `status` and no card ever badges a `running` session.
 <!-- ANCHOR:quality-gates -->
 ## 2. QUALITY GATES
 
-The stale-decay derivation is a pure function, boundary-tested at the 30-minute edge and proven never to
+The stale-decay derivation is a pure function, boundary-tested at the 20-minute edge and proven never to
 emit a `status` write. The relabel/datetime is proven by render assertions ("messages", a valid `<time
 datetime>` equal to `updatedAt`, absolute-on-tap). The optional-field gate is boundary-tested both ways:
-field-absent renders today's card (compacted `id` title, no badge, zero-turn sessions still visible,
-inert/empty accordion body), field-present renders the enrichment. A dedicated test asserts NO badge on a
+field-absent renders today's card (compacted `id` title, no badge, zero-turn sessions still visible, no
+inline enrichment), field-present renders the enrichment. A dedicated test asserts NO badge on a
 `running` session and NO client-sliced title. `token-identity` resolves 0-diff across light/dark/system for
-the card CSS, `test:web` is green, and the card's a11y contract (badge as labelled status, accordion as an
-expandable region, `<time>` semantics) is preserved — all from the final state.
+the card CSS, `test:web` is green, and the card's a11y contract (badge as labelled status, no accordion
+region, `<time>` semantics) is preserved — all from the final state.
 <!-- /ANCHOR:quality-gates -->
 
 ---

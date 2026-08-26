@@ -10,7 +10,7 @@ and shell callbacks, derives roster freshness and composes four small Svelte sur
 Current state:
 
 - [`screen-home.svelte`](./screen-home.svelte) owns the hero, session cards, device footer and child-surface composition.
-- [`card-session.svelte`](./card-session.svelte) derives one roster row from a per-id selector.
+- [`card-session.svelte`](./card-session.svelte) derives one roster row from a per-id selector, including the always-inline detail row, hue mark, seen-dot and stale look.
 - [`empty-state.svelte`](./empty-state.svelte) and [`freshness.svelte`](./freshness.svelte) render roster state without owning the roster fetch.
 - [`session-list-seams.ts`](./session-list-seams.ts) holds the pure recency, list-state, status-grouping and organize projections.
 - [`push-settings.svelte`](./push-settings.svelte) owns the notification preference request lifecycle and attention-class switches.
@@ -80,7 +80,7 @@ The folder is flat. This inventory names every direct file other than the README
 | [`push-settings.svelte`](./push-settings.svelte) | Loads push config, subscribes, unsubscribes and updates attention preferences. |
 | [`push-settings.stories.ts`](./push-settings.stories.ts) | Exercises push settings presentation states. |
 | [`card-session.svelte`](./card-session.svelte) | Renders one session card from a per-id selector. |
-| [`card-session.stories.ts`](./card-session.stories.ts) | Exercises idle and launching card states. |
+| [`card-session.stories.ts`](./card-session.stories.ts) | Exercises idle, launching, and stale-running card states. |
 | [`screen-home.svelte`](./screen-home.svelte) | Composes the full Home surface and forwards shell actions. |
 | [`screen-home.stories.ts`](./screen-home.stories.ts) | Exercises the Home screen with roster and device inputs. |
 | [`session-list-seams.ts`](./session-list-seams.ts) | Pure recency sort, list-state derivation, status-grouped roster and organize pipeline. |

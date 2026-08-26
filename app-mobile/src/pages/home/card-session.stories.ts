@@ -48,3 +48,17 @@ export const Launching: Story = {
     openDisabled: true,
   },
 };
+
+const STALE_RUNNING: SessionCardDto = {
+  ...SESSION,
+  status: 'running',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+};
+
+export const StaleRunning: Story = {
+  args: {
+    ...Default.args,
+    sessionId: STALE_RUNNING.id,
+    selectSession: (id: string) => (id === STALE_RUNNING.id ? STALE_RUNNING : undefined),
+  },
+};

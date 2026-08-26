@@ -12,18 +12,18 @@
   "derived": {
     "trigger_phrases": [],
     "key_topics": [
-      "plan",
-      "per-card",
+      "shipped",
+      "card",
       "presentation",
-      "content",
-      "verified",
-      "orca",
-      "synthesis",
-      "set",
-      "ships",
-      "now",
-      "relabel",
-      "blocks"
+      "over",
+      "existing",
+      "dto",
+      "fields",
+      "plus",
+      "device-local",
+      "seen",
+      "clock",
+      "messages"
     ],
     "importance_tier": "important",
     "status": "in_progress",
@@ -102,7 +102,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Plan the per-card presentation and content from the verified orca synthesis. The \u2705 set ships now: relabel 'blocks'\u2192'messages' + a real ISO datetime + absolute-time-on-tap (2.1), stale-decay a running card to a dimmed/idle look after 30 min via updatedAt without ever writing status (1.8), drop the resting-done dot reserving a live glyph for attention (1.7), and the peek-before-open accordion chrome (2.5 chrome). The \u26a0\ufe0f card-content bundle is planned UI-plus-fallback and requested in 007-host-requests: the needs-you attention badge (1.6), human title / last-message preview / agent chip (2.2), host-derived titles never client-sliced (2.3), recoverable-empty preservation (2.4), and the accordion body (2.5 body). The title-is-a-projection policy note (2.6) frames the request. Fail-closed throughout; proven by token-identity 0-diff, test:web green, and a11y-parity. Plan only.",
+    "causal_summary": "Shipped the \u2705 card presentation over existing DTO fields plus a device-local seen clock: messages + ISO datetime, 20-min stale-unknown look, dropped resting-done glyph, always-inline detail, hue mark, seen-dot, two channels. The \u26a0\ufe0f card-content bundle is wired behind an optional-field gate and stays inert until the host publishes those keys.",
     "created_at": "2026-08-26T05:54:46.000Z",
     "last_save_at": "2026-08-26T05:54:46.000Z",
     "save_lineage": "graph_only",
@@ -114,13 +114,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:71e62ed155bd427023d45593f08719ba9d9af727acd474017a6232b1c5c88e2e",
+    "source_fingerprint": "sha256:f96d38c0b02ec6fe8e67678c868ac9f9b4726c92777ecb8223d8de79fe6e2aff",
     "source_doc_hashes": {
-      "spec.md": "3df26566279bc9edda9a353556fd773193303cf43d1926f37507121bf567f021",
-      "plan.md": "bdc566fba26055e1090e443192700fe2996897704ce25baff88762b007f51a72",
-      "tasks.md": "681655fca0ca2359371117d0d9da98e02c6cdb48c8dbc052a6aa9d7bd3ef5488",
-      "checklist.md": "05d67c83ad0bafa0c1c0e5c2cdb655e416808875df295b2e10646304f6f44985",
-      "implementation-summary.md": "36b8d61487507cc048590d77cdd5c4baac0c8cf7eacd36366105046f4fa663d4"
+      "spec.md": "9d3c7f3e80c1d5b26ee444576c6021b2fd13219d4ed82aa4535fc056c19d4f05",
+      "plan.md": "22afed2ecee9857fa5bb9ac60fb33f8a7d2e6bb1c6c93870c7d08ab09ef57140",
+      "tasks.md": "38b03232a01827bf21c24e7e1823c8e276fe3ec9ed48036895c9c39799fa50d7",
+      "checklist.md": "f8053196b9617a2403ba46c6948f1ff9d2cc8abd3c4aa7c52a1007bf531364ae",
+      "implementation-summary.md": "334467dcd6eb5a64291cb3a827803a9acc73a43bcf6af7a5d022f0ea4746d0b8"
     },
     "last_active_child_id": null,
     "last_active_at": null

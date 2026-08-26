@@ -1,17 +1,16 @@
 ---
-title: "Home card polish tasks — ✅ presentation set + ⚠️ card-content bundle behind a field gate, planned open"
-description: "Open task ledger for card polish: relabel + datetime (2.1), stale-decay (1.8), drop resting-done dot (1.7), accordion chrome (2.5) as ✅; and the ⚠️ bundle — attention badge (1.6), title/preview/agent (2.2/2.3), recoverable-empty (2.4), accordion body (2.5) — behind an optional-field gate, plus the title-is-a-projection policy note (2.6). Every task open, each citing its rec number and the real app file it will touch. Host fields logged to 007-host-requests, never invented."
+title: "Home card polish tasks — ✅ presentation set + ⚠️ card-content bundle behind a field gate, implemented"
+description: "Task ledger for card polish: relabel + datetime, 20-min stale-unknown look, dropped resting-done glyph, always-inline row, hue mark, seen-dot, two channels; ⚠️ enrichments wired behind an optional-field gate. Implemented."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/003-card-polish"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Added open ND card-polish rows marking ND-3.8 and ND-1.6/2.1 as SUPERSEDES."
-    next_safe_action: "Start the ✅ ND rows (hue, seen-dot, 20-min decay, inline row) on operator go."
-    blockers:
-      - "T2.5–T2.8 (attention/title/preview/agent/recoverable/accordion-body) wait on host fields in 007-host-requests"
-    completion_pct: 0
+    last_updated_at: "2026-08-26T19:25:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Shipped always-inline cards with seen-dot, hue mark, and 20-min stale look"
+    next_safe_action: "None — phase implemented; gated host fields stay inert until the relay publishes them"
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
@@ -22,9 +21,8 @@ _memory:
 <!-- ANCHOR:notation -->
 ## TASK NOTATION
 
-`[x]` complete · `[ ]` open · `[~]` deferred with a stated reason. Every task is OPEN — this is a plan;
-nothing is implemented until the operator says "go". Each task cites its rec number and the file it touches.
-The ⚠️ tasks are marked host-blocked: their enrichment renders only when the host field is present.
+`[x]` complete · `[ ]` open · `[~]` deferred with a stated reason. ✅ presentation and the ⚠️
+optional-field gate are implemented. Accordion chrome and 30-min idle decay stay superseded.
 <!-- /ANCHOR:notation -->
 
 ---
@@ -32,31 +30,24 @@ The ⚠️ tasks are marked host-blocked: their enrichment renders only when the
 <!-- ANCHOR:phase-1 -->
 ## PHASE 1: SETUP
 
-- [ ] **T1.1** (rec 1.8) Add a pure `decayedLook(status, updatedAt, now)` returning a dimmed/idle
-  presentation flag when `status === 'running'` and `now − updatedAt > 30 min`, with a boundary test at the
-  30-minute edge proving it never emits a `status` — new pure helper beside `shared/format/view-helpers.ts`.
-- [ ] **T1.2** (rec 2.1) Add a datetime/absolute-time helper (ISO `datetime` + absolute-on-tap string)
-  beside `relativeTime` — `shared/format/view-helpers.ts`.
-- [ ] **T1.3** (recs 1.6, 2.2, 2.3, 2.4, 2.5-body) Define the optional-field card projection — every
-  enrichment field (`attention`, `title`, `lastMessagePreview`, `agent`, `resumable`/`queuedMessageCount`,
-  `previewMessages[]`) typed optional — with both-ways render tests (absent → today's card, present →
-  enriched). Capture the `token-identity`/`test:web` baselines.
-
-### nodeterm fold-in (setup)
-
-- [ ] **T1.4** (rec ND-3.9) Add a pure `hueFromId(id)` deriving a stable, distinguishable hue from the
-  opaque `id`, with a determinism test (same id → same hue; no host field, no id leak) — new pure helper
-  beside `shared/format/view-helpers.ts`.
-- [ ] **T1.5** (rec ND-3.7) Add a device-local seen-marker: persist a per-session `lastSeenUpdatedAt`, set
-  on open/focus, read fail-closed (unreadable store ⇒ no dot, never a false "seen") — client-local preference
-  store beside the home view state.
-- [ ] **T1.6** (recs ND-1.6, ND-2.1) Retune the stale-decay helper to a 20-minute edge returning a
-  stale/unknown *look* (not idle), boundary-tested at 20 min and proven never to emit a `status` —
-  `shared/format/view-helpers.ts`.  [SUPERSEDES orca T1.1 / rec 1.8: 20 min → unknown, not 30 min → idle]
-- [ ] **T1.7** (recs ND-3.1, ND-3.2, ND-3.3, ND-3.5) Extend the optional-field card projection with
-  `contextPercent`, `activity`+`tool`, `prompt`, and the `model` bundled on the same usage payload — each
-  typed optional with both-ways render tests (absent → today's card, present → enriched).  [host-blocked:
-  needs the ⚠️ fields — requested in `007-host-requests`]
+- [~] **T1.1** (rec 1.8) Add a pure `decayedLook(status, updatedAt, now)` returning a dimmed/idle
+  presentation flag when `status === 'running'` and `now − updatedAt > 30 min` — SUPERSEDED by T1.6
+  (`decideStalePresentation` at 20 min → stale-unknown, never idle).
+- [x] **T1.2** (rec 2.1) Add a datetime/absolute-time helper (ISO `datetime` + absolute-on-tap string)
+  beside `relativeTime` — `shared/format/view-helpers.ts` `absoluteTimeLabel`. Proof: `view-helpers.test.ts`.
+- [x] **T1.3** (recs 1.6, 2.2, 2.3, 2.4, 2.5-body) Define the optional-field card projection — every
+  enrichment field typed optional — with both-ways render tests. Proof: `card-projection.test.ts` +
+  `card-session.svelte.test.ts`.
+- [x] **T1.4** (rec ND-3.9) Add a pure `hueFromId(id)` deriving a stable hue from the opaque `id` —
+  `shared/format/card-projection.ts`. Proof: `card-projection.test.ts` determinism + no id leak.
+- [x] **T1.5** (rec ND-3.7) Add a device-local seen-marker: persist per-session `lastSeenUpdatedAt`,
+  fail-closed (unreadable store ⇒ no dot) — `shared/format/seen-marker.ts`. Proof: `seen-marker.test.ts`.
+- [x] **T1.6** (recs ND-1.6, ND-2.1) Stale-decay helper at a 20-minute edge returning a stale/unknown
+  *look*, never a `status` — `decideStalePresentation` in `shared/format/card-projection.ts`. Proof:
+  `card-projection.test.ts` 20-min boundary + no status write. SUPERSEDES T1.1.
+- [x] **T1.7** (recs ND-3.1, ND-3.2, ND-3.3, ND-3.5) Extend the optional-field card projection with
+  `contextPercent`, `activity`+`tool`, `prompt`, and `model` — each own-property gated. Proof:
+  `card-projection.test.ts` both-ways suite.
 <!-- /ANCHOR:phase-1 -->
 
 ---
@@ -64,67 +55,53 @@ The ⚠️ tasks are marked host-blocked: their enrichment renders only when the
 <!-- ANCHOR:phase-2 -->
 ## PHASE 2: IMPLEMENTATION
 
-- [ ] **T2.1** (rec 2.1) Relabel the card meta "blocks" → "messages"; wrap the time in `<time
-  datetime={updatedAt}>` and reveal the absolute timestamp on tap — `pages/home/screen-home.svelte`.
-- [ ] **T2.2** (rec 1.8) Apply the `decayedLook` dimmed/idle presentation to a stale running card, paired
-  with the existing freshness readout; never write `status` — `pages/home/screen-home.svelte`.
-- [ ] **T2.3** (rec 1.7) Drop the resting-done glyph, reserving a live glyph for genuine attention —
-  `pages/home/screen-home.svelte` / `shared/chrome/session-state-icon.svelte`.
-- [ ] **T2.4** (rec 2.5 chrome) Add the peek accordion chrome: expand-in-place, separate Open control,
-  `stopPropagation` so peek does not navigate — `pages/home/screen-home.svelte`.
-- [ ] **T2.5** (rec 1.6) Render the needs-you attention badge through the field gate: badge `done | blocked
-  | waiting` only when a host `attention` value is present AND `status !== 'running'`; no badge otherwise —
-  `pages/home/screen-home.svelte`.  [host-blocked: needs a host `attention` field; the Inbox `AttentionItemDto`
-  keys on `lookupId`, not `sessionId`, so the join is not free — requested in `007-host-requests`]
-- [ ] **T2.6** (recs 2.2, 2.3) Render the human title / last-message preview / agent chip through the field
-  gate; keep the compacted `id` as the fallback title and never client-slice a title —
-  `pages/home/screen-home.svelte`.  [host-blocked: needs host `title`/`lastMessagePreview`/`agent` — requested
-  in `007-host-requests`]
-- [ ] **T2.7** (rec 2.4) Apply hide-empty ONLY when a host `resumable`/`queuedMessageCount` field is
-  present; otherwise keep zero-turn sessions visible — `pages/home/screen-home.svelte`.  [host-blocked:
-  needs the host field; hiding `messageCount === 0` today is lossy — requested in `007-host-requests`]
-- [ ] **T2.8** (rec 2.5 body) Render the accordion body from host `previewMessages[]` when present;
-  otherwise leave it inert/empty and never synthesize previews from a client cache —
-  `pages/home/screen-home.svelte`.  [host-blocked: needs host `previewMessages[]` — requested in `007-host-requests`]
-- [ ] **T2.9** (rec 2.6) Write the title-is-a-projection policy note (redacted host `title` is a projection,
-  not an id; raw `cwd` is not) and log the full card-content bundle to `007-host-requests`.
-
-### nodeterm fold-in (implementation)
-
-- [ ] **T2.10** (recs ND-1.6, ND-2.1) Apply the 20-minute stale/unknown *look* to a running card via
-  `updatedAt`, paired with the existing freshness readout; never write `status` — `pages/home/screen-home.svelte`.
-  [SUPERSEDES orca T2.2 / rec 1.8: decays to a stale/unknown look at 20 min, not a dimmed idle at 30 min]
-- [ ] **T2.11** (rec ND-3.8) Render the enriched detail row ALWAYS-INLINE (title + activity/preview +
-  context%) and reserve a single tap for open; drop the peek-accordion chrome — `pages/home/screen-home.svelte`.
-  [SUPERSEDES orca T2.4/T2.8 / rec 2.5: an always-inline row, not an expand-to-peek accordion; sidesteps the
-  empty-accordion-when-no-preview trap]
-- [ ] **T2.12** (rec ND-3.9) Render a stable hue mark (colored dot / monogram) on each card from
-  `hueFromId(id)` for at-a-glance scanning — `pages/home/screen-home.svelte`.
-- [ ] **T2.13** (rec ND-3.7) Dot a card whose DTO `updatedAt` is newer than its persisted `lastSeenUpdatedAt`
-  ("changed since you looked"); clear on open; fail-closed to no dot when the store is unreadable —
-  `pages/home/screen-home.svelte`.
-- [ ] **T2.14** (recs ND-1.7, ND-3.6) Keep two orthogonal card channels: the live-STATE badge (RUNNING from
-  `status==='running'`) stays separate from the read-STATE glyph (the seen-dot / attention); never conflate,
-  never badge a running session as unread — `pages/home/screen-home.svelte` / `shared/chrome/session-state-icon.svelte`.
-- [ ] **T2.15** (rec ND-3.1) Render the context-window fill meter (model label + mini-bar + "NN%") through
-  the field gate: only when host `contextPercent` is present; render nothing when absent —
-  `pages/home/screen-home.svelte`.  [host-blocked: needs host `contextPercent` (0–100) — requested in
-  `007-host-requests`]
-- [ ] **T2.16** (rec ND-3.2) Render the live "activity" line ("Running npm test") for a running card through
-  the field gate: only when host `activity`(+`tool`) is present; fall back to the plain working state when
-  absent — `pages/home/screen-home.svelte`.  [host-blocked: needs host `activity`+`tool` — requested in
-  `007-host-requests`]
-- [ ] **T2.17** (rec ND-3.3) Render the "You:" turn-opening line through the field gate: only when host
-  `prompt` is present; omit when absent — `pages/home/screen-home.svelte`.  [host-blocked: needs host
-  `prompt` — requested in `007-host-requests`]
-- [ ] **T2.18** (rec ND-3.5) Render the `model` chip inside the context meter, bundled on the same usage
-  payload as `contextPercent`; never fall back to a literal agent name; reinforces orca `agent`/`model` — do
-  NOT re-request — `pages/home/screen-home.svelte`.  [host-blocked: rides the `contextPercent` usage payload —
-  `007-host-requests`]
-- [ ] **T2.19** (recs ND-3.4, ND-3.10) Extend the title-is-a-projection note: ND-3.4 confirms `title` is a
-  host projection of the session's own name, never client-sliced (keep `compactId(id)` as the fallback);
-  record ND-3.10 (client-authored labels/priority/assignee) as a backlog exclusion, portable only as a
-  device-local preference — reinforce/exclude, do NOT re-request.
+- [x] **T2.1** (rec 2.1) Relabel the card meta "blocks" → "messages"; wrap the time in `<time
+  datetime={updatedAt}>` and reveal the absolute timestamp on tap — `pages/home/card-session.svelte`.
+  Proof: `card-session.svelte.test.ts`.
+- [~] **T2.2** (rec 1.8) Apply the `decayedLook` dimmed/idle presentation — SUPERSEDED by T2.10
+  (20-min stale-unknown look, never idle).
+- [x] **T2.3** (rec 1.7) Drop the resting-done glyph on idle cards (omit `SessionStateIcon` when
+  presented status is idle) — `pages/home/card-session.svelte`. Proof: `card-session.svelte.test.ts`
+  no `✓` on Settled.
+- [~] **T2.4** (rec 2.5 chrome) Peek accordion chrome — SUPERSEDED by T2.11 (always-inline row; no
+  accordion shipped).
+- [x] **T2.5** (rec 1.6) Render the needs-you attention badge through the field gate: badge `done |
+  blocked | waiting` only when host `attention` is present AND `status !== 'running'` —
+  `card-projection.ts` / `card-session.svelte`. Proof: both-ways + never-badge-running tests.
+- [x] **T2.6** (recs 2.2, 2.3) Render human title / last-message preview / agent chip through the
+  field gate; `compactId(id)` stays the fallback title — `card-projection.ts` / `card-session.svelte`.
+  Proof: both-ways + no-client-sliced-title tests.
+- [x] **T2.7** (rec 2.4) Apply hide-empty ONLY when a host `resumable`/`queuedMessageCount` field is
+  present; otherwise keep zero-turn sessions visible — `shouldRenderCard`. Proof: `card-projection.test.ts`.
+- [x] **T2.8** (rec 2.5 body) Host `previewMessages[]` / `lastMessagePreview` render inline when
+  present; never synthesized from a client cache. Accordion body not built (T2.11). Proof:
+  `card-session.svelte.test.ts` inline detail, no `details`/`aria-expanded`.
+- [x] **T2.9** (rec 2.6) Title-is-a-projection policy note written in `implementation-summary.md`;
+  card-content bundle already logged in `007-host-requests` (this phase did not re-request).
+- [x] **T2.10** (recs ND-1.6, ND-2.1) Apply the 20-minute stale/unknown *look* to a running card via
+  `updatedAt`; never write `status` — `card-session.svelte` `data-stale` + `presentedStatus`. Proof:
+  `card-session.svelte.test.ts` host status stays `running`. SUPERSEDES T2.2.
+- [x] **T2.11** (rec ND-3.8) Render the enriched detail row ALWAYS-INLINE; reserve tap for Open; no
+  peek-accordion — `card-session.svelte`. Proof: `card-session.svelte.test.ts`. SUPERSEDES T2.4/T2.8 chrome.
+- [x] **T2.12** (rec ND-3.9) Render a stable hue mark from `hueFromId(id)` — `card-session.svelte`.
+  Proof: `card-session.svelte.test.ts` `data-hue` matches helper, style omits the id.
+- [x] **T2.13** (rec ND-3.7) Dot a card whose DTO `updatedAt` is newer than persisted
+  `lastSeenUpdatedAt`; clear on open; fail-closed to no dot when the store is unreadable —
+  `seen-marker.ts` + Home `handleOpen`. Proof: `seen-marker.test.ts`, `card-session.svelte.test.ts`,
+  `screen-home.svelte.test.ts` persist-on-open.
+- [x] **T2.14** (recs ND-1.7, ND-3.6) Keep two orthogonal card channels: live-STATE badge stays
+  separate from the seen-dot; never badge a running session as unread — `card-session.svelte`
+  `data-unread` suppressed when `status === 'running'`. Proof: `card-session.svelte.test.ts`.
+- [x] **T2.15** (rec ND-3.1) Context-window fill meter through the field gate — only when host
+  `contextPercent` is present. Proof: `card-session.svelte.test.ts` both-ways.
+- [x] **T2.16** (rec ND-3.2) Live activity line through the field gate — only when host `activity`(+`tool`)
+  is present. Proof: `card-session.svelte.test.ts` both-ways.
+- [x] **T2.17** (rec ND-3.3) "You:" turn-opening line through the field gate — only when host `prompt`
+  is present. Proof: `card-session.svelte.test.ts` both-ways.
+- [x] **T2.18** (rec ND-3.5) `model` chip inside the context meter, bundled on the same usage payload;
+  never a literal agent-name fallback. Proof: `card-projection.test.ts` model omitted without meter.
+- [x] **T2.19** (recs ND-3.4, ND-3.10) Title-is-a-projection note extended; client-authored
+  labels/priority/assignee recorded as a backlog exclusion in `implementation-summary.md`. Not built.
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -132,30 +109,23 @@ The ⚠️ tasks are marked host-blocked: their enrichment renders only when the
 <!-- ANCHOR:phase-3 -->
 ## PHASE 3: VERIFICATION
 
-- [ ] **T3.1** Run the `decayedLook` boundary test (30-min edge; no `status` write) and the relabel/datetime
-  render test ("messages" · valid `<time datetime>` = `updatedAt` · absolute-on-tap).
-- [ ] **T3.2** Run the optional-field gate both-ways tests (each enrichment absent → today's card; present →
-  enriched) and the explicit never-badge-running and no-client-sliced-title tests.
-- [ ] **T3.3** Run `token-identity` (0-diff across light/dark/system) for the card CSS and `test:web` from
-  the final state.
-- [ ] **T3.4** Run the a11y-parity check (badge as labelled status, accordion as an expandable region,
-  `<time>` semantics preserved) and confirm every ⚠️ item is logged in `007-host-requests` with its
-  fail-closed fallback.
-
-### nodeterm fold-in (verification)
-
-- [ ] **T3.5** (recs ND-1.6/2.1, ND-3.9, ND-3.7) Run the 20-minute stale/unknown decay boundary test (no
-  `status` write; supersedes the 30-min/idle case), the `hueFromId` determinism test, and the device-local
-  seen-dot test (newer `updatedAt` → dot; unreadable store ⇒ no dot).
-- [ ] **T3.6** (recs ND-3.1, ND-3.2, ND-3.3, ND-3.5) Run the optional-field gate both-ways tests for
-  `contextPercent` / `activity`+`tool` / `prompt` / `model` (absent → today's card; present → meter /
-  activity line / "You:" line / model chip); assert render-nothing-when-absent.
-- [ ] **T3.7** (recs ND-3.8, ND-1.7/3.6) Assert the detail row is always-inline (no accordion) and the live
-  badge stays orthogonal to the read-state glyph (never badge a running session as unread); run
-  `token-identity` (0-diff) and `test:web` from the final state, plus a11y-parity for the meter and inline row.
-- [ ] **T3.8** Confirm every folded ND ⚠️ field (`contextPercent`, `activity`+`tool`, `prompt`) is logged in
-  `007-host-requests` with its UI and fail-closed fallback; ND-3.4/3.5 recorded as reinforce-not-re-request
-  and ND-3.10 as a backlog exclusion; each ND row traces to its rec.
+- [x] **T3.1** 20-min stale/unknown boundary (no `status` write) and relabel/datetime render
+  ("messages" · `<time datetime>` = `updatedAt` · absolute-on-tap). Proof: `card-projection.test.ts`,
+  `card-session.svelte.test.ts`.
+- [x] **T3.2** Optional-field gate both-ways plus never-badge-running and no-client-sliced-title.
+  Proof: `card-projection.test.ts`, `card-session.svelte.test.ts`.
+- [x] **T3.3** `token-identity` 0-diff (light/dark/system) vs HEAD card corpus; `test:web` from the
+  final state: svelte 72 files / 577 passed + 3 skipped; logic 29 files / 308 passed.
+- [x] **T3.4** a11y-parity: live badge labelled, seen-dot `role="img"` + aria-label, meter labelled,
+  `<time datetime>` preserved; ⚠️ fields already in `007-host-requests` (not re-requested).
+- [x] **T3.5** 20-minute stale/unknown decay, `hueFromId` determinism, seen-dot newer/`updatedAt` +
+  unreadable-store fail-closed. Proof: listed tests above.
+- [x] **T3.6** Optional-field gate both-ways for `contextPercent` / `activity`+`tool` / `prompt` /
+  `model`. Proof: `card-projection.test.ts`, `card-session.svelte.test.ts`.
+- [x] **T3.7** Detail row always-inline (no accordion); live badge orthogonal to seen-dot; running
+  never unread-badged; token-identity 0/0/0; `test:web` green.
+- [x] **T3.8** Folded ND ⚠️ fields already logged in `007-host-requests`; ND-3.4/3.5 reinforce-not-re-request;
+  ND-3.10 backlog exclusion in `implementation-summary.md`. This phase did not edit `007-host-requests`.
 <!-- /ANCHOR:phase-3 -->
 
 ---
@@ -163,12 +133,12 @@ The ⚠️ tasks are marked host-blocked: their enrichment renders only when the
 <!-- ANCHOR:completion -->
 ## COMPLETION CRITERIA
 
-The ✅ set lands: the card reads "messages" with a real `<time datetime>` and absolute-on-tap, a stale
-running card dims via `updatedAt` without a `status` write, the resting-done dot is gone, and the peek
-accordion chrome expands with a separate Open — with token-identity 0-diff, `test:web` green, and a11y-parity
-from the final state. The ⚠️ bundle (1.6, 2.2, 2.3, 2.4, 2.5-body) is wired behind the optional-field gate,
-degrades to today's card, and is logged to `007-host-requests`; no `running` session is ever badged and no
-client-sliced title is ever shown.
+The ✅ set landed: the card reads "messages" with a real `<time datetime>` and absolute-on-tap, a stale
+running card shows an unknown look via `updatedAt` without a `status` write, the resting-done glyph is
+gone on idle cards, and the detail row is always-inline with a single tap for Open — token-identity
+0-diff, `test:web` green, a11y-parity from the final state. The ⚠️ bundle is wired behind the
+optional-field gate, degrades to today's card, and stays inert until the host publishes the keys; no
+`running` session is ever badged and no client-sliced title is ever shown.
 <!-- /ANCHOR:completion -->
 
 ---

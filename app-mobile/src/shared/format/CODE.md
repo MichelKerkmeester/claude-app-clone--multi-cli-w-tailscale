@@ -32,12 +32,14 @@ The output is presentation data. Reducers own state transitions. The transport m
 
 ## 3. PACKAGE TOPOLOGY
 
-The folder has three flat modules with one intentional I/O edge:
+The folder is a set of flat helpers with two intentional I/O edges:
 
 ```text
 format.ts -> pure value strings
 view-helpers.ts -> pure view strings and route parsing
 view-helpers.ts -> ../transport/relay.ts for approval pages
+card-projection.ts -> pure card view model and optional host-field gate
+seen-marker.ts -> localStorage last-seen clocks
 attention.ts -> ../transport/auth.ts for session establishment
 attention.ts -> local postJson for attention and push endpoints
 ```
@@ -64,8 +66,9 @@ The folder is flat:
 | File | Responsibility |
 |---|---|
 | [`format.ts`](./format.ts) | Time, number, cost and artifact-size formatters. |
-| [`view-helpers.ts`](./view-helpers.ts) | Route, theme, approval, status, copy and time-bucket helpers. |
-| [`card-projection.ts`](./card-projection.ts) | Session-card view model and stale-working decay. |
+| [`view-helpers.ts`](./view-helpers.ts) | Route, theme, approval, status, copy, relative time, absolute time and time-bucket helpers. |
+| [`card-projection.ts`](./card-projection.ts) | Session-card view model, optional host-field gate, hue mark and stale-working decay. |
+| [`seen-marker.ts`](./seen-marker.ts) | Device-local last-seen clocks for the changed-since-looked dot. |
 | [`roster-view-preference.ts`](./roster-view-preference.ts) | Device-local recency/status grouping preference. |
 | [`attention.ts`](./attention.ts) | Attention Inbox and Web Push endpoint calls. |
 | [`README.md`](./README.md) | Feature orientation for formatting and attention data. |

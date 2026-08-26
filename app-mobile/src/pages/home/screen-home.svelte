@@ -50,6 +50,13 @@
     toggleFavoriteId,
     writeFavoriteIds,
   } from '$shared/state/favorite-preference.js';
+  import {
+    markLastSeen,
+    readLastSeenMap,
+    writeLastSeenMap,
+    type SeenStore,
+  } from '$shared/format/seen-marker.js';
+  import { shouldRenderCard } from '$shared/format/card-projection.js';
   import { fireHaptic } from '$shared/chrome/haptics.js';
   import Button from '$shared/primitives/button/button.svelte';
   import Freshness from './freshness.svelte';
@@ -105,6 +112,7 @@
   let searchQuery = $state('');
   let favoritePref = $state(readFavoritePreference());
   let selectedHost = $state('');
+  let seenStore = $state<SeenStore>(readLastSeenMap());
 
   // ───────────────────────────────────────────────────────────────────
   // 6. DERIVED STATE
@@ -171,6 +179,14 @@
     return rosterItems.find((item) => item.id === id);
   }
 
+  function selectLastSeen(id: string): string | undefined {
+    return seenStore.lastSeenById.get(id);
+  }
+
+  function cardUnread(item: SessionCardDto): boolean {
+    return item.status !== 'running' && groupingUnread.has(item.id);
+  }
+
   async function refreshRoster(): Promise<void> {
     if (refreshing) return;
     refreshing = true;
@@ -195,6 +211,12 @@
     launchingId = sessionId;
     unreadIds = markSeen(unreadIds, sessionId);
     writeUnreadIds(unreadIds);
+    const opened = selectSession(sessionId);
+    if (opened !== undefined && seenStore.available) {
+      const next = markLastSeen(seenStore.lastSeenById, sessionId, opened.updatedAt);
+      seenStore = { available: true, lastSeenById: next };
+      writeLastSeenMap(next);
+    }
     fireHaptic('selection');
     onSelect(sessionId);
     if (launchTimer !== null) clearTimeout(launchTimer);
@@ -420,17 +442,19 @@
         hostTooOld={listView.kind === 'host-too-old'}
       />
     {:else}
-      {#if resumeLive !== null}
+      {#if resumeLive !== null && shouldRenderCard(resumeLive)}
         <div class="resume--slot" data-resume-slot="true">
           <p class="resume--label">Resume</p>
           <CardSession
             sessionId={resumeLive.id}
             {selectSession}
             source={sessions.source}
-            unread={groupingUnread.has(resumeLive.id)}
+            unread={cardUnread(resumeLive)}
             {launchingId}
             openDisabled={resumeOpenDisabled}
             onOpen={handleOpen}
+            {selectLastSeen}
+            seenAvailable={seenStore.available}
           />
         </div>
       {/if}
@@ -453,27 +477,31 @@
             </h3>
             <div class="session--grid" role="list">
               {#each section.items as item (item.id)}
-                <div role="listitem" class="roster--row">
-                  <CardSession
-                    sessionId={item.id}
-                    {selectSession}
-                    source={sessions.source}
-                    unread={groupingUnread.has(item.id)}
-                    {launchingId}
-                    openDisabled={listOpenDisabled}
-                    onOpen={handleOpen}
-                  />
-                  <Button
-                    class="roster--favorite"
-                    data-favorite-id={item.id}
-                    aria-pressed={favoritePref.ids.has(item.id)}
-                    aria-label="Pin session"
-                    disabled={!favoritePref.available}
-                    onclick={() => toggleFavorite(item.id)}
-                  >
-                    Pin
-                  </Button>
-                </div>
+                {#if shouldRenderCard(item)}
+                  <div role="listitem" class="roster--row">
+                    <CardSession
+                      sessionId={item.id}
+                      {selectSession}
+                      source={sessions.source}
+                      unread={cardUnread(item)}
+                      {launchingId}
+                      openDisabled={listOpenDisabled}
+                      onOpen={handleOpen}
+                      {selectLastSeen}
+                      seenAvailable={seenStore.available}
+                    />
+                    <Button
+                      class="roster--favorite"
+                      data-favorite-id={item.id}
+                      aria-pressed={favoritePref.ids.has(item.id)}
+                      aria-label="Pin session"
+                      disabled={!favoritePref.available}
+                      onclick={() => toggleFavorite(item.id)}
+                    >
+                      Pin
+                    </Button>
+                  </div>
+                {/if}
               {/each}
             </div>
           </section>
@@ -491,27 +519,31 @@
             </h3>
             <div class="session--grid" role="list">
               {#each section.items as item (item.id)}
-                <div role="listitem" class="roster--row">
-                  <CardSession
-                    sessionId={item.id}
-                    {selectSession}
-                    source={sessions.source}
-                    unread={groupingUnread.has(item.id)}
-                    {launchingId}
-                    openDisabled={listOpenDisabled}
-                    onOpen={handleOpen}
-                  />
-                  <Button
-                    class="roster--favorite"
-                    data-favorite-id={item.id}
-                    aria-pressed={favoritePref.ids.has(item.id)}
-                    aria-label="Pin session"
-                    disabled={!favoritePref.available}
-                    onclick={() => toggleFavorite(item.id)}
-                  >
-                    Pin
-                  </Button>
-                </div>
+                {#if shouldRenderCard(item)}
+                  <div role="listitem" class="roster--row">
+                    <CardSession
+                      sessionId={item.id}
+                      {selectSession}
+                      source={sessions.source}
+                      unread={cardUnread(item)}
+                      {launchingId}
+                      openDisabled={listOpenDisabled}
+                      onOpen={handleOpen}
+                      {selectLastSeen}
+                      seenAvailable={seenStore.available}
+                    />
+                    <Button
+                      class="roster--favorite"
+                      data-favorite-id={item.id}
+                      aria-pressed={favoritePref.ids.has(item.id)}
+                      aria-label="Pin session"
+                      disabled={!favoritePref.available}
+                      onclick={() => toggleFavorite(item.id)}
+                    >
+                      Pin
+                    </Button>
+                  </div>
+                {/if}
               {/each}
             </div>
           </section>

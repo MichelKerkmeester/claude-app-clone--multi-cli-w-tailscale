@@ -12,7 +12,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { compactId, relativeTimeAt, timeBucket } from '../src/shared/format/view-helpers.js';
+import { compactId, relativeTimeAt, timeBucket, absoluteTimeLabel } from '../src/shared/format/view-helpers.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. TESTS
@@ -60,5 +60,15 @@ describe('timeBucket', () => {
 
   it('does not invent a searchable title from a compact id', () => {
     expect(compactId('session_clock_001')).toBe('session_clock_001');
+  });
+});
+
+describe('absoluteTimeLabel', () => {
+  it('returns a canonical ISO string for a parseable clock', () => {
+    expect(absoluteTimeLabel('2026-08-17T10:00:00.000Z')).toBe('2026-08-17T10:00:00.000Z');
+  });
+
+  it('keeps an unparseable clock visibly unresolved', () => {
+    expect(absoluteTimeLabel('not-a-timestamp')).toBe('unknown time');
   });
 });

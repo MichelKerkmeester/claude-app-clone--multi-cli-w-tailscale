@@ -122,6 +122,16 @@ export function timeBucket(updatedAt: string, now: number): TimeBucket {
   return sameUtcDay(updated, yesterday) ? 'yesterday' : 'older';
 }
 
+/**
+ * Absolute inspect string for tap-to-reveal. Unparseable clocks stay
+ * visibly unknown rather than becoming a fabricated wall time.
+ */
+export function absoluteTimeLabel(value: string): string {
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return 'unknown time';
+  return new Date(parsed).toISOString();
+}
+
 /** Legacy clock-reading wrapper kept for existing call sites. */
 function relativeTime(value: string): string {
   return relativeTimeAt(value, Date.now());

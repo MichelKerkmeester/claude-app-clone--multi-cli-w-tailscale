@@ -1,17 +1,16 @@
 ---
-title: "Home card polish — relabel + datetime, stale-decay, drop resting-done dot, peek accordion, and the ⚠️ card-content bundle"
-description: "Plan the per-card presentation and content from the verified orca synthesis. The ✅ set ships now: relabel 'blocks'→'messages' + a real ISO datetime + absolute-time-on-tap (2.1), stale-decay a running card to a dimmed/idle look after 30 min via updatedAt without ever writing status (1.8), drop the resting-done dot reserving a live glyph for attention (1.7), and the peek-before-open accordion chrome (2.5 chrome). The ⚠️ card-content bundle is planned UI-plus-fallback and requested in 007-host-requests: the needs-you attention badge (1.6), human title / last-message preview / agent chip (2.2), host-derived titles never client-sliced (2.3), recoverable-empty preservation (2.4), and the accordion body (2.5 body). The title-is-a-projection policy note (2.6) frames the request. Fail-closed throughout; proven by token-identity 0-diff, test:web green, and a11y-parity. Plan only."
+title: "Home card polish — relabel + datetime, 20-min stale-unknown look, always-inline row, hue, seen-dot, gated card-content bundle"
+description: "Shipped the ✅ card presentation over existing DTO fields plus a device-local seen clock: messages + ISO datetime, 20-min stale-unknown look, dropped resting-done glyph, always-inline detail, hue mark, seen-dot, two channels. The ⚠️ card-content bundle is wired behind an optional-field gate and stays inert until the host publishes those keys."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/003-card-polish"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Folded nodeterm ND card recs into scope with the ❌ ND-3.10 exclusion noted."
-    next_safe_action: "Ship the ✅ ND set while ⚠️ contextPercent/activity/prompt wait on 007-host-requests."
-    blockers:
-      - "Attention badge (1.6), title/preview/agent (2.2), host titles (2.3), recoverable-empty (2.4), accordion body (2.5) need new host read-only fields — requested in 007-host-requests"
-    completion_pct: 0
+    last_updated_at: "2026-08-26T19:25:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Shipped always-inline cards with seen-dot, hue mark, and 20-min stale look"
+    next_safe_action: "None — phase implemented; gated host fields stay inert until the relay publishes them"
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -30,12 +29,12 @@ _memory:
 |---|---|
 | Parent | `002-home-selection` |
 | Level | 2 |
-| Status | Planned — implementation deferred until the operator says "go" |
-| Recs ✅ | 2.1 relabel + datetime · 1.8 stale-decay · 1.7 drop resting-done dot · 2.5 accordion chrome |
-| Recs ⚠️ | 1.6 attention badge · 2.2 title/preview/agent · 2.3 host titles · 2.4 recoverable-empty · 2.5 accordion body |
+| Status | Implemented |
+| Recs ✅ | 2.1 relabel + datetime · 20-min stale-unknown (supersedes 1.8) · 1.7 drop resting-done · always-inline (supersedes 2.5) · hue · seen-dot · two channels |
+| Recs ⚠️ | 1.6 attention · 2.2 title/preview/agent · 2.3 host titles · 2.4 recoverable-empty · contextPercent/activity/prompt/model — gated, inert until host keys land |
 | Recs (policy) | 2.6 title-is-a-projection |
-| Host dependency | Heavy — the card-content bundle needs new host read-only fields (`007-host-requests`) |
-| Barrier | relabel/decay/dot/accordion behaviour proven · never writes status · never badges running · no client-invented title · token-identity 0-diff · test:web green · a11y-parity |
+| Host dependency | Partial — the ⚠️ card-content bundle is gated; it renders only when host keys are present |
+| Barrier | messages/datetime · 20-min stale-unknown never writes status · always-inline · hue · seen-dot fail-closed · never badges running · no client-invented title · token-identity 0-diff · test:web green · a11y-parity |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -50,15 +49,17 @@ verified orca synthesis (Angle 2, plus 1.6–1.8) closes these — but the card 
 in orca, and most of the enrichments need host fields our `SessionCardDto` (`id`, `status`, `updatedAt`,
 `messageCount`) does not carry.
 
-This sub-phase splits cleanly. The **✅ set** is cheap and ships now: relabel "blocks"→"messages" and add a
-real ISO `datetime` with absolute-time-on-tap (2.1); stale-decay a "running" card to a dimmed/idle look
-after 30 min of silence via `updatedAt`, without ever writing `status` (1.8); drop the resting-"done" dot,
-reserving a live glyph for genuine attention (1.7); and the peek-before-open accordion *chrome* (2.5).
+This sub-phase splits cleanly. The **✅ set** shipped over existing DTO fields plus a device-local seen
+clock: relabel "blocks"→"messages" and a real ISO `datetime` with absolute-time-on-tap (2.1); a `running`
+card silent for 20 minutes presents as unknown via `updatedAt` without writing `status` (ND-1.6/2.1,
+superseding 1.8); drop the resting-"done" glyph, reserving a live glyph for genuine attention (1.7); an
+always-inline detail row with a single tap for Open (ND-3.8, superseding 2.5); a hue mark from the opaque
+`id` (ND-3.9); a fail-closed seen-dot (ND-3.7); and two orthogonal card channels (ND-1.7/3.6).
 
-The **⚠️ card-content bundle** is planned here as UI-plus-fail-closed-fallback and requested in
+The **⚠️ card-content bundle** is wired as UI-plus-fail-closed-fallback and already requested in
 `007-host-requests`: the needs-you attention badge (1.6), the human title / last-message preview / agent
 chip (2.2), host-derived titles that are never client-sliced (2.3), recoverable-empty preservation (2.4),
-and the accordion *body* (2.5). None invents a field on the client; each degrades to the current card until
+and context/activity/prompt/model. None invents a field on the client; each degrades to today's card until
 the field lands. The title-is-a-projection policy note (2.6) frames why a redacted host `title` survives
 the "opaque ids only" home rule.
 <!-- /ANCHOR:problem -->
@@ -134,13 +135,12 @@ inventing any host field on the client; writing `status`; every file outside `ap
 
 - **REQ-001** (2.1) — The card meta reads "messages" (not "blocks"); the time renders in a `<time
   datetime>` with the ISO `updatedAt` and reveals the absolute timestamp on tap.
-- **REQ-002** (1.8) — A `running` card older than 30 min renders a dimmed/idle *look* derived purely from
-  `updatedAt`; no code path writes `status`.
+- **REQ-002** (ND-1.6/2.1, supersedes 1.8) — A `running` card whose `updatedAt` is 20 minutes old or older
+  renders a stale/unknown *look* derived purely from `updatedAt`; no code path writes `status`.
 - **REQ-003** (1.7) — The resting-done glyph is removed; a live glyph is reserved for genuine attention
   (delivered by 1.6 when its field lands).
-- **REQ-004** (2.5 chrome) — The peek accordion expands in place with a separate Open control and
-  `stopPropagation`; with no host preview the body is empty/disabled and never synthesizes previews from a
-  client cache.
+- **REQ-004** (ND-3.8, supersedes 2.5) — The enriched detail row is always-inline; a single tap Opens; with
+  no host preview the card stays today's card and never synthesizes previews from a client cache.
 - **REQ-005** (1.6, ⚠️) — When a host `attention` field (or a verified Inbox `sessionId` join) exists, the
   card badges `done | blocked | waiting` and NEVER `working`. Until then, no badge renders. Requested in
   `007-host-requests`.
@@ -152,8 +152,8 @@ inventing any host field on the client; writing `status`; every file outside `ap
 - **REQ-008** (2.6) — A policy note records that a redacted host `title` is a projection (not an id) and is
   compatible with the "opaque ids only" home rule; raw `cwd` is not.
 - **REQ-009** — `token-identity` resolves 0-diff, `test:web` stays green, and the card's a11y contract
-  (the badge as a labelled status, the accordion as an expandable region, the `<time>` semantics) is
-  preserved from the final state.
+  (the badge as a labelled status, no accordion region, the `<time>` semantics) is preserved from the
+  final state.
 <!-- /ANCHOR:requirements -->
 
 ---
@@ -161,12 +161,12 @@ inventing any host field on the client; writing `status`; every file outside `ap
 <!-- ANCHOR:success-criteria -->
 ## 5. SUCCESS CRITERIA
 
-1. The card reads "messages" with a real `<time datetime>` and absolute-on-tap; a stale running card dims
-   without any `status` write; the resting-done dot is gone.
-2. The peek accordion chrome expands in place with a separate Open; with no host preview the body is inert
-   and no client-cache preview is synthesized.
-3. Every ⚠️ item (1.6, 2.2, 2.3, 2.4, 2.5-body) is planned with a fail-closed fallback and logged to
-   `007-host-requests`; the card degrades to today's card until the fields land.
+1. The card reads "messages" with a real `<time datetime>` and absolute-on-tap; a stale running card shows
+   an unknown look without any `status` write; the resting-done glyph is gone.
+2. The detail row is always-inline with a single tap for Open; with no host preview the card stays today's
+   card and no client-cache preview is synthesized.
+3. Every ⚠️ item (1.6, 2.2, 2.3, 2.4, context/activity/prompt/model) is wired with a fail-closed fallback
+   and logged to `007-host-requests`; the card degrades to today's card until the fields land.
 4. No card ever badges a `running` session; no client-invented title is ever shown.
 5. `token-identity` is 0-diff, `test:web` is green, and a11y-parity holds from the final state.
 <!-- /ANCHOR:success-criteria -->
@@ -201,8 +201,8 @@ inventing any host field on the client; writing `status`; every file outside `ap
 - **Does our Inbox payload map to `sessionId` without a resolve RPC?** The protocol says no (`lookupId`
   only on `AttentionItemDto`). Confirm before choosing the Inbox-join over a host `attention` field —
   tracked in `007-host-requests`. Until confirmed, the badge is host-`attention`-field-gated.
-- Does the accordion peek stay collapsed by default with a single-open policy, or allow multiple open?
-  Assumed single-open to keep the roster scannable, pending the operator.
+- The accordion peek policy is closed: nodeterm dropped expand-to-peek, so this phase ships always-inline
+  with a single tap for Open.
 <!-- /ANCHOR:questions -->
 
 ---

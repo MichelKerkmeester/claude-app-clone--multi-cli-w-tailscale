@@ -32,7 +32,7 @@ this folder does not own their open state.
 
 | Feature | What It Does |
 |---|---|
-| Session roster | Shows opaque session identifiers, status, block count and relative update time. |
+| Session roster | Shows opaque session identifiers, status, message count and relative update time. |
 | Session opening | Sends the selected session id to the shell, which navigates to the session route. |
 | Freshness readout | Shows the last known sync time and labels the roster as live or stale, with the matching steering or input message. |
 | Empty and error states | Explains an empty catalog and reports a roster error without hiding the rest of the page. |

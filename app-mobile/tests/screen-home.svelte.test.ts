@@ -204,6 +204,16 @@ describe('home roster list behaviour', () => {
     expect(screen.getByText(/unknown time/i)).toBeInTheDocument();
     expect(screen.queryByText(/just now/i)).not.toBeInTheDocument();
   });
+
+  it('persists last-seen on open so a later update can show the changed-since-looked dot', async () => {
+    const user = userEvent.setup();
+    const { onSelect } = renderHome([
+      card('session_seen_001', { status: 'idle', updatedAt: OCCURRED_AT }),
+    ]);
+    await user.click(screen.getByRole('button', { name: /session_seen_001/i }));
+    expect(onSelect).toHaveBeenCalledWith('session_seen_001');
+    expect(window.localStorage.getItem('pi-remote.session-last-seen')).toContain(OCCURRED_AT);
+  });
 });
 
 describe('home roster list organization', () => {

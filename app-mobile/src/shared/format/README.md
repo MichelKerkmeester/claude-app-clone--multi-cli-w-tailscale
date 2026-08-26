@@ -12,9 +12,9 @@
 
 | Metric | Current behavior |
 |---|---|
-| Modules | Three flat TypeScript modules |
+| Modules | Flat TypeScript helpers for values, card projection, seen clocks and attention I/O |
 | Pure helpers | Time, number, cost, size, route, status, theme and copy helpers |
-| Browser I/O | Attention endpoints, service-worker subscription and foreground preference calls |
+| Browser I/O | Attention endpoints, last-seen clocks, service-worker subscription and foreground preference calls |
 | Safety boundary | Protocol response guards and opaque route id checks before values reach screens |
 
 ---
@@ -41,7 +41,7 @@ The folder keeps wording close to the conversion that needs it. Reducers retain 
 |---|---|---|
 | Intl support | `Intl.DateTimeFormat`, `Intl.NumberFormat` and `Intl.PluralRules` | Formatters use the browser locale for time, number and model-count text. |
 | Protocol values | Attention, approval, session and push DTOs | `view-helpers.ts` and `attention.ts` use protocol guards and types. |
-| Browser APIs | `window`, `localStorage`, `Notification`, service workers and `atob` | Only the attention and preference paths need browser I/O. |
+| Browser APIs | `window`, `localStorage`, `Notification`, service workers and `atob` | Attention, last-seen clocks, and preference paths need browser I/O. |
 | Relay boundary | Auth and approval transport helpers | `attention.ts` establishes a session before opening an attention hint and delegates approval reads to transport. |
 
 ---
@@ -51,8 +51,9 @@ The folder keeps wording close to the conversion that needs it. Reducers retain 
 | File | Role |
 |---|---|
 | [`format.ts`](./format.ts) | Pure time, number, cost and artifact-size formatters. |
-| [`view-helpers.ts`](./view-helpers.ts) | Route readers, approval loading, theme preference, labels, icons, compact ids, relative time, time buckets and countdowns. |
-| [`card-projection.ts`](./card-projection.ts) | Session-card view model and stale-working decay. |
+| [`view-helpers.ts`](./view-helpers.ts) | Route readers, approval loading, theme preference, labels, icons, compact ids, relative and absolute time, time buckets and countdowns. |
+| [`card-projection.ts`](./card-projection.ts) | Session-card view model, optional host-field gate, hue mark and stale-working decay. |
+| [`seen-marker.ts`](./seen-marker.ts) | Device-local last-seen clocks for the changed-since-looked dot. |
 | [`roster-view-preference.ts`](./roster-view-preference.ts) | Device-local recency versus status grouping preference. |
 | [`attention.ts`](./attention.ts) | Attention Inbox and Web Push endpoint calls with response validation. |
 | [`CODE.md`](./CODE.md) | Data flow and the pure-helper versus I/O boundary. |

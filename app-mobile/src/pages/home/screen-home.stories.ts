@@ -15,13 +15,12 @@ const ROSTER_ITEMS: readonly SessionCardDto[] = DEMO_SESSIONS.sessions;
 const UPDATED_AT: string = ROSTER_ITEMS[0]?.updatedAt ?? new Date().toISOString();
 
 const noop = (): void => {};
-const onSelect = (_sessionId: string): void => {};
 
 const baseArgs = {
   connection: 'live' as ConnectionPhase,
   cache: null,
   device: DEMO_IDENTITY,
-  onSelect,
+  onSelect: noop,
   onRevoke: noop,
   onLogout: noop,
 };
@@ -81,6 +80,19 @@ export const Stale: Story = {
       items: ROSTER_ITEMS,
       phase: 'ready',
       source: 'cache',
+      updatedAt: UPDATED_AT,
+      error: null,
+    } satisfies SessionListState,
+  },
+};
+
+export const Ready: Story = {
+  args: {
+    ...baseArgs,
+    sessions: {
+      items: ROSTER_ITEMS,
+      phase: 'ready',
+      source: 'relay',
       updatedAt: UPDATED_AT,
       error: null,
     } satisfies SessionListState,

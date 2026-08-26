@@ -20,6 +20,7 @@
     readonly onSelect: (sessionId: string) => void;
     readonly onRevoke: () => void;
     readonly onLogout: () => void;
+    readonly onRefresh?: () => Promise<void>;
   }
 </script>
 
@@ -28,12 +29,35 @@
   // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { sessionStatusLabel, compactId, relativeTime } from '$shared/format/view-helpers.js';
+  import { onMount, untrack } from 'svelte';
+  import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
+  import { compactId, readSessionIdFromLocation } from '$shared/format/view-helpers.js';
+  import {
+    readRosterGrouping,
+    writeRosterGrouping,
+    type RosterGrouping,
+  } from '$shared/format/roster-view-preference.js';
+  import {
+    applyUnreadTransitions,
+    markSeen,
+    readUnreadIds,
+    unreadSetsEqual,
+    writeUnreadIds,
+  } from '$shared/state/unread-overlay.js';
+  import { fireHaptic } from '$shared/chrome/haptics.js';
   import Button from '$shared/primitives/button/button.svelte';
   import Freshness from './freshness.svelte';
   import EmptyState from './empty-state.svelte';
-  import SessionStateIcon from '$shared/chrome/session-state-icon.svelte';
   import PushSettings from './push-settings.svelte';
+  import CardSession from './card-session.svelte';
+  import {
+    buildStatusList,
+    dedupSessions,
+    deriveListState,
+    hostAttentionPresent,
+    sortByRecency,
+    STATUS_SECTION_LABELS,
+  } from './session-list-seams.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
@@ -47,14 +71,164 @@
     onSelect,
     onRevoke,
     onLogout,
+    onRefresh,
   }: HomeProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. DERIVED STATE
+  // 5. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  const PULL_THRESHOLD_PX = 56;
+  const LAUNCH_TIMEOUT_MS = 8_000;
+
+  let grouping = $state<RosterGrouping>(readRosterGrouping());
+  let unreadIds = $state<Set<string>>(readUnreadIds());
+  let previousStatuses = $state(new Map<string, SessionCardDto['status']>());
+  let launchingId = $state<string | null>(null);
+  let refreshing = $state(false);
+  let refreshFailed = $state(false);
+  let pullDistance = $state(0);
+  let pulling = $state(false);
+  let pullStartY = 0;
+  let edgeBumped = false;
+  let launchTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   // Do not edit — staleness derivation — Not designer-editable.
-  const isStale = $derived(sessions.source === 'cache' || connection !== 'live');
+  const isStale = $derived(
+    sessions.source === 'cache' || connection !== 'live' || refreshFailed,
+  );
+  const listView = $derived(deriveListState(sessions, connection));
+  const resumeSession = $derived(
+    cache === null || cache.sessions.length === 0
+      ? null
+      : (sortByRecency(cache.sessions)[0] ?? null),
+  );
+  const resumeLive = $derived(
+    resumeSession === null
+      ? null
+      : (listView.items.find((item) => item.id === resumeSession.id) ?? resumeSession),
+  );
+  const rosterItems = $derived(
+    dedupSessions({
+      cacheItems: cache?.sessions ?? [],
+      liveItems: listView.items,
+    }).filter((item) => item.id !== resumeLive?.id),
+  );
+  const groupingUnread = $derived(
+    hostAttentionPresent(rosterItems) || hostAttentionPresent(resumeLive === null ? [] : [resumeLive])
+      ? unreadIds
+      : new Set<string>(),
+  );
+  const statusSections = $derived(buildStatusList(rosterItems, groupingUnread));
+  const recencyItems = $derived(sortByRecency(rosterItems));
+  const showEmpty = $derived(resumeLive === null && listView.items.length === 0);
+  const listOpenDisabled = $derived(launchingId !== null);
+  const resumeOpenDisabled = $derived(launchingId !== null || connection !== 'live');
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
+  function selectSession(id: string): SessionCardDto | undefined {
+    if (resumeLive !== null && resumeLive.id === id) return resumeLive;
+    return rosterItems.find((item) => item.id === id);
+  }
+
+  async function refreshRoster(): Promise<void> {
+    if (refreshing) return;
+    refreshing = true;
+    try {
+      if (onRefresh === undefined) {
+        throw new Error('Roster refresh is unavailable.');
+      }
+      await onRefresh();
+      refreshFailed = false;
+      fireHaptic('success');
+    } catch {
+      refreshFailed = true;
+      fireHaptic('error');
+    } finally {
+      refreshing = false;
+    }
+  }
+
+  function handleOpen(event: MouseEvent, sessionId: string): void {
+    event.stopPropagation();
+    if (launchingId !== null) return;
+    launchingId = sessionId;
+    unreadIds = markSeen(unreadIds, sessionId);
+    writeUnreadIds(unreadIds);
+    fireHaptic('selection');
+    onSelect(sessionId);
+    if (launchTimer !== null) clearTimeout(launchTimer);
+    launchTimer = setTimeout(() => {
+      launchingId = null;
+      launchTimer = null;
+    }, LAUNCH_TIMEOUT_MS);
+  }
+
+  function setGrouping(next: RosterGrouping): void {
+    grouping = next;
+    writeRosterGrouping(next);
+  }
+
+  function onRosterTouchStart(event: TouchEvent): void {
+    if (refreshing) return;
+    const touch = event.touches[0];
+    if (touch === undefined) return;
+    pullStartY = touch.clientY;
+    pulling = true;
+    edgeBumped = false;
+    pullDistance = 0;
+  }
+
+  function onRosterTouchMove(event: TouchEvent): void {
+    if (!pulling) return;
+    const touch = event.touches[0];
+    if (touch === undefined) return;
+    pullDistance = Math.max(0, touch.clientY - pullStartY);
+    if (pullDistance >= PULL_THRESHOLD_PX && !edgeBumped) {
+      edgeBumped = true;
+      fireHaptic('edge-bump');
+    }
+  }
+
+  function onRosterTouchEnd(): void {
+    if (!pulling) return;
+    const shouldRefresh = pullDistance >= PULL_THRESHOLD_PX;
+    pulling = false;
+    pullDistance = 0;
+    if (shouldRefresh) void refreshRoster();
+  }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 8. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
+  // Overlay unread bits from status transitions; writes stay untracked so the
+  // overlay cannot re-trigger this effect.
+  $effect(() => {
+    const items = sessions.items;
+    const foregroundId = readSessionIdFromLocation();
+    untrack(() => {
+      const next = applyUnreadTransitions(previousStatuses, items, foregroundId, unreadIds);
+      if (!unreadSetsEqual(unreadIds, next.unread)) {
+        unreadIds = next.unread;
+        writeUnreadIds(next.unread);
+      }
+      previousStatuses = next.statuses;
+    });
+  });
+
+  onMount(() => {
+    return () => {
+      if (launchTimer !== null) clearTimeout(launchTimer);
+    };
+  });
 </script>
 
 <!-- Component content -->
@@ -79,35 +253,117 @@
     </div>
   </section>
 
-  <section class="session--section" aria-labelledby="session-heading">
+  <section
+    class="session--section"
+    aria-labelledby="session-heading"
+    aria-busy={refreshing ? 'true' : undefined}
+    ontouchstart={onRosterTouchStart}
+    ontouchmove={onRosterTouchMove}
+    ontouchend={onRosterTouchEnd}
+  >
     <div class="section-heading">
       <div>
         <h2 id="session-heading">Recent sessions</h2>
         <p>Opaque identifiers only. No prompts, paths, or host context.</p>
       </div>
-      <Freshness stale={isStale} at={sessions.updatedAt ?? cache?.savedAt ?? null} />
-    </div>
-    {#if sessions.items.length === 0}
-      <EmptyState loading={sessions.phase === 'loading'} error={sessions.error} />
-    {:else}
-      <div class="session--grid">
-        {#each sessions.items as session (session.id)}
-          <!-- Do not edit — session open onPress → onSelect route — Not designer-editable. -->
-          <Button class="session--card" onclick={() => onSelect(session.id)}>
-            <span class={`session--state state--${session.status}`}>
-              <SessionStateIcon status={session.status} />
-              {sessionStatusLabel(session.status)}
-            </span>
-            <strong>{compactId(session.id)}</strong>
-            <span class="session--meta">
-              {session.messageCount} blocks <i aria-hidden="true"></i> {relativeTime(session.updatedAt)}
-            </span>
-            <span class="open-arrow" aria-hidden="true">
-              Open
-            </span>
+      <div class="roster--toolbar">
+        <div class="roster--grouping" role="group" aria-label="Roster grouping">
+          <Button
+            class="roster--grouping-option"
+            aria-pressed={grouping === 'recency'}
+            onclick={() => setGrouping('recency')}
+          >
+            Recency
           </Button>
-        {/each}
+          <Button
+            class="roster--grouping-option"
+            aria-pressed={grouping === 'status'}
+            onclick={() => setGrouping('status')}
+          >
+            Status
+          </Button>
+        </div>
+        <Button class="roster--refresh" aria-label="Refresh sessions" onclick={() => void refreshRoster()}>
+          Refresh
+        </Button>
+        <Freshness stale={isStale} at={sessions.updatedAt ?? cache?.savedAt ?? null} />
       </div>
+    </div>
+    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+      {listView.kind === 'loading'
+        ? 'Reading the relay'
+        : listView.kind === 'error-retry'
+          ? 'Catalog unavailable'
+          : listView.kind === 'host-too-old'
+            ? 'Host too old'
+            : `${rosterItems.length} sessions`}
+    </div>
+    {#if showEmpty}
+      <EmptyState
+        loading={listView.kind === 'loading'}
+        error={listView.kind === 'error-retry' ? listView.error : null}
+        hostTooOld={listView.kind === 'host-too-old'}
+      />
+    {:else}
+      {#if resumeLive !== null}
+        <div class="resume--slot" data-resume-slot="true">
+          <p class="resume--label">Resume</p>
+          <CardSession
+            sessionId={resumeLive.id}
+            {selectSession}
+            source={sessions.source}
+            unread={groupingUnread.has(resumeLive.id)}
+            {launchingId}
+            openDisabled={resumeOpenDisabled}
+            onOpen={handleOpen}
+          />
+        </div>
+      {/if}
+      {#if grouping === 'status'}
+        {#each statusSections as section (section.bucket)}
+          <section
+            class="status--section"
+            data-status-section={section.bucket}
+            aria-labelledby={`status-heading-${section.bucket}`}
+          >
+            <h3 class="status--heading" id={`status-heading-${section.bucket}`}>
+              {STATUS_SECTION_LABELS[section.bucket]}
+              <span data-section-count={section.bucket}>{section.count}</span>
+            </h3>
+            <div class="session--grid" role="list">
+              {#each section.items as item (item.id)}
+                <div role="listitem">
+                  <CardSession
+                    sessionId={item.id}
+                    {selectSession}
+                    source={sessions.source}
+                    unread={groupingUnread.has(item.id)}
+                    {launchingId}
+                    openDisabled={listOpenDisabled}
+                    onOpen={handleOpen}
+                  />
+                </div>
+              {/each}
+            </div>
+          </section>
+        {/each}
+      {:else}
+        <div class="session--grid" role="list">
+          {#each recencyItems as item (item.id)}
+            <div role="listitem">
+              <CardSession
+                sessionId={item.id}
+                {selectSession}
+                source={sessions.source}
+                unread={groupingUnread.has(item.id)}
+                {launchingId}
+                openDisabled={listOpenDisabled}
+                onOpen={handleOpen}
+              />
+            </div>
+          {/each}
+        </div>
+      {/if}
     {/if}
   </section>
   <div class="device-footer">
@@ -126,12 +382,13 @@
 <!-- Home view -->
 <!-- This surface: home-view — hero, session roster, device footer, push settings. Decomposed into this scoped block;
      hero / hero-copy--block / hero-copy / relay-orbit(+::before/::after) / orbit--core / orbit-node(+one/two/three)
-     / session--section / section-heading(solo) / session--grid / session--state / session--meta(+i) / open-arrow
-     / device-footer(+>div) are owned solely by this component so they move with it. .session--card and
-     .device-footer button (Button primitive prop-class + data-hovered/data-focus-visible) are reproduced as
-     :global(...) top-level selectors so Svelte scoping cannot drop them; the .session--card > strong and
-     .session--card[data-hovered|data-focus-visible] .open-arrow descendants keep the primitive ancestor
-     :global and Home's own element scoped. .home-view (routed-frame group with session/review/inbox),
+     / session--section / section-heading(solo) / session--grid / device-footer(+>div) are owned solely by this
+     component so they move with it. Inner card chrome (.session--state / .session--meta(+i) / .open-arrow,
+     including the hovered/focus-visible reveal) lives on the session card so one row's styles move with that
+     card. .session--card and .device-footer button (Button primitive prop-class + data-hovered/data-focus-visible)
+     are reproduced as :global(...) top-level selectors so Svelte scoping cannot drop them; the
+     .session--card > strong descendant keeps the primitive ancestor :global and Home's own element scoped.
+     .home-view (routed-frame group with session/review/inbox),
      .surface--eyebrow (shared kicker), the .hero h1 base group (shared with review/inbox/enrollment h1),
      .section-heading / .section-heading h2 / .section-heading p groups (shared with session--title /
      session--toolbar / push--settings), the .state--running / .state--idle / .state--interrupted color rules and
@@ -307,16 +564,6 @@
   }
 
   /* Keep this rule aligned with its surrounding surface. */
-  .session--state {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    color: var(--ink-muted);
-    font-size: 0.72rem;
-    font-weight: 680;
-  }
-
-  /* Keep this rule aligned with its surrounding surface. */
   :global(.session--card > strong) {
     align-self: end;
     padding-top: var(--space-4);
@@ -325,42 +572,6 @@
     font-size: 1.05rem;
     font-weight: 650;
     letter-spacing: -0.02em;
-  }
-
-  /* Keep this rule aligned with its surrounding surface. */
-  .session--meta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    color: var(--ink-muted);
-    font-size: 0.73rem;
-    font-weight: 550;
-  }
-
-  /* Keep this rule aligned with its surrounding surface. */
-  .session--meta i {
-    width: 0.2rem;
-    height: 0.2rem;
-    border-radius: 50%;
-    background: var(--line-strong);
-  }
-
-  /* This slot: open-arrow — session--card affordance. */
-  .open-arrow {
-    position: absolute;
-    right: var(--space-4);
-    bottom: var(--space-4);
-    color: var(--accent-ink);
-    font-size: 0.7rem;
-    font-weight: 700;
-    opacity: 0;
-    transition: opacity var(--duration-fast) ease;
-  }
-
-  /* Keep this rule aligned with its surrounding surface. */
-  :global(.session--card[data-hovered]) .open-arrow,
-  :global(.session--card[data-focus-visible]) .open-arrow {
-    opacity: 1;
   }
 
   /* This slot: device — device-key footer (logout · revoke). */
@@ -454,18 +665,102 @@
     }
   }
 
-  @media (hover: none) {
-    /* Keep this rule aligned with its surrounding surface. */
-    .open-arrow {
-      opacity: 1;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     /* Keep this rule aligned with its surrounding surface. */
     :global(.session--card[data-hovered]) {
       transform: none;
     }
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     2. ROSTER GROUPING AND REFRESH
+  ─────────────────────────────────────────────────────────────────── */
+  /* Groups recency/status and refresh beside the freshness readout. */
+  .roster--toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: end;
+    gap: var(--space-3);
+  }
+
+  /* Device-local grouping; the host never receives this choice. */
+  .roster--grouping {
+    display: flex;
+    padding: 0.2rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--grouping-option) {
+    min-height: 2.75rem;
+    min-inline-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--ink-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--grouping-option[aria-pressed='true']) {
+    background: var(--ink);
+    color: var(--ink-inverse);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--refresh) {
+    min-height: 2.75rem;
+    min-inline-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     3. STATUS SECTIONS AND RESUME SLOT
+  ─────────────────────────────────────────────────────────────────── */
+  /* Always-present section so empty buckets do not jump the list. */
+  .status--section {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Header count uses the same membership function as the rows. */
+  .status--heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0 0 var(--space-3);
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    font-weight: 680;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Reserved last-opened highlight; inert until the connection is live. */
+  .resume--slot {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  .resume--label {
+    margin: 0 0 var(--space-3);
+    color: var(--accent-ink);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   /* End of surface: home-view */
 </style>

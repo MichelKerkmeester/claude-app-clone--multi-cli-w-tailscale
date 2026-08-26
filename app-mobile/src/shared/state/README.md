@@ -67,6 +67,7 @@ The component decides how a state value looks. The reducer decides when that val
 | [`todo-state.ts`](./todo-state.ts) | Read-only todo snapshot and delta reducer. |
 | [`todo-model.ts`](./todo-model.ts) | Ordered todo display sections, groups and progress. |
 | [`turns.ts`](./turns.ts) | Conversational turn grouping for ordered transcript blocks. |
+| [`unread-overlay.ts`](./unread-overlay.ts) | Device-local unread/seen overlay that never writes status. |
 | [`runtime-issues.ts`](./runtime-issues.ts) | Local copy for allowlisted runtime issue codes. |
 | [`CODE.md`](./CODE.md) | Reducer topology, flow and edit boundaries. |
 

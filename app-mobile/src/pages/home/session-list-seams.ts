@@ -14,6 +14,8 @@
 
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
+import type { ConnectionPhase, SessionListState } from '../../shared/state/state.js';
+
 // ───────────────────────────────────────────────────────────────────
 // 2. TIME BUCKETS AND RECENCY SORT
 // ───────────────────────────────────────────────────────────────────
@@ -45,6 +47,24 @@ export function timeBucket(updatedAt: string, now: number): TimeBucket {
 /** Most recently updated first; ISO timestamps compare lexicographically. */
 export function recencySort(items: readonly SessionCardDto[]): readonly SessionCardDto[] {
   return [...items].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+}
+
+/**
+ * Newest finite `updatedAt` first. An unparseable clock sinks last and never
+ * becomes a fabricated recency, so the sort cannot invent "just now".
+ */
+export function sortByRecency(items: readonly SessionCardDto[]): readonly SessionCardDto[] {
+  return [...items]
+    .map((item, index) => ({ item, index, time: Date.parse(item.updatedAt) }))
+    .sort((left, right) => {
+      const leftOk = Number.isFinite(left.time);
+      const rightOk = Number.isFinite(right.time);
+      if (leftOk && !rightOk) return -1;
+      if (!leftOk && rightOk) return 1;
+      if (leftOk && rightOk && left.time !== right.time) return right.time - left.time;
+      return left.index - right.index;
+    })
+    .map((entry) => entry.item);
 }
 
 export interface TimeBucketGroup {
@@ -181,4 +201,87 @@ export function dedupSessions(input: RosterReconcileInput): readonly SessionCard
   for (const item of input.cacheItems) owner.set(item.id, item);
   for (const item of input.liveItems) owner.set(item.id, item);
   return [...owner.values()];
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 6. LIST STATE AND STATUS-GROUPED ROSTER
+// ───────────────────────────────────────────────────────────────────
+
+export type ListViewKind = 'loading' | 'error-retry' | 'host-too-old' | 'ready';
+
+export interface DerivedListView {
+  readonly kind: ListViewKind;
+  readonly items: readonly SessionCardDto[];
+  readonly error: string | null;
+}
+
+/**
+ * Keep prior rows visible while a refetch is in flight. An empty catalog is
+ * only "ready" once the host has answered; a failed fetch stays unresolved
+ * instead of looking like "no sessions". Host-too-old needs a capability
+ * signal the relay does not publish, so that kind never fires here.
+ */
+export function deriveListState(
+  sessionState: SessionListState,
+  connection: ConnectionPhase,
+): DerivedListView {
+  void connection;
+  const items = sessionState.items;
+  if (items.length > 0) {
+    return { kind: 'ready', items, error: sessionState.error };
+  }
+  if (sessionState.phase === 'loading' || sessionState.phase === 'idle') {
+    return { kind: 'loading', items, error: null };
+  }
+  if (sessionState.phase === 'error') {
+    return { kind: 'error-retry', items, error: sessionState.error };
+  }
+  return { kind: 'ready', items, error: sessionState.error };
+}
+
+export interface StatusListSection {
+  readonly bucket: StatusBucket;
+  readonly count: number;
+  readonly items: readonly SessionCardDto[];
+}
+
+export const STATUS_SECTION_LABELS: Record<StatusBucket, string> = {
+  attention: 'Attention',
+  unread: 'Unread',
+  working: 'Running',
+  idle: 'Idle',
+  unknown: 'Unknown',
+};
+
+/**
+ * True only when the host already published an `attention` field. The client
+ * never invents that field; this gate stays false on today's DTO.
+ */
+export function hostAttentionPresent(items: readonly SessionCardDto[]): boolean {
+  return items.some((item) => Object.prototype.hasOwnProperty.call(item, 'attention'));
+}
+
+/**
+ * Always-present attention-first sections. Membership uses the same
+ * first-match classifier as the counts, so a header cannot drift from its
+ * rows. Within a section, newest finite clock wins.
+ */
+export function buildStatusList(
+  items: readonly SessionCardDto[],
+  unreadById: ReadonlySet<string> = new Set(),
+): readonly StatusListSection[] {
+  const buckets: Record<StatusBucket, SessionCardDto[]> = {
+    attention: [],
+    unread: [],
+    working: [],
+    idle: [],
+    unknown: [],
+  };
+  for (const item of items) {
+    buckets[sessionStatusGroup(item.status, unreadById.has(item.id))].push(item);
+  }
+  return BUCKET_DISPLAY_ORDER.map((bucket) => {
+    const sorted = sortByRecency(buckets[bucket]);
+    return { bucket, count: sorted.length, items: sorted };
+  });
 }

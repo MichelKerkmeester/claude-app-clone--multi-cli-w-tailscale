@@ -83,6 +83,7 @@ The folder is flat. Story files exercise the corresponding component with real p
 | [`status-pill.stories.ts`](./status-pill.stories.ts) | Connection phase stories. |
 | [`theme-control.svelte`](./theme-control.svelte) | Auto, Light and Dark option control. |
 | [`theme-control.stories.ts`](./theme-control.stories.ts) | Theme preference stories. |
+| [`haptics.ts`](./haptics.ts) | No-op-safe selection, success, error and edge-bump vibration. |
 | [`README.md`](./README.md) | Feature orientation for shared chrome. |
 | [`CODE.md`](./CODE.md) | This code-folder map. |
 

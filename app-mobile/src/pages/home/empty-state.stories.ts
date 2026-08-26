@@ -16,4 +16,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Empty: Story = { args: { loading: false, error: null } };
 
+export const Loading: Story = { args: { loading: true, error: null } };
+
 export const Error: Story = { args: { loading: false, error: 'The relay request failed.' } };
+
+export const HostTooOld: Story = { args: { loading: false, error: null, hostTooOld: true } };

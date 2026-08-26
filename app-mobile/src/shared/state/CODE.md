@@ -81,6 +81,7 @@ The folder is flat:
 | [`todo-model.ts`](./todo-model.ts) | Ordered todo sections, group runs and progress. |
 | [`todo-state.ts`](./todo-state.ts) | Todo projection reducer and announcements. |
 | [`turns.ts`](./turns.ts) | Conversational turn grouping. |
+| [`unread-overlay.ts`](./unread-overlay.ts) | Device-local unread/seen overlay that never writes status. |
 | [`use-runtime.svelte.ts`](./use-runtime.svelte.ts) | Live runtime refresh and mutation lifecycle. |
 | [`README.md`](./README.md) | Feature orientation and reducer-versus-component guidance. |
 | [`CODE.md`](./CODE.md) | This code-folder map. |

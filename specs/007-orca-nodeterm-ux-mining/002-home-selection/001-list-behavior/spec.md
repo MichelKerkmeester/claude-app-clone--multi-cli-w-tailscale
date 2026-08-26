@@ -5,12 +5,12 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior"
-    last_updated_at: "2026-08-26T14:30:00.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Folded ten nodeterm status-grouping recs into the orca list-behaviour scope"
-    next_safe_action: "Build the status-grouped roster helper beside recency-sort when the operator says go"
+    last_updated_at: "2026-08-26T17:50:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Wired phase-1 seams into the home roster and verified test:web"
+    next_safe_action: "None — phase implemented; sibling list-organization can decorate this list"
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -29,7 +29,7 @@ _memory:
 |---|---|
 | Parent | `002-home-selection` |
 | Level | 2 |
-| Status | Planned — implementation deferred until the operator says "go" |
+| Status | Implemented |
 | Recs | 1.1 recency-sort · 1.2 pull-to-refresh · 1.9 four-kind list states · 1.10 resume slot · 1.11 single-flight Open · 1.12 haptics |
 | Host dependency | None — all six are ✅ drop-in |
 | Barrier | list-order + keep-last-good + keep-old-on-refetch behaviour proven · single-flight proven · token-identity 0-diff · test:web green · a11y-parity preserved |

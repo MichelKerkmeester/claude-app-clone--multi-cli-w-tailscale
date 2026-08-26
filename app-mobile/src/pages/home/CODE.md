@@ -10,7 +10,9 @@ and shell callbacks, derives roster freshness and composes four small Svelte sur
 Current state:
 
 - [`screen-home.svelte`](./screen-home.svelte) owns the hero, session cards, device footer and child-surface composition.
+- [`card-session.svelte`](./card-session.svelte) derives one roster row from a per-id selector.
 - [`empty-state.svelte`](./empty-state.svelte) and [`freshness.svelte`](./freshness.svelte) render roster state without owning the roster fetch.
+- [`session-list-seams.ts`](./session-list-seams.ts) holds the pure recency, list-state and status-grouping projections.
 - [`push-settings.svelte`](./push-settings.svelte) owns the notification preference request lifecycle and attention-class switches.
 - The route adapter and shell own URL transitions, authentication, session fetching, Review and Inbox overlay state.
 
@@ -71,14 +73,17 @@ The folder is flat. This inventory names every direct file other than the README
 
 | File | Responsibility |
 |---|---|
-| [`empty-state.svelte`](./empty-state.svelte) | Renders loading, empty and error roster copy. |
-| [`empty-state.stories.ts`](./empty-state.stories.ts) | Exercises loading, empty and error states. |
+| [`empty-state.svelte`](./empty-state.svelte) | Renders loading, empty, error and host-too-old roster copy. |
+| [`empty-state.stories.ts`](./empty-state.stories.ts) | Exercises loading, empty, error and host-too-old states. |
 | [`freshness.svelte`](./freshness.svelte) | Renders live or stale status and the last sync time. |
 | [`freshness.stories.ts`](./freshness.stories.ts) | Exercises live and stale freshness states. |
 | [`push-settings.svelte`](./push-settings.svelte) | Loads push config, subscribes, unsubscribes and updates attention preferences. |
 | [`push-settings.stories.ts`](./push-settings.stories.ts) | Exercises push settings presentation states. |
+| [`card-session.svelte`](./card-session.svelte) | Renders one session card from a per-id selector. |
+| [`card-session.stories.ts`](./card-session.stories.ts) | Exercises idle and launching card states. |
 | [`screen-home.svelte`](./screen-home.svelte) | Composes the full Home surface and forwards shell actions. |
 | [`screen-home.stories.ts`](./screen-home.stories.ts) | Exercises the Home screen with roster and device inputs. |
+| [`session-list-seams.ts`](./session-list-seams.ts) | Pure recency sort, list-state derivation and status-grouped roster. |
 | `CODE.md` | This code-folder map. |
 
 ---

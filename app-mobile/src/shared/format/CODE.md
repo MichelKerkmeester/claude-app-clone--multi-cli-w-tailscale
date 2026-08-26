@@ -63,9 +63,11 @@ The folder is flat:
 
 | File | Responsibility |
 |---|---|
-| [`attention.ts`](./attention.ts) | Attention Inbox and Web Push endpoint calls. |
 | [`format.ts`](./format.ts) | Time, number, cost and artifact-size formatters. |
 | [`view-helpers.ts`](./view-helpers.ts) | Route, theme, approval, status and copy helpers. |
+| [`card-projection.ts`](./card-projection.ts) | Session-card view model and stale-working decay. |
+| [`roster-view-preference.ts`](./roster-view-preference.ts) | Device-local recency/status grouping preference. |
+| [`attention.ts`](./attention.ts) | Attention Inbox and Web Push endpoint calls. |
 | [`README.md`](./README.md) | Feature orientation for formatting and attention data. |
 | [`CODE.md`](./CODE.md) | This code-folder map. |
 

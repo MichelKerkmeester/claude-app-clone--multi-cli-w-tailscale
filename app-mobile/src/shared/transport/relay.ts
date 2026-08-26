@@ -302,7 +302,7 @@ export interface PlanBindingResponse {
 // 5. SESSIONS, TICKETS, AND ATTACHMENTS
 // ───────────────────────────────────────────────────────────────────
 
-export async function fetchSessions(signal: AbortSignal): Promise<readonly SessionCardDto[]> {
+export async function fetchSessions(signal?: AbortSignal): Promise<readonly SessionCardDto[]> {
   const payload = await postJson('/api/sessions', undefined, signal);
   if (
     !isRecord(payload) ||

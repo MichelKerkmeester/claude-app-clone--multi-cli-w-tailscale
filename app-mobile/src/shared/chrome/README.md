@@ -55,6 +55,7 @@ The components own presentation and local event wiring. The page or shell owns n
 | [`theme-control.svelte`](./theme-control.svelte) | Renders the Auto, Light and Dark pressed-state options. |
 | [`session-state-icon.svelte`](./session-state-icon.svelte) | Maps a session status to a compact glyph. |
 | [`root-error-boundary.svelte`](./root-error-boundary.svelte) | Keeps render failures inside a reloadable recovery surface. |
+| [`haptics.ts`](./haptics.ts) | No-op-safe selection, success, error and edge-bump vibration. |
 | [`header.stories.ts`](./header.stories.ts) | Covers the header with and without Review navigation. |
 | [`status-pill.stories.ts`](./status-pill.stories.ts) | Covers the connection phases. |
 | [`theme-control.stories.ts`](./theme-control.stories.ts) | Covers the three theme preferences. |

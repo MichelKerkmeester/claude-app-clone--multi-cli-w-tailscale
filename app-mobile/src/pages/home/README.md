@@ -57,7 +57,8 @@ this folder does not own their open state.
 | File | Role |
 |---|---|
 | [`screen-home.svelte`](./screen-home.svelte) | Composes the hero, session roster, device footer and push settings. |
-| [`empty-state.svelte`](./empty-state.svelte) | Shows loading, empty and error copy for the roster. |
+| [`card-session.svelte`](./card-session.svelte) | Renders one session card from a per-id selector. |
+| [`empty-state.svelte`](./empty-state.svelte) | Shows loading, empty, error and host-too-old copy for the roster. |
 | [`freshness.svelte`](./freshness.svelte) | Renders live or stale status and the last sync time. |
 | [`push-settings.svelte`](./push-settings.svelte) | Loads push support and manages attention-class switches. |
 | [routes/+page.svelte](../../routes/+page.svelte) | Supplies shell state and callbacks to the Home component. |

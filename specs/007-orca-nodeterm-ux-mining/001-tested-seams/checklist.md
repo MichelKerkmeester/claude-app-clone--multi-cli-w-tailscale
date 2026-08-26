@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/001-tested-seams"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Wrote the open barrier checklist for six seams; nothing verified yet."
-    next_safe_action: "Await operator go; barriers close only against the implemented final state."
+    recent_action: "Added open barriers for eight nodeterm seams; nothing verified yet."
+    next_safe_action: "Await operator go; nodeterm barriers close only against the implemented state."
     blockers: []
     completion_pct: 0
 ---
@@ -55,6 +55,7 @@ differential test (every incremental prefix equals a canonical full rebuild) and
 - [ ] **CHK-TEST-01** [P0] Differential test: each incremental seam equals a canonical full rebuild at every prefix. [proof: `test:web` suite over message grouping, draft reconciliation, and the scope-guard/reducer — equality asserted at every prefix]
 - [ ] **CHK-TEST-02** [P0] `test:web` passes from the final state (new suites + existing). [proof: `test:web` all files pass]
 - [ ] **CHK-TEST-03** [P0] Token identity holds at 0 diffs across the three themes — this phase changed no CSS. [proof: `token-identity.mjs diff` vs baseline — 0 CHANGED / 0 VANISHED / 0 ADDED, light/dark/system]
+- [ ] **CHK-TEST-04** [P0] Differential test the incremental nodeterm seams: each equals a canonical full rebuild at every prefix — status bucketing (ND-1.1), single-owner dedup (ND-1.11), done-holdoff (ND-2.6), reconnect-decide (ND-6.1). [proof: `test:web` suite asserting incremental == full rebuild at every prefix of a roster / status-event stream]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -64,6 +65,7 @@ differential test (every incremental prefix equals a canonical full rebuild) and
 
 - [ ] **CHK-FIX-01** [P0] Boundary test: every fail-closed case resolves to a visibly-unresolved value, never a success. [proof: epoch change → `awaitingSnapshot`; `unknown-session` gap → error not empty; unknown kind → `kind:'unknown'`/`richEligible:false`; cross-session settlement → dropped; stale `running` card → decayed, `status` untouched]
 - [ ] **CHK-FIX-02** [P0] An unpaired tool call stays visibly in-flight; a mismatched-epoch or wrong-session envelope is dropped, not merged. [proof: `pendingResultCallIds` non-empty for an unpaired call; `blocksFromEnvelopes` drops the mismatched envelope]
+- [ ] **CHK-FIX-03** [P0] Boundary test the nodeterm seams: every fail-closed case stays visibly unresolved, never a success. [proof: stale `running` → Unknown, `status` untouched, not "done" (ND-2.1); running-but-unread stays Running (ND-2.3); presumed-idle downgrades only running, never clears needs-you (ND-2.7); reconnect keeps a live `running` stale, not promoted (ND-6.1); a doubled `id` emits once (ND-1.11)]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -91,6 +93,7 @@ differential test (every incremental prefix equals a canonical full rebuild) and
 
 - [ ] **CHK-ORG-01** [P1] Each new pure seam is co-located beside the file it serves (home roster beside `screen-home.svelte`; card projection + stale-decay beside `view-helpers.ts`; scope-guard + draft-reconcile beside `state.ts`). [proof: file placement matches the source-structure convention]
 - [ ] **CHK-ORG-02** [P2] Every task cites a rec number and no seam is blocked on a host field. [proof: `tasks.md` each task → a rec; `blockers: []`; all seams read existing DTO fields]
+- [ ] **CHK-ORG-03** [P2] Traceability: every folded nodeterm task cites its `ND-x.y` id and reads only existing DTO fields plus the device-local unread bit. [proof: `tasks.md` T2.7–T2.14 each → an `ND-x.y` rec; the ND-2.2 needs-you axis stays ⚠️ requested in `../007-host-requests`, not invented here]
 <!-- /ANCHOR:file-org -->
 
 ---

@@ -7,7 +7,7 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/001-tested-seams"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored the planned-stub doc; implementation deferred until the operator says go."
+    recent_action: "Extended the planned stub with eight nodeterm seams; implementation deferred."
     next_safe_action: "Await operator go, then implement PHASE 1–3 and fill this doc from the final state."
     blockers: []
     completion_pct: 0
@@ -45,6 +45,16 @@ revision), and per-item `revision`/`seq`: (1) home filter/sort/group beside `pag
 extracted from `transcriptReducer` (`shared/state/state.ts`); (5) the id+epoch scope-guard extracted from
 that same reducer; (6) stale-decay beside `shared/format/view-helpers.ts`. The three new seams will be
 authored pure and left unwired — their rendered consumers land in phases 002/003.
+
+Also planned (not yet built): eight nodeterm-derived seams folded in from
+`../research-nodeterm/research.md`, each pure over existing DTO fields plus a device-local unread bit and
+left unwired. Home-roster projections beside `pages/home/screen-home.svelte` — status-bucketing (ND-1.1),
+first-match membership precedence (ND-1.3), the unread-aware bucket lattice (ND-2.3), and single-owner dedup
+(ND-1.11); a card-presentation stale-decider beside `shared/format/view-helpers.ts` that decays a `running`
+card to *Unknown* at 20 min (ND-2.1, superseding orca 1.8's 30-min → idle); and three status reconcilers
+beside `shared/state/state.ts` — done-holdoff (ND-2.6), asymmetric idle-rescue (ND-2.7), and reconnect-decide
+(ND-6.1). Each gets its differential and/or boundary test (T2.7–T2.14, T3.5–T3.6). The needs-you /
+approval-vs-question axis (ND-2.2) and end-reason (ND-2.9) stay ⚠️ host requests in `../007-host-requests`.
 <!-- /ANCHOR:what-built -->
 
 ---

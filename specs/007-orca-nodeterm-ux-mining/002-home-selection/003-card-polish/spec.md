@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/003-card-polish"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned card polish: ✅ relabel/decay/dot/accordion-chrome + ⚠️ card-content bundle."
-    next_safe_action: "Implement the ✅ set; the ⚠️ bundle waits on host fields in 007-host-requests."
+    recent_action: "Folded nodeterm ND card recs into scope with the ❌ ND-3.10 exclusion noted."
+    next_safe_action: "Ship the ✅ ND set while ⚠️ contextPercent/activity/prompt wait on 007-host-requests."
     blockers:
       - "Attention badge (1.6), title/preview/agent (2.2), host titles (2.3), recoverable-empty (2.4), accordion body (2.5) need new host read-only fields — requested in 007-host-requests"
     completion_pct: 0
@@ -104,6 +104,23 @@ the "opaque ids only" home rule.
 - **2.6 Title-is-a-projection policy note.** A documented note: the `id` stays opaque; a redacted host
   `title`/`projectLabel` is a *projection*, not an id, and survives the "opaque ids, no paths" home rule;
   raw `cwd` on home would violate it. No code — it frames the `007-host-requests` bundle.
+
+**nodeterm fold-in (added to the above, deduped against orca):**
+- **✅ ship-now (existing DTO / pure interaction):** **ND-3.7** device-local "changed since you looked" dot
+  (persist `lastSeenUpdatedAt`, fail-closed); **ND-3.8** always-inline detail row that drops the
+  peek-accordion — **SUPERSEDES orca 2.5** (nodeterm removed the expand step; sidesteps the empty-accordion
+  trap); **ND-3.9** deterministic hue from the opaque `id`; **ND-1.6/ND-2.1** stale-working card decays to a
+  stale/unknown *look* at 20 min over `updatedAt` without writing `status` — **SUPERSEDES orca 1.8**
+  (unknown, not a fake idle); **ND-1.7/ND-3.6** two orthogonal card channels (a live-state RUNNING badge kept
+  separate from the read-state glyph).
+- **⚠️ new host read-only field (plan UI + fail-closed fallback; requested in `007-host-requests`, never
+  invented):** **ND-3.1** context-window fill meter (`contextPercent`, 0–100) — the standout; **ND-3.2** live
+  "activity" line ("Running npm test", `activity`+`tool`); **ND-3.3** the "You:" turn-opening line (`prompt`).
+- **Reinforce, do NOT re-request:** **ND-3.4** `title` is a host projection of the session's own name, never
+  client-sliced (keep `compactId(id)` as the fallback); **ND-3.5** `agent`+`model` — the `model` rides the
+  same usage payload as `contextPercent`, so bundle them.
+- **❌ exclusion:** **ND-3.10** client-authored card metadata (labels / priority / assignee) — backlog
+  exclusion, portable only as a device-local preference, never host truth or a host-rendered card.
 
 **Out of scope:** any list-behaviour rec (→ `001`); any sectioning/filter/search/favorite chrome (→ `002`);
 inventing any host field on the client; writing `status`; every file outside `app-mobile/src/pages/home/**`,

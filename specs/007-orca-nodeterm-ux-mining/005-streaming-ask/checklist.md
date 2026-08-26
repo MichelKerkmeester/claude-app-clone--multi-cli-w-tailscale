@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/005-streaming-ask"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Wrote the barrier checklist for recs 5.1–5.8; all barriers open, nothing proven yet."
-    next_safe_action: "Await operator go; barriers are proven only from the final implemented state."
+    recent_action: "Added open ND-2.6/2.9/6.8 fold-in barriers to the Angle-5 checklist."
+    next_safe_action: "Await operator go before proving barriers from the final state."
     blockers: []
     completion_pct: 0
 ---
@@ -45,6 +45,8 @@ focus order survived. Nothing here is checked yet — this is a plan.
 - [ ] **CHK-CQ-01** [P0] The working dots show only while running with no token block; once an assistant text block exists for the running turn, that partial text is the streaming indicator (5.2). [evidence: `hasStreamingTokens` states rendered]
 - [ ] **CHK-CQ-02** [P0] The optimistic echo reconciles by host message id with no duplicate row, and the exact raw draft is restored on reject (5.3). [evidence: reconcile path + reject-restore assertion]
 - [ ] **CHK-CQ-03** [P0] The input lock names its reason (waiting-for-lease vs disconnected), applies the 600 ms settle, and never revokes the editable textbox (5.4). [evidence: `inputLockReason` mapping + settle edge; editable always-on]
+- [ ] **CHK-CQ-04** [P0] A late `running` re-reported within the ~3 s done-holdoff after an `idle`/`interrupted` end does NOT resurrect the turn; only an `epoch`/new-turn advance reopens idle→running (ND-2.6). [evidence: done-holdoff reconcile assertion]
+- [ ] **CHK-CQ-05** [P0] A retracted/cleared signal (dismissed ask, stopped indicator, cleared send-failure) survives a reconnect/`sync.gap` without loss or resurrection, held outside the ephemeral view (ND-6.8). [evidence: gap/reconnect reconcile assertion]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -64,6 +66,7 @@ focus order survived. Nothing here is checked yet — this is a plan.
 
 - [ ] **CHK-FIX-01** [P0] Every one of the eight recs (5.1–5.8) is implemented or explicitly proven-already-satisfied, and the two deferred sub-items (5.3 image-preview cache, 5.5 multi-question wizard) are marked `[~]` with their host dependency. [evidence: task→rec table]
 - [ ] **CHK-FIX-02** [P0] At most one blocking prompt renders at a time, Ask taking precedence; no heuristic prose-scrape prompt was introduced (5.7). [evidence: `activeBlockingPrompt` selector + overlay audit]
+- [ ] **CHK-FIX-03** [P0] The three folded nodeterm findings (ND-2.6, ND-2.9, ND-6.8) are each implemented or proven-already-satisfied and traced to an ND id, and `test:web` is green from the final state with these reconciliation behaviours covered. [evidence: task→ND table; `test:web` pass]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -73,6 +76,7 @@ focus order survived. Nothing here is checked yet — this is a plan.
 
 - [ ] **CHK-SEC-01** [P0] Fail-closed holds: no synthetic partial-text without a host running signal (5.2), no approval offered against a working agent (paused-states guard, 5.6), and unknown-session / dropped-socket / revision-mismatch state stays visibly unresolved. [evidence: fail-closed pass over the send/approval paths]
 - [ ] **CHK-SEC-02** [P0] The client owns no session truth: approval buttons come only from the host ticket, a pending message is never persisted as the session, and no new host field is invented on the client. [evidence: ticket-only render; no client-owned mutable session state added]
+- [ ] **CHK-SEC-03** [P0] A stale/interrupted end is never celebrated as a completion: `interrupted` suppresses the "finished" affordance, and the stale-end host end-reason stays `[~]` deferred to `007-host-requests` rather than faked on the client (ND-2.9). [evidence: interrupted-suppression assertion; deferred host ask noted]
 <!-- /ANCHOR:security -->
 
 ---

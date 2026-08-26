@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/001-tested-seams"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned the extraction + test approach for six seams; no code written."
-    next_safe_action: "Await operator go, then extract the seams and author the paired tests (PHASE 1–2)."
+    recent_action: "Added the extraction + test approach for eight nodeterm seams; no code written."
+    next_safe_action: "Await operator go, then extract the nodeterm seams and author paired tests (PHASE 1–2)."
     blockers: []
     completion_pct: 0
 ---
@@ -75,6 +75,29 @@ rendered consumers land in phases 002/003 — this phase ships only the tested f
 The canonical rebuild each differential test compares against is a deliberately simple, obviously-correct
 reference (e.g. a full re-group from scratch, a full re-reduce from the empty state) — never the seam under
 test — so the two implementations disagreeing surfaces a real defect.
+
+**Nodeterm-derived seams — author pure, leave unwired, test both ways.** Eight further seams
+(`../research-nodeterm/research.md`) extend the same discipline. Four are **home-roster projections** beside
+`screen-home.svelte`, layered over `SessionListState`: status-bucketing into always-present counted sections
+(ND-1.1); a first-match membership-precedence classifier (attention → working → unread → idle → unknown) so a
+running-but-unread card stays under Running (ND-1.3); the unread-aware bucket lattice whose membership
+priority is deliberately distinct from display order, over `status` + a device-local unread bit (ND-2.3); and
+a single-owner dedup that emits each `id` once when the roster reconciles cache vs live via
+`SessionListState.source` (ND-1.11). One is a **card-presentation decider** beside `view-helpers.ts`: the
+20-min stale → *Unknown* decay over `updatedAt` with injected `now`, never writing `status` — which
+**supersedes** orca's 30-min → idle dim (T2.3) as the more honest fail-closed behaviour. Three are **status
+reconcilers** beside `state.ts`, feeding `sessionListReducer`: done-holdoff (a late `running` within 3 s of
+`idle` with no new-turn marker is ignored, ND-2.6), asymmetric idle-rescue (a presumed-idle signal may only
+downgrade `running`, never clear a needs-you card, ND-2.7), and reconnect-decide (default `undecided`,
+distrust only live rows, never locally promote a stale `running`, ND-6.1).
+
+Each nodeterm seam is authored pure over existing DTO fields plus the device-local unread bit and left
+unwired, matching the orca seams' pattern. The incremental ones (bucketing, dedup, done-holdoff,
+reconnect-decide) get a **differential test** — every prefix of a roster / status-event stream equals a
+canonical full rebuild — and every seam gets a **boundary test** for its fail-closed case (stale → Unknown
+not "done"; running-but-unread stays Running; presumed-idle downgrades only running; reconnect keeps a live
+`running` stale; a doubled `id` emits once). The needs-you / approval-vs-question axis (ND-2.2) and end-reason
+(ND-2.9) stay ⚠️ host requests in `../007-host-requests`, so no seam here is blocked on a host field.
 <!-- /ANCHOR:architecture -->
 
 ---

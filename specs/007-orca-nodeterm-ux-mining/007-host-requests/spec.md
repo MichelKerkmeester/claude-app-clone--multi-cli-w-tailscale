@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/007-host-requests"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Host-request spec drafted; ⚠️ field/RPC bundle + fallbacks + Open-Q#1 answered."
-    next_safe_action: "Hand to the relay/host team; consuming phases build each field when it ships."
+    recent_action: "Added nodeterm net-new host requests (contextPercent/activity/prompt/attn-ext/read-ack)."
+    next_safe_action: "Hand orca+nodeterm request to relay team; consuming phases build each field on ship."
     blockers:
       - "Host dependency: every requested field/RPC is relay-authored; this phase implements nothing and unblocks only when the relay publishes the fields."
     completion_pct: 0
@@ -73,6 +73,12 @@ three open operator/product questions. Each field/RPC entry defines its wire sha
 its fail-closed fallback, and its wire-compat note. All citations trace to a numbered rec in
 `../research/research.md`.
 
+Also in scope: the **net-new host requests mined from nodeterm** (`../research-nodeterm/`, deduped against the
+orca set) — `contextPercent`, `activity` (+ raw `tool`), `prompt`, an approval-vs-question sub-kind + end-reason
+extension of the already-requested `attention`, a cross-surface read-ack RPC, and an optional `stateEnteredAt`
+transition-clock. Each carries the same four facets and cites its `ND-x.y` id; the orca fields nodeterm merely
+reinforces (`title`, `agent`/`model`, the base `attention` enum) are noted, NOT re-requested.
+
 **Out of scope:** implementing, editing, or creating any client code — this phase writes no code under
 `app-mobile/`, invents no field on the client, and renders no UI (each consuming phase owns its own
 implementation, verification, and a11y/token-identity gates). Also out of scope: the host's own implementation
@@ -105,6 +111,21 @@ the client own or edit mutable session truth (that is ❌, not a request).
 - **REQ-005** — Every requested field/RPC traces to a rec number and names its consuming phase; the request
   never has the client own or edit session truth (fail-closed); and each field is marked additive-safe or its
   client-guard coordination is stated, per the actual `pi-rpc-protocol` guards.
+- **REQ-006** — The **nodeterm net-new card-content fields** are documented with the same four facets, each
+  citing its `ND-x.y` id (tasks T2.14–T2.16): `contextPercent` (0–100, optional on `SessionCardDto` — the
+  context-window fill meter; the `model` label rides the same usage payload, so bundle it with the
+  already-requested `agent`/`model`; fail-closed: no meter when absent; additive-safe; ND-3.1); `activity`
+  (+ raw `tool`) (the live present-tense action line that upgrades "Working…"; fail-closed: plain working state;
+  ND-3.2); and `prompt` (the current turn's opening "You:" user line, host-clipped; fail-closed: omit; ND-3.3).
+  Consuming phase for all three: `002-home-selection/003-card-polish`.
+- **REQ-007** — The **nodeterm net-new presence extensions** are documented with the same four facets, each
+  citing its `ND-x.y` id (tasks T2.17–T2.19): an approval-vs-question **sub-kind** (+ `options[]`) and an
+  **end-reason** extending the already-requested `attention` — referencing the `NodeStateChange` shape — so a
+  presumed-*stale* end is not mistaken for a natural finish (fail-closed: base three-value attention; ND-2.2,
+  ND-2.9); a cross-surface **read-ack RPC** with a loop-guard (fail-closed: local-only dismissal; LOW/optional;
+  ND-2.10); and an optional **`stateEnteredAt`** transition-clock for accurate in-state age (fail-closed: age
+  off `updatedAt`; LOW/optional/candidate-drop; ND-2.8, ND-1.5). The base `attention` enum, `title`, and
+  `agent`/`model` are reinforced by nodeterm but NOT re-requested.
 <!-- /ANCHOR:requirements -->
 
 ---
@@ -175,6 +196,7 @@ The three operator/product questions carried from `../research/research.md` "Nee
 ## 8. CROSS-REFERENCES
 
 - `../research/research.md` — the verified synthesis; the "Needs host support" section and recs 1.3–1.6, 2.2–2.6, 1.14, 4.2, 4.5, 4.6, 5.6, 6.4.
+- `../research-nodeterm/research.md` + `.../findings/angle-2.md`, `.../findings/angle-3.md` — the nodeterm mining; the net-new "Needs host support" set ND-3.1, ND-3.2, ND-3.3, ND-2.2, ND-2.9, ND-2.10, ND-2.8/1.5 (REQ-006/007).
 - `../spec.md` — the phase parent (§3 map: this is Phase 7; the consuming phases are 002–006).
 - `../002-home-selection/` — consumes `title`/`lastMessagePreview`/`agent`/`attention`/`projectLabel`/`pinned`/`previewMessages[]`.
 - `../004-composer/` — consumes the `@`-file-search and paste-upload-lease and dictation RPCs.

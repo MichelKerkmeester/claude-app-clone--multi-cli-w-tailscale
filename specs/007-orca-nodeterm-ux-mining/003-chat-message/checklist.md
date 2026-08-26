@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/003-chat-message"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Wrote the OPEN barrier checklist; no barrier is proven yet."
-    next_safe_action: "On operator go, satisfy the pre-implementation barriers first."
+    recent_action: "Added ND-4.1-4.8 barriers to the OPEN chat message checklist"
+    next_safe_action: "On operator go, satisfy the pre-implementation barriers first"
     blockers: []
     completion_pct: 0
 ---
@@ -51,6 +51,9 @@ or open an unauthorized file. All items are OPEN — nothing is implemented yet.
   pairing and in-flight state derive from the existing grouping, not new session state. [rec: 3.4]
 - [ ] **CHK-CQ-03** [P1] Copy paths (3.2, 3.3) reuse `use-copy-feedback.svelte.ts`; Copy is unavailable (not
   faked) when the clipboard API is absent; the tint confirm does not shift layout. [recs: 3.2, 3.3]
+- [ ] **CHK-CQ-04** [P0] The find bar (ND-4.1) drives a flat line index decoupled from the virtualized DOM,
+  lowercased once per snapshot; `next()` / `prev()` scroll the `@tanstack/svelte-virtual` list to an
+  off-screen match and highlight it via `<mark>`, never relying on browser find. [rec: ND-4.1]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -64,6 +67,9 @@ or open an unauthorized file. All items are OPEN — nothing is implemented yet.
   present — not by a piped tail exit code). [recs: 3.1-3.6, 6.6]
 - [ ] **CHK-TEST-03** [P1] The component stories for the touched surfaces still mount and render. [recs: 3.1,
   3.2, 3.4]
+- [ ] **CHK-TEST-04** [P0] token-identity resolves 0-diff and `test:web` passes from the final state for the
+  ND-4.x controls — find bar, quantified copy receipt, native `<details>` folding, and the 5-state load
+  state. [recs: ND-4.1, ND-4.2, ND-4.6, ND-4.7]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -90,6 +96,11 @@ or open an unauthorized file. All items are OPEN — nothing is implemented yet.
   "unavailable". [rec: 6.6]
 - [ ] **CHK-SEC-03** [P1] Nothing under `specs/context/**` is touched; changes stay under
   `app-mobile/src/pages/chat/`. [recs: 3.1-3.7, 6.6]
+- [ ] **CHK-SEC-04** [P0] A `missing` / `unsupported` / `error` transcript (ND-4.7) never renders as an empty
+  conversation, and a reload never blanks a rendered `ok` thread. [rec: ND-4.7]
+- [ ] **CHK-SEC-05** [P0] A prose file-path (ND-4.4) stays inert "unavailable" unless routed through the
+  artifact viewer with a host-supplied reference; a URL opens external; a local path / URI is never resolved
+  directly. [rec: ND-4.4]
 <!-- /ANCHOR:security -->
 
 ---
@@ -114,6 +125,8 @@ or open an unauthorized file. All items are OPEN — nothing is implemented yet.
   3.2, 3.4, 3.5, 3.6]
 - [ ] **CHK-ORG-02** [P2] Each affordance is additive and independently revertible; no unrelated transcript
   surface is refactored. [recs: 3.1-3.6, 6.6]
+- [ ] **CHK-ORG-03** [P1] a11y-parity is preserved on the find bar and the action menu (label, focus order,
+  disclosure roles, dismissal, live regions); every ND-4.x task traces to a finding. [recs: ND-4.1, ND-4.8]
 <!-- /ANCHOR:file-org -->
 
 ---

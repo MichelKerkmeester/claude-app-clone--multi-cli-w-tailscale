@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/004-composer"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned composer recs 4.1–4.8 against real files; no code implemented yet."
-    next_safe_action: "Await operator go, then build the Phase 1 seams, then Phase 2 per rec."
+    recent_action: "Added nodeterm dictation pipeline ND-5.1–5.9 to the composer plan."
+    next_safe_action: "Await operator go, then build Phase 1 seams incl. the dictation scaler."
     blockers:
       - "rec 4.2 @-file search needs a host file-search RPC (requested in 007-host-requests); plan the UI now, implement when it lands."
     completion_pct: 0
@@ -109,6 +109,35 @@ typed-`/model`-into-the-TUI pattern is explicitly not adopted.
 empty-while-in-flight) over a NEW host file-search RPC analogous to `fetchCommands` in `transport/relay.js`.
 Absent the RPC the `@` trigger is inert — no device FS walk, no local synthesis. Implementation waits on the
 host field; only the shape is planned here.
+
+**Dictation pipeline (ND-5.1–5.9, net-new; extends rec 4.6).** We ship zero dictation today, so this is a new
+surface, not a narrowing of an existing predicate. The approach is a strict **capture → permission →
+insert-as-draft** loop that never crosses the composer's mutation seam. *Capture (ND-5.1):* a new
+`pages/chat/chrome/dictation-overlay.svelte` records the whole take, then on STOP transcribes it once (batch,
+no streaming partial); the only live feedback is an RMS audio-level equalizer + `mm:ss` elapsed (a
+sqrt+gain-scaled meter with an idle floor, polled ~20 Hz) — deliberately not partial text, so there is no
+partial/final reconcile. *Permission (ND-5.3):* `navigator.permissions`/`getUserMedia` is gated BEFORE the
+first record; denial surfaces an actionable message + a Settings deep-link, a failed start tears the track
+down (the OS mic indicator never stays lit), a secure (HTTPS) context is required, and "no model wins" so the
+failure appears before the user speaks a whole take. *Insert-as-draft (ND-5.4, constraint-critical):* the
+transcript is written to the composer draft via `setPrompt` and routed through the SAME `canSendMessage`
+send-gate — identical trust to typing — and NEVER calls submit; STOP = transcribe+insert, CANCEL (Esc/×) =
+discard, a cancelled/superseded take never lands, an insert failure surfaces ("could not insert"), and a
+newer overlay instance is never closed by an older take. This is the discipline that makes on-device STT
+constraint-legal under host-authoritative + fail-closed.
+
+**Fail-closed dictation setup states (ND-5.2, ND-5.5, ND-5.8).** A setup sheet under `pages/chat/chrome/`
+presents the model as a radio list with download progress, a first-class **None/off** row, and a
+dangling-pointer heal (adopt a fresh download only when the current pick has nothing behind it; on delete
+fall back to any on-disk model but never re-adopt over an explicit None); the model is cached in
+IndexedDB/Cache API and corrupt/partial downloads are screened before use. The mic control in
+`composer-tools.svelte` drives two capture modes — tap-to-toggle vs press-and-hold walkie-talkie — with a
+sub-400 ms hold cancelling as an accidental tap, window blur cancelling, and STOP ≠ CANCEL; a mid-dictation
+session switch discards the old take (retarget-cancels) so a transcript never lands in the wrong session's
+draft. On-device STT is ✅ (client interaction, editable draft); it becomes ⚠️ only if audio is shipped to a
+host STT RPC — in which case the recording length is capped below the transport single-frame budget
+(**ND-5.6**), inert until that RPC lands (`007-host-requests`). Paste (**ND-5.7**) only adds a screenshot
+MIME→extension map to the rec 4.5 classifier; the language-hint select (**ND-5.9**) ships only with dictation.
 <!-- /ANCHOR:architecture -->
 
 ---

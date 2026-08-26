@@ -5,10 +5,10 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
+    last_updated_at: "2026-08-26T14:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored the planned-stub doc; no code, no verification run."
-    next_safe_action: "Implement the six recs when the operator says go, then fill this doc."
+    recent_action: "Extended the planned stub with the ten nodeterm status-grouping recs, still no code"
+    next_safe_action: "Implement status-grouped roster alongside recency-sort when the operator says go"
     blockers: []
     completion_pct: 0
 ---
@@ -29,7 +29,8 @@ _memory:
 | Level | 2 |
 | Status | Planned — implementation deferred until the operator says "go" |
 | Requirements planned | REQ-001 … REQ-007 |
-| Host dependency | None — all six recs are ✅ drop-in |
+| Host dependency | Orca six ✅ drop-in · fold-in unread/needs-you axis = host `attention` (⚠️ requested in `007-host-requests`) |
+| nodeterm fold-in | ND-1.1/1.2/1.3/1.4/1.8/1.9/1.10 · ND-2.3/2.4/2.5 — status-grouped list |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -43,6 +44,17 @@ state machine — loading · error+retry · host-too-old · ready — that keeps
 reserved resume slot filled from cache and inert until live (1.10), single-flight Open (1.11), and a
 no-op-safe haptics taxonomy (1.12). All read existing `SessionCardDto` fields or are pure interaction;
 none writes `status` or needs a new host field.
+
+The nodeterm fold-in adds (still planned) a derived status-grouped list: a `buildStatusList` projection into
+fixed, always-present, attention-first sections (`attention → unread → working → idle → unknown`), each with
+a count (ND-1.1/1.2); first-match membership precedence so a running-but-unread session stays under Running
+(ND-1.3/2.3); newest-`updatedAt`-first within-section sort that never fabricates a clock (ND-1.4); header
+counts derived by the same precedence as the rows (ND-1.9); per-id `$derived` card subscription (ND-1.8); a
+device-local recency/status toggle (ND-1.10); and an unread overlay kept device-local and never folded into
+`status` (ND-2.4/2.5). These ship over the existing DTO plus a device-local unread bit; the unread/needs-you
+axis lights up when the host `attention` field lands — ⚠️ already requested in `007-host-requests`, not
+re-requested. The status sections complement orca 1.3's time buckets (sibling `002-list-organization`), an
+orthogonal grouping axis, not a replacement.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -73,6 +85,15 @@ it "no sessions"; a dedicated capability field is an `007-host-requests` item, n
 
 **Presentation only — never write `status`.** Every affordance derives a view from existing fields; the
 resume slot and single-flight disable are local interaction state that never mutates session truth.
+
+**Status sections complement, not replace, time buckets.** The nodeterm status-grouped list (ND-1.1) is an
+orthogonal grouping axis to orca 1.3's time buckets (sibling `002-list-organization`); a device-local toggle
+(ND-1.10) selects flat recency (orca 1.1) or status grouping, fail-closed on parse.
+
+**Unread stays a device-local overlay.** The unread bit is client-only and never folded into `status`
+(ND-2.5); it is set only when the session's chat is not foreground+active (ND-2.4). The Unread section and
+the needs-you part of Attention fail closed to empty until the host `attention` field lands — not
+re-requested, already in `007-host-requests`.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -89,6 +110,9 @@ resume slot and single-flight disable are local interaction state that never mut
 | Token identity | Pending — 0-diff across light/dark/system for any card CSS touched |
 | `test:web` | Pending — green from the final state |
 | a11y-parity | Pending — roster live region / list semantics / focus order preserved |
+| `buildStatusList` precedence/count | Pending — first-match precedence holds; counts equal rows (anti-drift) |
+| status-section sort | Pending — newest-`updatedAt`-first; absent clock sinks, never faked |
+| unread overlay ⟂ status | Pending — unread bit never folded into `status`; recency/status toggle fails closed |
 | `validate.sh --strict` | Pending — exit 0 via realpath |
 <!-- /ANCHOR:verification -->
 
@@ -97,9 +121,11 @@ resume slot and single-flight disable are local interaction state that never mut
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-This is a planning stub; no code exists and no gate has run. The one open dependency is the `host-too-old`
-capability signal (see Decisions) — until it is confirmed, that state folds into `error+retry`. Everything
-else is ✅ drop-in and blocked on nothing. Sibling sub-phases `002-list-organization` and `003-card-polish`
+This is a planning stub; no code exists and no gate has run. Two open dependencies: the `host-too-old`
+capability signal (see Decisions) — until confirmed, that state folds into `error+retry` — and the
+fold-in's unread/needs-you axis, which needs the host `attention` field (⚠️ already requested in
+`007-host-requests`); until it lands the Unread section is present but empty and status-only grouping ships.
+Everything else is ✅ drop-in and blocked on nothing. Sibling sub-phases `002-list-organization` and `003-card-polish`
 decorate this list; `003`'s card-content bundle is the ⚠️ host-dependent work that this sub-phase does not
 carry.
 <!-- /ANCHOR:limitations -->

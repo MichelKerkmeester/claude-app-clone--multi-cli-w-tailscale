@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/005-streaming-ask"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned the eight Angle-5 streaming/ask recs as Level-2 tasks over existing DTO fields."
-    next_safe_action: "Await operator go; then implement PHASE 1 derivations before touching any surface."
+    recent_action: "Folded nodeterm ND-2.6/2.9/6.8 reconciliation notes into the Angle-5 scope."
+    next_safe_action: "Await operator go before implementing the PHASE 1 derivations."
     blockers: []
     completion_pct: 0
 ---
@@ -82,6 +82,15 @@ props it consumes; paste-image upload and its host media lease (the image-previe
 of 5.3 is gated on that and cross-refs `004-composer` / `007-host-requests`); the multi-question ask wizard,
 which needs a host multi-question grouping payload we do not have (⚠️ → `007-host-requests`); the home,
 navigation, and card surfaces owned by the sibling phases.
+
+**nodeterm fold-in (reconciliation over existing fields):** three nodeterm Angle-2/6 findings harden the
+same streaming/ask surfaces — **ND-2.6** (a `running` re-reported within the ~3 s done-holdoff must not
+resurrect a finished turn; only an `epoch`/new-turn advance reopens idle→running — extends orca 4.8 to status
+transitions), **ND-6.8** (a retracted/cleared signal — a dismissed ask, a stopped "Working…" indicator, a
+cleared send-failure — is an edge kept outside the ephemeral view so a reconnect/`sync.gap` can neither lose
+nor resurrect it — reinforces orca 5.5), and **ND-2.9** (a stale/interrupted end is never celebrated as a
+completion — `interrupted` already suppresses it, and the stale-end host end-reason is ⚠️ → `007-host-requests`).
+All are ✅ reconciliation over existing fields except the ND-2.9 end-reason, which is a host ask.
 <!-- /ANCHOR:scope -->
 
 ---

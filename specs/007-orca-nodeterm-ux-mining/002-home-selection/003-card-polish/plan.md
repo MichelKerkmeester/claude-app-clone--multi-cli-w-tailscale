@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/003-card-polish"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned ✅ presentation set + an optional-field gate for the ⚠️ card-content bundle."
-    next_safe_action: "Build the relabel/datetime/decay/dot ✅ set with pure helpers when the operator says go."
+    recent_action: "Planned the always-inline row and extended the field gate to the ND ⚠️ meter set."
+    next_safe_action: "Build the ✅ ND inline row and pure hue/seen-dot/decay helpers on operator go."
     blockers:
       - "The ⚠️ bundle (1.6/2.2/2.3/2.4/2.5-body) renders only once host fields land via 007-host-requests"
     completion_pct: 0
@@ -78,6 +78,27 @@ badge. The `never badge running` rule is enforced in the projection, independent
 
 **No client cache as a source of truth.** The accordion body and any preview come from host fields only;
 synthesizing them from a client transcript cache is explicitly excluded.
+
+**nodeterm fold-in — always-inline detail row (supersedes the accordion).** nodeterm tried the expand-to-peek
+step and removed it: a small card shows an ALWAYS-INLINE detail row (title + activity/preview + context%) and
+reserves a single tap for open. This **SUPERSEDES the orca 2.5 peek-accordion** above — it sidesteps the
+"empty accordion when the host sends no preview" trap, so the ⚠️ preview/activity render inline behind the
+same field gate rather than inside an expandable body (ND-3.8).
+
+**nodeterm fold-in — the extended optional-field gate.** The same optional-field seam widens to the ND ⚠️
+fields, each rendering ONLY when its host field is present and degrading to today's card when absent:
+`contextPercent` draws the fill meter (else nothing), `activity`+`tool` draws the live "activity" line for a
+running card (else the plain working state), `prompt` draws the "You:" turn-opening line (else omitted), and
+`model` rides the same usage payload as `contextPercent`, so the model chip comes bundled with the meter.
+Each is requested in `007-host-requests`; none is invented on the client (ND-3.1/3.2/3.3/3.5).
+
+**nodeterm fold-in — pure presentation wins, no host field.** Three ✅ additions are pure derivations over
+existing fields or device-local state: a deterministic `hueFromId(id)` mark for at-a-glance scanning (ND-3.9);
+a device-local "changed since you looked" dot that persists `lastSeenUpdatedAt` and dots a card whose
+`updatedAt` is newer, fail-closed to no dot when the store is unreadable (ND-3.7); and a stale-decay retuned
+to a 20-minute edge that decays a running card to a stale/unknown *look* — **SUPERSEDES orca 1.8's
+30-min→idle**, never writes `status` (ND-1.6/2.1). The live-state RUNNING badge stays a separate channel from
+this read-state glyph (ND-1.7/3.6), and a running session is never badged as unread.
 <!-- /ANCHOR:architecture -->
 
 ---

@@ -5,10 +5,10 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
+    last_updated_at: "2026-08-26T14:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored the open barrier for the six list-behaviour recs; no evidence yet."
-    next_safe_action: "Fill each barrier with evidence during implementation when the operator says go."
+    recent_action: "Added fail-closed status-grouping barriers beside the orca list-behaviour barriers"
+    next_safe_action: "Fill each status-grouping barrier with evidence when the operator says go"
     blockers: []
     completion_pct: 0
 ---
@@ -49,6 +49,10 @@ interaction tests, `token-identity` for any card CSS touched, `test:web`, and an
   output only.
 - [ ] **CHK-CQ-03** [P1] Order and list-state live in pure functions over the immutable snapshot (the
   cross-cutting guardrail), not inline in the `.svelte` render.
+- [ ] **CHK-CQ-04** [P1] `buildStatusList` and its status-precedence/count derivation live as pure functions
+  over the immutable snapshot (ND-1.1/2.3), not inline in the `.svelte` render.
+- [ ] **CHK-CQ-05** [P1] Each card derives its live status from a per-id `$derived` keyed on that id
+  (ND-1.8), never a whole-roster reactive object, so one flip invalidates only that card.
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -62,6 +66,13 @@ interaction tests, `token-identity` for any card CSS touched, `test:web`, and an
   visibly unresolved (host-too-old / error+retry), never "no sessions".
 - [ ] **CHK-TEST-03** [P0] `token-identity` resolves 0-diff across light/dark/system for any card CSS
   touched, and `test:web` passes from the final state.
+- [ ] **CHK-TEST-04** [P0] First-match precedence is tested — a running-but-unread session stays under
+  Running and is never double-classified (ND-1.3/2.3).
+- [ ] **CHK-TEST-05** [P0] Each section's count is derived by the same precedence function as its rows and
+  asserted equal (anti-drift, ND-1.9); an absent `updatedAt` sinks last and is never rendered as "just now"
+  (ND-1.4).
+- [ ] **CHK-TEST-06** [P1] `token-identity` is 0-diff and `test:web` green for the sectioned roster and the
+  recency/status toggle from the final state.
 <!-- /ANCHOR:testing -->
 
 ---
@@ -83,7 +94,13 @@ interaction tests, `token-identity` for any card CSS touched, `test:web`, and an
 - [ ] **CHK-SEC-01** [P0] Fail-closed: no client-invented session truth, no `status` write, host-too-old
   distinguished from no-sessions; unknown/stale data stays visibly unresolved.
 - [ ] **CHK-SEC-02** [P0] Nothing under `specs/context/**` is touched and no file outside
-  `app-mobile/src/pages/home/**` + the two cited `shared/**` helpers (and their tests) changes.
+  `app-mobile/src/pages/home/**` + the cited `shared/**` helpers (and their tests) changes.
+- [ ] **CHK-SEC-03** [P0] Fail-closed on the unread/needs-you axis: no client-invented attention; the Unread
+  section and the needs-you part of Attention stay empty until the host `attention` field lands (⚠️ already
+  requested in `007-host-requests`, not re-requested), and the unread bit is never folded into `status`
+  (ND-2.5).
+- [ ] **CHK-SEC-04** [P0] The recency/status view toggle is device-local and fails closed on an
+  unreadable/unparseable store (ND-1.10); the host never receives it.
 <!-- /ANCHOR:security -->
 
 ---
@@ -93,6 +110,8 @@ interaction tests, `token-identity` for any card CSS touched, `test:web`, and an
 
 - [ ] **CHK-DOC-01** [P1] `validate.sh <phase> --strict` exits 0 through its realpath from the final state.
 - [ ] **CHK-DOC-02** [P1] No spec path or artifact id was introduced into any code comment (comment hygiene).
+- [ ] **CHK-DOC-03** [P1] Each folded nodeterm rec (ND-1.1/1.2/1.3/1.4/1.8/1.9/1.10 · ND-2.3/2.4/2.5) traces
+  to a task row and a test (traceability).
 <!-- /ANCHOR:docs -->
 
 ---
@@ -104,6 +123,8 @@ interaction tests, `token-identity` for any card CSS touched, `test:web`, and an
   absent (Safari/PWA) and never throws.
 - [ ] **CHK-ORG-02** [P2] The roster's a11y contract (live region, list semantics, focus order) is
   preserved — proven by the a11y-parity check.
+- [ ] **CHK-ORG-03** [P2] The always-present attention-first section headers with counts (ND-1.2) preserve
+  the roster's list semantics / AT tree and focus order — proven by the a11y-parity check.
 <!-- /ANCHOR:file-org -->
 
 ---

@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/005-streaming-ask"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned derivation-first approach; three recs verify-only, two gap-closers, three tighten."
-    next_safe_action: "Await operator go; build the PHASE 1 pure derivations before touching any surface."
+    recent_action: "Added the done-holdoff and edge-vs-self-correcting approach for the ND fold-in."
+    next_safe_action: "Await operator go before building the PHASE 1 derivations."
     blockers: []
     completion_pct: 0
 ---
@@ -77,6 +77,19 @@ verified, not re-engineered. The Review screen already renders approve/deny from
 paused-states guard as defence-in-depth. Named copy (5.8) splits the transcript's single empty state into
 loading/error/empty and routes send failures through an assertive sibling of the polite
 `runtime-status-region`.
+
+**nodeterm fold-in — reconciliation discipline (ND-2.6 / ND-6.8 / ND-2.9).** Three Angle-2/6 findings sharpen
+the host-snapshot reconciliation. A **done-holdoff** guard (ND-2.6, `DONE_HOLDOFF_MS` ≈ 3 s) holds a
+just-finished card through a late out-of-order `running` re-report; only an `epoch`/turn-boundary advance
+reopens idle→running, so a stray post-`done` event never resurrects the turn — the status-transition analogue
+of orca 4.8's "a re-reported identical value must not revert a user pick." An **edge-vs-self-correcting-signal**
+split (ND-6.8) governs `sync.gap`/reconnect handling: a self-correcting sample (a "Working…" tick) is safe to
+drop, since the next one supersedes it, but a *retraction* — a dismissed ask, a stopped indicator, a cleared
+error — is an edge nothing re-announces, so retracted/cleared state is held outside the ephemeral view and
+reconciled from the next snapshot rather than left waiting on a superseding update that never comes
+(reinforces orca 5.5). And a stale/interrupted end is never promoted to a "finished" celebration (ND-2.9):
+`interrupted` already suppresses it; distinguishing a presumed-stale sweep from a natural `idle` needs a host
+end-reason (⚠️ → `007-host-requests`), planned as a gated ask, not faked on the client.
 <!-- /ANCHOR:architecture -->
 
 ---

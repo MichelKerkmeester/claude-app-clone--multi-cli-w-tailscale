@@ -5,10 +5,10 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
+    last_updated_at: "2026-08-26T14:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored the open task ledger for the six list-behaviour recs; nothing built."
-    next_safe_action: "Start T1.1 (sortByRecency helper + differential test) when the operator says go."
+    recent_action: "Added ten nodeterm status-grouping task rows beside the orca list-behaviour ledger"
+    next_safe_action: "Start buildStatusList helper plus its precedence test when the operator says go"
     blockers: []
     completion_pct: 0
 ---
@@ -38,6 +38,16 @@ nothing is implemented until the operator says "go". Each task cites its rec num
   host-too-old ≠ empty — reads `SessionListState` from `shared/state/state.ts`.
 - [ ] **T1.3** Capture the `token-identity` and `test:web` baselines before any `.svelte` edit — records
   the pre-change roster render for the 0-diff comparison.
+- [ ] **T1.4** (ND-1.1/1.2/1.3/2.3) Add a pure `buildStatusList(items, unreadById)` that buckets the roster
+  into fixed, always-present, attention-first sections (`attention → unread → working → idle → unknown`)
+  with first-match membership precedence (`attention → working → unread → idle → unknown`) so a
+  running-but-unread session stays under Running — new `app-mobile/src/shared/format/session-list.ts`, plus a
+  precedence/lattice unit test. Unread/needs-you input is ⚠️ host `attention` (requested in
+  `007-host-requests`); fails closed to an empty Unread section until it lands.
+- [ ] **T1.5** (ND-1.4/1.9) Add within-section newest-`updatedAt`-first sort (absent clock sinks last, never
+  faked as "just now") and per-section counts derived by the SAME precedence function as the rows
+  (anti-drift) — `app-mobile/src/shared/format/session-list.ts`, plus a boundary test on
+  empty/single/equal/absent-clock inputs.
 <!-- /ANCHOR:phase-1 -->
 
 ---
@@ -59,6 +69,21 @@ nothing is implemented until the operator says "go". Each task cites its rec num
 - [ ] **T2.6** (rec 1.12) Add a no-op-safe haptics wrapper (selection · success · error · edge-bump) and
   fire it on pick / open-refresh success / fail-closed error / overscroll — a new `shared/` haptics helper,
   called from `pages/home/screen-home.svelte`.
+- [ ] **T2.7** (ND-1.1/1.2) Render the status-grouped roster from `buildStatusList`: fixed, attention-first
+  section headers with counts, empty sections still shown so the list never jumps — `app-mobile/src/pages/
+  home/screen-home.svelte` (+ `pages/home/empty-state.svelte`). These *status* sections COMPLEMENT orca
+  1.3's *time* buckets (sibling `002-list-organization`), an orthogonal grouping axis, not a replacement.
+- [ ] **T2.8** (ND-1.10) Add a device-local "sort by recency / group by status" toggle, localStorage-backed
+  and fail-closed on parse, selecting orca 1.1's flat recency view or the ND-1.1 status-grouped view — a
+  `shared/` preference helper called from `app-mobile/src/pages/home/screen-home.svelte`; the host never
+  learns it exists.
+- [ ] **T2.9** (ND-1.8) Derive each card's live status from a per-id `$derived` keyed on that id, never a
+  whole-roster reactive object, so one session's flip invalidates only that card —
+  `app-mobile/src/pages/home/screen-home.svelte` (card render).
+- [ ] **T2.10** (ND-2.4/2.5) Carry the unread bit as a pure client device-local overlay, set on a transition
+  to idle/needs-you only when that session's chat is NOT foreground+active ("never mark unread while
+  watching"), never folded into `status` — a `shared/` unread-state helper + `app-mobile/src/pages/home/
+  screen-home.svelte`. ⚠️ the needs-you input is host `attention` (requested in `007-host-requests`).
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -74,6 +99,12 @@ nothing is implemented until the operator says "go". Each task cites its rec num
   resume slot / skeleton, and `test:web` from the final state.
 - [ ] **T3.4** Run the a11y-parity check on the roster (live region, list semantics, focus order preserved)
   and confirm no rec wrote `status` or any session field.
+- [ ] **T3.5** (ND-1.3/2.3) Test first-match membership precedence — a running-but-unread session stays
+  under Running and is never double-classified; membership-priority ≠ display-order holds.
+- [ ] **T3.6** (ND-1.9/1.4) Assert each section count equals its row membership under the same precedence
+  function (anti-drift), and an absent `updatedAt` sinks last and is never rendered as "just now".
+- [ ] **T3.7** (ND-2.5/1.10) Assert no path folds the unread overlay into `status`, and the recency/status
+  toggle fails closed on an unreadable/unparseable store.
 <!-- /ANCHOR:phase-3 -->
 
 ---

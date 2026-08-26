@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/003-chat-message"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned the build approach and quality gates for recs 3.1-3.7 and 6.6."
-    next_safe_action: "On operator go, execute PHASE 1 setup; nothing implemented yet."
+    recent_action: "Added the find-index-decoupled-from-DOM approach for ND-4.1 over the virtual list"
+    next_safe_action: "On operator go, execute PHASE 1 setup; nothing implemented yet"
     blockers: []
     completion_pct: 0
 ---
@@ -93,6 +93,35 @@ without adding a second source of truth:
   is the fallback.
 
 The ❌ set (3.7) is recorded as backlog exclusions with rationale; nothing is implemented for it.
+
+**nodeterm fold (ND-4.x).** Eight message-level findings layer onto the same projection:
+
+- **Find bar — flat index decoupled from the DOM (ND-4.1), load-bearing.** Our list is virtualized
+  (`@tanstack/svelte-virtual`), so off-screen matches are NOT in the DOM and browser find cannot reach them.
+  The find bar therefore builds a flat `SearchSnippet[]` line index over the loaded snapshot when it opens —
+  a model that outlives what is currently mounted — lowercased ONCE per snapshot (not per keystroke), with a
+  1-based `matchIndex` / `matchCount` and `next()` / `prev()` wraparound. `next()` scrolls the virtualizer to
+  match N and highlights it with the existing `<mark>` primitive (`artifacts/text-preview.svelte` /
+  `code-preview.svelte`), rather than relying on the browser's own find. This same
+  flat-model-decoupled-from-mounted-rows pattern is the shared substrate for per-turn scroll (3.1) and
+  jump-to-latest. Searching beyond the loaded snapshot needs a host search RPC / `hasMore` token (⚠️, ties
+  orca 6.4), deferred to `007-host-requests`; snapshot-scoped find ships first. This fills the orca 3.7 gap.
+- **Copy receipt + honesty (ND-4.2, ND-4.3).** `use-copy-feedback.svelte.ts` gains a quantified label
+  ("Copied N lines" / "N chars", one trailing newline stripped, null on empty) and an explicit one-owner /
+  never-green-beside-red invariant, plus a once-per-install `localStorage`-gated "hold to select" coach.
+- **Prose links (ND-4.4).** We are the relay-remote (no client fs) case: `safe-markdown.svelte` opens http(s)
+  URLs external, keeps file paths inert "unavailable" unless routed through the artifact viewer with a host
+  reference (reinforces 6.6), and never resolves a path directly.
+- **Markdown (ND-4.5).** Sanitize-always stays; add per-message-text memoization so a turn-finish does not
+  re-parse the transcript, and raw-text-until-ready so an async-highlighted block never blanks.
+- **Tool folding (ND-4.6).** Native `<details>` one-line folding where a group is a single call+result, null
+  result = in-flight — reinforces the 3.4 recast.
+- **Load taxonomy (ND-4.7).** `screen-chat.svelte`'s empty/error state becomes the 5-state
+  `loading|ok|missing|unsupported|error` split (retryable-or-not); a `missing`/`unsupported`/`error`
+  transcript never renders as an empty conversation and a reload never blanks a rendered `ok` thread —
+  supersedes orca 5.8.
+- **Action menu (ND-4.8).** The long-press menu renders as a body portal (our list is `overflow`-clipped),
+  flips away from the bottom edge, and shows disabled rows with a hint — SAFE read-only actions only.
 <!-- /ANCHOR:architecture -->
 
 ---

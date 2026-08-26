@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/003-chat-message"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned chat message/transcript interactions (recs 3.1-3.7, 6.6); tasks OPEN."
-    next_safe_action: "On operator go, implement PHASE 1 setup for the message-interaction seams."
+    recent_action: "Folded nodeterm ND-4.1-4.8 into the chat message/transcript scope note"
+    next_safe_action: "On operator go, implement PHASE 1 setup for the message-interaction seams"
     blockers: []
     completion_pct: 0
 ---
@@ -30,7 +30,7 @@ _memory:
 | Parent | `007-orca-nodeterm-ux-mining` |
 | Level | 2 |
 | Status | Planned (no implementation until the operator says "go") |
-| Recs covered | 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7 (exclusions), 6.6 |
+| Recs covered | 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7 (exclusions), 6.6; nodeterm ND-4.1-4.8 (ND-4.1 fills 3.7 gap, ND-4.7 supersedes 5.8) |
 | Constraint | Host-authoritative, fail-closed — the client owns no editable session metadata |
 | Barrier | fail-closed (no client-owned session truth) + token-identity 0-diff + a11y-parity preserved + test:web green + every task → a rec |
 <!-- /ANCHOR:metadata -->
@@ -99,6 +99,28 @@ blocked.
 - **REC 3.7 — record the ❌ exclusions as backlog exclusions:** regenerate, reply/quote, edit-and-resend,
   message reactions, a per-message context menu, and in-conversation search. orca native-chat lacks all six;
   they are our gaps, not ports. Recorded here and in §6; no code.
+
+**In scope (nodeterm fold — ND-4.x, all ✅ with a few ⚠️ sub-cases):**
+
+The nodeterm pass (`../research-nodeterm/`, Angle 4) folds eight message-level findings in beside the orca set:
+
+- **ND-4.1 (HEADLINE, new)** — transcript-wide find bar (search-in-conversation): a flat line index decoupled
+  from the virtualized `@tanstack/svelte-virtual` DOM, lowercased once per snapshot, `{i}/{count}` with
+  wraparound and a role-tagged snippet, reusing the `<mark>` primitive; `next()` scrolls the virtualizer to an
+  off-screen match. **Fills the orca 3.7 gap** — in-conversation search moves from a ❌ backlog exclusion to a
+  ✅ shipped bar. Searching beyond the loaded snapshot is a ⚠️ host RPC (ties orca 6.4).
+- **ND-4.2** — quantified copy receipt ("Copied N lines" vs "N chars", strip one trailing newline, null on
+  empty); improves orca 3.3.
+- **ND-4.3** — copy-affordance honesty (one owner per slot, never green beside red, a once-per-install
+  `localStorage`-gated "hold to select" coach).
+- **ND-4.4** — prose link split: we are the relay-remote (no client fs) case, so http(s) URLs open external
+  (✅), file paths stay inert unless routed through the artifact viewer with a host ref (⚠️, reinforces orca
+  6.6), and a path is never resolved directly (❌).
+- **ND-4.5** — markdown = sanitize always + memoize per message text + raw-text-until-ready (never blank).
+- **ND-4.6** — native `<details>` one-line tool folding, null result = in-flight; reinforces orca 3.4.
+- **ND-4.7** — 5-state transcript load taxonomy (`loading|ok|missing|unsupported|error`, retryable-or-not; a
+  reload never blanks a rendered thread). **Supersedes orca 5.8.**
+- **ND-4.8** — portal-with-edge-flip action menu with disabled-plus-hint rows, SAFE read-only actions only.
 
 **Out of scope:**
 

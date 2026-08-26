@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/001-tested-seams"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned six pure-function seams with differential + boundary tests; nothing built."
-    next_safe_action: "Await operator go, then extract the six seams and author their tests (PHASE 1)."
+    recent_action: "Folded eight nodeterm seams into the plan alongside the six orca seams; nothing built."
+    next_safe_action: "Await operator go, then extract the fourteen seams and author their tests (PHASE 1)."
     blockers: []
     completion_pct: 0
 ---
@@ -93,6 +93,32 @@ the test is the proof they are correct the moment that phase wires them.
 Each seam ships with a **differential test** and a **boundary test** (see §4). The scope-guard and
 message-grouping/draft-reconcile extractions route their existing call sites through the new pure entry so
 there is exactly one source of truth.
+
+**Also in scope — nodeterm-derived seams (fold-in, all ✅ pure over existing DTO fields + a device-local
+bit):** eight seams mined from the nodeterm research pass (`../research-nodeterm/research.md`), added
+alongside the six orca seams above, each with its own differential + boundary test:
+
+- **ND-1.1** status-bucketing (`buildStatusList` analog) — flatten the roster and bucket by live `status`
+  into always-present counted sections. Beside `pages/home/screen-home.svelte`.
+- **ND-1.3** first-match membership precedence — attention → working → unread → idle → unknown; a
+  running-but-unread card stays under Running. Beside `screen-home.svelte`.
+- **ND-2.3** unread-aware bucket lattice — membership priority ≠ display order, over `status` + a
+  device-local unread bit. Beside `screen-home.svelte`.
+- **ND-1.11** flattened-list dedup / single-owner — reconcile cache vs live (`SessionListState.source`),
+  emit each `id` once. Beside `screen-home.svelte`.
+- **ND-2.1** stale-decider — decay a `running` card to *Unknown* at 20 min over `updatedAt`, never writing
+  `status`. Beside `shared/format/view-helpers.ts`. **SUPERSEDES orca 1.8** (30-min → idle): a lost agent
+  is unknown, not idle.
+- **ND-2.6** done-holdoff reconciliation — a late `running` within 3 s of `idle` with no new-turn marker is
+  ignored. Beside `shared/state/state.ts`.
+- **ND-2.7** asymmetric idle-rescue — a presumed-idle signal may only downgrade `running`, never clear a
+  needs-you card. Beside `shared/state/state.ts`.
+- **ND-6.1** reconnect-decide — default `undecided`; distrust only live rows, never locally promote a stale
+  `running` to done/idle. Beside `shared/state/state.ts`.
+
+The richer needs-you / approval-vs-question axis (ND-2.2) and an end-reason (ND-2.9) remain ⚠️ host fields
+already **requested in `../007-host-requests`** — not invented here; every seam above reads only existing
+DTO fields plus the device-local unread bit.
 
 **Out of scope:** any view affordance itself (sort UI, buckets UI, filter chrome, stale-decay styling,
 card relabel markup, tool-folding layout, ask-wizard) — those are phases 002–006; any new host field or

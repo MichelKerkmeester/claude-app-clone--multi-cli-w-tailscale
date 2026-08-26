@@ -5,10 +5,10 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
+    last_updated_at: "2026-08-26T14:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned pure helpers + local interaction approach for the six list-behaviour recs."
-    next_safe_action: "Build the sort + list-state helpers with differential tests when the operator says go."
+    recent_action: "Planned the status-grouped-list approach beside the six orca list-behaviour recs"
+    next_safe_action: "Build buildStatusList plus deriveListState pure helpers when the operator says go"
     blockers: []
     completion_pct: 0
 ---
@@ -70,6 +70,24 @@ absent.
 
 **No status writes.** None of these derive a *stored* status; the sort and state derivation read
 `updatedAt`/`status`/`phase` and produce view output only.
+
+**Status-grouped list (nodeterm fold-in).** A third pure seam joins the two above: a
+`buildStatusList(items, unreadById)` in a new `shared/format/session-list.ts` projects the snapshot into
+fixed, always-present, attention-first sections (`attention → unread → working → idle → unknown`), each
+carrying a count. Membership is first-match `attention → working → unread → idle → unknown` (ND-1.3/2.3), so
+a running-but-unread session stays under Running; the same precedence function feeds the header counts, so
+header and rows cannot drift (ND-1.9). Within a section it sorts newest-`updatedAt`-first, sinking an absent
+clock and never fabricating one (ND-1.4). The status sections are an *orthogonal* grouping axis to orca
+1.3's time buckets (sibling `002-list-organization`) — a device-local toggle (ND-1.10, localStorage,
+fail-closed on parse) selects orca 1.1's flat recency view or this status-grouped view. In the render, each
+card derives its live status from a per-id `$derived` keyed on that id, never a whole-roster reactive
+object, so one flip invalidates only that card (ND-1.8).
+
+**Unread is a device-local overlay, never session truth (ND-2.4/2.5).** The unread bit is client-only; it is
+set on a host transition to idle/needs-you only when that session's chat is not foreground+active, and is
+never folded into `status`. The Unread section and the needs-you part of Attention read the host `attention`
+field — ⚠️ already requested in `007-host-requests`, not re-requested. Until it lands the roster fails closed:
+the Unread section is present but empty and status-only grouping ships over the existing DTO.
 <!-- /ANCHOR:architecture -->
 
 ---
@@ -79,17 +97,27 @@ absent.
 
 ### Phase 1 · setup
 Add the pure helpers with their differential/boundary tests: `sortByRecency` (1.1) and `deriveListState`
-(1.9). Establish the token-identity and `test:web` baselines before any `.svelte` edit.
+(1.9). Add `buildStatusList` (ND-1.1/1.2/1.3/2.3) in `shared/format/session-list.ts` with its
+first-match-precedence test, its anti-drift section-count test (ND-1.9), and its never-fake-clock
+within-section sort (ND-1.4). Establish the token-identity and `test:web` baselines before any `.svelte`
+edit.
 
 ### Phase 2 · implementation
 Wire recency-sort into the roster render; extend `empty-state.svelte`/`screen-home.svelte` to render the
 four states keeping prior items on refetch; add pull-to-refresh keeping last-good (1.2); add the
 cache-filled inert resume slot (1.10); add single-flight Open with per-row spinner and `stopPropagation`
-(1.11); add the no-op-safe haptics wrapper and fire it on selection/success/error/edge-bump (1.12).
+(1.11); add the no-op-safe haptics wrapper and fire it on selection/success/error/edge-bump (1.12). Render
+the status-grouped sections — always-present, attention-first, counted (ND-1.1/1.2) — behind a device-local
+recency/status toggle (ND-1.10); derive each card's status from a per-id `$derived` (ND-1.8); carry the
+unread bit as a device-local overlay set only when the session's chat is not foreground+active (ND-2.4),
+never folded into `status` (ND-2.5).
 
 ### Phase 3 · verification
 Run the helper differential/boundary tests, the pull-to-refresh keep-last-good test, the single-flight
 test, `token-identity`, `test:web`, and the a11y-parity check on the roster — all from the final state.
+Also test first-match precedence (running-but-unread stays Running, ND-1.3/2.3), section-count/row
+anti-drift (ND-1.9), the absent-clock-sinks-never-faked sort (ND-1.4), and that the unread overlay never
+writes `status` and the recency/status toggle fails closed (ND-2.5/1.10).
 <!-- /ANCHOR:phases -->
 
 ---
@@ -98,8 +126,10 @@ test, `token-identity`, `test:web`, and the a11y-parity check on the roster — 
 ## 5. TESTING STRATEGY
 
 New unit tests for the two pure helpers (differential vs. a canonical implementation; boundary on
-empty/single/equal/stale/unknown). New interaction tests for keep-last-good on a rejected refresh and for
-single-flight Open. Existing `test:web` proves no roster behaviour regressed; `token-identity` proves the
+empty/single/equal/stale/unknown), plus `buildStatusList` tests for first-match precedence
+(running-but-unread stays Running, ND-1.3/2.3), section-count/row anti-drift (ND-1.9), and the
+absent-clock-sinks-never-faked within-section sort (ND-1.4). New interaction tests for keep-last-good on a
+rejected refresh and for single-flight Open. Existing `test:web` proves no roster behaviour regressed; `token-identity` proves the
 card chrome's rendered values are unchanged; the a11y-parity check proves the list's AT tree and focus
 order are preserved. All run from the final state before the phase closes.
 <!-- /ANCHOR:testing -->

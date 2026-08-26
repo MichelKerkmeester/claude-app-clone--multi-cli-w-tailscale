@@ -1,14 +1,14 @@
 ---
 title: "orca + nodeterm UX mining — implement the verified portable recommendations"
-description: "Phase parent for porting verified, portability-checked UX recommendations from two deep-research runs into the SvelteKit mobile client: orca (research/research.md, ~48 recs, already planned into the seven phases below) and nodeterm (research-nodeterm/, a 10-iteration Luna run in progress). Grouped by area and ordered by leverage and dependency: a tested pure-function foundation, home session-selection UX, chat message/transcript UX, composer UX, streaming and ask/permission hardening, navigation correctness, and a host-protocol request spec for the items that need new host fields. Every ported idea stays host-authoritative and fail-closed; nothing implements until the operator says go."
+description: "Phase parent for porting verified, portability-checked UX recommendations from two research passes into the SvelteKit mobile client, both now folded area-by-area into the seven phases below: orca (research/research.md, ~48 recs) and nodeterm (research-nodeterm/, 58 findings from a manual multi-agent pass). Grouped by area and ordered by leverage and dependency: a tested pure-function foundation, home session-selection UX, chat message/transcript UX, composer UX, streaming and ask/permission hardening, navigation correctness, and a host-protocol request spec for the items that need new host fields. Every ported idea stays host-authoritative and fail-closed; nothing implements until the operator says go."
 contextType: "planning"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Renamed packet to add nodeterm; orca phases planned; nodeterm research starting."
-    next_safe_action: "Run 10-iter nodeterm research (luna-max via cursor); then synthesize + integrate."
+    recent_action: "Folded 58 nodeterm findings into all phases beside the orca recs; plan-only."
+    next_safe_action: "Await operator go; implement the ✅ set, request the new host fields in 007."
     blockers: []
     completion_pct: 0
 ---
@@ -18,7 +18,7 @@ _memory:
 
 # orca + nodeterm UX mining — implementation phase parent
 
-> **Phase links** — orca research: [`research/research.md`](research/research.md) · nodeterm research: `research-nodeterm/` (in progress) · Findings artifacts published separately
+> **Phase links** — orca research: [`research/research.md`](research/research.md) · nodeterm research: `research-nodeterm/` (58 findings, folded into the phases) · Findings artifacts published separately
 
 ---
 
@@ -28,7 +28,7 @@ _memory:
 | Field | Value |
 |---|---|
 | Mode | Phase parent |
-| Source of truth | orca: `research/research.md` (fresh-Opus-verified; ~48 recs, 0 hallucinations) · nodeterm: `research-nodeterm/` (10-iter Luna run, in progress) |
+| Source of truth | orca: `research/research.md` (fresh-Opus-verified; ~48 recs) · nodeterm: `research-nodeterm/` (58 findings, folded into the phases) |
 | Children | `001-tested-seams`, `002-home-selection` (nested), `003-chat-message`, `004-composer`, `005-streaming-ask`, `006-navigation`, `007-host-requests` |
 | Status | Planning (no implementation until the operator says "go") |
 | Constraint | Host-authoritative, fail-closed — the client owns no editable session metadata |

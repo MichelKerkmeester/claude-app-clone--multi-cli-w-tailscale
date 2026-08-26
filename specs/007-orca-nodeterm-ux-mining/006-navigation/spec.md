@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/006-navigation"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned fail-closed nav (6.1-6.5); tasks open; no code touched yet."
-    next_safe_action: "On operator go, implement 6.1 entry re-validation first, then 6.2/6.3/6.5."
+    recent_action: "Added a nodeterm ND-6.1-6.7,6.9 scope note to the fail-closed nav phase"
+    next_safe_action: "On operator go, implement ND-6.1 reconnect-undecided then ND-6.2 drop"
     blockers: []
     completion_pct: 0
 ---
@@ -29,7 +29,7 @@ _memory:
 |---|---|
 | Parent | `007-orca-nodeterm-ux-mining` |
 | Level | 2 |
-| Recs covered | 6.1, 6.2, 6.3, 6.4, 6.5 |
+| Recs covered | 6.1, 6.2, 6.3, 6.4, 6.5 (+ nodeterm ND-6.1-6.7, ND-6.9) |
 | Writer | Claude (plan only; implementation deferred until the operator says go) |
 | Barrier | fail-closed entry re-validation + selection-precedence separation + FAB/arrow split + view-mode store fails closed + token-identity 0-diff + test:web green + a11y-parity + traceability |
 <!-- /ANCHOR:metadata -->
@@ -80,6 +80,30 @@ session truth.
 - **6.5 — Per-session view-mode.** A device-local per-session view-mode preference store that fails closed
   on an unreadable store, mirroring the theme try/catch precedent.
 
+**Folded from nodeterm (Angle 6) — all ✅ pure interaction/logic, strongly fail-closed-aligned:**
+- **ND-6.1 — reconnect defaults to *undecided*.** After the sync socket reconnects, a card the stale snapshot
+  showed as `working` stays `working (stale)` (dimmed via the Live/Stale banner), never flipped to `done`/`idle`
+  locally; a reconnect distrusts only *live* rows (idle-really-working self-corrects). Reinforces orca 1.8;
+  adds the "wrong terminal state = false notification" cost.
+- **ND-6.2 — close-vs-drop.** A host-connection drop greys the chat in place and reconnects the SAME id (never
+  a second view, never a bounce Home); only a user "back" leaves. Reinforces orca 6.2.
+- **ND-6.3 — never hang on a dead connection.** Race any pending open/reconnect/enroll promise against a
+  close-signal + a 60 s timeout, disposing the half-open socket on failure (audit the first-open /
+  enrollment-pending path).
+- **ND-6.4 — the session id is navigation intent, never persisted truth.** A target whose `id`+`epoch` no
+  longer validate prunes to a safe fallback (back Home, "session no longer available"), never a phantom.
+  Reinforces orca 6.1/6.2.
+- **ND-6.5 — warm-reattach vs cold-restore + a restored marker.** On cache hydration show a "showing saved
+  messages / reconnecting…" marker until the live snapshot lands, never blanking the transcript. Reinforces
+  orca 1.10/6.1.
+- **ND-6.6 — `updatedAt` is not liveness.** Pair with `noteRelayHeartbeat()` + the Live/Stale banner; a stale
+  liveness signal ⇒ `unknown`, never `idle`. Reinforces orca 1.8.
+- **ND-6.7 — fail-closed QR/enrollment pairing.** An offer parser that returns a typed null on malformed input
+  (never throws), require-TLS endpoint validation (loopback-only for plaintext), and a single-use token that
+  prompts a fresh code on a dropped enrollment.
+- **ND-6.9 (disciplines only) — strict-id resolution** (never a fuzzy "newest for this context" fallback) and
+  never rendering UI that promises content which didn't load. Reinforces orca 6.1.
+
 **Out of scope:**
 - The per-turn scroll-to-top arrow's own *implementation* (owned by `../003-chat-message`, rec 3.1); this
   phase only guarantees the split.
@@ -87,6 +111,8 @@ session truth.
   (6.4 ⚠️) are requested in `../007-host-requests`, not invented here.
 - orca's chat-vs-terminal view split (❌ — we have no PTY); synthesizing earlier messages from a stale
   client cache across epochs (❌); any client edit of session metadata.
+- The nodeterm handoff / PTY / SSH *mechanism* (ND-6.9 ❌) — the host owns transcripts; the client writes no
+  host files and spawns no agents. Only the two ND-6.9 disciplines above are folded in.
 <!-- /ANCHOR:scope -->
 
 ---

@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/006-navigation"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned the fail-closed nav approach and its proof; no code touched."
-    next_safe_action: "On operator go, implement entry re-validation (6.1) at the route seam first."
+    recent_action: "Extended the plan with undecided-reconnect and connection-boundary hardening"
+    next_safe_action: "On operator go, land ND-6.1 reconnect-undecided at the sync-socket seam"
     blockers: []
     completion_pct: 0
 ---
@@ -89,6 +89,30 @@ default AND marks the preference unresolved, so a later reader cannot mistake "u
 cleared all overrides." `screen-chat.svelte` consumes it; the concrete mode set is minimal today (orca's
 chat-vs-terminal split is ❌ for us), so this ships the fail-closed seam future per-session presentation
 toggles read through.
+
+**Reconnect defaults to *undecided* (ND-6.1, ND-6.5, ND-6.6).** The sync socket already re-pushes a fresh
+snapshot on reconnect and carries `noteRelayHeartbeat()` as a liveness channel distinct from a card's
+`updatedAt`. The plan locks in the fail-closed reconnect discipline: a card the stale snapshot showed as
+`working` stays `working (stale)` — dimmed via the Live/Stale banner — and is never flipped to `done`/`idle`
+locally; only the host's fresh snapshot moves it. The asymmetry is explicit — a reconnect distrusts only *live*
+rows (idle-really-working self-corrects within seconds), so the cost avoided is a false "finished"
+notification, not merely caution. Cache hydration (`use-sync-socket.svelte.ts` reads the read-only cache when
+its cursor is superseded) gains the UX half: a "showing saved messages / reconnecting…" restored marker until
+the live snapshot lands, never blanking the transcript. Liveness is derived from the heartbeat, never from
+`updatedAt` freshness — a stale liveness signal resolves to `unknown`, never `idle`.
+
+**Connection-boundary hardening (ND-6.2, ND-6.3, ND-6.4, ND-6.7, ND-6.9).** Four rules harden the seams orca's
+Angle 6 never touched. (1) Close-vs-drop: a host-connection drop greys the chat in place and reconnects the
+SAME id — never a second view, never a bounce Home; only a user "back" leaves. (2) Never hang: any pending
+open/reconnect/enroll promise races a close-signal + a 60 s timeout and disposes the half-open socket on
+failure, so a dead connection that never errors cannot strand a silent spinner — audit the first-open and
+enrollment-pending paths. (3) Prune-to-fallback: the route id is navigation intent; a target whose `id`+`epoch`
+no longer validate prunes to Home ("session no longer available"), never a phantom, and identity resolves
+strictly by session id (ND-6.9), never a fuzzy "newest for this context" fallback. (4) Fail-closed pairing: the
+enrollment offer parser returns a typed null on malformed input (never throws), the relay endpoint is
+TLS-validated (loopback-only for plaintext), and the pairing token is single-use (a dropped enrollment prompts
+a fresh code). All folded rules are ✅ pure interaction/logic and need no new host field; the nodeterm handoff
+*mechanism* stays a ❌ exclusion — the host owns transcripts.
 <!-- /ANCHOR:architecture -->
 
 ---

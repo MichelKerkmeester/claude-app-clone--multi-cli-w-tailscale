@@ -5,10 +5,10 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
+    last_updated_at: "2026-08-26T14:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned the six ✅ list-behaviour recs (1.1/1.2/1.9/1.10/1.11/1.12); no code."
-    next_safe_action: "Implement recency-sort + pull-to-refresh + list states when the operator says go."
+    recent_action: "Folded ten nodeterm status-grouping recs into the orca list-behaviour scope"
+    next_safe_action: "Build the status-grouped roster helper beside recency-sort when the operator says go"
     blockers: []
     completion_pct: 0
 ---
@@ -33,6 +33,7 @@ _memory:
 | Recs | 1.1 recency-sort · 1.2 pull-to-refresh · 1.9 four-kind list states · 1.10 resume slot · 1.11 single-flight Open · 1.12 haptics |
 | Host dependency | None — all six are ✅ drop-in |
 | Barrier | list-order + keep-last-good + keep-old-on-refetch behaviour proven · single-flight proven · token-identity 0-diff · test:web green · a11y-parity preserved |
+| nodeterm fold-in | ND-1.1/1.2/1.3/1.4/1.8/1.9/1.10 · ND-2.3/2.4/2.5 — status-grouped list; ✅ over existing DTO + device-local unread bit, ⚠️ unread/needs-you axis = host `attention` (requested in 007-host-requests) |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -78,6 +79,37 @@ skeleton state), the change stays behaviour-preserving and is proven by `token-i
 - **1.12 Haptics taxonomy.** Five intents — selection (picker ticks) · success (open/refresh) · error
   (fail-closed) · edge-bump (overscroll) — behind a `navigator.vibrate` wrapper that no-ops when the API
   is absent. Pure interaction.
+
+**In scope — nodeterm status-grouped list (fold-in):**
+- **ND-1.1 / ND-1.2 status-grouped sections.** Model the roster as a derived status-grouped list (a
+  `buildStatusList`-style pure projection) with fixed, always-present, attention-first sections —
+  `attention → unread → working → idle → unknown`, each with a count, headers rendered even when empty so
+  the list never jumps as sessions move. Status maps from the existing DTO (`interrupted → attention`,
+  `running → working`, `idle → idle`, `unknown → unknown`). These *status* sections **complement** orca
+  1.3's *time* buckets (which live in sibling `002-list-organization`); they are orthogonal grouping axes,
+  not a replacement.
+- **ND-1.3 / ND-2.3 first-match precedence ≠ display order.** A pure `sessionStatusGroup(status, unread)`
+  assigns membership first-match `attention → working → unread → idle → unknown`, so a still-running-but-
+  unread session stays under Running and is never double-classified. Membership-priority and display-order
+  are separate orderings in one lattice.
+- **ND-1.4 within-section sort.** Each section sorts newest-transition-first by `updatedAt`; an absent clock
+  sinks last and is never faked as "just now".
+- **ND-1.9 anti-drift counts.** Each section header's count is derived by the same precedence function as
+  the rows, so header and contents can never drift.
+- **ND-1.8 per-id subscription.** Each card derives its live view from a per-id `$derived` keyed on that id,
+  never a whole-roster reactive object, so one session's flip does not invalidate the list.
+- **ND-1.10 two-toggle local preference.** A device-local "sort by recency / group by status" toggle,
+  localStorage-backed and fail-closed on parse; the host never learns it exists. Carries both orca 1.1's
+  flat recency view and the status-grouped view behind one switch.
+- **ND-2.4 / ND-2.5 read-state ⟂ workflow-state.** The unread bit is a pure client device-local overlay,
+  never folded into `status`; it is set on a transition to idle/needs-you only when that session's chat is
+  not foreground+active ("never mark unread while watching").
+
+**⚠️ Host dependency (fold-in):** the *unread / needs-you* axis — the Unread section and the needs-you part
+of Attention in ND-1.2/1.3/2.3/2.4 — needs the host `attention` field, **already requested in
+`007-host-requests`; not re-requested here.** Fail-closed until it lands: the Unread section renders empty
+(always-present), no session is classed unread, and status-only grouping (attention-from-`interrupted` /
+working / idle / unknown) ships over the existing DTO today.
 
 **Out of scope:** any host-field-dependent enrichment (title/preview/agent/attention → `003-card-polish`
 and `007-host-requests`); time-bucket sectioning, filter chips, search, favorite, new-session chrome

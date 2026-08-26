@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/007-host-requests"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned stub written; request-spec scope + Open-Q#1 resolution recorded; nothing built."
-    next_safe_action: "On operator go, hand the request to the relay team; build in the consuming phases."
+    recent_action: "Extended PLANNED stub with 6 nodeterm net-new host requests; still planned, none built."
+    next_safe_action: "On operator go, hand orca+nodeterm request to relay; build in consuming phases."
     blockers:
       - "Host dependency: every requested field/RPC is relay-authored; this phase implements nothing."
     completion_pct: 0
@@ -48,6 +48,13 @@ Nothing is built yet. When authored, this phase will deliver the ⚠️ "Needs h
   [recs 2.4, 1.3, 1.4, 2.6, 1.14, 6.4]
 - **Chat RPCs:** `@`-file-search, image-paste upload lease, host-backed dictation/STT, a typed approval
   envelope (only if the Review ticket doesn't already cover it). [recs 4.2, 4.5, 4.6, 5.6]
+- **Net-new from the nodeterm mining** (`../research-nodeterm/`, deduped against orca): `contextPercent`
+  (0–100, optional — the context-window fill meter; bundle its `model` label with `agent`/`model`; ND-3.1),
+  `activity` (+ raw `tool`) (the live present-tense action line; ND-3.2), `prompt` (the turn's opening "You:"
+  line; ND-3.3), an approval-vs-question sub-kind + end-reason extending the already-requested `attention`
+  (ND-2.2, ND-2.9), a cross-surface read-ack RPC (LOW/optional; ND-2.10), and an optional `stateEnteredAt`
+  transition-clock (LOW/optional/candidate-drop; ND-2.8, ND-1.5). Consuming phase: card fields →
+  `002-home-selection/003-card-polish`, read-ack → `006-navigation`.
 
 Each entry will carry a wire shape, the exact UI it unlocks and its consuming phase, the fail-closed fallback,
 and the wire-compat note. This phase writes no client code — the UI is built later in the consuming phases.
@@ -93,6 +100,13 @@ for a redacted label is Open Question #2 and gates recs 1.3/1.4/2.6.
 **Likely no new approval envelope.** The protocol already carries approval types (`ApprovalResultStatus`,
 `status: 'pending'`, `types.ts:1013,1019`) and a Review surface exists — so rec 5.6's envelope is probably
 already covered; the request marks it confirm-then-drop rather than a new field.
+
+**Bundle `contextPercent` with the model label; extend `attention`, don't re-request it.** The nodeterm mining
+adds `contextPercent` as the single best content-model idea orca never raised, and its `model` label rides the
+SAME usage payload — so the context meter also yields the already-requested `model` chip for free (bundle them).
+The approval-vs-question sub-kind + end-reason are additive sub-fields on the already-requested `attention`
+(referencing nodeterm's `NodeStateChange` shape), NOT a re-request of the base enum. `title`, `agent`/`model`,
+and the base `attention` enum are reinforced by nodeterm and left unchanged.
 <!-- /ANCHOR:decisions -->
 
 ---

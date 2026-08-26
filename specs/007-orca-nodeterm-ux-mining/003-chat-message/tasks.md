@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/003-chat-message"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Wrote the OPEN task ledger for recs 3.1-3.7 and 6.6; nothing implemented."
-    next_safe_action: "On operator go, start T1.1 baselines and seam confirmation."
+    recent_action: "Added OPEN ND-4.1-4.8 task rows beside the orca recs 3.1-3.7, 6.6"
+    next_safe_action: "On operator go, start T1.1 baselines and seam confirmation"
     blockers: []
     completion_pct: 0
 ---
@@ -41,6 +41,17 @@ real app file(s) it will touch. All tasks are OPEN — this is a plan.
 - [ ] **T1.3** Record the REC 3.7 backlog exclusions (regenerate, reply/quote, edit-and-resend, reactions,
   per-message context menu, in-conversation search) with rationale — orca native-chat lacks all six; these
   are our gaps, not ports, and edit/resend + regenerate would be host operations needing host RPCs. [rec: 3.7]
+- [ ] **T1.4** Confirm the find-bar seams for the nodeterm fold: the `@tanstack/svelte-virtual` host and
+  scroll API in `transcript-list.svelte`, the `<mark>` highlight primitive in `artifacts/text-preview.svelte`
+  / `artifacts/code-preview.svelte`, and the existing per-preview `findTerm` pattern in
+  `artifacts/preview-controls.svelte` / `artifacts/artifact-viewer-host.svelte`. ND-4.1 fills the orca 3.7
+  in-conversation-search gap — the find bar supersedes that single ❌ exclusion; the other five 3.7 exclusions
+  stay recorded (T1.3). [rec: ND-4.1 · `pages/chat/transcript/transcript-list.svelte`,
+  `pages/chat/artifacts/text-preview.svelte`, `pages/chat/artifacts/code-preview.svelte`,
+  `pages/chat/artifacts/preview-controls.svelte`, `pages/chat/artifacts/artifact-viewer-host.svelte`]
+- [ ] **T1.5** Baseline `screen-chat.svelte`'s current empty/error state before the 5-state load recast, so a
+  rendered thread must survive a reload. ND-4.7 supersedes orca 5.8. [rec: ND-4.7 ·
+  `pages/chat/screen-chat.svelte`]
 <!-- /ANCHOR:phase-1 -->
 
 ---
@@ -81,6 +92,45 @@ real app file(s) it will touch. All tasks are OPEN — this is a plan.
   as a ⚠️ host field deferred to `007-host-requests`. [rec: 6.6 ·
   `pages/chat/rich-content/safe-markdown.svelte`, `pages/chat/rich-content/rich-content-router.svelte`,
   `pages/chat/artifacts/artifact-viewer-provider.svelte`]
+- [ ] **T2.8** Build the transcript-wide find bar: a flat `SearchSnippet[]` line index built on open,
+  decoupled from the virtualized DOM, lowercased once per snapshot; substring match exposing `matchCount`
+  and a 1-based `matchIndex` with `next()` / `prev()` wraparound and reset-to-first on each new query; a
+  `{i}/{count}` chrome (Enter=next, Shift+Enter=prev, Esc=close) with a role-tagged (`user`/`assistant`/
+  `tool`) snippet of the current match. `next()` scrolls the `@tanstack/svelte-virtual` list to an off-screen
+  match — it never relies on browser find — and reuses the `<mark>` primitive. Search beyond the loaded
+  snapshot is a ⚠️ host search RPC / `hasMore` token deferred to `007-host-requests` (ties orca 6.4). [rec:
+  ND-4.1 · fills the orca 3.7 gap · `pages/chat/transcript/transcript-list.svelte`,
+  `pages/chat/artifacts/text-preview.svelte`, `pages/chat/artifacts/code-preview.svelte`]
+- [ ] **T2.9** Swap `use-copy-feedback.svelte.ts`'s unit-only label for a quantified receipt (multi-line →
+  "Copied N lines", single line → "N chars"), stripping exactly one trailing newline before both counts and
+  returning null on empty / newline-only input; feed both the per-fence copy and the per-answer copy. [rec:
+  ND-4.2 · improves orca 3.3 · `pages/chat/rich-content/use-copy-feedback.svelte.ts`]
+- [ ] **T2.10** Adopt copy-affordance honesty as an explicit invariant: one owner per confirm slot; the green
+  receipt yields to the copy-failure message (never green beside red); a once-per-install, `try/catch`-guarded
+  `localStorage`-gated "hold to select" coach on a drag that produced neither a copy nor a selection. [rec:
+  ND-4.3 · `pages/chat/rich-content/use-copy-feedback.svelte.ts`,
+  `pages/chat/transcript/assistant-actions.svelte`]
+- [ ] **T2.11** Split prose link handling in `safe-markdown.svelte` — we are the relay-remote (no client fs)
+  case: http(s) URLs render tappable open-external (✅); file-path tokens stay inert "unavailable" unless
+  routed through the artifact viewer with a host-supplied stable reference (⚠️, reinforces orca 6.6); a bare
+  local path / URI is never resolved directly (❌). [rec: ND-4.4 · `pages/chat/rich-content/safe-markdown.svelte`,
+  `pages/chat/rich-content/rich-content-router.svelte`, `pages/chat/artifacts/artifact-viewer-provider.svelte`]
+- [ ] **T2.12** Harden the markdown path: sanitize on every render (already enforced by `rich-content/`),
+  memoize the parsed output per message / block text so a turn-finish does not re-parse the whole transcript,
+  and keep raw text on screen until an async-highlighted block is ready — never blank. [rec: ND-4.5 ·
+  `pages/chat/rich-content/safe-markdown.svelte`, `pages/chat/rich-content/card-code.svelte`]
+- [ ] **T2.13** Adopt native `<details>` one-line tool folding where a group is a single call+result, with a
+  null result reading as visibly in-flight (call↔result pairing). [rec: ND-4.6 · reinforces orca 3.4 ·
+  `pages/chat/transcript/collapsed-evidence.svelte`, `pages/chat/transcript/normalized-activity-group.svelte`,
+  `pages/chat/transcript/block.svelte`]
+- [ ] **T2.14** Recast `screen-chat.svelte`'s transcript load state into the 5-state taxonomy
+  (`loading | ok | missing | unsupported | error`), each with its own title / detail and retryable-or-not;
+  `missing` / `unsupported` / `error` never render as an empty conversation and a reload never blanks a
+  rendered `ok` thread. [rec: ND-4.7 · supersedes orca 5.8 · `pages/chat/screen-chat.svelte`]
+- [ ] **T2.15** Render the long-press action menu (copy selection / copy message / copy code) as a body
+  portal edge-flipped away from the viewport bottom, closing on backdrop tap, with disabled rows carrying a
+  hint and only SAFE read-only actions — never a client-owned mutation. [rec: ND-4.8 ·
+  `pages/chat/transcript/transcript-list.svelte`, `pages/chat/chrome/sheet-model-effort.svelte` (pattern)]
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -98,6 +148,15 @@ real app file(s) it will touch. All tasks are OPEN — this is a plan.
   3.2, 3.4, 3.5, 3.6]
 - [ ] **T3.4** `test:web` green and `validate.sh <packet> --strict` exit 0 (via realpath) from the final
   state; confirm every task traces to a rec and the 3.7 exclusions are recorded. [recs: 3.1-3.7, 6.6]
+- [ ] **T3.5** Find-bar navigation proof: `next()` / `prev()` wraparound over the flat index scrolls the
+  `@tanstack/svelte-virtual` list to an off-screen match and highlights it via `<mark>`; the action menu
+  portal flips at the bottom edge and shows disabled rows with a hint. [recs: ND-4.1, ND-4.8]
+- [ ] **T3.6** Fail-closed load / link review: `missing` / `unsupported` / `error` transcripts never render
+  as an empty conversation, a reload never blanks a rendered thread (ND-4.7), and a prose file-path stays
+  inert unless host-referenced (ND-4.4). [recs: ND-4.7, ND-4.4]
+- [ ] **T3.7** token-identity 0-diff + a11y-parity + `test:web` green from the final state for the quantified
+  copy receipt, copy-honesty invariant, memoized markdown, and native `<details>` folding; every ND-4.x task
+  traces to a finding. [recs: ND-4.2, ND-4.3, ND-4.5, ND-4.6]
 <!-- /ANCHOR:phase-3 -->
 
 ---

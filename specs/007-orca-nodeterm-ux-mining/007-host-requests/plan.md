@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/007-host-requests"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Request-spec structure planned; four-facet contract per field/RPC; grounded in real DTOs."
-    next_safe_action: "Author the request tables; hand to relay team; consuming phases build on ship."
+    recent_action: "Added nodeterm additions wire-compat note; new optional fields additive-safe, RPC new."
+    next_safe_action: "Author the nodeterm request rows; hand to relay team; consuming phases build on ship."
     blockers:
       - "Host dependency: the requested fields/RPCs are relay-authored; the plan produces a request, not code."
     completion_pct: 0
@@ -70,6 +70,13 @@ The request is anchored to the real, current shapes so the host team can diff ag
 
 Each request row is written so the fail-closed fallback is the client's CURRENT behaviour — the field's absence
 is never a broken state, only an un-enriched one, and a stale/unknown value stays visibly unresolved.
+
+- **The nodeterm net-new fields are wire-compat by the same asymmetry.** `contextPercent`, `activity`/`tool`,
+  `prompt`, and `stateEnteredAt` are all **additive optional fields on `SessionCardDto`** — a new optional field
+  is additive-safe under the permissive `isSessionCardDto` (`guards.ts:1244`), invisible to an un-updated client.
+  The `attention` sub-kind + end-reason are **additive sub-fields on the already-requested `attention`**, not a
+  new top-level key, so they inherit the same additive-safe guarantee. The cross-surface **read-ack RPC** is a
+  NEW endpoint versioned independently, feature-detected, with a local-only-dismissal fallback when absent.
 <!-- /ANCHOR:architecture -->
 
 ---

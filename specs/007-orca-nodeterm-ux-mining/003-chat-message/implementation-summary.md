@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/003-chat-message"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Wrote the PLANNED implementation-summary stub; no code written."
-    next_safe_action: "Await operator go, then implement PHASE 1 setup."
+    recent_action: "Extended the PLANNED stub with nodeterm ND-4.1-4.8 affordances"
+    next_safe_action: "Await operator go, then implement PHASE 1 setup"
     blockers: []
     completion_pct: 0
 ---
@@ -46,6 +46,20 @@ root (3.5); a safe session action sheet with open / copy-id / refresh that forwa
 slash-commands (3.6); and file-link routing through the existing artifact viewer with an inert "unavailable"
 fallback (6.6). The ❌ set — regenerate, reply/quote, edit-and-resend, reactions, a per-message context menu,
 in-conversation search (3.7) — will be recorded as backlog exclusions, not built.
+
+The nodeterm pass (Angle 4) folds eight message-level affordances in beside the orca set. **ND-4.1
+(headline)** — a transcript-wide find bar driven by a flat line index decoupled from the virtualized
+`@tanstack/svelte-virtual` DOM, lowercased once per snapshot, `{i}/{count}` with wraparound and a role-tagged
+snippet, reusing the `<mark>` primitive; it fills the orca 3.7 in-conversation-search gap, and search beyond
+the loaded snapshot is a deferred ⚠️ host RPC. **ND-4.2/4.3** — a quantified copy receipt ("Copied N lines" /
+"N chars") and a one-owner / never-green-beside-red copy-honesty invariant with a once-per-install coach.
+**ND-4.4** — prose links split URL (open external ✅) from file path (inert unless host-referenced ⚠️, never
+resolved directly ❌) for our relay-remote (no client fs) case. **ND-4.5** — sanitize-always plus
+per-message-text memoization and raw-text-until-ready. **ND-4.6** — native `<details>` folding with null
+result = in-flight. **ND-4.7** — a 5-state (`loading|ok|missing|unsupported|error`) transcript load taxonomy
+that never renders an empty conversation for a `missing`/`unsupported`/`error` read and never blanks a
+reloaded thread, superseding orca 5.8. **ND-4.8** — a body-portal, edge-flipped action menu with
+disabled-plus-hint rows, SAFE read-only actions only.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -112,5 +126,8 @@ rename needs a host RPC (REC 3.6 only dispatches the existing command string), a
 with no host-supplied artifact reference stays inert "unavailable" until the host publishes an authorized
 reference (REC 6.6). The ❌ set (REC 3.7) is recorded as backlog exclusions and is out of orca-copy scope —
 edit/resend and regenerate would be host operations (new turns / fork identity) needing host RPCs and
-reconciliation. This document is a planned stub; no completion is claimed.
+reconciliation. From the nodeterm fold, the find bar (ND-4.1) is snapshot-scoped only — searching beyond the
+loaded transcript window needs a host search RPC / `hasMore` token (⚠️, ties orca 6.4), deferred to
+`007-host-requests`; and a prose file-path link (ND-4.4) stays inert "unavailable" until the host publishes an
+authorized artifact reference. This document is a planned stub; no completion is claimed.
 <!-- /ANCHOR:limitations -->

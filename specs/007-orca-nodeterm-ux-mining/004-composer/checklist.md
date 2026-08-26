@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/004-composer"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned composer recs 4.1–4.8 against real files; barriers defined, all OPEN."
-    next_safe_action: "Await operator go; barriers hold only after Phase 2 implements and Phase 3 proves."
+    recent_action: "Added dictation barriers ND-5.1–5.9; all OPEN."
+    next_safe_action: "Await operator go; dictation barriers hold after Phase 2/3."
     blockers:
       - "rec 4.2 @-file search needs a host file-search RPC (requested in 007-host-requests)."
     completion_pct: 0
@@ -52,6 +52,10 @@ the AT tree by a11y-parity. All barriers are OPEN; nothing is implemented yet.
   suggestions are capped at 12, and rows come only from the host catalog snapshot.
 - [ ] **CHK-CQ-03** [P1] [rec 4.4] The recall sheet is device-local, empty-composer-only, skips empties +
   consecutive dups, and fills (never sends) the draft; storage failure degrades to empty history.
+- [ ] **CHK-CQ-04** [P0] [ND-5.4] Dictation NEVER auto-submits: the transcript only writes the draft via
+  `setPrompt` and routes through the SAME `canSendMessage` send-gate (== typing; the user confirms); STOP ≠
+  CANCEL, a cancelled/superseded take never lands, an insert failure surfaces, and a newer overlay instance is
+  never closed by an older take.
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -65,6 +69,9 @@ the AT tree by a11y-parity. All barriers are OPEN; nothing is implemented yet.
   slash-panel, and attachment suites.
 - [ ] **CHK-TEST-03** [P0] [rec 4.8] Regression tests prove the model/effort sheet refuses to commit with an
   unknown baseline (`current === null`) and does NOT revert a staged pick on an identical host re-report.
+- [ ] **CHK-TEST-04** [P1] [ND-5.1 / ND-5.5] The pure dictation seams (RMS→equalizer scaler, capture-mode
+  state machine with the 400 ms tap-cancel) each have a canonical differential test; a11y-parity holds for the
+  new dictation overlay + setup-sheet dialog semantics, live regions, and focus return.
 <!-- /ANCHOR:testing -->
 
 ---
@@ -72,8 +79,8 @@ the AT tree by a11y-parity. All barriers are OPEN; nothing is implemented yet.
 <!-- ANCHOR:fix-completeness -->
 ## FIX COMPLETENESS
 
-- [ ] **CHK-FIX-01** [P0] Every task in `tasks.md` cites a rec number (4.1–4.8) and the real file it touches;
-  no task is traceless.
+- [ ] **CHK-FIX-01** [P0] Every task in `tasks.md` cites a rec number (4.1–4.8) and the real file it touches
+  (dictation tasks additionally cite an ND-5.x id); no task is traceless.
 - [ ] **CHK-FIX-02** [P1] [rec 4.5] Pending-image chips + paste classification route only through the
   existing attachment draft/lease; no base64 image ever enters a DTO, and paste-image is inert when
   `mediaCapability.enabled` is false.
@@ -91,6 +98,11 @@ the AT tree by a11y-parity. All barriers are OPEN; nothing is implemented yet.
 - [ ] **CHK-SEC-02** [P0] No client-owned or client-edited session metadata is introduced; the composer only
   reads existing DTO fields / host capabilities and requests host-authorized changes. Nothing under
   `specs/context/**`, `scripts/`, the backend, or a sibling phase folder is touched.
+- [ ] **CHK-SEC-03** [P0] [ND-5.3 / ND-5.2] Dictation is fail-closed: mic permission is asked before the
+  first record with an actionable denial + Settings deep-link, a failed start tears the track down (no dead
+  mic), a secure (HTTPS) context is required, and setup surfaces a first-class None/off + model-not-ready
+  states. An on-device transcript is never host truth; audio→host STT (ND-5.6 cap) is ⚠️ and inert until the
+  host STT RPC lands (`007-host-requests`).
 <!-- /ANCHOR:security -->
 
 ---

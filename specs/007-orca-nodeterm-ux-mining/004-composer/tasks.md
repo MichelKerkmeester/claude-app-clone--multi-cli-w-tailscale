@@ -7,10 +7,11 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/004-composer"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned composer recs 4.1–4.8 against real files; no code implemented yet."
-    next_safe_action: "Await operator go, then start T1.1 (extract the recall + @-trigger seams)."
+    recent_action: "Added a nodeterm dictation task block ND-5.1–5.9; all tasks OPEN."
+    next_safe_action: "Await operator go, then start T1.1 and the dictation seams T1.4."
     blockers:
       - "rec 4.2 @-file search needs a host file-search RPC (requested in 007-host-requests); T2.8 is inert until it lands."
+      - "ND-5.6 audio→host STT cap is ⚠️; inert until a host STT RPC lands (007-host-requests)."
     completion_pct: 0
 ---
 
@@ -43,6 +44,10 @@ operator says go.
   (`session-composer.svelte`, `composer-command-autocomplete.svelte`, `composer-tools.svelte`,
   `sheet-model-effort.svelte`, `pages/chat/attachments/*`) before any change, so the pure-relabel/no-regression
   claims have a real starting point.
+- [ ] **T1.4** [rec 4.6 / ND-5.1, ND-5.5] Extract the pure dictation seams: the RMS audio-level →
+  equalizer-bar scaler (sqrt+gain curve, idle floor, ~20 Hz poll) and the capture-mode state machine (toggle
+  vs hold-to-talk, 400 ms accidental-tap cancel, STOP ≠ CANCEL) as pure functions under `shared/`, each with
+  a canonical differential test. Scaling/interaction only — no `getUserMedia` / MediaRecorder yet.
 <!-- /ANCHOR:phase-1 -->
 
 ---
@@ -87,6 +92,42 @@ operator says go.
   debounce, ~16-row cap, generation-counter stale-safety, empty-while-in-flight, query-in → relative-paths-out
   over a NEW host file-search RPC in `shared/commands/*`/`shared/transport/*`. No device FS walk. **BLOCKED**
   on the host RPC (`007-host-requests`); leave inert until it lands.
+
+### Dictation pipeline (net-new from nodeterm — extends rec 4.6; no orca equivalent)
+
+- [ ] **T2.9** [rec 4.6 / ND-5.1, ND-5.4] Build the dictation overlay chrome — a new
+  `pages/chat/chrome/dictation-overlay.svelte` — as a BATCH capture loop (record → STOP → transcribe the
+  whole take once, no streaming partial); the only live feedback is the RMS audio-level equalizer + `mm:ss`
+  elapsed (never partial text, so there is no partial/final reconcile). The transcript is written to the draft
+  via `setPrompt` and routed through the SAME `canSendMessage` send-gate — it NEVER calls submit. STOP =
+  transcribe+insert; CANCEL (Esc/×) = discard; a cancelled/superseded take never lands; an insert failure is
+  surfaced ("could not insert"); a newer overlay instance is never closed by an older take.
+- [ ] **T2.10** [rec 4.6 / ND-5.2] Add a fail-closed dictation setup sheet under `pages/chat/chrome/`:
+  model-download progress, a first-class None/off row, and the dangling-pointer heal (adopt a fresh download
+  only when the current pick has nothing behind it; on delete fall back to any on-disk model but never
+  re-adopt over an explicit None); cache the model in IndexedDB/Cache API and screen corrupt/partial downloads
+  before use. ⚠️ If the STT model is host-hosted, surface "choose / download a model" as sheet states, never a
+  dead mic.
+- [ ] **T2.11** [rec 4.6 / ND-5.3] Gate the mic permission BEFORE the first record via
+  `navigator.permissions` / `getUserMedia`: an actionable denial message + a Settings deep-link, a failed
+  start tears the track down (the OS mic indicator never stays lit), "no model wins" so the failure surfaces
+  before the user speaks, and a secure (HTTPS) context is required. Add the mic control to the composer action
+  row in `pages/chat/chrome/composer-tools.svelte`.
+- [ ] **T2.12** [rec 4.6 / ND-5.5, ND-5.8] Wire the two capture modes to the mic control — tap-to-toggle (tap
+  start, tap stop+insert) vs press-and-hold walkie-talkie (hold to record, release to stop) — with a hold
+  under 400 ms cancelling quietly as an accidental tap, window blur cancelling, and STOP ≠ CANCEL. On a
+  mid-dictation session switch, discard the old take (remount/retarget) so a transcript never lands in the
+  wrong session's draft.
+- [ ] **T2.13** [rec 4.5 / ND-5.7] Extend the rec 4.5 paste classifier (T2.4) with a screenshot
+  MIME→extension map so a clipboard `image/png` blob is named `pasted-<ts>.png` before it enters
+  `attachmentDraft.selectFiles` (`pages/chat/attachments/*`). Reinforces orca 4.5; adds NO new host request.
+- [ ] **T2.14** [rec 4.6 / ND-5.6] ⚠️ ONLY IF audio is ever shipped to a host STT RPC: cap the recording
+  length below the transport single-frame budget (auto-stop fires the same transcribe+insert path, with a
+  "recording capped…" notice). On-device WASM STT keeps a memory ceiling only. BLOCKED on host STT
+  (`007-host-requests`); not built until it lands.
+- [ ] **T2.15** [rec 4.6 / ND-5.9] Ship a per-locale language-hint select (auto-detect default) in the
+  dictation setup sheet, only when dictation ships. Record ND-5.9's absences — prompt-history / `@`-mentions /
+  slash stay orca-owned (recs 4.4 / 4.2 / 4.3) — as exclusions in `spec.md`; do NOT re-propose them.
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -105,8 +146,14 @@ operator says go.
 - [ ] **T3.3** [a11y-parity] The a11y contract is preserved: the composer polite/assertive live regions, the
   slash listbox aria, the new recall/dictation/`@` sheet dialog semantics, and focus return all match the
   pre-change behaviour.
-- [ ] **T3.4** [traceability] Every task cites a rec number (4.1–4.8); `validate.sh <packet> --strict`
-  exits 0 through its realpath.
+- [ ] **T3.4** [traceability] Every task cites a rec number (4.1–4.8); dictation tasks additionally cite an
+  ND-5.x id; `validate.sh <packet> --strict` exits 0 through its realpath.
+- [ ] **T3.5** [fail-closed / ND-5.4, ND-5.3] Prove dictation is constraint-legal and fail-closed: the
+  transcript only writes the draft via `setPrompt` and routes through `canSendMessage` (never auto-submits);
+  STOP ≠ CANCEL, a cancelled/superseded take never lands, an insert failure surfaces, a newer overlay instance
+  is never closed; the mic permission is asked before record with an actionable denial + Settings deep-link, a
+  failed start tears the track down (no dead mic), and a secure context is required. Confirm the composer maps
+  Shift+Enter → newline vs Enter → send (ND-5.9).
 <!-- /ANCHOR:phase-3 -->
 
 ---
@@ -115,9 +162,11 @@ operator says go.
 ## COMPLETION CRITERIA
 
 Every ✅ recommendation (4.1, 4.3, 4.4, 4.6-fallback, 4.7, 4.8) is implemented as pure view state /
-interaction with its tests green; every ⚠️ recommendation (4.2, 4.5-paste, 4.6-host-STT) is either shipped
-inert behind its host capability or deferred to `007-host-requests`; the fail-closed, token-identity,
-test:web, and a11y-parity barriers hold from the final state; and every task traces to a rec number.
+interaction with its tests green; the net-new on-device dictation pipeline (ND-5.1–5.5, 5.7–5.9) ships as an
+editable-draft-no-auto-submit surface that routes through the send-gate; every ⚠️ recommendation (4.2,
+4.5-paste, 4.6-host-STT, ND-5.6 audio→host cap) is either shipped inert behind its host capability or deferred
+to `007-host-requests`; the fail-closed, token-identity, test:web, and a11y-parity barriers hold from the
+final state; and every task traces to a rec number.
 <!-- /ANCHOR:completion -->
 
 ---

@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/006-navigation"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned-state doc written; status Planned; no implementation."
-    next_safe_action: "On operator go, implement 6.1 entry re-validation first, then verify."
+    recent_action: "Extended the planned stub with the nodeterm ND-6.1-6.7,6.9 nav folds"
+    next_safe_action: "On operator go, implement ND-6.1 reconnect-undecided then verify"
     blockers: []
     completion_pct: 0
 ---
@@ -28,7 +28,7 @@ _memory:
 | Parent | `007-orca-nodeterm-ux-mining` |
 | Level | 2 |
 | Status | Planned |
-| Requirements planned | REQ-001 … REQ-006 (recs 6.1-6.5) |
+| Requirements planned | REQ-001 … REQ-006 (recs 6.1-6.5) + nodeterm ND-6.1-6.7, ND-6.9 |
 | Implementation | Deferred until the operator says go |
 <!-- /ANCHOR:metadata -->
 
@@ -47,6 +47,17 @@ retries confined to idempotent activation. The list jump-to-latest FAB in `trans
 distinct from the per-turn scroll-to-top arrow (6.3). Load-earlier will be recorded as not-portable-now
 because the host sends the full redacted snapshot (6.4). A per-session device-local view-mode preference store
 will fail closed on an unreadable store (6.5).
+
+Folded from the nodeterm Angle-6 pass (all ✅ pure interaction/logic, strongly fail-closed-aligned): reconnect
+defaults to *undecided* so a stale `working` card stays `working (stale)` and is never locally promoted to
+`done`/`idle` (ND-6.1); a host-connection drop greys the chat in place and reconnects the same id, never a
+second view or a bounce Home (ND-6.2); any pending open/reconnect/enroll promise races a close-signal + a 60 s
+timeout, never hanging (ND-6.3); a target whose `id`+`epoch` no longer validate prunes to a safe Home fallback,
+never a phantom (ND-6.4); cache hydration shows a "restored" marker until the live snapshot lands (ND-6.5);
+liveness rides the relay heartbeat, never `updatedAt` freshness (ND-6.6); QR/enrollment pairing parses to a
+typed null (never throws), TLS-validates the endpoint, and treats the token as single-use (ND-6.7); and the two
+handoff disciplines — strict-id resolution and never promising content that didn't load — are extracted
+(ND-6.9). The handoff *mechanism* itself is a ❌ exclusion.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -90,6 +101,17 @@ turns from a stale cache across epochs is prohibited.
 **6.5 ships the fail-closed seam, not a new toggle.** orca's chat-vs-terminal split is not portable (no PTY),
 so the concrete mode set is minimal; the value is a per-session device-local store that treats an unreadable
 state as unresolved rather than "no overrides."
+
+**Reconnect is fail-closed by default, not merely cautious (ND-6.1).** Only *live* rows can be stranded by a
+lost event; an idle-really-working card self-corrects. A reconnect therefore distrusts only the live rows, and
+a locally-promoted terminal state is barred — a wrong "finished" costs a false notification. Cache hydration
+marks the view "restored" until the live snapshot lands, and liveness rides the heartbeat, never `updatedAt`.
+
+**The connection-establishment boundary is hardened without a host field (ND-6.2/6.3/6.4/6.7/6.9).**
+Close-vs-drop reconnects in place with the same id; a pending open/reconnect/enroll promise races close + a
+60 s timeout so a dead socket cannot hang; a not-found `id`+`epoch` prunes strictly to Home; and enrollment
+pairing parses to a typed null, TLS-validates, and uses a single-use token. The nodeterm handoff mechanism is
+❌ — the host owns transcripts.
 <!-- /ANCHOR:decisions -->
 
 ---

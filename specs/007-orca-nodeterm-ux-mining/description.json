@@ -1,7 +1,7 @@
 {
   "level": "3",
   "specFolder": "007-orca-nodeterm-ux-mining",
-  "description": "Phase parent for porting verified, portability-checked UX recommendations from two deep-research runs into the SvelteKit mobile client: orca",
+  "description": "Phase parent for porting verified, portability-checked UX recommendations from two research passes into the SvelteKit mobile client, both now folded",
   "keywords": [
     "phase",
     "parent",

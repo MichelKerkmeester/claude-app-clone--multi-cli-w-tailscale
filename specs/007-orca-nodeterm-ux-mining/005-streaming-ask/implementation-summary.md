@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/005-streaming-ask"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Wrote the planned-stub doc for recs 5.1–5.8; status Planned, no code written."
-    next_safe_action: "Await operator go; implement PHASE 1 derivations, then the per-rec surfaces."
+    recent_action: "Extended the planned Angle-5 stub with the ND-2.6/2.9/6.8 fold-in."
+    next_safe_action: "Await operator go before implementing the PHASE 1 derivations."
     blockers: []
     completion_pct: 0
 ---
@@ -47,6 +47,13 @@ empty/loading/error transcript copy with a single assertive send-failure channel
 read existing DTO fields or be pure interaction; none will make the client own session truth. The primary
 surfaces are `pages/chat/transcript/transcript-list.svelte`, `pages/chat/transcript/runtime-status-region.svelte`,
 `pages/chat/features/ask-question/card-ask-question.svelte`, and `shared/transport/use-sync-socket.svelte.ts`.
+
+It will also fold in three nodeterm Angle-2/6 reconciliation findings over these same surfaces: a done-holdoff
+so a late out-of-order `running` never resurrects a finished turn (ND-2.6, extending orca 4.8 to status
+transitions); retracted/cleared signals kept outside the ephemeral view as edges that survive a
+reconnect/`sync.gap` (ND-6.8, reinforcing orca 5.5); and no celebration of a stale/interrupted end as a
+completion (ND-2.9). All three are reconciliation over existing fields except the ND-2.9 stale-end reason,
+which is a deferred host ask (→ `007-host-requests`).
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -84,6 +91,13 @@ than built on invented client grouping.
 Stop is treated as an optional separate affordance, avoiding a duplicated abort path. The partial-text
 indicator is gated strictly on the host running signal plus an actual assistant text block, so no typing
 ghost appears when the host has not reported a running turn.
+
+**Reconcile status transitions with a done-holdoff and an edge-vs-self-correcting split (ND-2.6 / ND-6.8).** A
+`running` re-reported within the ~3 s done-holdoff of an end is held off unless an `epoch`/turn-boundary marks
+a new turn, so a stray post-`done` event never resurrects the turn — the status-transition analogue of orca
+4.8's re-reported-value rule. A retracted signal (dismissed ask, stopped indicator, cleared error) is an edge
+nothing re-announces, so it is held outside the ephemeral view and reconciled from the next snapshot rather
+than left waiting on a superseding update — reinforcing orca 5.5.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -112,6 +126,8 @@ cache of 5.3 depends on paste-image and its media lease (`004-composer` / `007-h
 stepped multi-question ask wizard of 5.5 depends on a host multi-question grouping payload
 (`007-host-requests`). Both are planned as gated tasks. The partial-text indicator (5.2) is only as granular
 as the host's revisioned assistant text blocks — it is not a per-token typing animation, by design, because
-faking token-level progress the host never reported would violate fail-closed. This document is a planned
-stub; no completion is claimed.
+faking token-level progress the host never reported would violate fail-closed. A presumed-stale end is also
+indistinguishable from a natural `idle` in our DTO, so distinguishing it needs a host end-reason (ND-2.9, ⚠️ →
+`007-host-requests`); `interrupted` already suppresses a false "finished" celebration, so only the
+stale-sweep case is deferred. This document is a planned stub; no completion is claimed.
 <!-- /ANCHOR:limitations -->

@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/006-navigation"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Barrier checklist drafted; all items open; no evidence yet."
-    next_safe_action: "On operator go, satisfy CHK-PRE then the code-quality/testing barriers."
+    recent_action: "Added nodeterm ND reconnect, connection, and enrollment barriers, all open"
+    next_safe_action: "On operator go, satisfy the ND-6.1 stale-working barrier first"
     blockers: []
     completion_pct: 0
 ---
@@ -51,6 +51,13 @@ implements until the operator says go.
   epoch guard and awaiting-snapshot barrier. [evidence: T2.2 — planned]
 - [ ] **CHK-CQ-03** [P0] *(6.2)* "selected" / "host-active" / "navigation-requested" are separate states;
   retries are idempotent-activation-only; message-send and Stop are never auto-retried. [evidence: T2.3 — planned]
+- [ ] **CHK-CQ-04** [P0] *(ND-6.1, ND-6.5, ND-6.6)* On reconnect a stale `working` card never flips to
+  `done`/`idle` locally — it stays `working (stale)`, dimmed via the Live/Stale banner; the restored marker
+  holds until the live snapshot; liveness rides `noteRelayHeartbeat()`, never `updatedAt`. [evidence: T2.8 /
+  T2.12 / T2.13 — planned]
+- [ ] **CHK-CQ-05** [P0] *(ND-6.2, ND-6.3)* A host-connection drop greys the chat in place and reconnects the
+  SAME id (no second view, no bounce Home); no open/reconnect/enroll promise hangs without a close-signal +
+  60 s timeout. [evidence: T2.9 / T2.10 — planned]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -63,6 +70,8 @@ implements until the operator says go.
 - [ ] **CHK-TEST-02** [P0] *(6.3)* `token-identity` resolves 0-diff for the transcript-list CSS (the FAB/arrow
   split changes no rendered value). [evidence: T3.2 — planned]
 - [ ] **CHK-TEST-03** [P0] `test:web` passes from the final state. [evidence: T3.1-T3.3 — planned]
+- [ ] **CHK-TEST-04** [P0] The folded reconnect / connection-boundary / enrollment behaviours (ND-6.1-6.7)
+  hold under `test:web` from the final state. [evidence: T3.5-T3.7 — planned]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -89,6 +98,12 @@ implements until the operator says go.
 - [ ] **CHK-SEC-02** [P0] *(6.4)* Load-earlier is recorded as not-portable-now; real paging is deferred to a
   host `hasMore` token; no earlier messages are synthesized from a stale cache across epochs. [evidence:
   T2.6 — planned]
+- [ ] **CHK-SEC-03** [P0] *(ND-6.4, ND-6.9)* A not-found / `id`+`epoch`-invalid target fails closed to Home
+  ("session no longer available"), never a phantom; identity resolves strictly by session id, never a fuzzy
+  "newest for this context" fallback. [evidence: T2.11 / T2.15 — planned]
+- [ ] **CHK-SEC-04** [P0] *(ND-6.7)* The QR/enrollment offer parser returns a typed null (never throws) on
+  malformed input, requires TLS (loopback-only for plaintext), and treats the pairing token as single-use.
+  [evidence: T2.14 — planned]
 <!-- /ANCHOR:security -->
 
 ---
@@ -110,6 +125,8 @@ implements until the operator says go.
   (6.2 true-follow, 6.4 real-paging) are deferred to `../007-host-requests`, not invented. [evidence: T3.4 — planned]
 - [ ] **CHK-ORG-02** [P2] The a11y contract is preserved across the FAB/arrow split and the unavailable-state
   addition (roles, labels, focus, dismissal). [evidence: T3.2 a11y-parity — planned]
+- [ ] **CHK-ORG-03** [P1] Every folded task traces to an ND id (ND-6.1-6.7, ND-6.9); the handoff *mechanism*
+  (ND-6.9) is recorded as a ❌ exclusion, not built. [evidence: T3.8 — planned]
 <!-- /ANCHOR:file-org -->
 
 ---

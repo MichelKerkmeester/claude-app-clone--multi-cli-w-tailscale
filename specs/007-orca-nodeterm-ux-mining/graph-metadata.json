@@ -76,7 +76,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Phase parent for porting verified, portability-checked UX recommendations from two deep-research runs into the SvelteKit mobile client: orca (research/research.md, ~48 recs, already planned into the seven phases below) and nodeterm (research-nodeterm/, a 10-iteration Luna run in progress). Grouped by area and ordered by leverage and dependency: a tested pure-function foundation, home session-selection UX, chat message/transcript UX, composer UX, streaming and ask/permission hardening, navigation correctness, and a host-protocol request spec for the items that need new host fields.",
+    "causal_summary": "Phase parent for porting verified, portability-checked UX recommendations from two research passes into the SvelteKit mobile client, both now folded area-by-area into the seven phases below: orca (research/research.md, ~48 recs) and nodeterm (research-nodeterm/, 58 findings from a manual multi-agent pass).",
     "created_at": "2026-08-26T05:54:46.000Z",
     "last_save_at": "2026-08-26T05:54:46.000Z",
     "save_lineage": "graph_only",
@@ -84,9 +84,9 @@
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:5fe59d36d78bdb19e2c57ec32fe2dcfecb49c144e4a271ffeb82d5eb22ef253d",
+    "source_fingerprint": "sha256:65474715a4455d3370b721775675f6954ace8de1161abe48b1c09291a0e5fa11",
     "source_doc_hashes": {
-      "spec.md": "0f5d14f15377117dc85188690a57e36b8e8c7738bf7111a72ecdb743ecf2c2c0",
+      "spec.md": "5f71c435600ecdee83771fb9303744b0c7b336a763bfa8c5ae19740040e226f1",
       "research/research.md": "69fdbf03c28169035cbf4b00b971d554c53762e5c156c03eed5bef9dacf3bccc"
     },
     "last_active_child_id": null,

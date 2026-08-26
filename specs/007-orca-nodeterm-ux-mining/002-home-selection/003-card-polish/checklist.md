@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/003-card-polish"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored the open barrier for the nine card-polish recs; no evidence yet."
-    next_safe_action: "Fill each barrier with evidence during implementation when the operator says go."
+    recent_action: "Added ND barriers: fail-closed ⚠️ fields, 20-min no-status decay, traceability."
+    next_safe_action: "Fill each ND barrier with evidence during implementation on operator go."
     blockers:
       - "The ⚠️ bundle barriers (1.6/2.2/2.3/2.4/2.5-body) stay open pending host fields in 007-host-requests"
     completion_pct: 0
@@ -50,6 +50,9 @@ and no-client-title tests, `token-identity` for the card CSS, `test:web`, and an
   the client, and no preview is synthesized from a client transcript cache.
 - [ ] **CHK-CQ-03** [P0] The compacted `id` stays the fallback title; no title is ever client-sliced from a
   prompt preamble.
+- [ ] **CHK-CQ-04** [P0] (ND-3.9, ND-3.7) `hueFromId(id)` is a pure deterministic derivation over the opaque
+  `id`; the "changed since you looked" dot is device-local over `lastSeenUpdatedAt`, fail-closed to no dot
+  when the store is unreadable — neither leaks the `id` nor invents a host field.
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -64,6 +67,10 @@ and no-client-title tests, `token-identity` for the card CSS, `test:web`, and an
   today's card; present renders the enrichment.
 - [ ] **CHK-TEST-03** [P0] `token-identity` resolves 0-diff across light/dark/system for the card CSS, and
   `test:web` passes from the final state.
+- [ ] **CHK-TEST-04** [P0] The ND both-ways gate tests pass (`contextPercent` / `activity`+`tool` / `prompt` /
+  `model` absent → today's card; present → meter / activity line / "You:" line / model chip), the 20-minute
+  stale/unknown decay boundary test asserts no `status` write, and the `hueFromId` determinism and seen-dot
+  tests pass — all from the final state.
 <!-- /ANCHOR:testing -->
 
 ---
@@ -76,6 +83,14 @@ and no-client-title tests, `token-identity` for the card CSS, `test:web`, and an
 - [ ] **CHK-FIX-02** [P0] Hide-empty applies ONLY over a host `resumable`/`queuedMessageCount` field; with
   the field absent, zero-turn sessions stay visible (no lossy client hide); the accordion body is inert
   without host `previewMessages[]`.
+- [ ] **CHK-FIX-03** [P0] (ND-1.6/2.1, SUPERSEDES orca 1.8) The stale-decay is retuned to 20 minutes and
+  decays a running card to a stale/unknown *look* — never idle, never a `status` write.
+- [ ] **CHK-FIX-04** [P0] Each ND ⚠️ field degrades to today's card when absent: no meter without
+  `contextPercent`, the plain working state without `activity`, no "You:" line without `prompt`, no model
+  chip without the usage payload.
+- [ ] **CHK-FIX-05** [P0] (ND-3.8, ND-1.7/3.6) The enriched detail row is always-inline (the peek-accordion
+  is dropped), and the live-state RUNNING badge stays orthogonal to the read-state glyph — a running session
+  is never badged as unread.
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -100,6 +115,9 @@ and no-client-title tests, `token-identity` for the card CSS, `test:web`, and an
   `agent`, `queuedMessageCount`/`resumable`, `previewMessages[]`) and the Inbox-`sessionId` question are
   recorded in `007-host-requests`, each with the UI it unlocks and the fail-closed fallback; the
   title-is-a-projection policy note (2.6) is written; no spec path or artifact id is in any code comment.
+- [ ] **CHK-DOC-03** [P1] Every folded ND ⚠️ field (`contextPercent`, `activity`+`tool`, `prompt`) is logged
+  in `007-host-requests` with its UI and fail-closed fallback; ND-3.4/3.5 are recorded reinforce-not-re-request
+  and ND-3.10 as a backlog exclusion; each ND row traces to its rec.
 <!-- /ANCHOR:docs -->
 
 ---
@@ -111,6 +129,9 @@ and no-client-title tests, `token-identity` for the card CSS, `test:web`, and an
   `shared/format/view-helpers.ts`; the optional-field projection stays a single seam, not scattered branches.
 - [ ] **CHK-ORG-02** [P2] The card's a11y contract (badge as labelled status, accordion as an expandable
   region, `<time>` semantics) is preserved — proven by the a11y-parity check.
+- [ ] **CHK-ORG-03** [P2] The context meter, the always-inline detail row, and the hue / seen-dot marks
+  preserve the card's a11y contract (meter as a labelled progress affordance, no role/label regression) —
+  proven by the a11y-parity check.
 <!-- /ANCHOR:file-org -->
 
 ---

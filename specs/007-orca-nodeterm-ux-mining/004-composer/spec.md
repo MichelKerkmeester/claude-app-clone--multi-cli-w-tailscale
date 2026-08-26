@@ -7,10 +7,11 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/004-composer"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned composer recs 4.1–4.8 against real files; no code implemented yet."
-    next_safe_action: "Await operator go, then implement Phase 2 starting with rec 4.1 in session-composer.svelte."
+    recent_action: "Folded nodeterm dictation ND-5.1–5.9 into composer scope; no code yet."
+    next_safe_action: "Await operator go, then implement dictation + recs 4.1–4.8 in composer."
     blockers:
       - "rec 4.2 @-file search needs a host file-search RPC (requested in 007-host-requests); plan the UI now, implement when it lands."
+      - "ND-5.6 audio→host STT cap is ⚠️; inert until a host STT RPC lands (007-host-requests)."
     completion_pct: 0
 ---
 
@@ -90,11 +91,36 @@ sub-pattern (orca's typed-`/model`-into-the-TUI) is explicitly rejected in favou
   relative paths out), reusing the autocomplete overlay. ⚠️ BLOCKED on the host RPC; plan only.
   `pages/chat/chrome/composer-command-autocomplete.svelte`, `shared/commands/*`.
 
+**Also in scope — the net-new on-device dictation pipeline (nodeterm findings ND-5.1 … ND-5.9), extending
+rec 4.6:** we ship zero dictation today (confirmed negative — no `getUserMedia`/speech in `app-mobile/src`),
+and nodeterm owns the one fully-portable composer feature the orca pass only sketched. This phase now adds a
+new dictation overlay under `pages/chat/chrome/` plus a fail-closed setup sheet, feeding
+`session-composer.svelte` via `setPrompt` and a mic control in `pages/chat/chrome/composer-tools.svelte`:
+
+- **ND-5.1** — batch transcribe (record → STOP → transcribe once); live feedback is an RMS audio-level
+  equalizer + `mm:ss`, never partial text (side-steps the partial/final reconcile).
+- **ND-5.2** — fail-closed setup: model-download progress, a first-class None/off row, and dangling-pointer
+  heal; cache the model in IndexedDB/Cache API. ⚠️ becomes host-dependent only if the STT model is hosted.
+- **ND-5.3** — mic permission asked BEFORE the first record; actionable denial + Settings deep-link; a failed
+  start tears the track down; requires a secure (HTTPS) context.
+- **ND-5.4** (constraint-critical) — the transcript is inserted as an EDITABLE DRAFT, no auto-submit, routed
+  through the normal `canSendMessage` send-gate (== typing; the user confirms); discard-on-cancel,
+  insert-failure surfaced, a newer overlay instance never closed by an older take.
+- **ND-5.5** — two capture modes (tap-to-toggle vs press-and-hold); a hold under 400 ms cancels as an
+  accidental tap; STOP ≠ CANCEL; window blur cancels.
+- **ND-5.7** — the paste/drop classifier (rec 4.5) gains a screenshot MIME→extension map only; reinforces
+  orca 4.5's pending-image chips / host media RPC — no re-request.
+- **ND-5.8** — a mid-dictation session switch discards the old take (retarget-cancels).
+
 **Out of scope:** any host RPC contract itself (owned by `007-host-requests`); the actual file-search or STT
 network implementation (⚠️ items ship inert until the host lands the field); orca's typed-`/model`-into-the-TUI
 option pattern (❌, explicitly rejected); any change to backend, `scripts/`, sibling phase folders, or
 `specs/context/**`; base64 media in a DTO (❌); any client-owned/edited session metadata; the streaming,
-ask-card, and navigation recommendations (Angles 5–6, other phases).
+ask-card, and navigation recommendations (Angles 5–6, other phases). Per **ND-5.9**, prompt-history recall,
+`@`-mentions, and slash-suggestion stay orca-owned (recs 4.4 / 4.2 / 4.3) and are NOT re-proposed as nodeterm
+ports; nodeterm has no chat composer, so those surfaces belong to the CLI-in-the-pane there. The **ND-5.6**
+audio→host-STT recording cap is out of scope until a host STT RPC exists (⚠️, `007-host-requests`); on-device
+STT ships without it. The language-hint select (ND-5.9) ships only alongside dictation.
 <!-- /ANCHOR:scope -->
 
 ---

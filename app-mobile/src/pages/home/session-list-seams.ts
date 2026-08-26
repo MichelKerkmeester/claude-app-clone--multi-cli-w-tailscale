@@ -14,34 +14,23 @@
 
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
+import { compactId, timeBucket, type TimeBucket } from '../../shared/format/view-helpers.js';
 import type { ConnectionPhase, SessionListState } from '../../shared/state/state.js';
+
+export type { TimeBucket };
+export { timeBucket };
 
 // ───────────────────────────────────────────────────────────────────
 // 2. TIME BUCKETS AND RECENCY SORT
 // ───────────────────────────────────────────────────────────────────
 
-export type TimeBucket = 'active' | 'today' | 'yesterday' | 'older';
-
-const ACTIVE_WINDOW_MS = 60 * 60_000;
-
-function sameUtcDay(left: Date, right: Date): boolean {
-  return (
-    left.getUTCFullYear() === right.getUTCFullYear() &&
-    left.getUTCMonth() === right.getUTCMonth() &&
-    left.getUTCDate() === right.getUTCDate()
-  );
-}
-
-export function timeBucket(updatedAt: string, now: number): TimeBucket {
-  const updated = new Date(updatedAt);
-  if (Number.isNaN(updated.getTime())) return 'older';
-  const elapsed = now - updated.getTime();
-  if (elapsed < ACTIVE_WINDOW_MS) return 'active';
-  const nowDate = new Date(now);
-  if (sameUtcDay(updated, nowDate)) return 'today';
-  const yesterday = new Date(nowDate);
-  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  return sameUtcDay(updated, yesterday) ? 'yesterday' : 'older';
+/**
+ * Running cards stay in Active even when their clock is older than the
+ * one-hour window, because status is the host's live signal.
+ */
+export function sessionTimeBucket(item: SessionCardDto, now: number): TimeBucket {
+  if (item.status === 'running') return 'active';
+  return timeBucket(item.updatedAt, now);
 }
 
 /** Most recently updated first; ISO timestamps compare lexicographically. */
@@ -78,7 +67,7 @@ export function groupByTimeBucket(
 ): readonly TimeBucketGroup[] {
   const groups = new Map<TimeBucket, SessionCardDto[]>();
   for (const item of items) {
-    const bucket = timeBucket(item.updatedAt, now);
+    const bucket = sessionTimeBucket(item, now);
     const list = groups.get(bucket);
     if (list === undefined) groups.set(bucket, [item]);
     else list.push(item);
@@ -284,4 +273,126 @@ export function buildStatusList(
     const sorted = sortByRecency(buckets[bucket]);
     return { bucket, count: sorted.length, items: sorted };
   });
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 7. ORGANIZE PIPELINE (FILTER × SEARCH × BUCKET × FAVORITE)
+// ───────────────────────────────────────────────────────────────────
+
+export type StatusFilter = 'running' | 'idle' | 'interrupted';
+
+export interface OrganizeInput {
+  readonly filter: StatusFilter | null;
+  readonly query: string;
+  readonly favorites: ReadonlySet<string>;
+  readonly now: number;
+  readonly labels?: ReadonlyMap<string, string>;
+}
+
+export interface TimeListSection {
+  readonly bucket: TimeBucket;
+  readonly count: number;
+  readonly items: readonly SessionCardDto[];
+}
+
+export interface OrganizeResult {
+  readonly items: readonly SessionCardDto[];
+  readonly timeSections: readonly TimeListSection[];
+  readonly statusSections: readonly StatusListSection[];
+}
+
+export const TIME_SECTION_LABELS: Record<TimeBucket, string> = {
+  active: 'Active',
+  today: 'Today',
+  yesterday: 'Yesterday',
+  older: 'Older',
+};
+
+const TIME_DISPLAY_ORDER: readonly TimeBucket[] = ['active', 'today', 'yesterday', 'older'];
+
+/**
+ * Match only data this device already holds: the opaque id, its compact
+ * form, and any device-local label. Host title/preview is never invented.
+ */
+export function matchesClientHeldQuery(
+  item: SessionCardDto,
+  query: string,
+  labels: ReadonlyMap<string, string> = new Map(),
+): boolean {
+  const needle = query.trim().toLowerCase();
+  if (needle.length === 0) return true;
+  if (item.id.toLowerCase().includes(needle)) return true;
+  if (compactId(item.id).toLowerCase().includes(needle)) return true;
+  const label = labels.get(item.id);
+  return label !== undefined && label.toLowerCase().includes(needle);
+}
+
+export function filterRoster(
+  items: readonly SessionCardDto[],
+  filter: StatusFilter | null,
+  query: string,
+  labels: ReadonlyMap<string, string> = new Map(),
+): readonly SessionCardDto[] {
+  return items.filter((item) => {
+    if (filter !== null && item.status !== filter) return false;
+    return matchesClientHeldQuery(item, query, labels);
+  });
+}
+
+/**
+ * Float pinned ids to the front of an already-sorted section without
+ * changing relative order inside the pinned or unpinned groups.
+ */
+export function floatFavorites(
+  items: readonly SessionCardDto[],
+  favorites: ReadonlySet<string>,
+): readonly SessionCardDto[] {
+  if (favorites.size === 0) return items;
+  const pinned: SessionCardDto[] = [];
+  const rest: SessionCardDto[] = [];
+  for (const item of items) {
+    if (favorites.has(item.id)) pinned.push(item);
+    else rest.push(item);
+  }
+  return [...pinned, ...rest];
+}
+
+export function buildTimeList(
+  items: readonly SessionCardDto[],
+  now: number,
+  favorites: ReadonlySet<string> = new Set(),
+): readonly TimeListSection[] {
+  const buckets: Record<TimeBucket, SessionCardDto[]> = {
+    active: [],
+    today: [],
+    yesterday: [],
+    older: [],
+  };
+  for (const item of items) {
+    buckets[sessionTimeBucket(item, now)].push(item);
+  }
+  return TIME_DISPLAY_ORDER.flatMap((bucket) => {
+    const sorted = floatFavorites(sortByRecency(buckets[bucket]), favorites);
+    return sorted.length === 0 ? [] : [{ bucket, count: sorted.length, items: sorted }];
+  });
+}
+
+/**
+ * One composed pipeline over an immutable snapshot: status filter, then
+ * client-held query, then time/status sections with favorites floated
+ * inside each section.
+ */
+export function organize(
+  items: readonly SessionCardDto[],
+  input: OrganizeInput,
+  unreadById: ReadonlySet<string> = new Set(),
+): OrganizeResult {
+  const filtered = filterRoster(items, input.filter, input.query, input.labels ?? new Map());
+  const timeSections = buildTimeList(filtered, input.now, input.favorites);
+  const statusSections = buildStatusList(filtered, unreadById).map((section) => ({
+    ...section,
+    items: floatFavorites(section.items, input.favorites),
+    count: section.count,
+  }));
+  return { items: filtered, timeSections, statusSections };
 }

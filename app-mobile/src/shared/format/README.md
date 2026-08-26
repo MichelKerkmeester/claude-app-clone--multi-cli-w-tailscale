@@ -51,7 +51,7 @@ The folder keeps wording close to the conversion that needs it. Reducers retain 
 | File | Role |
 |---|---|
 | [`format.ts`](./format.ts) | Pure time, number, cost and artifact-size formatters. |
-| [`view-helpers.ts`](./view-helpers.ts) | Route readers, approval loading, theme preference, labels, icons, compact ids, relative time and countdowns. |
+| [`view-helpers.ts`](./view-helpers.ts) | Route readers, approval loading, theme preference, labels, icons, compact ids, relative time, time buckets and countdowns. |
 | [`card-projection.ts`](./card-projection.ts) | Session-card view model and stale-working decay. |
 | [`roster-view-preference.ts`](./roster-view-preference.ts) | Device-local recency versus status grouping preference. |
 | [`attention.ts`](./attention.ts) | Attention Inbox and Web Push endpoint calls with response validation. |

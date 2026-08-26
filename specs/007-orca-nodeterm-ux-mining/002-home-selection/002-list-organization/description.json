@@ -1,9 +1,8 @@
 {
   "level": "2",
   "specFolder": "007-orca-nodeterm-ux-mining/002-home-selection/002-list-organization",
-  "description": "Plan the home list's sectioning and filtering from the verified orca synthesis: time-bucket sections with counts (Active/Today/Yesterday/Older) derived from upd",
+  "description": "Home list sectioning and filtering from the verified orca synthesis: time-bucket sections with counts (Active/Today/Yesterday/Older) derived from updatedAt (1.3",
   "keywords": [
-    "plan",
     "home",
     "list",
     "sectioning",
@@ -13,7 +12,8 @@
     "synthesis",
     "time-bucket",
     "sections",
-    "counts"
+    "counts",
+    "active"
   ],
   "lastUpdated": "2026-08-26T05:54:46.000Z",
   "specId": "002",

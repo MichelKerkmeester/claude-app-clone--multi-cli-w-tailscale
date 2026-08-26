@@ -1,17 +1,16 @@
 ---
 title: "Home list organization — time-bucket sections, status filter chips, search chrome, device-local favorite, new-session chrome"
-description: "Plan the home list's sectioning and filtering from the verified orca synthesis: time-bucket sections with counts (Active/Today/Yesterday/Older) derived from updatedAt (1.3), status filter chips over existing status (1.4), the search-box chrome with two distinct empty states (1.5, chrome ✅ / useful query ⚠️), a device-local favorite as pure view-state that only reorders the local list (1.14), and the 'New session' chrome disabled-until-live (1.13, chrome ✅ / create needs a host RPC ⚠️). The chrome ships now; the two ⚠️ paths — useful search over title/preview and the create RPC — are requested in 007-host-requests and fail closed. Proven behaviour-preserving by token-identity 0-diff, test:web green, and a11y-parity. Plan only."
+description: "Home list sectioning and filtering from the verified orca synthesis: time-bucket sections with counts (Active/Today/Yesterday/Older) derived from updatedAt (1.3), status filter chips over existing status (1.4), the search-box chrome with two distinct empty states (1.5, chrome ✅ / useful query ⚠️), a device-local favorite as pure view-state that only reorders the local list (1.14), and the 'New session' chrome disabled-until-live (1.13, chrome ✅ / create needs a host RPC ⚠️). The chrome shipped; the two ⚠️ paths stay fail-closed."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/002-list-organization"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned time buckets/filter/search-chrome/favorite/new-session chrome (recs 1.3–1.5,1.13,1.14)."
-    next_safe_action: "Implement the ✅ chrome; defer useful-search + create-RPC to 007-host-requests."
-    blockers:
-      - "Useful search (1.5) and session-create (1.13) need host fields/RPC — requested in 007-host-requests; the chrome ships fail-closed without them"
-    completion_pct: 0
+    last_updated_at: "2026-08-26T18:40:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Implemented list-organization chrome over existing DTO fields"
+    next_safe_action: "None — phase implemented; sibling card-polish can decorate the cards"
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -30,7 +29,7 @@ _memory:
 |---|---|
 | Parent | `002-home-selection` |
 | Level | 2 |
-| Status | Planned — implementation deferred until the operator says "go" |
+| Status | Implemented |
 | Recs | 1.3 time buckets · 1.4 status filter chips · 1.5 search chrome · 1.13 new-session chrome · 1.14 device-local favorite |
 | Host dependency | Partial — useful search (1.5) + session-create (1.13) are ⚠️; the chrome and 1.3/1.4/1.14 are ✅ |
 | Barrier | sectioning/filter/favorite behaviour proven · two search empty states distinct · new-session inert-until-live + no client create · token-identity 0-diff · test:web green · a11y-parity |

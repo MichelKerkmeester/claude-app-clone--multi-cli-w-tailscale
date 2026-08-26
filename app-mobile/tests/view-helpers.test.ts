@@ -12,7 +12,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { relativeTimeAt } from '../src/shared/format/view-helpers.js';
+import { compactId, relativeTimeAt, timeBucket } from '../src/shared/format/view-helpers.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. TESTS
@@ -41,5 +41,24 @@ describe('relativeTimeAt', () => {
   it('clamps negative elapsed to the newest label, preserving legacy rendering', () => {
     // A future-dated card reads as recent, never as a negative age.
     expect(relativeTimeAt('2026-08-18T00:00:00.000Z', NOW)).toBe('just now');
+  });
+});
+
+describe('timeBucket', () => {
+  const NOW = Date.parse('2026-08-17T12:00:00.000Z');
+
+  it('assigns active / today / yesterday / older from the injected clock', () => {
+    expect(timeBucket('2026-08-17T11:30:00.000Z', NOW)).toBe('active');
+    expect(timeBucket('2026-08-17T09:00:00.000Z', NOW)).toBe('today');
+    expect(timeBucket('2026-08-16T12:00:00.000Z', NOW)).toBe('yesterday');
+    expect(timeBucket('2026-08-10T12:00:00.000Z', NOW)).toBe('older');
+  });
+
+  it('keeps an unparseable timestamp in the oldest bucket', () => {
+    expect(timeBucket('not-a-date', NOW)).toBe('older');
+  });
+
+  it('does not invent a searchable title from a compact id', () => {
+    expect(compactId('session_clock_001')).toBe('session_clock_001');
   });
 });

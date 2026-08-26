@@ -8,11 +8,12 @@
     readonly loading: boolean;
     readonly error: string | null;
     readonly hostTooOld?: boolean;
+    readonly noMatch?: boolean;
   }
 </script>
 
 <script lang="ts">
-  let { loading, error, hostTooOld = false }: EmptyStateProps = $props();
+  let { loading, error, hostTooOld = false, noMatch = false }: EmptyStateProps = $props();
 
   const heading = $derived(
     hostTooOld
@@ -21,22 +22,39 @@
         ? 'Reading the relay'
         : error !== null
           ? 'Catalog unavailable'
-          : 'No sessions found',
+          : noMatch
+            ? 'No sessions match'
+            : 'No sessions here',
   );
   const body = $derived(
     hostTooOld
       ? 'This relay cannot list sessions. Update the host and retry.'
       : loading
         ? 'The catalog is being read from the relay.'
-        : (error ?? 'The catalog is empty. Start a local Pi session and refresh this view.'),
+        : error !== null
+          ? error
+          : noMatch
+            ? 'Nothing on this device matches that session id. A title search waits on the host.'
+            : 'The catalog is empty. Start a local Pi session and refresh this view.',
   );
   const icon = $derived(loading ? '•••' : hostTooOld ? '△' : error !== null ? '!' : '○');
+  const listKind = $derived(
+    hostTooOld
+      ? 'host-too-old'
+      : loading
+        ? 'loading'
+        : error !== null
+          ? 'error-retry'
+          : noMatch
+            ? 'no-match'
+            : 'empty',
+  );
 </script>
 
 <!-- Component content -->
 <!-- Empty state -->
 <!-- This surface: empty--state — empty/unavailable list state. -->
-<div class="empty--state" data-list-kind={hostTooOld ? 'host-too-old' : loading ? 'loading' : error !== null ? 'error-retry' : 'empty'}>
+<div class="empty--state" data-list-kind={listKind}>
   <span class="empty--icon" aria-hidden="true">
     {icon}
   </span>

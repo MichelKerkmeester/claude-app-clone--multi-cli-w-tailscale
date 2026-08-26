@@ -20,19 +20,25 @@ import {
   BUCKET_MEMBERSHIP_PRIORITY,
   bucketByStatus,
   buildStatusList,
+  buildTimeList,
   dedupSessions,
   deriveListState,
   displayOrderIndex,
+  filterRoster,
+  floatFavorites,
   groupByTimeBucket,
   hostAttentionPresent,
+  organize,
   recencySort,
   sessionStatusGroup,
+  sessionTimeBucket,
   sortByRecency,
   timeBucket,
   type StatusBucket,
   type StatusBucketSection,
   type TimeBucketGroup,
 } from '../src/pages/home/session-list-seams.js';
+import { compactId } from '../src/shared/format/view-helpers.js';
 import type { SessionListState } from '../src/shared/state/state.js';
 
 // ───────────────────────────────────────────────────────────────────
@@ -427,5 +433,180 @@ describe('buildStatusList', () => {
 
   it('does not treat current DTO cards as having a host attention field', () => {
     expect(hostAttentionPresent([card('idle')])).toBe(false);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────
+// 8. ORGANIZE PIPELINE
+// ───────────────────────────────────────────────────────────────────
+
+function canonicalOrganize(
+  items: readonly SessionCardDto[],
+  input: {
+    readonly filter: 'running' | 'idle' | 'interrupted' | null;
+    readonly query: string;
+    readonly favorites: ReadonlySet<string>;
+    readonly now: number;
+    readonly labels?: ReadonlyMap<string, string>;
+  },
+) {
+  const needle = input.query.trim().toLowerCase();
+  const filtered = items.filter((item) => {
+    if (input.filter !== null && item.status !== input.filter) return false;
+    if (needle.length === 0) return true;
+    if (item.id.toLowerCase().includes(needle)) return true;
+    if (compactId(item.id).toLowerCase().includes(needle)) return true;
+    const label = input.labels?.get(item.id);
+    return label !== undefined && label.toLowerCase().includes(needle);
+  });
+  const buckets: Record<'active' | 'today' | 'yesterday' | 'older', SessionCardDto[]> = {
+    active: [],
+    today: [],
+    yesterday: [],
+    older: [],
+  };
+  for (const item of filtered) {
+    const bucket =
+      item.status === 'running' ? 'active' : timeBucket(item.updatedAt, input.now);
+    buckets[bucket].push(item);
+  }
+  const timeSections = (['active', 'today', 'yesterday', 'older'] as const).flatMap((bucket) => {
+    const sorted = sortByRecency(buckets[bucket]);
+    const pinned = sorted.filter((item) => input.favorites.has(item.id));
+    const rest = sorted.filter((item) => !input.favorites.has(item.id));
+    const sectionItems = [...pinned, ...rest];
+    return sectionItems.length === 0
+      ? []
+      : [{ bucket, count: sectionItems.length, items: sectionItems }];
+  });
+  return { items: filtered, timeSections };
+}
+
+describe('sessionTimeBucket', () => {
+  it('keeps a running card in Active even when its clock is old', () => {
+    expect(
+      sessionTimeBucket(card('run', { status: 'running', updatedAt: '2026-08-10T12:00:00.000Z' }), NOW),
+    ).toBe('active');
+  });
+});
+
+describe('organize pipeline', () => {
+  const older = card('old-idle', { status: 'idle', updatedAt: '2026-08-10T12:00:00.000Z' });
+  const today = card('today-idle', { status: 'idle', updatedAt: '2026-08-17T09:00:00.000Z' });
+  const running = card('run-old', { status: 'running', updatedAt: '2026-08-10T12:00:00.000Z' });
+  const interrupted = card('stuck', {
+    status: 'interrupted',
+    updatedAt: '2026-08-16T12:00:00.000Z',
+  });
+
+  it('matches a canonical bucket × filter × favorite composition', () => {
+    const input = {
+      filter: 'idle' as const,
+      query: '',
+      favorites: new Set(['old-idle']),
+      now: NOW,
+    };
+    const items = [older, today, running, interrupted];
+    const actual = organize(items, input);
+    const expected = canonicalOrganize(items, input);
+    expect(actual.items.map((item) => item.id)).toEqual(expected.items.map((item) => item.id));
+    expect(actual.timeSections.map((section) => section.bucket)).toEqual(
+      expected.timeSections.map((section) => section.bucket),
+    );
+    expect(
+      actual.timeSections.map((section) => section.items.map((item) => item.id)),
+    ).toEqual(expected.timeSections.map((section) => section.items.map((item) => item.id)));
+  });
+
+  it('omits empty time buckets and keeps section counts aligned with rows', () => {
+    const sections = buildTimeList([running, older], NOW);
+    expect(sections.map((section) => section.bucket)).toEqual(['active', 'older']);
+    for (const section of sections) {
+      expect(section.count).toBe(section.items.length);
+    }
+  });
+
+  it('keeps an empty list, a single item, and an all-filtered list distinct', () => {
+    expect(organize([], { filter: null, query: '', favorites: new Set(), now: NOW }).items).toEqual(
+      [],
+    );
+    expect(
+      organize([older], { filter: null, query: '', favorites: new Set(), now: NOW }).items.map(
+        (item) => item.id,
+      ),
+    ).toEqual(['old-idle']);
+    expect(
+      organize([older, running], {
+        filter: 'interrupted',
+        query: '',
+        favorites: new Set(),
+        now: NOW,
+      }).items,
+    ).toEqual([]);
+  });
+
+  it('floats a favorite within its section and does not double-count it', () => {
+    const newerOlder = card('older-newer', {
+      status: 'idle',
+      updatedAt: '2026-08-11T12:00:00.000Z',
+    });
+    const result = organize([older, newerOlder], {
+      filter: null,
+      query: '',
+      favorites: new Set(['old-idle']),
+      now: NOW,
+    });
+    const olderSection = result.timeSections.find((section) => section.bucket === 'older');
+    expect(olderSection?.items.map((item) => item.id)).toEqual(['old-idle', 'older-newer']);
+    expect(olderSection?.count).toBe(2);
+  });
+
+  it('filters over existing status and composes with a client-held id query', () => {
+    expect(filterRoster([older, running, interrupted], 'running', '', new Map()).map((item) => item.id)).toEqual(
+      ['run-old'],
+    );
+    const queried = organize([older, running], {
+      filter: null,
+      query: 'run-old',
+      favorites: new Set(),
+      now: NOW,
+    });
+    expect(queried.items.map((item) => item.id)).toEqual(['run-old']);
+  });
+
+  it('does not match a synthesized title that the client does not hold', () => {
+    const result = organize([older], {
+      filter: null,
+      query: 'Weekly planning',
+      favorites: new Set(),
+      now: NOW,
+    });
+    expect(result.items).toEqual([]);
+  });
+
+  it('matches a device-local label without inventing a host title', () => {
+    const labels = new Map([['old-idle', 'desk pin']]);
+    const result = organize([older, running], {
+      filter: null,
+      query: 'desk pin',
+      favorites: new Set(),
+      now: NOW,
+      labels,
+    });
+    expect(result.items.map((item) => item.id)).toEqual(['old-idle']);
+  });
+});
+
+describe('floatFavorites', () => {
+  it('preserves recency inside the pinned group and the unpinned group', () => {
+    const first = card('a', { updatedAt: '2026-08-17T11:00:00.000Z' });
+    const second = card('b', { updatedAt: '2026-08-17T10:00:00.000Z' });
+    const third = card('c', { updatedAt: '2026-08-17T09:00:00.000Z' });
+    const sorted = sortByRecency([third, first, second]);
+    expect(floatFavorites(sorted, new Set(['c', 'a'])).map((item) => item.id)).toEqual([
+      'a',
+      'c',
+      'b',
+    ]);
   });
 });

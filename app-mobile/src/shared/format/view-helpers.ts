@@ -94,6 +94,34 @@ export function relativeTimeAt(value: string, now: number): string {
   return `${Math.round(hours / 24)}d ago`;
 }
 
+export type TimeBucket = 'active' | 'today' | 'yesterday' | 'older';
+
+const ACTIVE_WINDOW_MS = 60 * 60_000;
+
+function sameUtcDay(left: Date, right: Date): boolean {
+  return (
+    left.getUTCFullYear() === right.getUTCFullYear() &&
+    left.getUTCMonth() === right.getUTCMonth() &&
+    left.getUTCDate() === right.getUTCDate()
+  );
+}
+
+/**
+ * Bucket a host clock into Active / Today / Yesterday / Older. An unparseable
+ * timestamp sinks to Older so the helper never invents recency.
+ */
+export function timeBucket(updatedAt: string, now: number): TimeBucket {
+  const updated = new Date(updatedAt);
+  if (Number.isNaN(updated.getTime())) return 'older';
+  const elapsed = now - updated.getTime();
+  if (elapsed < ACTIVE_WINDOW_MS) return 'active';
+  const nowDate = new Date(now);
+  if (sameUtcDay(updated, nowDate)) return 'today';
+  const yesterday = new Date(nowDate);
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  return sameUtcDay(updated, yesterday) ? 'yesterday' : 'older';
+}
+
 /** Legacy clock-reading wrapper kept for existing call sites. */
 function relativeTime(value: string): string {
   return relativeTimeAt(value, Date.now());

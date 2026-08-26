@@ -68,6 +68,7 @@ The component decides how a state value looks. The reducer decides when that val
 | [`todo-model.ts`](./todo-model.ts) | Ordered todo display sections, groups and progress. |
 | [`turns.ts`](./turns.ts) | Conversational turn grouping for ordered transcript blocks. |
 | [`unread-overlay.ts`](./unread-overlay.ts) | Device-local unread/seen overlay that never writes status. |
+| [`favorite-preference.ts`](./favorite-preference.ts) | Device-local pin set that only reorders this device's roster. |
 | [`runtime-issues.ts`](./runtime-issues.ts) | Local copy for allowlisted runtime issue codes. |
 | [`CODE.md`](./CODE.md) | Reducer topology, flow and edit boundaries. |
 

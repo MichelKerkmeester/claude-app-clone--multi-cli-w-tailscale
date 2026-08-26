@@ -1,17 +1,16 @@
 ---
 title: "Home list organization plan — one composed pure pipeline for the ✅ chrome, ⚠️ paths deferred and fail-closed"
-description: "How the sectioning/filtering chrome is built and proven: bucket (1.3), filter (1.4), and favorite (1.14) as one composed pure pipeline over the immutable snapshot (differential-tested); the search box and its two empty states as ✅ chrome matching only client-held data with the useful query deferred to the host (1.5); the 'New session' control as inert-until-live chrome with no client-owned create (1.13). Proven by the pipeline differential tests plus token-identity 0-diff, test:web green, and a11y-parity."
+description: "How the sectioning/filtering chrome is built and proven: bucket (1.3), filter (1.4), and favorite (1.14) as one composed pure pipeline over the immutable snapshot (differential-tested); the search box and its two empty states as ✅ chrome matching only client-held data with the useful query deferred to the host (1.5); the 'New session' control as inert-until-live chrome with no client-owned create (1.13)."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/002-home-selection/002-list-organization"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
-    last_updated_by: "claude-opus-4-8"
-    recent_action: "Planned a composed pure bucket×filter×favorite pipeline + fail-closed search/create chrome."
-    next_safe_action: "Build the bucket/filter/favorite pipeline with differential tests when the operator says go."
-    blockers:
-      - "Useful search (1.5) and session-create (1.13) need host fields/RPC — requested in 007-host-requests"
-    completion_pct: 0
+    last_updated_at: "2026-08-26T18:40:00.000Z"
+    last_updated_by: "cursor-grok-4.6"
+    recent_action: "Implemented the composed bucket-filter-favorite pipeline plus fail-closed chrome"
+    next_safe_action: "None — phase implemented; sibling card-polish can decorate the cards"
+    blockers: []
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: plan-core | v2.2 -->

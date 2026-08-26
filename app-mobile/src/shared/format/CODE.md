@@ -64,7 +64,7 @@ The folder is flat:
 | File | Responsibility |
 |---|---|
 | [`format.ts`](./format.ts) | Time, number, cost and artifact-size formatters. |
-| [`view-helpers.ts`](./view-helpers.ts) | Route, theme, approval, status and copy helpers. |
+| [`view-helpers.ts`](./view-helpers.ts) | Route, theme, approval, status, copy and time-bucket helpers. |
 | [`card-projection.ts`](./card-projection.ts) | Session-card view model and stale-working decay. |
 | [`roster-view-preference.ts`](./roster-view-preference.ts) | Device-local recency/status grouping preference. |
 | [`attention.ts`](./attention.ts) | Attention Inbox and Web Push endpoint calls. |

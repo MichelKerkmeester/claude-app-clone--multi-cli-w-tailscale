@@ -17,6 +17,7 @@
     readonly connection: ConnectionPhase;
     readonly cache: ReadOnlyCache | null;
     readonly device: DeviceIdentity | null;
+    readonly hosts?: readonly string[];
     readonly onSelect: (sessionId: string) => void;
     readonly onRevoke: () => void;
     readonly onLogout: () => void;
@@ -44,6 +45,11 @@
     unreadSetsEqual,
     writeUnreadIds,
   } from '$shared/state/unread-overlay.js';
+  import {
+    readFavoritePreference,
+    toggleFavoriteId,
+    writeFavoriteIds,
+  } from '$shared/state/favorite-preference.js';
   import { fireHaptic } from '$shared/chrome/haptics.js';
   import Button from '$shared/primitives/button/button.svelte';
   import Freshness from './freshness.svelte';
@@ -51,12 +57,14 @@
   import PushSettings from './push-settings.svelte';
   import CardSession from './card-session.svelte';
   import {
-    buildStatusList,
     dedupSessions,
     deriveListState,
     hostAttentionPresent,
+    organize,
     sortByRecency,
     STATUS_SECTION_LABELS,
+    TIME_SECTION_LABELS,
+    type StatusFilter,
   } from './session-list-seams.js';
 
   // ───────────────────────────────────────────────────────────────────
@@ -68,6 +76,7 @@
     connection,
     cache,
     device,
+    hosts = [],
     onSelect,
     onRevoke,
     onLogout,
@@ -92,6 +101,10 @@
   let pullStartY = 0;
   let edgeBumped = false;
   let launchTimer: ReturnType<typeof setTimeout> | null = null;
+  let statusFilter = $state<StatusFilter | null>(null);
+  let searchQuery = $state('');
+  let favoritePref = $state(readFavoritePreference());
+  let selectedHost = $state('');
 
   // ───────────────────────────────────────────────────────────────────
   // 6. DERIVED STATE
@@ -123,11 +136,31 @@
       ? unreadIds
       : new Set<string>(),
   );
-  const statusSections = $derived(buildStatusList(rosterItems, groupingUnread));
-  const recencyItems = $derived(sortByRecency(rosterItems));
-  const showEmpty = $derived(resumeLive === null && listView.items.length === 0);
+  const organized = $derived(
+    organize(
+      rosterItems,
+      {
+        filter: statusFilter,
+        query: searchQuery,
+        favorites: favoritePref.ids,
+        now: Date.now(),
+      },
+      groupingUnread,
+    ),
+  );
+  const statusSections = $derived(organized.statusSections);
+  const timeSections = $derived(organized.timeSections);
+  const catalogEmpty = $derived(resumeLive === null && listView.items.length === 0);
+  const noMatchEmpty = $derived(
+    !catalogEmpty && organized.items.length === 0 && searchQuery.trim().length > 0,
+  );
   const listOpenDisabled = $derived(launchingId !== null);
   const resumeOpenDisabled = $derived(launchingId !== null || connection !== 'live');
+  const hostChoices = $derived(
+    hosts.length > 0 ? hosts : device === null ? [] : [device.hostFingerprint],
+  );
+  const showHostPicker = $derived(hostChoices.length > 1);
+  const newSessionLive = $derived(connection === 'live');
 
   // ───────────────────────────────────────────────────────────────────
   // 7. HELPERS
@@ -174,6 +207,21 @@
   function setGrouping(next: RosterGrouping): void {
     grouping = next;
     writeRosterGrouping(next);
+  }
+
+  function setStatusFilter(next: StatusFilter): void {
+    statusFilter = statusFilter === next ? null : next;
+  }
+
+  function toggleFavorite(sessionId: string): void {
+    if (!favoritePref.available) return;
+    const ids = toggleFavoriteId(favoritePref.ids, sessionId);
+    favoritePref = { available: true, ids };
+    writeFavoriteIds(ids);
+  }
+
+  function handleNewSession(): void {
+    if (!newSessionLive) return;
   }
 
   function onRosterTouchStart(event: TouchEvent): void {
@@ -266,7 +314,7 @@
         <h2 id="session-heading">Recent sessions</h2>
         <p>Opaque identifiers only. No prompts, paths, or host context.</p>
       </div>
-      <div class="roster--toolbar">
+        <div class="roster--toolbar">
         <div class="roster--grouping" role="group" aria-label="Roster grouping">
           <Button
             class="roster--grouping-option"
@@ -283,6 +331,15 @@
             Status
           </Button>
         </div>
+        <Button
+          class="roster--new-session"
+          data-new-session="true"
+          disabled={!newSessionLive}
+          aria-describedby="new-session-unavailable"
+          onclick={handleNewSession}
+        >
+          New session
+        </Button>
         <Button class="roster--refresh" aria-label="Refresh sessions" onclick={() => void refreshRoster()}>
           Refresh
         </Button>
@@ -298,7 +355,65 @@
             ? 'Host too old'
             : `${rosterItems.length} sessions`}
     </div>
-    {#if showEmpty}
+    <p id="new-session-unavailable" class="roster--unavailable">
+      New session stays unavailable until the host can create one.
+    </p>
+    {#if showHostPicker}
+      <label class="roster--host-picker">
+        <span>Host</span>
+        <select
+          value={selectedHost === '' ? (hostChoices[0] ?? '') : selectedHost}
+          aria-label="Host for a new session"
+          onchange={(event) => {
+            selectedHost = event.currentTarget.value;
+          }}
+        >
+          {#each hostChoices as host (host)}
+            <option value={host}>{compactId(host)}</option>
+          {/each}
+        </select>
+      </label>
+    {/if}
+    <div class="roster--filters">
+      <div class="roster--chips" role="group" aria-label="Status filter">
+        <Button
+          class="roster--chip"
+          aria-pressed={statusFilter === 'running'}
+          onclick={() => setStatusFilter('running')}
+        >
+          Active
+        </Button>
+        <Button
+          class="roster--chip"
+          aria-pressed={statusFilter === 'idle'}
+          onclick={() => setStatusFilter('idle')}
+        >
+          Idle
+        </Button>
+        <Button
+          class="roster--chip"
+          aria-pressed={statusFilter === 'interrupted'}
+          onclick={() => setStatusFilter('interrupted')}
+        >
+          Interrupted
+        </Button>
+      </div>
+      <label class="roster--search">
+        <span class="sr-only">Search session ids on this device</span>
+        <input
+          type="search"
+          bind:value={searchQuery}
+          placeholder="Search session id"
+          aria-label="Search session ids on this device"
+          inputmode="search"
+          autocomplete="off"
+        />
+      </label>
+    </div>
+    {#if !favoritePref.available}
+      <p class="roster--favorites-unavailable" role="status">Favorites unavailable</p>
+    {/if}
+    {#if catalogEmpty}
       <EmptyState
         loading={listView.kind === 'loading'}
         error={listView.kind === 'error-retry' ? listView.error : null}
@@ -319,7 +434,13 @@
           />
         </div>
       {/if}
-      {#if grouping === 'status'}
+      {#if noMatchEmpty}
+        <EmptyState
+          loading={false}
+          error={null}
+          noMatch={true}
+        />
+      {:else if grouping === 'status'}
         {#each statusSections as section (section.bucket)}
           <section
             class="status--section"
@@ -332,7 +453,7 @@
             </h3>
             <div class="session--grid" role="list">
               {#each section.items as item (item.id)}
-                <div role="listitem">
+                <div role="listitem" class="roster--row">
                   <CardSession
                     sessionId={item.id}
                     {selectSession}
@@ -342,27 +463,59 @@
                     openDisabled={listOpenDisabled}
                     onOpen={handleOpen}
                   />
+                  <Button
+                    class="roster--favorite"
+                    data-favorite-id={item.id}
+                    aria-pressed={favoritePref.ids.has(item.id)}
+                    aria-label="Pin session"
+                    disabled={!favoritePref.available}
+                    onclick={() => toggleFavorite(item.id)}
+                  >
+                    Pin
+                  </Button>
                 </div>
               {/each}
             </div>
           </section>
         {/each}
       {:else}
-        <div class="session--grid" role="list">
-          {#each recencyItems as item (item.id)}
-            <div role="listitem">
-              <CardSession
-                sessionId={item.id}
-                {selectSession}
-                source={sessions.source}
-                unread={groupingUnread.has(item.id)}
-                {launchingId}
-                openDisabled={listOpenDisabled}
-                onOpen={handleOpen}
-              />
+        {#each timeSections as section (section.bucket)}
+          <section
+            class="time--section"
+            data-time-section={section.bucket}
+            aria-labelledby={`time-heading-${section.bucket}`}
+          >
+            <h3 class="time--heading" id={`time-heading-${section.bucket}`}>
+              {TIME_SECTION_LABELS[section.bucket]}
+              <span data-time-count={section.bucket}>{section.count}</span>
+            </h3>
+            <div class="session--grid" role="list">
+              {#each section.items as item (item.id)}
+                <div role="listitem" class="roster--row">
+                  <CardSession
+                    sessionId={item.id}
+                    {selectSession}
+                    source={sessions.source}
+                    unread={groupingUnread.has(item.id)}
+                    {launchingId}
+                    openDisabled={listOpenDisabled}
+                    onOpen={handleOpen}
+                  />
+                  <Button
+                    class="roster--favorite"
+                    data-favorite-id={item.id}
+                    aria-pressed={favoritePref.ids.has(item.id)}
+                    aria-label="Pin session"
+                    disabled={!favoritePref.available}
+                    onclick={() => toggleFavorite(item.id)}
+                  >
+                    Pin
+                  </Button>
+                </div>
+              {/each}
             </div>
-          {/each}
-        </div>
+          </section>
+        {/each}
       {/if}
     {/if}
   </section>
@@ -759,6 +912,185 @@
     color: var(--accent-ink);
     font-size: 0.78rem;
     font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     4. FILTER, SEARCH, FAVORITE, AND NEW-SESSION CHROME
+  ─────────────────────────────────────────────────────────────────── */
+  /* Inert create control; stays disabled until the connection is live. */
+  :global(.roster--new-session) {
+    min-height: 2.75rem;
+    min-inline-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--new-session[data-disabled='true']) {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  /* Explains why create cannot run on this client. */
+  .roster--unavailable {
+    margin: 0 0 var(--space-4);
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+  }
+
+  /* Host picker is chrome only; it never creates a session. */
+  .roster--host-picker {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+    font-weight: 650;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  .roster--host-picker select {
+    min-height: 2.75rem;
+    min-inline-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.72rem;
+  }
+
+  /* Status chips compose with buckets over the existing status field. */
+  .roster--filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  .roster--chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--chip) {
+    min-height: 2.75rem;
+    min-inline-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--chip[aria-pressed='true']) {
+    background: var(--ink);
+    color: var(--ink-inverse);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--chip[data-hovered]) {
+    border-color: var(--line-strong);
+  }
+
+  /* Labelled search; matches opaque ids on this device only. */
+  .roster--search {
+    display: flex;
+    flex: 1 1 12rem;
+    min-inline-size: 12rem;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  .roster--search input {
+    width: 100%;
+    min-height: 2.75rem;
+    min-inline-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.85rem;
+  }
+
+  /* Unreadable pin store is an explicit unavailable state. */
+  .roster--favorites-unavailable {
+    margin: 0 0 var(--space-4);
+    color: var(--ink-muted);
+    font-size: 0.72rem;
+  }
+
+  /* Pin sits on the row, not inside the open control. */
+  .roster--row {
+    position: relative;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--favorite) {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    z-index: 1;
+    min-height: 2.75rem;
+    min-inline-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink-secondary);
+    font-size: 0.68rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--favorite[aria-pressed='true']) {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--favorite[data-hovered]) {
+    border-color: var(--line-strong);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  :global(.roster--favorite[data-disabled='true']) {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  /* Time buckets omit empty sections; counts match membership. */
+  .time--section {
+    margin-bottom: var(--space-6);
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  .time--heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0 0 var(--space-3);
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    font-weight: 680;
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }

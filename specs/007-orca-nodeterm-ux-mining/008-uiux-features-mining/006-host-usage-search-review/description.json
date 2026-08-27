@@ -1,0 +1,24 @@
+{
+  "specFolder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/006-host-usage-search-review",
+  "description": "Level-2 implementation phase 006-host-usage-search-review of the 008 UI/UX findings for the Pi Remote mobile client.",
+  "keywords": [
+    "level-2",
+    "implementation",
+    "phase",
+    "006-host-usage-search-review",
+    "findings",
+    "remote",
+    "mobile",
+    "client"
+  ],
+  "lastUpdated": "2026-08-27T17:00:58.815Z",
+  "specId": "006",
+  "folderSlug": "host-usage-search-review",
+  "parentChain": [
+    "007-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "2"
+}

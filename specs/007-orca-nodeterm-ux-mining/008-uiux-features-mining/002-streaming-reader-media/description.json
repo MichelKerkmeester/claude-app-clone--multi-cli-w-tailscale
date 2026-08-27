@@ -1,0 +1,24 @@
+{
+  "specFolder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/002-streaming-reader-media",
+  "description": "Level-2 implementation phase 002-streaming-reader-media of the 008 UI/UX findings for the Pi Remote mobile client.",
+  "keywords": [
+    "level-2",
+    "implementation",
+    "phase",
+    "002-streaming-reader-media",
+    "findings",
+    "remote",
+    "mobile",
+    "client"
+  ],
+  "lastUpdated": "2026-08-27T17:00:56.480Z",
+  "specId": "002",
+  "folderSlug": "streaming-reader-media",
+  "parentChain": [
+    "007-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "2"
+}

@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/003-home-switcher-nav-search",
+  "spec_folder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/003-home-switcher-nav-search",
+  "parent_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "home",
+      "surface",
+      "os-level",
+      "waiting",
+      "signal",
+      "one",
+      "flat",
+      "sort",
+      "cannot",
+      "say",
+      "just-finished",
+      "session"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "tasks.md",
+      "spec.md",
+      "plan.md",
+      "checklist.md"
+    ],
+    "entities": [
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Authored Level",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement The",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Give",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "File Path",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Change Type",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Technical Context",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Overview Land",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Live Activity",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Depends On",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Estimated Effort",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Test Type",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Task Format",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "until",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "honest",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "host",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Date",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "The home surface has no OS-level \"N waiting\" signal, one flat sort that cannot say a just-finished session outranks a still-churning one, and a search that matches only the opaque id and never preview text",
+    "created_at": "2026-08-27T17:00:57.262Z",
+    "last_save_at": "2026-08-27T17:00:57.262Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:8df7d80caf59fd1cebe0823d09dd35f498c2aff9d532f681c8ec06b934b32b5b",
+    "source_doc_hashes": {
+      "spec.md": "ff4cfd7ca3971118e85e16333a970c04c2f58bfe0625f9964d37cacff3a320b4",
+      "plan.md": "1a3c11683ff3a49466a4aa643d62ca73d133a6b0e954858a19d05832fd33d84f",
+      "tasks.md": "edc929d0a0f1a9d2dfbb30fb94fb468c3133358cc8b71b23b41e179b54730b99",
+      "checklist.md": "405f5815390626f59f6bf3f17530e90d34b89501c35a146c614c21fafd6e2dea"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

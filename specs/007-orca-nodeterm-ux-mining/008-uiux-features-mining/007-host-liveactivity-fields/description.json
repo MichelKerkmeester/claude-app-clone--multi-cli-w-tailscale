@@ -1,0 +1,24 @@
+{
+  "specFolder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/007-host-liveactivity-fields",
+  "description": "Level-2 implementation phase 007-host-liveactivity-fields of the 008 UI/UX findings for the Pi Remote mobile client.",
+  "keywords": [
+    "level-2",
+    "implementation",
+    "phase",
+    "007-host-liveactivity-fields",
+    "findings",
+    "remote",
+    "mobile",
+    "client"
+  ],
+  "lastUpdated": "2026-08-27T17:00:59.381Z",
+  "specId": "007",
+  "folderSlug": "host-liveactivity-fields",
+  "parentChain": [
+    "007-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "2"
+}

@@ -1071,14 +1071,29 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
+    min-inline-size: 0;
+    min-block-size: 44px;
+    width: 100%;
+    padding-top: var(--space-1);
   }
 
   /* Keep this rule aligned with its surrounding surface. */
-  .composer--left,
-  .composer--right {
+  .composer--left {
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    min-inline-size: 0;
+    flex: 1 1 auto;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  .composer--right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    flex-shrink: 0;
+    margin-inline-start: auto;
   }
 
   /* Keep this rule aligned with its surrounding surface. */
@@ -1096,11 +1111,16 @@
   :global(.composer--primary) {
     display: grid;
     place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    inline-size: 44px;
+    block-size: 44px;
+    width: 2.75rem;
+    height: 2.75rem;
     padding: 0;
     border: 0;
     border-radius: 999px;
+    flex-shrink: 0;
     cursor: pointer;
     transition:
       background var(--duration-state, 120ms) var(--ease-out, ease),
@@ -1138,7 +1158,12 @@
 
   /* This state: later — the secondary "send after this turn" affordance (Button primitive → :global). */
   :global(.composer--later) {
-    min-height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    min-height: 2.75rem;
     padding-inline: var(--space-3);
     border: 1px solid var(--line);
     border-radius: 999px;
@@ -1146,6 +1171,7 @@
     color: var(--ink-secondary);
     font-size: 0.85rem;
     font-weight: 550;
+    flex-shrink: 0;
     cursor: pointer;
   }
 
@@ -1175,12 +1201,6 @@
      read-only and the primary action stays on the first row. */
   @media (max-width: 400px) {
     /* Keep this rule aligned with its surrounding surface. */
-    .composer--bar {
-      flex-wrap: wrap;
-      row-gap: var(--space-1);
-    }
-
-    /* Keep this rule aligned with its surrounding surface. */
     .composer--left {
       flex-wrap: wrap;
       row-gap: var(--space-1);
@@ -1194,12 +1214,14 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
+      gap: var(--space-2);
     }
 
     /* Keep this rule aligned with its surrounding surface. */
     .composer--left {
       min-inline-size: 0;
       flex-wrap: wrap;
+      row-gap: var(--space-1);
     }
   }
 </style>

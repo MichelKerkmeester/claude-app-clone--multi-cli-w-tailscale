@@ -22,6 +22,7 @@ import type { PiImageBridge } from '../attachments/pi-image-bridge.js';
 import type { CommandService, SlashSubmissionVerdict } from '../commands/command-service.js';
 import type { SyncHub } from '../replay/sync.js';
 import type { RpcSupervisor } from '../rpc/supervisor.js';
+import type { SessionEnrichmentService } from '../services/session-enrichment-service.js';
 import type { RelayStore } from '../store/relay-store.js';
 import type { TranscriptProjector } from '../store/transcript-projector.js';
 import { PromptRevisionCoordinator } from './prompt-revision-coordinator.js';
@@ -47,6 +48,7 @@ interface PromptServiceOptions {
     attachmentSetId?: string,
   ) => AttachmentOwner | null;
   readonly revisionCoordinator?: PromptRevisionCoordinator;
+  readonly sessionEnrichment?: SessionEnrichmentService;
 }
 
 /** A slash submission that failed revalidation; never retried and never forwarded. */
@@ -294,6 +296,7 @@ export class PromptService {
     occurredAt: string,
     submissionId: string,
   ): ReturnType<TranscriptProjector['projectSubmittedPrompt']> {
+    this.options.sessionEnrichment?.ingestBlock(identity.sessionId, block);
     const candidate: Envelope = {
       v: 1,
       eventId: `event_${randomUUID()}`,

@@ -731,7 +731,8 @@ function runtimeLevelToken(value: unknown): string | null {
     : null;
 }
 
-function pathFreeToken(value: unknown, max: number): string | null {
+/** Reject path separators and control characters; keep a bounded token. */
+export function pathFreeToken(value: unknown, max: number): string | null {
   const token = boundedToken(value, max);
   if (
     token === null ||
@@ -747,7 +748,11 @@ function pathFreeToken(value: unknown, max: number): string | null {
   return token;
 }
 
-function safeDisplayString(value: unknown, max: number): string | null {
+/**
+ * The only safe way to emit prompt-derived text: strip control/bidi, then
+ * reject urls, filesystem paths, secret assignments, and over-cap values.
+ */
+export function safeDisplayString(value: unknown, max: number): string | null {
   if (typeof value !== 'string') return null;
   const sanitized = value
     // eslint-disable-next-line no-control-regex
@@ -774,7 +779,7 @@ function boundedPositiveInteger(value: unknown): number | null {
     : null;
 }
 
-function boundedNonNegativeNumber(value: unknown): number | null {
+export function boundedNonNegativeNumber(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1_000_000_000
     ? value
     : null;

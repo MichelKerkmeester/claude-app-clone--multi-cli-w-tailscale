@@ -40,6 +40,7 @@ import { SyncHub } from './replay/sync.js';
 import type { AskQuestionCallbackOutcome } from './rpc/demux.js';
 import { RpcSupervisor } from './rpc/supervisor.js';
 import { RuntimeService } from './runtime/runtime-service.js';
+import { SessionEnrichmentService } from './services/session-enrichment-service.js';
 import { SessionCatalog } from './sessions/catalog.js';
 import { RelayStore } from './store/relay-store.js';
 import { getAllowlistedArtifactSnapshot } from './store/artifact-sanitizer.js';
@@ -164,6 +165,9 @@ export async function runRelay(): Promise<() => Promise<void>> {
     sessionId: SESSION_ID,
     mediaEnabled,
   });
+  const sessionEnrichment = new SessionEnrichmentService({
+    getContextWindow: () => runtime.getState()?.model?.contextWindow ?? null,
+  });
   const revisionCoordinator = new PromptRevisionCoordinator();
   const imageBridge = new PiImageBridge({
     supervisor,
@@ -188,6 +192,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
       attachmentSetId === undefined
         ? null
         : attachmentService.getOwnerForDevice(attachmentSetId, deviceId),
+    sessionEnrichment,
   });
   const hostAskQuestionBindings = new Map<string, HostAskQuestionBinding>();
   const pendingAskQuestionHandoffs: PendingAskQuestionHandoff[] = [];
@@ -243,7 +248,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
       askQuestions.present(askQuestion.presentation);
       return;
     }
-    publishPiEvent(store, syncHub, transcriptProjector, event, epoch);
+    publishPiEvent(store, syncHub, transcriptProjector, event, epoch, sessionEnrichment);
     if (event.type === 'agent_start') {
       catalog.register(SESSION_ID, 'running', 0);
       commands.setAvailability('running');
@@ -275,6 +280,7 @@ export async function runRelay(): Promise<() => Promise<void>> {
       : {}),
     prompts,
     runtime,
+    sessionEnrichment,
     askQuestions,
     commands,
     ...(push === undefined ? {} : { push }),
@@ -496,6 +502,7 @@ export function publishPiEvent(
   transcriptProjector: TranscriptProjector,
   event: PiRpcEvent,
   epoch: string,
+  sessionEnrichment?: SessionEnrichmentService,
 ): void {
   if (isAuthoritativeTodoProjectionEvent(event)) return;
   const identity = {
@@ -524,6 +531,7 @@ export function publishPiEvent(
     nextSequence: () => nextProjectedSequence++,
     sessionId: identity.sessionId,
   })) {
+    sessionEnrichment?.ingestBlock(identity.sessionId, block);
     // Store may decline a projection without consuming a sequence.
     const seq = store.nextSequence(identity, epoch);
     syncHub.publish({

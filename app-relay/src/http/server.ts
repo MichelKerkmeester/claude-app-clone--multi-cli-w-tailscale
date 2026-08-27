@@ -72,6 +72,7 @@ import { PiImageBridgeError } from '../attachments/pi-image-bridge.js';
 import type { CommandService } from '../commands/command-service.js';
 import type { SyncHub } from '../replay/sync.js';
 import { RuntimeIssueError, type RuntimeService } from '../runtime/runtime-service.js';
+import type { SessionEnrichmentService } from '../services/session-enrichment-service.js';
 import type { SessionCatalog } from '../sessions/catalog.js';
 import type { RelayStore } from '../store/relay-store.js';
 import type { InboundSecretScanner } from '../store/artifact-sanitizer.js';
@@ -155,6 +156,7 @@ export interface ReadOnlyServerOptions {
   };
   readonly prompts?: PromptService;
   readonly runtime?: RuntimeService;
+  readonly sessionEnrichment?: SessionEnrichmentService;
   readonly askQuestions?: AskQuestionService;
   readonly commands?: CommandService;
   readonly push?: PushService;
@@ -784,10 +786,12 @@ async function handleHttp(
     const sessions = options.catalog.list().map((card) => {
       const hostClass = options.push?.latestAttentionClass(card.id) ?? undefined;
       const attention = hostClass !== undefined ? ATTENTION_CLASS_TO_CARD[hostClass] : undefined;
+      const derived = options.sessionEnrichment?.getEnrichment(card.id) ?? {};
       const enriched: SessionCardDto = {
         ...card,
         ...(cardLabel === undefined || cardLabel === null ? {} : { model: cardLabel }),
         ...(attention === undefined ? {} : { attention }),
+        ...derived,
       };
       return isSessionCardDto(enriched) ? enriched : card;
     });

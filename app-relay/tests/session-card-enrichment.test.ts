@@ -22,6 +22,7 @@ import { AuthService } from '../src/auth/auth-service.js';
 import { startReadOnlyServer, type RunningReadOnlyServer } from '../src/http/server.js';
 import { PushService } from '../src/push/push-service.js';
 import { SyncHub } from '../src/replay/sync.js';
+import { SessionEnrichmentService } from '../src/services/session-enrichment-service.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
 import type { RuntimeService } from '../src/runtime/runtime-service.js';
@@ -29,6 +30,15 @@ import type { RuntimeService } from '../src/runtime/runtime-service.js';
 const ORIGIN = 'https://pi-remote.example.ts.net';
 const PRINCIPAL = 'operator@example.com';
 const SERVE_SECRET = 'serve_0123456789abcdefghijklmnopqrstuvwxyz';
+const SESSION_ID = 'session_local';
+const DERIVED_FIELDS = [
+  'title',
+  'prompt',
+  'lastMessagePreview',
+  'previewMessages',
+  'tool',
+  'contextPercent',
+] as const;
 
 interface Harness {
   readonly store: RelayStore;
@@ -88,14 +98,19 @@ afterEach(async () => {
 // 2. TEST HELPERS
 // ───────────────────────────────────────────────────────────────────
 
-function stateWithModel(modelLabel: string | null): RuntimeStateDto {
+function stateWithModel(modelLabel: string | null, contextWindow?: number): RuntimeStateDto {
   return {
     sessionId: 'session_local',
     revision: 1,
     model:
       modelLabel === null
         ? null
-        : { provider: 'openai', id: 'gpt-4o', label: modelLabel },
+        : {
+            provider: 'openai',
+            id: 'gpt-4o',
+            label: modelLabel,
+            ...(contextWindow === undefined ? {} : { contextWindow }),
+          },
     thinkingLevel: 'high',
     availableThinkingLevels: ['high'],
     mode: 'idle',
@@ -134,7 +149,10 @@ function insertAttention(
     );
 }
 
-async function createHarness(runtime?: RuntimeService): Promise<Harness> {
+async function createHarness(
+  runtime?: RuntimeService,
+  sessionEnrichment?: SessionEnrichmentService,
+): Promise<Harness> {
   let now = Date.parse('2026-01-01T00:00:00.000Z');
   const store = new RelayStore();
   const catalog = new SessionCatalog(store);
@@ -165,6 +183,7 @@ async function createHarness(runtime?: RuntimeService): Promise<Harness> {
     serveSecret: SERVE_SECRET,
     auth,
     ...(runtime === undefined ? {} : { runtime }),
+    ...(sessionEnrichment === undefined ? {} : { sessionEnrichment }),
     push,
     now: () => now,
     port: 0,
@@ -245,6 +264,28 @@ async function fetchSessions(
   return response.json() as Promise<{ sessions: Record<string, unknown>[] }>;
 }
 
+function expectDerivedOmitted(card: Record<string, unknown>): void {
+  for (const field of DERIVED_FIELDS) {
+    expect(card).not.toHaveProperty(field);
+  }
+}
+
+function userText(id: string, text: string): Record<string, unknown> {
+  return { kind: 'text', id, role: 'user', text };
+}
+
+function assistantText(id: string, text: string): Record<string, unknown> {
+  return { kind: 'text', id, role: 'assistant', text };
+}
+
+function toolCall(id: string, toolName: string): Record<string, unknown> {
+  return { kind: 'tool_call', id, toolName, inputSummary: '' };
+}
+
+function usage(id: string, inputTokens: number, outputTokens: number): Record<string, unknown> {
+  return { kind: 'usage', id, inputTokens, outputTokens, cost: 0 };
+}
+
 // ───────────────────────────────────────────────────────────────────
 // 3. TESTS
 // ───────────────────────────────────────────────────────────────────
@@ -259,6 +300,7 @@ describe('session card enrichment', () => {
     const card = body.sessions[0];
     expect(card).not.toHaveProperty('model');
     expect(card).not.toHaveProperty('attention');
+    expectDerivedOmitted(card);
     expect(isSessionCardDto(card)).toBe(true);
   });
 
@@ -272,6 +314,7 @@ describe('session card enrichment', () => {
     const card = body.sessions[0];
     expect(card).not.toHaveProperty('model');
     expect(card).not.toHaveProperty('attention');
+    expectDerivedOmitted(card);
     expect(isSessionCardDto(card)).toBe(true);
   });
 
@@ -350,6 +393,212 @@ describe('session card enrichment', () => {
     const card = body.sessions[0];
     // The latest attention wins
     expect(card.attention).toBe('done');
+    expect(isSessionCardDto(card)).toBe(true);
+  });
+
+  it('omits all six derived fields when the accumulator is empty (bare card, still valid)', async () => {
+    const enrichment = new SessionEnrichmentService();
+    const harness = await createHarness(undefined, enrichment);
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+
+    expect(body.sessions).toHaveLength(1);
+    const card = body.sessions[0];
+    expect(enrichment.getEnrichment(SESSION_ID)).toEqual({});
+    expectDerivedOmitted(card);
+    expect(isSessionCardDto(card)).toBe(true);
+  });
+
+  it('captures title from the first prompt and keeps it stable across later prompts', async () => {
+    const enrichment = new SessionEnrichmentService();
+    const harness = await createHarness(undefined, enrichment);
+    enrichment.ingestBlock(SESSION_ID, userText('block_u1', 'Plan the garden beds'));
+    enrichment.ingestBlock(SESSION_ID, userText('block_u2', 'What about tomatoes?'));
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+
+    expect(body.sessions).toHaveLength(1);
+    const card = body.sessions[0];
+    expect(card.title).toBe('Plan the garden beds');
+    expect(card.prompt).toBe('What about tomatoes?');
+    expect(isSessionCardDto(card)).toBe(true);
+  });
+
+  it('reflects latest prompt, assistant preview, and recent text blocks, each redacted and capped', async () => {
+    const enrichment = new SessionEnrichmentService();
+    const harness = await createHarness(undefined, enrichment);
+    enrichment.ingestBlock(SESSION_ID, userText('block_u1', 'First prompt'));
+    enrichment.ingestBlock(SESSION_ID, assistantText('block_a1', 'First reply'));
+    for (let index = 2; index <= 10; index += 1) {
+      enrichment.ingestBlock(
+        SESSION_ID,
+        assistantText(`block_a${index}`, `Reply number ${index}`),
+      );
+    }
+    enrichment.ingestBlock(SESSION_ID, userText('block_u2', 'Latest prompt'));
+    enrichment.ingestBlock(SESSION_ID, assistantText('block_a_over', 'a'.repeat(281)));
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+
+    expect(body.sessions).toHaveLength(1);
+    const card = body.sessions[0];
+    expect(card.prompt).toBe('Latest prompt');
+    expect(card).not.toHaveProperty('lastMessagePreview');
+    expect(card.previewMessages).toEqual([
+      'Reply number 4',
+      'Reply number 5',
+      'Reply number 6',
+      'Reply number 7',
+      'Reply number 8',
+      'Reply number 9',
+      'Reply number 10',
+      'Latest prompt',
+    ]);
+    expect(isSessionCardDto(card)).toBe(true);
+
+    enrichment.ingestBlock(SESSION_ID, assistantText('block_a_ok', 'a'.repeat(280)));
+    const capped = await fetchSessions(harness, authorized.cookie);
+    expect(capped.sessions[0]?.lastMessagePreview).toBe('a'.repeat(280));
+    expect(isSessionCardDto(capped.sessions[0])).toBe(true);
+  });
+
+  it('rejects path, URL, and secret text so those fields are omitted and raw text never appears', async () => {
+    const pathText = 'Please open /Users/michel/private/notes.txt tonight';
+    const urlText = 'Visit https://evil.example/leak for details';
+    const secretText = 'password: hunter2-never-emit';
+    const enrichment = new SessionEnrichmentService();
+    const harness = await createHarness(undefined, enrichment);
+    enrichment.ingestBlock(SESSION_ID, userText('block_ok', 'Garden plan'));
+    enrichment.ingestBlock(SESSION_ID, userText('block_path', pathText));
+    enrichment.ingestBlock(SESSION_ID, assistantText('block_url', urlText));
+    enrichment.ingestBlock(SESSION_ID, assistantText('block_secret', secretText));
+    enrichment.ingestBlock(SESSION_ID, assistantText('block_safe', 'Water the seedlings'));
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+
+    expect(body.sessions).toHaveLength(1);
+    const card = body.sessions[0];
+    const serialized = JSON.stringify(card);
+    expect(card.title).toBe('Garden plan');
+    expect(card).not.toHaveProperty('prompt');
+    expect(card.lastMessagePreview).toBe('Water the seedlings');
+    expect(card.previewMessages).toEqual(['Garden plan', 'Water the seedlings']);
+    expect(serialized).not.toContain(pathText);
+    expect(serialized).not.toContain('/Users/michel/private/notes.txt');
+    expect(serialized).not.toContain(urlText);
+    expect(serialized).not.toContain('https://evil.example/leak');
+    expect(serialized).not.toContain(secretText);
+    expect(serialized).not.toContain('hunter2-never-emit');
+    expect(serialized).not.toContain('password:');
+    expect(isSessionCardDto(card)).toBe(true);
+  });
+
+  it('sets tool from the latest tool_call name', async () => {
+    const enrichment = new SessionEnrichmentService();
+    const harness = await createHarness(undefined, enrichment);
+    enrichment.ingestBlock(SESSION_ID, toolCall('block_t1', 'read'));
+    enrichment.ingestBlock(SESSION_ID, toolCall('block_t2', 'bash'));
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+
+    expect(body.sessions).toHaveLength(1);
+    const card = body.sessions[0];
+    expect(card.tool).toBe('bash');
+    expect(isSessionCardDto(card)).toBe(true);
+  });
+
+  it('computes contextPercent as round(100*used/max), clamped, and omits without max or usage', async () => {
+    const runtime = createRuntimeStub(stateWithModel('GPT-4o', 200));
+    const enrichment = new SessionEnrichmentService({
+      getContextWindow: () => runtime.getState()?.model?.contextWindow ?? null,
+    });
+    const harness = await createHarness(runtime, enrichment);
+    const authorized = await authorize(harness);
+
+    let body = await fetchSessions(harness, authorized.cookie);
+    expect(body.sessions[0]).not.toHaveProperty('contextPercent');
+    expect(isSessionCardDto(body.sessions[0])).toBe(true);
+
+    enrichment.ingestBlock(SESSION_ID, usage('block_use1', 70, 10));
+    body = await fetchSessions(harness, authorized.cookie);
+    expect(body.sessions[0]?.contextPercent).toBe(40);
+    expect(isSessionCardDto(body.sessions[0])).toBe(true);
+
+    enrichment.ingestBlock(SESSION_ID, usage('block_use2', 250, 0));
+    body = await fetchSessions(harness, authorized.cookie);
+    expect(body.sessions[0]?.contextPercent).toBe(100);
+    expect(isSessionCardDto(body.sessions[0])).toBe(true);
+
+    const noMax = new SessionEnrichmentService();
+    noMax.ingestBlock(SESSION_ID, usage('block_use3', 70, 10));
+    const harnessNoMax = await createHarness(undefined, noMax);
+    const authorizedNoMax = await authorize(harnessNoMax);
+    const omitted = await fetchSessions(harnessNoMax, authorizedNoMax.cookie);
+    expect(omitted.sessions[0]).not.toHaveProperty('contextPercent');
+    expect(isSessionCardDto(omitted.sessions[0])).toBe(true);
+  });
+
+  it('does not double-count duplicate usage ids and reports contextPercent after many usage blocks', async () => {
+    const runtime = createRuntimeStub(stateWithModel('GPT-4o', 1_000));
+    const enrichment = new SessionEnrichmentService({
+      getContextWindow: () => runtime.getState()?.model?.contextWindow ?? null,
+    });
+    const harness = await createHarness(runtime, enrichment);
+    const authorized = await authorize(harness);
+
+    enrichment.ingestBlock(SESSION_ID, usage('block_dup', 100, 0));
+    enrichment.ingestBlock(SESSION_ID, usage('block_dup', 100, 0));
+    enrichment.ingestBlock(SESSION_ID, usage('block_dup', 400, 0));
+    let body = await fetchSessions(harness, authorized.cookie);
+    expect(body.sessions[0]?.contextPercent).toBe(10);
+    expect(isSessionCardDto(body.sessions[0])).toBe(true);
+
+    for (let index = 0; index < 200; index += 1) {
+      enrichment.ingestBlock(SESSION_ID, usage(`block_many_${index}`, 1, 0));
+    }
+    body = await fetchSessions(harness, authorized.cookie);
+    expect(body.sessions[0]?.contextPercent).toBe(30);
+    expect(isSessionCardDto(body.sessions[0])).toBe(true);
+  });
+
+  it('omits un-prefixed sk-ant token from prompt and never emits the raw token in card JSON', async () => {
+    const leaked = 'sk-ant-api03-abcdefghijklmnopqrstuvwxyz012345';
+    const enrichment = new SessionEnrichmentService();
+    const harness = await createHarness(undefined, enrichment);
+    enrichment.ingestBlock(SESSION_ID, userText('block_ok', 'Garden plan'));
+    enrichment.ingestBlock(SESSION_ID, userText('block_leaked', `Continue with ${leaked}`));
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+
+    expect(body.sessions).toHaveLength(1);
+    const card = body.sessions[0];
+    const serialized = JSON.stringify(card);
+    expect(card.title).toBe('Garden plan');
+    expect(card).not.toHaveProperty('prompt');
+    expect(card.previewMessages).toEqual(['Garden plan']);
+    expect(serialized).not.toContain(leaked);
+    expect(serialized).not.toContain('sk-ant-api03');
+    expect(isSessionCardDto(card)).toBe(true);
+  });
+
+  it('excludes role-less Agent started lifecycle text from preview fields', async () => {
+    const enrichment = new SessionEnrichmentService();
+    const harness = await createHarness(undefined, enrichment);
+    enrichment.ingestBlock(SESSION_ID, { kind: 'text', id: 'life_start', text: 'Agent started.' });
+    enrichment.ingestBlock(SESSION_ID, assistantText('block_a1', 'Hello from the agent'));
+    enrichment.ingestBlock(SESSION_ID, { kind: 'text', id: 'life_end', text: 'Agent run ended.' });
+    enrichment.ingestBlock(SESSION_ID, { kind: 'text', id: 'life_pi', text: 'Pi event: session idle' });
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+
+    expect(body.sessions).toHaveLength(1);
+    const card = body.sessions[0];
+    const serialized = JSON.stringify(card);
+    expect(card.lastMessagePreview).toBe('Hello from the agent');
+    expect(card.previewMessages).toEqual(['Hello from the agent']);
+    expect(serialized).not.toContain('Agent started.');
+    expect(serialized).not.toContain('Agent run ended.');
+    expect(serialized).not.toContain('Pi event:');
     expect(isSessionCardDto(card)).toBe(true);
   });
 });

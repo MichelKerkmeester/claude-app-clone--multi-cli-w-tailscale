@@ -430,6 +430,18 @@ export interface SessionCardDto {
   readonly status: 'idle' | 'running' | 'interrupted' | 'unknown';
   readonly updatedAt: string;
   readonly messageCount: number;
+  readonly title?: string;
+  readonly lastMessagePreview?: string;
+  readonly agent?: string;
+  readonly model?: string;
+  readonly attention?: 'done' | 'blocked' | 'waiting';
+  readonly contextPercent?: number;
+  readonly activity?: string;
+  readonly tool?: string;
+  readonly prompt?: string;
+  readonly previewMessages?: readonly string[];
+  readonly resumable?: boolean;
+  readonly queuedMessageCount?: number;
 }
 
 interface TranscriptBlockBase extends JsonObject {

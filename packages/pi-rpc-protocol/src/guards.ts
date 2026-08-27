@@ -252,6 +252,18 @@ const RICH_TOOL_NAME_MAX_LENGTH = 128;
 const RICH_INPUT_SUMMARY_MAX_LENGTH = 64 * 1024;
 const RICH_OUTPUT_MAX_LENGTH = 128 * 1024;
 const RICH_TEXT_ARTIFACT_SOURCE_MAX_LENGTH = 256 * 1024;
+
+// ── Session card enrichment field caps ────────────────────────────
+// These guard redacted host text; values above the cap are rejected.
+const CARD_TITLE_MAX_LENGTH = 200;
+const CARD_LAST_MESSAGE_PREVIEW_MAX_LENGTH = 280;
+const CARD_AGENT_MAX_LENGTH = 128;
+const CARD_MODEL_MAX_LENGTH = 128;
+const CARD_ACTIVITY_MAX_LENGTH = 128;
+const CARD_TOOL_MAX_LENGTH = 128;
+const CARD_PROMPT_MAX_LENGTH = 4_096;
+const CARD_PREVIEW_MESSAGES_CAP = 8;
+
 const TRANSCRIPT_SHELL_KIND_SET = new Set<TranscriptShellKind>(TRANSCRIPT_SHELL_KINDS);
 const TRANSCRIPT_LIFECYCLE_SET = new Set<TranscriptLifecycle>(TRANSCRIPT_LIFECYCLES);
 const TRANSCRIPT_CHECKPOINT_SET = new Set<TranscriptTerminalCheckpoint>(
@@ -1250,7 +1262,37 @@ export function isSessionCardDto(value: unknown): value is SessionCardDto {
     !Number.isNaN(Date.parse(value.updatedAt)) &&
     Number.isSafeInteger(value.messageCount) &&
     typeof value.messageCount === 'number' &&
-    value.messageCount >= 0
+    value.messageCount >= 0 &&
+    // ── Optional enrichment fields (additive-safe: absent === valid) ──
+    (value.title === undefined || isSafeDisplayString(value.title, CARD_TITLE_MAX_LENGTH)) &&
+    (value.lastMessagePreview === undefined ||
+      isSafeDisplayString(value.lastMessagePreview, CARD_LAST_MESSAGE_PREVIEW_MAX_LENGTH)) &&
+    (value.agent === undefined || isSafeDisplayString(value.agent, CARD_AGENT_MAX_LENGTH)) &&
+    (value.model === undefined || isSafeDisplayString(value.model, CARD_MODEL_MAX_LENGTH)) &&
+    (value.attention === undefined ||
+      value.attention === 'done' ||
+      value.attention === 'blocked' ||
+      value.attention === 'waiting') &&
+    (value.contextPercent === undefined ||
+      (typeof value.contextPercent === 'number' &&
+        Number.isFinite(value.contextPercent) &&
+        value.contextPercent >= 0 &&
+        value.contextPercent <= 100)) &&
+    (value.activity === undefined ||
+      isSafeDisplayString(value.activity, CARD_ACTIVITY_MAX_LENGTH)) &&
+    (value.tool === undefined || isSafeDisplayString(value.tool, CARD_TOOL_MAX_LENGTH)) &&
+    (value.prompt === undefined || isSafeDisplayString(value.prompt, CARD_PROMPT_MAX_LENGTH)) &&
+    (value.previewMessages === undefined ||
+      (Array.isArray(value.previewMessages) &&
+        value.previewMessages.length <= CARD_PREVIEW_MESSAGES_CAP &&
+        value.previewMessages.every((entry: unknown) =>
+          isSafeDisplayString(entry, CARD_LAST_MESSAGE_PREVIEW_MAX_LENGTH),
+        ))) &&
+    (value.resumable === undefined || typeof value.resumable === 'boolean') &&
+    (value.queuedMessageCount === undefined ||
+      (typeof value.queuedMessageCount === 'number' &&
+        Number.isSafeInteger(value.queuedMessageCount) &&
+        value.queuedMessageCount >= 0))
   );
 }
 

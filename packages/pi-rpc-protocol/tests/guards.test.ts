@@ -549,6 +549,136 @@ describe('protocol guards', () => {
   });
 });
 
+describe('wire-compat: isSessionCardDto', () => {
+  /** A bare 4-field card from an older host must still be valid. */
+  it('accepts a bare 4-field card (old-host compat)', () => {
+    expect(
+      isSessionCardDto({
+        id: 'session_local',
+        status: 'idle',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+        messageCount: 0,
+      }),
+    ).toBe(true);
+  });
+
+  /** A fully-enriched card with all 12 new fields must be valid. */
+  it('accepts a fully-enriched card', () => {
+    expect(
+      isSessionCardDto({
+        id: 'session_local',
+        status: 'running',
+        updatedAt: '2026-06-15T12:30:00.000Z',
+        messageCount: 5,
+        title: 'Fix login bug',
+        lastMessagePreview: 'I think the issue is in the auth module',
+        agent: 'codex',
+        model: 'gpt-4o',
+        attention: 'waiting',
+        contextPercent: 42,
+        activity: 'editing',
+        tool: 'bash',
+        prompt: 'Fix the login flow',
+        previewMessages: ['First message', 'Second message'],
+        resumable: true,
+        queuedMessageCount: 3,
+      }),
+    ).toBe(true);
+  });
+
+  /** An unknown extra key must be ignored (additive-safe). */
+  it('ignores unknown extra keys (additive-safe)', () => {
+    expect(
+      isSessionCardDto({
+        id: 'session_local',
+        status: 'idle',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+        messageCount: 0,
+        unknownField: 'should be ignored',
+      }),
+    ).toBe(true);
+  });
+
+  // ── Rejection cases ───────────────────────────────────────────
+
+  it('rejects attention: "completed" (not a valid badge value)', () => {
+    const result = isSessionCardDto({
+      id: 'session_local',
+      status: 'idle',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      messageCount: 0,
+      attention: 'completed',
+    });
+    expect(result).toBe(false);
+  });
+
+  it('rejects contextPercent > 100', () => {
+    const result = isSessionCardDto({
+      id: 'session_local',
+      status: 'idle',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      messageCount: 0,
+      contextPercent: 150,
+    });
+    expect(result).toBe(false);
+  });
+
+  it('rejects contextPercent < 0', () => {
+    const result = isSessionCardDto({
+      id: 'session_local',
+      status: 'idle',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      messageCount: 0,
+      contextPercent: -1,
+    });
+    expect(result).toBe(false);
+  });
+
+  it('rejects an over-cap title', () => {
+    const result = isSessionCardDto({
+      id: 'session_local',
+      status: 'idle',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      messageCount: 0,
+      title: 'x'.repeat(201),
+    });
+    expect(result).toBe(false);
+  });
+
+  it('rejects previewMessages with a non-string entry', () => {
+    const result = isSessionCardDto({
+      id: 'session_local',
+      status: 'idle',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      messageCount: 0,
+      previewMessages: ['ok', 42],
+    });
+    expect(result).toBe(false);
+  });
+
+  it('rejects negative queuedMessageCount', () => {
+    const result = isSessionCardDto({
+      id: 'session_local',
+      status: 'idle',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      messageCount: 0,
+      queuedMessageCount: -1,
+    });
+    expect(result).toBe(false);
+  });
+
+  it('rejects resumable with a non-boolean', () => {
+    const result = isSessionCardDto({
+      id: 'session_local',
+      status: 'idle',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      messageCount: 0,
+      resumable: 'yes',
+    });
+    expect(result).toBe(false);
+  });
+});
+
 describe('ask-question guards', () => {
   it('rejects unknown ordinals, duplicate options and display-bearing metadata blocks', () => {
     expect(

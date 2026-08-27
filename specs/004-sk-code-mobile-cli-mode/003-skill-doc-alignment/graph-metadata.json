@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sk-code-mobile-cli-mode/003-skill-doc-alignment",
+  "spec_folder": "004-sk-code-mobile-cli-mode/003-skill-doc-alignment",
+  "parent_id": "004-sk-code-mobile-cli-mode",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "seven",
+      "docs",
+      "sk-code-mobile-cli",
+      "skill",
+      "lag",
+      "sk-create-skill",
+      "asset",
+      "reference",
+      "readme",
+      "phase",
+      "doc",
+      "alignment"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "tasks.md",
+      "spec.md",
+      "plan.md",
+      "checklist.md"
+    ],
+    "entities": [
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Feature Specification",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement Seven",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Every",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "File Path",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Change Type",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Plan",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Technical Context",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Overview Bring",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pattern Template",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Key Components",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Data Flow Read",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Task Format",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "setup",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "per-file",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "the GATE",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Seven docs in the `sk-code-mobile-cli` skill lag the `sk-create-skill` v4 asset, reference, and readme",
+    "created_at": "2026-08-27T10:13:06.612Z",
+    "last_save_at": "2026-08-27T10:13:06.612Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md"
+    ],
+    "source_fingerprint": "sha256:9b2932f19d916c388ae9849b36c105881080672403a14600655f0d44c3e69e66",
+    "source_doc_hashes": {
+      "spec.md": "d1aa8ffa8499dc7f39fb52a62fd419f548037d307f029a5fe9b2ec564864437c",
+      "plan.md": "2b311f76aa15b85bdc6aa4011cfe2c1b772cdcda511763bd7f45b3e5743a32a4",
+      "tasks.md": "524f413e08b986f27ec45c42937164b136b4744f8aa7024d02d9bdbb37d92c8a",
+      "checklist.md": "dc1e9613d9467a7de5b82f472a432a84c6969f25659a1f22e329bef5c8bd35fc"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

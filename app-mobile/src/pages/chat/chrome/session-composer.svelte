@@ -981,22 +981,22 @@
     display: grid;
     gap: var(--space-2);
     margin-top: var(--space-4);
-    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
-    padding-inline-start: max(var(--space-3), env(safe-area-inset-left, 0px));
-    padding-inline-end: max(var(--space-3), env(safe-area-inset-right, 0px));
+    padding-bottom: 0;
+    padding-inline-start: env(safe-area-inset-left, 0px);
+    padding-inline-end: env(safe-area-inset-right, 0px);
     background: linear-gradient(to top, var(--canvas) 66%, transparent);
   }
 
-  /* This surface: composer — the input island. */
+  /* This surface: composer — edge-to-edge full-width input container. */
   /* Editable seam: layout — tray geometry; safe gutters are token-driven. */
   .composer--tray {
     display: grid;
     gap: var(--space-1);
-    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
-    border: 1px solid var(--line-strong);
-    border-radius: 1.75rem;
+    padding: var(--space-2) var(--space-3) max(var(--space-2), env(safe-area-inset-bottom)) var(--space-3);
+    border: 0;
+    border-top: 1px solid var(--line-strong);
+    border-radius: 0;
     background: var(--surface);
-    box-shadow: var(--shadow-raised);
   }
 
   /* Dashed Plan outline: host-confirmed only; execution is solid. */
@@ -1012,17 +1012,16 @@
 
   /* ── Installed-PWA safe-area hardening ───────────────────────────────
      With viewport-fit=cover the layout extends under the notch and rounded
-     corners in landscape; interactive islands keep clear of the insets while
-     portrait (all-zero insets) renders exactly as before. */
+     corners in landscape; interactive content keeps clear of the insets while
+     portrait (all-zero insets) renders edge-to-edge. */
   .composer--tray {
-    margin-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
+    padding-inline-start: max(var(--space-3), env(safe-area-inset-left, 0px));
+    padding-inline-end: max(var(--space-3), env(safe-area-inset-right, 0px));
   }
 
   /* Keep this rule aligned with its surrounding surface. */
   .composer--tray {
     min-inline-size: 0;
-    margin-inline-start: max(0px, env(safe-area-inset-left, 0px));
-    margin-inline-end: max(0px, env(safe-area-inset-right, 0px));
   }
 
   /* Keep this rule aligned with its surrounding surface. */

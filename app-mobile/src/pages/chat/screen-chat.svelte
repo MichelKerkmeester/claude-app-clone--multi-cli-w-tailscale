@@ -97,6 +97,15 @@
   import { useSyncSocket } from '$shared/transport/use-sync-socket.svelte.js';
   import type { EffortSheetSection } from './chrome/sheet-model-effort.svelte';
 
+  import {
+    inputLockReason,
+    inputLockReasonWithSettle,
+    holdOffLateRunning,
+    HoldOffResult,
+    INPUT_LOCK_SETTLE_MS,
+  } from '$shared/state/streaming-derivations.js';
+  import type { InputLockReason } from '$shared/state/streaming-derivations.js';
+
   import RuntimeStatusRegion from './transcript/runtime-status-region.svelte';
   import RuntimeModeAnnouncer from './chrome/runtime-mode-announcer.svelte';
   import SessionHeader from './chrome/session-header.svelte';
@@ -156,6 +165,25 @@
   let sheetOpen = $state(false);
   let sheetSection = $state<EffortSheetSection>('model');
 
+  // Turn-end tracking for the done-holdoff: a late re-reported running
+  // signal inside the ~3 s window does not resurrect a finished turn.
+  let lastEffectiveStatus = $state<SessionProps['status']>('idle');
+  let turnEndedAt = $state(0);
+  let turnEndedEpoch = $state<string | null>(null);
+
+  // Transient-state tracking for the 600 ms input-lock settle, so a
+  // dying socket never flashes send-enabled.
+  let lastTransientAt = $state(0);
+
+  // Reactive ticker that the inputLock derived reads so the settle
+  // release timer can re-evaluate the lock without any other signal.
+  let settleTick = $state(0);
+
+  // Previous raw input-lock value, used by the edge-detection effect
+  // to stamp lastTransientAt at the moment a transient→cleared edge
+  // fires (not at reconnect-start). Written only inside untrack.
+  let previousInputLockRaw: InputLockReason = 'none';
+
   // Which button opened each overlay, so focus can return to it on close.
   let headerTrigger = $state<HTMLButtonElement | null>(null);
   let stripTrigger = $state<HTMLButtonElement | null>(null);
@@ -192,15 +220,26 @@
       (runtimeControls.runtime.status === 'ready' || runtimeControls.runtime.status === 'pending'),
   );
   const runtimeRunning = $derived(runtimeState !== null && runtimeState.streaming === true);
+  // Streaming derivations: inputLock with settle.
+  const inputLock = $derived.by(() => {
+    // Reading settleTick makes the derived re-evaluate when the
+    // settle timer fires, so the lock releases on its own.
+    void settleTick;
+    return inputLockReasonWithSettle(
+      connection,
+      transcript.awaitingSnapshot,
+      lastTransientAt,
+      Date.now(),
+    );
+  });
   const canSubmit = $derived(
-    connection === 'live' &&
-      !transcript.awaitingSnapshot &&
+    inputLock === 'none' &&
       prompt.trim().length > 0 &&
       !sendingPrompt &&
       !slashSubmitting,
   );
   const canDispatchSlash = $derived(
-    connection === 'live' && !transcript.awaitingSnapshot && !sendingPrompt && !slashSubmitting,
+    inputLock === 'none' && !sendingPrompt && !slashSubmitting,
   );
   const slashCommandNames = $derived(
     SESSION_SLASH_NAMES.filter((name) => bindingFor(commandCatalog.snapshot, name) !== null),
@@ -212,6 +251,24 @@
       heldBlocks,
     }),
   );
+
+  // The raw running signal with the done-holdoff applied: a running
+  // re-reported within ~3 s of an idle/interrupted end is held off
+  // unless the epoch changed (new turn).
+  const runningRaw = $derived(status === 'running');
+  const running = $derived.by(() => {
+    if (!runningRaw) return false;
+    if (lastEffectiveStatus === 'running') return true;
+    const held = holdOffLateRunning({
+      currentStatus: status,
+      previousStatus: lastEffectiveStatus,
+      previousEpoch: turnEndedEpoch,
+      currentEpoch: transcript.epoch,
+      turnEndedAt,
+      now: Date.now(),
+    });
+    return held !== HoldOffResult.HOLD;
+  });
 
   // ───────────────────────────────────────────────────────────────────
   // 5. EFFECTS
@@ -274,6 +331,59 @@
     untrack(() => {
       heldBlocks = nextHeldTranscriptBlocks(current, heldBlocks);
     });
+  });
+
+  // Turn-end tracking for the done-holdoff: record when a running
+  // signal transitions to idle/interrupted, and the epoch at that
+  // moment. untrack the writes so the effect never re-triggers on
+  // its own output.
+  $effect(() => {
+    const current = status;
+    const epoch = transcript.epoch;
+    untrack(() => {
+      if (lastEffectiveStatus === 'running' && (current === 'idle' || current === 'interrupted')) {
+        turnEndedAt = Date.now();
+        turnEndedEpoch = epoch;
+      }
+      lastEffectiveStatus = current;
+    });
+  });
+
+  // Transient-edge tracking for the 600 ms input-lock settle: stamp
+  // lastTransientAt at the moment the lock clears (transient→none),
+  // not at the moment it appeared.  The release timer is re-armed on
+  // every effect re-run inside the settle window so that unrelated
+  // signal changes cannot cancel the pending release.
+  $effect(() => {
+    const raw = inputLockReason(connection, transcript.awaitingSnapshot);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    untrack(() => {
+      const previous = previousInputLockRaw;
+
+      if (raw === 'none' && previous !== 'none') {
+        // Edge: the lock just cleared — start the settle window at
+        // the clear moment, not the reconnect-start moment.
+        lastTransientAt = Date.now();
+      }
+
+      previousInputLockRaw = raw;
+
+      // Re-arm the release timer whenever we are inside the settle
+      // window, so a mid-window effect re-run preserves the deadline.
+      if (raw === 'none' && lastTransientAt > 0) {
+        const elapsed = Date.now() - lastTransientAt;
+        if (elapsed < INPUT_LOCK_SETTLE_MS) {
+          timer = setTimeout(() => {
+            settleTick += 1;
+          }, INPUT_LOCK_SETTLE_MS - elapsed);
+        }
+      }
+    });
+
+    return () => {
+      if (timer !== undefined) clearTimeout(timer);
+    };
   });
 
   // ───────────────────────────────────────────────────────────────────
@@ -496,7 +606,7 @@
       <TranscriptList
         {sessionId}
         blocks={transcriptLoadView.blocks}
-        running={status === 'running'}
+        running={running}
         canAnswer={connection === 'live' && !transcript.awaitingSnapshot}
         {askQuestionPrincipal}
         {todoProjection}
@@ -523,6 +633,15 @@
   />
 
   <!-- Composer: the prompt input with its send / stop / slash actions -->
+  <!-- Assertive a11y channel for send failures, cleared on the next accepted write. -->
+  {#if promptError !== null}
+    <div
+      aria-live="assertive"
+      aria-atomic="true"
+      class="sr-only"
+      data-send-error-announcer="true"
+    >{promptError}</div>
+  {/if}
   <AttachmentDraftProvider {sessionId} capability={mediaCapability} {modelCanViewPhotos}>
     <SessionComposer
       {prompt}

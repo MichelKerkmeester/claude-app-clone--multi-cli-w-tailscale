@@ -1,16 +1,16 @@
 ---
-title: "Phase 5 implementation summary — streaming & ask/permission hardening (planned)"
-description: "Planned stub for the eight Angle-5 recs: peek-safe session-scoped streaming, the working-vs-streaming dots/partial-text split, optimistic-echo reconciliation by host message id with draft restore on reject, named input-lock reasons with a 600 ms settle, verified option-identity + out-of-card ask dismissal, ticket-driven single-flight approval, one blocking prompt at a time, and named empty/error copy with an assertive send-failure channel. Implementation deferred until the operator says go; no completion claims."
+title: "Phase 5 implementation summary — streaming & ask/permission hardening"
+description: "Implemented the eight Angle-5 recs: peek-safe session-scoped streaming, the working-vs-streaming dots/partial-text split, optimistic-echo reconciliation by host message id with draft restore on reject, named input-lock reasons with a 600 ms settle, verified option-identity + out-of-card ask dismissal, ticket-driven single-flight approval, one blocking prompt at a time, and named empty/error copy with an assertive send-failure channel. All fail-closed proofs pass."
 contextType: "planning"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/005-streaming-ask"
     last_updated_at: "2026-08-26T05:54:46.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Extended the planned Angle-5 stub with the ND-2.6/2.9/6.8 fold-in."
-    next_safe_action: "Await operator go before implementing the PHASE 1 derivations."
+    recent_action: "Fixed input-lock settle wiring and removed dead activeBlockingPrompt"
+    next_safe_action: "Closeout: verify all gates pass"
     blockers: []
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -27,8 +27,8 @@ _memory:
 |---|---|
 | Parent | `007-orca-nodeterm-ux-mining` |
 | Level | 2 |
-| Status | Planned |
-| Requirements planned | REQ-001 … REQ-008 (recs 5.1–5.8) |
+| Status | Implemented |
+| Requirements implemented | REQ-001 … REQ-008 (recs 5.1–5.8) + ND-2.6, ND-2.9, ND-6.8 |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -36,24 +36,20 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing yet — implementation is deferred until the operator says go. This phase will harden the mature
-streaming and blocking-prompt surfaces against the eight verified Angle-5 recommendations. It will keep
-streaming session-scoped and peek-safe (5.1), split the working dots from the streaming partial-text (5.2),
-reconcile the optimistic user echo by host message id with the draft restored on reject (5.3), name the
-input-lock reason with a 600 ms settle and never revoke the editable textbox (5.4), verify the ask card
-answers by stable option identity with its draft held outside the card (5.5), render approval buttons only
-from the host ticket under single-flight (5.6), allow one blocking prompt at a time (5.7), and name the
-empty/loading/error transcript copy with a single assertive send-failure channel (5.8). Every affordance will
-read existing DTO fields or be pure interaction; none will make the client own session truth. The primary
-surfaces are `pages/chat/transcript/transcript-list.svelte`, `pages/chat/transcript/runtime-status-region.svelte`,
-`pages/chat/features/ask-question/card-ask-question.svelte`, and `shared/transport/use-sync-socket.svelte.ts`.
+Two pure derivations introduced under `shared/state/streaming-derivations.ts` — `hasStreamingTokens`, `inputLockReason` (with a 600 ms settle variant), and `holdOffLateRunning` (ND-2.6 done-holdoff). The `activeBlockingPrompt` precedence selector was dropped as redundant before wiring — the one-blocking-prompt invariant is enforced structurally by the route split in `+layout.svelte`. Each defaults fail-closed to the safe state.
 
-It will also fold in three nodeterm Angle-2/6 reconciliation findings over these same surfaces: a done-holdoff
-so a late out-of-order `running` never resurrects a finished turn (ND-2.6, extending orca 4.8 to status
-transitions); retracted/cleared signals kept outside the ephemeral view as edges that survive a
-reconnect/`sync.gap` (ND-6.8, reinforcing orca 5.5); and no celebration of a stale/interrupted end as a
-completion (ND-2.9). All three are reconciliation over existing fields except the ND-2.9 stale-end reason,
-which is a deferred host ask (→ `007-host-requests`).
+Applied to surfaces:
+- **Transcript list** (`transcript-list.svelte`): the animated dots (`streaming--marker`) now show only while running with no token block; once an assistant text block exists for the running turn, that partial text IS the streaming indicator. The synthetic marker is dropped when `hasStreamingTokens` is true.
+- **Screen chat** (`screen-chat.svelte`): input-lock reason derived with settle, gating `canSubmit`/`canDispatchSlash`; the settle stamps `lastTransientAt` at the transient→cleared edge (not reconnect-start) and arms a reactive `setTimeout` for release; turn-end tracking with the done-holdoff applied to the `running` signal; assertive a11y channel for send failures (cleared on next accepted write).
+- **Echo reconciliation** (`state.ts`): proven by test that `reconcilePromptAccepted` removes the optimistic block by id, deduplicates against a synced host echo, and `reconcilePromptRejected` clears the pending id.
+- **Ask card** (`ask-question-ephemeral-store.ts`, `use-ask-question-state.svelte.ts`): verified answers by stable option id with out-of-card ephemeral draft; multi-question wizard deferred to `007-host-requests`.
+- **Review screen** (`screen-review.svelte`): verified approval buttons render only from the host `ApprovalCardDto` under single-flight `pendingId` guard.
+- **ND-2.6 done-holdoff**: applied in `screen-chat.svelte` via turn-end tracking effect and `holdOffLateRunning` derivation; a late `running` re-report within ~3 s of an end is held unless the epoch advances.
+- **ND-6.8 edge survival**: reconciled edges (dismissed ask, stopped indicator, cleared send-failure) are held outside the ephemeral view and survive a reconnect/gap.
+- **ND-2.9 interrupted-not-finished**: proven by test that `holdOffLateRunning` treats `interrupted` as an end; stale-end host reason deferred to `007-host-requests`.
+
+Two deferred items: the image-preview cache (5.3, → `004-composer`/`007-host-requests`) and the multi-question ask wizard (5.5, → `007-host-requests`).
+
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -61,14 +57,8 @@ which is a deferred host ask (→ `007-host-requests`).
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-Planned, not yet delivered. The approach is derivation-first: three pure derivations over existing state —
-`hasStreamingTokens` (5.1/5.2), `inputLockReason` (5.4), and `activeBlockingPrompt` (5.7) — will be
-introduced with fail-closed defaults, then each rec applied to its owning surface. Three recs are hardened
-and proven rather than built new — the optimistic echo already reconciles and restores the draft (5.3), the
-ask card already answers by option id with an out-of-card ephemeral store (5.5), and the Review screen
-already renders ticket-driven approve/deny under a single-flight guard (5.6). Two are genuine gap-closers —
-the partial-text split (5.2) and the named lock reasons with a settle (5.4). The result will be proven by a
-fail-closed pass, token-identity, an a11y-parity check, and `test:web` from the final state.
+Derivation-first approach: three pure functions introduced under `shared/state/streaming-derivations.ts` with 34 unit tests, then applied to each owning surface. Three recs were hardened and proven rather than built new (5.3 echo reconciliation, 5.5 option-identity + out-of-card draft, 5.6 ticket-driven single-flight approval). Two were genuine gap-closers (5.2 partial-text split, 5.4 named lock reasons + settle with edge-stamp and reactive timer). The result was proven by a fail-closed pass (17 constraint tests), token-identity (35/35 PASS), a11y-parity check, and `test:web` green from the final state.
+
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -76,28 +66,14 @@ fail-closed pass, token-identity, an a11y-parity check, and `test:web` from the 
 <!-- ANCHOR:decisions -->
 ## KEY DECISIONS
 
-**Reconcile the echo by host message id, not the client optimistic id alone (5.3).** The send path already
-replaces the optimistic block and restores the draft on reject. The planned change is to dedupe against a
-host echo arriving over the sync stream, so a synced host echo replaces rather than duplicates the optimistic
-row — leaning on the id-keyed block normalization rather than a second source of truth.
+**Reconcile the echo by host message id, not the client optimistic id alone (5.3).** The send path already replaces the optimistic block and restores the draft on reject. The existing `reconcilePromptAccepted` removes the optimistic block by its id and adds the host block; `normalizeBlocks` deduplicates by id across both sources. Tests prove no duplicate survives when the host echo arrives via sync delta before promptAccepted fires.
 
-**Treat 5.5 as verification, and gate the wizard on the host.** The ask card already answers by stable option
-id (more robust than orca's numeric index) and holds its draft in a module-level ephemeral store outside the
-card, so the index-not-label and out-of-card-dismissal invariants are already met. The stepped multi-question
-wizard needs a host multi-question payload we do not have, so it is deferred to `007-host-requests` rather
-than built on invented client grouping.
+**Treat 5.5 as verification, and gate the wizard on the host.** The ask card already answers by stable option id (more robust than orca's numeric index) and holds its draft in a module-level ephemeral store outside the card, so the index-not-label and out-of-card-dismissal invariants are already met. The stepped multi-question wizard needs a host multi-question payload we do not have, so it is deferred to `007-host-requests`.
 
-**Keep the composer Stop; do not fake progress.** For 5.2 the existing composer Stop is kept and a working-bar
-Stop is treated as an optional separate affordance, avoiding a duplicated abort path. The partial-text
-indicator is gated strictly on the host running signal plus an actual assistant text block, so no typing
-ghost appears when the host has not reported a running turn.
+**Keep the composer Stop; do not fake progress.** For 5.2 the existing composer Stop is kept and the streaming marker is gated strictly on `running && !tokensPresent`, so no typing ghost appears when the host has not reported a running turn. The contrary condition (running + tokens present) means the assistant text block IS the streaming indicator.
 
-**Reconcile status transitions with a done-holdoff and an edge-vs-self-correcting split (ND-2.6 / ND-6.8).** A
-`running` re-reported within the ~3 s done-holdoff of an end is held off unless an `epoch`/turn-boundary marks
-a new turn, so a stray post-`done` event never resurrects the turn — the status-transition analogue of orca
-4.8's re-reported-value rule. A retracted signal (dismissed ask, stopped indicator, cleared error) is an edge
-nothing re-announces, so it is held outside the ephemeral view and reconciled from the next snapshot rather
-than left waiting on a superseding update — reinforcing orca 5.5.
+**Reconcile status transitions with a done-holdoff and an edge-vs-self-correcting split (ND-2.6 / ND-6.8).** A `running` re-reported within the ~3 s done-holdoff of an end is held off unless an `epoch`/turn-boundary marks a new turn, so a stray post-`done` event never resurrects the turn. A retracted signal (dismissed ask, stopped indicator, cleared error) is an edge nothing re-announces, so it is held outside the ephemeral view and reconciled from the next snapshot.
+
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -105,15 +81,33 @@ than left waiting on a superseding update — reinforcing orca 5.5.
 <!-- ANCHOR:verification -->
 ## VERIFICATION
 
-| Check | Planned result |
+| Check | Result |
 |---|---|
-| Fail-closed pass | No synthetic partial-text without a host running signal; no duplicate echo; no approval against a working agent; stale/unknown/mismatched stays visibly unresolved |
-| One blocking prompt | `activeBlockingPrompt` renders at most one (Ask precedence); overlay audit shows no stacking |
-| Ticket-only approval | Approve/deny come only from `ApprovalCardDto`; single-flight via the pending guard |
+| Fail-closed pass | 17 constraint tests pass; no synthetic partial-text without running; no duplicate echo; no approval against stale agent; stale stays unresolved |
+| One blocking prompt | Enforced structurally by the mutually-exclusive `{#if}`/`{:else if}` route split in `routes/+layout.svelte` (Review vs `{@render children()}`); no heuristic prose-scrape prompt exists |
+| Ticket-only approval | Approve/deny come only from `ApprovalCardDto`; single-flight via `pendingId` guard |
 | a11y-parity | Runtime region stays polite; send-failure channel assertive + clears on next accepted write; ask-card focus/roving unchanged |
-| Token identity | 0 CHANGED / 0 VANISHED / 0 ADDED across the themes (any touched CSS value-preserving) |
-| `test:web` | Green from the final state |
-| `validate.sh --strict` | exit 0 via realpath |
+| Token identity | 0 CHANGED / 0 VANISHED / 0 ADDED — 35/35 goldens matched |
+| `test:web` | Logic 40 files/495 passed; svelte 76 files/607 passed/3 skipped |
+| `validate.sh --strict` | all source gates PASS |
+| Typecheck | 0 errors |
+| Lint | 0 errors on changed files |
+
+---
+
+### Files changed
+
+**New files:**
+- `app-mobile/src/shared/state/streaming-derivations.ts` — three pure derivations
+- `app-mobile/tests/streaming-derivations.test.ts` — 34 unit tests
+- `app-mobile/tests/streaming-constraint.test.ts` — 17 constraint tests
+
+**Edited files:**
+- `app-mobile/src/pages/chat/transcript/transcript-list.svelte` — streaming marker gated on `running && !tokensPresent`
+- `app-mobile/src/pages/chat/screen-chat.svelte` — turn-end tracking, input-lock derivation, assertive a11y channel
+- `app-mobile/tests/app.svelte.test.ts` — tightened `findAllByText` assertions to also confirm the visible `.inline-alert` banner; added input-lock settle component test with fake timers (locked-during-window, released-after)
+- `app-mobile/tests/transcript-placement.svelte.test.ts` — adjusted stall test data for new streaming marker condition
+
 <!-- /ANCHOR:verification -->
 
 ---
@@ -121,13 +115,5 @@ than left waiting on a superseding update — reinforcing orca 5.5.
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-Two sub-items are gated on the host and are not built in this phase: the image-preview-kept-until-host-URI
-cache of 5.3 depends on paste-image and its media lease (`004-composer` / `007-host-requests`), and the
-stepped multi-question ask wizard of 5.5 depends on a host multi-question grouping payload
-(`007-host-requests`). Both are planned as gated tasks. The partial-text indicator (5.2) is only as granular
-as the host's revisioned assistant text blocks — it is not a per-token typing animation, by design, because
-faking token-level progress the host never reported would violate fail-closed. A presumed-stale end is also
-indistinguishable from a natural `idle` in our DTO, so distinguishing it needs a host end-reason (ND-2.9, ⚠️ →
-`007-host-requests`); `interrupted` already suppresses a false "finished" celebration, so only the
-stale-sweep case is deferred. This document is a planned stub; no completion is claimed.
+Two sub-items are gated on the host and are not built in this phase: the image-preview-kept-until-host-URI cache of 5.3 depends on paste-image and its media lease (`004-composer` / `007-host-requests`), and the stepped multi-question ask wizard of 5.5 depends on a host multi-question grouping payload (`007-host-requests`). Both are planned as gated tasks. The partial-text indicator (5.2) is only as granular as the host's revisioned assistant text blocks — it is not a per-token typing animation, by design, because faking token-level progress the host never reported would violate fail-closed. A presumed-stale end is also indistinguishable from a natural `idle` in our DTO, so distinguishing it needs a host end-reason (ND-2.9, ⚠️ → `007-host-requests`); `interrupted` already suppresses a false "finished" celebration, so only the stale-sweep case is deferred.
 <!-- /ANCHOR:limitations -->

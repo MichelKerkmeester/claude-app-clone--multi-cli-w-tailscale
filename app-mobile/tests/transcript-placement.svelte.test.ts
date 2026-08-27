@@ -200,12 +200,12 @@ describe('transcript inline image placement', () => {
   it('changes the streaming label after a long silence', async () => {
     vi.useFakeTimers();
     vi.setSystemTime(
-      Date.parse('2026-08-17T10:00:03.000Z') + TRANSCRIPT_STALL_THRESHOLD_MS - 1_000,
+      Date.parse('2026-08-17T10:00:03.000Z') + TRANSCRIPT_STALL_THRESHOLD_MS - 2_000,
     );
     const rendered = render(TranscriptList, {
       props: {
         sessionId: 'session_stall_001',
-        blocks: transcriptBlocks().slice(0, 6),
+        blocks: transcriptBlocks().slice(0, 5), // no assistant text block yet
         running: true,
       },
     });

@@ -135,6 +135,8 @@ import {
   transcriptReducer,
 } from '../src/shared/state/state.js';
 
+import { INPUT_LOCK_SETTLE_MS } from '../src/shared/state/streaming-derivations.js';
+
 const occurredAt = '2026-08-13T10:00:00.000Z';
 const sessionId = 'session_web_001';
 
@@ -1027,7 +1029,7 @@ it('a stale race preserves the draft, clears the binding, refreshes the catalog,
   const user = userEvent.setup();
   relay.submitSlashCommand.mockRejectedValueOnce(new relay.SlashSubmitError('stale_catalog'));
   const dispatchTranscript = vi.fn();
-  render(Session, {
+  const { container } = render(Session, {
     props: {
       connection: 'live',
       sessionId,
@@ -1054,9 +1056,13 @@ it('a stale race preserves the draft, clears the binding, refreshes the catalog,
   expect(composer).toHaveValue('/plan ');
   // …the catalog is refreshed for reselection…
   await waitFor(() => expect(relay.fetchCommands.mock.calls.length).toBeGreaterThan(1));
-  expect(
-    await screen.findByText('Commands changed on the host. Choose the command again.'),
-  ).toBeInTheDocument();
+  const staleMessages = await screen.findAllByText('Commands changed on the host. Choose the command again.');
+  expect(staleMessages.length).toBeGreaterThanOrEqual(1);
+  // Confirm the visible banner still renders alongside the sr-only announcer.
+  expect(staleMessages[0]).toBeInTheDocument();
+  expect(container.querySelector('.inline-alert')?.textContent).toContain(
+    'Commands changed on the host. Choose the command again.',
+  );
   expect(dispatchTranscript).not.toHaveBeenCalledWith(
     expect.objectContaining({ type: 'promptAccepted' }),
   );
@@ -1071,7 +1077,7 @@ it('a stale race preserves the draft, clears the binding, refreshes the catalog,
 it('a denied command preserves the draft and never retries or falls back to text', async () => {
   const user = userEvent.setup();
   relay.submitSlashCommand.mockRejectedValueOnce(new relay.SlashSubmitError('command_denied'));
-  render(Session, {
+  const { container } = render(Session, {
     props: {
       connection: 'live',
       sessionId,
@@ -1095,9 +1101,15 @@ it('a denied command preserves the draft and never retries or falls back to text
   await waitFor(() => expect(relay.requestTicket).toHaveBeenCalledTimes(1));
   expect(relay.submitSlashCommand).toHaveBeenCalledTimes(1);
   expect(composer).toHaveValue('/plan ');
-  expect(
-    await screen.findByText('That command is not available right now. Choose it again to retry.'),
-  ).toBeInTheDocument();
+  const deniedMessages = await screen.findAllByText(
+    'That command is not available right now. Choose it again to retry.',
+  );
+  expect(deniedMessages.length).toBeGreaterThanOrEqual(1);
+  // Confirm the visible banner still renders alongside the sr-only announcer.
+  expect(deniedMessages[0]).toBeInTheDocument();
+  expect(container.querySelector('.inline-alert')?.textContent).toContain(
+    'That command is not available right now. Choose it again to retry.',
+  );
   // Denied outcomes do not refresh the catalog and are never retried or
   // converted to the ordinary text lane.
   const readsAfterDenial = relay.fetchCommands.mock.calls.length;
@@ -1455,7 +1467,52 @@ it('renders the Attention Inbox', async () => {
 });
 
 // ───────────────────────────────────────────────────────────────────
-// 5. HELPERS
+// 5. INPUT-LOCK SETTLE COMPONENT TEST
+// ───────────────────────────────────────────────────────────────────
+
+it('gates the send control for the settle window after a transient→live edge', async () => {
+  vi.useFakeTimers();
+
+  const { rerender } = render(Session, {
+    props: {
+      connection: 'reconnecting',
+      sessionId,
+      initialCache: null,
+      transcript: { ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' },
+      dispatchConnection: vi.fn(),
+      dispatchTranscript: vi.fn(),
+      status: 'idle',
+      onBack: vi.fn(),
+    },
+  });
+
+  // Rerender to live to trigger the transient→cleared edge.
+  await rerender({
+    connection: 'live',
+  });
+
+  // Type a message so the send button is meaningfully testable.
+  const textarea = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  fireEvent.input(textarea, { target: { value: 'edge test' } });
+
+  const sendButton = screen.getByRole('button', { name: 'Send message' });
+  // Inside the settle window — send must stay disabled.
+  expect(sendButton).toBeDisabled();
+
+  // Advance past the settle window.
+  await vi.advanceTimersByTimeAsync(INPUT_LOCK_SETTLE_MS + 50);
+
+  // Wait for the reactive flush so the derived re-evaluates.
+  await vi.advanceTimersByTimeAsync(0);
+
+  // After the settle window — send must be enabled.
+  expect(sendButton).toBeEnabled();
+
+  vi.useRealTimers();
+});
+
+// ───────────────────────────────────────────────────────────────────
+// 6. HELPERS
 // ───────────────────────────────────────────────────────────────────
 
 function block<T extends TranscriptBlock>(value: Omit<T, 'revision' | 'seq' | 'occurredAt'>): T {

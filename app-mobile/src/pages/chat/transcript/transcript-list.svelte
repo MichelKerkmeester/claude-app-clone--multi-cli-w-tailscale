@@ -9,6 +9,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   import type { DisplayTranscriptBlock, TodoProjectionState } from '$shared/state/state.js';
+  import { hasStreamingTokens } from '$shared/state/streaming-derivations.js';
 
   export interface TranscriptListProps {
     readonly sessionId?: string;
@@ -106,6 +107,7 @@
     onClearTodoAnnouncement,
   }: TranscriptListProps = $props();
 
+  const tokensPresent = $derived(hasStreamingTokens(blocks, running));
   const artifactSessionId = $derived(sessionId ?? '');
 
   // ───────────────────────────────────────────────────────────────────
@@ -517,7 +519,7 @@
     <div class="transcript--scroll" bind:this={scrollEl} onscroll={onScroll}>
       <div
         class="transcript--virtual"
-        style="height: {$virtualizer.getTotalSize() + (running ? 72 : 0)}px"
+        style="height: {$virtualizer.getTotalSize() + (running && !tokensPresent ? 72 : 0)}px"
       >
         {#each $virtualizer.getVirtualItems() as virtualItem (renderItems[virtualItem.index]?.id ?? virtualItem.key)}
           {@const item = renderItems[virtualItem.index]}
@@ -585,7 +587,10 @@
           {/if}
         {/each}
         <!-- This state: streaming — This slot: streaming--marker. -->
-        {#if running}
+        <!-- The animated dots show only while running with no token block;
+             once an assistant text block exists for the running turn, that
+             partial text IS the streaming indicator. -->
+        {#if running && !tokensPresent}
           <div
             class="streaming--marker"
             role="status"

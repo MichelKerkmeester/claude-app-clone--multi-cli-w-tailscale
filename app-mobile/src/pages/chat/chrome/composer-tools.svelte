@@ -24,6 +24,16 @@
     readonly composerEmpty?: boolean;
     readonly onRecallHistory?: () => void;
     readonly onOpenModelEffort?: (section: 'model' | 'effort') => void;
+    /** Dictation control callbacks. */
+    readonly onDictationTap?: () => void;
+    readonly onDictationPress?: (event: PointerEvent) => void;
+    readonly onDictationRelease?: (event: PointerEvent, holdDurationMs: number) => void;
+    /** True while a dictation recording is active. */
+    readonly dictationActive?: boolean;
+    /** Current dictation capture mode. */
+    readonly dictationMode?: 'toggle' | 'hold-to-talk';
+    /** Whether dictation is available in this browser. */
+    readonly dictationAvailable?: boolean;
   }
 
   // ───────────────────────────────────────────────────────────────────
@@ -53,6 +63,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { Popover } from 'bits-ui';
+  import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
   import { hideOutside } from '$shared/primitives/a11y/aria-hide-outside.svelte.js';
   import Button from '$shared/primitives/button/button.svelte';
   import CommandPalette from './command-palette.svelte';
@@ -74,6 +85,12 @@
     composerEmpty = false,
     onRecallHistory = () => undefined,
     onOpenModelEffort = undefined,
+    onDictationTap = undefined,
+    onDictationPress = undefined,
+    onDictationRelease = undefined,
+    dictationActive = false,
+    dictationMode = 'toggle',
+    dictationAvailable = false,
   }: ComposerToolsProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
@@ -91,6 +108,10 @@
 
   // Bridge focus-visible from the hidden checkbox input to its label.
   let checkboxFocusVisible = $state(false);
+
+  // Dictation hold-to-track timing.
+  let dictationHoldStartedAt: number | null = null;
+  let dictationHoldPointerId: number | null = null;
 
   // ───────────────────────────────────────────────────────────────────
   // 7. DERIVED STATE
@@ -152,6 +173,40 @@
     const target = event.currentTarget;
     if (target instanceof HTMLInputElement) onShiftTabPreferenceChange(target.checked);
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 10. DICTATION HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
+  // Keep handle dictation tap focused on its single responsibility.
+  function handleDictationClick(event: MouseEvent): void {
+    if (dictationMode === 'hold-to-talk') return;
+    event.preventDefault();
+    onDictationTap?.();
+  }
+
+  // Keep handle dictation pointer down focused on its single responsibility.
+  function handleDictationPointerDown(event: PointerEvent): void {
+    if (event.button !== 0) return;
+    if (dictationMode === 'hold-to-talk') {
+      dictationHoldPointerId = event.pointerId;
+      dictationHoldStartedAt = performance.now();
+      onDictationPress?.(event);
+    }
+  }
+
+  // Keep handle dictation pointer up focused on its single responsibility.
+  function handleDictationPointerUp(event: PointerEvent): void {
+    if (event.button !== 0) return;
+    if (dictationMode === 'hold-to-talk' && dictationHoldPointerId !== null) {
+      const holdDuration = dictationHoldStartedAt !== null
+        ? performance.now() - dictationHoldStartedAt
+        : 0;
+      dictationHoldPointerId = null;
+      dictationHoldStartedAt = null;
+      onDictationRelease?.(event, holdDuration);
+    }
+  }
 </script>
 
 <!-- Component content -->
@@ -166,6 +221,53 @@
     />
   </svg>
 {/snippet}
+
+<!-- Dictation mic control (outside the popover, in the composer bar). -->
+<button
+    type="button"
+    class="composer--mic"
+    class:is-recording={dictationActive}
+    data-dictation-available={dictationAvailable ? '' : undefined}
+    aria-label={dictationActive ? 'Stop dictation' : 'Start dictation'}
+    aria-pressed={dictationActive}
+    use:hover
+    use:press
+    use:focusVisible
+    onclick={handleDictationClick}
+    onpointerdown={handleDictationPointerDown}
+    onpointerup={handleDictationPointerUp}
+    onpointerleave={() => {
+      // Release the hold if the pointer leaves the button.
+      if (dictationMode === 'hold-to-talk' && dictationHoldPointerId !== null) {
+        const holdDuration = dictationHoldStartedAt !== null
+          ? performance.now() - dictationHoldStartedAt
+          : 0;
+        dictationHoldPointerId = null;
+        dictationHoldStartedAt = null;
+        onDictationRelease?.(new PointerEvent('pointerup'), holdDuration);
+      }
+    }}
+    style="min-block-size: 44px; min-inline-size: 44px"
+  >
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+      <path
+        d="M12 2a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
 
 <!-- Do not edit — tools popover react-aria wiring (DialogTrigger / Popover / Dialog) — Unchanged. -->
 <Popover.Root bind:open onOpenChange={handleOpenChange}>
@@ -491,5 +593,42 @@
   :global(.tools--recall[data-disabled]) {
     cursor: not-allowed;
     opacity: 0.4;
+  }
+
+  /* Dictation mic control in the composer action row. */
+  :global(.composer--mic) {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-secondary);
+    cursor: pointer;
+    transition:
+      background var(--duration-state, 120ms) var(--ease-out, ease),
+      color var(--duration-state, 120ms) var(--ease-out, ease);
+  }
+
+  :global(.composer--mic[data-hovered]),
+  :global(.composer--mic[data-pressed]) {
+    background: var(--surface-muted);
+  }
+
+  :global(.composer--mic[data-focus-visible]) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  :global(.composer--mic.is-recording) {
+    background: var(--danger);
+    color: #fff;
+    border-color: var(--danger);
+  }
+
+  :global(.composer--mic.is-recording[data-hovered]) {
+    background: color-mix(in srgb, var(--danger) 80%, black);
   }
 </style>

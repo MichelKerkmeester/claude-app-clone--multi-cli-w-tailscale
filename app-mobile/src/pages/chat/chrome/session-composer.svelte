@@ -93,6 +93,9 @@
   import { fileFromClipboardBlob } from '$shared/commands/paste-utils.js';
   import { createPlanModeShortcut } from '$shared/commands/plan-mode-shortcut.js';
   import Button from '$shared/primitives/button/button.svelte';
+  import DictationOverlay from './dictation-overlay.svelte';
+  import DictationSheet from './sheet-dictation.svelte';
+  import { ACCIDENTAL_TAP_MS } from '$shared/chrome/dictation-capture.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
@@ -159,6 +162,39 @@
   let leavePlanOpen = $state(false);
   let shiftTabEnabled = $state(readComposerShiftTabPreference());
 
+  // ───────────────────────────────────────────────────────────────────
+  // Dictation state
+  // ───────────────────────────────────────────────────────────────────
+
+  let dictationOpen = $state(false);
+  let dictationSheetOpen = $state(false);
+  let dictationMode = $state<'toggle' | 'hold-to-talk'>('toggle');
+  let dictationLang = $state('auto');
+  let dictationAvailable = $state(false);
+  let dictationEnabled = $state(true);
+  let dictationOverlayEl = $state<{
+    stopAndInsert: () => void;
+    cancelTake: () => void;
+  } | null>(null);
+  let dictationEngineMessage = $state('');
+
+  // Derive engine status: unavailable when unsupported or user-disabled.
+  const dictationEngineStatus = $derived(
+    !dictationAvailable || !dictationEnabled ? 'unavailable' : 'available',
+  );
+
+  // Check Web Speech availability on mount.
+  $effect(() => {
+    const SR = (
+      window as unknown as Record<string, unknown>
+    ).SpeechRecognition ?? (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
+    const available = typeof SR === 'function' && window.isSecureContext;
+    dictationAvailable = available;
+    dictationEngineMessage = available
+      ? 'On-device dictation ready.'
+      : 'Dictation is not available in this browser.';
+  });
+
   // The attachment hooks are the ported context/factory; called at top level.
   const attachmentDraft = getAttachmentDraft();
   const attachmentSubmission = useAttachmentSubmission(() => ({
@@ -203,6 +239,7 @@
       !awaitingSnapshot,
   );
   const canSendMessage = $derived(hasAttachments ? attachmentSendable : canSubmit);
+  const dictationActive = $derived(dictationOpen);
 
   // Pure slash trigger; re-evaluated on every committed input.
   const trigger = $derived.by(
@@ -420,6 +457,65 @@
   // ───────────────────────────────────────────────────────────────────
   // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
+
+  // ───────────────────────────────────────────────────────────────────
+  // Dictation handlers
+  // ───────────────────────────────────────────────────────────────────
+
+  // Keep handle dictation tap focused on its single responsibility.
+  async function handleDictationTap(): Promise<void> {
+    if (!dictationAvailable || !dictationEnabled) {
+      dictationSheetOpen = true;
+      return;
+    }
+    if (dictationOpen) {
+      dictationOverlayEl?.stopAndInsert();
+      return;
+    }
+    // The overlay owns getUserMedia — no pre-check needed.
+    dictationOpen = true;
+  }
+
+  // Keep handle dictation press focused on its single responsibility.
+  function handleDictationPress(): void {
+    if (!dictationAvailable || !dictationEnabled) {
+      dictationSheetOpen = true;
+      return;
+    }
+    if (dictationOpen) return;
+    dictationOpen = true;
+  }
+
+  // Keep handle dictation release focused on its single responsibility.
+  function handleDictationRelease(_event: PointerEvent, holdDurationMs: number): void {
+    if (!dictationOpen) return;
+    if (holdDurationMs < ACCIDENTAL_TAP_MS) {
+      // Accidental tap — cancel quietly.
+      dictationOverlayEl?.cancelTake();
+    } else {
+      dictationOverlayEl?.stopAndInsert();
+    }
+  }
+
+  // Keep handle dictation close focused on its single responsibility.
+  function handleDictationClose(): void {
+    dictationOpen = false;
+  }
+
+  // Keep handle dictation toggle focused on its single responsibility.
+  function handleDictationToggle(enabled: boolean): void {
+    dictationEnabled = enabled;
+    if (!enabled) {
+      dictationEngineMessage = 'Dictation is off.';
+    } else if (dictationAvailable) {
+      dictationEngineMessage = 'On-device dictation ready.';
+    }
+  }
+
+  // Keep handle dictation lang change focused on its single responsibility.
+  function handleDictationLangChange(lang: string): void {
+    dictationLang = lang;
+  }
 
   // Slash drafts use the ticketed lane; ordinary drafts keep send/steer routing.
   // Do not edit — Mutation path — Submit / steer / stop / snapshot / slash-draft / attachment flow; presentation may not reach past here.
@@ -694,6 +790,12 @@
           composerEmpty={!hasText && !hasAttachments}
           onRecallHistory={() => { toolsOpen = false; recallHistoryOpen = true; }}
           onOpenModelEffort={(section) => { toolsOpen = false; onOpenModelEffort?.(section); }}
+          {dictationActive}
+          {dictationMode}
+          {dictationAvailable}
+          onDictationTap={handleDictationTap}
+          onDictationPress={handleDictationPress}
+          onDictationRelease={handleDictationRelease}
         />
         <PlanModeButton
           runtime={runtimeControls.runtime}
@@ -772,6 +874,30 @@
     </div>
   </form>
   {#if mediaAvailable}<AttachmentPreviewDialog />{/if}
+
+  {#if dictationOpen}
+    <DictationOverlay
+      bind:this={dictationOverlayEl}
+      isOpen={dictationOpen}
+      mode={dictationMode}
+      sessionId={sessionId}
+      lang={dictationLang}
+      {setPrompt}
+      onClose={handleDictationClose}
+    />
+  {/if}
+
+  <DictationSheet
+    isOpen={dictationSheetOpen}
+    onOpenChange={(open) => (dictationSheetOpen = open)}
+    engineStatus={dictationEngineStatus}
+    dictationEnabled={dictationEnabled}
+    onToggleEnabled={handleDictationToggle}
+    lang={dictationLang}
+    onLangChange={handleDictationLangChange}
+    engineMessage={dictationEngineMessage}
+  />
+
   <PromptHistorySheet
     isOpen={recallHistoryOpen}
     onOpenChange={(open) => (recallHistoryOpen = open)}

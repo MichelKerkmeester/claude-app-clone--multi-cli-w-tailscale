@@ -21,6 +21,9 @@
     readonly modelCanViewPhotos: boolean;
     readonly localFiles: readonly File[] | undefined;
     readonly promptError?: string | null;
+    readonly connection?: 'live' | 'reconnecting' | 'offline';
+    readonly awaitingSnapshot?: boolean;
+    readonly sendingPrompt?: boolean;
   }
 </script>
 
@@ -44,6 +47,9 @@
     modelCanViewPhotos,
     localFiles,
     promptError = null,
+    connection = 'live',
+    awaitingSnapshot = false,
+    sendingPrompt = false,
   }: SessionComposerSurfaceProps = $props();
 </script>
 
@@ -63,5 +69,8 @@
     {mediaCapability}
     {localFiles}
     {promptError}
+    {connection}
+    {awaitingSnapshot}
+    {sendingPrompt}
   />
 </AttachmentDraftProvider>

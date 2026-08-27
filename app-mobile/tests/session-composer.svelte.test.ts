@@ -13,6 +13,8 @@
 // 1. IMPORTS
 // ───────────────────────────────────────────────────────────────────
 
+import { readFileSync } from 'node:fs';
+
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
@@ -125,6 +127,9 @@ interface HarnessProps {
   readonly modelCanViewPhotos?: boolean;
   readonly localFiles?: readonly File[];
   readonly promptError?: string | null;
+  readonly connection?: 'live' | 'reconnecting' | 'offline';
+  readonly awaitingSnapshot?: boolean;
+  readonly sendingPrompt?: boolean;
 }
 
 // ───────────────────────────────────────────────────────────────────
@@ -153,6 +158,9 @@ function renderComposer(props: HarnessProps = {}) {
       modelCanViewPhotos: props.modelCanViewPhotos ?? true,
       localFiles: props.localFiles,
       promptError: props.promptError ?? null,
+      connection: props.connection ?? 'live',
+      awaitingSnapshot: props.awaitingSnapshot ?? false,
+      sendingPrompt: props.sendingPrompt ?? false,
     },
   });
   return { ...view, sendPrompt, sendSlashDraft, onInsertCommand, catalog };
@@ -454,6 +462,84 @@ describe('explicit slash send gating', () => {
     await user.keyboard('{Enter}');
     await tick();
     expect(sendSlashDraft).not.toHaveBeenCalled();
+  });
+
+  it('a reconnect blip mid-typing keeps the textarea editable, focused, and Send gated', async () => {
+    const user = userEvent.setup();
+    const { sendPrompt, sendSlashDraft } = renderComposer({ connection: 'reconnecting' });
+    const composer = await typeDraft(user, 'mid-blip draft');
+    // The field stays editable through the transient lock — no disabled toggle,
+    // so the mobile keyboard is never dismissed and the draft survives.
+    expect(composer).toBeEnabled();
+    expect(composer).toHaveFocus();
+    expect(composer).toHaveValue('mid-blip draft');
+    // Send REMAINS gated while the lock holds.
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled();
+    await user.keyboard('{Enter}');
+    await tick();
+    expect(sendPrompt).not.toHaveBeenCalled();
+    expect(sendSlashDraft).not.toHaveBeenCalled();
+    expect(composer).toHaveValue('mid-blip draft');
+  });
+
+  it('an awaiting-snapshot lock keeps the textarea editable while Send stays gated', async () => {
+    const user = userEvent.setup();
+    const { sendPrompt } = renderComposer({ awaitingSnapshot: true });
+    const composer = await typeDraft(user, 'syncing draft');
+    expect(composer).toBeEnabled();
+    expect(composer).toHaveValue('syncing draft');
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled();
+    await user.keyboard('{Enter}');
+    await tick();
+    expect(sendPrompt).not.toHaveBeenCalled();
+  });
+
+  it('flags busy only while locked, and the busy rules key on the value not the attribute', async () => {
+    const user = userEvent.setup();
+    renderComposer();
+    const idle = await typeDraft(user, 'calm draft');
+    expect(idle.getAttribute('data-busy')).toBe('false');
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeEnabled();
+
+    cleanup();
+    renderComposer({ connection: 'reconnecting' });
+    expect(screen.getByLabelText('Message Pi').getAttribute('data-busy')).toBe('true');
+
+    // The attribute is always present — Svelte renders a false boolean as the
+    // string "false" — so a presence selector would pin the muted tint, the
+    // not-allowed cursor and the hidden caret on permanently.
+    const source = readFileSync(
+      'app-mobile/src/pages/chat/chrome/session-composer.svelte',
+      'utf8',
+    );
+    const busyRules = source.match(/\[data-busy[^\]]*\]/gu) ?? [];
+    expect(busyRules.length).toBeGreaterThan(0);
+    for (const rule of busyRules) expect(rule).toBe("[data-busy='true']");
+
+    // The field stays editable while the gate holds, so the busy treatment must
+    // not read as inert. jsdom computes neither of these, so guard the source:
+    // a hidden caret would strand a user typing through a reconnect blip.
+    const busyBlock = source.match(/\.composer--input\[data-busy='true'\]\s*\{[^}]*\}/u)?.[0] ?? '';
+    expect(busyBlock).not.toMatch(/caret-color:\s*transparent/u);
+    expect(busyBlock).not.toMatch(/cursor:\s*not-allowed/u);
+    expect(busyBlock).not.toMatch(/opacity:/u);
+  });
+
+  it('releases the send gate when the lock clears, keeping the draft intact', async () => {
+    const user = userEvent.setup();
+    const { rerender } = renderComposer({ connection: 'reconnecting' });
+    const composer = await typeDraft(user, 'held draft');
+    expect(composer).toHaveValue('held draft');
+    expect(composer.getAttribute('data-busy')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled();
+
+    // The lock clears the way the parent reports it: the field never lost its
+    // draft, and sending becomes available again without a remount.
+    rerender({ connection: 'live' } as never);
+    await tick();
+    expect(screen.getByLabelText('Message Pi')).toHaveValue('held draft');
+    expect(screen.getByLabelText('Message Pi').getAttribute('data-busy')).toBe('false');
+    expect(screen.getByRole('button', { name: 'Send message' })).toBeEnabled();
   });
 
   it('keeps ordinary running behavior unchanged: steer and Later, never slash', async () => {

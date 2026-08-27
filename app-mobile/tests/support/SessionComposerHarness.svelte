@@ -22,11 +22,15 @@
     readonly mediaCapability: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
     readonly localFiles: readonly File[] | undefined;
     readonly promptError?: string | null;
+    readonly connection?: 'live' | 'reconnecting' | 'offline';
+    readonly awaitingSnapshot?: boolean;
+    readonly sendingPrompt?: boolean;
   }
 </script>
 
 <script lang="ts">
   import SessionComposer from '../../src/pages/chat/chrome/session-composer.svelte';
+  import { inputLockReason } from '../../src/shared/state/streaming-derivations.js';
   import { getAttachmentDraft } from '../../src/pages/chat/attachments/attachment-draft-provider.svelte';
   import { INITIAL_RUNTIME_STATE } from '../../src/shared/state/runtime.js';
 
@@ -45,6 +49,9 @@
     mediaCapability,
     localFiles,
     promptError = null,
+    connection = 'live',
+    awaitingSnapshot = false,
+    sendingPrompt = false,
   }: SessionComposerHarnessProps = $props();
 
   // svelte-ignore state_referenced_locally
@@ -75,12 +82,16 @@
     setThinkingLevel: () => undefined,
     setMode: () => undefined,
   };
+
+  // Mirror the real screen: the parent owns the lock and forwards it.
+  const inputLock = $derived(inputLockReason(connection, awaitingSnapshot));
 </script>
 
 {#if localFiles !== undefined}
   <button type="button" onclick={selectLocalPhotos}>select local photos</button>
 {/if}
 <SessionComposer
+  {inputLock}
   {prompt}
   {setPrompt}
   {onDraftChange}
@@ -89,9 +100,9 @@
   stopRun={() => undefined}
   {canSubmit}
   {status}
-  connection="live"
-  awaitingSnapshot={false}
-  sendingPrompt={false}
+  {connection}
+  {awaitingSnapshot}
+  {sendingPrompt}
   stopping={false}
   {promptError}
   {runtimeControls}

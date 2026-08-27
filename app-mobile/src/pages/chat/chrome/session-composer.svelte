@@ -30,7 +30,9 @@
     readonly stopRun: () => void;
     readonly canSubmit: boolean;
     readonly status: 'idle' | 'running' | 'interrupted' | 'unknown';
-    readonly connection: string;
+    readonly connection: ConnectionPhase;
+    /** The parent's settled input-lock; sending pauses while it is not 'none'. */
+    readonly inputLock: InputLockReason;
     readonly awaitingSnapshot: boolean;
     readonly sendingPrompt: boolean;
     readonly stopping: boolean;
@@ -88,7 +90,13 @@
   import { insertSlashCommand } from '$shared/commands/insert-slash-command.js';
   import { deriveSlashTrigger, slashDismissalSignature } from '$shared/commands/use-slash-trigger.js';
   import { modeAuthority } from '$shared/state/runtime.js';
-  import { readComposerShiftTabPreference, writeComposerShiftTabPreference, recordPromptHistory } from '$shared/state/state.js';
+  import type { InputLockReason } from '$shared/state/streaming-derivations.js';
+  import {
+    readComposerShiftTabPreference,
+    writeComposerShiftTabPreference,
+    recordPromptHistory,
+    type ConnectionPhase,
+  } from '$shared/state/state.js';
   import PromptHistorySheet from './sheet-prompt-history.svelte';
   import { fileFromClipboardBlob } from '$shared/commands/paste-utils.js';
   import { createPlanModeShortcut } from '$shared/commands/plan-mode-shortcut.js';
@@ -114,6 +122,7 @@
     canSubmit,
     status,
     connection,
+    inputLock,
     awaitingSnapshot,
     sendingPrompt,
     stopping,
@@ -240,6 +249,10 @@
   );
   const canSendMessage = $derived(hasAttachments ? attachmentSendable : canSubmit);
   const dictationActive = $derived(dictationOpen);
+
+  // The textarea stays editable through every transient lock, so a reconnect
+  // blip cannot dismiss the mobile keyboard; only sending is gated on it.
+  const sendLocked = $derived(inputLock !== 'none');
 
   // Pure slash trigger; re-evaluated on every committed input.
   const trigger = $derived.by(
@@ -520,6 +533,11 @@
   // Slash drafts use the ticketed lane; ordinary drafts keep send/steer routing.
   // Do not edit — Mutation path — Submit / steer / stop / snapshot / slash-draft / attachment flow; presentation may not reach past here.
   function submit(): void {
+    if (sendLocked) {
+      // The lock is transient: typing continues, only the send pauses.
+      announcement = connection === 'live' ? 'Syncing with the relay…' : 'Reconnect to send.';
+      return;
+    }
     if (!attachmentCanSubmit) {
       announcement = attachmentDraft.blockingMessage ?? 'Finish checking the selected photos first.';
       return;
@@ -767,10 +785,7 @@
       }}
       onkeydown={onKeyDown}
       onpaste={handlePaste}
-      disabled={
-        connection !== 'live' ||
-        awaitingSnapshot
-      }
+      data-busy={sendLocked ? 'true' : 'false'}
       {placeholder}
     ></textarea>
     <div class="composer--bar">
@@ -829,7 +844,7 @@
               if (hasAttachments) attachmentSubmission.submit('followUp');
               else sendPrompt('followUp');
             }}
-            disabled={!canSendMessage || attachmentSubmission.busy}
+            disabled={!canSendMessage || attachmentSubmission.busy || sendLocked}
           >
             Later
           </Button>
@@ -852,7 +867,7 @@
             type="submit"
             class="composer--primary is-send"
             aria-label="Send command"
-            disabled={!effectiveSlashSendable}
+            disabled={!effectiveSlashSendable || sendLocked}
           >
             {#if slashSubmitting}{@render spinnerGlyph()}{:else}{@render sendGlyph()}{/if}
           </Button>
@@ -861,7 +876,7 @@
             type="submit"
             class="composer--primary is-send"
             aria-label={running ? 'Steer the current turn' : 'Send message'}
-            disabled={!canSendMessage || attachmentSubmission.busy}
+            disabled={!canSendMessage || attachmentSubmission.busy || sendLocked}
           >
             {#if sendingPrompt || attachmentSubmission.busy}
               {@render spinnerGlyph()}
@@ -1023,8 +1038,10 @@
     border-color: var(--accent);
   }
 
-  /* Muted surface tint: quiet non-interactive background while syncing or submitting. */
-  .composer--tray:has(.composer--input:disabled) {
+  /* Muted surface tint: quiet non-interactive background while syncing or submitting.
+     The busy signal is a data-attribute, not :disabled — the textarea must stay
+     editable through transient locks so the mobile keyboard is never dismissed. */
+  .composer--tray:has(.composer--input[data-busy='true']) {
     background: var(--surface-muted);
   }
 
@@ -1089,13 +1106,14 @@
     box-shadow: none;
   }
 
-  /* This state: awaitingSnapshot · sendingPrompt · slashSubmitting — the input is
-     disabled while the composer is busy or syncing (plus a non-live connection). */
-  .composer--input:disabled {
-    cursor: not-allowed;
+  /* This state: the send gate is held (reconnecting · awaiting snapshot ·
+     disconnected). The field stays fully editable and keeps its caret — only
+     sending pauses — so the treatment must not read as inert: no not-allowed
+     cursor, no hidden caret, and no whole-element opacity fade (which would
+     drop the draft below WCAG AA contrast). Text is held at full --ink. */
+  .composer--input[data-busy='true'] {
     color: var(--ink);
     -webkit-text-fill-color: var(--ink);
-    caret-color: transparent;
   }
 
   /* Keep this rule aligned with its surrounding surface. */
@@ -1105,7 +1123,7 @@
   }
 
   /* Keep this rule aligned with its surrounding surface. */
-  .composer--input:disabled::placeholder {
+  .composer--input[data-busy='true']::placeholder {
     color: var(--ink-muted);
     opacity: 0.6;
   }

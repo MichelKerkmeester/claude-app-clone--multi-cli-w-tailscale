@@ -252,6 +252,37 @@ export class SlashSubmitError extends Error {
   }
 }
 
+/** The three delivery verdicts for a prompt submit: resolved, refused, or ambiguous. */
+export type PromptDeliveryStatus = 'accepted' | 'rejected' | 'delivery-unknown';
+
+export interface PromptDeliveryOutcome {
+  readonly status: PromptDeliveryStatus;
+  readonly reasonCode: string;
+}
+
+/** The ambiguous-verdict shape reused across the relay's outcome lanes. */
+export const PROMPT_DELIVERY_UNKNOWN: PromptDeliveryOutcome = {
+  status: 'delivery-unknown',
+  reasonCode: 'delivery_unknown',
+};
+
+/**
+ * A prompt submit that did not settle as accepted. The outcome rides on the
+ * error itself, so a catch-and-rethrow keeps it readable by upstream callers
+ * — they must distinguish a refused submit from one that may have landed.
+ */
+export class PromptDeliveryError extends Error {
+  readonly outcome: PromptDeliveryOutcome;
+  readonly cause: unknown;
+
+  constructor(outcome: PromptDeliveryOutcome, message: string, cause: unknown = null) {
+    super(message);
+    this.name = 'PromptDeliveryError';
+    this.outcome = outcome;
+    this.cause = cause;
+  }
+}
+
 /** Parse a Retry-After header into clamped milliseconds, or null when unbounded. */
 export function parseBoundedRetryAfter(value: string | null): number | null {
   if (value === null) return null;
@@ -563,6 +594,23 @@ export async function submitPromptWithAttachmentRefs(
 // 6. PROMPT SUBMISSION
 // ───────────────────────────────────────────────────────────────────
 
+/** Classify a submit-transport failure: a relay refusal is definite, everything else may have landed. */
+function promptDeliveryOutcomeFor(error: unknown): PromptDeliveryOutcome {
+  if (error instanceof RelayRequestError && error.status !== null && error.status < 500) {
+    // The relay processed the request and refused it — never ambiguous.
+    return { status: 'rejected', reasonCode: error.code };
+  }
+  // Network loss, 5xx, abort, or an unreadable body may still have delivered the prompt.
+  return PROMPT_DELIVERY_UNKNOWN;
+}
+
+function promptDeliveryFailureMessage(error: unknown): string {
+  if (error instanceof RelayRequestError) {
+    return error.code === 'access_denied' ? 'Relay access denied.' : 'Relay request failed.';
+  }
+  return 'Prompt delivery is unresolved.';
+}
+
 export async function submitPrompt(
   sessionId: string,
   submissionId: string,
@@ -570,24 +618,50 @@ export async function submitPrompt(
   streamingBehavior?: 'steer' | 'followUp',
   signal?: AbortSignal,
 ): Promise<TextBlock> {
-  const ticket = await requestTicket(signal);
-  const payload = await postJson(
-    '/api/prompt/submit',
-    {
-      type: 'prompt.submit',
-      submissionId,
-      sessionId,
-      message,
-      ticket,
-      ...(streamingBehavior === undefined ? {} : { streamingBehavior }),
-    },
-    signal,
-    [202],
-  );
-  if (!isPromptSubmitResponse(payload)) {
-    throw new Error('Relay returned an invalid prompt acknowledgement.');
+  let ticket: string;
+  try {
+    ticket = await requestTicket(signal);
+  } catch (error: unknown) {
+    // The submit endpoint was never reached, so delivery failed definitively.
+    throw new PromptDeliveryError(
+      {
+        status: 'rejected',
+        reasonCode: error instanceof RelayRequestError ? error.code : 'request_failed',
+      },
+      promptDeliveryFailureMessage(error),
+      error,
+    );
   }
-  return payload.block;
+  try {
+    const payload = await postJson(
+      '/api/prompt/submit',
+      {
+        type: 'prompt.submit',
+        submissionId,
+        sessionId,
+        message,
+        ticket,
+        ...(streamingBehavior === undefined ? {} : { streamingBehavior }),
+      },
+      signal,
+      [202],
+    );
+    if (!isPromptSubmitResponse(payload)) {
+      // A 202 with an unreadable body: the prompt may already be accepted.
+      throw new PromptDeliveryError(
+        PROMPT_DELIVERY_UNKNOWN,
+        'Relay returned an invalid prompt acknowledgement.',
+      );
+    }
+    return payload.block;
+  } catch (error: unknown) {
+    if (error instanceof PromptDeliveryError) throw error;
+    throw new PromptDeliveryError(
+      promptDeliveryOutcomeFor(error),
+      promptDeliveryFailureMessage(error),
+      error,
+    );
+  }
 }
 
 /** One slash submit with fresh ticket and revision revalidation; stale/denied throw, never auto-retry. */

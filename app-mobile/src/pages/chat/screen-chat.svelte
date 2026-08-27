@@ -669,6 +669,7 @@
       {canSubmit}
       {status}
       {connection}
+      {inputLock}
       awaitingSnapshot={transcript.awaitingSnapshot}
       {sendingPrompt}
       {stopping}

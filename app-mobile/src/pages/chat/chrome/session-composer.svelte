@@ -1016,6 +1016,11 @@
     border-color: var(--accent);
   }
 
+  /* Muted surface tint: quiet non-interactive background while syncing or submitting. */
+  .composer--tray:has(.composer--input:disabled) {
+    background: var(--surface-muted);
+  }
+
   /* ── Installed-PWA safe-area hardening ───────────────────────────────
      With viewport-fit=cover the layout extends under the notch and rounded
      corners in landscape; interactive content keeps clear of the insets while
@@ -1081,13 +1086,21 @@
      disabled while the composer is busy or syncing (plus a non-live connection). */
   .composer--input:disabled {
     cursor: not-allowed;
-    opacity: 0.55;
+    color: var(--ink);
+    -webkit-text-fill-color: var(--ink);
+    caret-color: transparent;
   }
 
   /* Keep this rule aligned with its surrounding surface. */
   .composer--input::placeholder {
     color: var(--ink-muted);
     opacity: 0.8;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  .composer--input:disabled::placeholder {
+    color: var(--ink-muted);
+    opacity: 0.6;
   }
 
   /* Keep this rule aligned with its surrounding surface. */

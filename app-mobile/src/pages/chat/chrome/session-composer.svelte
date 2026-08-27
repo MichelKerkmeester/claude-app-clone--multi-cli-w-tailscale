@@ -1003,6 +1003,13 @@
       border-color var(--duration-state, 220ms) var(--ease-out, ease);
   }
 
+  /* Focus affordance: 2px accent top line while the input holds focus without shifting layout. */
+  .composer--tray:focus-within {
+    border-top-width: 2px;
+    border-top-color: var(--accent-strong);
+    padding-top: calc(var(--space-2) - 1px);
+  }
+
   /* Dashed Plan outline: host-confirmed only; held-back muted drafting surface. */
   .composer--tray.is-plan-mode {
     border-style: dashed;
@@ -1234,18 +1241,9 @@
     }
   }
 
-  /* Narrow widths give the mode control its own toolbar row above the
-     textarea: the left group wraps so the label never truncates Plan ·
-     read-only and the primary action stays on the first row. */
-  @media (max-width: 400px) {
-    /* Keep this rule aligned with its surrounding surface. */
-    .composer--left {
-      flex-wrap: wrap;
-      row-gap: var(--space-1);
-    }
-  }
-
-  /* Editable seam: layout — narrow reflow of the composer bar + ready/review card + sheets. */
+  /* Editable seam: layout — narrow reflow of the composer bar + ready/review card + sheets.
+     Narrow widths give the mode control its own toolbar row: the left group wraps so the
+     label never truncates Plan · read-only and the primary action stays on the first row. */
   @media (max-width: 27rem) {
     /* Keep this rule aligned with its surrounding surface. */
     .composer--bar {

@@ -979,12 +979,13 @@
     z-index: 5;
     bottom: 0;
     display: grid;
-    gap: var(--space-2);
-    margin-top: var(--space-4);
+    gap: var(--space-1);
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
     padding-bottom: 0;
     padding-inline-start: env(safe-area-inset-left, 0px);
     padding-inline-end: env(safe-area-inset-right, 0px);
-    background: linear-gradient(to top, var(--canvas) 66%, transparent);
+    background: linear-gradient(to top, var(--canvas) 50%, transparent);
   }
 
   /* This surface: composer — edge-to-edge full-width input container. */
@@ -1027,9 +1028,10 @@
   /* Keep this rule aligned with its surrounding surface. */
   .composer--disclaimer {
     margin: 0;
-    padding-inline: var(--space-2);
+    padding-inline: var(--space-3);
     color: var(--ink-muted);
     font-size: 0.75rem;
+    line-height: 1.35;
     text-align: center;
   }
 
@@ -1117,7 +1119,7 @@
   /* Keep this rule aligned with its surrounding surface. */
   .attachment--draft-message {
     margin: 0;
-    padding-inline: var(--space-2);
+    padding-inline: var(--space-1);
     color: var(--ink-muted);
     font-family: var(--font-display);
     font-size: 0.84rem;

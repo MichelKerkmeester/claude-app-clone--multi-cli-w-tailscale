@@ -1036,21 +1036,38 @@
   /* This slot: input — the single editing field; colour/type stay token-driven. */
   .composer--input {
     width: 100%;
-    min-height: 1.75rem;
+    min-height: 1.625rem;
     max-height: 140px;
-    padding: var(--space-2) var(--space-2) var(--space-1);
+    padding: var(--space-2) var(--space-1) var(--space-1);
     border: 0;
     background: transparent;
     color: var(--ink);
+    caret-color: var(--accent);
     font-family: var(--font-sans);
     font-size: 1.0625rem;
+    font-weight: 400;
     line-height: 1.5;
+    letter-spacing: -0.01em;
     resize: none;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-hairline) transparent;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Keep this rule aligned with its surrounding surface. */
+  .composer--input::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
   }
 
   /* Keep this rule aligned with its surrounding surface. */
   .composer--input:focus {
     outline: none;
+    box-shadow: none;
   }
 
   /* This state: awaitingSnapshot · sendingPrompt · slashSubmitting — the input is
@@ -1063,6 +1080,7 @@
   /* Keep this rule aligned with its surrounding surface. */
   .composer--input::placeholder {
     color: var(--ink-muted);
+    opacity: 0.8;
   }
 
   /* Keep this rule aligned with its surrounding surface. */

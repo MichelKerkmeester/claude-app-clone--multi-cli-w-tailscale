@@ -7,11 +7,11 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/007-host-requests"
     last_updated_at: "2026-08-27T00:00:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Relay emits 8 of 12 card fields; protocol + model/attention + redacted content shipped."
-    next_safe_action: "Record the 3 external-Pi fields; scope the chat RPCs + presence extensions."
+    recent_action: "Card-truth fix (real messageCount/interrupted/queued) shipped; RPC set dispositioned."
+    next_safe_action: "None — host work closed at the evidence-backed stopping point."
     blockers:
-      - "agent/resumable/queuedMessageCount + @-file-search + host STT need the external Pi CLI (out of this repo)."
-    completion_pct: 45
+      - "agent/resumable + @-file-search + host STT need the external Pi CLI (out of this repo)."
+    completion_pct: 60
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -57,9 +57,15 @@ prefixed secrets; caps to the protocol-guard limits) plus a conservative card-bo
 for un-prefixed token shapes; a rejected value omits the field. The merged card is re-validated against
 `isSessionCardDto` and falls back to the bare card on any mismatch.
 
-Not built — `agent`, `resumable`, `queuedMessageCount` have no relay source (the external Pi does not emit them);
-`activity` has no clean per-turn label. These, plus the chat RPCs and presence extensions, are recorded in
-LIMITATIONS.
+**Card-truth base fields** (`d21fc42`): a live-projector overlay at `GET /api/sessions` fixed three stubbed base
+fields the client already reads — real `messageCount` from the projector tally (it was hardcoded 0, so every card
+showed "No messages"), `status: 'interrupted'` as a stable resting status that survives the following settle (it
+was only ever idle/running), and `queuedMessageCount` from the steering+followUp queue items the relay already
+parses. The overlay is spread last (never clobbering the enrichment) and re-validated fail-closed;
+`messageCount` and `queuedMessageCount` share one snapshot so a live session can never be hidden.
+
+Not built — `agent`, `resumable` have no relay source (the external Pi does not emit them); `activity` has no
+clean per-turn label. These, plus the chat RPCs and presence extensions, are recorded in LIMITATIONS.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -106,12 +112,13 @@ label) do not exist in the relay's view of the external Pi, so they are omitted,
 | Check | Result |
 |---|---|
 | Protocol | `pi-rpc-protocol` typecheck 0; tests 60 (8 wire-compat: bare card valid, each invalid field rejected) |
-| Relay | `app-relay` typecheck 0; tests 47 files/324 (25 enrichment: enum map, redaction/secret omission, no usage double-count, fail-closed both ways) |
+| Relay | `app-relay` typecheck 0; tests 47 files/329 (enrichment + card-truth: enum map, redaction/secret omission, real messageCount, interrupted-survives-settle, queued count, fail-closed both ways) |
 | Client lights-up | `app-mobile` `card-projection.test.ts` 20 passed — the wire shapes agree |
 | Redaction proof | a path/URL/secret and an un-prefixed `sk-` token are omitted; raw text never in the card JSON |
 | Negative controls | attention map, redaction gate, and secret reject each fail their test when broken, then restored |
 | Independent review | Sonnet-xhigh accepted the enrichment (no P0); its two P1s fixed before commit |
-| Evidence commits | `bc76844` (protocol), `444c267` (model/attention), `5ffe38b` (redacted content) |
+| Evidence commits | `bc76844` (protocol), `444c267` (model/attention), `5ffe38b` (redacted content), `d21fc42` (card-truth) |
+| Card-truth review | Sonnet caught a settle-clobber P0 (interrupted erased by the next settle); fixed + negative-controlled |
 <!-- /ANCHOR:verification -->
 
 ---
@@ -119,13 +126,23 @@ label) do not exist in the relay's view of the external Pi, so they are omitted,
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-Three card fields need the external Pi CLI (out of this repo) and are not built: `agent` (no agent label distinct
-from the model), `resumable` (no resume-state flag), `queuedMessageCount` (no per-session queue count); `activity`
-has no clean per-turn label either. The remaining host-request surface is also unbuilt: the chat RPCs
-(`@`-file-search and host STT need the external Pi; a paste-upload lease, read-ack, and pin RPC are
-relay-feasible; the typed approval envelope is likely already covered by the existing Review path) and the
-presence extensions (attention sub-kind + end-reason, `stateEnteredAt`, `hasMore` page token). One residual
-privacy note: the shared safe-display sanitizer's secret detector is prefix-based; the card adds a conservative
-un-prefixed-token reject on top, but a general high-entropy secret scanner is a worthwhile follow-up now that
-conversational text reaches the card.
+Two card fields stay unbuilt for lack of a relay source (the external Pi does not emit them): `agent` (no label
+distinct from the model) and `resumable` (no resume-state flag); `activity` has no clean per-turn label. The
+remaining chat-RPC / presence surface was assessed by an independent Opus panel against the actual code and is
+deliberately NOT built, per its disposition:
+
+- **Already implemented** — the image paste-upload lease (the relay's `/api/attachment-sets` reserve/upload/
+  reconcile flow, consumed by the client) and the typed approval envelope (`ApprovalCardDto` + the Review path).
+- **Already implemented under another name** — the transcript `hasMore` page token is the existing `nextSeq`,
+  which the client already loops on.
+- **Need the external Pi CLI** — `@`-file-search (a real latent client consumer waits, but the FS walk runs on
+  the external Pi) and host-backed STT (device STT already ships via the browser).
+- **No client consumer, and the client is out of scope** — pin RPC + `pinned` (the client pin is device-local),
+  read-ack (device-local unread), attention approval-vs-question sub-kind + end-reason, and `stateEnteredAt`.
+  Because `isSessionCardDto` is additive-safe, adding any of these later inside its own consuming phase costs the
+  same as now, so none is built ahead of a reader.
+
+One residual privacy note: the shared safe-display sanitizer's secret detector is prefix-based; the card adds a
+conservative un-prefixed-token reject on top, but a general high-entropy secret scanner is a worthwhile follow-up
+now that conversational text reaches the card.
 <!-- /ANCHOR:limitations -->

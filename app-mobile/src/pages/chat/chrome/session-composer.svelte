@@ -985,7 +985,7 @@
     padding-bottom: 0;
     padding-inline-start: env(safe-area-inset-left, 0px);
     padding-inline-end: env(safe-area-inset-right, 0px);
-    background: linear-gradient(to top, var(--canvas) 50%, transparent);
+    background: linear-gradient(to bottom, transparent 0, var(--canvas) var(--space-2));
   }
 
   /* This surface: composer — edge-to-edge full-width input container. */

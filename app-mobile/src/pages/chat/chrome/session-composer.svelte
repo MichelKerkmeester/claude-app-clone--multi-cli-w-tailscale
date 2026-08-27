@@ -998,17 +998,22 @@
     border-top: 1px solid var(--line-strong);
     border-radius: 0;
     background: var(--surface);
+    transition:
+      background var(--duration-state, 220ms) var(--ease-out, ease),
+      border-color var(--duration-state, 220ms) var(--ease-out, ease);
   }
 
-  /* Dashed Plan outline: host-confirmed only; execution is solid. */
+  /* Dashed Plan outline: host-confirmed only; held-back muted drafting surface. */
   .composer--tray.is-plan-mode {
     border-style: dashed;
     border-color: var(--line-strong);
+    background: var(--surface-muted);
   }
 
-  /* Keep this rule aligned with its surrounding surface. */
+  /* Solid accent line: host-confirmed execution; live active state. */
   .composer--tray.is-executing-mode {
-    border-color: var(--line-strong);
+    border-style: solid;
+    border-color: var(--accent);
   }
 
   /* ── Installed-PWA safe-area hardening ───────────────────────────────

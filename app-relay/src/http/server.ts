@@ -29,15 +29,19 @@ import {
   isRuntimeControlCommand,
   isRuntimeModelTicketRequest,
   isRuntimeSnapshotDto,
+  isSessionCardDto,
   TODO_PROJECTION_CAPABILITY,
   type EnrollmentRequest,
   type PlanControlResponse,
   type RuntimeIssueCode,
   type RuntimeControlResponse,
+  type SessionCardDto,
   type SyncCursor,
   type SyncMessage,
 } from '@pi-remote/pi-rpc-protocol';
 import { WebSocket, WebSocketServer } from 'ws';
+
+import { projectSessionCardModelLabel } from '../store/redaction.js';
 
 import {
   AuthService,
@@ -767,7 +771,27 @@ async function handleHttp(
   }
   if (ingress.path === '/api/sessions') {
     await requireEmptyBody(request);
-    sendJson(response, 200, { sessions: options.catalog.list() });
+    const ATTENTION_CLASS_TO_CARD: Record<string, SessionCardDto['attention']> = {
+      finished: 'done',
+      needs_input: 'waiting',
+      error: 'blocked',
+    };
+    const stateModel = options.runtime?.getState()?.model;
+    const cardLabel: string | null | undefined =
+      stateModel !== undefined && stateModel !== null
+        ? projectSessionCardModelLabel(stateModel)
+        : undefined;
+    const sessions = options.catalog.list().map((card) => {
+      const hostClass = options.push?.latestAttentionClass(card.id) ?? undefined;
+      const attention = hostClass !== undefined ? ATTENTION_CLASS_TO_CARD[hostClass] : undefined;
+      const enriched: SessionCardDto = {
+        ...card,
+        ...(cardLabel === undefined || cardLabel === null ? {} : { model: cardLabel }),
+        ...(attention === undefined ? {} : { attention }),
+      };
+      return isSessionCardDto(enriched) ? enriched : card;
+    });
+    sendJson(response, 200, { sessions });
     return;
   }
   if (ingress.path === '/api/attention') {

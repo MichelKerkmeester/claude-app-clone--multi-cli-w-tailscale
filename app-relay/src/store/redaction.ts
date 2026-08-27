@@ -609,6 +609,11 @@ export function isControlPlaneProjection(payload: unknown): boolean {
   return typeof text === 'string' && /^Extension requested (?:setStatus|setPlan)$/.test(text);
 }
 
+/** Project a model label bounded to the session card's 128-char cap. */
+export function projectSessionCardModelLabel(model: AvailableModelDto): string | null {
+  return safeDisplayString(model.label, 128);
+}
+
 export function projectAvailableModel(row: unknown): AvailableModelDto | null {
   if (!isPlainObject(row)) {
     return null;

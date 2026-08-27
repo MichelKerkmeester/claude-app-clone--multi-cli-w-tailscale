@@ -191,6 +191,20 @@ export class PushService {
     ).map(toItem);
   }
 
+  /** Latest attention class for a session, or null when none exists. */
+  public latestAttentionClass(sessionId: string): AttentionClass | null {
+    const row = this.database
+      .prepare(
+        `
+      SELECT attention_class AS attentionClass
+      FROM attention_items WHERE session_id = ?
+      ORDER BY occurred_at DESC LIMIT 1
+    `,
+      )
+      .get(sessionId) as { attentionClass: AttentionClass } | undefined;
+    return row?.attentionClass ?? null;
+  }
+
   public resolve(
     lookupId: string,
     identity: { readonly hostId: string; readonly workspaceRef: string } = {

@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "packet_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining",
+  "spec_folder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining",
+  "parent_id": "007-orca-nodeterm-ux-mining",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "features",
+      "mining",
+      "orca",
+      "nodeterm",
+      "synthesis",
+      "authoritative",
+      "18-angle",
+      "manual",
+      "deep-research",
+      "pass",
+      "orca-main",
+      "nodeterm-main"
+    ],
+    "importance_tier": "important",
+    "status": "planned",
+    "key_files": [
+      "research/research.md",
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "research.md",
+        "kind": "doc",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Features Mining",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Requirements Seed Requirements",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Scope Seed Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Open Questions",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Research Context",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Requirements",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Live Activity",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "See Top",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "New Session",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Copy Context",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Optimistic Stop",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Open Settings",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "008 - UI/UX Features Mining",
+    "created_at": "2026-08-27T15:31:24.534Z",
+    "last_save_at": "2026-08-27T15:31:24.534Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "source_fingerprint": "sha256:1a92a46900db0d11ea21e5c19ac8c94ea3705576e4e1da278396766a9abbb635",
+    "source_doc_hashes": {
+      "spec.md": "6c4016981d40a2551bb1243bf692f788bc7396e1468c49996cde4cedef141e17",
+      "research/research.md": "65c460d0b46c091e24028dd4d0e6279b08e29548e12535863cc1fb943d8545c6"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

@@ -477,9 +477,9 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    inline-size: var(--trigger-width, min(calc(100vw - 24px), 40rem));
+    inline-size: var(--trigger-width, min(100vw, 40rem));
     min-inline-size: 0;
-    max-inline-size: calc(100vw - 24px);
+    max-inline-size: 100vw;
     max-block-size: min(280px, calc(var(--visual-viewport-height, 100dvh) * 0.4));
     padding: 4px;
     overflow: hidden;
@@ -620,9 +620,9 @@
   .slash--panel {
     inline-size: var(
       --trigger-width,
-      min(calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)), 40rem)
+      min(calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)), 40rem)
     );
-    max-inline-size: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    max-inline-size: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
   }
 
   /* Editable seam: contrast — system-wide forced-colors primitive: the scoped palettes yield to the user's

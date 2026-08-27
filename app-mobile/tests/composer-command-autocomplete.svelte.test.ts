@@ -683,9 +683,11 @@ describe('applied panel styling stays inside the frozen system', () => {
     expect(css).toContain('--slash-accent: var(--accent-ink)');
   });
 
-  it('bounds the panel against the visual viewport with 12px screen margins and no horizontal overflow', () => {
+  it('bounds the panel against the visual viewport and safe-area insets with no horizontal overflow', () => {
     expect(css).toMatch(/max-block-size: min\(280px, calc\(var\(--visual-viewport-height, 100dvh\) \* 0\.4\)\)/u);
-    expect(css).toMatch(/max-inline-size: calc\(100vw - 24px\)/u);
+    expect(css).toMatch(
+      /max-inline-size: calc\(100vw - env\(safe-area-inset-left\) - env\(safe-area-inset-right\)\)/u,
+    );
     expect(css).toMatch(/overflow-x: hidden/u);
   });
 
@@ -701,7 +703,7 @@ describe('applied panel styling stays inside the frozen system', () => {
   });
 
   it('zeroes all motion under reduced motion', () => {
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[^}]*\.slash--option,\n  \.slash--retry \{[^}]*transition: none/u);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[^}]*\.slash--option,\n {2}\.slash--retry \{[^}]*transition: none/u);
   });
 
   it('the focused row is identifiable without color (ink rail plus outline)', () => {

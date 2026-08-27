@@ -18,6 +18,7 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { DEMO_IDENTITY, isDemoMode } from '../fixtures/demo.js';
+import { raceWithTimeout, RaceTimeoutError } from '../state/race-timeout.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. CONSTANTS AND DEVICE TYPES
@@ -28,6 +29,10 @@ const STORE_NAME = 'credentials';
 const DEVICE_RECORD = 'device';
 // Demo has no relay expiry, so keep its observable deadline outside normal app lifetimes.
 export const DEMO_SESSION_EXPIRES_AT = '9999-12-31T23:59:59.999Z';
+
+// Used pairing IDs are tracked in memory to enforce single-use tokens.
+// A dropped enrollment must prompt a fresh code, never reuse the same QR.
+const usedPairingIds = new Set<string>();
 
 interface StoredDevice {
   readonly id: typeof DEVICE_RECORD;
@@ -50,13 +55,27 @@ export interface ApplicationSession extends DeviceIdentity {
 // 3. DEVICE ENROLLMENT
 // ───────────────────────────────────────────────────────────────────
 
-export async function enrollDevice(serializedQr: string): Promise<DeviceIdentity> {
+export async function enrollDevice(serializedQr: string, signal?: AbortSignal): Promise<DeviceIdentity> {
   const enrollment = parseEnrollment(serializedQr);
+  if (enrollment === null) {
+    throw new Error('The enrollment data is invalid.');
+  }
+  const endpointValidation = validateEnrollmentEndpoint(enrollment.origin);
+  if (!endpointValidation.accepted) {
+    throw new Error(
+      endpointValidation.reason === 'requires-tls'
+        ? 'Enrollment requires a secure relay endpoint.'
+        : 'Enrollment endpoint is invalid.',
+    );
+  }
   if (enrollment.origin !== window.location.origin) {
     throw new Error('This enrollment belongs to a different relay origin.');
   }
   if (Date.parse(enrollment.expiresAt) <= Date.now()) {
     throw new Error('This enrollment challenge has expired.');
+  }
+  if (usedPairingIds.has(enrollment.pairingId)) {
+    throw new Error('This enrollment code has already been used. Please scan a fresh QR code.');
   }
 
   const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, [
@@ -66,14 +85,30 @@ export async function enrollDevice(serializedQr: string): Promise<DeviceIdentity
   const publicKey = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
   const devicePublicKey = parsePublicKey(publicKey);
   const signature = await sign(keyPair.privateKey, enrollmentProof(enrollment, devicePublicKey));
-  const response = await postJson('/api/auth/enroll', {
-    enrollment,
-    publicKey: devicePublicKey,
-    signature,
-  });
+  // Owned abort controller lets the timeout dispose abort the in-flight fetch.
+  // Wire the external signal to abort the internal controller so the timeout
+  // dispose path is clean and fetch is not called with a to-be-aborted signal.
+  const abortController = new AbortController();
+  if (signal?.aborted === true) {
+    throw new RaceTimeoutError('aborted');
+  }
+  signal?.addEventListener('abort', () => abortController.abort(), { once: true });
+  const response = await raceWithTimeout(
+    postJson('/api/auth/enroll', {
+      enrollment,
+      publicKey: devicePublicKey,
+      signature,
+    }, abortController.signal),
+    {
+      timeoutMs: 60_000,
+      dispose: () => abortController.abort(),
+    },
+  );
   if (!isEnrollmentResponse(response) || response.hostFingerprint !== enrollment.hostFingerprint) {
     throw new Error('The relay returned an invalid enrollment response.');
   }
+  // Mark the pairing token as spent after a successful response.
+  usedPairingIds.add(enrollment.pairingId);
   await saveDevice({
     id: DEVICE_RECORD,
     deviceId: response.deviceId,
@@ -82,6 +117,78 @@ export async function enrollDevice(serializedQr: string): Promise<DeviceIdentity
     privateKey: keyPair.privateKey,
   });
   return response;
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 5. ENROLLMENT VALIDATION HELPERS
+// ───────────────────────────────────────────────────────────────────
+
+/**
+ * Parse a serialized enrollment QR string into an `EnrollmentQr` object.
+ * Returns null on any malformed input instead of throwing.
+ */
+export function parseEnrollment(serialized: string): EnrollmentQr | null {
+  try {
+    const value: unknown = JSON.parse(serialized);
+    if (isEnrollmentQr(value)) return value;
+  } catch {
+    // The null return below deliberately avoids reflecting untrusted QR contents.
+  }
+  return null;
+}
+
+export interface EndpointValidation {
+  readonly accepted: boolean;
+  readonly reason: 'ok' | 'loopback' | 'requires-tls' | 'unsupported-protocol' | 'invalid-origin';
+}
+
+/**
+ * Validate that an enrollment endpoint is reachable over a secure connection.
+ * Plaintext (http) is allowed only for loopback addresses (localhost, 127.0.0.1, ::1).
+ */
+export function validateEnrollmentEndpoint(origin: string): EndpointValidation {
+  let url: URL;
+  try {
+    url = new URL(origin);
+  } catch {
+    return { accepted: false, reason: 'invalid-origin' };
+  }
+  const protocol = url.protocol;
+  if (protocol === 'https:') return { accepted: true, reason: 'ok' };
+  if (protocol === 'http:') {
+    const hostname = url.hostname;
+    // Strip brackets from IPv6 for comparison.
+    const raw = hostname.startsWith('[') && hostname.endsWith(']') ? hostname.slice(1, -1) : hostname;
+    if (raw === 'localhost' || raw === '127.0.0.1' || raw === '::1') {
+      return { accepted: true, reason: 'loopback' };
+    }
+    return { accepted: false, reason: 'requires-tls' };
+  }
+  return { accepted: false, reason: 'unsupported-protocol' };
+}
+
+/**
+ * Check whether a pairing token has already been used (single-use enforcement).
+ * A dropped enrollment must prompt a fresh code.
+ */
+export function isPairingTokenUsed(pairingId: string): boolean {
+  return usedPairingIds.has(pairingId);
+}
+
+/**
+ * Clear the used-pairing-token set. Called when the user starts a fresh enrollment flow.
+ */
+export function clearUsedPairingTokens(): void {
+  usedPairingIds.clear();
+}
+
+/**
+ * Register a pairing token as used (testing support).
+ * Exported for tests to exercise the reject-on-reuse path without mocking
+ * crypto, fetch, and indexedDB.
+ */
+export function _registerPairingTokenForTest(pairingId: string): void {
+  usedPairingIds.add(pairingId);
 }
 
 // ───────────────────────────────────────────────────────────────────
@@ -132,7 +239,7 @@ export async function logoutDevice(): Promise<void> {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 5. QR IMAGE SCANNING
+// 7. QR IMAGE SCANNING
 // ───────────────────────────────────────────────────────────────────
 
 export async function scanQrImage(file: File): Promise<string> {
@@ -160,18 +267,8 @@ export async function scanQrImage(file: File): Promise<string> {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 6. SIGNING AND RELAY REQUEST HELPERS
+// 8. SIGNING AND RELAY REQUEST HELPERS
 // ───────────────────────────────────────────────────────────────────
-
-function parseEnrollment(serialized: string): EnrollmentQr {
-  try {
-    const value: unknown = JSON.parse(serialized);
-    if (isEnrollmentQr(value)) return value;
-  } catch {
-    // The error below deliberately avoids reflecting untrusted QR contents.
-  }
-  throw new Error('The enrollment data is invalid.');
-}
 
 function parsePublicKey(value: JsonWebKey): DevicePublicKeyJwk {
   if (
@@ -194,13 +291,14 @@ async function sign(privateKey: CryptoKey, statement: string): Promise<string> {
   return toBase64Url(new Uint8Array(signature));
 }
 
-async function postJson(path: string, body: unknown): Promise<unknown> {
+async function postJson(path: string, body: unknown, signal?: AbortSignal): Promise<unknown> {
   const response = await fetch(path, {
     method: 'POST',
     cache: 'no-store',
     credentials: 'same-origin',
     headers: body === undefined ? {} : { 'content-type': 'application/json' },
     body: body === undefined ? null : JSON.stringify(body),
+    ...(signal === undefined ? {} : { signal }),
   });
   if (!response.ok) throw new Error(`Relay authentication failed with HTTP ${response.status}.`);
   return response.status === 204 ? null : (response.json() as Promise<unknown>);
@@ -213,7 +311,7 @@ function toBase64Url(bytes: Uint8Array): string {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 7. DEVICE STORAGE
+// 9. DEVICE STORAGE
 // ───────────────────────────────────────────────────────────────────
 
 async function loadDevice(): Promise<StoredDevice | null> {

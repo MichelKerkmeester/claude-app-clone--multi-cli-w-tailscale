@@ -1591,16 +1591,31 @@ export async function openSyncSocket(
   const url = new URL(`${protocol}//${window.location.host}/api/sync`);
   url.searchParams.set('ticket', ticket);
   const socket = new WebSocket(url);
-  socket.addEventListener('open', () => {
-    noteRelayHeartbeat();
-    socket.send(
-      JSON.stringify({
-        type: 'subscribe',
-        sessionId,
-        ...(cursor === null ? {} : { cursor }),
-      }),
-    );
+
+  // Wait for the WebSocket to actually open before resolving the promise.
+  // This bounds the open-connection time so the caller can race it against a timeout.
+  await new Promise<void>((resolveOpen, rejectOpen) => {
+    socket.addEventListener('open', () => {
+      noteRelayHeartbeat();
+      socket.send(
+        JSON.stringify({
+          type: 'subscribe',
+          sessionId,
+          ...(cursor === null ? {} : { cursor }),
+        }),
+      );
+      resolveOpen();
+    }, { once: true });
+    socket.addEventListener('error', () => {
+      // An error before open means the connection failed; close the socket and reject.
+      socket.close();
+      rejectOpen(new Error('WebSocket connection failed.'));
+    }, { once: true });
+    socket.addEventListener('close', () => {
+      rejectOpen(new Error('WebSocket closed before opening.'));
+    }, { once: true });
   });
+
   socket.addEventListener('message', (event) => {
     try {
       const value: unknown = JSON.parse(String(event.data));

@@ -410,6 +410,12 @@
     opacity: 0.64;
   }
 
+  /* A stale-running reconnect card keeps the working state but dimmed, mirroring
+     the stale-unknown treatment so both unresolved states look similar. */
+  :global(.session--card[data-reconnect='stale-running']) {
+    opacity: 0.64;
+  }
+
   @media (forced-colors: active) {
     /* Keep this rule aligned with its surrounding surface. */
     .session--hue,

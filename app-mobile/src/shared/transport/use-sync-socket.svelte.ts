@@ -12,6 +12,7 @@ import { untrack } from 'svelte';
 import type { SyncCursor, SyncMessage } from '@pi-remote/pi-rpc-protocol';
 
 import { fetchTranscript, noteRelayHeartbeat, openSyncSocket } from './relay.js';
+import { raceWithTimeout } from '../state/race-timeout.js';
 import type { ReadOnlyCache } from './cache.js';
 import {
   transcriptReducer,
@@ -208,55 +209,67 @@ export function useSyncSocket(deps: {
         });
       }
       const attempt = ++connectionAttempt;
-      void openSyncSocket(
-        sessionId,
-        cursor,
-        (message) => {
-          noteRelayHeartbeat();
-          const at = new Date().toISOString();
-          if (
-            message.kind === 'sync.delta' &&
-            cursor !== null &&
-            cursor.epoch !== message.epoch
-          ) {
-            dispatchArtifactLifecycleEvent('pi-remote:transcript-superseded');
-            cursor = null;
-            applySyncMessage(message, at, dispatchTranscript, dispatchTodoProjection);
-            socket?.close();
-            return;
-          }
-          if (
-            message.kind === 'sync.snapshot' &&
-            cursor !== null &&
-            cursor.epoch !== message.epoch
-          ) {
-            dispatchArtifactLifecycleEvent('pi-remote:transcript-superseded');
-          }
-          pendingMessages.push({ message, at });
-          if (frame === null) {
-            frame = window.requestAnimationFrame(() => {
-              for (const pending of pendingMessages) {
-                applySyncMessage(
-                  pending.message,
-                  pending.at,
-                  dispatchTranscript,
-                  dispatchTodoProjection,
-                );
-              }
-              pendingMessages = [];
-              frame = null;
-            });
-          }
-          if (message.kind !== 'sync.gap') {
-            cursor = { epoch: message.epoch, seq: message.coversThrough };
-            dispatchConnection({ type: 'live', at });
-            retryCount = 0;
-            const invalidation = planInvalidationFromSync(message);
-            if (invalidation !== null) runtimeControls.invalidatePlan?.(invalidation);
-            void runtimeControls.refresh('live');
-          }
+      void raceWithTimeout(
+        openSyncSocket(
+          sessionId,
+          cursor,
+          (message) => {
+            noteRelayHeartbeat();
+            const at = new Date().toISOString();
+            if (
+              message.kind === 'sync.delta' &&
+              cursor !== null &&
+              cursor.epoch !== message.epoch
+            ) {
+              dispatchArtifactLifecycleEvent('pi-remote:transcript-superseded');
+              cursor = null;
+              applySyncMessage(message, at, dispatchTranscript, dispatchTodoProjection);
+              socket?.close();
+              return;
+            }
+            if (
+              message.kind === 'sync.snapshot' &&
+              cursor !== null &&
+              cursor.epoch !== message.epoch
+            ) {
+              dispatchArtifactLifecycleEvent('pi-remote:transcript-superseded');
+            }
+            pendingMessages.push({ message, at });
+            if (frame === null) {
+              frame = window.requestAnimationFrame(() => {
+                for (const pending of pendingMessages) {
+                  applySyncMessage(
+                    pending.message,
+                    pending.at,
+                    dispatchTranscript,
+                    dispatchTodoProjection,
+                  );
+                }
+                pendingMessages = [];
+                frame = null;
+              });
+            }
+            if (message.kind !== 'sync.gap') {
+              cursor = { epoch: message.epoch, seq: message.coversThrough };
+              dispatchConnection({ type: 'live', at });
+              retryCount = 0;
+              const invalidation = planInvalidationFromSync(message);
+              if (invalidation !== null) runtimeControls.invalidatePlan?.(invalidation);
+              void runtimeControls.refresh('live');
+            }
+          },
+          controller.signal,
+        ),
+        {
+          signal: controller.signal,
+          dispose: () => {
+            // Close any half-open socket on timeout/abort.
+            if (socket !== null) {
+              socket.close();
+              socket = null;
+            }
+          },
         },
-        controller.signal,
       )
         .then((openedSocket) => {
           if (stopped || attempt !== connectionAttempt) {

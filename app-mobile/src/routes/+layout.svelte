@@ -45,7 +45,14 @@
   // 3. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // `/session/<id>` selects a session; everything else clears selection.
+  // Selection precedence: three named states with distinct roles.
+  // - "selected" (URL / selectedSessionId): the user's current choice, presentation only.
+  // - "host-active": what the host reports as the live session (roster).
+  // - "navigation-requested": a pending supersede (host follow, inbox resolution).
+  // Only user-initiated navigation supersedes "selected" today. A roster refresh
+  // (fetchSessions) must never call navigate — it keeps the user's session.
+  // Retries are confined to idempotent activation (roster fetch, runtime refresh);
+  // message-send and Stop are never auto-retried.
   const selectedSessionId = $derived($page.params.id ?? null);
 
   // Hide the global bar once a live session owns the chrome.

@@ -49,10 +49,12 @@
   // ───────────────────────────────────────────────────────────────────
 
   // Keep submit focused on its single responsibility.
+  let abortController = new AbortController();
   const submit = () => {
     busy = true;
     error = null;
-    void enrollDevice(qrData.trim())
+    abortController = new AbortController();
+    void enrollDevice(qrData.trim(), abortController.signal)
       .then(async (identity) => {
         const authenticated = await establishSession();
         if (authenticated === null) throw new Error('Enrollment did not produce a device session.');

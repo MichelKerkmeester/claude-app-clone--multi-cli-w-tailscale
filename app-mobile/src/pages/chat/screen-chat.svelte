@@ -95,6 +95,7 @@
   import { useRuntime } from '$shared/state/use-runtime.svelte.js';
   import { useHostCommandCatalog } from '$shared/commands/host-command-catalog.svelte.js';
   import { useSyncSocket } from '$shared/transport/use-sync-socket.svelte.js';
+  import { readViewModePreference } from '$shared/state/view-mode.js';
   import type { EffortSheetSection } from './chrome/sheet-model-effort.svelte';
 
   import {
@@ -214,6 +215,8 @@
   const isStale = $derived(
     connection !== 'live' || transcript.source === 'cache' || transcript.awaitingSnapshot,
   );
+  // Per-session view-mode preference, fail-closed on storage failure.
+  const viewMode = $derived(readViewModePreference(sessionId));
   const runtimeState = $derived(runtimeControls.runtime.state);
   const runtimeAuthority = $derived(
     runtimeState !== null &&
@@ -411,8 +414,10 @@
   }
 
   // Stop the running turn. A delivery-unknown outcome is surfaced, never retried.
+  // No command issues before the authoritative epoch is confirmed.
   function stopRun() {
     if (stopping) return;
+    if (transcript.awaitingSnapshot) return;
     stopping = true;
     void abortPrompt()
       .then((result) => {
@@ -425,10 +430,11 @@
   }
 
   // Send a normal prompt: show it optimistically, submit, and put the draft back
-  // if the send is rejected.
+  // if the send is rejected. No command issues before the epoch is confirmed.
   function sendPrompt(behavior?: 'steer' | 'followUp') {
     const message = prompt.trim();
     if (!canSubmit || message.length === 0) return;
+    if (transcript.awaitingSnapshot) return;
     const submissionId = retrySubmissionId ?? `prompt_${crypto.randomUUID().replaceAll('-', '_')}`;
     const optimisticId = `optimistic_${submissionId}`;
     const occurredAt = new Date().toISOString();
@@ -540,6 +546,8 @@
   <!-- Screen-reader-only live regions for runtime status and mode changes -->
   <RuntimeStatusRegion runtime={runtimeControls.runtime} />
   <RuntimeModeAnnouncer runtime={runtimeControls.runtime} {connection} />
+  <!-- data-view-mode carries the fail-closed per-session preference for future CSS targeting. -->
+  <div hidden data-view-mode={viewMode.value} data-view-mode-resolved={viewMode.resolved}></div>
 
   <!-- Header: back / inbox / review, the theme toggle, and the model picker -->
   <SessionHeader
@@ -579,6 +587,11 @@
   {#if transcriptLoadView.showThread && transcript.awaitingSnapshot}
     <div class="barrier-note">
       Reconciliation barrier active. Waiting for a fresh snapshot.
+    </div>
+  {/if}
+  {#if transcriptLoadView.showThread && transcript.source === 'cache' && connection !== 'live'}
+    <div class="barrier-note">
+      Showing saved messages / reconnecting…
     </div>
   {/if}
 

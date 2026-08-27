@@ -81,11 +81,17 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { untrack } from 'svelte';
+  import { untrack, onDestroy } from 'svelte';
 
   import { messageFrom, relativeTime, sessionStatusLabel } from '$shared/format/view-helpers.js';
   import { installCacheRevalidation } from '$shared/transport/cache.js';
-  import { abortPrompt, submitPrompt } from '$shared/transport/relay.js';
+  import { abortPrompt, submitPrompt, PromptDeliveryError } from '$shared/transport/relay.js';
+  import { parkDraftText, readParkedDraftText } from '$shared/state/chat-draft-cache.js';
+  import {
+    deliveryHoldAction,
+    PROMPT_DELIVERY_HOLD_MS,
+    type DeliveryHold,
+  } from '$shared/state/prompt-delivery-hold.js';
   import { submitSlashDraft } from '$shared/commands/submit-slash-draft.js';
   import { bindingMatchesSnapshot, bindingFor, type SelectedCommandBinding } from '$shared/commands/commands.js';
   import { bindingAfterDraftChange } from '$shared/commands/insert-slash-command.js';
@@ -191,6 +197,12 @@
   let planReviewTrigger = $state<HTMLButtonElement | null>(null);
   let activeSheetTrigger = $state<HTMLButtonElement | null>(null);
   let heldBlocks = $state<readonly DisplayTranscriptBlock[] | null>(null);
+
+  // One unresolved send watching for its echoed turn, plus a tick the
+  // watcher effect reads so a deadline timer can re-arm it. The hold
+  // object itself is plain — the effect only reads it inside untrack.
+  let deliveryHolds: DeliveryHold[] = [];
+  let deliveryHoldTick = $state(0);
 
   const SESSION_SLASH_NAMES = ['rename', 'archive', 'new', 'fork'] as const;
   const runtimeControls = useRuntime(() => sessionId);
@@ -389,6 +401,112 @@
     };
   });
 
+  // Park the raw composer draft under the outgoing session and restore
+  // whatever that session parked when it returns, so navigation never
+  // loses an unsent draft. Only sessionId is read reactively; the write
+  // to prompt happens inside untrack so this effect can never depend on
+  // the state it restores (the self-invalidation rule).
+  $effect(() => {
+    const sid = sessionId;
+    untrack(() => {
+      prompt = readParkedDraftText(sid);
+    });
+    return () => {
+      parkDraftText(sid, untrack(() => prompt));
+    };
+  });
+
+  // Delivery-unknown holds: while a thrown send's fate is unresolved,
+  // watch the transcript for the echoed turn. The optimistic block stays
+  // visible during the hold; if the echo lands before the deadline the
+  // ack was lost but the turn arrived — the draft stays cleared and no
+  // resend is invited. Only a deadline expiry with no echo is treated as
+  // a true failure and hands the exact raw draft back. The deadline timer
+  // re-arms on every re-run inside the window (same discipline as the
+  // settle window above), and every write happens inside untrack — the
+  // effect reads transcript blocks reactively but must never depend on
+  // the hold state it settles.
+  $effect(() => {
+    void deliveryHoldTick;
+    const sid = sessionId;
+    const blocks = transcript.blocks;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    untrack(() => {
+      if (deliveryHolds.length === 0) return;
+      const now = Date.now();
+      const keep: DeliveryHold[] = [];
+      let soonest = Number.POSITIVE_INFINITY;
+
+      for (const hold of deliveryHolds) {
+        if (hold.sessionId !== sid) {
+          // The person navigated away while this send was unresolved. The
+          // watch cannot follow them, so hand the text back to the session
+          // that owns it rather than dropping it: returning restores it.
+          surrenderHold(hold);
+          continue;
+        }
+        const action = deliveryHoldAction(hold, blocks, now);
+        if (action === 'watch') {
+          keep.push(hold);
+          soonest = Math.min(soonest, hold.deadlineAt - now);
+          continue;
+        }
+        dispatchTranscript({
+          type: 'promptRejected',
+          sessionId: hold.sessionId,
+          optimisticId: hold.optimisticId,
+        });
+        if (action === 'restore') restoreFailedDraft(hold);
+      }
+
+      deliveryHolds = keep;
+      if (soonest !== Number.POSITIVE_INFINITY && soonest > 0) {
+        timer = setTimeout(() => {
+          deliveryHoldTick += 1;
+        }, soonest);
+      }
+    });
+
+    return () => {
+      // Only the timer is per-run: this cleanup also fires before every
+      // re-run, so surrendering holds here would discard them the moment
+      // one is registered. Teardown belongs to onDestroy.
+      if (timer !== undefined) clearTimeout(timer);
+    };
+  });
+
+
+  // Unmounting ends every watch. Park whatever is still unresolved so the
+  // draft comes back with its session instead of vanishing.
+  onDestroy(() => {
+    for (const hold of deliveryHolds) surrenderHold(hold);
+    deliveryHolds = [];
+  });
+
+  // A held send whose watch is ending without a verdict. The text is parked
+  // under its own session so re-entering that chat brings it back; parking
+  // beats restoring inline, which would drop it into whichever session the
+  // person is looking at now.
+  function surrenderHold(hold: DeliveryHold): void {
+    const parked = readParkedDraftText(hold.sessionId);
+    if (parked.trim().length === 0) parkDraftText(hold.sessionId, hold.rawDraft);
+  }
+
+  // A send that truly failed. Hand the exact raw draft back inline when the
+  // composer is free; if the person has already started a new message, park
+  // it instead so neither draft is destroyed.
+  function restoreFailedDraft(hold: DeliveryHold): void {
+    if (prompt.trim().length === 0) {
+      prompt = hold.rawDraft;
+      retrySubmissionId = hold.submissionId;
+      promptError = hold.errorText;
+      return;
+    }
+    surrenderHold(hold);
+    promptError = hold.errorText;
+  }
+
   // ───────────────────────────────────────────────────────────────────
   // 6. HANDLERS
   // ───────────────────────────────────────────────────────────────────
@@ -429,14 +547,21 @@
       .finally(() => (stopping = false));
   }
 
-  // Send a normal prompt: show it optimistically, submit, and put the draft back
-  // if the send is rejected. No command issues before the epoch is confirmed.
+  // Send a normal prompt: show it optimistically, submit, and decide the
+  // failure lane by delivery outcome. A definite refusal restores the
+  // exact raw draft right away; an unresolved send holds and watches the
+  // transcript for the echoed turn before restoring (see the hold effect).
   function sendPrompt(behavior?: 'steer' | 'followUp') {
-    const message = prompt.trim();
+    // The raw draft is captured before trimming so a restored draft is
+    // byte-identical to what the person typed.
+    const rawDraft = prompt;
+    const message = rawDraft.trim();
     if (!canSubmit || message.length === 0) return;
     if (transcript.awaitingSnapshot) return;
     const submissionId = retrySubmissionId ?? `prompt_${crypto.randomUUID().replaceAll('-', '_')}`;
     const optimisticId = `optimistic_${submissionId}`;
+    // The echo must be a turn beyond what the transcript already covers.
+    const coversThroughAtSubmit = transcript.coversThrough;
     const occurredAt = new Date().toISOString();
     dispatchTranscript({
       type: 'promptOptimistic',
@@ -466,10 +591,32 @@
         });
       })
       .catch((cause: unknown) => {
-        dispatchTranscript({ type: 'promptRejected', sessionId, optimisticId });
-        prompt = message;
-        retrySubmissionId = submissionId;
-        promptError = messageFrom(cause);
+        const status =
+          cause instanceof PromptDeliveryError ? cause.outcome.status : 'delivery-unknown';
+        if (status === 'rejected') {
+          // Definite refusal — the host never received the prompt.
+          dispatchTranscript({ type: 'promptRejected', sessionId, optimisticId });
+          prompt = rawDraft;
+          retrySubmissionId = submissionId;
+          promptError = messageFrom(cause);
+          return;
+        }
+        // The ack was lost; the turn may still land. Reusing the same
+        // submissionId keeps a later retry idempotent on the host.
+        deliveryHolds = [
+          ...deliveryHolds,
+          {
+            sessionId,
+            optimisticId,
+            submissionId,
+            message,
+            rawDraft,
+            sinceSeq: coversThroughAtSubmit,
+            deadlineAt: Date.now() + PROMPT_DELIVERY_HOLD_MS,
+            errorText: messageFrom(cause),
+          },
+        ];
+        deliveryHoldTick += 1;
       })
       .finally(() => (sendingPrompt = false));
   }

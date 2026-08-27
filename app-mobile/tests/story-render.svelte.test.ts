@@ -19,10 +19,15 @@
 
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { composeStories } from '@storybook/svelte';
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect } from 'vitest';
 
+import { clearChatDraftCache } from '../src/shared/state/chat-draft-cache.js';
 import * as railStories from '../src/pages/chat/attachments/attachment-rail.stories';
 import * as dialogStories from '../src/pages/chat/attachments/dialog-attachment-preview.stories';
+
+// Per-session parks are module state; clear them so a parked draft never
+// restores into the next story render.
+afterEach(() => clearChatDraftCache());
 
 // ───────────────────────────────────────────────────────────────────
 // 2. HELPERS

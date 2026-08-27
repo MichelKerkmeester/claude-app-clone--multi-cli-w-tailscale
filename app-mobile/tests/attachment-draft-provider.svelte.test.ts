@@ -20,6 +20,7 @@ import {
   attachmentDraftReducer,
   EMPTY_ATTACHMENT_DRAFT,
 } from '../src/pages/chat/attachments/attachment-state.js';
+import { clearChatDraftCache } from '../src/shared/state/chat-draft-cache.js';
 import AttachmentDraftTestSurface from './support/AttachmentDraftTestSurface.svelte';
 
 // ───────────────────────────────────────────────────────────────────
@@ -28,6 +29,9 @@ import AttachmentDraftTestSurface from './support/AttachmentDraftTestSurface.sve
 
 afterEach(() => {
   cleanup();
+  // Unmount parks the staged draft, so the cache must be cleared AFTER
+  // cleanup or the park leaks into the next test and inflates its count.
+  clearChatDraftCache();
   for (const restore of objectUrlRestorers.splice(0)) restore();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
@@ -188,26 +192,48 @@ describe('AttachmentDraftProvider', () => {
     expect(urls.revokeObjectURL).toHaveBeenCalledTimes(2);
   });
 
+  // SESSION SWITCH IS A PARK, NOT A WIPE: the outgoing session keeps its
+  // object URLs alive in the cache and the incoming session starts empty.
+  // This deliberately diverges from the React oracle's session-switch wipe,
+  // which destroyed staged attachments on every switch.
+  it('parks staged attachments on a session switch and restores them on return', async () => {
+    installObjectUrlStubs();
+    const files = [photo('one.jpg'), photo('two.jpg')];
+    const view = renderDraft({ files });
+    await fireEvent.click(screen.getByRole('button', { name: 'select fixtures' }));
+    await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('2'));
+
+    // Switch to a session with nothing parked: it must start empty,
+    // without revoking (destroying) session one's staged work.
+    view.rerender({
+      capability: { enabled: true, imageIn: true },
+      sessionId: 'session-two',
+      modelCanViewPhotos: true,
+      files: [],
+    });
+    await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('0'));
+
+    // Returning to session one restores the exact staged attachments.
+    view.rerender({
+      capability: { enabled: true, imageIn: true },
+      sessionId: 'session-one',
+      modelCanViewPhotos: true,
+      files,
+    });
+    await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('2'));
+    expect(screen.getByTestId('stored-file')).toHaveTextContent('same');
+  });
+
   it.each([
-    ['session switch', 'rerender'],
     ['logout', 'logout'],
     ['app lock', 'app-lock'],
   ])('revokes every URL on %s', async (_label, lifecycle) => {
     const urls = installObjectUrlStubs();
-    const view = renderDraft({ files: [photo('one.jpg'), photo('two.jpg')] });
+    renderDraft({ files: [photo('one.jpg'), photo('two.jpg')] });
     await fireEvent.click(screen.getByRole('button', { name: 'select fixtures' }));
     await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('2'));
 
-    if (lifecycle === 'rerender') {
-      view.rerender({
-        capability: { enabled: true, imageIn: true },
-        sessionId: 'session-two',
-        modelCanViewPhotos: true,
-        files: [],
-      });
-    } else {
-      window.dispatchEvent(new Event(`pi-remote:${lifecycle}`));
-    }
+    window.dispatchEvent(new Event(`pi-remote:${lifecycle}`));
     await waitFor(() => expect(urls.revokeObjectURL).toHaveBeenCalledTimes(2));
     expect(screen.getByTestId('count')).toHaveTextContent('0');
   });
@@ -256,19 +282,22 @@ describe('AttachmentDraftProvider', () => {
     expect(urls.createObjectURL).not.toHaveBeenCalled();
   });
 
-  it('revokes all URLs on unmount without a second revoke during Strict-style cleanup', async () => {
+  it('parks staged attachments on unmount and keeps their URLs alive for the return', async () => {
     const urls = installObjectUrlStubs();
     const view = renderDraft({ files: [photo('one.jpg')] });
     await fireEvent.click(screen.getByRole('button', { name: 'select fixtures' }));
     await waitFor(() => expect(screen.getByTestId('count')).toHaveTextContent('1'));
     view.unmount();
-    expect(urls.revokeObjectURL).toHaveBeenCalledTimes(1);
+    // Leaving the chat parks the staged attachments — the URL stays
+    // usable in the cache instead of being revoked.
+    expect(urls.revokeObjectURL).not.toHaveBeenCalled();
   });
 
   it('does not leak URL, timer, fetch, or XHR work under Strict Mode double invocation', async () => {
     // Svelte has no StrictMode double-invoke analog; the load-bearing leak
-    // assertions (revoke once, no fetch/xhr, no extra timers on unmount) are
-    // preserved verbatim from the React oracle.
+    // assertions (parked URL stays alive and is never double-revoked, no
+    // fetch/xhr, no extra timers on unmount) are preserved from the React
+    // oracle, adapted to park semantics.
     const urls = installObjectUrlStubs();
     const fetchSpy = vi.fn();
     const xhrSpy = vi.fn();
@@ -289,7 +318,8 @@ describe('AttachmentDraftProvider', () => {
     view.unmount();
     await tick();
 
-    expect(urls.revokeObjectURL).toHaveBeenCalledTimes(1);
+    // The staged URL is parked (kept alive), never revoked.
+    expect(urls.revokeObjectURL).not.toHaveBeenCalled();
     expect(timerSpy.mock.calls.length).toBe(timersBeforeUnmount);
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrSpy).not.toHaveBeenCalled();

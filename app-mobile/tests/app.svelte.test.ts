@@ -122,6 +122,7 @@ vi.mock('../src/shared/format/attention.js', () => ({
   setPushForeground: vi.fn(),
 }));
 
+import { clearChatDraftCache } from '../src/shared/state/chat-draft-cache.js';
 import Home from '../src/pages/home/screen-home.svelte';
 import Review from '../src/pages/review/screen-review.svelte';
 import Session from '../src/pages/chat/screen-chat.svelte';
@@ -264,6 +265,8 @@ afterEach(() => {
   document.body.removeAttribute('style');
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  // Unmount parks the draft; clear AFTER cleanup so it cannot leak forward.
+  clearChatDraftCache();
 });
 
 // ───────────────────────────────────────────────────────────────────
@@ -1230,11 +1233,24 @@ it('a session switch clears the binding: no cross-session slash submit', async (
     sessionId: 'session_other',
     transcript: { ...EMPTY_TRANSCRIPT, sessionId: 'session_other', source: 'none' },
   });
-  // The drafted token survives, but the binding cannot survive the switch:
-  // Send is fail-closed and nothing reaches the relay.
-  expect(screen.getByRole('button', { name: 'Send command' })).toBeDisabled();
+  // The draft is parked under the session that owns it, so the incoming
+  // session opens clean: no token, no binding, and nothing reaches the relay.
+  const switched = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+  expect(switched).toHaveValue('');
+  expect(screen.queryByRole('button', { name: 'Send command' })).toBeNull();
   await user.keyboard('{Enter}');
   expect(relay.requestTicket).not.toHaveBeenCalled();
+  expect(relay.submitSlashCommand).not.toHaveBeenCalled();
+
+  // Returning restores the parked draft verbatim — the binding still does
+  // not survive, so Send stays fail-closed until the draft is re-bound.
+  await rerender({
+    sessionId,
+    transcript: { ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' },
+  });
+  await waitFor(() =>
+    expect(screen.getByLabelText('Message Pi')).toHaveValue('/plan '),
+  );
   expect(relay.submitSlashCommand).not.toHaveBeenCalled();
 });
 

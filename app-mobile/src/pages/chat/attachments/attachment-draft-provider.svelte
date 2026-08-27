@@ -11,6 +11,12 @@
   } from '@pi-remote/pi-rpc-protocol';
 
   import {
+    clearChatDraftCache,
+    parkAttachmentSnapshot,
+    takeAttachmentSnapshot,
+  } from '$shared/state/chat-draft-cache.js';
+
+  import {
     attachmentDraftReducer,
     capabilityAllowsPhotos,
     EMPTY_ATTACHMENT_DRAFT,
@@ -27,6 +33,13 @@
   interface StoredAttachment {
     readonly file: File;
     readonly objectUrl: string | null;
+  }
+
+  /** What leaving a session parks, keyed by sessionId, ready for the return visit. */
+  interface ParkedAttachmentDraft {
+    readonly state: AttachmentDraftState;
+    readonly files: readonly { id: string; file: File; objectUrl: string | null }[];
+    readonly nextId: number;
   }
 
   export interface AttachmentDraftProviderProps {
@@ -130,10 +143,12 @@
     modelCanViewPhotos,
   });
   // svelte-ignore state_referenced_locally
-  let previousSession: string | null = sessionId;
-  // svelte-ignore state_referenced_locally
   let previousModelCanViewPhotos = modelCanViewPhotos;
   let nextId = 1;
+  // The session whose park was last consumed; a change means a real switch.
+  // The initial capture is deliberate: first mount is not a switch.
+  // svelte-ignore state_referenced_locally
+  let restoredSession: string | null | undefined = sessionId;
   const stored = new Map<string, StoredAttachment>();
   let previewTrigger: HTMLElement | null = null;
 
@@ -141,13 +156,23 @@
   // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
-  // Keep this effect synchronized with the state it observes.
+  // Park the staged attachments under the outgoing session and restore
+  // whatever the incoming session parked. One cleanup owns both the park
+  // and the leftover URL revocation so the park (which keeps object URLs
+  // alive in the cache) always runs first. Everything but sessionId
+  // happens inside untrack: this effect writes draftState, and depending
+  // on it here would re-run the park/restore on every draft keystroke —
+  // and writing to state an effect reads is exactly the self-invalidation
+  // loop that has bitten this codebase before.
   $effect(() => {
-    if (previousSession !== sessionId) {
-      previousSession = sessionId;
-      // untrack(clearStoredDraft) — depend on sessionId only, not draftState this effect writes.
-      untrack(() => clearStoredDraft());
-    }
+    const sid = sessionId;
+    untrack(() => restoreParkedDraft(sid));
+    return () => {
+      untrack(() => {
+        parkCurrentDraft(sid);
+        revokeAllObjectUrls();
+      });
+    };
   });
 
   // Keep this effect synchronized with the state it observes.
@@ -179,16 +204,31 @@
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') clearStoredDraft();
     };
+    // Logout and app lock are security events: no session's parked draft
+    // may survive them, not just the visible one's.
+    const onSecurityClear = () =>
+      clearChatDraftCache((snapshot) => {
+        // Every parked session's object URLs die with the cache, not just
+        // the mounted one's.
+        const parked = snapshot as ParkedAttachmentDraft | null;
+        if (parked === null) return;
+        for (const file of parked.files) {
+          if (file.objectUrl !== null) URL.revokeObjectURL(file.objectUrl);
+        }
+      });
     window.addEventListener('pi-remote:logout', onLogout);
+    window.addEventListener('pi-remote:logout', onSecurityClear);
     window.addEventListener('pi-remote:app-lock', onAppLock);
+    window.addEventListener('pi-remote:app-lock', onSecurityClear);
     window.addEventListener('pagehide', onPageHide);
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
       window.removeEventListener('pi-remote:logout', onLogout);
+      window.removeEventListener('pi-remote:logout', onSecurityClear);
       window.removeEventListener('pi-remote:app-lock', onAppLock);
+      window.removeEventListener('pi-remote:app-lock', onSecurityClear);
       window.removeEventListener('pagehide', onPageHide);
       document.removeEventListener('visibilitychange', onVisibilityChange);
-      revokeAllObjectUrls();
     };
   });
 
@@ -219,7 +259,58 @@
   // Keep clear stored draft focused on its single responsibility.
   function clearStoredDraft(): void {
     revokeAllObjectUrls();
+    // A cleared draft must not resurrect on the next visit.
+    parkAttachmentSnapshot(sessionId, null);
     dispatch({ type: 'lifecycle-clear' });
+  }
+
+  // Keep park current draft focused on its single responsibility.
+  function parkCurrentDraft(sid: string | null | undefined): void {
+    if (sid === null || sid === undefined) {
+      revokeAllObjectUrls();
+      return;
+    }
+    if (draftState.items.length === 0) {
+      // Nothing staged — a stale park must not outlive the cleared draft.
+      parkAttachmentSnapshot(sid, null);
+      return;
+    }
+    const files: { id: string; file: File; objectUrl: string | null }[] = [];
+    for (const item of draftState.items) {
+      const entry = stored.get(item.id);
+      if (entry === undefined) continue;
+      files.push({ id: item.id, file: entry.file, objectUrl: entry.objectUrl });
+      // Ownership moves to the cache; leftover revocation must not kill
+      // the parked object URLs.
+      stored.delete(item.id);
+    }
+    parkAttachmentSnapshot<ParkedAttachmentDraft>(sid, {
+      state: { ...draftState, previewId: null },
+      files,
+      nextId,
+    });
+  }
+
+  // Keep restore parked draft focused on its single responsibility.
+  function restoreParkedDraft(sid: string | null | undefined): void {
+    const switched = restoredSession !== sid;
+    restoredSession = sid;
+    const parked = takeAttachmentSnapshot<ParkedAttachmentDraft>(sid);
+    if (parked === null) {
+      // Nothing parked. Only a genuine session switch clears: staged work
+      // must never bleed between sessions, but a plain remount of the same
+      // session (or a draft seeded before mount) keeps what is already there.
+      if (switched) {
+        revokeAllObjectUrls();
+        dispatch({ type: 'lifecycle-clear' });
+      }
+      return;
+    }
+    for (const file of parked.files) {
+      stored.set(file.id, { file: file.file, objectUrl: file.objectUrl });
+    }
+    nextId = parked.nextId;
+    draftState = parked.state;
   }
 
   // Keep clear for capability loss focused on its single responsibility.

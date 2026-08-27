@@ -5,12 +5,12 @@ contextType: "planning"
 _memory:
   continuity:
     packet_pointer: "specs/004-sk-code-mobile-cli-mode/003-skill-doc-alignment"
-    last_updated_at: "2026-08-27T00:00:00.000Z"
+    last_updated_at: "2026-08-27T12:00:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored plan-only Level-2 packet (spec/plan/tasks/checklist) for skill doc alignment."
-    next_safe_action: "Operator reviews and approves; then execute A-D via isolated cross-repo worktree."
+    recent_action: "Implemented A-D in isolated Public worktree 037; opened PR #38. Gates green: scan-skill-references broken:0, negative-controls absent, ci-skill-root-metadata passed, validate_document.py rc=0. dqi-baseline refreshed to measured current-state (48 docs)."
+    next_safe_action: "Merge PR #38 to Public main, then reconcile packet to complete (implementation-summary.md, checklist)."
     blockers: []
-    completion_pct: 0
+    completion_pct: 90
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->

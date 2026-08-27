@@ -1,17 +1,17 @@
 ---
-title: "Phase 7 implementation summary — host protocol request spec (PLANNED)"
-description: "Planned stub for the ⚠️ host-request spec: it will deliver the minimum home-card bundle (title, lastMessagePreview, agent, attention), the optional/product-gated fields, and the chat RPCs as a cross-team request, each with a wire shape, its consuming-phase UI, a fail-closed fallback, and a wire-compat note grounded in the real pi-rpc-protocol guards. Open Question #1 is answered from the protocol (the Inbox item carries no sessionId). Implementation deferred until the operator says go; this phase writes no client code."
-contextType: "planning"
+title: "Phase 7 implementation summary — host card enrichment (IMPLEMENTED, in progress)"
+description: "Relay + protocol implementation of the host-request set: the SessionCardDto shape gained twelve optional read-only fields (additive-safe), and the relay now emits eight of them (model, attention, and six host-redacted content/derived fields) at GET /api/sessions. Three card fields need the external Pi CLI; the chat RPCs + presence extensions remain."
+contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/007-host-requests"
-    last_updated_at: "2026-08-26T05:54:46.000Z"
+    last_updated_at: "2026-08-27T00:00:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Extended PLANNED stub with 6 nodeterm net-new host requests; still planned, none built."
-    next_safe_action: "On operator go, hand orca+nodeterm request to relay; build in consuming phases."
+    recent_action: "Relay emits 8 of 12 card fields; protocol + model/attention + redacted content shipped."
+    next_safe_action: "Record the 3 external-Pi fields; scope the chat RPCs + presence extensions."
     blockers:
-      - "Host dependency: every requested field/RPC is relay-authored; this phase implements nothing."
-    completion_pct: 0
+      - "agent/resumable/queuedMessageCount + @-file-search + host STT need the external Pi CLI (out of this repo)."
+    completion_pct: 45
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: implementation-summary-core | v2.2 -->
@@ -28,8 +28,8 @@ _memory:
 |---|---|
 | Parent | `007-orca-nodeterm-ux-mining` |
 | Level | 2 |
-| Status | Planned — implementation deferred until the operator says go |
-| Requirements planned | REQ-001 … REQ-005 (none shipped) |
+| Status | In progress — card enrichment implemented; chat RPCs + external-Pi fields remaining |
+| Surface | `packages/pi-rpc-protocol/` + `app-relay/` (the external Pi CLI is out of this repo) |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -37,27 +37,29 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-Nothing is built yet. When authored, this phase will deliver the ⚠️ "Needs host support" set from
-`../research/research.md` as a buildable cross-team request to the relay/host team:
+The host protocol request became a host implementation. `SessionCardDto` gained twelve optional read-only fields
+and the relay now emits eight of them; the client's fail-closed fallbacks light up when a field is present.
 
-- **Minimum home-card bundle** (extends `SessionCardDto`, `packages/pi-rpc-protocol/src/types.ts:428`):
-  `title`, `lastMessagePreview`, `agent` (+ optional `model`), `attention` (`none|blocked|waiting|completed`,
-  unread ≠ working). [recs 2.2, 2.3, 1.6]
-- **Optional / product-gated:** `queuedMessageCount`/`subagentTranscriptCount` or `resumable`; redacted
-  `projectLabel`/`cwd`/`branch`; `pinned` + a pin RPC; capped `previewMessages[]`; `hasMore`/page token.
-  [recs 2.4, 1.3, 1.4, 2.6, 1.14, 6.4]
-- **Chat RPCs:** `@`-file-search, image-paste upload lease, host-backed dictation/STT, a typed approval
-  envelope (only if the Review ticket doesn't already cover it). [recs 4.2, 4.5, 4.6, 5.6]
-- **Net-new from the nodeterm mining** (`../research-nodeterm/`, deduped against orca): `contextPercent`
-  (0–100, optional — the context-window fill meter; bundle its `model` label with `agent`/`model`; ND-3.1),
-  `activity` (+ raw `tool`) (the live present-tense action line; ND-3.2), `prompt` (the turn's opening "You:"
-  line; ND-3.3), an approval-vs-question sub-kind + end-reason extending the already-requested `attention`
-  (ND-2.2, ND-2.9), a cross-surface read-ack RPC (LOW/optional; ND-2.10), and an optional `stateEnteredAt`
-  transition-clock (LOW/optional/candidate-drop; ND-2.8, ND-1.5). Consuming phase: card fields →
-  `002-home-selection/003-card-polish`, read-ack → `006-navigation`.
+**Protocol foundation** (`bc76844`): `SessionCardDto` (`packages/pi-rpc-protocol/src/types.ts:428`) gained the
+twelve optional fields the client reads — `title`, `lastMessagePreview`, `agent`, `model`, `attention`
+(`done|blocked|waiting`, reconciled from the request spec's `completed`), `contextPercent`, `activity`, `tool`,
+`prompt`, `previewMessages`, `resumable`, `queuedMessageCount`. `isSessionCardDto` validates each when present and
+stays permissive to unknown extras, so a bare four-field card from an older host still validates (additive-safe).
 
-Each entry will carry a wire shape, the exact UI it unlocks and its consuming phase, the fail-closed fallback,
-and the wire-compat note. This phase writes no client code — the UI is built later in the consuming phases.
+**Relay emits model + attention** (`444c267`): merged live at `GET /api/sessions` — the runtime model label and
+the session's latest attention, mapped from the host `AttentionClass` (`finished→done`, `needs_input→waiting`,
+`error→blocked`). Absent source omits the field.
+
+**Relay emits six host-redacted content/derived fields** (`5ffe38b`): an in-memory `SessionEnrichmentService`
+derives `title`, `prompt`, `lastMessagePreview`, `previewMessages`, `tool`, and `contextPercent` from Pi's
+existing transcript/prompt stream. Every text field routes through `safeDisplayString` (rejects paths, URLs,
+prefixed secrets; caps to the protocol-guard limits) plus a conservative card-boundary `looksLikeSecret` reject
+for un-prefixed token shapes; a rejected value omits the field. The merged card is re-validated against
+`isSessionCardDto` and falls back to the bare card on any mismatch.
+
+Not built — `agent`, `resumable`, `queuedMessageCount` have no relay source (the external Pi does not emit them);
+`activity` has no clean per-turn label. These, plus the chat RPCs and presence extensions, are recorded in
+LIMITATIONS.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -65,14 +67,14 @@ and the wire-compat note. This phase writes no client code — the UI is built l
 <!-- ANCHOR:how-delivered -->
 ## HOW IT WAS DELIVERED
 
-The request will be authored as three tables (card bundle, optional fields, chat RPCs), each row a four-facet
-contract, grounded in the real current shapes so the host can diff against them directly: `SessionCardDto`
-(`types.ts:428`), `AttentionItemDto`/`AttentionClass` (`types.ts:1068,1054`), and the guard strictness
-(`isSessionCardDto` permissive at `guards.ts:1244` vs `isAttentionItemDto` strict `hasOnlyKeys` at
-`guards.ts:364`). Each fail-closed fallback will equal the client's current behaviour, so a field's absence is
-un-enriched, never broken. The request will then be handed to the relay team; when a field ships, its named
-consuming phase (`002-home-selection`, `003-chat-message`, `004-composer`, `005-streaming-ask`) builds and
-verifies the UI under its own `token-identity`/`test:web`/a11y gates.
+Protocol-first, then relay, in additive-safe batches. The DTO shape landed first with wire-compat tests (a bare
+card still validates; each invalid new field is rejected). The relay then emitted fields at the `GET /api/sessions`
+projection — a read-time merge for live state (`model`/`attention`), and an in-memory accumulator hooked to the
+transcript/prompt ingest for the derived content fields, so nothing is persisted and an absent summary omits the
+field. Redaction is the load-bearing invariant for the content fields: the same safe-display sanitizer the
+protocol guard uses, applied at capture, with a second full-card re-validation before the response. Every field
+was proven end-to-end against the client's `card-projection` reader and reviewed by an independent agent with a
+negative control on each constraint (the attention map, the redaction gate, the secret reject).
 <!-- /ANCHOR:how-delivered -->
 
 ---
@@ -80,33 +82,20 @@ verifies the UI under its own `token-identity`/`test:web`/a11y gates.
 <!-- ANCHOR:decisions -->
 ## KEY DECISIONS
 
-**Request `attention` on `SessionCardDto`, not `sessionId` on the Inbox item.** Open Question #1 is answered
-against our own protocol: `AttentionItemDto = { lookupId, attentionClass, generation, nonce, occurredAt }`
-(`types.ts:1068`) carries no `sessionId` — that field appears only on `AttentionResolutionDto` (`types.ts:1076`)
-after a per-item open. So the "attention badge as a free view-join" path is unavailable. Of the two host fixes,
-adding `attention` to `SessionCardDto` is additive-safe under the permissive `isSessionCardDto` guard, whereas
-adding `sessionId` to `AttentionItemDto` would break the strict `hasOnlyKeys` guard for every un-updated
-client. The card field wins. This is MUST-CONFIRM-FIRST with the operator before the host commits.
+**`attention` on `SessionCardDto`, mapped from `AttentionClass`.** Added to the permissive card guard (additive-safe),
+never `sessionId` on the strict `AttentionItemDto`. The host `needs_input|finished|error` maps to the client
+`done|blocked|waiting` at the projection; no state is dropped.
 
-**Reconcile the attention taxonomy.** The host's existing `AttentionClass` is `'needs_input' | 'finished' |
-'error'` (three values, no `working`), while the requested card enum is `none|blocked|waiting|completed`. The
-request will state the mapping (or ask the host to widen `AttentionClass`) so no state is silently dropped; the
-"never badge a running session" rule holds because no `working` value exists.
+**The Pi CLI is external — most content is derived in the relay.** Only `pi-rpc-protocol` and `app-relay` live in
+this repo; the Pi agent is a separate process the relay proxies over RPC. So the redacted content fields are
+derived from Pi's existing transcript/prompt stream at the relay ingest, not sourced from a new Pi field.
 
-**Request only a redacted `projectLabel`, gated on product.** Home enforces "opaque identifiers only, no
-paths" (`app-mobile/src/pages/home/screen-home.svelte:86`); a raw `cwd` is ❌. Whether product lifts the ban
-for a redacted label is Open Question #2 and gates recs 1.3/1.4/2.6.
+**Prompt-derived text is allowed on the card, host-redacted (operator-approved).** The relay historically kept
+prompt/path/label content off the card; the operator lifted that for host-redacted `title`/`preview`/`prompt`.
+Every such value passes the safe-display sanitizer plus the card-boundary secret reject, or the field is omitted.
 
-**Likely no new approval envelope.** The protocol already carries approval types (`ApprovalResultStatus`,
-`status: 'pending'`, `types.ts:1013,1019`) and a Review surface exists — so rec 5.6's envelope is probably
-already covered; the request marks it confirm-then-drop rather than a new field.
-
-**Bundle `contextPercent` with the model label; extend `attention`, don't re-request it.** The nodeterm mining
-adds `contextPercent` as the single best content-model idea orca never raised, and its `model` label rides the
-SAME usage payload — so the context meter also yields the already-requested `model` chip for free (bundle them).
-The approval-vs-question sub-kind + end-reason are additive sub-fields on the already-requested `attention`
-(referencing nodeterm's `NodeStateChange` shape), NOT a re-request of the base enum. `title`, `agent`/`model`,
-and the base `attention` enum are reinforced by nodeterm and left unchanged.
+**Fields with no relay source are not faked.** `agent`, `resumable`, `queuedMessageCount` (and a clean `activity`
+label) do not exist in the relay's view of the external Pi, so they are omitted, not fabricated.
 <!-- /ANCHOR:decisions -->
 
 ---
@@ -114,15 +103,15 @@ and the base `attention` enum are reinforced by nodeterm and left unchanged.
 <!-- ANCHOR:verification -->
 ## VERIFICATION
 
-| Check | Planned result |
+| Check | Result |
 |---|---|
-| Four-facet coverage | Every field/RPC (T2.1–T2.13) has shape + consuming phase + fail-closed fallback + wire-compat — pending author |
-| Traceability | Every entry cites a rec number and names a consuming phase — pending author |
-| Fail-closed coverage | Every field's absent-behaviour equals current client behaviour — pending author |
-| Open Question #1 | Answered from `pi-rpc-protocol` (`types.ts:1068,1076`, `guards.ts:364,396`) — recorded |
-| No client code touched | `git status` shows changes only under this phase folder — to confirm at close |
-| `validate.sh --strict` | exit 0 via realpath — to run at close |
-| `token-identity` / `test:web` / a11y | N/A here; inherited by the consuming phases when the fields ship |
+| Protocol | `pi-rpc-protocol` typecheck 0; tests 60 (8 wire-compat: bare card valid, each invalid field rejected) |
+| Relay | `app-relay` typecheck 0; tests 47 files/324 (25 enrichment: enum map, redaction/secret omission, no usage double-count, fail-closed both ways) |
+| Client lights-up | `app-mobile` `card-projection.test.ts` 20 passed — the wire shapes agree |
+| Redaction proof | a path/URL/secret and an un-prefixed `sk-` token are omitted; raw text never in the card JSON |
+| Negative controls | attention map, redaction gate, and secret reject each fail their test when broken, then restored |
+| Independent review | Sonnet-xhigh accepted the enrichment (no P0); its two P1s fixed before commit |
+| Evidence commits | `bc76844` (protocol), `444c267` (model/attention), `5ffe38b` (redacted content) |
 <!-- /ANCHOR:verification -->
 
 ---
@@ -130,11 +119,13 @@ and the base `attention` enum are reinforced by nodeterm and left unchanged.
 <!-- ANCHOR:limitations -->
 ## KNOWN LIMITATIONS
 
-Every item here is blocked on the relay: the request is buildable the moment the host ships a field, but not
-before, and the consuming phases stay on their fail-closed fallbacks until then. Three items carry residual
-uncertainty for the operator/host: the redacted-`projectLabel` product rule (Open Q#2), whether a paste-upload
-lease and `@`-search already exist on the Pi relay given the composer's existing photo-attachment path (Open
-Q#3), and the final attention taxonomy (map the card enum onto `AttentionClass`, or widen it). This phase
-implements no client code and makes no completion claim; it hands the relay team a precise contract and waits
-for the operator's go.
+Three card fields need the external Pi CLI (out of this repo) and are not built: `agent` (no agent label distinct
+from the model), `resumable` (no resume-state flag), `queuedMessageCount` (no per-session queue count); `activity`
+has no clean per-turn label either. The remaining host-request surface is also unbuilt: the chat RPCs
+(`@`-file-search and host STT need the external Pi; a paste-upload lease, read-ack, and pin RPC are
+relay-feasible; the typed approval envelope is likely already covered by the existing Review path) and the
+presence extensions (attention sub-kind + end-reason, `stateEnteredAt`, `hasMore` page token). One residual
+privacy note: the shared safe-display sanitizer's secret detector is prefix-based; the card adds a conservative
+un-prefixed-token reject on top, but a general high-entropy secret scanner is a worthwhile follow-up now that
+conversational text reaches the card.
 <!-- /ANCHOR:limitations -->

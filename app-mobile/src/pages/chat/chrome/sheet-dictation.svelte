@@ -288,7 +288,7 @@
     align-items: flex-end;
     justify-content: center;
     overflow: hidden;
-    background: color-mix(in srgb, #24221f 56%, transparent);
+    background: var(--scrim);
     animation: dictation-sheet-backdrop-in 180ms ease-out;
   }
 
@@ -450,7 +450,7 @@
     inline-size: 1rem;
     block-size: 1rem;
     border-radius: 999px;
-    background: #fff;
+    background: var(--on-accent);
     transition: transform 200ms ease;
   }
 

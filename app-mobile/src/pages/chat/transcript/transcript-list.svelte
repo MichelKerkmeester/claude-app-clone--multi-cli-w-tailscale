@@ -782,7 +782,7 @@
     padding-inline: 0.3rem;
     border-radius: 999px;
     background: var(--accent);
-    color: #fff;
+    color: var(--on-accent-text);
     font-size: 0.7rem;
     font-weight: 700;
   }

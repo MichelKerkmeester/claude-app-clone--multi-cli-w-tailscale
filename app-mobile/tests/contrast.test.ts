@@ -67,6 +67,9 @@ const LIGHT: readonly Pair[] = [
   { name: 'warning on warning-soft', fg: '#8a452f', bg: '#f3e4de', min: NORMAL_TEXT },
   { name: 'control-border on canvas', fg: '#7b7974', bg: '#f8f8f6', min: LARGE_OR_NON_TEXT },
   { name: 'focus ring on canvas', fg: '#121212', bg: '#f8f8f6', min: LARGE_OR_NON_TEXT },
+  { name: 'on-accent on accent (non-text)', fg: '#ffffff', bg: '#d97757', min: LARGE_OR_NON_TEXT },
+  { name: 'on-danger on danger', fg: '#f8f8f6', bg: '#8d382e', min: LARGE_OR_NON_TEXT },
+  { name: 'on-accent-text on accent (badge)', fg: '#24221f', bg: '#d97757', min: NORMAL_TEXT },
 ];
 
 const DARK: readonly Pair[] = [
@@ -81,6 +84,9 @@ const DARK: readonly Pair[] = [
   { name: 'control-border on canvas', fg: '#807a70', bg: '#181715', min: LARGE_OR_NON_TEXT },
   { name: 'focus ring on surface', fg: '#f8f8f6', bg: '#2d2a26', min: LARGE_OR_NON_TEXT },
   { name: 'focus ring on canvas', fg: '#f8f8f6', bg: '#24221f', min: LARGE_OR_NON_TEXT },
+  { name: 'on-accent on accent (non-text)', fg: '#ffffff', bg: '#d97757', min: LARGE_OR_NON_TEXT },
+  { name: 'on-danger on danger', fg: '#24221f', bg: '#ee9b91', min: LARGE_OR_NON_TEXT },
+  { name: 'on-accent-text on accent (badge)', fg: '#24221f', bg: '#d97757', min: NORMAL_TEXT },
 ];
 
 const MODEL_SHEET_LIGHT: readonly Pair[] = [

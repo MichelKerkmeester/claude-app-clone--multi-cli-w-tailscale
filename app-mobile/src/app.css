@@ -116,6 +116,10 @@
   --accent-strong: var(--pi-accent-ui);
   --accent-soft: var(--pi-selection);
   --accent-ink: var(--pi-accent-txt);
+  --on-accent: #ffffff;                 /* content on an accent/accent-strong fill (clay is theme-invariant) */
+  --on-accent-text: #24221f;            /* AA-dark text on an accent fill: 5.08:1 on clay, both themes */
+  --on-danger: var(--canvas);           /* content on a --danger fill; --canvas flips so AA holds both themes */
+  --scrim: color-mix(in srgb, #24221f 56%, transparent);  /* the fixed dark overlay backdrop, one source */
   --action-bg: var(--pi-carbon);
   --action-fg: var(--pi-bone);
   --success: #37624a;
@@ -197,6 +201,10 @@
   --accent-strong: #b85f42;
   --accent-soft: var(--pi-selection);
   --accent-ink: var(--pi-accent-txt);
+  --on-accent: #ffffff;                 /* content on an accent/accent-strong fill (clay is theme-invariant) */
+  --on-accent-text: #24221f;            /* AA-dark text on an accent fill: 5.08:1 on clay, both themes */
+  --on-danger: var(--canvas);           /* content on a --danger fill; --canvas flips so AA holds both themes */
+  --scrim: color-mix(in srgb, #24221f 56%, transparent);  /* the fixed dark overlay backdrop, one source */
   --action-bg: var(--pi-carbon);
   --action-fg: var(--pi-bone);
   --success: #8fc4a4;
@@ -250,6 +258,10 @@
     --accent-strong: #b85f42;
     --accent-soft: var(--pi-selection);
     --accent-ink: var(--pi-accent-txt);
+    --on-accent: #ffffff;                 /* content on an accent/accent-strong fill (clay is theme-invariant) */
+    --on-accent-text: #24221f;            /* AA-dark text on an accent fill: 5.08:1 on clay, both themes */
+    --on-danger: var(--canvas);           /* content on a --danger fill; --canvas flips so AA holds both themes */
+    --scrim: color-mix(in srgb, #24221f 56%, transparent);  /* the fixed dark overlay backdrop, one source */
     --action-bg: var(--pi-carbon);
     --action-fg: var(--pi-bone);
     --success: #8fc4a4;

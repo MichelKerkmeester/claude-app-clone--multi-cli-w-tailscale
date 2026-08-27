@@ -637,7 +637,7 @@
   }
 
   .dictation-overlay--clock {
-    font-family: var(--font-display, monospace);
+    font-family: var(--font-mono);
     font-size: 0.875rem;
     color: var(--ink-muted);
     font-variant-numeric: tabular-nums;
@@ -668,7 +668,7 @@
     border: 0;
     border-radius: 999px;
     background: var(--accent);
-    color: #fff;
+    color: var(--on-accent);
     cursor: pointer;
   }
 

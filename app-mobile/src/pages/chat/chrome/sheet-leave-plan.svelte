@@ -208,7 +208,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    background: rgb(0 0 0 / 35%);
+    background: var(--scrim);
   }
 
   /* This slot: sheet — constraint + raised sheet + entry. */

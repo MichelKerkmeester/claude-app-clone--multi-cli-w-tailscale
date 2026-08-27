@@ -624,7 +624,7 @@
 
   :global(.composer--mic.is-recording) {
     background: var(--danger);
-    color: #fff;
+    color: var(--on-danger);
     border-color: var(--danger);
   }
 

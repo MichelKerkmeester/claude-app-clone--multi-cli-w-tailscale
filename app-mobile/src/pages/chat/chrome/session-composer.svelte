@@ -1111,7 +1111,7 @@
   /* This state: send · steer — the morphing primary disc; steer shares this form. */
   :global(.composer--primary.is-send) {
     background: var(--accent);
-    color: #fff;
+    color: var(--on-accent);
   }
 
   /* Keep this rule aligned with its surrounding surface. */

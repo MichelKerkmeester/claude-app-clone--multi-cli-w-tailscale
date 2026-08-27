@@ -223,7 +223,7 @@
     align-items: flex-end;
     justify-content: center;
     overflow: hidden;
-    background: color-mix(in srgb, #24221f 56%, transparent);
+    background: var(--scrim);
     animation: prompt-history-backdrop-in 180ms ease-out;
   }
 

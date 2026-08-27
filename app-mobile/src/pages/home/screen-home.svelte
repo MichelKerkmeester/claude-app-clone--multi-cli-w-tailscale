@@ -651,7 +651,7 @@
     place-items: center;
     border-radius: 50%;
     background: var(--accent);
-    color: white;
+    color: var(--on-accent);
     font-size: clamp(1.4rem, 4vw, 2.5rem);
     font-weight: 700;
   }

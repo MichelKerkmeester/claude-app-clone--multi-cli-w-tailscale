@@ -722,6 +722,60 @@ describe('Pi transcript projector', () => {
     expect(JSON.stringify(projected)).not.toContain('PIXEL_CANARY');
     expect(JSON.stringify(projected)).not.toContain('private-name.png');
   });
+
+  it('exposes a live card snapshot from message, queue, and interrupted-turn events', () => {
+    const projector = new TranscriptProjector();
+    expect(projector.cardSnapshot()).toEqual({
+      messageCount: 0,
+      queuedMessageCount: 0,
+      status: null,
+    });
+
+    projector.project(
+      {
+        type: 'message_start',
+        message: assistantMessage([{ type: 'text', text: 'one' }]),
+      },
+      { occurredAt: OCCURRED_AT, nextSequence: () => 1 },
+    );
+    projector.project(
+      {
+        type: 'message_start',
+        message: assistantMessage([{ type: 'text', text: 'two' }]),
+      },
+      { occurredAt: OCCURRED_AT, nextSequence: () => 2 },
+    );
+    expect(projector.cardSnapshot().messageCount).toBe(2);
+
+    projector.project(
+      { type: 'queue_update', steering: ['steer'], followUp: ['follow-a', 'follow-b'] },
+      { occurredAt: OCCURRED_AT, nextSequence: () => 3 },
+    );
+    expect(projector.cardSnapshot().queuedMessageCount).toBe(3);
+
+    projector.project({ type: 'queue_update', steering: [], followUp: [] }, {
+      occurredAt: OCCURRED_AT,
+      nextSequence: () => 4,
+    });
+    expect(projector.cardSnapshot().queuedMessageCount).toBe(0);
+
+    projector.project({ type: 'agent_start' }, { occurredAt: OCCURRED_AT, nextSequence: () => 5 });
+    expect(projector.cardSnapshot().status).toBe('running');
+    projector.project(
+      { type: 'agent_end', lifecycle: 'interrupted' },
+      { occurredAt: OCCURRED_AT, nextSequence: () => 6 },
+    );
+    expect(projector.cardSnapshot().status).toBe('interrupted');
+    // A settle after an interrupt keeps the interrupted resting status.
+    projector.project({ type: 'agent_settled' }, { occurredAt: OCCURRED_AT, nextSequence: () => 7 });
+    expect(projector.cardSnapshot().status).toBe('interrupted');
+    // The next turn start clears it back to running.
+    projector.project({ type: 'agent_start' }, { occurredAt: OCCURRED_AT, nextSequence: () => 8 });
+    expect(projector.cardSnapshot().status).toBe('running');
+    // A normal settle from running goes idle.
+    projector.project({ type: 'agent_settled' }, { occurredAt: OCCURRED_AT, nextSequence: () => 9 });
+    expect(projector.cardSnapshot().status).toBe('idle');
+  });
 });
 
 function project(event: PiRpcEvent): readonly TranscriptBlock[] {

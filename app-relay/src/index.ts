@@ -281,6 +281,10 @@ export async function runRelay(): Promise<() => Promise<void>> {
     prompts,
     runtime,
     sessionEnrichment,
+    sessionCardLive: {
+      snapshotFor: (sessionId) =>
+        sessionId === SESSION_ID ? transcriptProjector.cardSnapshot() : undefined,
+    },
     askQuestions,
     commands,
     ...(push === undefined ? {} : { push }),

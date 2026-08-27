@@ -120,6 +120,13 @@ export interface InboundImageProjectionContext {
   readonly source: InboundImageSource;
 }
 
+/** Live card fields derived from the projected event stream. Unknown stays null/zero. */
+export interface SessionCardLiveSnapshot {
+  readonly messageCount: number;
+  readonly queuedMessageCount: number;
+  readonly status: 'idle' | 'running' | 'interrupted' | null;
+}
+
 // ───────────────────────────────────────────────────────────────────
 // 4. CORE LOGIC
 // ───────────────────────────────────────────────────────────────────
@@ -206,14 +213,25 @@ export class TranscriptProjector {
   private turnOrdinal = 0;
   private messageOrdinal = 0;
   private activeMessage: number | null = null;
+  private queuedPendingCount = 0;
+  private cardStatus: SessionCardLiveSnapshot['status'] = null;
 
   public constructor(private readonly artifactStore?: ArtifactStore) {}
+
+  public cardSnapshot(): SessionCardLiveSnapshot {
+    return {
+      messageCount: this.messageOrdinal,
+      queuedMessageCount: this.queuedPendingCount,
+      status: this.cardStatus,
+    };
+  }
 
   public project(
     event: PiRpcEvent,
     context: TranscriptProjectionContext,
   ): readonly TranscriptBlock[] {
     this.eventOrdinal += 1;
+    this.applyCardSignals(event);
     const blocks: TranscriptBlock[] = [];
     const emit = (key: string, body: TranscriptBlockBody): void => {
       blocks.push(this.createBlock(key, body, context));
@@ -746,6 +764,31 @@ export class TranscriptProjector {
     return `event:${this.eventOrdinal}:${type}`;
   }
 
+  private applyCardSignals(event: PiRpcEvent): void {
+    switch (event.type) {
+      case 'agent_start':
+        this.cardStatus = 'running';
+        return;
+      case 'agent_settled':
+        // A settle after an interrupt keeps the interrupted resting status;
+        // it clears only when the next turn starts. A normal settle goes idle.
+        if (this.cardStatus !== 'interrupted') this.cardStatus = 'idle';
+        return;
+      case 'agent_end':
+      case 'turn_end':
+        if (isInterruptedOrCancelledTurn(event)) {
+          this.cardStatus = 'interrupted';
+        }
+        return;
+      case 'queue_update':
+        this.queuedPendingCount =
+          stringArray(event['steering']).length + stringArray(event['followUp']).length;
+        return;
+      default:
+        return;
+    }
+  }
+
   private projectArtifact(
     event: PiRpcEvent,
     context: TranscriptProjectionContext,
@@ -1048,6 +1091,20 @@ function lifecycleFromMetadata(
     candidate === 'unknown'
     ? candidate
     : fallback;
+}
+
+function isInterruptedOrCancelledToken(value: string | null): boolean {
+  return value === 'interrupted' || value === 'cancelled';
+}
+
+/** True only when the turn-end event itself carries an interrupted or cancelled signal. */
+function isInterruptedOrCancelledTurn(event: PiRpcEvent): boolean {
+  if (event['aborted'] === true) return true;
+  if (isInterruptedOrCancelledToken(lifecycleFromMetadata(event, 'unknown'))) return true;
+  if (isInterruptedOrCancelledToken(stringValue(event['reason']))) return true;
+  if (isInterruptedOrCancelledToken(stringValue(event['error']))) return true;
+  const message = recordValue(event['message']);
+  return message !== null && isInterruptedOrCancelledToken(lifecycleFromMetadata(message, 'unknown'));
 }
 
 function checkpointFromMetadata(

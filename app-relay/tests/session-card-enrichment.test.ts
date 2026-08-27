@@ -14,17 +14,19 @@ import {
   isSessionCardDto,
   type DevicePublicKeyJwk,
   type EnrollmentQr,
+  type PiRpcEvent,
   type RuntimeStateDto,
 } from '@pi-remote/pi-rpc-protocol';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { AuthService } from '../src/auth/auth-service.js';
-import { startReadOnlyServer, type RunningReadOnlyServer } from '../src/http/server.js';
+import { startReadOnlyServer, type RunningReadOnlyServer, type SessionCardLiveSource } from '../src/http/server.js';
 import { PushService } from '../src/push/push-service.js';
 import { SyncHub } from '../src/replay/sync.js';
 import { SessionEnrichmentService } from '../src/services/session-enrichment-service.js';
 import { SessionCatalog } from '../src/sessions/catalog.js';
 import { RelayStore } from '../src/store/relay-store.js';
+import { TranscriptProjector } from '../src/store/transcript-projector.js';
 import type { RuntimeService } from '../src/runtime/runtime-service.js';
 
 const ORIGIN = 'https://pi-remote.example.ts.net';
@@ -152,6 +154,7 @@ function insertAttention(
 async function createHarness(
   runtime?: RuntimeService,
   sessionEnrichment?: SessionEnrichmentService,
+  sessionCardLive?: SessionCardLiveSource,
 ): Promise<Harness> {
   let now = Date.parse('2026-01-01T00:00:00.000Z');
   const store = new RelayStore();
@@ -184,6 +187,7 @@ async function createHarness(
     auth,
     ...(runtime === undefined ? {} : { runtime }),
     ...(sessionEnrichment === undefined ? {} : { sessionEnrichment }),
+    ...(sessionCardLive === undefined ? {} : { sessionCardLive }),
     push,
     now: () => now,
     port: 0,
@@ -284,6 +288,38 @@ function toolCall(id: string, toolName: string): Record<string, unknown> {
 
 function usage(id: string, inputTokens: number, outputTokens: number): Record<string, unknown> {
   return { kind: 'usage', id, inputTokens, outputTokens, cost: 0 };
+}
+
+function liveFromProjector(projector: TranscriptProjector): SessionCardLiveSource {
+  return {
+    snapshotFor: (sessionId) =>
+      sessionId === SESSION_ID ? projector.cardSnapshot() : undefined,
+  };
+}
+
+function projectEvent(projector: TranscriptProjector, event: Record<string, unknown>): void {
+  let sequence = 1;
+  projector.project(event as PiRpcEvent, {
+    occurredAt: '2026-01-01T00:00:00.000Z',
+    nextSequence: () => sequence++,
+    sessionId: SESSION_ID,
+  });
+}
+
+function messageStart(text: string): Record<string, unknown> {
+  return {
+    type: 'message_start',
+    message: {
+      role: 'assistant',
+      content: [{ type: 'text', text }],
+      api: 'test',
+      provider: 'test',
+      model: 'test',
+      usage: { input: 1, output: 1, totalTokens: 2, cost: { total: 0 } },
+      stopReason: 'stop',
+      timestamp: 1,
+    },
+  };
 }
 
 // ───────────────────────────────────────────────────────────────────
@@ -599,6 +635,131 @@ describe('session card enrichment', () => {
     expect(serialized).not.toContain('Agent started.');
     expect(serialized).not.toContain('Agent run ended.');
     expect(serialized).not.toContain('Pi event:');
+    expect(isSessionCardDto(card)).toBe(true);
+  });
+
+  it('emits the real projector message count after messages and 0 for an empty session', async () => {
+    const emptyProjector = new TranscriptProjector();
+    const emptyHarness = await createHarness(undefined, undefined, liveFromProjector(emptyProjector));
+    const emptyAuth = await authorize(emptyHarness);
+    const emptyBody = await fetchSessions(emptyHarness, emptyAuth.cookie);
+    expect(emptyBody.sessions[0]?.messageCount).toBe(0);
+    expect(isSessionCardDto(emptyBody.sessions[0])).toBe(true);
+
+    const projector = new TranscriptProjector();
+    projectEvent(projector, messageStart('first'));
+    projectEvent(projector, messageStart('second'));
+    const harness = await createHarness(undefined, undefined, liveFromProjector(projector));
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+    expect(body.sessions[0]?.messageCount).toBe(2);
+    expect(body.sessions[0]).not.toHaveProperty('queuedMessageCount');
+    expect(isSessionCardDto(body.sessions[0])).toBe(true);
+  });
+
+  it('sets card status interrupted when a turn ends interrupted, and a normal settle stays idle', async () => {
+    const interruptedProjector = new TranscriptProjector();
+    projectEvent(interruptedProjector, { type: 'agent_start' });
+    projectEvent(interruptedProjector, { type: 'agent_end', lifecycle: 'interrupted' });
+    const interruptedHarness = await createHarness(
+      undefined,
+      undefined,
+      liveFromProjector(interruptedProjector),
+    );
+    interruptedHarness.catalog.register(SESSION_ID, 'running', 0, '2026-01-01T00:00:00.000Z');
+    const interruptedAuth = await authorize(interruptedHarness);
+    const interruptedBody = await fetchSessions(interruptedHarness, interruptedAuth.cookie);
+    expect(interruptedBody.sessions[0]?.status).toBe('interrupted');
+    expect(isSessionCardDto(interruptedBody.sessions[0])).toBe(true);
+
+    const cancelledProjector = new TranscriptProjector();
+    projectEvent(cancelledProjector, { type: 'agent_start' });
+    projectEvent(cancelledProjector, { type: 'turn_end', status: 'cancelled' });
+    const cancelledHarness = await createHarness(
+      undefined,
+      undefined,
+      liveFromProjector(cancelledProjector),
+    );
+    cancelledHarness.catalog.register(SESSION_ID, 'running', 0, '2026-01-01T00:00:00.000Z');
+    const cancelledAuth = await authorize(cancelledHarness);
+    const cancelledBody = await fetchSessions(cancelledHarness, cancelledAuth.cookie);
+    expect(cancelledBody.sessions[0]?.status).toBe('interrupted');
+    expect(isSessionCardDto(cancelledBody.sessions[0])).toBe(true);
+
+    const settledProjector = new TranscriptProjector();
+    projectEvent(settledProjector, { type: 'agent_start' });
+    projectEvent(settledProjector, { type: 'agent_settled' });
+    const settledHarness = await createHarness(
+      undefined,
+      undefined,
+      liveFromProjector(settledProjector),
+    );
+    settledHarness.catalog.register(SESSION_ID, 'running', 0, '2026-01-01T00:00:00.000Z');
+    const settledAuth = await authorize(settledHarness);
+    const settledBody = await fetchSessions(settledHarness, settledAuth.cookie);
+    expect(settledBody.sessions[0]?.status).toBe('idle');
+    expect(isSessionCardDto(settledBody.sessions[0])).toBe(true);
+  });
+
+  it('emits queuedMessageCount as steering plus followUp from queue_update and omits it with no queue', async () => {
+    const queuedProjector = new TranscriptProjector();
+    projectEvent(queuedProjector, messageStart('hello'));
+    projectEvent(queuedProjector, {
+      type: 'queue_update',
+      steering: ['steer-one', 'steer-two'],
+      followUp: ['follow-one'],
+    });
+    const queuedHarness = await createHarness(undefined, undefined, liveFromProjector(queuedProjector));
+    const queuedAuth = await authorize(queuedHarness);
+    const queuedBody = await fetchSessions(queuedHarness, queuedAuth.cookie);
+    expect(queuedBody.sessions[0]?.messageCount).toBe(1);
+    expect(queuedBody.sessions[0]?.queuedMessageCount).toBe(3);
+    expect(isSessionCardDto(queuedBody.sessions[0])).toBe(true);
+
+    const emptyQueueProjector = new TranscriptProjector();
+    projectEvent(emptyQueueProjector, messageStart('hello'));
+    projectEvent(emptyQueueProjector, { type: 'queue_update', steering: [], followUp: [] });
+    const emptyQueueHarness = await createHarness(
+      undefined,
+      undefined,
+      liveFromProjector(emptyQueueProjector),
+    );
+    const emptyQueueAuth = await authorize(emptyQueueHarness);
+    const emptyQueueBody = await fetchSessions(emptyQueueHarness, emptyQueueAuth.cookie);
+    expect(emptyQueueBody.sessions[0]?.messageCount).toBe(1);
+    expect(emptyQueueBody.sessions[0]).not.toHaveProperty('queuedMessageCount');
+    expect(isSessionCardDto(emptyQueueBody.sessions[0])).toBe(true);
+  });
+
+  it('preserves model, attention, and content enrichment alongside live card fields', async () => {
+    const runtime = createRuntimeStub(stateWithModel('GPT-4o', 200));
+    const enrichment = new SessionEnrichmentService({
+      getContextWindow: () => runtime.getState()?.model?.contextWindow ?? null,
+    });
+    enrichment.ingestBlock(SESSION_ID, userText('block_u1', 'Garden plan'));
+    enrichment.ingestBlock(SESSION_ID, assistantText('block_a1', 'Water the seedlings'));
+    enrichment.ingestBlock(SESSION_ID, toolCall('block_t1', 'bash'));
+    enrichment.ingestBlock(SESSION_ID, usage('block_use1', 70, 10));
+    const projector = new TranscriptProjector();
+    projectEvent(projector, messageStart('Water the seedlings'));
+    projectEvent(projector, {
+      type: 'queue_update',
+      steering: ['next'],
+      followUp: [],
+    });
+    const harness = await createHarness(runtime, enrichment, liveFromProjector(projector));
+    insertAttention(harness, SESSION_ID, 'needs_input', '2026-01-01T00:00:00.000Z');
+    const authorized = await authorize(harness);
+    const body = await fetchSessions(harness, authorized.cookie);
+    const card = body.sessions[0];
+    expect(card?.model).toBe('GPT-4o');
+    expect(card?.attention).toBe('waiting');
+    expect(card?.title).toBe('Garden plan');
+    expect(card?.lastMessagePreview).toBe('Water the seedlings');
+    expect(card?.tool).toBe('bash');
+    expect(card?.contextPercent).toBe(40);
+    expect(card?.messageCount).toBe(1);
+    expect(card?.queuedMessageCount).toBe(1);
     expect(isSessionCardDto(card)).toBe(true);
   });
 });

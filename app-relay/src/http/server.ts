@@ -42,6 +42,7 @@ import {
 import { WebSocket, WebSocketServer } from 'ws';
 
 import { projectSessionCardModelLabel } from '../store/redaction.js';
+import type { SessionCardLiveSnapshot } from '../store/transcript-projector.js';
 
 import {
   AuthService,
@@ -131,6 +132,10 @@ interface ActiveSocket {
   isAlive: boolean;
 }
 
+export interface SessionCardLiveSource {
+  snapshotFor(sessionId: string): SessionCardLiveSnapshot | undefined;
+}
+
 export interface ReadOnlyServerOptions {
   readonly store: RelayStore;
   readonly catalog: SessionCatalog;
@@ -157,6 +162,7 @@ export interface ReadOnlyServerOptions {
   readonly prompts?: PromptService;
   readonly runtime?: RuntimeService;
   readonly sessionEnrichment?: SessionEnrichmentService;
+  readonly sessionCardLive?: SessionCardLiveSource;
   readonly askQuestions?: AskQuestionService;
   readonly commands?: CommandService;
   readonly push?: PushService;
@@ -787,11 +793,13 @@ async function handleHttp(
       const hostClass = options.push?.latestAttentionClass(card.id) ?? undefined;
       const attention = hostClass !== undefined ? ATTENTION_CLASS_TO_CARD[hostClass] : undefined;
       const derived = options.sessionEnrichment?.getEnrichment(card.id) ?? {};
+      const live = options.sessionCardLive?.snapshotFor(card.id);
       const enriched: SessionCardDto = {
         ...card,
         ...(cardLabel === undefined || cardLabel === null ? {} : { model: cardLabel }),
         ...(attention === undefined ? {} : { attention }),
         ...derived,
+        ...sessionCardLiveOverlay(live),
       };
       return isSessionCardDto(enriched) ? enriched : card;
     });
@@ -2591,6 +2599,18 @@ function singleHeader(value: string | readonly string[] | undefined): string | n
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function sessionCardLiveOverlay(live: SessionCardLiveSnapshot | undefined): Partial<SessionCardDto> {
+  if (live === undefined) return {};
+  const status = live.status;
+  return {
+    messageCount: live.messageCount,
+    ...(live.queuedMessageCount > 0 ? { queuedMessageCount: live.queuedMessageCount } : {}),
+    ...(status === 'idle' || status === 'running' || status === 'interrupted'
+      ? { status }
+      : {}),
+  };
 }
 
 function assertServerConfiguration(options: ReadOnlyServerOptions): void {

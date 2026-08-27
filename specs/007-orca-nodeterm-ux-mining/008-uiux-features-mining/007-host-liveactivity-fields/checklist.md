@@ -54,7 +54,9 @@ _memory:
 ---
 
 <!-- ANCHOR:testing -->
-## Testing (acceptance criteria mapping)
+## TESTING
+
+_Acceptance criteria mapping._
 
 - [ ] CHK-020 [P1] REQ-001 (LA-1): arbitration picks the correct session across tier and tie cases against a fixture
 - [ ] CHK-021 [P1] REQ-002 (LA-2): a tick never re-elects; only a state edge changes the winner

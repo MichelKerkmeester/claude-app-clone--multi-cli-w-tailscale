@@ -181,7 +181,7 @@
     ],
     "causal_summary": "Two verified accessibility gaps cost every user a tap or a lost gesture: the find-bar input has no focus-on-open, so every Find in transcript costs an extra tap before the keyboard appears, and only one of five chat sheets closes on the hardware back-gesture so the other four fall through to real navigation",
     "created_at": "2026-08-27T17:00:57.834Z",
-    "last_save_at": "2026-08-27T17:00:57.834Z",
+    "last_save_at": "2026-08-27T19:20:21.301Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -190,12 +190,12 @@
       "tasks.md",
       "checklist.md"
     ],
-    "source_fingerprint": "sha256:effb154e6bd144b68f90f8194694809ad5759a740f176c61adef9257208ed732",
+    "source_fingerprint": "sha256:8194559f83b8497f04d91dd56bf8c22c41ba1ac0a76e57d63dda1cfa032e4173",
     "source_doc_hashes": {
-      "spec.md": "aec9fd10aa2c2b64da7a73817767d13be478656e473f9fefeb18b8450be68e5c",
+      "spec.md": "b44dfd7b66cd5770005eb205c8e31110ca5db54398049a21f3d8e7fe747af6e4",
       "plan.md": "b0e2c3e8a8a6cf251696e5a0e12f38d605da55dfd058c70fcb1cd9c712e3aeee",
-      "tasks.md": "9af5f04df92ab1ee18c9a7ab066ef26304bda96cd3f810385b7ae67197120b88",
-      "checklist.md": "5e0e746dc0e4823603267f8b7123bb88b5ee7dd6638156583f2fb6021fded62c"
+      "tasks.md": "7eac6f197d56aae3ca78e9df89036b4e42b9c4fef98a0ebb22fc9cd51d555ef8",
+      "checklist.md": "71f583c2f88be30b62a32a165d6e0888bdbdad806fc37e77a04b4b0c0156925a"
     },
     "last_active_child_id": null,
     "last_active_at": null

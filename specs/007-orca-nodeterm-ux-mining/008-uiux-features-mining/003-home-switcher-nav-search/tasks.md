@@ -26,7 +26,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-1 -->
-## PHASE 1: WAVE-1 P0 QUICK-WIN
+## PHASE 1: SETUP
+
+_WAVE-1 P0 QUICK-WIN_
 
 - [ ] T1.1 [HP-4 → REQ-001] Aggregate the attention-flagged count via `attentionBadgeFor` in `shared/format/card-projection.ts` and call `navigator.setAppBadge(n)` / `clearAppBadge()` from the `routes/+layout.svelte` roster and visibility lifecycle; fall back to the device-local unread count in `shared/state/unread-overlay.ts` + `shared/format/seen-marker.ts`; push wiring in `shared/format/attention.ts`. Done: badge equals count, clears at zero, no-op where the API is absent.
 - [ ] T1.2 [baseline] Capture the home token-identity and test:web baseline before any change. Done: baseline recorded for the no-regression claim.
@@ -35,7 +37,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-2 -->
-## PHASE 2: HOME SORT/DENSITY + SEARCH BATCH
+## PHASE 2: IMPLEMENTATION
+
+_HOME SORT/DENSITY + SEARCH BATCH_
 
 - [ ] T2.1 [HP-1 → REQ-002] Add a "Smart" single-comparator sort (needs-you > done-not-stale > working > idle/stale) beside `sortByRecency` / `buildStatusList` in `pages/home/session-list-seams.ts`; toggle in `pages/home/screen-home.svelte` and persist in `shared/format/roster-view-preference.ts`. Done: a just-finished session outranks a still-working one; four-class ordering tested.
 - [ ] T2.2 [HP-5 → REQ-003] Force-expand any collapsible section while a filter/search is active in `pages/home/screen-home.svelte` + `pages/home/session-list-seams.ts`. Done: no matching card hidden inside a collapsed section; no-op when no collapsible sections exist.
@@ -50,7 +54,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-3 -->
-## PHASE 3: DOCK, NAVIGATION, VERIFICATION
+## PHASE 3: VERIFICATION
+
+_DOCK, NAVIGATION, VERIFICATION_
 
 - [ ] T3.1 [SD-1 → REQ-006] Build `pages/chat/chrome/dock-recent-sessions.svelte` over a client-local recency stack under `shared/state/`; list visited sessions newest-first; navigate via `getAppActions().navigate`. Done: MRU order opens the just-left session first.
 - [ ] T3.2 [SD-2 → REQ-007] Factor one shared attention-badge resolver (working > permission > unread > done) in `shared/format/attention.ts` / `card-projection.ts`, consumed by both `pages/home/card-session.svelte` and the dock. Done: home card and dock chip never disagree; precedence tested.

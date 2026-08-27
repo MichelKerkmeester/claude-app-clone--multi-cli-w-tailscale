@@ -53,7 +53,9 @@ _memory:
 ---
 
 <!-- ANCHOR:testing -->
-## Testing (acceptance criteria mapping)
+## TESTING
+
+_Acceptance criteria mapping._
 
 - [ ] CHK-020 [P0] REQ-001 (CI-4): reconnect blip mid-typing does not disable the textarea; Send stays gated
 - [ ] CHK-021 [P0] REQ-002 (CI-1): A→Home→B→A restores draft and staged attachment exactly; storage failure degrades to empty

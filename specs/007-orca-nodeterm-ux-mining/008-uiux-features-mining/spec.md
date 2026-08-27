@@ -7,8 +7,8 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining"
     last_updated_at: "2026-08-27T18:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Decomposed the 99-finding master plan into 7 Level-2 phase children; authored the parent phase map."
-    next_safe_action: "Operator picks a phase; the client-only phases (001-004) implement first, host phases (005-007) after their relay fields land."
+    recent_action: "Decomposed the master plan into 7 Level-2 phase children."
+    next_safe_action: "Operator picks a phase; client phases 001-004 before host phases 005-007."
     blockers:
       - "Phases 005, 006, 007 carry host-gated findings; each blocked finding needs a relay-authored, client-read-only field or RPC before its render unblocks."
     completion_pct: 0

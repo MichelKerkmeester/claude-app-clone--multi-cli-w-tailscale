@@ -36,6 +36,7 @@ _memory:
 | **Findings owned** | CE-1, CE-2, CE-3, CE-4, CE-5, CE-6, CE-7, HP-3, AN-1, AN-2, AN-3, AN-4, AN-5 (13) |
 | **Constraint** | Host-authoritative, fail-closed; the client owns no editable session truth |
 | **Client vs host** | Host-gated; CE-5 client-ready-now, the other 12 blocked on a relay field or RPC |
+| **Phase chain** | after `004-a11y-onboarding` · before `006-host-usage-search-review` |
 <!-- /ANCHOR:metadata -->
 
 ---

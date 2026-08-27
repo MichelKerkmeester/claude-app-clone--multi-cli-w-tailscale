@@ -53,7 +53,9 @@ _memory:
 ---
 
 <!-- ANCHOR:testing -->
-## Testing (acceptance criteria mapping)
+## TESTING
+
+_Acceptance criteria mapping._
 
 - [ ] CHK-020 [P0] REQ-001 (HP-4): badge equals attention count, clears at zero, no-op where the API is absent
 - [ ] CHK-021 [P1] REQ-002 (HP-1): Smart sort ranks a just-finished session above a still-working one

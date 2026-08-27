@@ -36,6 +36,7 @@ _memory:
 | **Findings owned** | CI-1, CI-2, CI-4, CI-5, RS-1, RS-2, RS-3 (7) |
 | **Constraint** | Host-authoritative, fail-closed - the client owns no editable session truth |
 | **Client vs host** | 6 client-ready-now; CI-5 host-gated (skills-catalog RPC) |
+| **Phase chain** | first phase · before `002-streaming-reader-media` |
 <!-- /ANCHOR:metadata -->
 
 ---

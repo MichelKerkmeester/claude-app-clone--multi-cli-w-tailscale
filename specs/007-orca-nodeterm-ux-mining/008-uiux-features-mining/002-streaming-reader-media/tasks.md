@@ -26,7 +26,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-1 -->
-## PHASE 1: STREAMING-CLARITY BATCH + MEDIA QUICK-WINS
+## PHASE 1: SETUP
+
+_STREAMING-CLARITY BATCH + MEDIA QUICK-WINS_
 
 - [ ] T1.1 [SP-1 → REQ-001] Add a dedicated always-expanded thinking branch before the activity `RichBlockFrame` in `pages/chat/rich-content/rich-content-router.svelte` (~L52-79, ~L158-165); set the expanded disclosure default in `shared/state/transcript-disclosure.svelte.ts`. Done: thinking renders as a muted-prose row without a tap; test asserts branch order.
 - [ ] T1.2 [SP-2 → REQ-002] Render live "Working - m:ss" from the existing 1s `stallClock` (stallClock minus mostRecentBlockAt) in `pages/chat/transcript/transcript-list.svelte` (~L365-400), surfaced via `pages/chat/transcript/runtime-status-region.svelte`. Done: label ticks per second; test drives the clock.
@@ -39,7 +41,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-2 -->
-## PHASE 2: READER GESTURES, SAFETY GATES, ARTIFACT FIND, PRIMITIVES
+## PHASE 2: IMPLEMENTATION
+
+_READER GESTURES, SAFETY GATES, ARTIFACT FIND, PRIMITIVES_
 
 - [ ] T2.1 [TE-1 → REQ-007] Add a `use:` pinch gesture action under `shared/primitives/` over the virtualized scroll host in `pages/chat/transcript/transcript-list.svelte` (~L380-424); transient scale 0.8x-1.8x, composed to work mid-scroll. Done: pinch scales within bounds without hijacking scroll.
 - [ ] T2.2 [TE-2 → REQ-008] Extend `renderInlineParts` in `pages/chat/rich-content/safe-markdown.svelte` (~L223-267) and `isFilePathToken` in `pages/chat/rich-content/prose-link.ts` to classify bare-prose and code-span file paths (whitelisted extensions, URL-guarded, fail-closed). Done: `path/file.ts:42` detected in prose and code-span; URL not misclassified. Open action is TE-3 (phase 006).

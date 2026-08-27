@@ -26,7 +26,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-1 -->
-## PHASE 1: SHIP THE READY-NOW PIECE
+## PHASE 1: SETUP
+
+_SHIP THE READY-NOW PIECE_
 
 - [ ] T1.1 [CE-5 → REQ-001] Add a device-local read/archive store under `shared/state/`, layered over host `resolved`; wire the badge effect in `shared/format/attention.ts` and the card render in `pages/inbox/screen-attention-inbox.svelte`. Done: reading a card hides it from this device's badge only, no host state changes, client-only test green.
 - [ ] T1.2 [baseline] Capture the inbox token-identity and test:web baseline for `screen-attention-inbox.svelte` before any change. Done: real starting numbers recorded.
@@ -35,7 +37,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-2 -->
-## PHASE 2: FIXTURE-BACKED HARNESSES (host-gated)
+## PHASE 2: IMPLEMENTATION
+
+_FIXTURE-BACKED HARNESSES (host-gated)_
 
 - [ ] T2.1 [CE-1 → REQ-002] [B] Build the cross-session Inbox timeline render (newest-first, keyed by `sessionId`) in `pages/inbox/screen-attention-inbox.svelte` against a fixture. BLOCKED on the inbox-event RPC (sessionId per event, `../../007-host-requests/`). Done: renders nothing with field absent, renders history from a fixture.
 - [ ] T2.2 [CE-2 → REQ-003] [B] Render the deduped stream (same title within 10 min = one card) in `screen-attention-inbox.svelte`. BLOCKED on dedup behaviour on the RPC. Done: fixture with a duplicate in-window shows one card; client invents no dedup.

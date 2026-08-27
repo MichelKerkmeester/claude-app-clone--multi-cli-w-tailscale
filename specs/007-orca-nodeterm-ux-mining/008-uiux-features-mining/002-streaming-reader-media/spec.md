@@ -34,6 +34,7 @@ _memory:
 | **Findings owned** | SP-1, SP-2, SP-4, MA-1, MA-4, MA-2, TE-1, TE-2, TE-4, TE-5, MA-5, MI-2, MI-4 (13) |
 | **Constraint** | Host-authoritative, fail-closed - the client owns no editable session truth |
 | **Client vs host** | 13 client-ready-now; no host field (TE-3 open-action is host-gated and owned by phase 006) |
+| **Phase chain** | after `001-composer-send` · before `003-home-switcher-nav-search` |
 <!-- /ANCHOR:metadata -->
 
 ---

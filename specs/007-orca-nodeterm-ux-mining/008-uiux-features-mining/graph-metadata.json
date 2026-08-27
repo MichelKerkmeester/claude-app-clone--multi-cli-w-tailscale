@@ -159,7 +159,7 @@
     ],
     "causal_summary": "The orca+nodeterm mining run produced 99 verdict-checked UI/UX findings for the app-mobile client (Pi Remote, a host-authoritative fail-closed SvelteKit PWA)",
     "created_at": "2026-08-27T15:31:24.534Z",
-    "last_save_at": "2026-08-27T17:05:53.917Z",
+    "last_save_at": "2026-08-27T19:17:33.179Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -167,9 +167,9 @@
       "plan.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:211b66144fe51d8a86868b86e59834dcaf25ff611c6bae1cb689fd60385f43ca",
+    "source_fingerprint": "sha256:5cf1c53e999273d161d7a4d22a3fef3a60a6d4958636218c43bf501a33cc4cde",
     "source_doc_hashes": {
-      "spec.md": "2cce99e911963a853360f8e09918a6717ecf05b553346303bcf851ea56748270",
+      "spec.md": "e13f7e0d120c3534ef8dc46908c23839428489a1f6bd3a2c70437f8ef768aa3a",
       "plan.md": "355fef2ae12bb548b1964ef68aff51930cd2ea2e969108ed5265ce97e33e8a5e",
       "research/research.md": "65c460d0b46c091e24028dd4d0e6279b08e29548e12535863cc1fb943d8545c6"
     },

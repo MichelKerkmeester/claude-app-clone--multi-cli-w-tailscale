@@ -34,6 +34,7 @@ _memory:
 | **Findings owned** | AI-1, AI-2, AI-3, AI-4, OS-1, OS-2, OS-3, OS-4, OS-5, OS-6, OS-7 (11) |
 | **Constraint** | Host-authoritative, fail-closed. The client owns no editable session truth |
 | **Client vs host** | 11 client-ready-now; no host field required |
+| **Phase chain** | after `003-home-switcher-nav-search` · before `005-host-inbox-notifications` |
 <!-- /ANCHOR:metadata -->
 
 ---

@@ -181,7 +181,7 @@
     ],
     "causal_summary": "Three high-value read-only surfaces are absent because the client has no field to render: a per-provider usage/quota view (am I about to hit a wall), a cross-session transcript search (which conversation was I discussing X in), and a per-session change-review hub (is the agent branch green and mergeable)",
     "created_at": "2026-08-27T17:00:58.956Z",
-    "last_save_at": "2026-08-27T17:05:33.846Z",
+    "last_save_at": "2026-08-27T19:20:21.893Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -190,12 +190,12 @@
       "tasks.md",
       "checklist.md"
     ],
-    "source_fingerprint": "sha256:b2009c38ed94b0c307fd103ae2c095a5b5a91f3c786366ba33a4ea329aeba46d",
+    "source_fingerprint": "sha256:1a69ca329ae88bfdfc71cb82cbbb068ac6b2a07906119fbf86d6889a2276bed6",
     "source_doc_hashes": {
-      "spec.md": "f422597555d40fc4d397f720c836c06f08b82149cbeb7ceeeba694a1cc89d96e",
+      "spec.md": "bcecc963da45d220ce0f6eece0d73528414958c8517261d9709325a5e2668771",
       "plan.md": "65d5a25bb2f20180302db448d781308335f2c3f6b5ba509d66ad6749fa52341c",
-      "tasks.md": "28052bbf9f4a86d76e4bc202fae23843bf4d69444c0df43986e4ae22f05ffd0e",
-      "checklist.md": "417f29efb63ab9fea8d845b002bc29b36f2da956135065578fa57a14f3cf4634"
+      "tasks.md": "e99bceed1bbbae6985e00a4b57467c64eb0a9b88b0699c99521601b62a60fe26",
+      "checklist.md": "b51d942c0549d0635130c8107e1fa260bd84c9d843b43f04bdd689d26aa5f4a6"
     },
     "last_active_child_id": null,
     "last_active_at": null

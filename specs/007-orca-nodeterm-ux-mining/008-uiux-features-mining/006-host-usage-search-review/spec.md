@@ -36,6 +36,7 @@ _memory:
 | **Findings owned** | UQ-1..8, SH-1, CR-1..9, TE-3, MI-1, MI-3 (21) |
 | **Constraint** | Host-authoritative, fail-closed - the client renders only host-pre-resolved tokens, never computes a verdict or mutates |
 | **Client vs host** | Host-gated: UQ-3, UQ-6 ready-now; SH-1, TE-3, MI-1 partial (client harness/detection ready); the other 16 blocked-on-host |
+| **Phase chain** | after `005-host-inbox-notifications` · before `007-host-liveactivity-fields` |
 <!-- /ANCHOR:metadata -->
 
 ---

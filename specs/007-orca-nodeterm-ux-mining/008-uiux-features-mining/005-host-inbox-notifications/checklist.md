@@ -53,7 +53,9 @@ _memory:
 ---
 
 <!-- ANCHOR:testing -->
-## Testing (acceptance criteria mapping)
+## TESTING
+
+_Acceptance criteria mapping._
 
 - [ ] CHK-020 [P1] REQ-001 (CE-5): reading a card hides it from this device's badge only; no host state changes
 - [ ] CHK-021 [P1] REQ-002 (CE-1): timeline renders nothing with field absent; renders newest-first by sessionId from a fixture

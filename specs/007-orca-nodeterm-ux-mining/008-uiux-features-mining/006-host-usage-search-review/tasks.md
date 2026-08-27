@@ -26,7 +26,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-1 -->
-## PHASE 1: READY-NOW CLIENT LOGIC (fixtures)
+## PHASE 1: SETUP
+
+_READY-NOW CLIENT LOGIC (fixtures)_
 
 - [ ] T1.1 [UQ-3 → REQ-003] Build the reset-countdown formatter + boundary-aware tick scheduler (one wakeup per hour) in new `shared/format/usage-format.ts`, unit-tested against a fixture `resetsAt`. Done: correct live countdown, scheduler wakes only at the rounding boundary.
 - [ ] T1.2 [UQ-6 → REQ-006] Build the used-vs-remaining display toggle in `shared/format/usage-format.ts`, device-local, kept separate from severity colour. Done: switching the label never flips colour meaning; unit test covers both labels.
@@ -38,7 +40,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-2 -->
-## PHASE 2: WIRE RENDERS BEHIND HOST FIELDS (inert)
+## PHASE 2: IMPLEMENTATION
+
+_WIRE RENDERS BEHIND HOST FIELDS (inert)_
 
 - [ ] T2.1 [UQ-1 → REQ-001] [B] Account-usage card slot in `pages/home/screen-home.svelte` + new `pages/home/usage-*.svelte` detail sheet; inert without the usage payload. Host: usage payload.
 - [ ] T2.2 [UQ-2 → REQ-002] [B] Render the host-flagged gating window as the headline in `usage-*.svelte`, never a client-picked fullest bar. Host: isActive/primaryLimit.

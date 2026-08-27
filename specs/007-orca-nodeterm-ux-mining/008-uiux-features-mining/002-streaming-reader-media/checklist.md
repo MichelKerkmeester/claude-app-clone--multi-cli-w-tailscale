@@ -53,7 +53,9 @@ _memory:
 ---
 
 <!-- ANCHOR:testing -->
-## Testing (acceptance criteria mapping)
+## TESTING
+
+_Acceptance criteria mapping._
 
 - [ ] CHK-020 [P0] REQ-001 (SP-1): thinking renders as an always-visible muted-prose row before the activity branch
 - [ ] CHK-021 [P0] REQ-002 (SP-2): live "Working - m:ss" ticks per second from stallClock; no host field

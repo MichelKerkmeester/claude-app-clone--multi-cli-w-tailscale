@@ -26,7 +26,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-1 -->
-## PHASE 1: WAVE-1 P0 QUICK-WINS AND THE SHEET PRIMITIVE
+## PHASE 1: SETUP
+
+_WAVE-1 P0 QUICK-WINS AND THE SHEET PRIMITIVE_
 
 - [ ] T1.1 [AI-1 → REQ-001] Add a focus-on-open action to the find-bar input (~L52-65) in `pages/chat/transcript/transcript-find-bar.svelte`, driven by the open state in `pages/chat/transcript/transcript-list.svelte` and `pages/chat/transcript/transcript-find-context.svelte.ts`, with the mobile deferral. Done: opening Find focuses the input and raises the keyboard with no second tap.
 - [ ] T1.2 [AI-2 → REQ-002] Move pushState/popstate back-dismiss and focusin containment into `shared/primitives/sheet/sheet.svelte` + `shared/primitives/a11y/aria-hide-outside.svelte.ts`; remove the bespoke copy (~L126-152) from `pages/chat/chrome/sheet-plan-review.svelte`. Done: back-gesture closes the topmost sheet on every sheet; bespoke handler gone; test covers at least two sheets.
@@ -36,7 +38,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-2 -->
-## PHASE 2: ONBOARDING, SETTINGS, DIAGNOSTICS
+## PHASE 2: IMPLEMENTATION
+
+_ONBOARDING, SETTINGS, DIAGNOSTICS_
 
 - [ ] T2.1 [AI-4 → REQ-004] New `pages/chat/chrome/sheet-quick-prompts.svelte` sibling of `sheet-prompt-history.svelte`; insert a chip as an editable draft via `shared/commands/insert-slash-command.ts` and `setPromptComposer`; a11y-label every icon-only row. Done: chip fills draft without sending; every icon-only control named; storage failure degrades to empty.
 - [ ] T2.2 [AI-3 → REQ-003] Conditional moveUp/moveDown a11y action pair under `shared/primitives/a11y/`, unit-tested now, wired to a future reorder UI. Done: helper present and tested; wired to nothing until a reorder ships.

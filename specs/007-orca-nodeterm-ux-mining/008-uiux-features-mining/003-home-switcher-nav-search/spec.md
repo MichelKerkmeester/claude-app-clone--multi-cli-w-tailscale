@@ -36,6 +36,7 @@ _memory:
 | **Findings owned** | HP-1, HP-4, HP-5, SC-2, SC-4, SD-1, SD-2, SD-3, SD-4, SD-5, SD-6, NL-1, NL-2, NL-4, NL-5, SH-2, SH-3, SH-4, SH-5 (19) |
 | **Constraint** | Host-authoritative, fail-closed; the client owns no editable session truth |
 | **Client vs host** | 19 client-ready-now; SH-3 has a host-gated repo:/path: operator half deferred to phase 006 |
+| **Phase chain** | after `002-streaming-reader-media` · before `004-a11y-onboarding` |
 <!-- /ANCHOR:metadata -->
 
 ---

@@ -53,7 +53,9 @@ _memory:
 ---
 
 <!-- ANCHOR:testing -->
-## Testing (acceptance criteria mapping)
+## TESTING
+
+_Acceptance criteria mapping._
 
 - [ ] CHK-020 [P0] REQ-001 (AI-1): opening Find focuses the input and raises the keyboard with no second tap
 - [ ] CHK-021 [P0] REQ-002 (AI-2): back-gesture closes the topmost sheet on every sheet; bespoke copy removed from sheet-plan-review.svelte

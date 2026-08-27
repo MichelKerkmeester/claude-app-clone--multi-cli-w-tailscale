@@ -36,6 +36,7 @@ _memory:
 | **Findings owned** | LA-1, LA-2, LA-3, LA-4, LA-5, LA-6, LA-7, CI-3, MA-3, SC-1, SC-3, SP-3, HP-6 (13) |
 | **Constraint** | Host-authoritative, fail-closed; the client owns no editable session truth |
 | **Client vs host** | Host-gated phase. Ready-now: LA-1, LA-2, LA-3, LA-5, LA-7. Partial: SC-3 (elapsed only). Blocked: LA-4, LA-6, CI-3, MA-3, SC-1, SC-3 counts, SP-3, HP-6 |
+| **Phase chain** | after `006-host-usage-search-review` · final phase |
 <!-- /ANCHOR:metadata -->
 
 ---

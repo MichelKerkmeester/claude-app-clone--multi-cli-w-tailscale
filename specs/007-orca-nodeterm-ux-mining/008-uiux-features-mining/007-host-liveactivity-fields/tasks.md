@@ -26,7 +26,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-1 -->
-## PHASE 1: READY-NOW LIVE-ACTIVITY MODULES
+## PHASE 1: SETUP
+
+_READY-NOW LIVE-ACTIVITY MODULES_
 
 - [ ] T1.1 [LA-1 → REQ-001] Build the single-slot arbitration function (needsYou > unread-done > working > idle, ties on first-seen) over `attention` plus local first-seen as a pure module under `shared/format/` (the shared attention resolver the phase-003 dock reuses). Done: fixture test covers tier and tie cases; `card-session.svelte` consumes it.
 - [ ] T1.2 [LA-2 → REQ-002] Guard the arbitration in the same module so an activity tick refreshes the winner in place and never re-elects. Done: fixture test covers tick-vs-edge; a tick on a non-winner does not re-rank.
@@ -39,7 +41,9 @@ _memory:
 ---
 
 <!-- ANCHOR:phase-2 -->
-## PHASE 2: HOST-GATED SCAFFOLDS (inert until the field lands)
+## PHASE 2: IMPLEMENTATION
+
+_HOST-GATED SCAFFOLDS (inert until the field lands)_
 
 - [ ] T2.1 [LA-4 → REQ-004] [B] Wire the typed edge-versus-tick push contract through `shared/format/attention.ts` and the service worker (edges priority 10 immediate, ticks coalesced priority 5 at 20s+). BLOCKED on the push contract (`../../007-host-requests/`). Done: inert with the contract absent; edges immediate and ticks coalesced against a fixture.
 - [ ] T2.2 [LA-6 → REQ-006] [B] Gate the done treatment on an end-reason flag, never the text, in `attention.ts` and the service worker. BLOCKED on an end-reason flag on the done edge. Done: neutral done with the flag absent; honest interrupted/stale state against a fixture flag.

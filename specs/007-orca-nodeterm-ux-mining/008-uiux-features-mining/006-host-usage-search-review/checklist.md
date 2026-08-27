@@ -53,7 +53,9 @@ _memory:
 ---
 
 <!-- ANCHOR:testing -->
-## Testing (acceptance criteria mapping)
+## TESTING
+
+_Acceptance criteria mapping._
 
 - [ ] CHK-020 [P1] REQ-003 (UQ-3): reset-countdown formatter correct from a fixture; scheduler wakes only at the rounding boundary
 - [ ] CHK-021 [P1] REQ-006 (UQ-6): used/remaining toggle never flips colour meaning; device-local

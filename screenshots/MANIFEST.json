@@ -2,8 +2,8 @@
   "generatedFrom": "storybook-static",
   "frame": "402x874",
   "deviceScaleFactor": 1,
-  "total": 287,
-  "captured": 287,
+  "total": 300,
+  "captured": 300,
   "failed": 0,
   "entries": [
     {
@@ -1456,6 +1456,76 @@
       "rel": "rich-content/text-artifact-card--long-text.png"
     },
     {
+      "id": "source-control-changedfiles--without-host-data",
+      "title": "Source Control/ChangedFiles",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/changed-files--without-host-data.png"
+    },
+    {
+      "id": "source-control-checklist--without-host-data",
+      "title": "Source Control/CheckList",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/check-list--without-host-data.png"
+    },
+    {
+      "id": "source-control-checksummary--without-host-data",
+      "title": "Source Control/CheckSummary",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/check-summary--without-host-data.png"
+    },
+    {
+      "id": "source-control-commithistory--without-host-data",
+      "title": "Source Control/CommitHistory",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/commit-history--without-host-data.png"
+    },
+    {
+      "id": "source-control-conflictlist--without-host-data",
+      "title": "Source Control/ConflictList",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/conflict-list--without-host-data.png"
+    },
+    {
+      "id": "source-control-prchip--without-host-data",
+      "title": "Source Control/PrChip",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/pr-chip--without-host-data.png"
+    },
+    {
+      "id": "source-control-reviewerlist--without-host-data",
+      "title": "Source Control/ReviewerList",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/reviewer-list--without-host-data.png"
+    },
+    {
+      "id": "source-control-sheetprdetails--without-host-data",
+      "title": "Source Control/SheetPrDetails",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/sheet-pr-details--without-host-data.png"
+    },
+    {
+      "id": "source-control-sourcecontrolhub--without-host-data",
+      "title": "Source Control/SourceControlHub",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/source-control-hub--without-host-data.png"
+    },
+    {
+      "id": "source-control-upstreamstatus--without-host-data",
+      "title": "Source Control/UpstreamStatus",
+      "name": "Without Host Data",
+      "ok": true,
+      "rel": "source-control/upstream-status--without-host-data.png"
+    },
+    {
       "id": "transcript-assistantactions--answer-actions",
       "title": "Transcript/AssistantActions",
       "name": "Answer Actions",
@@ -1848,6 +1918,20 @@
       "rel": "views/enrollment--default.png"
     },
     {
+      "id": "views-enrollment-onboarding-wizard--choice",
+      "title": "Views/Enrollment/Onboarding Wizard",
+      "name": "Choice",
+      "ok": true,
+      "rel": "views/enrollment-onboarding-wizard--choice.png"
+    },
+    {
+      "id": "views-enrollment-onboarding-wizard--complete",
+      "title": "Views/Enrollment/Onboarding Wizard",
+      "name": "Complete",
+      "ok": true,
+      "rel": "views/enrollment-onboarding-wizard--complete.png"
+    },
+    {
       "id": "views-freshness--ready",
       "title": "Views/Freshness",
       "name": "Ready",
@@ -1958,6 +2042,13 @@
       "name": "Running",
       "ok": true,
       "rel": "views/session-state-icon--running.png"
+    },
+    {
+      "id": "views-settings-diagnostics--default",
+      "title": "Views/Settings Diagnostics",
+      "name": "Default",
+      "ok": true,
+      "rel": "views/settings-diagnostics--default.png"
     },
     {
       "id": "views-statuspill--connecting",

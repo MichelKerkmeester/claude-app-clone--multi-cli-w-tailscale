@@ -15,6 +15,7 @@
     "storybook": "npm run storybook -w @pi-remote/web",
     "story:coverage": "node scripts/story-coverage.mjs",
     "story:new": "node scripts/new-story.mjs",
+    "story:shots": "npm run build-storybook -w @pi-remote/web && node scripts/capture-screenshots.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",

@@ -3,7 +3,14 @@
   // This surface: safe-markdown — renders already-redacted Markdown to safe prose.
   // Do not edit — This module is the read-only sanitization boundary; the allowlist, URL/scheme filtering, and character escaping are frozen and NOT designer-editable.
 
-  import { classifyHrefScheme, classifyProseLink, detectFilePathSegments, isFilePathToken } from './prose-link.js';
+  import {
+    canRouteProsePathToArtifact,
+    classifyHrefScheme,
+    classifyProseLink,
+    detectFilePathSegments,
+    isFilePathToken,
+  } from './prose-link.js';
+  import type { HostResolvedProsePath } from './prose-link.js';
   import { parseDiagramSource } from './sandboxed-diagram.svelte';
 
   // ───────────────────────────────────────────────────────────────────
@@ -52,12 +59,18 @@
     | { readonly kind: 'strong'; readonly text: string }
     | { readonly kind: 'em'; readonly text: string }
     | { readonly kind: 'del'; readonly text: string }
-    | { readonly kind: 'file-path'; readonly text: string; readonly code: boolean }
+    | {
+        readonly kind: 'file-path';
+        readonly text: string;
+        readonly code: boolean;
+        readonly resolution: HostResolvedProsePath | null;
+      }
     | {
         readonly kind: 'link';
         readonly text: string;
         readonly href: string;
-        readonly mode: 'external' | 'unavailable';
+        readonly mode: 'external' | 'artifact' | 'unavailable';
+        readonly resolution: HostResolvedProsePath | null;
       };
 
   // ───────────────────────────────────────────────────────────────────
@@ -222,17 +235,29 @@
 
   // Do not edit — Inline rendering interprets only the fixed tokenPattern; remaining text is scanned for extension-whitelisted paths; every link destination is scheme-filtered.
   // Keep append plain text focused on its single responsibility.
-  function appendPlainText(parts: SafeMarkdownInlinePart[], text: string): void {
+  function appendPlainText(
+    parts: SafeMarkdownInlinePart[],
+    text: string,
+    resolvePath: (path: string) => HostResolvedProsePath | null,
+  ): void {
     for (const segment of detectFilePathSegments(text)) {
       if (segment.kind === 'file-path') {
-        parts.push({ kind: 'file-path', text: segment.text, code: false });
+        parts.push({
+          kind: 'file-path',
+          text: segment.text,
+          code: false,
+          resolution: resolvePath(segment.text),
+        });
       } else if (segment.text.length > 0) {
         parts.push({ kind: 'text', text: segment.text });
       }
     }
   }
 
-  function renderInlineParts(source: string): readonly SafeMarkdownInlinePart[] {
+  function renderInlineParts(
+    source: string,
+    resolvePath: (path: string) => HostResolvedProsePath | null,
+  ): readonly SafeMarkdownInlinePart[] {
     const parts: SafeMarkdownInlinePart[] = [];
     let remaining = source;
     const tokenPattern =
@@ -240,16 +265,21 @@
     while (remaining.length > 0) {
       const match = tokenPattern.exec(remaining);
       if (match === null) {
-        appendPlainText(parts, remaining);
+        appendPlainText(parts, remaining, resolvePath);
         break;
       }
       const start = match.index;
-      if (start > 0) appendPlainText(parts, remaining.slice(0, start));
+      if (start > 0) appendPlainText(parts, remaining.slice(0, start), resolvePath);
       const token = match[0];
       if (token.startsWith('`')) {
         const inner = token.slice(1, -1);
         if (isFilePathToken(inner, { allowBareName: true })) {
-          parts.push({ kind: 'file-path', text: inner, code: true });
+          parts.push({
+            kind: 'file-path',
+            text: inner,
+            code: true,
+            resolution: resolvePath(inner),
+          });
         } else {
           parts.push({ kind: 'code', text: inner });
         }
@@ -271,11 +301,19 @@
           destStart >= 0 && destEnd > destStart ? token.slice(destStart + 1, destEnd).trim() : '';
         const dest = rawDest.replace(/^<|>$/u, '');
         const classified = classifyProseLink(dest);
+        const resolution =
+          classified.kind === 'file-path' ? resolvePath(classified.destination) : null;
         parts.push({
           kind: 'link',
           text: label,
           href: classified.destination,
-          mode: classified.kind === 'external-url' ? 'external' : 'unavailable',
+          mode:
+            classified.kind === 'external-url'
+              ? 'external'
+              : resolution !== null
+                ? 'artifact'
+                : 'unavailable',
+          resolution,
         });
       }
       remaining = remaining.slice(start + token.length);
@@ -444,13 +482,21 @@
     source: string;
     class?: string;
     ariaLabel?: string;
+    hostResolvedPaths?: readonly HostResolvedProsePath[];
+    onOpenArtifact?: (resolution: HostResolvedProsePath, trigger: HTMLButtonElement | null) => void;
   }
 
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
-  let { source, class: className = '', ariaLabel = 'Formatted text' }: Props = $props();
+  let {
+    source,
+    class: className = '',
+    ariaLabel = 'Formatted text',
+    hostResolvedPaths,
+    onOpenArtifact,
+  }: Props = $props();
 
   const feedback = useCopyFeedback();
   const find = getTranscriptFindContext();
@@ -477,6 +523,38 @@
   // 7. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
+  // Match only a path the host resolved exactly; the client never resolves or normalizes filesystem paths.
+  function resolveHostArtifact(path: string): HostResolvedProsePath | null {
+    const resolution = hostResolvedPaths?.find((candidate) => candidate.path === path);
+    if (
+      resolution === undefined ||
+      resolution.exists !== true ||
+      resolution.isDirectory !== false ||
+      !canRouteProsePathToArtifact(resolution.openTarget)
+    ) {
+      return null;
+    }
+    return resolution;
+  }
+
+  // A host resolution is rechecked at activation so a stale or declined target stays inert.
+  function openResolvedArtifact(
+    event: MouseEvent,
+    resolution: HostResolvedProsePath | null,
+  ): void {
+    event.preventDefault();
+    if (
+      resolution === null ||
+      resolution.exists !== true ||
+      resolution.isDirectory !== false ||
+      !canRouteProsePathToArtifact(resolution.openTarget)
+    ) {
+      return;
+    }
+    const target = event.currentTarget;
+    onOpenArtifact?.(resolution, target instanceof HTMLButtonElement ? target : null);
+  }
+
   // Rejected schemes never reach the overlay; only the fail-closed gate's
   // open-external verdict may open it, and the default navigation is cancelled
   // so the chat stays in the foreground.
@@ -496,7 +574,51 @@
 <!-- Component content -->
 {#snippet marked(text: string)}{#each findParts(text, findTerm) as part, partIndex (partIndex)}{#if part.mark}<mark class="artifact-find--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{/snippet}
 
-{#snippet inline(text: string)}{#each renderInlineParts(text) as part, i (i)}{#if part.kind === 'code'}<code>{@render marked(part.text)}</code>{:else if part.kind === 'strong'}<strong>{@render marked(part.text)}</strong>{:else if part.kind === 'em'}<em>{@render marked(part.text)}</em>{:else if part.kind === 'del'}<del>{@render marked(part.text)}</del>{:else if part.kind === 'file-path'}{#if part.code}<code class="safe-markdown--file-path">{@render marked(part.text)}</code>{:else}<span class="safe-markdown--file-path">{@render marked(part.text)}</span>{/if}{:else if part.kind === 'link'}{#if part.mode === 'external'}<a class="safe-markdown--link" href={part.href} target="_blank" rel="external noopener noreferrer" onclick={(event) => openExternalLink(event, part.href)}>{@render marked(part.text)}</a>{:else}<span class="safe-markdown--unavailable" title="Link unavailable" aria-disabled="true">{@render marked(part.text)}</span>{/if}{:else}{@render marked(part.text)}{/if}{/each}{/snippet}
+{#snippet inline(text: string)}
+  {#each renderInlineParts(text, resolveHostArtifact) as part, i (i)}
+    {#if part.kind === 'code'}
+      <code>{@render marked(part.text)}</code>
+    {:else if part.kind === 'strong'}
+      <strong>{@render marked(part.text)}</strong>
+    {:else if part.kind === 'em'}
+      <em>{@render marked(part.text)}</em>
+    {:else if part.kind === 'del'}
+      <del>{@render marked(part.text)}</del>
+    {:else if part.kind === 'file-path'}
+      {#if part.resolution !== null && onOpenArtifact !== undefined}
+        <button
+          type="button"
+          class="safe-markdown--file-path-button"
+          onclick={(event) => openResolvedArtifact(event, part.resolution)}
+        >{#if part.code}<code class="safe-markdown--file-path">{@render marked(part.text)}</code>{:else}{@render marked(part.text)}{/if}</button>
+      {:else if part.code}
+        <code class="safe-markdown--file-path">{@render marked(part.text)}</code>
+      {:else}
+        <span class="safe-markdown--file-path">{@render marked(part.text)}</span>
+      {/if}
+    {:else if part.kind === 'link'}
+      {#if part.mode === 'external'}
+        <a
+          class="safe-markdown--link"
+          href={part.href}
+          target="_blank"
+          rel="external noopener noreferrer"
+          onclick={(event) => openExternalLink(event, part.href)}
+        >{@render marked(part.text)}</a>
+      {:else if part.mode === 'artifact' && part.resolution !== null && onOpenArtifact !== undefined}
+        <button
+          type="button"
+          class="safe-markdown--file-path-button"
+          onclick={(event) => openResolvedArtifact(event, part.resolution)}
+        >{@render marked(part.text)}</button>
+      {:else}
+        <span class="safe-markdown--unavailable" title="Link unavailable" aria-disabled="true">{@render marked(part.text)}</span>
+      {/if}
+    {:else}
+      {@render marked(part.text)}
+    {/if}
+  {/each}
+{/snippet}
 
 {#if ast === null}
   <!-- Do not edit — The fail-closed fallback renders rejected source verbatim and marks the canonical source for exact copying. -->
@@ -713,5 +835,19 @@
     color: var(--ink-muted);
     text-decoration: underline dotted;
     cursor: default;
+  }
+
+  /* This control: host-resolved file paths become readable, keyboard-focusable actions. */
+  .safe-markdown--file-path-button {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    padding: 0 var(--space-1);
+    border: 0;
+    background: transparent;
+    color: var(--accent-ink);
+    font: inherit;
+    text-align: start;
+    text-decoration: underline;
+    cursor: pointer;
   }
 </style>

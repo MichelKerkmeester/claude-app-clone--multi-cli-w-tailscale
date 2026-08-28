@@ -27,6 +27,15 @@ export interface FilePathTokenOptions {
   readonly allowBareName?: boolean;
 }
 
+export interface HostResolvedProsePath {
+  readonly path: string;
+  readonly exists: boolean;
+  readonly isDirectory: boolean;
+  readonly openTarget: string | null | undefined;
+  readonly line?: number | null;
+  readonly column?: number | null;
+}
+
 // ───────────────────────────────────────────────────────────────────
 // 2. CONSTANTS
 // ───────────────────────────────────────────────────────────────────

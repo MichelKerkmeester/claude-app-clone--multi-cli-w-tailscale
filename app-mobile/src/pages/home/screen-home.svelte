@@ -18,6 +18,7 @@
     readonly cache: ReadOnlyCache | null;
     readonly device: DeviceIdentity | null;
     readonly hosts?: readonly string[];
+    readonly usage?: AccountUsagePayload | null;
     readonly onSelect: (sessionId: string) => void;
     readonly onRevoke: () => void | Promise<void>;
     readonly onLogout: () => void | Promise<void>;
@@ -72,12 +73,24 @@
     type SeenStore,
   } from '$shared/format/seen-marker.js';
   import { shouldRenderCard } from '$shared/format/card-projection.js';
+  import {
+    barColor,
+    barFillPercent,
+    DEFAULT_USAGE_DISPLAY_MODE,
+    hasUsageCapability,
+    percentText,
+    projectUsageWindow,
+    selectGatingWindow,
+    type AccountUsagePayload,
+    type UsageReading,
+  } from '$shared/format/usage-format.js';
   import { fireHaptic } from '$shared/chrome/haptics.js';
   import { rosterReadBypassesCache, runRosterRefresh } from '$shared/state/foreground-polling.js';
   import Button from '$shared/primitives/button/button.svelte';
   import Freshness from './freshness.svelte';
   import EmptyState from './empty-state.svelte';
   import PushSettings from './push-settings.svelte';
+  import UsageSheet from './usage-sheet.svelte';
   import CardSession from './card-session.svelte';
   import {
     dedupSessions,
@@ -102,6 +115,7 @@
     cache,
     device,
     hosts = [],
+    usage = null,
     onSelect,
     onRevoke,
     onLogout,
@@ -140,6 +154,7 @@
     readonly message: string;
   } | null>(null);
   let cleanupQueue = $state(rehydrateDeviceCleanupQueue());
+  let usageSheetOpen = $state(false);
 
   // ───────────────────────────────────────────────────────────────────
   // 6. DERIVED STATE
@@ -203,6 +218,14 @@
       action,
       row: getSettingsRow(action === 'revoke' ? 'revoke-device' : 'logout'),
     })),
+  );
+  const usageCardWindow = $derived(
+    hasUsageCapability(usage) ? selectGatingWindow(usage.windows) : null,
+  );
+  const usageCardView = $derived(
+    usage === null || usageCardWindow === null
+      ? null
+      : projectUsageWindow(usageCardWindow, Date.now()),
   );
 
   // ───────────────────────────────────────────────────────────────────
@@ -359,6 +382,18 @@
     if (!newSessionLive) return;
   }
 
+  function openUsageSheet(): void {
+    if (!hasUsageCapability(usage)) return;
+    usageSheetOpen = true;
+  }
+
+  function usageCardMeterStyle(reading: UsageReading): string {
+    const color = barColor(100 - reading.usedPercent);
+    return color === null
+      ? ''
+      : `--usage-fill: ${barFillPercent(reading.usedPercent, DEFAULT_USAGE_DISPLAY_MODE)}%; --usage-color: ${color};`;
+  }
+
   function onRosterTouchStart(event: TouchEvent): void {
     if (refreshing) return;
     const touch = event.touches[0];
@@ -439,6 +474,46 @@
       <span class="orbit-node orbit-node--three"></span>
     </div>
   </section>
+
+  {#if usageCardWindow !== null && usageCardView !== null}
+    <section class="usage--slot" aria-labelledby="usage-card-heading">
+      <Button
+        class="usage--card"
+        aria-haspopup="dialog"
+        aria-label="Open account usage details"
+        onclick={openUsageSheet}
+      >
+        <span class="usage--card-copy">
+          <span class="surface--eyebrow">Account usage</span>
+          <strong id="usage-card-heading" data-usage-card-headline="true">{usageCardWindow.label}</strong>
+        </span>
+        {#if usageCardView.state === 'loading'}
+          <span class="usage--card-status" role="status">Loading usage</span>
+        {:else if usageCardView.state === 'unavailable'}
+          <span class="usage--card-status" role="status">Usage unavailable</span>
+        {:else if usageCardView.reading !== null}
+          <span class="usage--card-summary">
+            <span
+              class="usage--card-meter"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={usageCardView.reading.usedPercent}
+              aria-label={`${usageCardWindow.label} ${percentText(usageCardView.reading.usedPercent, DEFAULT_USAGE_DISPLAY_MODE)}`}
+              style={usageCardMeterStyle(usageCardView.reading)}
+            >
+              <span class="usage--card-meter-fill"></span>
+            </span>
+            <span class="usage--card-value">
+              {percentText(usageCardView.reading.usedPercent, DEFAULT_USAGE_DISPLAY_MODE)}
+              {#if usageCardView.stale}<span class="usage--card-stale">Stale</span>{/if}
+            </span>
+          </span>
+        {/if}
+      </Button>
+    </section>
+    <UsageSheet usage={usage} open={usageSheetOpen} onClose={() => (usageSheetOpen = false)} />
+  {/if}
 
   <section
     class="session--section"
@@ -1443,6 +1518,111 @@
     font-weight: 680;
     letter-spacing: 0.04em;
     text-transform: uppercase;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     5. ACCOUNT USAGE SLOT
+  ─────────────────────────────────────────────────────────────────── */
+  /* Reserves space for usage only when the host has supplied its gating marker. */
+  .usage--slot {
+    margin-block: var(--space-8);
+  }
+
+  /* Makes the host-gated usage summary a clear detail-sheet trigger. */
+  :global(.usage--card) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(9rem, 14rem);
+    align-items: center;
+    gap: var(--space-5);
+    width: 100%;
+    min-block-size: 6rem;
+    padding: var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--ink);
+    text-align: start;
+    cursor: pointer;
+  }
+
+  /* Shows keyboard focus on the summary trigger without relying on its fill color. */
+  :global(.usage--card[data-focus-visible]) {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  /* Keeps the usage label and host-selected window together. */
+  .usage--card-copy {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  /* Gives the host-selected headline enough emphasis to scan quickly. */
+  .usage--card-copy strong {
+    font-size: clamp(1.1rem, 3vw, 1.45rem);
+  }
+
+  /* Keeps a status word visible when the host has no usable figure. */
+  .usage--card-status {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    text-align: end;
+  }
+
+  /* Keeps the summary number and its meter together on the card. */
+  .usage--card-summary {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  /* Keeps the card meter visible without exposing a zero for unknown data. */
+  .usage--card-meter {
+    position: relative;
+    height: 0.65rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--line);
+  }
+
+  /* Fills the card meter with the accepted host quantity. */
+  .usage--card-meter-fill {
+    display: block;
+    width: var(--usage-fill);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--usage-color);
+  }
+
+  /* Aligns the card value and stale marker for a quick scan. */
+  .usage--card-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: end;
+    gap: var(--space-2);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  /* Makes stale data explicit beside the preserved value. */
+  .usage--card-stale {
+    color: var(--ink-muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 39rem) {
+    /* Stacks the usage summary when a phone cannot fit two readable columns. */
+    :global(.usage--card) {
+      grid-template-columns: 1fr;
+    }
+
+    /* Keeps the status and value aligned with the stacked summary. */
+    .usage--card-status,
+    .usage--card-value {
+      text-align: start;
+      justify-content: start;
+    }
   }
   /* End of surface: home-view */
 </style>

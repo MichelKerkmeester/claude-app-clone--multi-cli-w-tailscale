@@ -7,11 +7,11 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/006-host-usage-search-review"
     last_updated_at: "2026-08-27T18:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored Level-2 plan for the host-gated usage/search/change-review phase; no code."
+    recent_action: "Shipped five ready-now findings; sixteen ship inert and filed."
     next_safe_action: "Build the ready-now client logic (UQ-3/UQ-6 formatter, SH-1 harness, TE-3 detection)."
     blockers:
       - "18 of 21 findings are blocked on relay-authored read-only fields/RPCs (usage payload, sessions.search, PR/git payload, resolveTerminalPath, new-session and branch RPCs)."
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -31,7 +31,7 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P1 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-27 |
 | **Findings owned** | UQ-1..8, SH-1, CR-1..9, TE-3, MI-1, MI-3 (21) |
 | **Constraint** | Host-authoritative, fail-closed - the client renders only host-pre-resolved tokens, never computes a verdict or mutates |

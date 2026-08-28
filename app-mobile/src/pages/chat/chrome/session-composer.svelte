@@ -17,6 +17,13 @@
   // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
+  export interface TranscriptQuoteCapability {
+    /** Character budget for the editable draft sent to the host fresh-chat opener. */
+    readonly excerptBudget: number;
+    /** Open a host-created fresh chat with this text as its initial editable draft. */
+    readonly openFreshChat: (initialDraft: string) => void;
+  }
+
   export interface SessionComposerProps {
     readonly sessionId?: string;
     readonly sessionEpoch?: string | null;
@@ -54,6 +61,8 @@
     readonly onOpenModelEffort?: (section: 'model' | 'effort') => void;
     /** Host capability fixture; production callers keep this disabled until enablement. */
     readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
+    /** Host-created fresh-chat opener; absent until the relay supports this flow. */
+    readonly transcriptQuoteCapability?: TranscriptQuoteCapability | null;
     readonly onAttachmentSubmitted?: () => void;
   }
 
@@ -69,7 +78,7 @@
   // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
-  import { untrack } from 'svelte';
+  import { onMount, untrack } from 'svelte';
 
   import ComposerCommandAutocomplete, {
     SLASH_LISTBOX_ID,
@@ -104,6 +113,8 @@
   import DictationOverlay from './dictation-overlay.svelte';
   import DictationSheet from './sheet-dictation.svelte';
   import { ACCIDENTAL_TAP_MS } from '$shared/chrome/dictation-capture.js';
+  import { excerptToBudget } from '$shared/format/excerpt.js';
+  import { readTranscriptSelection } from '../transcript/transcript-selection.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 5. PROPS
@@ -137,6 +148,7 @@
     externalOverlayOpen = false,
     onOpenModelEffort = undefined,
     mediaCapability = null,
+    transcriptQuoteCapability = null,
     onAttachmentSubmitted,
   }: SessionComposerProps = $props();
 
@@ -165,6 +177,7 @@
   let commitPending = $state(false);
   // Outside dismiss re-arms on the next draft/caret/textarea interaction.
   let outsideDismissed = $state(false);
+  let transcriptSelection = $state({ text: '', inside: false });
 
   // Mode menu + leave sheet; only the sheet can lead to a Build mutation.
   let modeMenuOpen = $state(false);
@@ -233,6 +246,11 @@
   const attachmentCanSubmit = $derived(!mediaAvailable || attachmentDraft.canSubmit);
   const hasText = $derived(prompt.trim().length > 0);
   const hasAttachments = $derived(attachmentDraft.hasAttachments);
+  const transcriptQuoteAvailable = $derived(
+    transcriptQuoteCapability !== null &&
+      transcriptSelection.inside &&
+      transcriptSelection.text.trim().length > 0,
+  );
   const slashSendable = $derived(
     slashDraft && binding !== null && runtimeAuthority && !running && canSubmit && !slashSubmitting,
   );
@@ -354,6 +372,20 @@
   // ───────────────────────────────────────────────────────────────────
   // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
+
+  // Keep transcript selection local; the optional host opener is the only exit from this surface.
+  onMount(() => {
+    const updateTranscriptSelection = (): void => {
+      const frame = document.querySelector<HTMLElement>('.transcript--frame');
+      const next = readTranscriptSelection(frame);
+      untrack(() => {
+        transcriptSelection = next;
+      });
+    };
+    updateTranscriptSelection();
+    document.addEventListener('selectionchange', updateTranscriptSelection);
+    return () => document.removeEventListener('selectionchange', updateTranscriptSelection);
+  });
 
   // Draft recovery (sessionStorage); media bytes are never placed in storage.
   $effect(() => {
@@ -537,6 +569,13 @@
     dictationLang = lang;
   }
 
+  // Open a host-created fresh chat with an editable, budgeted transcript draft.
+  function quoteSelectionIntoFreshChat(): void {
+    const capability = transcriptQuoteCapability;
+    if (capability === null || !transcriptQuoteAvailable) return;
+    capability.openFreshChat(excerptToBudget(transcriptSelection.text, capability.excerptBudget));
+  }
+
   // Slash drafts use the ticketed lane; ordinary drafts keep send/steer routing.
   // Do not edit — Mutation path — Submit / steer / stop / snapshot / slash-draft / attachment flow; presentation may not reach past here.
   function submit(): void {
@@ -712,6 +751,18 @@
 <!-- Do not edit — Send / steer / stop / snapshot / prompt-submission and the keyboard anchoring hook stay fenced; presentation may not reach past them. -->
 <div class="composer--region">
   {#if promptError !== null}<div class="inline-alert">{promptError}</div>{/if}
+  <!-- This slot: transcript-quote — an optional host action prepares a fresh editable draft. -->
+  {#if transcriptQuoteAvailable}
+    <Button
+      type="button"
+      class="composer--later"
+      aria-label="Quote selection into a new chat"
+      onpointerdown={(event) => event.preventDefault()}
+      onclick={quoteSelectionIntoFreshChat}
+    >
+      Quote selection into a new chat
+    </Button>
+  {/if}
   <p class="composer--disclaimer">{disclaimer}</p>
   <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
     {announcement}

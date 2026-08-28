@@ -9,7 +9,10 @@
   // ───────────────────────────────────────────────────────────────────
 
   import type { DisplayTranscriptBlock, TodoProjectionState } from '$shared/state/state.js';
-  import { hasStreamingTokens } from '$shared/state/streaming-derivations.js';
+  import {
+    formatStreamingElapsedLabel,
+    hasStreamingTokens,
+  } from '$shared/state/streaming-derivations.js';
 
   export interface TranscriptListProps {
     readonly sessionId?: string;
@@ -20,6 +23,7 @@
     readonly todoProjection?: TodoProjectionState;
     readonly onRefreshTodos?: () => void;
     readonly onClearTodoAnnouncement?: () => void;
+    readonly onElapsedLabelChange?: (label: string | null) => void;
   }
 
   // ───────────────────────────────────────────────────────────────────
@@ -105,6 +109,7 @@
     todoProjection = EMPTY_TODO_PROJECTION_STATE,
     onRefreshTodos,
     onClearTodoAnnouncement,
+    onElapsedLabelChange,
   }: TranscriptListProps = $props();
 
   const tokensPresent = $derived(hasStreamingTokens(blocks, running));
@@ -376,6 +381,11 @@
       mostRecentBlockAt !== undefined &&
       stallClock - mostRecentBlockAt >= TRANSCRIPT_STALL_THRESHOLD_MS,
   );
+  const elapsedLabel = $derived.by(() =>
+    running && mostRecentBlockAt !== undefined
+      ? formatStreamingElapsedLabel(stallClock, mostRecentBlockAt)
+      : null,
+  );
 
   // Do not edit — virtualization — Count/estimateSize/measureElement/overscan; rows are measured.
   const virtualizer = createVirtualizer<HTMLDivElement, HTMLDivElement>({
@@ -388,6 +398,13 @@
   // ───────────────────────────────────────────────────────────────────
   // 9. EFFECTS
   // ───────────────────────────────────────────────────────────────────
+
+  // Keep the document-level status region aligned with the same clock as the marker.
+  $effect(() => {
+    const label = elapsedLabel;
+    const onChange = onElapsedLabelChange;
+    untrack(() => onChange?.(label));
+  });
 
   // Keep this effect synchronized with the state it observes.
   $effect(() => {

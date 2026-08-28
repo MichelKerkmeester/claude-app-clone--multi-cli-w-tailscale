@@ -109,6 +109,7 @@
   import type { EffortSheetSection } from './chrome/sheet-model-effort.svelte';
 
   import {
+    hasTranscriptEpochAdvanced,
     inputLockReason,
     inputLockReasonWithSettle,
     holdOffLateRunning,
@@ -171,6 +172,10 @@
   // brand-new send against one that chat never made.
   let failedSendRetry = $state<{ scopeKey: string; submissionId: string } | null>(null);
   let stopping = $state(false);
+  let locallyInterrupted = $state(false);
+  let elapsedLabel = $state<string | null>(null);
+  let observedTranscriptEpoch: string | null = null;
+  let hasObservedTranscriptEpoch = false;
   let binding = $state<SelectedCommandBinding | null>(null);
   let slashSubmitting = $state(false);
   let cacheResumeGeneration = $state(0);
@@ -289,7 +294,7 @@
   // unless the epoch changed (new turn).
   const runningRaw = $derived(status === 'running');
   const running = $derived.by(() => {
-    if (!runningRaw) return false;
+    if (!runningRaw || locallyInterrupted) return false;
     if (lastEffectiveStatus === 'running') return true;
     const held = holdOffLateRunning({
       currentStatus: status,
@@ -305,6 +310,39 @@
   // ───────────────────────────────────────────────────────────────────
   // 5. EFFECTS
   // ───────────────────────────────────────────────────────────────────
+
+  // Secondary re-arm: a relay generation change invalidates local presentation
+  // state. The primary re-arm is the person sending again — an epoch marks a
+  // relay generation, not a turn, so it can go a whole session without moving.
+  //
+  // Session identity is tracked alongside it because this component instance is
+  // reused across chats (the route has no keyed remount). Without this, a stop
+  // in one chat would follow the person into the next one: selecting a session
+  // empties the transcript to a null epoch, and a null on either side is not an
+  // advance, so the hidden state would never clear and a perfectly live turn in
+  // the new chat would render as if the host had stopped.
+  let observedSessionId: string | null = null;
+  $effect(() => {
+    const currentEpoch = transcript.epoch;
+    const currentSession = sessionId;
+    untrack(() => {
+      if (observedSessionId !== currentSession) {
+        observedSessionId = currentSession;
+        locallyInterrupted = false;
+        observedTranscriptEpoch = currentEpoch;
+        hasObservedTranscriptEpoch = currentEpoch !== null;
+        return;
+      }
+      if (
+        hasObservedTranscriptEpoch &&
+        hasTranscriptEpochAdvanced(observedTranscriptEpoch, currentEpoch)
+      ) {
+        locallyInterrupted = false;
+      }
+      observedTranscriptEpoch = currentEpoch;
+      hasObservedTranscriptEpoch = true;
+    });
+  });
 
   // On foreground or reconnect, refresh the runtime and command catalog once.
   $effect(() => {
@@ -568,6 +606,7 @@
     if (stopping) return;
     if (transcript.awaitingSnapshot) return;
     stopping = true;
+    locallyInterrupted = true;
     const scopeKey = sessionId;
     void abortPrompt()
       .then((result) => {
@@ -590,6 +629,11 @@
     const message = rawDraft.trim();
     if (!canSubmit || message.length === 0) return;
     if (transcript.awaitingSnapshot) return;
+    // Sending again is the person starting a new turn, so the locally hidden
+    // running state must come back. The relay epoch cannot carry this: it
+    // marks a relay generation, not a turn, so waiting on it would leave the
+    // working indicator dark for every turn after the first Stop.
+    locallyInterrupted = false;
     // Every async settlement of this send is checked against the scope it
     // started in, never against the session the person is reading when it
     // lands.
@@ -675,6 +719,8 @@
   // and fail closed with no retry.
   function dispatchSlashDraft(draft: string, selected: SelectedCommandBinding) {
     if (slashSubmitting || !canDispatchSlash) return;
+    // A slash submission is a new turn on the same footing as a prompt.
+    locallyInterrupted = false;
     slashSubmitting = true;
     promptError = null;
     const scopeKey = sessionId;
@@ -740,13 +786,17 @@
   const setPromptComposer = (updater: (current: string) => string) => {
     prompt = updater(prompt);
   };
+
+  function updateElapsedLabel(label: string | null): void {
+    elapsedLabel = label;
+  }
 </script>
 
 <!-- The in-session view: header, status line, transcript, composer, and the overlay sheets. -->
 <!-- Do not edit the connection / transcript / sync / composer wiring below — it is app logic, not styling. -->
 <main class="session--view">
   <!-- Screen-reader-only live regions for runtime status and mode changes -->
-  <RuntimeStatusRegion runtime={runtimeControls.runtime} />
+  <RuntimeStatusRegion runtime={runtimeControls.runtime} {elapsedLabel} />
   <RuntimeModeAnnouncer runtime={runtimeControls.runtime} {connection} />
   <!-- data-view-mode carries the fail-closed per-session preference for future CSS targeting. -->
   <div hidden data-view-mode={viewMode.value} data-view-mode-resolved={viewMode.resolved}></div>
@@ -830,6 +880,7 @@
           todoRefreshGeneration += 1;
         }}
         onClearTodoAnnouncement={() => dispatchTodoProjection({ type: 'clearAnnouncement' })}
+        onElapsedLabelChange={updateElapsedLabel}
       />
     {:else}
       <TranscriptLoadPanel

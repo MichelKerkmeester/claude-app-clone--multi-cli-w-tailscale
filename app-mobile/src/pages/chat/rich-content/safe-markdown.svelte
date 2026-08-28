@@ -3,7 +3,8 @@
   // This surface: safe-markdown — renders already-redacted Markdown to safe prose.
   // Do not edit — This module is the read-only sanitization boundary; the allowlist, URL/scheme filtering, and character escaping are frozen and NOT designer-editable.
 
-  import { classifyProseLink } from './prose-link.js';
+  import { classifyHrefScheme, classifyProseLink, detectFilePathSegments, isFilePathToken } from './prose-link.js';
+  import { parseDiagramSource } from './sandboxed-diagram.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 1. TYPE DEFINITIONS
@@ -51,6 +52,7 @@
     | { readonly kind: 'strong'; readonly text: string }
     | { readonly kind: 'em'; readonly text: string }
     | { readonly kind: 'del'; readonly text: string }
+    | { readonly kind: 'file-path'; readonly text: string; readonly code: boolean }
     | {
         readonly kind: 'link';
         readonly text: string;
@@ -66,7 +68,6 @@
   const RAW_HTML_PATTERN =
     /<\s*\/?\s*(?:script|style|form|input|textarea|button|img|iframe|frame|object|embed|audio|video|source|svg|link|meta|base)\b|<\s*\/?\s*[a-z][^>]*>/iu;
   const RAW_MARKUP_PATTERN = /<!--[\s\S]*?-->|<!doctype\b|<!\[cdata\[/iu;
-  const UNSAFE_SCHEME_PATTERN = /(?:javascript|vbscript|data|file|blob):/iu;
   const MARKDOWN_DESTINATION_PATTERN = /!?\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+["'][^"']*["'])?\s*\)/gu;
   const ANY_MARKDOWN_DESTINATION_PATTERN =
     /!?\[[^\]\r\n]*\]\(\s*<?([^)\r\n>]*)>?(?:\s+["'][^"']*["'])?\s*\)/gu;
@@ -219,7 +220,18 @@
     return nodes;
   }
 
-  // Do not edit — Inline rendering interprets only the fixed tokenPattern; other runs stay plain and every link destination is scheme-filtered.
+  // Do not edit — Inline rendering interprets only the fixed tokenPattern; remaining text is scanned for extension-whitelisted paths; every link destination is scheme-filtered.
+  // Keep append plain text focused on its single responsibility.
+  function appendPlainText(parts: SafeMarkdownInlinePart[], text: string): void {
+    for (const segment of detectFilePathSegments(text)) {
+      if (segment.kind === 'file-path') {
+        parts.push({ kind: 'file-path', text: segment.text, code: false });
+      } else if (segment.text.length > 0) {
+        parts.push({ kind: 'text', text: segment.text });
+      }
+    }
+  }
+
   function renderInlineParts(source: string): readonly SafeMarkdownInlinePart[] {
     const parts: SafeMarkdownInlinePart[] = [];
     let remaining = source;
@@ -228,14 +240,19 @@
     while (remaining.length > 0) {
       const match = tokenPattern.exec(remaining);
       if (match === null) {
-        parts.push({ kind: 'text', text: remaining });
+        appendPlainText(parts, remaining);
         break;
       }
       const start = match.index;
-      if (start > 0) parts.push({ kind: 'text', text: remaining.slice(0, start) });
+      if (start > 0) appendPlainText(parts, remaining.slice(0, start));
       const token = match[0];
       if (token.startsWith('`')) {
-        parts.push({ kind: 'code', text: token.slice(1, -1) });
+        const inner = token.slice(1, -1);
+        if (isFilePathToken(inner, { allowBareName: true })) {
+          parts.push({ kind: 'file-path', text: inner, code: true });
+        } else {
+          parts.push({ kind: 'code', text: inner });
+        }
       } else if (token.startsWith('**') || token.startsWith('__')) {
         parts.push({ kind: 'strong', text: token.slice(2, -2) });
       } else if (token.startsWith('~~')) {
@@ -266,20 +283,23 @@
     return parts;
   }
 
-  // Do not edit — The sanitization gate rejects raw HTML/markup, control characters, and unsafe schemes in every Markdown destination.
+  // Do not edit — The sanitization gate rejects raw HTML/markup, control characters, and destinations the scheme gate rejects.
   function isUnsafeMarkdown(source: string): boolean {
     if (
       RAW_HTML_PATTERN.test(source) ||
       RAW_MARKUP_PATTERN.test(source) ||
-      CONTROL_CHARACTER_PATTERN.test(source) ||
-      UNSAFE_SCHEME_PATTERN.test(normalizeForSchemeCheck(source))
+      CONTROL_CHARACTER_PATTERN.test(source)
     ) {
       return true;
     }
-    for (const pattern of [MARKDOWN_DESTINATION_PATTERN, ANY_MARKDOWN_DESTINATION_PATTERN]) {
-      for (const match of source.matchAll(pattern)) {
-        const destination = match[1] ?? '';
-        if (UNSAFE_SCHEME_PATTERN.test(normalizeForSchemeCheck(destination))) return true;
+    // Scan the raw source and the control-stripped form so a scheme split across
+    // a newline or percent-encoded in a destination cannot skip the gate.
+    for (const candidate of [source, normalizeForSchemeCheck(source)]) {
+      for (const pattern of [MARKDOWN_DESTINATION_PATTERN, ANY_MARKDOWN_DESTINATION_PATTERN]) {
+        for (const match of candidate.matchAll(pattern)) {
+          const destination = match[1] ?? '';
+          if (classifyHrefScheme(normalizeForSchemeCheck(destination)) === 'rejected') return true;
+        }
       }
     }
     return false;
@@ -401,6 +421,7 @@
       'diff',
       'ansi',
       'plaintext',
+      'mermaid',
     ]);
     return allowed.has(normalized) ? normalized : null;
   }
@@ -413,8 +434,10 @@
 
 <script lang="ts">
   import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
+  import InAppLinkOverlay from '../artifacts/in-app-link-overlay.svelte';
   import { findParts } from '../transcript/transcript-find-index.js';
   import { getTranscriptFindContext } from '../transcript/transcript-find-context.svelte.js';
+  import SandboxedDiagram from './sandboxed-diagram.svelte';
   import { useCopyFeedback } from './use-copy-feedback.svelte.js';
 
   interface Props {
@@ -442,12 +465,38 @@
   const controlPresentation = $derived.by(() =>
     ast === null ? presentInvisibleCharacters(source) : { value: source, changed: false },
   );
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. LOCAL STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  let overlayUrl = $state<string | null>(null);
+  let overlayOpener = $state<HTMLElement | null>(null);
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
+  // Rejected schemes never reach the overlay; only the fail-closed gate's
+  // open-external verdict may open it, and the default navigation is cancelled
+  // so the chat stays in the foreground.
+  function openExternalLink(event: MouseEvent, href: string): void {
+    event.preventDefault();
+    if (classifyHrefScheme(href) !== 'open-external') return;
+    const target = event.currentTarget;
+    overlayOpener = target instanceof HTMLElement ? target : null;
+    overlayUrl = href;
+  }
+
+  function closeExternalLink(): void {
+    overlayUrl = null;
+  }
 </script>
 
 <!-- Component content -->
 {#snippet marked(text: string)}{#each findParts(text, findTerm) as part, partIndex (partIndex)}{#if part.mark}<mark class="artifact-find--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{/snippet}
 
-{#snippet inline(text: string)}{#each renderInlineParts(text) as part, i (i)}{#if part.kind === 'code'}<code>{@render marked(part.text)}</code>{:else if part.kind === 'strong'}<strong>{@render marked(part.text)}</strong>{:else if part.kind === 'em'}<em>{@render marked(part.text)}</em>{:else if part.kind === 'del'}<del>{@render marked(part.text)}</del>{:else if part.kind === 'link'}{#if part.mode === 'external'}<a class="safe-markdown--link" href={part.href} target="_blank" rel="external noopener noreferrer">{@render marked(part.text)}</a>{:else}<span class="safe-markdown--unavailable" title="Link unavailable" aria-disabled="true">{@render marked(part.text)}</span>{/if}{:else}{@render marked(part.text)}{/if}{/each}{/snippet}
+{#snippet inline(text: string)}{#each renderInlineParts(text) as part, i (i)}{#if part.kind === 'code'}<code>{@render marked(part.text)}</code>{:else if part.kind === 'strong'}<strong>{@render marked(part.text)}</strong>{:else if part.kind === 'em'}<em>{@render marked(part.text)}</em>{:else if part.kind === 'del'}<del>{@render marked(part.text)}</del>{:else if part.kind === 'file-path'}{#if part.code}<code class="safe-markdown--file-path">{@render marked(part.text)}</code>{:else}<span class="safe-markdown--file-path">{@render marked(part.text)}</span>{/if}{:else if part.kind === 'link'}{#if part.mode === 'external'}<a class="safe-markdown--link" href={part.href} target="_blank" rel="external noopener noreferrer" onclick={(event) => openExternalLink(event, part.href)}>{@render marked(part.text)}</a>{:else}<span class="safe-markdown--unavailable" title="Link unavailable" aria-disabled="true">{@render marked(part.text)}</span>{/if}{:else}{@render marked(part.text)}{/if}{/each}{/snippet}
 
 {#if ast === null}
   <!-- Do not edit — The fail-closed fallback renders rejected source verbatim and marks the canonical source for exact copying. -->
@@ -498,7 +547,11 @@
               onclick={() => feedback.copy(`fence-${index}`, node.source)}
             >{feedback.copiedUnit === `fence-${index}` && !feedback.copyFailed ? 'Copied' : 'Copy'}</button>
           {/if}
-          <pre class="safe-markdown--code" data-language={node.language ?? undefined}><code>{node.source}</code></pre>
+          {#if node.language === 'mermaid' && parseDiagramSource(node.source) !== null}
+            <SandboxedDiagram source={node.source} />
+          {:else}
+            <pre class="safe-markdown--code" data-language={node.language ?? undefined}><code>{node.source}</code></pre>
+          {/if}
         </div>
       {/if}
     {/each}
@@ -506,6 +559,10 @@
       <p class="safe-markdown--copy-status" role="status" aria-live="polite">{feedback.announcement}</p>
     {/if}
   </div>
+{/if}
+
+{#if overlayUrl !== null}
+  <InAppLinkOverlay url={overlayUrl} restoreFocusTo={overlayOpener} onClose={closeExternalLink} />
 {/if}
 
 <style>
@@ -651,7 +708,8 @@
     text-decoration: underline;
   }
 
-  .safe-markdown--unavailable {
+  .safe-markdown--unavailable,
+  .safe-markdown--file-path {
     color: var(--ink-muted);
     text-decoration: underline dotted;
     cursor: default;

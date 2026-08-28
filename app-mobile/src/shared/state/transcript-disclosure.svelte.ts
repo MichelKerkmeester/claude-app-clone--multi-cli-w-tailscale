@@ -11,6 +11,12 @@ export interface TranscriptDisclosureState {
   open: boolean;
 }
 
+// Thinking content is readable on first paint, while explicit user toggles still persist.
+export function openTranscriptDisclosureByDefault(blockId: string | undefined): void {
+  if (blockId === undefined || openByBlockId.has(blockId)) return;
+  openByBlockId.set(blockId, true);
+}
+
 export function getTranscriptDisclosureState(
   blockId: string | undefined,
 ): TranscriptDisclosureState {
@@ -37,8 +43,7 @@ export function createTranscriptDisclosureBinding(
     set open(value: boolean) {
       const blockId = getBlockId();
       if (blockId === undefined) unkeyedState.open = value;
-      else if (value) openByBlockId.set(blockId, true);
-      else openByBlockId.delete(blockId);
+      else openByBlockId.set(blockId, value);
     },
   };
 }

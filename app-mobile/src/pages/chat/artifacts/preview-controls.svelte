@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   // ───────────────────────────────────────────────────────────────────
   // 1. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -9,7 +11,11 @@
     wrap?: boolean;
     onWrapChange?: (wrap: boolean) => void;
     findTerm?: string;
+    findMatchCount?: number;
+    findMatchIndex?: number;
     onFindTermChange?: (term: string) => void;
+    onFindNext?: () => void;
+    onFindPrevious?: () => void;
     canCopy?: boolean;
     canShare?: boolean;
     onCopy?: () => void;
@@ -30,7 +36,11 @@
     wrap = false,
     onWrapChange,
     findTerm = '',
+    findMatchCount,
+    findMatchIndex,
     onFindTermChange,
+    onFindNext,
+    onFindPrevious,
     canCopy = false,
     canShare = false,
     onCopy,
@@ -58,6 +68,19 @@
   };
 
   const PAN_DIRECTIONS = ['up', 'left', 'right', 'down'] as const;
+  const FIND_STEP_EVENT = 'artifact-find-step';
+  const FIND_STATE_EVENT = 'artifact-find-state';
+
+  interface FindStateDetail {
+    readonly term: string;
+    readonly count: number;
+    readonly index: number;
+  }
+
+  interface FindStepDetail {
+    readonly term: string;
+    readonly direction: 'next' | 'previous';
+  }
 
   // ───────────────────────────────────────────────────────────────────
   // 3. HELPERS
@@ -67,6 +90,52 @@
   function panGlyph(direction: 'up' | 'down' | 'left' | 'right'): string {
     return direction === 'up' ? '↑' : direction === 'down' ? '↓' : direction === 'left' ? '←' : '→';
   }
+
+  // Keep step find focused on its single responsibility.
+  function stepFind(direction: 'next' | 'previous'): void {
+    const callback = direction === 'next' ? onFindNext : onFindPrevious;
+    if (callback !== undefined) {
+      callback();
+      return;
+    }
+    window.dispatchEvent(new CustomEvent<FindStepDetail>(FIND_STEP_EVENT, { detail: { term: findTerm, direction } }));
+  }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. FIND STATE
+  // ───────────────────────────────────────────────────────────────────
+
+  let observedFindCount = $state(0);
+  let observedFindIndex = $state(0);
+
+  const displayedFindCount = $derived(findMatchCount ?? observedFindCount);
+  const displayedFindIndex = $derived(
+    findMatchIndex ?? (displayedFindCount > 0 ? Math.max(observedFindIndex, 1) : 0),
+  );
+
+  // Keep find state scoped to the active search term and avoid stale sibling updates.
+  $effect(() => {
+    const term = findTerm;
+    const handleFindState = (event: Event): void => {
+      const detail = (event as CustomEvent<FindStateDetail>).detail;
+      if (detail?.term !== term) return;
+      untrack(() => {
+        observedFindCount = detail.count;
+        observedFindIndex = detail.index;
+      });
+    };
+    window.addEventListener(FIND_STATE_EVENT, handleFindState);
+    return () => window.removeEventListener(FIND_STATE_EVENT, handleFindState);
+  });
+
+  // Reset the uncontrolled display before the preview reports its new search state.
+  $effect(() => {
+    void findTerm;
+    untrack(() => {
+      observedFindCount = 0;
+      observedFindIndex = 0;
+    });
+  });
 </script>
 
 <!-- Component content -->
@@ -107,6 +176,11 @@
       <span>Find</span>
       <input type="search" value={findTerm} oninput={(event) => onFindTermChange?.(event.currentTarget.value)} aria-label={`Find in ${KIND_LABELS[kind].toLocaleLowerCase()}`} inputmode="search" />
     </label>
+    {#if findTerm.trim().length > 0}
+      <span class="artifact-find--count" aria-live="polite">{displayedFindIndex}/{displayedFindCount}</span>
+      <button type="button" class="artifact--control-button" aria-label="Previous match" onclick={() => stepFind('previous')} disabled={displayedFindCount === 0}>Previous</button>
+      <button type="button" class="artifact--control-button" aria-label="Next match" onclick={() => stepFind('next')} disabled={displayedFindCount === 0}>Next</button>
+    {/if}
   {/if}
   {#if kind !== 'image' && canCopy && onCopy !== undefined}
     <button type="button" class="artifact--control-button" onclick={onCopy}>{copyLabel}</button>
@@ -140,7 +214,7 @@
     text-transform: uppercase;
   }
 
-  /* This slot: control-chip — the static status chips (kind, read-only, zoom %). */
+  /* This slot: control-chip — the static status chips (kind, read-only, zoom %, find count). */
   .artifact-preview--controls span {
     min-block-size: 2rem;
     border: 1px solid var(--line);

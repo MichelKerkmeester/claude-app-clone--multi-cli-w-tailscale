@@ -84,7 +84,9 @@
   // 4. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
+  import { untrack } from 'svelte';
   import { getOptionalArtifactViewer } from '../artifacts/artifact-viewer-provider.svelte';
+  import { openTranscriptDisclosureByDefault } from '$shared/state/transcript-disclosure.svelte.js';
   import CodeCard from './card-code.svelte';
   import CommandOutputCard from './card-command-output.svelte';
   import { createInMemoryArtifactDocument } from './f6-viewer-adapter.js';
@@ -109,6 +111,9 @@
   // ───────────────────────────────────────────────────────────────────
 
   const canOpen = $derived(onOpen !== undefined || viewer !== null);
+  const isThinkingActivity = $derived(
+    block.kind === 'activity' && block.sourceBlock.kind === 'thinking',
+  );
 
   // ───────────────────────────────────────────────────────────────────
   // 7. EFFECTS
@@ -118,6 +123,11 @@
   $effect(() => {
     if (onOpen !== undefined || viewer === null || !isRichCardBlock(block)) return;
     viewer.updateInMemory(createInMemoryArtifactDocument(block));
+  });
+
+  $effect(() => {
+    if (!isThinkingActivity) return;
+    untrack(() => openTranscriptDisclosureByDefault(block.blockId));
   });
 
   // ───────────────────────────────────────────────────────────────────
@@ -155,6 +165,11 @@
   <div class={`rich--prose-block block-role--${block.role ?? 'assistant'}`}>
     <SafeMarkdown source={block.canonicalSource} ariaLabel="Transcript response" />
   </div>
+{:else if block.kind === 'activity' && block.sourceBlock.kind === 'thinking'}
+  <p class="block--copy quiet-copy" data-thinking-prose="true">
+    <span class="sr-only">Thinking summary</span>
+    {block.sourceBlock.summary}
+  </p>
 {:else if block.kind === 'activity'}
   <RichBlockFrame
     title={activityTitle(block.sourceBlock)}

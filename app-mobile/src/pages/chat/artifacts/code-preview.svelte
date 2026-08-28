@@ -1,47 +1,11 @@
-<script module lang="ts">
-  // This module holds the shared Code Preview types and helpers.
-  // ───────────────────────────────────────────────────────────────────
-  // MODULE: CODE PREVIEW
-  // ───────────────────────────────────────────────────────────────────
-
-  // ───────────────────────────────────────────────────────────────────
-  // 1. TYPE DEFINITIONS
-  // ───────────────────────────────────────────────────────────────────
-
-  interface FindPart {
-    readonly text: string;
-    readonly mark: boolean;
-  }
-
-  // ───────────────────────────────────────────────────────────────────
-  // 2. HELPERS
-  // ───────────────────────────────────────────────────────────────────
-
-  // Keep find parts focused on its single responsibility.
-  function findParts(text: string, findTerm: string): readonly FindPart[] {
-    if (findTerm.trim().length === 0) return [{ text, mark: false }];
-    const needle = findTerm.toLocaleLowerCase();
-    const source = text.toLocaleLowerCase();
-    const parts: FindPart[] = [];
-    let cursor = 0;
-    let match = source.indexOf(needle, cursor);
-    while (match >= 0) {
-      if (match > cursor) parts.push({ text: text.slice(cursor, match), mark: false });
-      parts.push({ text: text.slice(match, match + findTerm.length), mark: true });
-      cursor = match + findTerm.length;
-      match = source.indexOf(needle, cursor);
-    }
-    if (cursor === 0) return [{ text, mark: false }];
-    if (cursor < text.length) parts.push({ text: text.slice(cursor), mark: false });
-    return parts;
-  }
-</script>
-
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
   // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
+  import { untrack } from 'svelte';
+
+  import { findParts } from '../transcript/transcript-find-index.js';
   import {
     normalizeHighlightLanguage,
     useHighlightedCode,
@@ -56,6 +20,9 @@
     language?: string;
     wrap?: boolean;
     findTerm?: string;
+    findMatchIndex?: number;
+    onFindMatchCountChange?: (count: number) => void;
+    onFindMatchChange?: (index: number) => void;
     ariaLabel?: string;
     enableHighlighting?: boolean;
     revision?: string | number;
@@ -67,6 +34,9 @@
     language,
     wrap = false,
     findTerm = '',
+    findMatchIndex,
+    onFindMatchCountChange,
+    onFindMatchChange,
     ariaLabel = 'Code preview',
     enableHighlighting = true,
     revision = 1,
@@ -74,15 +44,56 @@
   }: Props = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 5. LOCAL STATE
+  // 5. FIND HELPERS
+  // ───────────────────────────────────────────────────────────────────
+
+  interface IndexedFindPart {
+    readonly text: string;
+    readonly mark: boolean;
+    readonly matchIndex: number | null;
+  }
+
+  interface IndexedTokenParts {
+    readonly kind: string;
+    readonly parts: readonly IndexedFindPart[];
+  }
+
+  interface FindStateDetail {
+    readonly term: string;
+    readonly count: number;
+    readonly index: number;
+  }
+
+  interface FindStepDetail {
+    readonly term: string;
+    readonly direction: 'next' | 'previous';
+  }
+
+  const FIND_STEP_EVENT = 'artifact-find-step';
+  const FIND_STATE_EVENT = 'artifact-find-state';
+
+  // Keep indexed find parts aligned with the highlight-all renderer.
+  function indexFindParts(text: string, term: string, startIndex: number): { readonly parts: readonly IndexedFindPart[]; readonly nextIndex: number } {
+    let nextIndex = startIndex;
+    const parts = findParts(text, term).map((part) => {
+      if (!part.mark) return { ...part, matchIndex: null };
+      nextIndex += 1;
+      return { ...part, matchIndex: nextIndex };
+    });
+    return { parts, nextIndex };
+  }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 6. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
   let scrollEl = $state<HTMLDivElement | null>(null);
   let atLiveEdgeRef = true;
   let atLiveEdge = $state(true);
+  let currentFindIndex = $state(0);
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. DERIVED STATE
+  // 7. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const safeLanguage = $derived(normalizeHighlightLanguage(language));
@@ -95,10 +106,26 @@
   const status = $derived(highlighted.current.status);
   const revisionId = $derived(highlighted.current.revisionId);
   const tokens = $derived(highlighted.current.tokens);
-  const lines = $derived(text.split('\n'));
+  const lineNumbers = $derived(text.split('\n').map((_, index) => index + 1));
+  const plainFindParts = $derived(indexFindParts(text, findTerm, 0).parts);
+  const tokenFindParts = $derived.by(() => {
+    if (tokens === null) return null;
+    let matchIndex = 0;
+    return tokens.map((token): IndexedTokenParts => {
+      const indexed = indexFindParts(token.text, findTerm, matchIndex);
+      matchIndex = indexed.nextIndex;
+      return { kind: token.kind, parts: indexed.parts };
+    });
+  });
+  const findMatchCount = $derived(
+    tokenFindParts === null
+      ? plainFindParts.filter((part) => part.mark).length
+      : tokenFindParts.reduce((count, token) => count + token.parts.filter((part) => part.mark).length, 0),
+  );
+  const activeFindIndex = $derived(findMatchIndex ?? currentFindIndex);
 
   // ───────────────────────────────────────────────────────────────────
-  // 7. EFFECTS
+  // 8. EFFECTS
   // ───────────────────────────────────────────────────────────────────
 
   // Keep this effect synchronized with the state it observes.
@@ -119,8 +146,49 @@
     }
   });
 
+  // Reset the current match whenever the searchable content changes.
+  $effect(() => {
+    const count = findMatchCount;
+    void findTerm;
+    void text;
+    if (findMatchIndex !== undefined) return;
+    untrack(() => {
+      const nextIndex = count > 0 ? 1 : 0;
+      if (currentFindIndex !== nextIndex) currentFindIndex = nextIndex;
+    });
+  });
+
+  // Keep the sibling find control synchronized without coupling the render tree.
+  $effect(() => {
+    const term = findTerm;
+    const handleFindStep = (event: Event): void => {
+      const detail = (event as CustomEvent<FindStepDetail>).detail;
+      if (detail?.term !== term || findMatchIndex !== undefined) return;
+      untrack(() => {
+        if (findMatchCount === 0) return;
+        currentFindIndex = detail.direction === 'next'
+          ? currentFindIndex === findMatchCount ? 1 : currentFindIndex + 1
+          : currentFindIndex <= 1 ? findMatchCount : currentFindIndex - 1;
+      });
+    };
+    window.addEventListener(FIND_STEP_EVENT, handleFindStep);
+    return () => window.removeEventListener(FIND_STEP_EVENT, handleFindStep);
+  });
+
+  // Publish the count and current match for a sibling find control or a controlled parent.
+  $effect(() => {
+    const count = findMatchCount;
+    const index = activeFindIndex;
+    const term = findTerm;
+    untrack(() => {
+      onFindMatchCountChange?.(count);
+      onFindMatchChange?.(index);
+      window.dispatchEvent(new CustomEvent<FindStateDetail>(FIND_STATE_EVENT, { detail: { term, count, index } }));
+    });
+  });
+
   // ───────────────────────────────────────────────────────────────────
-  // 8. HANDLERS
+  // 9. HANDLERS
   // ───────────────────────────────────────────────────────────────────
 
   // Keep update live edge focused on its single responsibility.
@@ -160,8 +228,8 @@
     data-display-buffer="true"
     onscroll={followTail ? updateLiveEdge : undefined}
   >
-    <div class="artifact-code--gutter" aria-hidden="true" style="user-select: none; -webkit-user-select: none;">{#each lines as _line, index (index)}<span>{index + 1}</span>{/each}</div>
-    <pre class="artifact-code--source"><code>{#if tokens === null}{#each findParts(text, findTerm) as part}{#if part.mark}<mark class="artifact-find--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}{#each tokens as token, index (index)}<span class={'artifact-code--token is-' + token.kind}>{#each findParts(token.text, findTerm) as part}{#if part.mark}<mark class="artifact-find--match">{part.text}</mark>{:else}{part.text}{/if}{/each}</span>{/each}{/if}</code></pre>
+    <div class="artifact-code--gutter" aria-hidden="true" style="user-select: none; -webkit-user-select: none;">{#each lineNumbers as lineNumber (lineNumber)}<span>{lineNumber}</span>{/each}</div>
+    <pre class="artifact-code--source"><code>{#if tokenFindParts === null}{#each plainFindParts as part, partIndex (partIndex)}{#if part.mark}<mark class={`artifact-find--match${part.matchIndex === activeFindIndex ? ' is-current' : ''}`} data-find-index={part.matchIndex} aria-current={part.matchIndex === activeFindIndex ? 'true' : undefined}>{part.text}</mark>{:else}{part.text}{/if}{/each}{:else}{#each tokenFindParts as token, index (index)}<span class={'artifact-code--token is-' + token.kind}>{#each token.parts as part, partIndex (partIndex)}{#if part.mark}<mark class={`artifact-find--match${part.matchIndex === activeFindIndex ? ' is-current' : ''}`} data-find-index={part.matchIndex} aria-current={part.matchIndex === activeFindIndex ? 'true' : undefined}>{part.text}</mark>{:else}{part.text}{/if}{/each}</span>{/each}{/if}</code></pre>
   </div>
   {#if followTail && !atLiveEdge}
     <button type="button" class="artifact--jump-latest" onclick={jumpToLatest}>Jump to latest</button>
@@ -265,6 +333,12 @@
   /* Keep this rule aligned with its surrounding surface. */
   .artifact-code--token:global(.is-comment) {
     color: #9f998f;
+  }
+
+  /* This state: current-match — distinguishes the selected result without removing other marks. */
+  :global(.artifact-find--match.is-current) {
+    background: var(--accent-strong);
+    color: var(--ink-inverse);
   }
 
   /* This slot: jump-latest — the follow-tail live-edge control; ships native :hover/:focus-visible. */

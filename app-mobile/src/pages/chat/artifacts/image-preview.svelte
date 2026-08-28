@@ -62,6 +62,8 @@
 </script>
 
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
@@ -74,6 +76,8 @@
 
   let imageState = $state<ImagePreviewState>('loading');
   let objectUrl = $state<string | null>(null);
+  let naturalWidth = $state(0);
+  let naturalHeight = $state(0);
   let zoom = $state(IMAGE_PREVIEW_MIN_ZOOM);
   let pan = $state({ x: 0, y: 0 });
   let panStart: { x: number; y: number; panX: number; panY: number } | null = null;
@@ -92,10 +96,14 @@
   $effect(() => {
     void block.digest;
     let active = true;
-    imageState = 'loading';
-    zoom = IMAGE_PREVIEW_MIN_ZOOM;
-    pan = { x: 0, y: 0 };
-    objectUrl = null;
+    untrack(() => {
+      imageState = 'loading';
+      naturalWidth = 0;
+      naturalHeight = 0;
+      zoom = IMAGE_PREVIEW_MIN_ZOOM;
+      pan = { x: 0, y: 0 };
+      objectUrl = null;
+    });
     const currentBytes = bytes;
     if (
       currentBytes === null ||
@@ -103,7 +111,9 @@
       currentBytes.byteLength > IMAGE_PREVIEW_MAX_BYTES ||
       (block.byteLength !== null && currentBytes.byteLength !== block.byteLength)
     ) {
-      imageState = 'too-large';
+      untrack(() => {
+        imageState = 'too-large';
+      });
       return () => {
         active = false;
       };
@@ -114,10 +124,18 @@
     objectUrl = url;
     image.onload = () => {
       if (!active) return;
-      imageState = isBoundedImage(image.naturalWidth, image.naturalHeight) ? 'ready' : 'too-large';
+      untrack(() => {
+        naturalWidth = image.naturalWidth;
+        naturalHeight = image.naturalHeight;
+        imageState = isBoundedImage(image.naturalWidth, image.naturalHeight) ? 'ready' : 'too-large';
+      });
     };
     image.onerror = () => {
-      if (active) imageState = 'corrupt';
+      if (active) {
+        untrack(() => {
+          imageState = 'corrupt';
+        });
+      }
     };
     image.src = url;
     return () => {
@@ -126,7 +144,9 @@
       image.onerror = null;
       image.src = '';
       URL.revokeObjectURL(url);
-      objectUrl = null;
+      untrack(() => {
+        objectUrl = null;
+      });
     };
   });
 
@@ -191,6 +211,7 @@
       onpointercancel={stopPan}
       onpointerleave={stopPan}
     >
+      <span class="image-preview--dimensions" aria-label="Intrinsic image dimensions">{naturalWidth} × {naturalHeight}px</span>
       <img class="image-preview--image" src={objectUrl} alt={block.altText ?? 'Sanitized image preview'} draggable={false} style:transform={`translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`} />
     </div>
   {/if}
@@ -198,9 +219,9 @@
 
 <!-- Image preview controls -->
 <!-- This surface: image-preview--controls — the image zoom toolbar. Decomposed into this scoped block;
-     single-component (ImagePreview). The image display classes (image-preview / image-preview--image /
-     image-preview--stage) are shared with SecureImagePreview and stay global (→ app.css at cutover); the
-     toolbar buttons carry the shared .artifact--control-button, also global. Values unchanged. -->
+     single-component (ImagePreview). The base image display classes (image-preview / image-preview--image)
+     remain shared with SecureImagePreview; this component owns the transparency backdrop and dimensions chip.
+     The toolbar buttons carry the shared .artifact--control-button, also global. Values unchanged. -->
 <style>
   /* This slot: image-controls — the zoom/pan toolbar row. */
   .image-preview--controls {
@@ -208,5 +229,42 @@
     flex-wrap: wrap;
     gap: var(--space-2);
     align-items: center;
+  }
+
+  /* This slot: image-stage — checkerboard squares reveal transparent pixels. */
+  .image-preview--stage {
+    position: relative;
+    background-color: #f8f8f6;
+    background-image: linear-gradient(45deg, #e8e4de 25%, transparent 25%, transparent 75%, #e8e4de 75%), linear-gradient(45deg, #e8e4de 25%, transparent 25%, transparent 75%, #e8e4de 75%);
+    background-position: 0 0, 0.5rem 0.5rem;
+    background-size: 1rem 1rem;
+  }
+
+  /* This slot: dimensions — intrinsic pixels remain visible above the image. */
+  .image-preview--dimensions {
+    position: absolute;
+    inset-block-start: var(--space-2);
+    inset-inline-end: var(--space-2);
+    z-index: 1;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #ffffff;
+    color: #24221f;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.45rem 0.6rem;
+  }
+
+  /* This state: dark — keeps the transparency pattern distinct on dark surfaces. */
+  :global(:root[data-theme='dark']) .image-preview--stage {
+    background-color: #24221f;
+    background-image: linear-gradient(45deg, #3c3934 25%, transparent 25%, transparent 75%, #3c3934 75%), linear-gradient(45deg, #3c3934 25%, transparent 25%, transparent 75%, #3c3934 75%);
+  }
+
+  /* This state: dark — preserves contrast for the intrinsic dimensions chip. */
+  :global(:root[data-theme='dark']) .image-preview--dimensions {
+    background: #24221f;
+    color: #f8f8f6;
   }
 </style>

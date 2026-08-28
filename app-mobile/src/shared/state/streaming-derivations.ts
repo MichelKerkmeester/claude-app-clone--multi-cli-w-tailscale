@@ -51,7 +51,19 @@ export function hasStreamingTokens(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 5. INPUT LOCK REASON
+// 5. STREAMING ELAPSED LABEL
+// ───────────────────────────────────────────────────────────────────
+
+/** Format the elapsed time from the existing transcript clock pair. */
+export function formatStreamingElapsedLabel(now: number, startedAt: number): string {
+  const elapsedSeconds = Math.max(0, Math.floor((now - startedAt) / 1_000));
+  const minutes = Math.floor(elapsedSeconds / 60);
+  const seconds = String(elapsedSeconds % 60).padStart(2, '0');
+  return `Working — ${minutes}:${seconds}`;
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 6. INPUT LOCK REASON
 // ───────────────────────────────────────────────────────────────────
 // Determines why the session input is locked, if at all.
 //   awaitingSnapshot / reconnecting → waiting-for-lease (transient)
@@ -102,7 +114,7 @@ export function inputLockReasonWithSettle(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 6. DONE-HOLDOFF
+// 7. DONE-HOLDOFF
 // ───────────────────────────────────────────────────────────────────
 // A running signal re-reported within the done-holdoff window after an
 // idle/interrupted end does NOT move the card back to running. Only a
@@ -171,4 +183,16 @@ export function holdOffLateRunning(input: HoldOffInput): HoldOffResult {
 
   // Default: pass through.
   return HoldOffResult.PASS;
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 8. TRANSCRIPT EPOCH ADVANCE
+// ───────────────────────────────────────────────────────────────────
+
+/** A new non-null epoch is the only host signal that re-arms a stopped view. */
+export function hasTranscriptEpochAdvanced(
+  previousEpoch: string | null,
+  currentEpoch: string | null,
+): boolean {
+  return previousEpoch !== null && currentEpoch !== null && previousEpoch !== currentEpoch;
 }

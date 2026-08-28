@@ -27,7 +27,7 @@ _memory:
 | **Level** | 2 |
 | **Status** | Complete |
 | **Scope** | Archive-wide; 334 stories, 308 shots |
-| **Commits** | (this commit) |
+| **Commits** | `d0879ba` |
 | **Executors** | Grok 4.6 xhigh via Cursor and GPT-5.6 Luna xhigh via Codex, on disjoint files |
 <!-- /ANCHOR:metadata -->
 

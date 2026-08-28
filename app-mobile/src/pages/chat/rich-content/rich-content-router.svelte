@@ -87,6 +87,7 @@
   import { untrack } from 'svelte';
   import { getOptionalArtifactViewer } from '../artifacts/artifact-viewer-provider.svelte';
   import { openTranscriptDisclosureByDefault } from '$shared/state/transcript-disclosure.svelte.js';
+  import DiffPreview, { parseUnifiedDiff } from '../artifacts/diff-preview.svelte';
   import CodeCard from './card-code.svelte';
   import CommandOutputCard from './card-command-output.svelte';
   import { createInMemoryArtifactDocument } from './f6-viewer-adapter.js';
@@ -180,8 +181,14 @@
   </RichBlockFrame>
 {:else if block.kind === 'diff'}
   {@const source = block.sourceBlock as DisplayTranscriptBlock & { readonly patch?: unknown }}
+  {@const patch = typeof source.patch === 'string' ? source.patch : null}
+  {@const parsed = patch === null ? null : parseUnifiedDiff(patch)}
   <RichBlockFrame title="File diff" eyebrow="Diff" class="rich-diff-card">
-    <pre class="rich--shell-well">{typeof source.patch === 'string' ? source.patch : 'Diff unavailable'}</pre>
+    {#if parsed !== null && patch !== null}
+      <DiffPreview {patch} />
+    {:else}
+      <pre class="rich--shell-well">{patch ?? 'Diff unavailable'}</pre>
+    {/if}
   </RichBlockFrame>
 {:else if block.kind === 'fallback'}
   <RichBlockFrame title="Unsupported block" class="rich--fallback-card">

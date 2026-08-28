@@ -69,6 +69,7 @@
   import { EMPTY_TODO_PROJECTION_STATE } from '$shared/state/state.js';
   import { pruneTranscriptDisclosureState } from '$shared/state/transcript-disclosure.svelte.js';
   import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
+  import { pinchScale } from '$shared/primitives/pinch-scale.js';
   import { normalizeTranscriptBlocks } from '../rich-content/normalize-transcript-blocks.js';
   import { groupBlocksIntoTurns } from '$shared/state/turns.js';
   import { groupNormalizedTranscript, insertTodoProjectionItem } from './transcript-helpers.js';
@@ -533,7 +534,7 @@
       />
     {/if}
     <!-- This slot: scroll-region — the scrollable clip of the virtual list. -->
-    <div class="transcript--scroll" bind:this={scrollEl} onscroll={onScroll}>
+    <div class="transcript--scroll" bind:this={scrollEl} onscroll={onScroll} use:pinchScale>
       <div
         class="transcript--virtual"
         style="height: {$virtualizer.getTotalSize() + (running && !tokensPresent ? 72 : 0)}px"
@@ -809,6 +810,8 @@
     height: min(70dvh, 54rem);
     overflow: auto;
     overscroll-behavior: contain;
+    /* Vertical panning remains native while the action observes a second touch pointer. */
+    touch-action: pan-y;
     scrollbar-color: var(--line-strong) transparent;
   }
 
@@ -817,6 +820,9 @@
   .transcript--virtual {
     position: relative;
     width: 100%;
+    /* Visual scaling leaves the virtualizer's measured row geometry unchanged during a gesture. */
+    transform: scale(var(--transcript-text-scale, 1));
+    transform-origin: top left;
   }
 
   /* Do not edit — virtual row + streaming marker share the measured absolute row slot. */

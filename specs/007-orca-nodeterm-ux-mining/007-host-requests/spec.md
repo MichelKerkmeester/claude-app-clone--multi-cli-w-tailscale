@@ -180,6 +180,42 @@ the client own or edit mutable session truth (that is ❌, not a request).
   to be paired, because opening the wrong host from a notification is a cross-host leak; without the
   dismissal event a banner simply stays until dismissed locally, and the show-then-dismiss race guard
   ensures a late dismissal never produces a visible flash. Wire-compat: additive on both.
+- **REQ-014** — **Account usage windows** are requested, citing recs `UQ-1` through `UQ-8`. Shape: per-window
+  entries carrying used and remaining figures, a reset timestamp, a per-window availability state, and a
+  host-flagged `isActive`/`primary` marker naming WHICH window is currently gating — the client must not pick
+  the fullest bar and call it the limit, because the fullest window is frequently not the one that will stop
+  the next request. Also requested: a stale marker plus a grace signal after a rate-limited read, and a
+  documented poll cadence gated on a remote reader so the client cannot be the thing that exhausts the quota
+  it is displaying. Consuming phase: `008-uiux-features-mining/006-host-usage-search-review`. Fail-closed
+  fallback: with the payload absent the usage card and its detail sheet render nothing at all; a failed poll
+  keeps the last good value and marks it stale rather than showing a zero. Wire-compat: additive.
+- **REQ-015** — A **`sessions.search` RPC** is requested, citing rec `SH-1`. Shape: a query in, and out a
+  capped list of `{ sessionId, title, snippet, updatedAt }`, with the host owning the match and the snippet
+  so the client never scans transcripts it does not hold. Consuming phase:
+  `008-uiux-features-mining/006-host-usage-search-review`. Fail-closed fallback: the client half already
+  ships as a debounced harness with a two-character minimum that issues no query and returns no results
+  without the capability. Wire-compat: additive.
+- **REQ-016** — A **source-control review bundle** is requested, citing recs `CR-1` through `CR-9`. Shape, as
+  host-pre-resolved tokens the client only renders: a PR summary with a state pill, a worst-of rollup and a
+  comment count; a provider-neutral CLASSIFIED check summary plus per-check rows with host-supplied URLs;
+  a committed-on-branch changed-files list whose patches the client renders through its existing unified-diff
+  parser; commit history with per-commit files; `upstreamStatus` for ahead/behind and branch identity;
+  a conflict state that keeps provider-reported and locally-confirmed separate; and reviewer rows. The client
+  computes no verdict and mutates no repository state. Consuming phase:
+  `008-uiux-features-mining/006-host-usage-search-review`. Fail-closed fallback: every surface renders
+  nothing without its field; an UNKNOWN check classification renders muted-unresolved and never as passing;
+  an absent `upstreamStatus` shows no sync label rather than a guessed one. Wire-compat: additive.
+- **REQ-017** — **Host path resolution for prose file paths** is requested, citing rec `TE-3`. Shape: given a
+  path string appearing in model output, the host resolves it to a real artifact reference, or declines.
+  The client must never resolve a path itself and never walk a device filesystem. Consuming phase:
+  `008-uiux-features-mining/006-host-usage-search-review`. Fail-closed fallback: an unresolved path stays
+  INERT exactly as it renders today — no tap target and no navigation — which is what the sanitization
+  boundary already enforces. Wire-compat: additive.
+- **REQ-018** — A **branch/fork RPC returning a new resumable session** is requested, citing rec `MI-3`.
+  Shape: a request naming the session and the point to branch from, returning the host's own new session id.
+  Consuming phase: `008-uiux-features-mining/006-host-usage-search-review`. Fail-closed fallback: the branch
+  entry renders nothing until the RPC lands and never fabricates a session id or implies a branch was
+  created. Wire-compat: additive.
 <!-- /ANCHOR:requirements -->
 
 ---

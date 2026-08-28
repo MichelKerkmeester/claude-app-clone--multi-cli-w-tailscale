@@ -46,7 +46,7 @@ _memory:
 
 - [x] CHK-010 [P0] Code passes eslint/format checks [evidence: `npx eslint` exit 0 on every changed file]
 - [x] CHK-011 [P0] No console errors or warnings introduced [evidence: `npm run test:web` runs both suites clean: 108 files 760 passed, 77 files 749 passed]
-- [x] CHK-012 [P1] Every host-gated surface fails closed (renders nothing) with its field absent [evidence: an independent probe rendered all seven source-control surfaces with no host data and each produced empty output]
+- [x] CHK-012 [P1] Every host-gated surface fails closed (renders nothing) with its field absent [evidence: a probe rendered `pr-chip.svelte`, `check-summary.svelte`, `upstream-status.svelte`, `reviewer-list.svelte`, `commit-history.svelte`, `conflict-list.svelte` and `source-control-hub.svelte` with empty props and all 7 produced empty output; the usage sheet suite covers its absent-payload case]
 - [x] CHK-013 [P1] The client renders only host-pre-resolved tokens; no verdict, inference, or mutation [evidence: no verdict is computed: `check-summary.svelte` renders the host classification and `upstream-status.svelte` renders host `upstreamStatus` only]
 <!-- /ANCHOR:code-quality -->
 
@@ -98,7 +98,7 @@ _Acceptance criteria mapping._
 ## Documentation
 
 - [x] CHK-040 [P1] spec/plan/tasks synchronized; every blocked field cross-referenced to `../../007-host-requests/` [evidence: `spec.md`, `plan.md` and `tasks.md` cross-reference REQ-014 through REQ-018 in `../../007-host-requests/spec.md`]
-- [x] CHK-041 [P1] Code comments carry durable WHY only (no spec/finding ids in code) [evidence: a hygiene scan over every changed file in `app-mobile/src` and `app-mobile/tests` returned no spec paths or finding ids]
+- [x] CHK-041 [P1] Code comments carry durable WHY only (no spec/finding ids in code) [evidence: a hygiene scan over every changed file in `app-mobile/src` and `app-mobile/tests` returned no spec paths or finding ids, and commit `f2ea254` passed the pre-commit hygiene hook]
 <!-- /ANCHOR:docs -->
 
 ---

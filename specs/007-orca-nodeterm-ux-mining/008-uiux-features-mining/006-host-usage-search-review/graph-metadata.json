@@ -26,12 +26,13 @@
       "quota"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "tasks.md",
       "spec.md",
       "plan.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -59,9 +60,9 @@
         "source": "derived"
       },
       {
-        "name": "Authored Level",
-        "kind": "proper_noun",
-        "path": "spec.md",
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -90,6 +91,12 @@
       },
       {
         "name": "File Path",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Change Type",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
@@ -143,19 +150,19 @@
         "source": "derived"
       },
       {
-        "name": "phase-002 MA-1",
+        "name": "a",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "lazy",
+        "name": "literal",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "phase-003 NL-1",
+        "name": "no",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
@@ -171,31 +178,27 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Verification Protocol",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "Three high-value read-only surfaces are absent because the client has no field to render: a per-provider usage/quota view (am I about to hit a wall), a cross-session transcript search (which conversation was I discussing X in), and a per-session change-review hub (is the agent branch green and mergeable)",
     "created_at": "2026-08-27T17:00:58.956Z",
-    "last_save_at": "2026-08-27T19:20:21.893Z",
+    "last_save_at": "2026-08-28T14:52:46.525Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:1a69ca329ae88bfdfc71cb82cbbb068ac6b2a07906119fbf86d6889a2276bed6",
+    "source_fingerprint": "sha256:0c0b90b96195ee13c926e1117a4d71e5c1bbe513468f9d390b6d6e1e7dcb8b49",
     "source_doc_hashes": {
-      "spec.md": "bcecc963da45d220ce0f6eece0d73528414958c8517261d9709325a5e2668771",
+      "spec.md": "b0f1ef9c7b63172246434ec92227e15570230151b8d9af66456ffeeb2fc56320",
       "plan.md": "65d5a25bb2f20180302db448d781308335f2c3f6b5ba509d66ad6749fa52341c",
-      "tasks.md": "e99bceed1bbbae6985e00a4b57467c64eb0a9b88b0699c99521601b62a60fe26",
-      "checklist.md": "b51d942c0549d0635130c8107e1fa260bd84c9d843b43f04bdd689d26aa5f4a6"
+      "tasks.md": "2471aefe699fec37f92e893e58b2fafebcd3b5530264424ac29b797a08d27bfd",
+      "checklist.md": "0e181543db33301166da1f2efd49134d17bec4c05e6874629fe9c18345b908a7",
+      "implementation-summary.md": "ca280b47dde1678b51e08940b3a0af0e5743caf435aea9c10eeb8be9b857dfe4"
     },
     "last_active_child_id": null,
     "last_active_at": null

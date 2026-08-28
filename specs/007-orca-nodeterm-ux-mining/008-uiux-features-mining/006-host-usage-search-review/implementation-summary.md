@@ -28,7 +28,7 @@ _memory:
 | **Level** | 2 |
 | **Status** | Complete |
 | **Findings** | UQ-1..8, SH-1, CR-1..9, TE-3, MI-1, MI-3 (21) |
-| **Commits** | (this commit) |
+| **Commits** | `f2ea254` |
 | **Executors** | Six file-disjoint lanes in two waves: GPT-5.6 Luna at xhigh |
 <!-- /ANCHOR:metadata -->
 

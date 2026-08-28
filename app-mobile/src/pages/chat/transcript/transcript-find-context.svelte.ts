@@ -8,9 +8,10 @@ const FIND_CONTEXT_KEY = Symbol('transcript-find');
 
 export interface TranscriptFindContext {
   term: string;
+  open: boolean;
 }
 
-const EMPTY_FIND: TranscriptFindContext = { term: '' };
+const EMPTY_FIND: TranscriptFindContext = { term: '', open: false };
 
 export function setTranscriptFindContext(ctx: TranscriptFindContext): void {
   setContext(FIND_CONTEXT_KEY, ctx);

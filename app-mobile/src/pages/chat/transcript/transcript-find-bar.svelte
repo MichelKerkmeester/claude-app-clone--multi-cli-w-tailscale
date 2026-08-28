@@ -23,6 +23,7 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { hover, press, focusVisible } from '$shared/primitives/a11y/interactions.js';
+  import { getTranscriptFindContext } from './transcript-find-context.svelte.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
@@ -30,6 +31,8 @@
 
   let { query, cursor, snippet, onQueryChange, onNext, onPrev, onClose }: TranscriptFindBarProps =
     $props();
+  let inputEl = $state<HTMLInputElement | null>(null);
+  const findContext = getTranscriptFindContext();
 
   // ───────────────────────────────────────────────────────────────────
   // 3. HANDLERS
@@ -47,15 +50,29 @@
       else onNext();
     }
   }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. EFFECTS
+  // ───────────────────────────────────────────────────────────────────
+
+  // Wait for the browser to finish inserting the bar before raising the mobile keyboard.
+  $effect(() => {
+    const open = findContext.open;
+    const input = inputEl;
+    if (!open || input === null || typeof window === 'undefined') return;
+    const frame = window.requestAnimationFrame(() => input.focus({ preventScroll: true }));
+    return () => window.cancelAnimationFrame(frame);
+  });
 </script>
 
 <!-- section: find bar chrome -->
-<div class="transcript-find" role="search">
+<div class="transcript-find" data-tour-target="transcript-find-bar" role="search">
   <label class="transcript-find--label" for="transcript-find-input">Find in transcript</label>
   <input
     id="transcript-find-input"
     class="transcript-find--input"
     type="search"
+    bind:this={inputEl}
     value={query}
     autocomplete="off"
     spellcheck="false"

@@ -7,9 +7,9 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/004-a11y-onboarding"
     last_updated_at: "2026-08-27T18:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored Level-2 plan for the a11y and onboarding phase (AI + OS findings); no code."
+    recent_action: "Shipped all eleven accessibility and onboarding findings."
     next_safe_action: "Await operator go, then implement the two Wave-1 P0 quick-wins (AI-1, AI-2) first."
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -29,7 +29,7 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P0 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-27 |
 | **Findings owned** | AI-1, AI-2, AI-3, AI-4, OS-1, OS-2, OS-3, OS-4, OS-5, OS-6, OS-7 (11) |
 | **Constraint** | Host-authoritative, fail-closed. The client owns no editable session truth |

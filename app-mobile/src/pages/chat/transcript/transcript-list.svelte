@@ -130,7 +130,7 @@
   let findOpen = $state(false);
   let findQuery = $state('');
   let findMatchIndex = $state(0);
-  const findContext = $state({ term: '' });
+  const findContext = $state({ term: '', open: false });
   setTranscriptFindContext(findContext);
   const copyFeedback = useCopyFeedback();
   let menuOpen = $state(false);
@@ -184,12 +184,14 @@
 
   function openFind(): void {
     findOpen = true;
+    findContext.open = true;
   }
 
   function closeFind(): void {
     findOpen = false;
     findQuery = '';
     findMatchIndex = 0;
+    findContext.open = false;
     findContext.term = '';
   }
 
@@ -449,6 +451,7 @@
     untrack(() => {
       const cursor = createFindCursor(matches);
       findMatchIndex = cursor.matchIndex;
+      findContext.open = open;
       findContext.term = open ? query : '';
       if (open && cursor.matchCount > 0) {
         scrollFindMatch(cursor);

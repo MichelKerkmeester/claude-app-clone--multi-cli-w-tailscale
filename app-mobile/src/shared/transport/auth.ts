@@ -19,6 +19,10 @@ import {
 
 import { DEMO_IDENTITY, isDemoMode } from '../fixtures/demo.js';
 import { clearAuthRejectionStrikes } from './auth-rejection-latch.js';
+import {
+  completeDeviceCleanup,
+  enqueueDeviceCleanup,
+} from '../state/device-cleanup-queue.js';
 import { raceWithTimeout, RaceTimeoutError } from '../state/race-timeout.js';
 
 // ───────────────────────────────────────────────────────────────────
@@ -232,13 +236,28 @@ export async function establishSession(): Promise<ApplicationSession | null> {
 export async function revokeDevice(): Promise<void> {
   try {
     await postJson('/api/auth/revoke-device', undefined);
-  } finally {
-    await clearDevice();
+  } catch (cause) {
+    enqueueDeviceCleanup('revoke');
+    throw cause;
   }
+
+  try {
+    await clearDevice();
+  } catch (cause) {
+    enqueueDeviceCleanup('revoke');
+    throw cause;
+  }
+  completeDeviceCleanup('revoke');
 }
 
 export async function logoutDevice(): Promise<void> {
-  await postJson('/api/auth/logout', undefined);
+  try {
+    await postJson('/api/auth/logout', undefined);
+  } catch (cause) {
+    enqueueDeviceCleanup('logout');
+    throw cause;
+  }
+  completeDeviceCleanup('logout');
 }
 
 // ───────────────────────────────────────────────────────────────────

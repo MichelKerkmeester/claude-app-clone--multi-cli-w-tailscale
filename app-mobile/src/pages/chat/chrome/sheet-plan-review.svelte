@@ -69,7 +69,6 @@
 
   let sheetOpen = $state(false);
   let safeActionEl = $state<HTMLButtonElement | null>(null);
-  let sheetEl = $state<HTMLElement | null>(null);
   let swipeStart = $state<{ readonly x: number; readonly y: number } | null>(null);
 
   // ───────────────────────────────────────────────────────────────────
@@ -122,35 +121,6 @@
     restoreFocus();
   }
 
-  // Do not edit — The open effect (safe-action focus, back-button state + popstate, focusin containment) and swipe refs below are not designer-editable.
-  $effect(() => {
-    if (!isOpen) return;
-    const timer = window.setTimeout(() => safeActionEl?.focus({ preventScroll: true }), 0);
-    const previousState = window.history.state;
-    window.history.pushState(
-      { ...(previousState ?? {}), planReview: true },
-      '',
-      window.location.href,
-    );
-
-    const onPopState = () => dismissSafely();
-    // Keep on focus in focused on its single responsibility.
-    const onFocusIn = (event: FocusEvent) => {
-      const target = event.target;
-      if (target instanceof Node && !sheetEl?.contains(target)) dismissSafely();
-    };
-    window.addEventListener('popstate', onPopState);
-    document.addEventListener('focusin', onFocusIn);
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener('popstate', onPopState);
-      document.removeEventListener('focusin', onFocusIn);
-      if (window.history.state?.planReview === true) {
-        window.history.replaceState(previousState, '', window.location.href);
-      }
-    };
-  });
-
   // This state: swipe-dismiss — dragging the grabber/backdrop past the threshold closes the sheet.
   // Do not edit — The pointer/touch gesture handlers below are not designer-editable.
   function onPointerDown(event: PointerEvent): void {
@@ -190,16 +160,6 @@
   // 10. HELPERS
   // ───────────────────────────────────────────────────────────────────
 
-  // Keep attach sheet focused on its single responsibility.
-  function attachSheet(node: Element): () => void {
-    const el = node as HTMLElement;
-    const overlay = el.closest('.plan-review--overlay') as HTMLElement | null;
-    sheetEl = overlay ?? el;
-    return () => {
-      if (sheetEl === overlay || sheetEl === el) sheetEl = null;
-    };
-  }
-
   // Keep attach safe action focused on its single responsibility.
   function attachSafeAction(node: Element): () => void {
     const el = node as HTMLButtonElement;
@@ -213,7 +173,7 @@
 <!-- Component content -->
 <!-- Plan review sheet -->
 <!-- This surface: plan-review-sheet — modal review of the plan; the only atomic execute path. -->
-<!-- Do not edit — ModalOverlay/Modal/Dialog React-aria wiring, safe-focus restore, back-button (popstate) containment, focusin dismissal, and the touch/pointer swipe-dismiss gesture are not designer-editable. -->
+<!-- Do not edit — ModalOverlay/Modal/Dialog React-aria wiring, safe-focus restore, and the touch/pointer swipe-dismiss gesture are not designer-editable. -->
 {#if artifact !== null && artifact !== undefined && artifact.validity === 'valid'}
   <Sheet bind:open={sheetOpen} onOpenChange={onSheetOpenChange}>
     <!-- This slot: overlay — fixed scrim + centring. -->
@@ -232,7 +192,7 @@
       ontouchend={onTouchEnd}
     >
        <!-- This slot: modal — bottom-docked sheet + entry. Do not edit — Modal/Dialog React-aria wiring + swipe handlers. -->
-      <div class="plan-review--modal" {@attach attachSheet}>
+      <div class="plan-review--modal">
         <div class="plan-review--dialog">
           <!-- This slot: grabber — swipe-dismiss handle. -->
           <div class="plan-review--handle" aria-hidden="true"></div>

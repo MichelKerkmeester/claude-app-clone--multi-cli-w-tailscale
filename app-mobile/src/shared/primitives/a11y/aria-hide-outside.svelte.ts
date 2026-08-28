@@ -18,6 +18,10 @@ export interface SheetContext {
   readonly isOpen: () => boolean;
 }
 
+export interface SheetLayer {
+  readonly isOpen: () => boolean;
+}
+
 interface HideSession {
   readonly targets: readonly Element[];
 }
@@ -27,6 +31,8 @@ interface HideSession {
 // ───────────────────────────────────────────────────────────────────
 
 const activeSessions: HideSession[] = [];
+const activeSheetLayers: SheetLayer[] = [];
+const claimedSheetEvents = new WeakSet<Event>();
 const changedAttributes = new Map<Element, string | null>();
 let observer: MutationObserver | null = null;
 let observedBody: HTMLElement | null = null;
@@ -77,6 +83,47 @@ export function setSheetContext(isOpen: () => boolean): void {
 
 export function getSheetContext(): SheetContext | undefined {
   return getContext<SheetContext | undefined>(SHEET_CONTEXT);
+}
+
+export function registerSheetLayer(layer: SheetLayer): () => void {
+  activeSheetLayers.push(layer);
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    const index = activeSheetLayers.indexOf(layer);
+    if (index !== -1) activeSheetLayers.splice(index, 1);
+  };
+}
+
+export function isTopmostSheetLayer(layer: SheetLayer): boolean {
+  for (let index = activeSheetLayers.length - 1; index >= 0; index -= 1) {
+    const candidate = activeSheetLayers[index];
+    if (candidate?.isOpen() === true) return candidate === layer;
+  }
+  return false;
+}
+
+export function claimSheetEvent(event: Event): boolean {
+  if (claimedSheetEvents.has(event)) return false;
+  claimedSheetEvents.add(event);
+  return true;
+}
+
+export function isFocusInsideTopmostSheet(target: EventTarget | null): boolean {
+  if (
+    typeof document === 'undefined' ||
+    target === null ||
+    typeof Node === 'undefined' ||
+    !(target instanceof Node)
+  ) {
+    return false;
+  }
+
+  const dialogs = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-dialog-content][data-state="open"]'),
+  ).filter((dialog) => dialog.getAttribute('aria-hidden')?.toLowerCase() !== 'true');
+  return dialogs.at(-1)?.contains(target) ?? false;
 }
 
 // ───────────────────────────────────────────────────────────────────

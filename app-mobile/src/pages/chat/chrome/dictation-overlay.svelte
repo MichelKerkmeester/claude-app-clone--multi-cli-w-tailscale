@@ -531,6 +531,7 @@
 {#if isOpen}
   <div
     class="dictation-overlay"
+    data-tour-target="dictation-overlay"
     role="dialog"
     aria-label="Dictation"
     aria-describedby="dictation-status"

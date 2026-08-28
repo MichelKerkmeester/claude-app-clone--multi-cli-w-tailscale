@@ -19,8 +19,8 @@
     readonly device: DeviceIdentity | null;
     readonly hosts?: readonly string[];
     readonly onSelect: (sessionId: string) => void;
-    readonly onRevoke: () => void;
-    readonly onLogout: () => void;
+    readonly onRevoke: () => void | Promise<void>;
+    readonly onLogout: () => void | Promise<void>;
     readonly onRefresh?: () => Promise<void>;
   }
 </script>
@@ -58,6 +58,13 @@
     toggleFavoriteId,
     writeFavoriteIds,
   } from '$shared/state/favorite-preference.js';
+  import {
+    completeDeviceCleanup,
+    rehydrateDeviceCleanupQueue,
+    subscribeDeviceCleanupQueue,
+    type DeviceCleanupAction,
+  } from '$shared/state/device-cleanup-queue.js';
+  import { getSettingsRow } from '$shared/format/settings-search.js';
   import {
     markLastSeen,
     readLastSeenMap,
@@ -127,6 +134,12 @@
   let favoritePref = $state(readFavoritePreference());
   let selectedHost = $state('');
   let seenStore = $state<SeenStore>(readLastSeenMap());
+  let retryingCleanup = $state<DeviceCleanupAction | null>(null);
+  let cleanupRetryError = $state<{
+    readonly action: DeviceCleanupAction;
+    readonly message: string;
+  } | null>(null);
+  let cleanupQueue = $state(rehydrateDeviceCleanupQueue());
 
   // ───────────────────────────────────────────────────────────────────
   // 6. DERIVED STATE
@@ -185,6 +198,12 @@
   );
   const showHostPicker = $derived(hostChoices.length > 1);
   const newSessionLive = $derived(connection === 'live');
+  const cleanupRows = $derived(
+    cleanupQueue.pending.map((action) => ({
+      action,
+      row: getSettingsRow(action === 'revoke' ? 'revoke-device' : 'logout'),
+    })),
+  );
 
   // ───────────────────────────────────────────────────────────────────
   // 7. HELPERS
@@ -300,6 +319,42 @@
     writeFavoriteIds(ids);
   }
 
+  function cleanupHandler(action: DeviceCleanupAction): () => void | Promise<void> {
+    return action === 'revoke' ? onRevoke : onLogout;
+  }
+
+  function retryCleanup(action: DeviceCleanupAction): void {
+    if (retryingCleanup !== null) return;
+    cleanupRetryError = null;
+    retryingCleanup = action;
+    try {
+      const result = cleanupHandler(action)();
+      if (result === undefined) {
+        retryingCleanup = null;
+        return;
+      }
+      void result.then(
+        () => {
+          completeDeviceCleanup(action);
+          retryingCleanup = null;
+        },
+        (cause: unknown) => {
+          cleanupRetryError = {
+            action,
+            message: cause instanceof Error ? cause.message : 'The cleanup retry did not finish.',
+          };
+          retryingCleanup = null;
+        },
+      );
+    } catch (cause: unknown) {
+      cleanupRetryError = {
+        action,
+        message: cause instanceof Error ? cause.message : 'The cleanup retry did not finish.',
+      };
+      retryingCleanup = null;
+    }
+  }
+
   function handleNewSession(): void {
     if (!newSessionLive) return;
   }
@@ -353,7 +408,11 @@
   });
 
   onMount(() => {
+    const unsubscribeCleanupQueue = subscribeDeviceCleanupQueue((next) => {
+      cleanupQueue = next;
+    });
     return () => {
+      unsubscribeCleanupQueue();
       if (launchTimer !== null) clearTimeout(launchTimer);
     };
   });
@@ -701,10 +760,35 @@
     <span>
       {device === null ? 'Device key active' : `Host ${compactId(device.hostFingerprint)}`}
     </span>
-    <div>
-      <!-- Do not edit — device logout / revoke onPress handlers — Not designer-editable. -->
-      <Button onclick={onLogout}>Log out</Button>
-      <Button onclick={onRevoke}>Revoke this device</Button>
+    <div class="device-footer--controls">
+      {#if cleanupQueue.available}
+        {#each cleanupRows as cleanup (cleanup.action)}
+          <article class="device-cleanup--card" role="alert" data-cleanup-action={cleanup.action}>
+            <strong>{cleanup.row.title} unfinished</strong>
+            <span class="device-cleanup--detail">
+              {cleanup.action === 'revoke'
+                ? 'Device removal is unfinished.'
+                : 'Sign-out is unfinished.'}
+            </span>
+            <small>{cleanup.row.description}</small>
+            <Button
+              class="device-cleanup--retry"
+              disabled={retryingCleanup !== null}
+              onclick={() => retryCleanup(cleanup.action)}
+            >
+              Retry
+            </Button>
+            {#if cleanupRetryError?.action === cleanup.action}
+              <span class="device-cleanup--error" role="status">{cleanupRetryError.message}</span>
+            {/if}
+          </article>
+        {/each}
+      {/if}
+      <div class="device-footer--actions">
+        <!-- Do not edit — device logout / revoke onPress handlers — Not designer-editable. -->
+        <Button onclick={onLogout}>Log out</Button>
+        <Button onclick={onRevoke}>Revoke this device</Button>
+      </div>
     </div>
   </div>
   <PushSettings />
@@ -923,6 +1007,61 @@
   .device-footer > div {
     display: flex;
     gap: var(--space-2);
+  }
+
+  /* Keeps unfinished device actions visible beside the normal controls. */
+  .device-footer--controls {
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: end;
+  }
+
+  /* Keeps normal device actions grouped separately from recovery cards. */
+  .device-footer--actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  /* Makes an unconfirmed action explicit instead of presenting it as complete. */
+  .device-cleanup--card {
+    display: grid;
+    gap: var(--space-1);
+    min-width: min(100%, 15rem);
+    padding: var(--space-3);
+    border: 1px solid var(--danger);
+    border-radius: var(--radius-sm);
+    background: var(--danger-soft);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+  }
+
+  /* Keeps the unfinished action copy readable inside the recovery card. */
+  .device-cleanup--detail,
+  .device-cleanup--card small {
+    color: var(--ink-secondary);
+    line-height: 1.4;
+  }
+
+  /* Keeps retry touch-sized and visually distinct from the destructive action. */
+  :global(.device-cleanup--retry) {
+    min-height: 2.75rem;
+    justify-self: start;
+    padding-inline: var(--space-3);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Reports a failed retry without replacing the durable pending action. */
+  .device-cleanup--error {
+    color: var(--danger);
+    line-height: 1.4;
   }
 
   /* Keep this rule aligned with its surrounding surface. */

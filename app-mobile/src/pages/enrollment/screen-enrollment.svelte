@@ -9,15 +9,19 @@
   // ───────────────────────────────────────────────────────────────────
 
   import type { ConnectionPhase } from '$shared/state/state.js';
+  import type { OnboardingGate } from '$shared/state/onboarding-gates.js';
   import type { DeviceIdentity } from '$shared/transport/auth.js';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. TYPE DEFINITIONS
   // ───────────────────────────────────────────────────────────────────
 
+  export const FIRST_PAIR_TIMEOUT_MS = 25_000;
+
   export interface EnrollmentProps {
     readonly phase: ConnectionPhase;
     readonly onEnrolled: (device: DeviceIdentity) => void;
+    readonly onboardingGates?: readonly OnboardingGate[];
   }
 </script>
 
@@ -26,15 +30,27 @@
   // 3. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
+  import { onDestroy, onMount } from 'svelte';
   import { enrollDevice, establishSession, scanQrImage } from '$shared/transport/auth.js';
+  import {
+    appendConnectionEvent,
+    readConnectionLog,
+    type ConnectionLogCode,
+    type ConnectionLogEvent,
+  } from '$shared/transport/connection-log.js';
+  import {
+    DEFAULT_ONBOARDING_GATES,
+    readOnboardingGateState,
+  } from '$shared/state/onboarding-gates.js';
   import { messageFrom } from '$shared/format/view-helpers.js';
   import Button from '$shared/primitives/button/button.svelte';
+  import OnboardingWizard from './onboarding-wizard.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
-  let { phase, onEnrolled }: EnrollmentProps = $props();
+  let { phase, onEnrolled, onboardingGates = DEFAULT_ONBOARDING_GATES }: EnrollmentProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
   // 5. LOCAL STATE
@@ -43,28 +59,128 @@
   let qrData = $state('');
   let error = $state<string | null>(null);
   let busy = $state(false);
+  let connectionEvents = $state<readonly ConnectionLogEvent[]>(readConnectionLog());
+  let pairingGuidance = $state<string | null>(
+    readOnboardingGateState().decisions['pairing-guidance'] ?? null,
+  );
 
   // ───────────────────────────────────────────────────────────────────
-  // 6. HANDLERS
+  // 6. CONNECTION LOG
   // ───────────────────────────────────────────────────────────────────
 
-  // Keep submit focused on its single responsibility.
+  // Refresh the device-local log while this auth surface is visible.
+  function refreshConnectionEvents(): void {
+    connectionEvents = readConnectionLog();
+  }
+
+  // Keep connection codes understandable without reflecting free-form errors.
+  function connectionCode(cause: unknown): ConnectionLogCode {
+    return cause instanceof PairingTimeoutError ? 'timeout' : 'unknown';
+  }
+
+  function connectionStatusLabel(status: ConnectionLogEvent['status']): string {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  function connectionKindLabel(kind: ConnectionLogEvent['kind']): string {
+    return kind.charAt(0).toUpperCase() + kind.slice(1);
+  }
+
+  function connectionCodeLabel(code: ConnectionLogCode): string {
+    return code.replaceAll('-', ' ');
+  }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 7. HANDLERS
+  // ───────────────────────────────────────────────────────────────────
+
+  class PairingTimeoutError extends Error {
+    constructor() {
+      super('Pairing was not confirmed within 25 seconds.');
+      this.name = 'PairingTimeoutError';
+    }
+  }
+
   let abortController = new AbortController();
+  let pairingTimeoutId: number | null = null;
+  let pairingTimedOut = false;
+
+  // Keep session confirmation behind the timeout so a late response never reaches the shell.
+  async function enrollAndAuthenticate(serializedQr: string, signal: AbortSignal): Promise<DeviceIdentity> {
+    const identity = await enrollDevice(serializedQr, signal);
+    if (signal.aborted) throw new PairingTimeoutError();
+    const authenticated = await establishSession();
+    if (authenticated === null) throw new Error('Enrollment did not produce a device session.');
+    return identity;
+  }
+
+  // Keep submit focused on one confirmed enrollment attempt.
   const submit = () => {
+    if (busy) return;
     busy = true;
     error = null;
     abortController = new AbortController();
-    void enrollDevice(qrData.trim(), abortController.signal)
-      .then(async (identity) => {
-        const authenticated = await establishSession();
-        if (authenticated === null) throw new Error('Enrollment did not produce a device session.');
+    pairingTimedOut = false;
+    const attemptStartedAt = Date.now();
+    appendConnectionEvent({ kind: 'connection', status: 'started' });
+    refreshConnectionEvents();
+
+    const pairing = enrollAndAuthenticate(qrData.trim(), abortController.signal);
+    const timeout = new Promise<never>((_, reject) => {
+      pairingTimeoutId = window.setTimeout(() => {
+        pairingTimedOut = true;
+        abortController.abort();
+        reject(new PairingTimeoutError());
+      }, FIRST_PAIR_TIMEOUT_MS);
+    });
+
+    void Promise.race([pairing, timeout])
+      .then((identity) => {
+        appendConnectionEvent({
+          kind: 'connection',
+          status: 'succeeded',
+          durationMs: Date.now() - attemptStartedAt,
+        });
+        refreshConnectionEvents();
         onEnrolled(identity);
       })
       .catch((cause: unknown) => {
-        error = messageFrom(cause);
+        const failure = pairingTimedOut ? new PairingTimeoutError() : cause;
+        appendConnectionEvent({
+          kind: 'connection',
+          status: 'failed',
+          durationMs: Date.now() - attemptStartedAt,
+          code: connectionCode(failure),
+        });
+        error =
+          failure instanceof PairingTimeoutError
+            ? 'Pairing timed out after 25 seconds. Check the connection log and try again.'
+            : messageFrom(failure);
+        refreshConnectionEvents();
       })
-      .finally(() => (busy = false));
+      .finally(() => {
+        if (pairingTimeoutId !== null) {
+          window.clearTimeout(pairingTimeoutId);
+          pairingTimeoutId = null;
+        }
+        busy = false;
+      });
   };
+
+  function handleOnboardingDecision(gateId: string, decision: string): void {
+    if (gateId === 'pairing-guidance') pairingGuidance = decision;
+  }
+
+  onMount(() => {
+    refreshConnectionEvents();
+    const refreshTimer = window.setInterval(refreshConnectionEvents, 500);
+    return () => window.clearInterval(refreshTimer);
+  });
+
+  onDestroy(() => {
+    abortController.abort();
+    if (pairingTimeoutId !== null) window.clearTimeout(pairingTimeoutId);
+  });
 </script>
 
 <!-- Component content -->
@@ -73,6 +189,7 @@
 <!-- Do not edit — enrollment/auth wiring (enrollDevice · establishSession · scanQrImage · submit · onChange) — Not designer-editable. -->
 <main class="enrollment--view">
   <section class="enrollment--card">
+    <OnboardingWizard gates={onboardingGates} onDecision={handleOnboardingDecision} />
     <div class="surface--symbol" aria-hidden="true">
       π
     </div>
@@ -82,6 +199,12 @@
       Scan or paste the relay's short-lived QR data. This device creates its own key and starts
       in read-only mode.
     </p>
+    {#if pairingGuidance === 'guided'}
+      <p class="pairing--guidance" role="status">
+        Guided pairing: use a fresh QR code from the relay, then wait for this device session to be
+        confirmed.
+      </p>
+    {/if}
     <label for="qr-data">Enrollment data</label>
     <textarea
       id="qr-data"
@@ -112,11 +235,32 @@
       </Button>
     </div>
     {#if error !== null}
-      <div class="inline-alert">{error}</div>
+      <div class="inline-alert" role="alert">{error}</div>
     {/if}
     {#if phase === 'authenticating'}
       <div class="barrier-note">Checking this device</div>
     {/if}
+    <section class="connection--log" aria-labelledby="connection-log-heading">
+      <div>
+        <h2 id="connection-log-heading">Connection log</h2>
+        <p>Recent device-local connection events stay available while pairing is in progress.</p>
+      </div>
+      {#if connectionEvents.length === 0}
+        <p class="connection--empty">No connection events yet.</p>
+      {:else}
+        <ol aria-label="Recent connection events">
+          {#each connectionEvents as event, index (`${event.at}-${index}`)}
+            <li data-connection-event={`${event.kind}-${index}`}>
+              <span>{connectionKindLabel(event.kind)} · {connectionStatusLabel(event.status)}</span>
+              {#if event.code !== undefined}
+                <span>{connectionCodeLabel(event.code)}</span>
+              {/if}
+              <time datetime={event.at}>{event.at}</time>
+            </li>
+          {/each}
+        </ol>
+      {/if}
+    </section>
   </section>
 </main>
 
@@ -147,6 +291,75 @@
     border-radius: var(--radius-lg);
     background: var(--surface-raised);
     box-shadow: var(--shadow-raised);
+  }
+
+  /* Keeps the optional local pairing path visible without changing auth state. */
+  .pairing--guidance {
+    padding: var(--space-3) var(--space-4);
+    border-inline-start: 3px solid var(--accent);
+    background: var(--accent-soft);
+    color: var(--ink-secondary);
+    font-size: 0.82rem;
+  }
+
+  /* Keeps bounded local diagnostics readable while a pairing attempt is active. */
+  .connection--log {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--line);
+  }
+
+  /* Gives the diagnostics section a distinct heading without competing with enrollment. */
+  .connection--log h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 680;
+  }
+
+  /* Explains that the log is local evidence rather than a host status claim. */
+  .connection--log p {
+    margin: var(--space-1) 0 0;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+
+  /* Keeps a long reload-surviving log from pushing pairing controls away. */
+  .connection--log ol {
+    display: grid;
+    max-height: 12rem;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    list-style: none;
+  }
+
+  /* Presents status, safe code and timestamp as one scannable event. */
+  .connection--log li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 var(--space-3);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-secondary);
+    font-size: 0.75rem;
+  }
+
+  /* Keeps timestamps subordinate to the event status. */
+  .connection--log time {
+    grid-column: 1 / -1;
+    color: var(--ink-muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+  }
+
+  /* Makes an empty log explicit without implying a successful pairing. */
+  .connection--empty {
+    color: var(--ink-muted);
   }
 
   /* This slot: symbol — the π mark. */

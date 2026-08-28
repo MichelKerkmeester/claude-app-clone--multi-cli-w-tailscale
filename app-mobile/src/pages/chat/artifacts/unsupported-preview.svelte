@@ -3,23 +3,32 @@
   // MODULE: UNSUPPORTED PREVIEW
   // ───────────────────────────────────────────────────────────────────
 
+  import MediaPlayer from './media-player.svelte';
+  import { resolvePlayableMedia, type MediaPreviewInput } from './media-player.js';
+
   interface Props {
     renderer?: string;
     message?: string;
+    media?: MediaPreviewInput | null;
   }
 
-  let { renderer = 'this file type', message }: Props = $props();
+  let { renderer = 'this file type', message, media = null }: Props = $props();
+  const playableMedia = $derived(resolvePlayableMedia(media));
 </script>
 
 <!-- Component content -->
 <!-- Unsupported preview -->
 <!-- This surface: unsupported-preview — the unavailable/unsupported read notice. -->
 <!-- This state: unsupported · withheld · denied · missing · corrupt · too-large · … — the caller
-     passes the message; this renders the notice. -->
-<div class="artifact--unsupported-preview">
-  <strong>Preview unavailable</strong>
-  <p>{message ?? `${renderer} previews are not available in this reader.`}</p>
-</div>
+     passes explicit media bytes when a native player is allowed; otherwise this renders the notice. -->
+{#if playableMedia !== null}
+  <MediaPlayer source={playableMedia} />
+{:else}
+  <div class="artifact--unsupported-preview">
+    <strong>Preview unavailable</strong>
+    <p>{message ?? `${renderer} previews are not available in this reader.`}</p>
+  </div>
+{/if}
 
 <!-- Artifact unsupported preview -->
 <!-- This surface: artifact--unsupported-preview — the unavailable/unsupported read notice. Decomposed into this scoped block;

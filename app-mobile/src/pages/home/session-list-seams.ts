@@ -3,8 +3,8 @@
 // ───────────────────────────────────────────────────────────────────
 
 // Pure roster projections over SessionListState items plus a device-local
-// unread bit. Every function reads only existing DTO fields (id, status,
-// updatedAt, messageCount) and never writes status or invents host truth.
+// unread bit. Optional host fields are read only through explicit capability
+// gates; absent fields stay absent and no host truth is written or inferred.
 // A running-but-unread card is classified by its status first, so it is
 // never double-listed as unread.
 
@@ -16,6 +16,45 @@ import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
 import { compactId, timeBucket, type TimeBucket } from '../../shared/format/view-helpers.js';
 import type { ConnectionPhase, SessionListState } from '../../shared/state/state.js';
+
+export interface SessionCardHostFields {
+  readonly cacheExpiresAt?: string | number;
+  readonly tokenCount?: number;
+  readonly toolCallCount?: number;
+  readonly projectLabel?: string;
+}
+
+export type SessionCardInput = SessionCardDto & SessionCardHostFields;
+
+type CountField = 'tokenCount' | 'toolCallCount';
+
+type HostField = keyof SessionCardHostFields;
+
+function readOptionalHostField(item: SessionCardDto, key: HostField): unknown {
+  if (!Object.prototype.hasOwnProperty.call(item, key)) return undefined;
+  return Reflect.get(item, key);
+}
+
+/** Read a host expiry only when the host supplied a finite timestamp. */
+export function readCacheExpiresAt(item: SessionCardDto): number | null {
+  const value = readOptionalHostField(item, 'cacheExpiresAt');
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value !== 'string') return null;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+/** Read a non-negative integer count without turning a missing field into zero. */
+export function readHostCount(item: SessionCardDto, key: CountField): number | null {
+  const value = readOptionalHostField(item, key);
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : null;
+}
+
+/** Read a non-empty project label supplied by the host. */
+export function readProjectLabel(item: SessionCardDto): string | null {
+  const value = readOptionalHostField(item, 'projectLabel');
+  return typeof value === 'string' && value.trim().length > 0 ? value : null;
+}
 
 export type { TimeBucket };
 export { timeBucket };
@@ -618,4 +657,49 @@ export function organize(
   }));
   const smartItems = sortBySmart(filtered, input.now);
   return { items: filtered, smartItems, timeSections, statusSections };
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 9. PROJECT GROUPING
+// ───────────────────────────────────────────────────────────────────
+
+/** Enable project grouping only when every visible row has a usable host label. */
+export function projectGroupingAvailable(items: readonly SessionCardDto[]): boolean {
+  return items.length > 0 && items.every((item) => readProjectLabel(item) !== null);
+}
+
+export interface ProjectListSection {
+  readonly key: string;
+  readonly label: string;
+  readonly count: number;
+  readonly items: readonly SessionCardDto[];
+  readonly active: boolean;
+}
+
+/** Select the host-labeled project that contains the first running session. */
+export function activeProjectLabel(items: readonly SessionCardDto[]): string | null {
+  const activeItem = items.find((item) => item.status === 'running') ?? items[0];
+  return activeItem === undefined ? null : readProjectLabel(activeItem);
+}
+
+/** Group the current display order while keeping the active project stable across filters. */
+export function buildProjectSections(
+  items: readonly SessionCardDto[],
+  activeLabel: string | null = activeProjectLabel(items),
+): readonly ProjectListSection[] {
+  const groups = new Map<string, SessionCardDto[]>();
+  for (const item of items) {
+    const label = readProjectLabel(item);
+    if (label === null) continue;
+    const group = groups.get(label);
+    if (group === undefined) groups.set(label, [item]);
+    else group.push(item);
+  }
+  return [...groups.entries()].map(([label, group]) => ({
+    key: `project:${label}`,
+    label,
+    count: group.length,
+    items: group,
+    active: label === activeLabel,
+  }));
 }

@@ -7,11 +7,11 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/007-host-liveactivity-fields"
     last_updated_at: "2026-08-27T18:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored Level-2 plan for the Live-Activity and host DTO-field phase; no code."
+    recent_action: "Shipped five ready-now findings wired into the card; eight ship inert."
     next_safe_action: "Await operator go, then build the five ready-now Live-Activity pure modules first."
     blockers:
       - "LA-4, LA-6, CI-3, MA-3, SC-1, SC-3 (counts), SP-3, HP-6 are host-gated; each needs a relay-authored, client-read-only field or RPC before its render unblocks."
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -31,7 +31,7 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P1 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-27 |
 | **Findings owned** | LA-1, LA-2, LA-3, LA-4, LA-5, LA-6, LA-7, CI-3, MA-3, SC-1, SC-3, SP-3, HP-6 (13) |
 | **Constraint** | Host-authoritative, fail-closed; the client owns no editable session truth |

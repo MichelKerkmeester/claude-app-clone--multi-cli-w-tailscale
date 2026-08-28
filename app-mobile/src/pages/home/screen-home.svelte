@@ -93,15 +93,19 @@
   import UsageSheet from './usage-sheet.svelte';
   import CardSession from './card-session.svelte';
   import {
+    activeProjectLabel,
+    buildProjectSections,
     dedupSessions,
     deriveListState,
     forceExpandSections,
     hostAttentionPresent,
     organize,
+    projectGroupingAvailable,
     searchMatchKind,
     sortByRecency,
     STATUS_SECTION_LABELS,
     TIME_SECTION_LABELS,
+    type ProjectListSection,
     type StatusFilter,
   } from './session-list-seams.js';
 
@@ -145,6 +149,8 @@
   let statusFilter = $state<StatusFilter | null>(null);
   let searchQuery = $state('');
   let collapsedSections = new SvelteSet<string>();
+  let collapsedProjectSections = new SvelteSet<string>();
+  let expandedProjectSections = new SvelteSet<string>();
   let favoritePref = $state(readFavoritePreference());
   let selectedHost = $state('');
   let seenStore = $state<SeenStore>(readLastSeenMap());
@@ -201,6 +207,21 @@
   const statusSections = $derived(organized.statusSections);
   const timeSections = $derived(organized.timeSections);
   const smartItems = $derived(organized.smartItems);
+  const projectDisplayItems = $derived(
+    grouping === 'status'
+      ? statusSections.flatMap((section) => section.items)
+      : grouping === 'smart'
+        ? smartItems
+        : timeSections.flatMap((section) => section.items),
+  );
+  const projectActiveLabel = $derived(
+    projectGroupingAvailable(rosterItems) ? activeProjectLabel(rosterItems) : null,
+  );
+  const projectSections = $derived(
+    projectGroupingAvailable(organized.items)
+      ? buildProjectSections(projectDisplayItems, projectActiveLabel)
+      : null,
+  );
   const filteringActive = $derived(statusFilter !== null || searchQuery.trim().length > 0);
   const catalogEmpty = $derived(resumeLive === null && listView.items.length === 0);
   const noMatchEmpty = $derived(
@@ -325,6 +346,37 @@
     if (section.open) next.delete(key);
     else next.add(key);
     collapsedSections = next;
+  }
+
+  function projectSectionIsOpen(section: ProjectListSection): boolean {
+    const defaultOpen = section.active;
+    const open = collapsedProjectSections.has(section.key)
+      ? false
+      : expandedProjectSections.has(section.key) || defaultOpen;
+    return forceExpandSections(
+      [{ key: section.key, collapsible: true, open }],
+      filteringActive,
+    )[0]?.open ?? open;
+  }
+
+  function handleProjectSectionToggle(event: Event, key: string): void {
+    const section = event.currentTarget;
+    if (!(section instanceof HTMLDetailsElement)) return;
+    if (filteringActive) {
+      section.open = true;
+      return;
+    }
+    const nextCollapsed = new SvelteSet(collapsedProjectSections);
+    const nextExpanded = new SvelteSet(expandedProjectSections);
+    if (section.open) {
+      nextExpanded.delete(key);
+      nextCollapsed.add(key);
+    } else {
+      nextCollapsed.delete(key);
+      nextExpanded.add(key);
+    }
+    collapsedProjectSections = nextCollapsed;
+    expandedProjectSections = nextExpanded;
   }
 
   function previewMatch(item: SessionCardDto): boolean {
@@ -668,6 +720,61 @@
           error={null}
           noMatch={true}
         />
+      {:else if projectSections !== null}
+        {#each projectSections as section (section.key)}
+          <details
+            class="project--section"
+            data-project-section={section.label}
+            data-project-active={section.active ? 'true' : 'false'}
+            aria-labelledby={`project-heading-${section.label}`}
+            open={projectSectionIsOpen(section)}
+            ontoggle={(event) => handleProjectSectionToggle(event, section.key)}
+          >
+            <summary class="project--heading">
+              <h3 id={`project-heading-${section.label}`}>
+                {section.label}
+                <span data-project-count={section.label}>{section.count}</span>
+              </h3>
+            </summary>
+            <div class="session--grid" role="list">
+              {#each section.items as item (item.id)}
+                {#if shouldRenderCard(item)}
+                  <div role="listitem" class="roster--row">
+                    <CardSession
+                      sessionId={item.id}
+                      {selectSession}
+                      source={sessions.source}
+                      unread={cardUnread(item)}
+                      {launchingId}
+                      openDisabled={listOpenDisabled}
+                      onOpen={handleOpen}
+                      {selectLastSeen}
+                      seenAvailable={seenStore.available}
+                      {unreadIds}
+                      {density}
+                      {signalVisibility}
+                      onDensityChange={setDensity}
+                      onSignalToggle={toggleSignal}
+                    />
+                    <Button
+                      class="roster--favorite"
+                      data-favorite-id={item.id}
+                      aria-pressed={favoritePref.ids.has(item.id)}
+                      aria-label="Pin session"
+                      disabled={!favoritePref.available}
+                      onclick={() => toggleFavorite(item.id)}
+                    >
+                      Pin
+                    </Button>
+                    {#if previewMatch(item)}
+                      <span class="roster--match-label" data-search-match="preview">Matched in preview</span>
+                    {/if}
+                  </div>
+                {/if}
+              {/each}
+            </div>
+          </details>
+        {/each}
       {:else if grouping === 'status'}
         {#each statusSections as section (section.bucket)}
           <details
@@ -1277,14 +1384,16 @@
   ─────────────────────────────────────────────────────────────────── */
   /* Always-present section so empty buckets do not jump the list. */
   .status--section,
-  .smart--section {
+  .smart--section,
+  .project--section {
     margin-bottom: var(--space-6);
   }
 
   /* Disclosure headers keep section counts available without hiding active hits. */
   .status--heading,
   .time--heading,
-  .smart--heading {
+  .smart--heading,
+  .project--heading {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -1301,14 +1410,16 @@
   /* Keep the native disclosure marker from competing with the section label. */
   .status--heading::-webkit-details-marker,
   .time--heading::-webkit-details-marker,
-  .smart--heading::-webkit-details-marker {
+  .smart--heading::-webkit-details-marker,
+  .project--heading::-webkit-details-marker {
     display: none;
   }
 
   /* Preserve heading semantics inside the disclosure trigger. */
   .status--heading h3,
   .time--heading h3,
-  .smart--heading h3 {
+  .smart--heading h3,
+  .project--heading h3 {
     display: flex;
     width: 100%;
     align-items: baseline;

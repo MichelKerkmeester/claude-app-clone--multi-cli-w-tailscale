@@ -63,6 +63,8 @@
     readonly mediaCapability?: Pick<RuntimeMediaCapabilityDto, 'enabled' | 'imageIn'> | null;
     /** Host-created fresh-chat opener; absent until the relay supports this flow. */
     readonly transcriptQuoteCapability?: TranscriptQuoteCapability | null;
+    /** Host-parked launch draft; absent until the relay exposes this capability. */
+    readonly launchDraft?: string | null;
     readonly onAttachmentSubmitted?: () => void;
   }
 
@@ -94,6 +96,7 @@
   import { getAttachmentDraft } from '../attachments/attachment-draft-provider.svelte';
   import { capabilityAllowsPhotos } from '../attachments/attachment-state.js';
   import { useAttachmentSubmission } from '../attachments/use-attachment-submission.svelte.js';
+  import { adoptLaunchDraft } from '$shared/commands/adopt-launch-draft.js';
   import { rankHostCommands } from '$shared/commands/rank-host-commands.js';
   import { bindingFor } from '$shared/commands/commands.js';
   import { insertSlashCommand } from '$shared/commands/insert-slash-command.js';
@@ -149,6 +152,7 @@
     onOpenModelEffort = undefined,
     mediaCapability = null,
     transcriptQuoteCapability = null,
+    launchDraft = null,
     onAttachmentSubmitted,
   }: SessionComposerProps = $props();
 
@@ -164,6 +168,7 @@
   // Non-DOM refs: plain closure variables, never reactive.
   let pendingCaretRef: number | null = null;
   let capturedDraftBeforeSend: string | null = null;
+  const handledLaunchDraftSessions: Record<string, true> = Object.create(null);
 
   let announcement = $state('');
   // Selection/caret facts for the slash trigger; textarea remains the only editor.
@@ -385,6 +390,20 @@
     updateTranscriptSelection();
     document.addEventListener('selectionchange', updateTranscriptSelection);
     return () => document.removeEventListener('selectionchange', updateTranscriptSelection);
+  });
+
+  // Adopt a host draft only once per session and never over live typing.
+  $effect(() => {
+    const sid = sessionId;
+    const result = adoptLaunchDraft({
+      sessionId: sid,
+      launchDraft,
+      currentDraft: untrack(() => prompt),
+      alreadyHandled: sid !== undefined && handledLaunchDraftSessions[sid] === true,
+    });
+    if (!result.handled || sid === undefined) return;
+    handledLaunchDraftSessions[sid] = true;
+    if (result.adopted) untrack(() => setPrompt(() => result.draft));
   });
 
   // Draft recovery (sessionStorage); media bytes are never placed in storage.

@@ -4,16 +4,39 @@
   // MODULE: SESSION CARD
   // ───────────────────────────────────────────────────────────────────
 
-  import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
   import type {
     CardDensity,
     SignalKey,
     SignalVisibility,
   } from '$shared/format/roster-view-preference.js';
+  import type {
+    LiveActivityCandidate,
+    LiveActivityEvent,
+  } from '$shared/format/live-activity-arbitration.js';
+  import type { SessionCardInput } from './session-list-seams.js';
+
+  export interface LiveActivityCardInput {
+    readonly candidates: readonly LiveActivityCandidate[];
+    readonly event?: LiveActivityEvent;
+  }
+
+  export const COUNTDOWN_MINUTE_MS = 60_000;
+
+  export function nextMinuteBoundaryDelay(now: number): number {
+    const remainder = ((now % COUNTDOWN_MINUTE_MS) + COUNTDOWN_MINUTE_MS) % COUNTDOWN_MINUTE_MS;
+    return remainder === 0 ? COUNTDOWN_MINUTE_MS : COUNTDOWN_MINUTE_MS - remainder;
+  }
+
+  export function formatCountdown(expiresAt: number, now: number): string {
+    const remainingSeconds = Math.max(0, Math.ceil((expiresAt - now) / 1_000));
+    const minutes = Math.floor(remainingSeconds / 60);
+    const seconds = remainingSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
 
   export interface SessionCardProps {
     readonly sessionId: string;
-    readonly selectSession: (id: string) => SessionCardDto | undefined;
+    readonly selectSession: (id: string) => SessionCardInput | undefined;
     readonly source: 'none' | 'cache' | 'relay';
     readonly unread: boolean;
     readonly unreadIds?: ReadonlySet<string>;
@@ -26,6 +49,7 @@
     readonly onOpen: (event: MouseEvent, sessionId: string) => void;
     readonly selectLastSeen?: (id: string) => string | undefined;
     readonly seenAvailable?: boolean;
+    readonly liveActivity?: LiveActivityCardInput;
   }
 </script>
 
@@ -34,6 +58,16 @@
   // 1. IMPORTS
   // ───────────────────────────────────────────────────────────────────
 
+  import { untrack } from 'svelte';
+  import type { LiveActivityContentInput } from '$shared/format/live-activity-content.js';
+  import {
+    arbitrateLiveActivity,
+    selectLiveActivity,
+    type LiveActivitySelection,
+  } from '$shared/format/live-activity-arbitration.js';
+  import { resolveLiveActivityContent } from '$shared/format/live-activity-content.js';
+  import { resolveLiveActivityStaleness } from '$shared/state/live-activity-staleness.js';
+  import { createLatchedDismiss } from '$shared/state/latched-dismiss.js';
   import { sessionStatusLabel, relativeTimeAt } from '$shared/format/view-helpers.js';
   import {
     decideStalePresentation,
@@ -43,6 +77,7 @@
   } from '$shared/format/card-projection.js';
   import { changedSinceLooked } from '$shared/format/seen-marker.js';
   import { reconnectVerdict } from '$shared/state/reconcile-seams.js';
+  import { readCacheExpiresAt, readHostCount } from './session-list-seams.js';
   import Button from '$shared/primitives/button/button.svelte';
   import SessionStateIcon, { toolGlyphFor } from '$shared/chrome/session-state-icon.svelte';
 
@@ -71,6 +106,7 @@
     onOpen,
     selectLastSeen = () => undefined,
     seenAvailable = true,
+    liveActivity,
   }: SessionCardProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
@@ -157,6 +193,15 @@
     signalVisibility.context &&
       (density === 'detailed' || COMPACT_SIGNAL_KEYS.includes('context')),
   );
+  let cacheClock = $state(Date.now());
+  const cacheExpiresAt = $derived(session === undefined ? null : readCacheExpiresAt(session));
+  const cacheCountdown = $derived(
+    cacheExpiresAt === null ? null : formatCountdown(cacheExpiresAt, cacheClock),
+  );
+  const tokenCount = $derived(session === undefined ? null : readHostCount(session, 'tokenCount'));
+  const toolCallCount = $derived(
+    session === undefined ? null : readHostCount(session, 'toolCallCount'),
+  );
   const toolGlyph = $derived.by(() => {
     if (session === undefined || session.status !== 'running' || projection === null || projection.tool === null) return null;
     return toolGlyphFor(projection.tool);
@@ -173,6 +218,121 @@
     return projection.activity ?? projection.tool;
   });
 
+  let liveActivitySelection = $state<LiveActivitySelection | null>(null);
+  let liveActivityDismissVersion = $state(0);
+  let liveActivityClock = $state(Date.now());
+  const liveActivityDismiss = createLatchedDismiss<string>();
+
+  $effect(() => {
+    const capability = liveActivity;
+    if (capability === undefined) {
+      untrack(() => {
+        liveActivitySelection = null;
+      });
+      return;
+    }
+
+    const candidates = capability.candidates;
+    const event = capability.event;
+    const unreadIdsForActivity = localUnreadIds;
+    const current = untrack(() => liveActivitySelection);
+    const next = untrack(() => {
+      if (current === null) return selectLiveActivity(candidates, unreadIdsForActivity);
+      if (event === undefined) return current;
+      return arbitrateLiveActivity({
+        current,
+        event,
+        localUnreadIds: unreadIdsForActivity,
+        sessions: candidates,
+      });
+    });
+    untrack(() => {
+      liveActivitySelection = next;
+    });
+  });
+
+  const liveActivityForCard = $derived(
+    session !== undefined &&
+      liveActivitySelection !== null &&
+      liveActivitySelection.session.id === session.id
+      ? liveActivitySelection
+      : null,
+  );
+  const liveActivityContentInput = $derived.by((): LiveActivityContentInput | null => {
+    const selected = liveActivityForCard;
+    if (selected === null) return null;
+    const selectedProjection = projectSessionCard(selected.session, localUnreadIds);
+    return {
+      ...(selectedProjection.prompt === null ? {} : { prompt: selectedProjection.prompt }),
+      ...(selectedProjection.activity === null ? {} : { activity: selectedProjection.activity }),
+      state: sessionStatusLabel(selected.session.status),
+    };
+  });
+  const liveActivityLine = $derived(
+    liveActivityContentInput === null
+      ? undefined
+      : resolveLiveActivityContent(liveActivityContentInput),
+  );
+  const liveActivityStateKey = $derived.by(() => {
+    const selected = liveActivityForCard;
+    if (selected === null || liveActivityLine === undefined) return null;
+    return JSON.stringify({
+      id: selected.session.id,
+      status: selected.session.status,
+      updatedAt: selected.session.updatedAt,
+      badge: selected.badge?.kind ?? null,
+      content: liveActivityLine,
+    });
+  });
+  const liveActivityVisible = $derived.by(() => {
+    void liveActivityDismissVersion;
+    const stateKey = liveActivityStateKey;
+    return stateKey !== null && liveActivityDismiss.isVisible(stateKey);
+  });
+  const liveActivityStaleness = $derived.by(() => {
+    const selected = liveActivityForCard;
+    if (selected === null) return { isStale: false, delayMs: 0 };
+    return resolveLiveActivityStaleness({
+      updatedAt: selected.session.updatedAt,
+      now: liveActivityClock,
+    });
+  });
+  const liveActivityStale = $derived(liveActivityStaleness.isStale);
+
+  $effect(() => {
+    const selected = liveActivityForCard;
+    const staleness = liveActivityStaleness;
+    if (selected === null || staleness.isStale || staleness.delayMs <= 0) return;
+
+    const timer = setTimeout(() => {
+      untrack(() => {
+        liveActivityClock = Date.now();
+      });
+    }, staleness.delayMs);
+    return () => clearTimeout(timer);
+  });
+
+  // The minute boundary is enough precision for an expiry chip and avoids a
+  // render loop for every card once per second.
+  $effect(() => {
+    const expiresAt = cacheExpiresAt;
+    if (expiresAt === null || expiresAt <= Date.now()) return;
+
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const tick = (): void => {
+      untrack(() => {
+        cacheClock = Date.now();
+      });
+      if (expiresAt > Date.now()) {
+        timer = setTimeout(tick, nextMinuteBoundaryDelay(Date.now()));
+      }
+    };
+    timer = setTimeout(tick, nextMinuteBoundaryDelay(Date.now()));
+    return () => {
+      if (timer !== null) clearTimeout(timer);
+    };
+  });
+
   let showAbsolute = $state(false);
 
   function handleCardClick(event: MouseEvent): void {
@@ -181,6 +341,15 @@
       return;
     }
     onOpen(event, sessionId);
+  }
+
+  function handleLiveActivityDismiss(event: MouseEvent | KeyboardEvent): void {
+    event.stopPropagation();
+    event.preventDefault();
+    const stateKey = liveActivityStateKey;
+    if (stateKey === null) return;
+    liveActivityDismiss.dismiss(stateKey);
+    liveActivityDismissVersion += 1;
   }
 </script>
 
@@ -197,6 +366,8 @@
     data-hue={String(hue)}
     data-unread={showUnread ? 'true' : undefined}
     data-reconnect={reconnectLook === 'stale-running' ? 'stale-running' : undefined}
+    data-live-activity={liveActivityForCard !== null ? 'true' : undefined}
+    data-live-stale={liveActivityStale ? 'true' : undefined}
     disabled={openDisabled}
     aria-busy={isLaunching ? 'true' : undefined}
     onclick={handleCardClick}
@@ -240,6 +411,31 @@
       {/if}
     </span>
     <strong>{projection.title}</strong>
+    {#if liveActivityForCard !== null && liveActivityLine !== undefined && liveActivityVisible}
+      <span
+        class="session--live-activity"
+        data-live-activity="true"
+        data-live-activity-session-id={liveActivityForCard.session.id}
+        data-live-stale={liveActivityStale ? 'true' : undefined}
+      >
+        <span class="session--live-content" data-live-activity-content="true">{liveActivityLine}</span>
+        {#if liveActivityForCard.badge !== null}
+          <span
+            class="session--live-badge"
+            data-live-activity-badge={liveActivityForCard.badge.kind}
+          >{liveActivityForCard.badge.label}</span>
+        {/if}
+        <span
+          class="session--live-dismiss"
+          data-live-dismiss="true"
+          role="button"
+          tabindex="0"
+          aria-label="Dismiss live activity"
+          onclick={handleLiveActivityDismiss}
+          onkeydown={(event) => handleControlKeydown(event, () => handleLiveActivityDismiss(event))}
+        >Dismiss</span>
+      </span>
+    {/if}
     {#if showInlineDetail}
       <span class="session--detail-controls" data-detail-controls="true">
         <span class="session--density-controls" role="group" aria-label="Card density">
@@ -339,6 +535,22 @@
       <time datetime={session.updatedAt}>
         {showAbsolute ? projection.absoluteOnTap : timeLabel}
       </time>
+      {#if cacheCountdown !== null}
+        <span
+          class="session--metric session--cache"
+          data-cache-countdown="true"
+          role="status"
+          aria-label={`Cache expires in ${cacheCountdown}`}
+        >{cacheCountdown}</span>
+      {/if}
+      {#if tokenCount !== null}
+        <span class="session--metric" data-token-count="true">{tokenCount} tokens</span>
+      {/if}
+      {#if toolCallCount !== null}
+        <span class="session--metric" data-tool-call-count="true">
+          {toolCallCount} tool call{toolCallCount === 1 ? '' : 's'}
+        </span>
+      {/if}
     </span>
     <span class="open-arrow" aria-hidden="true">
       {#if isLaunching}
@@ -377,6 +589,17 @@
     color: var(--ink-muted);
     font-size: 0.73rem;
     font-weight: 550;
+  }
+
+  /* Optional host metrics sit beside the elapsed clock without changing it. */
+  .session--metric {
+    white-space: nowrap;
+  }
+
+  /* The cache chip makes a host-provided expiry visible without implying cache ownership. */
+  .session--cache {
+    color: var(--accent-ink);
+    font-weight: 700;
   }
 
   /* Keep this rule aligned with its surrounding surface. */
@@ -537,6 +760,52 @@
     line-height: 1;
   }
 
+  /* The glanceable line stays close to the title without changing card navigation. */
+  .session--live-activity {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--ink-secondary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  /* Content remains readable when a host line contains a long token or path. */
+  .session--live-content {
+    overflow-wrap: anywhere;
+  }
+
+  /* The shared badge keeps arbitration demand visible beside the content line. */
+  .session--live-badge {
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: var(--danger-soft);
+    color: var(--danger);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* Dismissal stays a keyboard and touch-sized local control inside the card. */
+  .session--live-dismiss {
+    min-block-size: 2.75rem;
+    padding: 0.7rem 0.55rem;
+    color: var(--accent-ink);
+    cursor: pointer;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  /* Keyboard users need a visible focus indication for the local dismiss action. */
+  .session--live-dismiss:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
   /* Enriched host lines stay in-flow so a tap still means Open. */
   .session--detail {
     display: flex;
@@ -586,6 +855,11 @@
     height: 100%;
     background: var(--accent);
     content: '';
+  }
+
+  /* A quiet live activity recedes without changing the host-owned session status. */
+  :global(.session--card[data-live-stale='true']) {
+    opacity: 0.64;
   }
 
   /* A lost running agent stays visibly unresolved without rewriting status. */

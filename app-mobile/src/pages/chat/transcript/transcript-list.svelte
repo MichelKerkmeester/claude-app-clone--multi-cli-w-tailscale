@@ -14,6 +14,14 @@
     hasStreamingTokens,
   } from '$shared/state/streaming-derivations.js';
 
+  export type TranscriptEndReason = 'done' | 'cancelled' | 'failed' | 'interrupted';
+
+  export interface TranscriptActivityEntry {
+    readonly id: string;
+    readonly label: string;
+    readonly detail?: string;
+  }
+
   export interface TranscriptListProps {
     readonly sessionId?: string;
     readonly blocks: readonly DisplayTranscriptBlock[];
@@ -24,6 +32,8 @@
     readonly onRefreshTodos?: () => void;
     readonly onClearTodoAnnouncement?: () => void;
     readonly onElapsedLabelChange?: (label: string | null) => void;
+    readonly endReason?: TranscriptEndReason;
+    readonly subagentActivity?: readonly TranscriptActivityEntry[];
   }
 
   // ───────────────────────────────────────────────────────────────────
@@ -111,6 +121,8 @@
     onRefreshTodos,
     onClearTodoAnnouncement,
     onElapsedLabelChange,
+    endReason,
+    subagentActivity,
   }: TranscriptListProps = $props();
 
   const tokensPresent = $derived(hasStreamingTokens(blocks, running));
@@ -628,6 +640,27 @@
           </div>
         {/if}
       </div>
+      {#if endReason === 'done'}
+        <div class="transcript--done" data-transcript-done="true" role="status">
+          <span aria-hidden="true">✓</span>
+          <span>Done</span>
+        </div>
+      {/if}
+      {#if subagentActivity !== undefined && subagentActivity.length > 0}
+        <details class="transcript--activity-tail" data-transcript-activity-tail="true">
+          <summary>Subagent activity ({subagentActivity.length})</summary>
+          <ul class="transcript--activity-list">
+            {#each subagentActivity as entry (entry.id)}
+              <li class="transcript--activity-item">
+                <span>{entry.label}</span>
+                {#if entry.detail !== undefined}
+                  <p>{entry.detail}</p>
+                {/if}
+              </li>
+            {/each}
+          </ul>
+        </details>
+      {/if}
     </div>
     <!-- This state: not-live-edge — This slot: scroll--to-latest pill + count badge. -->
     {#if !atLiveEdge}
@@ -695,6 +728,71 @@
   /* The rail stays absent; turn boundaries provide conversation hierarchy. */
   .transcript--frame::before {
     content: none;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     2. GATED TRANSCRIPT DETAILS
+  ─────────────────────────────────────────────────────────────────── */
+  /* Separates a host-confirmed completion from ordinary transcript copy. */
+  .transcript--done {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-block: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-muted);
+    color: var(--ink-secondary);
+    font-size: 0.85rem;
+    font-weight: 650;
+  }
+
+  /* Keeps the completion glyph supplementary to its text label. */
+  .transcript--done > span:first-child {
+    color: var(--accent-ink);
+    font-size: 1rem;
+  }
+
+  /* Gives the activity disclosure a visible boundary without implying it is always populated. */
+  .transcript--activity-tail {
+    margin-block: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-muted);
+  }
+
+  /* Keeps the native disclosure target large enough for touch and keyboard use. */
+  .transcript--activity-tail summary {
+    display: flex;
+    align-items: center;
+    min-block-size: 44px;
+    padding: var(--space-2) var(--space-3);
+    color: var(--ink-secondary);
+    font-size: 0.85rem;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  /* Adds space for the activity entries only after the disclosure is opened. */
+  .transcript--activity-list {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0 var(--space-3) var(--space-3) calc(var(--space-3) + 1.25rem);
+    color: var(--ink-secondary);
+    font-size: 0.8rem;
+  }
+
+  /* Keeps each activity entry readable as a separate host-provided item. */
+  .transcript--activity-item {
+    padding-top: var(--space-2);
+  }
+
+  /* De-emphasizes optional activity detail while preserving its readable contrast. */
+  .transcript--activity-item p {
+    margin: var(--space-1) 0 0;
+    color: var(--ink-muted);
   }
 
   .transcript--find-toggle,

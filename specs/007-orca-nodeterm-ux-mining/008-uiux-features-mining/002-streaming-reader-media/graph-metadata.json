@@ -26,12 +26,13 @@
       "reader"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "tasks.md",
       "spec.md",
       "plan.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -56,6 +57,12 @@
         "name": "checklist.md",
         "kind": "doc",
         "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -171,31 +178,27 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Verification Protocol",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "The transcript is where a long agent turn either reads clearly or reads as a black box",
     "created_at": "2026-08-27T17:00:56.622Z",
-    "last_save_at": "2026-08-27T19:20:20.703Z",
+    "last_save_at": "2026-08-28T07:43:41.243Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:c6a647c0943f0715b7672dfe3fc5248823c9d6421b8712df632851d40f2a1a93",
+    "source_fingerprint": "sha256:ccd13e53372d0455cda3446933dde0c93fb30d0dc322feb764058f57fc93007e",
     "source_doc_hashes": {
-      "spec.md": "f691bf6e9929e7da373cc5f41cdee21a55728d6dddc29e23bc68bbf805b477c0",
+      "spec.md": "711f4167665043aac5c1f804b31ce12ec59df48dbfabfd5a51a840255b5a8166",
       "plan.md": "fc142159a6516c88c4b26e74f752c1bce6fbbd04f939175f6701eac9257c84bf",
-      "tasks.md": "c5470552638da2a9b313940d7b9a04ad5d5bbef6fa49544a1e8a62d3ec36c702",
-      "checklist.md": "6d2a3d749cdba493a3ffacd86e271e664698f8c2a74bdd9bc75f92133ca2af04"
+      "tasks.md": "b3b79033bfdc492e2a074fb24e4d4e4958638a80200099dfc96e7d55ceca5ab1",
+      "checklist.md": "e8604219205bdfe4e4775c9203d068ebfe2170adc926978b190c9414ac2eef90",
+      "implementation-summary.md": "51ed46b58baca735d04711e375a5fd97bb15ec7c3bd18b3634a5d95b074245f6"
     },
     "last_active_child_id": null,
     "last_active_at": null

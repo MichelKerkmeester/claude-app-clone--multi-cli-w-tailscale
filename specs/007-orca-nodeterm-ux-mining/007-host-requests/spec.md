@@ -126,6 +126,15 @@ the client own or edit mutable session truth (that is ❌, not a request).
   ND-2.10); and an optional **`stateEnteredAt`** transition-clock for accurate in-state age (fail-closed: age
   off `updatedAt`; LOW/optional/candidate-drop; ND-2.8, ND-1.5). The base `attention` enum, `title`, and
   `agent`/`model` are reinforced by nodeterm but NOT re-requested.
+- **REQ-008** — A **reusable-prompt / skills catalog RPC** is requested, citing rec `CI-5`. Shape: a
+  session-scoped payload mirroring the existing host command catalog (`hostEpoch`, `sessionId`,
+  `sessionRevision`, `catalogRevision`, `fetchedAt`, plus `entries[]` of `{ name, source, body }`, where
+  `source` names the pack or extension offering the entry) — the client needs `source` to badge a name
+  offered by more than one place, and `body` is the canned text inserted into the composer as an editable
+  draft that is never auto-sent. Consuming phase: `008-uiux-features-mining/001-composer-send`. Fail-closed
+  fallback: with the field absent the intake renders nothing, invents no rows, and stays unreachable — the
+  client half already ships this way. Wire-compat: additive — a new optional catalog lane beside the command
+  catalog, so an older host that omits it simply leaves the surface inert.
 <!-- /ANCHOR:requirements -->
 
 ---

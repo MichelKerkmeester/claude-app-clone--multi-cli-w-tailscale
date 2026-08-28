@@ -30,10 +30,10 @@ _memory:
 
 _WAVE-1 P0 QUICK-WINS_
 
-- [ ] T1.1 [CI-4 → REQ-001] Narrow the `disabled` predicate on the `<textarea>` (~L770) in `pages/chat/chrome/session-composer.svelte` so transient locks leave the field editable; move the locks onto the send gate via `inputLockReasonWithSettle` in `shared/state/streaming-derivations.ts`. Done: reconnect blip mid-typing does not disable the field, Send stays gated.
-- [ ] T1.2 [CI-1 → REQ-002] Add a sessionId-keyed draft+attachment cache under `shared/state/`; wire the draft state in `pages/chat/screen-chat.svelte` (~L156) and stop wiping attachments on `sessionId` change in `pages/chat/attachments/attachment-draft-provider.svelte` + `attachment-state.ts`. Done: A→Home→B→A restores draft and staged photo; storage failure degrades to empty.
-- [ ] T1.3 [RS-1 → REQ-004] Tag send delivery `accepted|rejected|unknown` on the Error in `shared/transport/relay.ts` `submitPrompt` (~L566-591), reusing the `delivery-unknown` pattern (~L815/831). Done: three outcomes distinguishable, unknown survives re-throw, unit test covers all three.
-- [ ] T1.4 [CI-2 → REQ-003] Hold-before-restore in `pages/chat/screen-chat.svelte` `sendPrompt` (~L434-475): on a thrown POST, watch the transcript for the echoed turn (epoch/optimistic reconcile), 20 second deadline before restoring the draft. Done: lost-ack-but-landed does not restore or resend; true failure restores exact raw draft.
+- [x] T1.1 [CI-4 → REQ-001] Narrow the `disabled` predicate on the `<textarea>` (~L770) in `pages/chat/chrome/session-composer.svelte` so transient locks leave the field editable; move the locks onto the send gate via `inputLockReasonWithSettle` in `shared/state/streaming-derivations.ts`. Done: reconnect blip mid-typing does not disable the field, Send stays gated. [evidence: `session-composer.svelte` textarea drops `disabled`; parent lock forwarded; `session-composer.svelte.test.ts` 61 pass]
+- [x] T1.2 [CI-1 → REQ-002] Add a sessionId-keyed draft+attachment cache under `shared/state/`; wire the draft state in `pages/chat/screen-chat.svelte` (~L156) and stop wiping attachments on `sessionId` change in `pages/chat/attachments/attachment-draft-provider.svelte` + `attachment-state.ts`. Done: A→Home→B→A restores draft and staged photo; storage failure degrades to empty. [evidence: `chat-draft-cache.ts` + `attachment-draft-provider.svelte`; park/restore + fail-closed covered, `chat-draft-cache.test.ts` 15 pass]
+- [x] T1.3 [RS-1 → REQ-004] Tag send delivery `accepted|rejected|unknown` on the Error in `shared/transport/relay.ts` `submitPrompt` (~L566-591), reusing the `delivery-unknown` pattern (~L815/831). Done: three outcomes distinguishable, unknown survives re-throw, unit test covers all three. [evidence: `relay.ts` `PromptDeliveryError` 3 outcomes; `relay-prompt-delivery.test.ts` 8 pass]
+- [x] T1.4 [CI-2 → REQ-003] Hold-before-restore in `pages/chat/screen-chat.svelte` `sendPrompt` (~L434-475): on a thrown POST, watch the transcript for the echoed turn (epoch/optimistic reconcile), 20 second deadline before restoring the draft. Done: lost-ack-but-landed does not restore or resend; true failure restores exact raw draft. [evidence: `prompt-delivery-hold.ts` 20s watch + per-submission holds; `prompt-delivery-hold.test.ts` 14 pass]
 <!-- /ANCHOR:phase-1 -->
 
 ---
@@ -43,8 +43,8 @@ _WAVE-1 P0 QUICK-WINS_
 
 _HARDEN THE SEND PATH_
 
-- [ ] T2.1 [RS-2 → REQ-005] Stamp each held send error with its `scopeKey` (sessionId) in a small held-error store under `shared/state/`; check live scope before painting the `data-send-error-announcer` region (~L650-657) in `screen-chat.svelte`; toast-fallback when the banner unmounted. Done: deferred error never paints the wrong session; unmounted-banner path toasts.
-- [ ] T2.2 [RS-3 → REQ-006] Count consecutive E2EE-auth rejections in `shared/transport/use-sync-socket.svelte.ts` + `shared/transport/auth.ts`; flip the reconnect banner (via `shared/state/app-state.svelte.ts` / `state.ts connectionReducer`) to revoked/re-pair only on the third strike; only a full auth clears it. Done: 1/2 blips stay reconnecting, 3rd flips, full auth clears; unit test covers the sequence.
+- [x] T2.1 [RS-2 → REQ-005] Stamp each held send error with its `scopeKey` (sessionId) in a small held-error store under `shared/state/`; check live scope before painting the `data-send-error-announcer` region (~L650-657) in `screen-chat.svelte`; toast-fallback when the banner unmounted. Done: deferred error never paints the wrong session; unmounted-banner path toasts. [evidence: `deferred-send-error.svelte.ts` + scope guards in `screen-chat.svelte`; paint + render guards each negative-controlled]
+- [x] T2.2 [RS-3 → REQ-006] Count consecutive E2EE-auth rejections in `shared/transport/use-sync-socket.svelte.ts` + `shared/transport/auth.ts`; flip the reconnect banner (via `shared/state/app-state.svelte.ts` / `state.ts connectionReducer`) to revoked/re-pair only on the third strike; only a full auth clears it. Done: 1/2 blips stay reconnecting, 3rd flips, full auth clears; unit test covers the sequence. [evidence: `auth-rejection-latch.ts` 3-strike; cleared only by a live stream; `auth-rejection-latch.test.ts` 6 pass]
 <!-- /ANCHOR:phase-2 -->
 
 ---
@@ -54,9 +54,9 @@ _HARDEN THE SEND PATH_
 
 _HOST-GATED SCAFFOLD + VERIFICATION_
 
-- [ ] T3.1 [CI-5 → REQ-007] [B] Author the unified slash/skills picker under `shared/commands/` (analog of `host-command-catalog.svelte.ts`) with a collision/duplicate-source badge; inert without the host catalog field. BLOCKED on a host skills-catalog RPC (`../../007-host-requests/`). Done: inert with field absent, inserts editable draft (never auto-send) when present, badge on duplicate-source entries.
-- [ ] T3.2 [verification] Run token-identity on the composer CSS (0 diffs expected), the send-outcome + RS-3 latch + RS-2 scope regression tests, `test:web`, and the a11y-parity check from the final state. Done: all green, evidence captured.
-- [ ] T3.3 [traceability] Confirm every task cites a finding id and a real file, and each REQ has a covering task. Done: no traceless task.
+- [x] T3.1 [CI-5 → REQ-007] Author the unified slash/skills picker under `shared/commands/` (analog of `host-command-catalog.svelte.ts`) with a collision/duplicate-source badge; inert without the host catalog field. BLOCKED on a host skills-catalog RPC (`../../007-host-requests/`). Done: inert with field absent, inserts editable draft (never auto-send) when present, badge on duplicate-source entries. [evidence: `reusable-prompt-catalog.svelte.ts` inert without the host field; `reusable-prompt-catalog.svelte.test.ts` 12 pass]
+- [x] T3.2 [verification] Run token-identity on the composer CSS (0 diffs expected), the send-outcome + RS-3 latch + RS-2 scope regression tests, `test:web`, and the a11y-parity check from the final state. Done: all green, evidence captured. [evidence: `token-identity.mjs verify` PASS 35 goldens; `npm run test:web` 79+47 files / 640+585 tests; typecheck 0 errors]
+- [x] T3.3 [traceability] Confirm every task cites a finding id and a real file, and each REQ has a covering task. Done: no traceless task. [evidence: 7/7 REQs covered by a task; every task cites a finding id and an existing app file]
 <!-- /ANCHOR:phase-3 -->
 
 ---
@@ -64,10 +64,10 @@ _HOST-GATED SCAFFOLD + VERIFICATION_
 <!-- ANCHOR:completion -->
 ## COMPLETION CRITERIA
 
-- [ ] All P0 findings (CI-4, CI-1, CI-2, RS-1) implemented with acceptance tests green.
-- [ ] RS-2 and RS-3 implemented with regression tests; CI-5 shipped inert behind its host catalog.
-- [ ] No `[B]` blocked task remains except the host-gated CI-5, which is documented against `../../007-host-requests/`.
-- [ ] token-identity, test:web, a11y-parity green from the final state.
+- [x] All P0 findings (CI-4, CI-1, CI-2, RS-1) implemented with acceptance tests green.
+- [x] RS-2 and RS-3 implemented with regression tests; CI-5 shipped inert behind its host catalog.
+- [x] No `[B]` blocked task remains except the host-gated CI-5, which is documented against `../../007-host-requests/`.
+- [x] token-identity, test:web, a11y-parity green from the final state.
 <!-- /ANCHOR:completion -->
 
 ---

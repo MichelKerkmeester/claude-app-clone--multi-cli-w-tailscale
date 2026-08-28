@@ -31,7 +31,7 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P0 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-27 |
 | **Findings owned** | CI-1, CI-2, CI-4, CI-5, RS-1, RS-2, RS-3 (7) |
 | **Constraint** | Host-authoritative, fail-closed - the client owns no editable session truth |

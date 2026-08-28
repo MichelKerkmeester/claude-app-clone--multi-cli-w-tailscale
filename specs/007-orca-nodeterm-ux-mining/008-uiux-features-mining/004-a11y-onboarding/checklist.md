@@ -88,7 +88,7 @@ _Acceptance criteria mapping._
 <!-- ANCHOR:security -->
 ## Security
 
-- [x] CHK-040 [P0] Quick-prompts, gates, tour, cleanup queue, and ring buffer are client-only; none reach the host [evidence: onboarding gates, tour engine, cleanup queue, ring buffer and quick prompts all persist to local storage only; no host call exists on any of those paths]
+- [x] CHK-040 [P0] Quick-prompts, gates, tour, cleanup queue, and ring buffer are client-only; none reach the host [evidence: `onboarding-gates.test.ts`, `tour-engine.svelte.test.ts`, `device-cleanup-queue.test.ts` and `connection-log.test.ts` each assert local-storage-only persistence; no host call exists on any of those paths
 - [x] CHK-041 [P0] The Copy diagnostics blob carries no secret material [evidence: `connection-log.test.ts` asserts the copied blob carries only `at`, `kind`, `status`, `durationMs` and a safe `code`, with no token, header or pairing field]
 - [x] CHK-042 [P1] OS-7 never claims a permission is in effect when the OS denied it (RS-4 principle) [evidence: `push-settings.svelte.test.ts` asserts the switch never renders enabled while permission is denied; only a fresh probe clears a denial]
 <!-- /ANCHOR:security -->
@@ -99,7 +99,7 @@ _Acceptance criteria mapping._
 ## Documentation
 
 - [x] CHK-050 [P1] spec/plan/tasks synchronized; AI-3 conditional and OS-7 AN-6 absorption noted [evidence: `spec.md`, `plan.md` and `tasks.md` all record AI-3 as conditional and OS-7 as absorbing AN-6]
-- [x] CHK-051 [P1] Code comments carry durable WHY only (no spec/finding ids in code) [evidence: a hygiene scan over all changed sources and tests returned no spec paths or finding ids, and the commit passed the pre-commit hygiene hook]
+- [x] CHK-051 [P1] Code comments carry durable WHY only (no spec/finding ids in code) [evidence: a hygiene scan over every changed file in `app-mobile/src` and `app-mobile/tests` returned no matches for spec paths or finding ids, and commit `d4f1c24` passed the pre-commit hygiene hook]
 <!-- /ANCHOR:docs -->
 
 ---

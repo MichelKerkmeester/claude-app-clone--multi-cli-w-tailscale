@@ -27,7 +27,7 @@ _memory:
 | **Level** | 2 |
 | **Status** | Complete |
 | **Findings** | AI-1, AI-2, AI-3, AI-4, OS-1, OS-2, OS-3, OS-4, OS-5, OS-6, OS-7 (11) |
-| **Commits** | (this commit) |
+| **Commits** | `d4f1c24` |
 | **Executors** | Six file-disjoint lanes in two waves: GPT-5.6 Luna at xhigh |
 <!-- /ANCHOR:metadata -->
 
@@ -36,26 +36,33 @@ _memory:
 <!-- ANCHOR:what-built -->
 ## WHAT WAS BUILT
 
-- **Find focuses its own input.** Opening Find no longer costs a second tap before the keyboard rises; the
-  focus is deferred a frame because a same-frame focus on a just-appeared element is ignored on mobile.
+- **Find focuses its own input.** `transcript-find-bar.svelte` no longer costs a second tap before the
+  keyboard rises; the focus is deferred a frame because a same-frame focus on a just-appeared element is
+  ignored on mobile.
 - **Every sheet closes on the back gesture.** The pushState/popstate and focus-containment discipline moved
-  out of the one sheet that had it and into the shared primitive, so all five inherit it. Only the topmost
-  sheet closes, and the bespoke copy was deleted rather than left to push a second history entry.
-- **A quick-prompts sheet fills the draft and never sends.** Every control carries an accessible name, and
-  unreadable storage yields an empty sheet rather than an error or a guessed list.
-- **Onboarding cannot dead-end.** A decision already made, or a step that would be a no-op on this device,
-  is skipped rather than shown as a screen with nothing to do, and every choice reads as changeable.
-- **An interrupted device removal finishes itself.** A durable queue survives a restart and surfaces a Retry
-  card; an unconfirmed removal is never reported as done.
-- **A person can diagnose their own connection.** A bounded, reload-durable connection log feeds a
-  diagnostics screen whose probes stream in as they resolve, with a structured Copy diagnostics blob that
-  carries no credential material, and a first pair that stalls fails visibly at twenty five seconds.
-- **Settings answer to the words people use**, through a static local synonym index with no host call.
-- **Coach-marks fire once and never interrupt.** A step whose target is absent advances instead of stalling,
-  and no mark renders over an open overlay.
-- **The notification toggle cannot lie.** The real OS permission is re-read on focus and foreground; on
-  denial the toggle disables and offers Open Settings, and the blocked notice fires once rather than on
-  every focus.
+  out of the one sheet that had it and into `shared/primitives/sheet/sheet.svelte`, so all five inherit it.
+  Only the topmost sheet closes, and the bespoke copy was deleted from `sheet-plan-review.svelte` rather
+  than left to push a second history entry.
+- **A quick-prompts sheet fills the draft and never sends.** `sheet-quick-prompts.svelte` inserts through
+  `insert-slash-command.ts`; every control carries an accessible name, and unreadable storage yields an
+  empty sheet rather than an error or a guessed list.
+- **Onboarding cannot dead-end.** `onboarding-wizard.svelte` over `shared/state/onboarding-gates.ts` skips a
+  decision already made, or a step that would be a no-op on this device, rather than showing a screen with
+  nothing to do, and every choice reads as changeable.
+- **An interrupted device removal finishes itself.** `shared/state/device-cleanup-queue.ts` survives a
+  restart and surfaces a Retry card in the `screen-home.svelte` device footer; an unconfirmed removal is
+  never reported as done.
+- **A person can diagnose their own connection.** `shared/transport/connection-log.ts` is a bounded,
+  reload-durable ring buffer feeding `pages/settings/screen-settings.svelte`, whose probes stream in as they
+  resolve, with a structured Copy diagnostics blob that carries no credential material; a first pair that
+  stalls fails visibly at the twenty five second ceiling in `screen-enrollment.svelte`.
+- **Settings answer to the words people use**, through the static local synonym index in
+  `shared/format/settings-search.ts`, with no host call.
+- **Coach-marks fire once and never interrupt.** In `shared/state/tour-engine.svelte.ts` a step whose target
+  is absent advances instead of stalling, and no mark renders over an open overlay.
+- **The notification toggle cannot lie.** `push-settings.svelte` re-reads the real OS permission on focus and
+  foreground; on denial the toggle disables and offers Open Settings, and the blocked notice fires once
+  rather than on every focus.
 <!-- /ANCHOR:what-built -->
 
 ---

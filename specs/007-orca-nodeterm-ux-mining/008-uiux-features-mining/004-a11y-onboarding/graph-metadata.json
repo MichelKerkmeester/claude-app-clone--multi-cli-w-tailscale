@@ -26,12 +26,13 @@
       "input"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "tasks.md",
       "spec.md",
       "plan.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -59,9 +60,9 @@
         "source": "derived"
       },
       {
-        "name": "Authored Level",
-        "kind": "proper_noun",
-        "path": "spec.md",
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -90,6 +91,12 @@
       },
       {
         "name": "Change Type",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Acceptance Criteria",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
@@ -171,31 +178,27 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Verification Protocol",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "Two verified accessibility gaps cost every user a tap or a lost gesture: the find-bar input has no focus-on-open, so every Find in transcript costs an extra tap before the keyboard appears, and only one of five chat sheets closes on the hardware back-gesture so the other four fall through to real navigation",
     "created_at": "2026-08-27T17:00:57.834Z",
-    "last_save_at": "2026-08-27T19:20:21.301Z",
+    "last_save_at": "2026-08-28T12:48:56.636Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8194559f83b8497f04d91dd56bf8c22c41ba1ac0a76e57d63dda1cfa032e4173",
+    "source_fingerprint": "sha256:0054c7dd557c0605c3f3066f86ea17cd9d3f6132ee3957e23795cb474b287903",
     "source_doc_hashes": {
-      "spec.md": "b44dfd7b66cd5770005eb205c8e31110ca5db54398049a21f3d8e7fe747af6e4",
+      "spec.md": "fbb28d8bfeac9859e3cf2b2d5acd9cddef950ce3dd58137551505a55a11758dc",
       "plan.md": "b0e2c3e8a8a6cf251696e5a0e12f38d605da55dfd058c70fcb1cd9c712e3aeee",
-      "tasks.md": "7eac6f197d56aae3ca78e9df89036b4e42b9c4fef98a0ebb22fc9cd51d555ef8",
-      "checklist.md": "71f583c2f88be30b62a32a165d6e0888bdbdad806fc37e77a04b4b0c0156925a"
+      "tasks.md": "20fbc42967656201d44630e0e18163bcf2ff80c61ac2038d83d63cb29356d35c",
+      "checklist.md": "3994b72eefce4e4460301422c99a66a4bed18342a054884e7d9ff0d536af7686",
+      "implementation-summary.md": "e2496e100d99eb9e8a2d5002a23b06c083c2673a9baf110ad54b27b38ccc75a3"
     },
     "last_active_child_id": null,
     "last_active_at": null

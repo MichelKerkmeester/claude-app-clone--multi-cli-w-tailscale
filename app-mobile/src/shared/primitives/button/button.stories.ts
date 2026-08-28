@@ -32,3 +32,8 @@ export const Disabled: Story = {
 export const Submit: Story = {
   args: { type: 'submit', children: labelSnippet('Continue') },
 };
+// The primitive is headless; consumers supply the visual class. This is the
+// chrome-button class the inbox and review back controls actually pass.
+export const AsBackButton: Story = {
+  args: { class: 'back-button', children: labelSnippet('Back to sessions') },
+};

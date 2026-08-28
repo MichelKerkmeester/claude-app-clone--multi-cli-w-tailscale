@@ -19,8 +19,11 @@ if (IMAGE_BLOCK.byteLength === null) {
 const MODEL: ArtifactDetailsModel = Object.freeze({
   displayName: IMAGE_BLOCK.displayName,
   mediaType: IMAGE_BLOCK.mimeType,
-  width: 1,
-  height: 1,
+  // A real captured screenshot, so the Dimensions row reads like something a host
+  // would actually send. A 1x1 placeholder rendered as "1 x 1" and made the row
+  // look broken in the archived shot.
+  width: 1179,
+  height: 2556,
   thumbnailBytes: IMAGE_BLOCK.byteLength,
   fullBytes: IMAGE_BLOCK.byteLength,
   revision: IMAGE_BLOCK.revision,

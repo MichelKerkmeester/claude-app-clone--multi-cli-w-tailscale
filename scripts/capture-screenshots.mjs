@@ -64,7 +64,10 @@ const TRANSPARENT_PAGE_CSS = `
 const CROP_PADDING = 12;
 
 /** How many times a frame may be re-taken while trying to get two that agree. */
-const SHOT_RETRIES = 3;
+const SHOT_RETRIES = 4;
+
+/** Gap before the confirming frame, so a late paint shows up as a disagreement. */
+const CONFIRM_GAP_MS = 400;
 
 /** Below this the story drew nothing a person could see, so there is no shot to take. */
 const MIN_VISIBLE_PX = 4;
@@ -213,6 +216,27 @@ const AWAIT_ASSETS = `(async () => {
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
   const pending = [...document.images].filter((image) => !image.complete);
   await Promise.all(pending.map((image) => image.decode().catch(() => undefined)));
+
+  // A sandboxed frame paints on its own schedule and its document is opaque to
+  // this page, so there is nothing to await from the outside. Waiting on the load
+  // event and then giving the frame a moment is what stops a diagram being shot
+  // before it has drawn - which produced two different renderings of the same story.
+  // Wait for two composited frames. Under concurrent workers a shot could be taken
+  // between layout and paint, so the pixels lagged the DOM; a double rAF guarantees
+  // the browser has actually painted at least one full frame before the capture.
+  const painted = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(undefined))));
+  await painted();
+
+  const frames = [...document.querySelectorAll('iframe')];
+  if (frames.length > 0) {
+    await Promise.all(frames.map((frame) => new Promise((resolve) => {
+      const done = () => resolve(undefined);
+      frame.addEventListener('load', done, { once: true });
+      setTimeout(done, 2000);
+    })));
+    await new Promise((resolve) => setTimeout(resolve, 600));
+  }
+  await painted();
   return true;
 })()`;
 
@@ -321,6 +345,11 @@ async function main() {
         let buffer = await shoot();
         let stable = false;
         for (let attempt = 0; attempt < SHOT_RETRIES && !stable; attempt += 1) {
+          // Space the confirming frame rather than taking it immediately. Back to
+          // back, both shots can capture the same not-yet-painted state and agree,
+          // which is how a sandboxed diagram slipped through as "stable" and then
+          // rendered differently on the next run.
+          await page.waitForTimeout(CONFIRM_GAP_MS);
           const confirm = await shoot();
           if (confirm.equals(buffer)) stable = true;
           else buffer = confirm;
@@ -378,7 +407,13 @@ async function main() {
         visuallyEmpty: skipped,
         unstable,
         failed,
-        entries: results.sort((a, b) => (a.rel || '').localeCompare(b.rel || '')),
+        // Sort on the story id as well as the path. Entries with no image share an
+        // empty path, so a path-only sort left them tied and their order fell out of
+        // whichever worker happened to finish first - a manifest that reordered
+        // between runs while every image stayed identical.
+        entries: results.sort(
+          (a, b) => (a.rel || '').localeCompare(b.rel || '') || a.id.localeCompare(b.id),
+        ),
       },
       null,
       2,

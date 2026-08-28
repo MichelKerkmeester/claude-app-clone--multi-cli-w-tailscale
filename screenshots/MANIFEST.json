@@ -4,8 +4,8 @@
   "deviceScaleFactor": 1,
   "cropsToContent": true,
   "transparentBackground": true,
-  "total": 328,
-  "captured": 302,
+  "total": 334,
+  "captured": 308,
   "visuallyEmpty": 26,
   "unstable": 0,
   "failed": 0,
@@ -27,9 +27,9 @@
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "chrome-runtimemodeannouncer--plan",
+      "id": "chrome-runtimemodeannouncer--checking",
       "title": "Chrome/RuntimeModeAnnouncer",
-      "name": "Plan",
+      "name": "Checking",
       "ok": true,
       "visuallyEmpty": true,
       "note": "Renders nothing a sighted person can see; no screenshot taken."
@@ -43,14 +43,6 @@
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "chrome-runtimemodeannouncer--running",
-      "title": "Chrome/RuntimeModeAnnouncer",
-      "name": "Running",
-      "ok": true,
-      "visuallyEmpty": true,
-      "note": "Renders nothing a sighted person can see; no screenshot taken."
-    },
-    {
       "id": "chrome-runtimemodeannouncer--offline",
       "title": "Chrome/RuntimeModeAnnouncer",
       "name": "Offline",
@@ -59,9 +51,17 @@
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "chrome-runtimemodeannouncer--checking",
+      "id": "chrome-runtimemodeannouncer--plan",
       "title": "Chrome/RuntimeModeAnnouncer",
-      "name": "Checking",
+      "name": "Plan",
+      "ok": true,
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
+    },
+    {
+      "id": "chrome-runtimemodeannouncer--running",
+      "title": "Chrome/RuntimeModeAnnouncer",
+      "name": "Running",
       "ok": true,
       "visuallyEmpty": true,
       "note": "Renders nothing a sighted person can see; no screenshot taken."
@@ -155,17 +155,17 @@
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "transcript-runtimestatusregion--checking",
+      "id": "transcript-runtimestatusregion--accepted",
       "title": "Transcript/RuntimeStatusRegion",
-      "name": "Checking",
+      "name": "Accepted",
       "ok": true,
       "visuallyEmpty": true,
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "transcript-runtimestatusregion--streaming",
+      "id": "transcript-runtimestatusregion--checking",
       "title": "Transcript/RuntimeStatusRegion",
-      "name": "Streaming",
+      "name": "Checking",
       "ok": true,
       "visuallyEmpty": true,
       "note": "Renders nothing a sighted person can see; no screenshot taken."
@@ -179,17 +179,17 @@
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "transcript-runtimestatusregion--accepted",
+      "id": "transcript-runtimestatusregion--stale",
       "title": "Transcript/RuntimeStatusRegion",
-      "name": "Accepted",
+      "name": "Stale",
       "ok": true,
       "visuallyEmpty": true,
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "transcript-runtimestatusregion--stale",
+      "id": "transcript-runtimestatusregion--streaming",
       "title": "Transcript/RuntimeStatusRegion",
-      "name": "Stale",
+      "name": "Streaming",
       "ok": true,
       "visuallyEmpty": true,
       "note": "Renders nothing a sighted person can see; no screenshot taken."
@@ -203,17 +203,17 @@
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "transcript-todoprojectionblock--waiting",
+      "id": "transcript-todoprojectionblock--unsupported",
       "title": "Transcript/TodoProjectionBlock",
-      "name": "Waiting",
+      "name": "Unsupported",
       "ok": true,
       "visuallyEmpty": true,
       "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "transcript-todoprojectionblock--unsupported",
+      "id": "transcript-todoprojectionblock--waiting",
       "title": "Transcript/TodoProjectionBlock",
-      "name": "Unsupported",
+      "name": "Waiting",
       "ok": true,
       "visuallyEmpty": true,
       "note": "Renders nothing a sighted person can see; no screenshot taken."
@@ -232,7 +232,7 @@
       "name": "Open",
       "ok": true,
       "rel": "artifacts/artifact-details--open.png",
-      "size": "394x408"
+      "size": "394x335"
     },
     {
       "id": "artifacts-artifactheader--default",
@@ -952,7 +952,7 @@
       "name": "Answered",
       "ok": true,
       "rel": "ask-question/ask-question-card--answered.png",
-      "size": "394x56"
+      "size": "394x217"
     },
     {
       "id": "askquestion-askquestioncard--expired",
@@ -960,7 +960,7 @@
       "name": "Expired",
       "ok": true,
       "rel": "ask-question/ask-question-card--expired.png",
-      "size": "394x56"
+      "size": "394x181"
     },
     {
       "id": "askquestion-askquestioncard--presented",
@@ -968,7 +968,7 @@
       "name": "Presented",
       "ok": true,
       "rel": "ask-question/ask-question-card--presented.png",
-      "size": "394x56"
+      "size": "394x669"
     },
     {
       "id": "askquestion-askquestioncard--read-only",
@@ -976,7 +976,7 @@
       "name": "Read Only",
       "ok": true,
       "rel": "ask-question/ask-question-card--read-only.png",
-      "size": "394x56"
+      "size": "394x700"
     },
     {
       "id": "askquestion-askquestioncard--submitting",
@@ -984,7 +984,7 @@
       "name": "Submitting",
       "ok": true,
       "rel": "ask-question/ask-question-card--submitting.png",
-      "size": "394x56"
+      "size": "394x669"
     },
     {
       "id": "askquestion-askquestionfreetext--default",
@@ -1616,7 +1616,23 @@
       "name": "Default",
       "ok": true,
       "rel": "home/push-settings--default.png",
+      "size": "394x398"
+    },
+    {
+      "id": "home-pushsettings--host-error",
+      "title": "Home/PushSettings",
+      "name": "Host Error",
+      "ok": true,
+      "rel": "home/push-settings--host-error.png",
       "size": "394x396"
+    },
+    {
+      "id": "primitives-button--as-back-button",
+      "title": "Primitives/Button",
+      "name": "As Back Button",
+      "ok": true,
+      "rel": "primitives/button--as-back-button.png",
+      "size": "166x68"
     },
     {
       "id": "primitives-button--default",
@@ -2040,7 +2056,7 @@
       "name": "File Preview Denied",
       "ok": true,
       "rel": "transcript/block--file-preview-denied.png",
-      "size": "394x120"
+      "size": "394x216"
     },
     {
       "id": "transcript-block--file-preview-missing",
@@ -2048,7 +2064,7 @@
       "name": "File Preview Missing",
       "ok": true,
       "rel": "transcript/block--file-preview-missing.png",
-      "size": "394x144"
+      "size": "394x216"
     },
     {
       "id": "transcript-block--file-preview-ready",
@@ -2056,7 +2072,7 @@
       "name": "File Preview Ready",
       "ok": true,
       "rel": "transcript/block--file-preview-ready.png",
-      "size": "394x120"
+      "size": "394x216"
     },
     {
       "id": "transcript-block--file-preview-unsupported",
@@ -2064,7 +2080,7 @@
       "name": "File Preview Unsupported",
       "ok": true,
       "rel": "transcript/block--file-preview-unsupported.png",
-      "size": "394x168"
+      "size": "394x216"
     },
     {
       "id": "transcript-block--file-preview-withheld",
@@ -2072,7 +2088,7 @@
       "name": "File Preview Withheld",
       "ok": true,
       "rel": "transcript/block--file-preview-withheld.png",
-      "size": "394x144"
+      "size": "394x216"
     },
     {
       "id": "transcript-block--text-artifact",
@@ -2152,7 +2168,7 @@
       "name": "Denied",
       "ok": true,
       "rel": "transcript/file-preview-card--denied.png",
-      "size": "394x118"
+      "size": "394x214"
     },
     {
       "id": "transcript-filepreviewcard--missing",
@@ -2160,7 +2176,7 @@
       "name": "Missing",
       "ok": true,
       "rel": "transcript/file-preview-card--missing.png",
-      "size": "394x142"
+      "size": "394x214"
     },
     {
       "id": "transcript-filepreviewcard--ready",
@@ -2168,7 +2184,7 @@
       "name": "Ready",
       "ok": true,
       "rel": "transcript/file-preview-card--ready.png",
-      "size": "394x118"
+      "size": "394x214"
     },
     {
       "id": "transcript-filepreviewcard--unsupported",
@@ -2176,7 +2192,7 @@
       "name": "Unsupported",
       "ok": true,
       "rel": "transcript/file-preview-card--unsupported.png",
-      "size": "394x166"
+      "size": "394x214"
     },
     {
       "id": "transcript-filepreviewcard--withheld",
@@ -2184,7 +2200,7 @@
       "name": "Withheld",
       "ok": true,
       "rel": "transcript/file-preview-card--withheld.png",
-      "size": "394x142"
+      "size": "394x214"
     },
     {
       "id": "transcript-menutranscriptaction--mixed-availability",
@@ -2344,6 +2360,14 @@
       "name": "Default",
       "ok": true,
       "rel": "views/attention-inbox--default.png",
+      "size": "362x1112"
+    },
+    {
+      "id": "views-attentioninbox--host-error",
+      "title": "Views/AttentionInbox",
+      "name": "Host Error",
+      "ok": true,
+      "rel": "views/attention-inbox--host-error.png",
       "size": "362x676"
     },
     {
@@ -2504,7 +2528,7 @@
       "name": "Default",
       "ok": true,
       "rel": "views/review--default.png",
-      "size": "362x720"
+      "size": "362x1425"
     },
     {
       "id": "views-review--focused",
@@ -2512,6 +2536,14 @@
       "name": "Focused",
       "ok": true,
       "rel": "views/review--focused.png",
+      "size": "362x1425"
+    },
+    {
+      "id": "views-review--host-error",
+      "title": "Views/Review",
+      "name": "Host Error",
+      "ok": true,
+      "rel": "views/review--host-error.png",
       "size": "362x720"
     },
     {
@@ -2547,11 +2579,27 @@
       "size": "44x44"
     },
     {
+      "id": "views-sessionstateicon--interrupted",
+      "title": "Views/SessionStateIcon",
+      "name": "Interrupted",
+      "ok": true,
+      "rel": "views/session-state-icon--interrupted.png",
+      "size": "44x44"
+    },
+    {
       "id": "views-sessionstateicon--running",
       "title": "Views/SessionStateIcon",
       "name": "Running",
       "ok": true,
       "rel": "views/session-state-icon--running.png",
+      "size": "44x44"
+    },
+    {
+      "id": "views-sessionstateicon--unknown",
+      "title": "Views/SessionStateIcon",
+      "name": "Unknown",
+      "ok": true,
+      "rel": "views/session-state-icon--unknown.png",
       "size": "44x44"
     },
     {

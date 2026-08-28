@@ -7,9 +7,9 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/008-screenshot-archive-integrity"
     last_updated_at: "2026-08-28T20:00:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the screenshot archive integrity plan; no code yet."
-    next_safe_action: "Await operator go, then start T1.1."
-    completion_pct: 0
+    recent_action: "Fixed three live-app render defects and two capture determinism defects."
+    next_safe_action: "Operator picks phase 009; the archive is trustworthy evidence."
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -29,7 +29,7 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P0 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-28 |
 | **Scope** | archive-wide |
 | **Constraint** | Host-authoritative, fail-closed. Refinement never adds host truth |

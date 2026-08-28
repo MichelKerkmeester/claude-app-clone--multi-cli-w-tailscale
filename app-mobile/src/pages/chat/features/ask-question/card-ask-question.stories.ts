@@ -5,6 +5,10 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { AskQuestionTranscriptMeta } from '@pi-remote/pi-rpc-protocol';
 
+import { demoPostJson } from '$shared/fixtures/demo.js';
+import { installStoryHostFetch } from '$shared/fixtures/story-host-fetch.js';
+import { setAskQuestionDisplay } from './ask-question-ephemeral-store.js';
+import { isAskQuestionViewModel, type AskQuestionViewModel } from './ask-question-types.js';
 import AskQuestionCard from './card-ask-question.svelte';
 
 // Demo transcript shape for lifecycle stories.
@@ -21,10 +25,30 @@ const DEMO_ASK_QUESTION_BLOCK: AskQuestionTranscriptMeta = {
   status: 'presented',
 };
 
+const DEMO_ASK_QUESTION_DISPLAY: AskQuestionViewModel = (() => {
+  const payload = demoPostJson('/api/ask-question/display', {
+    sessionId: DEMO_ASK_QUESTION_BLOCK.sessionId,
+    questionId: DEMO_ASK_QUESTION_BLOCK.questionId,
+    revision: DEMO_ASK_QUESTION_BLOCK.presentedRevision,
+  });
+  if (!isAskQuestionViewModel(payload)) {
+    throw new Error('Demo ask-question display fixture is missing from demoPostJson.');
+  }
+  return payload;
+})();
+
 const meta = {
   title: 'AskQuestion/AskQuestionCard',
   component: AskQuestionCard,
   tags: ['autodocs'],
+  // The card fetches display text from the host; isolation has no relay, so
+  // seed the ephemeral store and answer that read with the live demo display.
+  beforeEach: () => {
+    setAskQuestionDisplay(DEMO_ASK_QUESTION_DISPLAY);
+    return installStoryHostFetch({
+      '/api/ask-question/display': () => DEMO_ASK_QUESTION_DISPLAY,
+    });
+  },
 } satisfies Meta<typeof AskQuestionCard>;
 
 export default meta;

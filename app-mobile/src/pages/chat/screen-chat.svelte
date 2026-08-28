@@ -88,6 +88,10 @@
   import { abortPrompt, submitPrompt, PromptDeliveryError } from '$shared/transport/relay.js';
   import { parkDraftText, readParkedDraftText } from '$shared/state/chat-draft-cache.js';
   import {
+    raiseDeferredSendError,
+    type ScopedSendError,
+  } from '$shared/state/deferred-send-error.svelte.js';
+  import {
     deliveryHoldAction,
     PROMPT_DELIVERY_HOLD_MS,
     type DeliveryHold,
@@ -161,8 +165,11 @@
 
   let prompt = $state('');
   let sendingPrompt = $state(false);
-  let promptError = $state<string | null>(null);
-  let retrySubmissionId = $state<string | null>(null);
+  let promptError = $state<ScopedSendError | null>(null);
+  // The retry affordance for a failed send belongs to the session that failed:
+  // reusing its submissionId from another chat would make the host dedupe a
+  // brand-new send against one that chat never made.
+  let failedSendRetry = $state<{ scopeKey: string; submissionId: string } | null>(null);
   let stopping = $state(false);
   let binding = $state<SelectedCommandBinding | null>(null);
   let slashSubmitting = $state(false);
@@ -190,6 +197,11 @@
   // to stamp lastTransientAt at the moment a transient→cleared edge
   // fires (not at reconnect-start). Written only inside untrack.
   let previousInputLockRaw: InputLockReason = 'none';
+
+  // Set at teardown. Late async send resolutions read it to stop writing
+  // state that no longer renders and to route their outcome to the toast
+  // strip instead. A plain closure flag: nothing renders from it.
+  let unmounted = false;
 
   // Which button opened each overlay, so focus can return to it on close.
   let headerTrigger = $state<HTMLButtonElement | null>(null);
@@ -255,6 +267,11 @@
   );
   const canDispatchSlash = $derived(
     inputLock === 'none' && !sendingPrompt && !slashSubmitting,
+  );
+  // The live-scope paint guard: an error stamped for another session is never
+  // rendered into this chat's announcer or composer banner.
+  const paintedPromptError = $derived(
+    promptError !== null && promptError.scopeKey === sessionId ? promptError : null,
   );
   const slashCommandNames = $derived(
     SESSION_SLASH_NAMES.filter((name) => bindingFor(commandCatalog.snapshot, name) !== null),
@@ -478,8 +495,10 @@
 
 
   // Unmounting ends every watch. Park whatever is still unresolved so the
-  // draft comes back with its session instead of vanishing.
+  // draft comes back with its session instead of vanishing. The unmount flag
+  // also routes late async send failures to the toast strip.
   onDestroy(() => {
+    unmounted = true;
     for (const hold of deliveryHolds) surrenderHold(hold);
     deliveryHolds = [];
   });
@@ -499,12 +518,24 @@
   function restoreFailedDraft(hold: DeliveryHold): void {
     if (prompt.trim().length === 0) {
       prompt = hold.rawDraft;
-      retrySubmissionId = hold.submissionId;
-      promptError = hold.errorText;
+      failedSendRetry = { scopeKey: hold.sessionId, submissionId: hold.submissionId };
+      paintSendError(hold.sessionId, hold.errorText);
       return;
     }
     surrenderHold(hold);
-    promptError = hold.errorText;
+    paintSendError(hold.sessionId, hold.errorText);
+  }
+
+  // A send failure paints its own session's banner while that screen is alive.
+  // Once the person has moved on — another chat, or this screen unmounted —
+  // the banner they could read is gone, so the shell's toast strip carries
+  // the message instead.
+  function paintSendError(scopeKey: string, message: string): void {
+    if (unmounted || scopeKey !== sessionId) {
+      raiseDeferredSendError({ scopeKey, message });
+      return;
+    }
+    promptError = { scopeKey, message };
   }
 
   // ───────────────────────────────────────────────────────────────────
@@ -537,13 +568,14 @@
     if (stopping) return;
     if (transcript.awaitingSnapshot) return;
     stopping = true;
+    const scopeKey = sessionId;
     void abortPrompt()
       .then((result) => {
         if (result.outcome.status !== 'aborted') {
-          promptError = `Stop was not confirmed (${result.outcome.status}).`;
+          paintSendError(scopeKey, `Stop was not confirmed (${result.outcome.status}).`);
         }
       })
-      .catch((cause: unknown) => (promptError = messageFrom(cause)))
+      .catch((cause: unknown) => paintSendError(scopeKey, messageFrom(cause)))
       .finally(() => (stopping = false));
   }
 
@@ -558,7 +590,14 @@
     const message = rawDraft.trim();
     if (!canSubmit || message.length === 0) return;
     if (transcript.awaitingSnapshot) return;
-    const submissionId = retrySubmissionId ?? `prompt_${crypto.randomUUID().replaceAll('-', '_')}`;
+    // Every async settlement of this send is checked against the scope it
+    // started in, never against the session the person is reading when it
+    // lands.
+    const scopeKey = sessionId;
+    const submissionId =
+      failedSendRetry !== null && failedSendRetry.scopeKey === scopeKey
+        ? failedSendRetry.submissionId
+        : `prompt_${crypto.randomUUID().replaceAll('-', '_')}`;
     const optimisticId = `optimistic_${submissionId}`;
     // The echo must be a turn beyond what the transcript already covers.
     const coversThroughAtSubmit = transcript.coversThrough;
@@ -578,13 +617,16 @@
     });
     prompt = '';
     promptError = null;
-    retrySubmissionId = null;
+    failedSendRetry = null;
     sendingPrompt = true;
-    void submitPrompt(sessionId, submissionId, message, behavior)
+    void submitPrompt(scopeKey, submissionId, message, behavior)
       .then((block) => {
+        // Dispatching with the send's own scope lets the transcript reducer
+        // ignore a settlement that lands after the person moved on, instead
+        // of splicing the echoed turn into another session's rows.
         dispatchTranscript({
           type: 'promptAccepted',
-          sessionId,
+          sessionId: scopeKey,
           optimisticId,
           block,
           at: new Date().toISOString(),
@@ -595,10 +637,18 @@
           cause instanceof PromptDeliveryError ? cause.outcome.status : 'delivery-unknown';
         if (status === 'rejected') {
           // Definite refusal — the host never received the prompt.
-          dispatchTranscript({ type: 'promptRejected', sessionId, optimisticId });
+          dispatchTranscript({ type: 'promptRejected', sessionId: scopeKey, optimisticId });
+          if (unmounted || sessionId !== scopeKey) {
+            // The person moved on before the refusal landed: the draft waits
+            // with its own session, and the failure reaches them via the toast
+            // strip instead of painting the chat they are reading now.
+            parkDraftText(scopeKey, rawDraft);
+            paintSendError(scopeKey, messageFrom(cause));
+            return;
+          }
           prompt = rawDraft;
-          retrySubmissionId = submissionId;
-          promptError = messageFrom(cause);
+          failedSendRetry = { scopeKey, submissionId };
+          paintSendError(scopeKey, messageFrom(cause));
           return;
         }
         // The ack was lost; the turn may still land. Reusing the same
@@ -606,7 +656,7 @@
         deliveryHolds = [
           ...deliveryHolds,
           {
-            sessionId,
+            sessionId: scopeKey,
             optimisticId,
             submissionId,
             message,
@@ -627,6 +677,7 @@
     if (slashSubmitting || !canDispatchSlash) return;
     slashSubmitting = true;
     promptError = null;
+    const scopeKey = sessionId;
     void submitSlashDraft({
       sessionId,
       draft,
@@ -639,21 +690,25 @@
     })
       .then((outcome) => {
         if (outcome.status === 'accepted') {
+          // The send's own scope keeps a settlement that lands after a session
+          // switch out of the transcript the person is reading now.
           dispatchTranscript({
             type: 'promptAccepted',
-            sessionId,
+            sessionId: scopeKey,
             optimisticId: outcome.block.id,
             block: outcome.block,
             at: new Date().toISOString(),
           });
-          prompt = '';
-          binding = null;
+          if (sessionId === scopeKey) {
+            prompt = '';
+            binding = null;
+          }
           return;
         }
         // Failed: keep the draft, drop the binding; a stale result also refreshes the catalog.
         binding = null;
         if (outcome.code === 'stale') void commandCatalog.refresh('manual');
-        promptError = slashFailureMessage(outcome.code);
+        paintSendError(scopeKey, slashFailureMessage(outcome.code));
       })
       .finally(() => (slashSubmitting = false));
   }
@@ -794,13 +849,13 @@
 
   <!-- Composer: the prompt input with its send / stop / slash actions -->
   <!-- Assertive a11y channel for send failures, cleared on the next accepted write. -->
-  {#if promptError !== null}
+  {#if paintedPromptError !== null}
     <div
       aria-live="assertive"
       aria-atomic="true"
       class="sr-only"
       data-send-error-announcer="true"
-    >{promptError}</div>
+    >{paintedPromptError.message}</div>
   {/if}
   <AttachmentDraftProvider {sessionId} capability={mediaCapability} {modelCanViewPhotos}>
     <SessionComposer
@@ -820,7 +875,7 @@
       awaitingSnapshot={transcript.awaitingSnapshot}
       {sendingPrompt}
       {stopping}
-      {promptError}
+      promptError={paintedPromptError?.message ?? null}
       {runtimeControls}
       catalog={commandCatalog}
       {binding}
@@ -836,7 +891,7 @@
       }}
       onAttachmentSubmitted={() => {
         promptError = null;
-        retrySubmissionId = null;
+        failedSendRetry = null;
         binding = null;
       }}
     />

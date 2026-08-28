@@ -125,6 +125,10 @@ import { readParkedDraftText } from '../src/shared/state/chat-draft-cache.js';
 import Session from '../src/pages/chat/screen-chat.svelte';
 import { EMPTY_TRANSCRIPT } from '../src/shared/state/state.js';
 import { clearChatDraftCache, parkDraftText } from '../src/shared/state/chat-draft-cache.js';
+import {
+  deferredSendErrorToast,
+  dismissDeferredSendErrorToast,
+} from '../src/shared/state/deferred-send-error.svelte.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 3. SETUP
@@ -156,6 +160,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   clearChatDraftCache();
+  dismissDeferredSendErrorToast();
   vi.restoreAllMocks();
 });
 
@@ -398,6 +403,34 @@ describe('delivery hold on a thrown send', () => {
     expect(readParkedDraftText(SESSION_ID)).toBe('  in flight  ');
     view.unmount();
   });
+
+
+  it('never paints a send error into the session that did not raise it', async () => {
+    // The error state survives a prop-driven session switch, so only the
+    // scope filter stops one chat's failure from appearing in another.
+    relay.submitPrompt.mockRejectedValueOnce(
+      new relay.PromptDeliveryError(
+        { status: 'rejected', reasonCode: 'access_denied' },
+        'Relay access denied.',
+      ),
+    );
+    const { view } = renderSession();
+    await sendDraft('  doomed  ');
+    await waitFor(() =>
+      expect(document.querySelector('[data-send-error-announcer]')).not.toBeNull(),
+    );
+
+    view.rerender({
+      connection: 'live',
+      sessionId: 'session_elsewhere',
+      initialCache: null,
+      transcript: { ...transcriptState(), sessionId: 'session_elsewhere' },
+      status: 'idle',
+    });
+    await tick();
+    expect(document.querySelector('[data-send-error-announcer]')).toBeNull();
+    view.unmount();
+  });
 });
 
 describe('per-session draft park across navigation', () => {
@@ -436,5 +469,135 @@ describe('per-session draft park across navigation', () => {
   await waitFor(() => expect(textarea).toHaveValue(''));
   getItemSpy.mockRestore();
   view.unmount();
+  });
+});
+
+describe('scope-safe deferred send errors', () => {
+  // A rejection that settles after the person moved to another session must
+  // not paint the announcer, the composer banner, or the restored draft in
+  // the chat they are reading now. The failure reaches them via the shell's
+  // toast strip, and the draft waits parked under its own session.
+  it('never paints a rejection that lands after the session switched', async () => {
+    let rejectSend!: (cause: unknown) => void;
+    relay.submitPrompt.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectSend = reject;
+        }),
+    );
+    const { view } = renderSession();
+    const textarea = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+    await userEvent.type(textarea, 'wandered draft');
+    await userEvent.click(screen.getByRole('button', { name: 'Send message' }));
+    await waitFor(() => expect(relay.submitPrompt).toHaveBeenCalledOnce());
+
+    view.rerender({
+      connection: 'live',
+      sessionId: 'session_elsewhere',
+      initialCache: null,
+      transcript: { ...transcriptState(), sessionId: 'session_elsewhere' },
+      status: 'idle',
+    });
+    await tick();
+
+    rejectSend(
+      new relay.PromptDeliveryError(
+        { status: 'rejected', reasonCode: 'access_denied' },
+        'Relay access denied.',
+      ),
+    );
+    await tick();
+    await tick();
+
+    expect(document.querySelector('[data-send-error-announcer="true"]')).toBeNull();
+    expect(screen.queryByText('Relay access denied.')).toBeNull();
+    expect((screen.getByLabelText('Message Pi') as HTMLTextAreaElement).value).toBe('');
+
+    // The shell toast strip carries the failure, stamped with the session
+    // the send actually belonged to, and the draft waits there for re-entry.
+    expect(deferredSendErrorToast()).toEqual({
+      scopeKey: SESSION_ID,
+      message: 'Relay access denied.',
+    });
+    expect(readParkedDraftText(SESSION_ID)).toBe('wandered draft');
+    view.unmount();
+  });
+
+  it('reaches the toast strip when the banner region has unmounted', async () => {
+    let rejectSend!: (cause: unknown) => void;
+    relay.submitPrompt.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectSend = reject;
+        }),
+    );
+    const { view } = renderSession();
+    await sendDraft('  late refusal draft  ');
+
+    view.unmount();
+    rejectSend(
+      new relay.PromptDeliveryError(
+        { status: 'rejected', reasonCode: 'access_denied' },
+        'Relay access denied.',
+      ),
+    );
+    await tick();
+    await tick();
+
+    expect(deferredSendErrorToast()).toEqual({
+      scopeKey: SESSION_ID,
+      message: 'Relay access denied.',
+    });
+    // The raw draft parks with its own session instead of vanishing with the
+    // dead component state.
+    expect(readParkedDraftText(SESSION_ID)).toBe('  late refusal draft  ');
+  });
+
+  it('still paints the stamped banner when the failure lands in the live session', async () => {
+    relay.submitPrompt.mockRejectedValueOnce(
+      new relay.PromptDeliveryError(
+        { status: 'rejected', reasonCode: 'access_denied' },
+        'Relay access denied.',
+      ),
+    );
+    renderSession();
+    await sendDraft('  kept draft  ');
+
+    const announcer = document.querySelector('[data-send-error-announcer="true"]');
+    expect(announcer?.textContent).toContain('Relay access denied.');
+    expect(deferredSendErrorToast()).toBeNull();
+  });
+
+  it('does not reuse a retry submissionId stamped for another session', async () => {
+    relay.submitPrompt.mockRejectedValueOnce(
+      new relay.PromptDeliveryError(
+        { status: 'rejected', reasonCode: 'access_denied' },
+        'Relay access denied.',
+      ),
+    );
+    const { view } = renderSession();
+    await sendDraft('failed there');
+    const foreignSubmissionId = relay.submitPrompt.mock.calls[0][1] as string;
+
+    // The failure stamped its retry affordance for SESSION_ID; a send from a
+    // different session must get a fresh id, not a foreign one.
+    view.rerender({
+      connection: 'live',
+      sessionId: 'session_elsewhere',
+      initialCache: null,
+      transcript: { ...transcriptState(), sessionId: 'session_elsewhere' },
+      status: 'idle',
+    });
+    await tick();
+    relay.submitPrompt.mockResolvedValueOnce({ id: 'block_second', kind: 'text' });
+    const textarea = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+    await userEvent.type(textarea, 'fresh session send');
+    await userEvent.click(screen.getByRole('button', { name: 'Send message' }));
+    await waitFor(() => expect(relay.submitPrompt).toHaveBeenCalledTimes(2));
+
+    const secondSubmissionId = relay.submitPrompt.mock.calls[1][1] as string;
+    expect(secondSubmissionId).not.toBe(foreignSubmissionId);
+    expect(secondSubmissionId).toMatch(/^prompt_/u);
+    expect(relay.submitPrompt.mock.calls[1][0]).toBe('session_elsewhere');
   });
 });

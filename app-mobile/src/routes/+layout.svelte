@@ -19,6 +19,11 @@
     setAppActions,
     type AppActions,
   } from '$shared/state/app-state.svelte.js';
+  import {
+    deferredSendErrorToast,
+    dismissDeferredSendErrorToast,
+    DEFERRED_SEND_ERROR_TOAST_MS,
+  } from '$shared/state/deferred-send-error.svelte.js';
   import { establishSession, revokeDevice, logoutDevice, type DeviceIdentity } from '$shared/transport/auth.js';
   import { fetchSessions } from '$shared/transport/relay.js';
   import { setPushForeground, unsubscribeFromPush } from '$shared/format/attention.js';
@@ -59,6 +64,9 @@
   const inSession = $derived(
     app.authReady && !app.reviewOpen && !app.inboxOpen && selectedSessionId !== null,
   );
+
+  // The shell's transient send-error toast; null means the strip renders nothing.
+  const sendErrorToast = $derived(deferredSendErrorToast());
 
   // ───────────────────────────────────────────────────────────────────
   // 4. HANDLERS
@@ -216,6 +224,21 @@
     };
   });
 
+  // The toast strip auto-dismisses after a fixed reading window. The timer
+  // re-arms on every effect re-run (a fresh toast or an unmount), the same
+  // deadline-preserving discipline the composer's settle window uses; writes
+  // inside the timer run after the effect scope closes, so they cannot
+  // self-invalidate.
+  $effect(() => {
+    let timer: number | undefined;
+    if (sendErrorToast !== null) {
+      timer = window.setTimeout(dismissDeferredSendErrorToast, DEFERRED_SEND_ERROR_TOAST_MS);
+    }
+    return () => {
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
+  });
+
   // Sessions roster fetch, keyed on auth + the current route session.
   $effect(() => {
     if (!app.authReady) return;
@@ -291,4 +314,25 @@
     {/if}
     {@render children()}
   {/if}
+  <!-- Toast strip: the shell's one transient error surface. A deferred send
+       failure that resolves after its chat screen unmounted lands here — the
+       in-composer banner stays primary while the chat is open because the
+       on-screen keyboard covers this strip. -->
+  {#if sendErrorToast !== null}
+    <div class="toast--strip inline-alert" role="alert">
+      {sendErrorToast.message}
+    </div>
+  {/if}
 </RootErrorBoundary>
+
+<style>
+  /* The strip floats above every route surface, including the plan overlay,
+     and clears the device safe area; its error skin comes from the shared
+     inline-alert class. */
+  .toast--strip {
+    position: fixed;
+    inset-inline: var(--page-gutter);
+    bottom: max(var(--space-4), env(safe-area-inset-bottom));
+    z-index: 120;
+  }
+</style>

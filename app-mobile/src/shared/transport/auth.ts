@@ -18,6 +18,7 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { DEMO_IDENTITY, isDemoMode } from '../fixtures/demo.js';
+import { clearAuthRejectionStrikes } from './auth-rejection-latch.js';
 import { raceWithTimeout, RaceTimeoutError } from '../state/race-timeout.js';
 
 // ───────────────────────────────────────────────────────────────────
@@ -196,7 +197,9 @@ export function _registerPairingTokenForTest(pairingId: string): void {
 // ───────────────────────────────────────────────────────────────────
 
 export async function establishSession(): Promise<ApplicationSession | null> {
-  if (isDemoMode()) return { ...DEMO_IDENTITY, expiresAt: DEMO_SESSION_EXPIRES_AT };
+  if (isDemoMode()) {
+    return { ...DEMO_IDENTITY, expiresAt: DEMO_SESSION_EXPIRES_AT };
+  }
   const device = await loadDevice();
   if (device === null) return null;
   if (device.origin !== window.location.origin) {
@@ -340,6 +343,9 @@ async function saveDevice(device: StoredDevice): Promise<void> {
 }
 
 async function clearDevice(): Promise<void> {
+  // The strike count belongs to the device identity being torn down; a
+  // freshly paired device must never start life part-way to re-pairing.
+  clearAuthRejectionStrikes();
   const database = await openDatabase();
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(STORE_NAME, 'readwrite');

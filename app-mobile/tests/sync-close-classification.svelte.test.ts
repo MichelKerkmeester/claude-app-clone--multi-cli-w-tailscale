@@ -32,6 +32,10 @@ import {
   type ConnectionAction,
   type ConnectionState,
 } from '../src/shared/state/state.js';
+import {
+  authRejectionLatchTripped,
+  clearAuthRejectionStrikes,
+} from '../src/shared/transport/auth-rejection-latch.js';
 
 type SocketEvent = { readonly code?: number };
 
@@ -128,6 +132,7 @@ async function waitForSocket(): Promise<void> {
 beforeEach(() => {
   vi.useFakeTimers();
   vi.clearAllMocks();
+  clearAuthRejectionStrikes();
   Object.defineProperty(navigator, 'onLine', { configurable: true, value: true });
   relay.fetchTranscript.mockResolvedValue(EMPTY_PAGE);
 });
@@ -143,12 +148,46 @@ afterEach(() => {
 // ───────────────────────────────────────────────────────────────────
 
 describe('sync socket close classification', () => {
-  it('surfaces revocation and never schedules another connection', async () => {
-    const harness = createHarness([new Date(Date.now() + 60_000).toISOString()]);
+  it('rides the first and second auth rejection out as reconnects', async () => {
+    const harness = createHarness([undefined, undefined]);
     await waitForSocket();
 
+    // Strike 1: the banner stays on reconnecting and a retry is armed.
     harness.sockets[0]?.emit('close', { code: 4003 });
+    expect(harness.getConnection().phase).toBe('reconnecting');
+    expect(authRejectionLatchTripped()).toBe(false);
+    expect(vi.getTimerCount()).toBe(1);
+    vi.advanceTimersByTime(2_000);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(relay.openSyncSocket).toHaveBeenCalledTimes(2);
 
+    // Strike 2: still reconnecting, still not re-pairing.
+    harness.sockets[1]?.emit('close', { code: 4003 });
+    expect(harness.getConnection().phase).toBe('reconnecting');
+    expect(authRejectionLatchTripped()).toBe(false);
+    expect(vi.getTimerCount()).toBe(1);
+
+    harness.dispose();
+  });
+
+  it('surfaces re-pairing on the third consecutive rejection and never reconnects', async () => {
+    const harness = createHarness([undefined, undefined, undefined]);
+    await waitForSocket();
+
+    // Walk strikes 1 and 2 through their armed retries.
+    harness.sockets[0]?.emit('close', { code: 4003 });
+    vi.advanceTimersByTime(2_000);
+    await Promise.resolve();
+    await Promise.resolve();
+    harness.sockets[1]?.emit('close', { code: 4003 });
+    vi.advanceTimersByTime(4_000);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(harness.getConnection().phase).toBe('reconnecting');
+
+    // Strike 3: stop and surface re-enrollment.
+    harness.sockets[2]?.emit('close', { code: 4003 });
     expect(harness.getConnection().phase).toBe('unenrolled');
     expect(vi.getTimerCount()).toBe(0);
     const callsAfterRevocation = relay.openSyncSocket.mock.calls.length;
@@ -193,8 +232,7 @@ describe('sync socket close classification', () => {
     harness.dispose();
   });
 
-  it('swaps the socket at eighty percent of the remaining session lifetime while live', async () => {
-    const ttlMs = 10_000;
+  it('swaps the socket at eighty percent of the remaining session lifetime while live', async () => {    const ttlMs = 10_000;
     const expiresAt = new Date(Date.now() + ttlMs).toISOString();
     const harness = createHarness([expiresAt, undefined]);
     await waitForSocket();

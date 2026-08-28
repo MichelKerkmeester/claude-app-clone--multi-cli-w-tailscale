@@ -12,6 +12,7 @@ import { untrack } from 'svelte';
 import type { SyncCursor, SyncMessage } from '@pi-remote/pi-rpc-protocol';
 
 import { fetchTranscript, noteRelayHeartbeat, openSyncSocket } from './relay.js';
+import { AUTH_REJECTION_LATCH_THRESHOLD, clearAuthRejectionStrikes, recordAuthRejectionStrike } from './auth-rejection-latch.js';
 import { raceWithTimeout } from '../state/race-timeout.js';
 import type { ReadOnlyCache } from './cache.js';
 import {
@@ -253,6 +254,11 @@ export function useSyncSocket(deps: {
               cursor = { epoch: message.epoch, seq: message.coversThrough };
               dispatchConnection({ type: 'live', at });
               retryCount = 0;
+              // A live stream is the only proof the device key is healthy end
+              // to end. Re-authenticating is not: every reconnect completes a
+              // challenge before the socket opens, so clearing on that would
+              // reset the count before a rejection could ever accumulate.
+              clearAuthRejectionStrikes();
               const invalidation = planInvalidationFromSync(message);
               if (invalidation !== null) runtimeControls.invalidatePlan?.(invalidation);
               void runtimeControls.refresh('live');
@@ -283,14 +289,20 @@ export function useSyncSocket(deps: {
           noteRelayHeartbeat();
           openedSocket.addEventListener('close', (event) => {
             if (stopped) return;
-            // 4003: authorization revoked — stop and surface re-enrollment.
-            if (event.code === 4003) {
-              stopForRevocation();
-              return;
-            }
             if (openedSocket !== socket) return;
             socket = null;
             clearSessionRefreshTimer();
+            // 4003: the relay rejected this device's E2EE auth. A single blip
+            // must not eject the device into re-pairing: rejections ride out
+            // through the ordinary reconnect path below, and only the third
+            // consecutive rejection stops reconnecting. Only a successful
+            // full auth clears the count — it never decays.
+            if (event.code === 4003) {
+              if (recordAuthRejectionStrike() >= AUTH_REJECTION_LATCH_THRESHOLD) {
+                stopForRevocation();
+                return;
+              }
+            }
             // 4001: session timer expired — reconnect now, not after backoff.
             if (event.code === 4001) {
               connect('expired');

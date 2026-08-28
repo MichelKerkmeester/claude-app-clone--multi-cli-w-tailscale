@@ -26,12 +26,13 @@
       "sessionid"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "tasks.md",
       "spec.md",
       "plan.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -59,9 +60,9 @@
         "source": "derived"
       },
       {
-        "name": "Authored Level",
-        "kind": "proper_noun",
-        "path": "spec.md",
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -90,6 +91,12 @@
       },
       {
         "name": "Change Type",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Blockers None",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
@@ -171,31 +178,27 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Verification Protocol",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "Today's inbox is snapshot-only",
     "created_at": "2026-08-27T17:00:58.399Z",
-    "last_save_at": "2026-08-27T19:20:21.595Z",
+    "last_save_at": "2026-08-28T13:37:35.209Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:a0da04b03f62b928fc5aa69909094198ce822a7f29980c597ce5b6b4dd9c5923",
+    "source_fingerprint": "sha256:5b8a563c3379a1ae87b75bb8a365ac191811804fddadc7f2874f652e724a6bb5",
     "source_doc_hashes": {
-      "spec.md": "175771b34ed8aff00db61992d4d519eab14e2a620fb74b09bf0b095fea9c948a",
+      "spec.md": "34577c886797f082ee79780e51a6a0eb7bb84023867b4aa82992b2bc1821b7f0",
       "plan.md": "0fd56e2a8a5c793607f885bccd9e84752dbe0684ec8ab0709c46b6fcb0243f92",
-      "tasks.md": "5a3ce95e5baf08b92808d8d63bfd4884073e88040f22a1c51bf998edf0fcadd3",
-      "checklist.md": "1153010a0fc075c5d2e94258ad9e20959c6f7f52f1a579b6d3222d1e2b9c1686"
+      "tasks.md": "1b6289da9fe29391f3bcd58d824cea4d391120fafe924915d8af8dfb50f4b0b5",
+      "checklist.md": "0d1eb7c09bde9a0976ebaf6a89b6a5c6081a04f4b3c6f05b4483792b55851d8c",
+      "implementation-summary.md": "c47ec9187a76e482c5fb06e1303134c62b3e8cd948a3c1067d2f29dc6623da04"
     },
     "last_active_child_id": null,
     "last_active_at": null

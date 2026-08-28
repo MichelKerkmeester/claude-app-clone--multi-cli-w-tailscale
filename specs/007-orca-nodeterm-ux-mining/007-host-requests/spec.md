@@ -135,6 +135,51 @@ the client own or edit mutable session truth (that is ❌, not a request).
   fallback: with the field absent the intake renders nothing, invents no rows, and stays unreachable — the
   client half already ships this way. Wire-compat: additive — a new optional catalog lane beside the command
   catalog, so an older host that omits it simply leaves the surface inert.
+- **REQ-009** — An **inbox event stream** is requested, citing recs `CE-1`, `CE-2`, `CE-3`, `CE-4`. Today's
+  `AttentionItemDto` is snapshot-only and carries no `sessionId`, so a cross-session timeline cannot be
+  joined client-side at all. Shape: an ordered event lane of
+  `{ eventId, sessionId, title, kind, occurredAt, resolved, supersedesEventId }`, with the host owning three
+  semantics the client must not synthesise — dedup (repeat of the same title from the same session inside a
+  ten-minute window is one event), supersede (an answered or content-changed ask replaces its predecessor
+  rather than sitting beside it), and retention (the newest done plus the newest unresolved per node).
+  Consuming phase: `008-uiux-features-mining/005-host-inbox-notifications`. Fail-closed fallback: with the
+  lane absent the timeline renders nothing — the client already computes these rules as pure functions over
+  an explicitly host-shaped input and returns empty for an empty list, inventing no card and resurrecting
+  nothing from local cache. Wire-compat: additive — a new optional lane beside the existing attention
+  snapshot, so an older host simply leaves the timeline empty.
+- **REQ-010** — The **inbox action and acknowledgement surface** is requested, citing recs `CE-6`, `CE-7`,
+  `HP-3`. Three parts: an `ackDone` re-broadcast so a finished-unseen card clears on every surface after one
+  view rather than once per device; a list-level ticket payload carrying enough of an approval to answer it
+  inline, alongside a re-check-still-blocked guard so acting on a stale ticket is refused rather than
+  applied; and a bulk read-ack RPC for multi-select. Consuming phase:
+  `008-uiux-features-mining/005-host-inbox-notifications`. Fail-closed fallback: without the re-broadcast a
+  view clears only locally; without the ticket payload the card offers no inline action and defers to the
+  existing Review route; without the bulk RPC the multi-select bar stays inert and never fakes a batch ack.
+  Wire-compat: additive on all three; `HP-3` is explicitly low priority and may be dropped.
+- **REQ-011** — **Delivery integrity for catch-up** is requested, citing rec `AN-1`. Shape: a monotonic
+  `{ seq, epoch }` on the event lane plus a `getMissedSince(seq, epoch)` RPC that reports whether the reply
+  is complete. The `epoch` is what makes a host restart safe: a client that saw a lower `seq` under a new
+  epoch must not treat the gap as already-delivered. Consuming phase:
+  `008-uiux-features-mining/005-host-inbox-notifications`. Fail-closed fallback: the client persists the
+  pair atomically and QUARANTINES an incomplete catch-up rather than advancing past a gap, so with the RPC
+  absent nothing advances and nothing is silently skipped. Wire-compat: additive.
+- **REQ-012** — **Notification policy and presence** is requested, citing recs `AN-2`, `AN-3`. Two parts:
+  a presence signal so an alert arriving while the person is already looking at the app can be held rather
+  than shown over what they are reading, then flushed on background and dropped if it resolved while held;
+  and independent server-side per-kind gates evaluated BEFORE any throttle, so a muted kind cannot consume
+  throttle budget and silently suppress a kind the person actually wants. Consuming phase:
+  `008-uiux-features-mining/005-host-inbox-notifications`. Fail-closed fallback: without presence the queue
+  holds nothing and behaviour is today's; without the server gate the client-side kind-before-throttle
+  ordering still applies locally but cannot stop the send. Wire-compat: additive; the per-kind gate extends
+  the existing `PushPreferences` rather than replacing it.
+- **REQ-013** — A **typed notification tap payload and a dismissal event** are requested, citing recs
+  `AN-4`, `AN-5`. Shape: a tap payload of `{ hostId, sessionId, recoveryHint? }`, and a
+  `DismissNotificationEvent` so a question answered on another device retracts this device's banner.
+  Consuming phase: `008-uiux-features-mining/005-host-inbox-notifications`. Fail-closed fallback: the client
+  REFUSES an unknown host and a malformed payload outright — it never falls back to whichever host happens
+  to be paired, because opening the wrong host from a notification is a cross-host leak; without the
+  dismissal event a banner simply stays until dismissed locally, and the show-then-dismiss race guard
+  ensures a late dismissal never produces a visible flash. Wire-compat: additive on both.
 <!-- /ANCHOR:requirements -->
 
 ---

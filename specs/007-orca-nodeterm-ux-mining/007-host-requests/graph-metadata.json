@@ -170,7 +170,7 @@
     ],
     "causal_summary": "A cross-team request to the relay/host team for the read-only fields and RPCs the ⚠️ orca recommendations need: the minimum home-card bundle (title, lastMessagePreview, agent, attention), the optional/product-gated fields (queued/subagent counts or resumable, redacted projectLabel/cwd/branch, pinned + pin RPC, capped previewMessages[], hasMore page token), and the chat RPCs (@-file-search, image-paste upload lease, dictation/STT, typed approval envelope).",
     "created_at": "2026-08-26T05:54:46.000Z",
-    "last_save_at": "2026-08-28T03:48:37.928Z",
+    "last_save_at": "2026-08-28T13:34:54.208Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -180,9 +180,9 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:890037f5c193c90456585108289b9ce2e6977eec76fe2a115b736e52fe3b6ce4",
+    "source_fingerprint": "sha256:ec7aeeeaa13b57e40088845e89c4a46d06685294c031623715c90a02df69d1a9",
     "source_doc_hashes": {
-      "spec.md": "ad52b62df0c88b68c4e88760b7aef4d59454dba0714b9d9ced49db5a363892a4",
+      "spec.md": "958497cdf205b3c5b3aa11fced49008b8883abf90e148e4b8b4dddc6c8cef085",
       "plan.md": "f15957d5848bd85a5d75049c8b52461d6a255bcce6ae58fd911e2745dbd36bf8",
       "tasks.md": "703fd207d26b69fd7c0d52ed73bcfa8d7455d4f899fc5de70d04bee25fefd08a",
       "checklist.md": "648e215afea24ed6dddf974192019366409333158e526a17ef9f6c9f76e1f959",

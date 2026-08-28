@@ -1,7 +1,7 @@
 {
   "level": "2",
   "specFolder": "007-orca-nodeterm-ux-mining/007-host-requests",
-  "description": "A cross-team request to the relay/host team for the read-only fields and RPCs the ⚠️ orca recommendations need: the minimum home-card bundle (title, l",
+  "description": "A cross-team request to the relay/host team for the read-only fields and RPCs the ⚠️ orca recommendations need: the minimum home-card bundle (title,",
   "keywords": [
     "cross-team",
     "request",
@@ -17,10 +17,9 @@
     "minimum",
     "home-card",
     "bundle",
-    "title",
-    "lastmessage"
+    "title"
   ],
-  "lastUpdated": "2026-08-28T03:48:37.779Z",
+  "lastUpdated": "2026-08-28T12:53:44.950Z",
   "specId": "007",
   "folderSlug": "host-requests",
   "parentChain": [

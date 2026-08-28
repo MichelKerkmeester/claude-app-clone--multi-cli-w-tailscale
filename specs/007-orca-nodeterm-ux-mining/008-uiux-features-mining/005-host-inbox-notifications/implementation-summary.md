@@ -28,7 +28,7 @@ _memory:
 | **Level** | 2 |
 | **Status** | Complete |
 | **Findings** | CE-1, CE-2, CE-3, CE-4, CE-5, CE-6, CE-7, HP-3, AN-1, AN-2, AN-3, AN-4, AN-5 (13) |
-| **Commits** | (this commit) |
+| **Commits** | `2c1917a` |
 | **Executors** | Six file-disjoint lanes in two waves: GPT-5.6 Luna at xhigh |
 <!-- /ANCHOR:metadata -->
 

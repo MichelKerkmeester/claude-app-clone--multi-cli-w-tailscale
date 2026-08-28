@@ -82,7 +82,7 @@ _Acceptance criteria mapping._
 - [x] CHK-FIX-001 [P0] Each finding classed (CE-5 instance-only; the rest cross-consumer over a host field) [evidence: CE-5 is the only instance-level fix in `inbox-read-state.ts`; the other twelve are cross-consumer over host fields that do not exist]
 - [x] CHK-FIX-002 [P0] Producer inventory: every consumer of `AttentionItemDto` audited for the added `sessionId` shape [evidence: `AttentionItemDto` was confirmed to carry no sessionId (`packages/pi-rpc-protocol/dist/types.d.ts:772`), so every consumer is unchanged and the join is filed as REQ-009]
 - [x] CHK-FIX-003 [P0] Consumer inventory: every notification-tap and badge consumer audited against the new payloads [evidence: `notification-tap-route.ts` and `attention.ts` are the two tap and badge consumers; both are capability-gated and covered]
-- [x] CHK-FIX-005 [P1] Fixture matrix axes (present/absent field, in-window/out-window, known/unknown host) listed before completion [evidence: the fixture axes are present/absent field, inside/outside the ten-minute window, and known/unknown host, each exercised in its own suite]
+- [x] CHK-FIX-005 [P1] Fixture matrix axes (present/absent field, in-window/out-window, known/unknown host) listed before completion [evidence: the axes are exercised as present/absent field in `inbox-timeline.test.ts`, inside/outside the ten-minute window in the same suite, and known/unknown host in `notification-tap-route.test.ts`]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -101,7 +101,7 @@ _Acceptance criteria mapping._
 ## Documentation
 
 - [x] CHK-050 [P1] spec/plan/tasks synchronized; every host dependency cross-referenced to `../../007-host-requests/` [evidence: `spec.md`, `plan.md` and `tasks.md` cross-reference REQ-009 through REQ-013 in `../../007-host-requests/spec.md`]
-- [x] CHK-051 [P1] Code comments carry durable WHY only (no spec/finding ids in code) [evidence: a hygiene scan over every changed file in `app-mobile/src` and `app-mobile/tests` returned no spec paths or finding ids, and the commit passed the pre-commit hygiene hook]
+- [x] CHK-051 [P1] Code comments carry durable WHY only (no spec/finding ids in code) [evidence: a hygiene scan over every changed file in `app-mobile/src` and `app-mobile/tests` returned no spec paths or finding ids, and commit `2c1917a` passed the pre-commit hygiene hook]
 <!-- /ANCHOR:docs -->
 
 ---

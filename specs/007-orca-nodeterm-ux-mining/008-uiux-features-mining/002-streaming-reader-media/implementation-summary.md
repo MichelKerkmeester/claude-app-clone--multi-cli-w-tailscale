@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/002-streaming-reader-media"
-    last_updated_at: "2026-08-28T07:43:40.000Z"
+    last_updated_at: "2026-08-28T11:42:24.000Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Shipped all thirteen findings across two commits; adversarial review fixed."
     next_safe_action: "Operator picks phase 003; the transcript re-feed guard waits on a consumer."
@@ -90,7 +90,9 @@ the source broken, the test watched to go red, the source restored.
 
 - `npm run typecheck -w @pi-remote/web` — 1174 files, 0 errors (6 warnings, the standing baseline).
 - `npm run test:web` — 88 files / 670 passed + 3 skipped, and 52 files / 616 passed, from the final state.
-- `node scripts/token-identity.mjs verify` — `PASS: all 35 tokens.md goldens matched across light/dark/system`.
+- `node scripts/token-identity.mjs verify app-mobile/src/app.css` — `PASS: all 35 tokens.md goldens
+  matched across light/dark/system`. The gate must be given its input files; invoked bare it reads
+  nothing and reports all 35 goldens missing, which is how it was mis-recorded here originally.
 - `npx eslint` — exit 0 on every changed file; the remaining `.svelte.ts` parse error is a repo-wide config
   gap, proven pre-existing by linting a pristine `HEAD` copy.
 - Two independent adversarial reviews each found a different P0 in the same feature, both reproduced.

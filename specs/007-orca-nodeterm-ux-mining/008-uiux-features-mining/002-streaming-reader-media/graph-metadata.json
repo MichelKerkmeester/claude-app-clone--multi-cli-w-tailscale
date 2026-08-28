@@ -182,7 +182,7 @@
     ],
     "causal_summary": "The transcript is where a long agent turn either reads clearly or reads as a black box",
     "created_at": "2026-08-27T17:00:56.622Z",
-    "last_save_at": "2026-08-28T07:43:41.243Z",
+    "last_save_at": "2026-08-28T11:42:25.030Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:ccd13e53372d0455cda3446933dde0c93fb30d0dc322feb764058f57fc93007e",
+    "source_fingerprint": "sha256:89213a155bd7f06cdb9a3a99ec89bc69f12488542c759fd4491740f989f7f54d",
     "source_doc_hashes": {
       "spec.md": "711f4167665043aac5c1f804b31ce12ec59df48dbfabfd5a51a840255b5a8166",
       "plan.md": "fc142159a6516c88c4b26e74f752c1bce6fbbd04f939175f6701eac9257c84bf",
       "tasks.md": "b3b79033bfdc492e2a074fb24e4d4e4958638a80200099dfc96e7d55ceca5ab1",
       "checklist.md": "e8604219205bdfe4e4775c9203d068ebfe2170adc926978b190c9414ac2eef90",
-      "implementation-summary.md": "51ed46b58baca735d04711e375a5fd97bb15ec7c3bd18b3634a5d95b074245f6"
+      "implementation-summary.md": "ecff6c90f315ca866229bc3969e920191bc14c86b40d8b9e1b861cb478fe3ad5"
     },
     "last_active_child_id": null,
     "last_active_at": null

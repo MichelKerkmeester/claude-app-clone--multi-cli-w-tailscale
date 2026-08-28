@@ -7,11 +7,11 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/003-home-switcher-nav-search"
     last_updated_at: "2026-08-27T18:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored Level-2 plan for home/switcher/nav/search phase (19 findings); no code."
+    recent_action: "Shipped all nineteen findings; dock now mounted and on the shared resolver."
     next_safe_action: "Await operator go, then implement the HP-4 PWA app-badge quick-win first."
     blockers:
       - "SH-3 repo:/path: operator half needs host cwd/branch (phase 006); free-term half ships now."
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -31,7 +31,7 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P1 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-27 |
 | **Findings owned** | HP-1, HP-4, HP-5, SC-2, SC-4, SD-1, SD-2, SD-3, SD-4, SD-5, SD-6, NL-1, NL-2, NL-4, NL-5, SH-2, SH-3, SH-4, SH-5 (19) |
 | **Constraint** | Host-authoritative, fail-closed; the client owns no editable session truth |

@@ -26,12 +26,13 @@
       "session"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "tasks.md",
       "spec.md",
       "plan.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -59,9 +60,9 @@
         "source": "derived"
       },
       {
-        "name": "Authored Level",
-        "kind": "proper_noun",
-        "path": "spec.md",
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -90,6 +91,12 @@
       },
       {
         "name": "Change Type",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Acceptance Criteria",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
@@ -161,7 +168,7 @@
         "source": "derived"
       },
       {
-        "name": "the",
+        "name": "gap",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
@@ -171,31 +178,27 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Verification Date",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "The home surface has no OS-level \"N waiting\" signal, one flat sort that cannot say a just-finished session outranks a still-churning one, and a search that matches only the opaque id and never preview text",
     "created_at": "2026-08-27T17:00:57.262Z",
-    "last_save_at": "2026-08-27T19:20:21.003Z",
+    "last_save_at": "2026-08-28T11:41:57.539Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8447198b2939997db42e61c24ceaa1d1111cbff794b836545d811aa0c7c329a0",
+    "source_fingerprint": "sha256:ae48a85d07969c9b06029de1435c02836eec52a9beb33080c5db86f86468f016",
     "source_doc_hashes": {
-      "spec.md": "75c0a257f1b35cca68a72b37081e195e19621a78eb54bd5a57a67b59249c5750",
+      "spec.md": "968556027230954c072af1aeaad34653d81827a77cb45deadfca5f8800fa465c",
       "plan.md": "1a3c11683ff3a49466a4aa643d62ca73d133a6b0e954858a19d05832fd33d84f",
-      "tasks.md": "de5bdbaa4b9c5a36673c92ba3b308166bc1b8769956d9db3c437be16bd5d2203",
-      "checklist.md": "f741c20565a3855a04aac6c5270c9244cdfbf484758e8c2add92ccccf4238f85"
+      "tasks.md": "30f1ebc24ecedcc18f734066c58a76e1075fcac081fe50418e6dc73dc329640d",
+      "checklist.md": "1085dd276185e68a25ff0a993a9577e7676f67a612add3cdccd564f2aa671468",
+      "implementation-summary.md": "83fb9f66b9a80ef33a76d8ef0f856c187fb0bd716d43efac621e345134b6d966"
     },
     "last_active_child_id": null,
     "last_active_at": null

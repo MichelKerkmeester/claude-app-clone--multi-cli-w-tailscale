@@ -18,6 +18,13 @@ import {
 } from '@pi-remote/pi-rpc-protocol';
 
 import { establishSession } from '../transport/auth.js';
+import {
+  applyInboxAckDoneRebroadcast,
+  createInboxAckIntent,
+  type InboxAckCapability,
+  type InboxAckDoneRebroadcast,
+  type InboxAckIntent,
+} from './inbox-ack.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. ATTENTION BADGE
@@ -48,7 +55,44 @@ export function resolveAttentionBadge(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 3. PUSH CONFIG TYPE
+// 3. ATTENTION INBOX VIEW
+// ───────────────────────────────────────────────────────────────────
+
+/** Keep host attention items visible unless this device has read their lookup id. */
+export function visibleAttentionItems(
+  items: readonly AttentionItemDto[],
+  localReadIds: ReadonlySet<string>,
+): readonly AttentionItemDto[] {
+  return items.filter((item) => !localReadIds.has(item.lookupId));
+}
+
+/** Count the attention items still visible on this device. */
+export function countAttentionItems(
+  items: readonly AttentionItemDto[],
+  localReadIds: ReadonlySet<string>,
+): number {
+  return visibleAttentionItems(items, localReadIds).length;
+}
+
+/** Create an acknowledgment intent without changing the local read overlay. */
+export function createAttentionAckIntent(
+  lookupId: string,
+  capability: InboxAckCapability | undefined,
+): InboxAckIntent | undefined {
+  return createInboxAckIntent(lookupId, capability);
+}
+
+/** Apply a host acknowledgment only when its advertised capability is present. */
+export function applyAttentionAckDoneRebroadcast(
+  readIds: ReadonlySet<string>,
+  rebroadcast: InboxAckDoneRebroadcast | undefined,
+  capability: InboxAckCapability | undefined,
+): Set<string> {
+  return applyInboxAckDoneRebroadcast(readIds, rebroadcast, capability);
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 4. PUSH CONFIG TYPE
 // ───────────────────────────────────────────────────────────────────
 
 export interface PushConfig {
@@ -58,7 +102,7 @@ export interface PushConfig {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 4. ATTENTION ENDPOINTS
+// 5. ATTENTION ENDPOINTS
 // ───────────────────────────────────────────────────────────────────
 
 export async function fetchAttention(signal?: AbortSignal): Promise<readonly AttentionItemDto[]> {
@@ -86,7 +130,7 @@ export async function openAttentionHint(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 5. PUSH SUBSCRIPTION LIFECYCLE
+// 6. PUSH SUBSCRIPTION LIFECYCLE
 // ───────────────────────────────────────────────────────────────────
 
 export async function fetchPushConfig(signal?: AbortSignal): Promise<PushConfig> {
@@ -145,7 +189,7 @@ export async function setPushForeground(foreground: boolean): Promise<void> {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 6. TRANSPORT HELPERS
+// 7. TRANSPORT HELPERS
 // ───────────────────────────────────────────────────────────────────
 
 async function postJson(path: string, body: unknown, signal?: AbortSignal): Promise<unknown> {

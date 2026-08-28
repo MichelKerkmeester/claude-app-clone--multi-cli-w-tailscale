@@ -7,11 +7,11 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/005-host-inbox-notifications"
     last_updated_at: "2026-08-27T18:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Authored Level-2 plan for the host inbox and notification phase (CE, AN, HP-3); no code."
+    recent_action: "Shipped CE-5 real; twelve host-gated findings ship inert and filed."
     next_safe_action: "Build CE-5 device-local read/archive and the fixture render harnesses first."
     blockers:
       - "12 of 13 findings need a relay-authored, client-read-only inbox-event RPC (sessionId per event) or push contract."
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -31,7 +31,7 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P1 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-27 |
 | **Findings owned** | CE-1, CE-2, CE-3, CE-4, CE-5, CE-6, CE-7, HP-3, AN-1, AN-2, AN-3, AN-4, AN-5 (13) |
 | **Constraint** | Host-authoritative, fail-closed; the client owns no editable session truth |

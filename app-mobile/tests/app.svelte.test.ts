@@ -88,6 +88,11 @@ const attention = vi.hoisted(() => ({
   updatePushPreferences: vi.fn(),
 }));
 
+const appState = vi.hoisted(() => ({
+  app: { sessions: { items: [] as SessionCardDto[] } },
+  navigate: vi.fn(),
+}));
+
 // ───────────────────────────────────────────────────────────────────
 // 3. SETUP
 // ───────────────────────────────────────────────────────────────────
@@ -117,9 +122,14 @@ vi.mock('@tanstack/svelte-virtual', () => {
 });
 
 vi.mock('../src/shared/transport/relay.js', () => relay);
-vi.mock('../src/shared/format/attention.js', () => ({
+vi.mock('../src/shared/format/attention.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/shared/format/attention.js')>()),
   ...attention,
   setPushForeground: vi.fn(),
+}));
+vi.mock('../src/shared/state/app-state.svelte.js', () => ({
+  getAppActions: () => ({ navigate: appState.navigate }),
+  getAppState: () => appState.app,
 }));
 
 import { clearChatDraftCache } from '../src/shared/state/chat-draft-cache.js';
@@ -137,6 +147,7 @@ import {
 } from '../src/shared/state/state.js';
 
 import { INPUT_LOCK_SETTLE_MS } from '../src/shared/state/streaming-derivations.js';
+import { writeRecencyStack } from '../src/shared/state/recency-stack.js';
 
 const occurredAt = '2026-08-13T10:00:00.000Z';
 const sessionId = 'session_web_001';
@@ -217,6 +228,7 @@ beforeEach(() => {
   } as unknown as DOMRectList);
 
   vi.clearAllMocks();
+  appState.app.sessions.items = [];
   relay.fetchCommands.mockResolvedValue(catalogFixture);
   attention.fetchPushConfig.mockResolvedValue({
     supported: false,
@@ -845,6 +857,39 @@ it('submits the compose box through the relay command path', async () => {
   expect(dispatchTranscript).toHaveBeenCalledWith(
     expect.objectContaining({ type: 'promptAccepted', block: accepted }),
   );
+});
+
+it('mounts the recent-session dock below the transcript with visited chips', () => {
+  const visited: SessionCardDto = {
+    id: 'session_visited_002',
+    title: 'Visited from chat',
+    status: 'idle',
+    updatedAt: occurredAt,
+    messageCount: 1,
+  };
+  appState.app.sessions.items = [visited];
+  writeRecencyStack([visited.id]);
+
+  render(Session, {
+    props: {
+      connection: 'live',
+      sessionId,
+      initialCache: null,
+      transcript: { ...EMPTY_TRANSCRIPT, sessionId, epoch: 'epoch_web_001', source: 'relay' },
+      dispatchConnection: vi.fn(),
+      dispatchTranscript: vi.fn(),
+      status: 'idle',
+      onBack: vi.fn(),
+      onInbox: vi.fn(),
+      onReview: vi.fn(),
+      theme: 'system',
+      onThemeChange: vi.fn(),
+    },
+  });
+
+  const dock = screen.getByRole('region', { name: 'Recent sessions' });
+  expect(dock).toBeInTheDocument();
+  expect(within(dock).getByRole('button', { name: 'Visited from chat, Settled' })).toBeInTheDocument();
 });
 
 it('prefetches the shared command catalog once for a live session', async () => {

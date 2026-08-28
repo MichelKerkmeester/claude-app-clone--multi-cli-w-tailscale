@@ -24,7 +24,10 @@ const attention = vi.hoisted(() => ({
   setPushForeground: vi.fn(),
 }));
 
-vi.mock('../src/shared/format/attention.js', () => attention);
+vi.mock('../src/shared/format/attention.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/shared/format/attention.js')>()),
+  ...attention,
+}));
 
 // ───────────────────────────────────────────────────────────────────
 // 2. FIXTURES
@@ -149,6 +152,37 @@ describe('home roster list behaviour', () => {
     ).toBeInTheDocument();
     expect(within(section('unread')).queryByRole('button')).not.toBeInTheDocument();
     expect(section('unread').querySelector('[data-section-count="unread"]')?.textContent).toBe('0');
+  });
+
+  it('shares density and signal visibility changes across mounted cards', async () => {
+    const user = userEvent.setup();
+    renderHome([
+      card('session_density_first', {
+        title: 'First density card',
+        lastMessagePreview: 'First preview',
+      }),
+      card('session_density_second', {
+        title: 'Second density card',
+        lastMessagePreview: 'Second preview',
+      }),
+    ]);
+
+    expect(document.querySelectorAll('[data-inline-density="detailed"]')).toHaveLength(2);
+    const compactControls = screen.getAllByRole('radio', { name: 'Compact' });
+    expect(compactControls).toHaveLength(2);
+    await user.click(compactControls[0]);
+
+    expect(document.querySelectorAll('[data-inline-density="compact"]')).toHaveLength(2);
+    expect(screen.getAllByRole('radio', { name: 'Compact' })).toHaveLength(2);
+    expect(screen.getAllByRole('radio', { name: 'Compact' })[1]).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+
+    const previewControls = screen.getAllByRole('checkbox', { name: 'Preview' });
+    expect(previewControls).toHaveLength(2);
+    await user.click(previewControls[0]);
+    expect(document.querySelectorAll('[data-inline-signal="preview"]')).toHaveLength(0);
   });
 
   it('keeps last-good rows and shows Stale when refresh rejects', async () => {

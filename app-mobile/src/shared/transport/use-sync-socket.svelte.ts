@@ -21,6 +21,7 @@ import {
   type TodoProjectionAction,
 } from '../state/state.js';
 import { messageFrom } from '../format/view-helpers.js';
+import { createForegroundPoller, isNavigatorReconnectEdge } from '../state/foreground-polling.js';
 
 // ───────────────────────────────────────────────────────────────────
 // 2. SYNC MESSAGE HELPERS
@@ -150,21 +151,6 @@ export function useSyncSocket(deps: {
     }
 
     const controller = new AbortController();
-    void fetchTranscript(sessionId, controller.signal)
-      .then((page) => {
-        dispatchTranscript({
-          type: 'page',
-          sessionId,
-          coversThrough: page.coversThrough,
-          blocks: page.items,
-          at: new Date().toISOString(),
-        });
-      })
-      .catch((error: unknown) => {
-        if (!controller.signal.aborted) {
-          dispatchTranscript({ type: 'error', error: messageFrom(error) });
-        }
-      });
 
     // ───────────────────────────────────────────────────────────────────
     // 4. SOCKET CONNECT AND RETRY
@@ -305,7 +291,7 @@ export function useSyncSocket(deps: {
             }
             // 4001: session timer expired — reconnect now, not after backoff.
             if (event.code === 4001) {
-              connect('expired');
+              if (document.visibilityState === 'visible') connect('expired');
               return;
             }
             retryCount += 1;
@@ -315,6 +301,7 @@ export function useSyncSocket(deps: {
             } as ConnectionAction);
             retryTimer = window.setTimeout(() => {
               retryTimer = null;
+              if (document.visibilityState !== 'visible') return;
               connect('retry');
             }, Math.min(1_000 * 2 ** retryCount, 15_000));
           });
@@ -325,6 +312,7 @@ export function useSyncSocket(deps: {
           if (refreshDelay !== null) {
             sessionRefreshTimer = window.setTimeout(() => {
               sessionRefreshTimer = null;
+              if (document.visibilityState !== 'visible') return;
               connect('preemptive');
             }, refreshDelay);
           }
@@ -335,6 +323,7 @@ export function useSyncSocket(deps: {
           if (mode === 'preemptive' && socket !== null) {
             retryTimer = window.setTimeout(() => {
               retryTimer = null;
+              if (document.visibilityState !== 'visible') return;
               connect('preemptive');
             }, MIN_SESSION_REFRESH_DELAY_MS);
             return;
@@ -343,12 +332,57 @@ export function useSyncSocket(deps: {
           dispatchConnection({ type: 'connecting', reconnect: true });
           retryTimer = window.setTimeout(() => {
             retryTimer = null;
+            if (document.visibilityState !== 'visible') return;
             connect('retry');
           }, Math.min(1_000 * 2 ** retryCount, 15_000));
         });
     };
-    // untrack initial connect so `connection` is not an effect dep.
-    untrack(() => connect('initial'));
+    let navigatorWasOnline = navigator.onLine;
+    const poller = createForegroundPoller({
+      intervalMs: 0,
+      getVisibility: () => document.visibilityState,
+      read: () => {
+        if (stopped) return;
+        void fetchTranscript(sessionId, controller.signal)
+          .then((page) => {
+            dispatchTranscript({
+              type: 'page',
+              sessionId,
+              coversThrough: page.coversThrough,
+              blocks: page.items,
+              at: new Date().toISOString(),
+            });
+          })
+          .catch((error: unknown) => {
+            if (!controller.signal.aborted) {
+              dispatchTranscript({ type: 'error', error: messageFrom(error) });
+            }
+          });
+        if (!navigator.onLine) return;
+        if (socket === null) {
+          untrack(() => connect(retryCount > 0 ? 'retry' : 'initial'));
+        }
+      },
+    });
+    const onVisibility = (): void => {
+      if (document.visibilityState === 'hidden') {
+        clearRetryTimer();
+        clearSessionRefreshTimer();
+      }
+      poller.notifyVisibility(document.visibilityState);
+    };
+    const onOnline = (): void => {
+      const reconnect = isNavigatorReconnectEdge(navigatorWasOnline, true);
+      navigatorWasOnline = true;
+      if (reconnect) poller.notifyReconnect();
+    };
+    const onOffline = (): void => {
+      navigatorWasOnline = false;
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    poller.start();
 
     // ───────────────────────────────────────────────────────────────────
     // 5. TEARDOWN
@@ -356,6 +390,10 @@ export function useSyncSocket(deps: {
 
     return () => {
       stopped = true;
+      poller.stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
       controller.abort();
       if (frame !== null) window.cancelAnimationFrame(frame);
       pendingMessages = [];

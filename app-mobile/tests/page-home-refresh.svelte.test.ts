@@ -81,7 +81,10 @@ const shell = vi.hoisted(() => {
   };
 });
 
-vi.mock('../src/shared/format/attention.js', () => attention);
+vi.mock('../src/shared/format/attention.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/shared/format/attention.js')>()),
+  ...attention,
+}));
 vi.mock('../src/shared/transport/relay.js', () => relay);
 vi.mock('../src/shared/state/app-state.svelte.js', () => ({
   getAppState: () => shell.app,

@@ -160,7 +160,10 @@ describe('session card polish', () => {
     expect(button).not.toHaveAttribute('data-unread');
     expect(document.querySelector('[data-live-badge="true"]')).not.toBeNull();
     expect(screen.getByText('Working')).toBeInTheDocument();
-    expect(document.querySelector('[data-attention-badge]')).toBeNull();
+    expect(document.querySelector('[data-attention-badge]')).toHaveAttribute(
+      'data-attention-badge',
+      'working',
+    );
   });
 
   it('opens on card tap and keeps compactId as the fallback title', async () => {
@@ -177,7 +180,10 @@ describe('optional host-field gate on the card', () => {
   it('keeps today\'s card when enrichment keys are absent', () => {
     renderCard(card({ status: 'running' }));
     expect(document.querySelector('[data-inline-detail="true"]')).toBeNull();
-    expect(document.querySelector('[data-attention-badge]')).toBeNull();
+    expect(document.querySelector('[data-attention-badge]')).toHaveAttribute(
+      'data-attention-badge',
+      'working',
+    );
     expect(document.querySelector('[data-context-percent]')).toBeNull();
     expect(screen.queryByText(/^You:/)).not.toBeInTheDocument();
     expect(screen.getByText(compactId('session_card_ui_001'))).toBeInTheDocument();
@@ -210,15 +216,18 @@ describe('optional host-field gate on the card', () => {
       'aria-valuenow',
       '42',
     );
-    expect(screen.getByRole('status')).toHaveTextContent('Waiting');
+    expect(screen.getByRole('status')).toHaveTextContent('Permission');
     expect(document.querySelector('[data-inline-detail="true"]')).not.toBeNull();
     expect(document.querySelector('[aria-expanded]')).toBeNull();
   });
 
-  it('does not badge a running session as needs-you when attention is present', () => {
+  it('keeps the shared working badge ahead of host permission attention', () => {
     renderCard(withHost(card({ status: 'running' }), { attention: 'waiting' }));
-    expect(document.querySelector('[data-attention-badge]')).toBeNull();
-    expect(screen.queryByText('Waiting')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-attention-badge]')).toHaveAttribute(
+      'data-attention-badge',
+      'working',
+    );
+    expect(screen.queryByText('Permission')).not.toBeInTheDocument();
     expect(screen.getByText('Working')).toBeInTheDocument();
   });
 

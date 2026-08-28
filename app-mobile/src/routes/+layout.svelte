@@ -9,6 +9,7 @@
   import { onMount, untrack, type Snippet } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
 
   // Global foundation + not-yet-decomposed rules; shrinks as surfaces move to scoped styles.
   import '../app.css';
@@ -28,9 +29,25 @@
   import { fetchSessions } from '$shared/transport/relay.js';
   import { setPushForeground, unsubscribeFromPush } from '$shared/format/attention.js';
   import { saveCache } from '$shared/transport/cache.js';
+  import { countAttentionSessions } from '$shared/format/card-projection.js';
   import { messageFrom } from '$shared/format/view-helpers.js';
+  import { readUnreadIds } from '$shared/state/unread-overlay.js';
+  import { updateAppBadge } from '$shared/state/app-badge.js';
   import type { ConnectionAction } from '$shared/state/state.js';
   import type { AttentionResolutionDto } from '@pi-remote/pi-rpc-protocol';
+  import {
+    bindSessionStackRouter,
+    dismissSessionToHome,
+    navigateSessionStack,
+    resetSessionStackNavigation,
+    type SessionStackRouter,
+  } from '$shared/state/session-stack-navigation.js';
+  import {
+    createForegroundPoller,
+    isNavigatorReconnectEdge,
+    ROSTER_POLL_MS,
+    type ForegroundPoller,
+  } from '$shared/state/foreground-polling.js';
 
   import RootErrorBoundary from '$shared/chrome/root-error-boundary.svelte';
   import Enrollment from '../pages/enrollment/screen-enrollment.svelte';
@@ -94,11 +111,37 @@
   });
 
   // ── Shell actions (routing + async auth combined with state) ──────────────
-  // Keep navigate focused on its single responsibility.
-  function navigate(sessionId: string | null): void {
-    void goto(sessionId === null ? '/' : `/session/${encodeURIComponent(sessionId)}`);
+  function gotoSessionStackHref(href: string, replaceState = false): ReturnType<typeof goto> {
+    const opts = replaceState ? { replaceState: true } : undefined;
+    if (href === '/') {
+      return goto(resolve('/'), opts);
+    }
+    if (href.startsWith('/session/')) {
+      const id = decodeURIComponent(href.slice('/session/'.length));
+      return goto(resolve('/session/[id]', { id }), opts);
+    }
+    throw new Error('Session stack navigation received an unsupported href.');
   }
-  // Keep on home focused on its single responsibility.
+
+  const sessionRouter: SessionStackRouter = {
+    push: (href) => gotoSessionStackHref(href),
+    replace: (href) => gotoSessionStackHref(href, true),
+    pop: () => {
+      history.back();
+    },
+  };
+  bindSessionStackRouter(sessionRouter);
+
+  let rosterPoller: ForegroundPoller | null = null;
+  let navigatorWasOnline = typeof navigator === 'undefined' ? true : navigator.onLine;
+
+  function navigate(sessionId: string | null): void {
+    if (sessionId === null) {
+      dismissSessionToHome(sessionRouter);
+      return;
+    }
+    navigateSessionStack({ pathname: $page.url.pathname }, { kind: 'session', sessionId });
+  }
   function onHome(): void {
     app.reviewOpen = false;
     navigate(null);
@@ -146,6 +189,7 @@
       .catch(() => undefined)
       .then(logoutDevice)
       .finally(() => {
+        resetSessionStackNavigation();
         app.authReady = false;
         app.dispatchConnection({ type: 'authenticating' });
         app.bumpAuthAttempt();
@@ -156,6 +200,17 @@
   setAppActions(actions);
 
   // ── Lifecycle effects (ported from App's useEffects) ──────────────────────
+
+  // Keep the OS badge derived from the current host roster and local unread overlay.
+  function syncAppBadge(items = app.sessions.items): void {
+    const count = countAttentionSessions(items, readUnreadIds());
+    untrack(() => updateAppBadge(count));
+  }
+
+  $effect(() => {
+    const items = app.sessions.items;
+    syncAppBadge(items);
+  });
 
   // Theme on <html>, theme-color meta, persistence, and system-scheme listener.
   $effect(() => {
@@ -185,7 +240,8 @@
 
   // Enrollment / session bootstrap: re-runs on each auth attempt (online, logout).
   $effect(() => {
-    app.authAttempt;
+    // Re-run when logout or coming online requests a new auth attempt.
+    void app.authAttempt;
     let stopped = false;
     if (!navigator.onLine) return;
     // untrack dispatchConnection: tracking `connection` would cancel establishSession mid-flight.
@@ -239,28 +295,45 @@
     };
   });
 
-  // Sessions roster fetch, keyed on auth + the current route session.
+  // Roster reads only while this tab is visible: one catch-up on show/reconnect,
+  // then a timer. Hidden tabs drop the timer so a backgrounded phone does not
+  // keep hitting the relay.
   $effect(() => {
     if (!app.authReady) return;
     const currentSessionId = selectedSessionId;
-    const controller = new AbortController();
-    // untrack dispatchSessions: tracking `sessions` would loop fetch abort/restart.
-    untrack(() => app.dispatchSessions({ type: 'loading' }));
-    void fetchSessions(controller.signal)
-      .then((items) => {
-        const at = new Date().toISOString();
-        app.dispatchSessions({ type: 'loaded', items, at });
-        if (currentSessionId === null) app.dispatchConnection({ type: 'live', at });
-      })
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-        app.dispatchSessions({ type: 'error', error: messageFrom(error) });
-        app.dispatchConnection({
-          type: navigator.onLine ? 'error' : 'offline',
-          ...(navigator.onLine ? { detail: 'Relay unavailable.' } : {}),
-        } as ConnectionAction);
-      });
-    return () => controller.abort();
+    let tickController: AbortController | null = null;
+    const poller = createForegroundPoller({
+      intervalMs: ROSTER_POLL_MS,
+      getVisibility: () => document.visibilityState,
+      read: () => {
+        tickController?.abort();
+        const controller = new AbortController();
+        tickController = controller;
+        // untrack dispatchSessions: tracking `sessions` would loop fetch abort/restart.
+        untrack(() => app.dispatchSessions({ type: 'loading' }));
+        void fetchSessions(controller.signal)
+          .then((items) => {
+            const at = new Date().toISOString();
+            app.dispatchSessions({ type: 'loaded', items, at });
+            if (currentSessionId === null) app.dispatchConnection({ type: 'live', at });
+          })
+          .catch((error: unknown) => {
+            if (controller.signal.aborted) return;
+            app.dispatchSessions({ type: 'error', error: messageFrom(error) });
+            app.dispatchConnection({
+              type: navigator.onLine ? 'error' : 'offline',
+              ...(navigator.onLine ? { detail: 'Relay unavailable.' } : {}),
+            } as ConnectionAction);
+          });
+      },
+    });
+    rosterPoller = poller;
+    poller.start();
+    return () => {
+      poller.stop();
+      tickController?.abort();
+      if (rosterPoller === poller) rosterPoller = null;
+    };
   });
 
   // Persist only relay-sourced roster + transcript.
@@ -269,10 +342,23 @@
   });
 
   onMount(() => {
-    const onOnline = () => app.bumpAuthAttempt();
-    const onOffline = () => app.dispatchConnection({ type: 'offline' });
+    const onOnline = () => {
+      const reconnect = isNavigatorReconnectEdge(navigatorWasOnline, true);
+      navigatorWasOnline = true;
+      app.bumpAuthAttempt();
+      if (reconnect) rosterPoller?.notifyReconnect();
+    };
+    const onOffline = () => {
+      navigatorWasOnline = false;
+      app.dispatchConnection({ type: 'offline' });
+    };
+    const onVisibility = () => {
+      rosterPoller?.notifyVisibility(document.visibilityState);
+      if (document.visibilityState === 'visible') syncAppBadge();
+    };
     window.addEventListener('online', onOnline);
     window.addEventListener('offline', onOffline);
+    document.addEventListener('visibilitychange', onVisibility);
 
     // /attention/<id> resolves on its route; app-lock/revoke events still land here.
     if (import.meta.env.PROD && 'serviceWorker' in navigator) {
@@ -284,6 +370,7 @@
     return () => {
       window.removeEventListener('online', onOnline);
       window.removeEventListener('offline', onOffline);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   });
 </script>

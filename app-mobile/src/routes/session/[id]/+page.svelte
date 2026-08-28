@@ -31,6 +31,10 @@
   );
 
   const status = $derived(session?.status ?? 'unknown');
+
+  function handleBack(): void {
+    actions.navigate(null);
+  }
 </script>
 
 <!-- Component content -->
@@ -45,7 +49,7 @@
         This session is no longer available.
       {/if}
     </p>
-    <button type="button" onclick={() => actions.navigate(null)}>Go Home</button>
+    <button type="button" onclick={handleBack}>Go Home</button>
   </div>
 {:else}
   <Session
@@ -58,7 +62,7 @@
     dispatchTranscript={app.dispatchTranscript}
     dispatchTodoProjection={app.dispatchTodoProjection}
     {status}
-    onBack={() => actions.navigate(null)}
+    onBack={handleBack}
     onInbox={actions.openInbox}
     onReview={actions.openReview}
     theme={app.theme}

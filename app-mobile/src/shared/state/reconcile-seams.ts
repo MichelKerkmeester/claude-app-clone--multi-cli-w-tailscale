@@ -80,3 +80,23 @@ export function reconnectVerdict(
   if (source === 'relay' && card.status === 'running') return 'stale-running';
   return 'undecided';
 }
+
+// ───────────────────────────────────────────────────────────────────
+// 5. RECENCY RECONCILIATION
+// ───────────────────────────────────────────────────────────────────
+
+/** Keep only local ids present in the host's current session roster. */
+export function reconcileRecencyStack(
+  recencyIds: readonly string[],
+  sessions: readonly Pick<SessionCardDto, 'id'>[],
+): string[] {
+  const liveIds = new Set(sessions.map((session) => session.id));
+  const seen = new Set<string>();
+  const reconciled: string[] = [];
+  for (const id of recencyIds) {
+    if (!liveIds.has(id) || seen.has(id)) continue;
+    seen.add(id);
+    reconciled.push(id);
+  }
+  return reconciled;
+}

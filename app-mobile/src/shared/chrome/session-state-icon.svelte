@@ -6,6 +6,25 @@
 
   import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
+  // Known host tools get a compact visual mark; unknown names remain readable text.
+  export const TOOL_GLYPHS: Readonly<Record<string, string>> = Object.freeze({
+    apply_patch: '✎',
+    bash: '⌘',
+    edit: '✎',
+    find: '⌕',
+    grep: '⌕',
+    read: '◌',
+    search: '⌕',
+    shell: '⌘',
+    terminal: '⌘',
+    web_search: '↗',
+    write: '✎',
+  });
+
+  export function toolGlyphFor(tool: string): string | null {
+    return TOOL_GLYPHS[tool] ?? null;
+  }
+
   export interface SessionStateIconProps {
     readonly status: SessionCardDto['status'];
   }

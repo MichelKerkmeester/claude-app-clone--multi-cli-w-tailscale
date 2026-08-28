@@ -3,8 +3,8 @@
 // ───────────────────────────────────────────────────────────────────
 
 // Presentation-only projections over SessionCardDto. Every function here
-// is pure over immutable card fields (status, messageCount, updatedAt)
-// plus an injected clock and optional host keys that are read only when
+// is pure over immutable card fields (status, messageCount, updatedAt),
+// an injected unread set, and optional host keys that are read only when
 // actually present. None of them writes status, fabricates a timestamp,
 // or invents a title. An absent clock must mean genuinely unknown, and a
 // stale working card decays to an *unknown* presentation — a lost agent
@@ -16,6 +16,7 @@
 
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 
+import { resolveAttentionBadge, type AttentionBadge } from './attention.js';
 import { compactId } from './view-helpers.js';
 
 // ───────────────────────────────────────────────────────────────────
@@ -64,7 +65,7 @@ export function hueFromId(id: string): number {
 // 4. OPTIONAL HOST-FIELD GATE
 // ───────────────────────────────────────────────────────────────────
 
-export type AttentionBadge = 'done' | 'blocked' | 'waiting';
+const EMPTY_UNREAD_IDS: ReadonlySet<string> = new Set();
 
 /** True only when the host published the key; inherited prototype names do not count. */
 export function hasHostField(card: object, key: string): boolean {
@@ -91,15 +92,6 @@ function ownPreviewMessages(card: object): readonly string[] | null {
   const value = ownValue(card, 'previewMessages');
   if (!Array.isArray(value) || !value.every((entry) => typeof entry === 'string')) return null;
   return value;
-}
-
-function attentionBadgeFor(card: SessionCardDto): AttentionBadge | null {
-  // A still-running agent is live work, never a needs-you badge.
-  if (card.status === 'running') return null;
-  if (!hasHostField(card, 'attention')) return null;
-  const value = ownValue(card, 'attention');
-  if (value === 'done' || value === 'blocked' || value === 'waiting') return value;
-  return null;
 }
 
 function hideEmptyFor(card: SessionCardDto, count: number): boolean {
@@ -148,7 +140,10 @@ export interface CardProjection {
   readonly prompt: string | null;
 }
 
-export function projectSessionCard(card: SessionCardDto): CardProjection {
+export function projectSessionCard(
+  card: SessionCardDto,
+  localUnreadIds: ReadonlySet<string> = EMPTY_UNREAD_IDS,
+): CardProjection {
   const count = card.messageCount;
   const named = hostTitle(card);
   const contextPercent = contextPercentFor(card);
@@ -161,7 +156,7 @@ export function projectSessionCard(card: SessionCardDto): CardProjection {
     isRestingDone: card.status === 'idle',
     isRecoverableEmpty: count === 0,
     hideEmpty: hideEmptyFor(card, count),
-    attentionBadge: attentionBadgeFor(card),
+    attentionBadge: resolveAttentionBadge(card, localUnreadIds),
     lastMessagePreview: ownString(card, 'lastMessagePreview'),
     previewMessages: ownPreviewMessages(card),
     agent: ownString(card, 'agent'),
@@ -172,6 +167,19 @@ export function projectSessionCard(card: SessionCardDto): CardProjection {
     tool: ownString(card, 'tool'),
     prompt: ownString(card, 'prompt'),
   };
+}
+
+/** Count sessions that have an attention signal for the person, excluding live work. */
+export function countAttentionSessions(
+  cards: readonly SessionCardDto[],
+  localUnreadIds: ReadonlySet<string> = EMPTY_UNREAD_IDS,
+): number {
+  let count = 0;
+  for (const card of cards) {
+    const badge = resolveAttentionBadge(card, localUnreadIds);
+    if (badge !== null && badge.kind !== 'working') count += 1;
+  }
+  return count;
 }
 
 export function shouldRenderCard(card: SessionCardDto): boolean {

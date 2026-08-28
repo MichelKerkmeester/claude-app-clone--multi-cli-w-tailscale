@@ -5,12 +5,22 @@
   // ───────────────────────────────────────────────────────────────────
 
   import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
+  import type {
+    CardDensity,
+    SignalKey,
+    SignalVisibility,
+  } from '$shared/format/roster-view-preference.js';
 
   export interface SessionCardProps {
     readonly sessionId: string;
     readonly selectSession: (id: string) => SessionCardDto | undefined;
     readonly source: 'none' | 'cache' | 'relay';
     readonly unread: boolean;
+    readonly unreadIds?: ReadonlySet<string>;
+    readonly density?: CardDensity;
+    readonly signalVisibility?: SignalVisibility;
+    readonly onDensityChange?: (density: CardDensity) => void;
+    readonly onSignalToggle?: (signal: SignalKey) => void;
     readonly launchingId: string | null;
     readonly openDisabled: boolean;
     readonly onOpen: (event: MouseEvent, sessionId: string) => void;
@@ -34,7 +44,7 @@
   import { changedSinceLooked } from '$shared/format/seen-marker.js';
   import { reconnectVerdict } from '$shared/state/reconcile-seams.js';
   import Button from '$shared/primitives/button/button.svelte';
-  import SessionStateIcon from '$shared/chrome/session-state-icon.svelte';
+  import SessionStateIcon, { toolGlyphFor } from '$shared/chrome/session-state-icon.svelte';
 
   // ───────────────────────────────────────────────────────────────────
   // 2. PROPS
@@ -45,6 +55,17 @@
     selectSession,
     source,
     unread,
+    unreadIds,
+    density = 'detailed',
+    signalVisibility = {
+      activity: true,
+      preview: true,
+      prompt: true,
+      agent: true,
+      context: true,
+    },
+    onDensityChange = () => undefined,
+    onSignalToggle = () => undefined,
     launchingId,
     openDisabled,
     onOpen,
@@ -53,12 +74,39 @@
   }: SessionCardProps = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 3. DERIVED STATE
+  // 3. DISPLAY CONTROLS
+  // ───────────────────────────────────────────────────────────────────
+
+  const EMPTY_UNREAD_IDS: ReadonlySet<string> = new Set();
+  const SIGNAL_KEYS: readonly SignalKey[] = ['activity', 'preview', 'prompt', 'agent', 'context'];
+  const SIGNAL_LABELS: Record<SignalKey, string> = {
+    activity: 'Activity',
+    preview: 'Preview',
+    prompt: 'Prompt',
+    agent: 'Agent',
+    context: 'Context',
+  };
+  const COMPACT_SIGNAL_KEYS: readonly SignalKey[] = ['activity', 'preview'];
+  const localUnreadIds = $derived(
+    unreadIds ?? (unread ? new Set([sessionId]) : EMPTY_UNREAD_IDS),
+  );
+
+  function handleControlKeydown(event: KeyboardEvent, activate: () => void): void {
+    event.stopPropagation();
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    activate();
+  }
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   // Per-id selector: one session's flip invalidates this card, not a roster object.
   const session = $derived(selectSession(sessionId));
-  const projection = $derived(session === undefined ? null : projectSessionCard(session));
+  const projection = $derived(
+    session === undefined ? null : projectSessionCard(session, localUnreadIds),
+  );
   const staleLook = $derived(
     session === undefined
       ? 'fresh'
@@ -86,12 +134,39 @@
       : changedSinceLooked(session.updatedAt, lastSeenUpdatedAt, seenAvailable),
   );
   const showUnread = $derived(
-    session !== undefined && session.status !== 'running' && unread,
+    session !== undefined && session.status !== 'running' && localUnreadIds.has(session.id),
   );
   const showInlineDetail = $derived(projection !== null && hasInlineEnrichment(projection));
+  const showActivity = $derived(
+    signalVisibility.activity &&
+      (density === 'detailed' || COMPACT_SIGNAL_KEYS.includes('activity')),
+  );
+  const showPreview = $derived(
+    signalVisibility.preview &&
+      (density === 'detailed' || COMPACT_SIGNAL_KEYS.includes('preview')),
+  );
+  const showPrompt = $derived(
+    signalVisibility.prompt &&
+      (density === 'detailed' || COMPACT_SIGNAL_KEYS.includes('prompt')),
+  );
+  const showAgent = $derived(
+    signalVisibility.agent &&
+      (density === 'detailed' || COMPACT_SIGNAL_KEYS.includes('agent')),
+  );
+  const showContext = $derived(
+    signalVisibility.context &&
+      (density === 'detailed' || COMPACT_SIGNAL_KEYS.includes('context')),
+  );
+  const toolGlyph = $derived.by(() => {
+    if (session === undefined || session.status !== 'running' || projection === null || projection.tool === null) return null;
+    return toolGlyphFor(projection.tool);
+  });
   const activityLine = $derived.by(() => {
-    if (projection === null) return null;
+    if (projection === null || toolGlyph !== null) return null;
     if (projection.activity === null && projection.tool === null) return null;
+    const unknownWorkingTool =
+      session?.status === 'running' && projection.tool !== null && toolGlyphFor(projection.tool) === null;
+    if (unknownWorkingTool) return projection.activity ?? projection.tool;
     if (projection.activity !== null && projection.tool !== null) {
       return `${projection.activity} (${projection.tool})`;
     }
@@ -135,11 +210,18 @@
       <span
         class={`session--state state--${presentedStatus}`}
         data-live-badge="true"
+        data-attention-badge={
+          presentedStatus === 'running' && projection.attentionBadge?.kind === 'working'
+            ? 'working'
+            : undefined
+        }
       >
         {#if presentedStatus !== 'idle'}
           <SessionStateIcon status={presentedStatus} />
         {/if}
-        {sessionStatusLabel(presentedStatus)}
+        {presentedStatus === 'running' && projection.attentionBadge?.kind === 'working'
+          ? projection.attentionBadge.label
+          : sessionStatusLabel(presentedStatus)}
       </span>
       {#if showSeenDot}
         <span
@@ -149,39 +231,90 @@
           aria-label="Changed since you looked"
         ></span>
       {/if}
-      {#if projection.attentionBadge !== null}
-        <span class="session--attention" role="status" data-attention-badge={projection.attentionBadge}>
-          {projection.attentionBadge === 'done'
-            ? 'Needs you'
-            : projection.attentionBadge === 'blocked'
-              ? 'Blocked'
-              : 'Waiting'}
-        </span>
+      {#if projection.attentionBadge !== null && projection.attentionBadge.kind !== 'working'}
+        <span
+          class="session--attention"
+          role="status"
+          data-attention-badge={projection.attentionBadge.kind}
+        >{projection.attentionBadge.label}</span>
       {/if}
     </span>
     <strong>{projection.title}</strong>
     {#if showInlineDetail}
-      <span class="session--detail" data-inline-detail="true">
-        {#if activityLine !== null}
-          <span class="session--activity">{activityLine}</span>
+      <span class="session--detail-controls" data-detail-controls="true">
+        <span class="session--density-controls" role="group" aria-label="Card density">
+          <span
+            class="session--density-control"
+            data-density-control="compact"
+            role="radio"
+            aria-checked={density === 'compact'}
+            tabindex="0"
+            onclick={(event) => {
+              event.stopPropagation();
+              onDensityChange('compact');
+            }}
+            onkeydown={(event) => handleControlKeydown(event, () => onDensityChange('compact'))}
+          >Compact</span>
+          <span
+            class="session--density-control"
+            data-density-control="detailed"
+            role="radio"
+            aria-checked={density === 'detailed'}
+            tabindex="0"
+            onclick={(event) => {
+              event.stopPropagation();
+              onDensityChange('detailed');
+            }}
+            onkeydown={(event) => handleControlKeydown(event, () => onDensityChange('detailed'))}
+          >Detailed</span>
+        </span>
+        <span class="session--signal-controls" role="group" aria-label="Signal visibility">
+          {#each SIGNAL_KEYS as signal (signal)}
+            <span
+              class="session--signal-control"
+              data-signal-control={signal}
+              role="checkbox"
+              aria-checked={signalVisibility[signal]}
+              tabindex="0"
+              onclick={(event) => {
+                event.stopPropagation();
+                onSignalToggle(signal);
+              }}
+              onkeydown={(event) => handleControlKeydown(event, () => onSignalToggle(signal))}
+            >{SIGNAL_LABELS[signal]}</span>
+          {/each}
+        </span>
+      </span>
+      <span class="session--detail" data-inline-detail="true" data-inline-density={density}>
+        {#if showActivity && activityLine !== null}
+          <span class="session--activity" data-inline-signal="activity">{activityLine}</span>
+        {:else if showActivity && toolGlyph !== null}
+          <span
+            class="session--tool"
+            data-inline-signal="activity"
+            data-tool-glyph={toolGlyph}
+            role="img"
+            aria-label={`Tool: ${projection.tool}`}
+          >{toolGlyph}</span>
         {/if}
-        {#if projection.lastMessagePreview !== null}
-          <span class="session--preview">{projection.lastMessagePreview}</span>
+        {#if showPreview && projection.lastMessagePreview !== null}
+          <span class="session--preview" data-inline-signal="preview">{projection.lastMessagePreview}</span>
         {/if}
-        {#if projection.previewMessages !== null}
+        {#if showPreview && projection.previewMessages !== null}
           {#each projection.previewMessages as preview, index (index)}
-            <span class="session--preview">{preview}</span>
+            <span class="session--preview" data-inline-signal="preview">{preview}</span>
           {/each}
         {/if}
-        {#if projection.prompt !== null}
-          <span class="session--prompt">You: {projection.prompt}</span>
+        {#if showPrompt && projection.prompt !== null}
+          <span class="session--prompt" data-inline-signal="prompt">You: {projection.prompt}</span>
         {/if}
-        {#if projection.agent !== null}
-          <span class="session--agent">{projection.agent}</span>
+        {#if showAgent && projection.agent !== null}
+          <span class="session--agent" data-inline-signal="agent">{projection.agent}</span>
         {/if}
-        {#if projection.contextPercent !== null}
+        {#if showContext && projection.contextPercent !== null}
           <span
             class="session--context"
+            data-inline-signal="context"
             role="meter"
             aria-valuemin="0"
             aria-valuemax="100"
@@ -339,7 +472,7 @@
     box-shadow: 0 0 0 1px var(--canvas);
   }
 
-  /* Host attention, never shown for a running session. */
+  /* Host attention and local unread state share one badge vocabulary. */
   .session--attention {
     padding: 0.1rem 0.45rem;
     border-radius: 999px;
@@ -354,6 +487,56 @@
   /* ───────────────────────────────────────────────────────────────────
      4. INLINE DETAIL AND STALE LOOK
   ─────────────────────────────────────────────────────────────────── */
+  /* Device-local controls keep card density and signal choices out of the host contract. */
+  .session--detail-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.68rem;
+    font-weight: 650;
+  }
+
+  /* Density and signal groups keep their labels together when the card narrows. */
+  .session--density-controls,
+  .session--signal-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  /* Each local preference has a touch-sized target and an explicit selected state. */
+  .session--density-control,
+  .session--signal-control {
+    min-block-size: 2.75rem;
+    padding: 0.7rem 0.55rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    line-height: 1.2;
+  }
+
+  /* Selected local preferences remain legible without relying on color alone. */
+  .session--density-control[aria-checked='true'],
+  .session--signal-control[aria-checked='true'] {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+
+  /* Known tools use a compact mark while retaining an accessible host name. */
+  .session--tool {
+    display: inline-grid;
+    width: 1.4rem;
+    height: 1.4rem;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
   /* Enriched host lines stay in-flow so a tap still means Open. */
   .session--detail {
     display: flex;

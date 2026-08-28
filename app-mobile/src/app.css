@@ -136,6 +136,27 @@
   --diff-remove: #f3e5e2;
   --shadow-raised: 0 4px 20px rgb(0 0 0 / 4%);
 
+  /* Editable seam: tokens — the recent-session dock keeps its status rings and surfaces
+     on explicit theme-local aliases so selected and idle chips never inherit a halo. */
+  --dock-surface: var(--surface-raised);
+  --dock-surface-selected: var(--accent-soft);
+  --dock-ink: var(--ink);
+  --dock-muted: var(--ink-muted);
+  --dock-line: var(--line);
+  --dock-accent: var(--accent-ink);
+  --dock-status-idle: var(--success);
+  --dock-status-running: var(--accent-ink);
+  --dock-status-interrupted: var(--warning);
+  --dock-status-unknown: var(--ink-muted);
+  --dock-ring-idle: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-idle));
+  --dock-ring-running: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-running));
+  --dock-ring-interrupted: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-interrupted));
+  --dock-ring-unknown: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-unknown));
+  --dock-selected-ring-idle: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-idle));
+  --dock-selected-ring-running: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-running));
+  --dock-selected-ring-interrupted: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-interrupted));
+  --dock-selected-ring-unknown: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-unknown));
+
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -217,6 +238,27 @@
   --diff-add: #203129;
   --diff-remove: #3a2522;
   --shadow-raised: 0 4px 20px rgb(0 0 0 / 24%);
+
+  /* Editable seam: tokens — the recent-session dock keeps its status rings and surfaces
+     on explicit theme-local aliases so selected and idle chips never inherit a halo. */
+  --dock-surface: var(--surface-raised);
+  --dock-surface-selected: var(--accent-soft);
+  --dock-ink: var(--ink);
+  --dock-muted: var(--ink-muted);
+  --dock-line: var(--line);
+  --dock-accent: var(--accent-ink);
+  --dock-status-idle: var(--success);
+  --dock-status-running: var(--accent-ink);
+  --dock-status-interrupted: var(--warning);
+  --dock-status-unknown: var(--ink-muted);
+  --dock-ring-idle: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-idle));
+  --dock-ring-running: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-running));
+  --dock-ring-interrupted: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-interrupted));
+  --dock-ring-unknown: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-unknown));
+  --dock-selected-ring-idle: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-idle));
+  --dock-selected-ring-running: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-running));
+  --dock-selected-ring-interrupted: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-interrupted));
+  --dock-selected-ring-unknown: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-unknown));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -274,6 +316,27 @@
     --diff-add: #203129;
     --diff-remove: #3a2522;
     --shadow-raised: 0 4px 20px rgb(0 0 0 / 24%);
+
+    /* Editable seam: tokens — the recent-session dock keeps its status rings and surfaces
+       on explicit theme-local aliases so selected and idle chips never inherit a halo. */
+    --dock-surface: var(--surface-raised);
+    --dock-surface-selected: var(--accent-soft);
+    --dock-ink: var(--ink);
+    --dock-muted: var(--ink-muted);
+    --dock-line: var(--line);
+    --dock-accent: var(--accent-ink);
+    --dock-status-idle: var(--success);
+    --dock-status-running: var(--accent-ink);
+    --dock-status-interrupted: var(--warning);
+    --dock-status-unknown: var(--ink-muted);
+    --dock-ring-idle: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-idle));
+    --dock-ring-running: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-running));
+    --dock-ring-interrupted: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-interrupted));
+    --dock-ring-unknown: color-mix(in oklch, var(--dock-surface) 68%, var(--dock-status-unknown));
+    --dock-selected-ring-idle: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-idle));
+    --dock-selected-ring-running: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-running));
+    --dock-selected-ring-interrupted: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-interrupted));
+    --dock-selected-ring-unknown: color-mix(in oklch, var(--dock-surface-selected) 68%, var(--dock-status-unknown));
   }
 }
 

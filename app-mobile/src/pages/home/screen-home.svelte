@@ -31,12 +31,20 @@
   // ───────────────────────────────────────────────────────────────────
 
   import { onMount, untrack } from 'svelte';
+  import { SvelteSet } from 'svelte/reactivity';
   import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
   import { compactId, readSessionIdFromLocation } from '$shared/format/view-helpers.js';
   import {
+    readCardDensity,
     readRosterGrouping,
+    readCardSignalVisibility,
+    writeCardDensity,
     writeRosterGrouping,
+    writeCardSignalVisibility,
+    type CardDensity,
     type RosterGrouping,
+    type SignalKey,
+    type SignalVisibility,
   } from '$shared/format/roster-view-preference.js';
   import {
     applyUnreadTransitions,
@@ -58,6 +66,7 @@
   } from '$shared/format/seen-marker.js';
   import { shouldRenderCard } from '$shared/format/card-projection.js';
   import { fireHaptic } from '$shared/chrome/haptics.js';
+  import { rosterReadBypassesCache, runRosterRefresh } from '$shared/state/foreground-polling.js';
   import Button from '$shared/primitives/button/button.svelte';
   import Freshness from './freshness.svelte';
   import EmptyState from './empty-state.svelte';
@@ -66,8 +75,10 @@
   import {
     dedupSessions,
     deriveListState,
+    forceExpandSections,
     hostAttentionPresent,
     organize,
+    searchMatchKind,
     sortByRecency,
     STATUS_SECTION_LABELS,
     TIME_SECTION_LABELS,
@@ -98,6 +109,8 @@
   const LAUNCH_TIMEOUT_MS = 8_000;
 
   let grouping = $state<RosterGrouping>(readRosterGrouping());
+  let density = $state<CardDensity>(readCardDensity());
+  let signalVisibility = $state<SignalVisibility>(readCardSignalVisibility());
   let unreadIds = $state<Set<string>>(readUnreadIds());
   let previousStatuses = $state(new Map<string, SessionCardDto['status']>());
   let launchingId = $state<string | null>(null);
@@ -110,6 +123,7 @@
   let launchTimer: ReturnType<typeof setTimeout> | null = null;
   let statusFilter = $state<StatusFilter | null>(null);
   let searchQuery = $state('');
+  let collapsedSections = new SvelteSet<string>();
   let favoritePref = $state(readFavoritePreference());
   let selectedHost = $state('');
   let seenStore = $state<SeenStore>(readLastSeenMap());
@@ -158,6 +172,8 @@
   );
   const statusSections = $derived(organized.statusSections);
   const timeSections = $derived(organized.timeSections);
+  const smartItems = $derived(organized.smartItems);
+  const filteringActive = $derived(statusFilter !== null || searchQuery.trim().length > 0);
   const catalogEmpty = $derived(resumeLive === null && listView.items.length === 0);
   const noMatchEmpty = $derived(
     !catalogEmpty && organized.items.length === 0 && searchQuery.trim().length > 0,
@@ -194,7 +210,13 @@
       if (onRefresh === undefined) {
         throw new Error('Roster refresh is unavailable.');
       }
-      await onRefresh();
+      await runRosterRefresh({
+        bypassCache: rosterReadBypassesCache('pull'),
+        fetchLive: () => onRefresh(),
+        serveCached: () => {
+          throw new Error('Pull-to-refresh cannot use the saved roster.');
+        },
+      });
       refreshFailed = false;
       fireHaptic('success');
     } catch {
@@ -229,6 +251,42 @@
   function setGrouping(next: RosterGrouping): void {
     grouping = next;
     writeRosterGrouping(next);
+  }
+
+  function setDensity(next: CardDensity): void {
+    density = next;
+    writeCardDensity(next);
+  }
+
+  function toggleSignal(signal: SignalKey): void {
+    const next = { ...signalVisibility, [signal]: !signalVisibility[signal] };
+    signalVisibility = next;
+    writeCardSignalVisibility(next);
+  }
+
+  function sectionIsOpen(key: string): boolean {
+    const section = forceExpandSections(
+      [{ key, collapsible: true, open: !collapsedSections.has(key) }],
+      filteringActive,
+    )[0];
+    return section?.open ?? true;
+  }
+
+  function handleSectionToggle(event: Event, key: string): void {
+    const section = event.currentTarget;
+    if (!(section instanceof HTMLDetailsElement)) return;
+    if (filteringActive) {
+      section.open = true;
+      return;
+    }
+    const next = new SvelteSet(collapsedSections);
+    if (section.open) next.delete(key);
+    else next.add(key);
+    collapsedSections = next;
+  }
+
+  function previewMatch(item: SessionCardDto): boolean {
+    return searchQuery.trim().length > 0 && searchMatchKind(item, searchQuery) === 'preview';
   }
 
   function setStatusFilter(next: StatusFilter): void {
@@ -352,6 +410,13 @@
           >
             Status
           </Button>
+          <Button
+            class="roster--grouping-option"
+            aria-pressed={grouping === 'smart'}
+            onclick={() => setGrouping('smart')}
+          >
+            Smart
+          </Button>
         </div>
         <Button
           class="roster--new-session"
@@ -455,6 +520,11 @@
             onOpen={handleOpen}
             {selectLastSeen}
             seenAvailable={seenStore.available}
+            {unreadIds}
+            {density}
+            {signalVisibility}
+            onDensityChange={setDensity}
+            onSignalToggle={toggleSignal}
           />
         </div>
       {/if}
@@ -466,15 +536,19 @@
         />
       {:else if grouping === 'status'}
         {#each statusSections as section (section.bucket)}
-          <section
+          <details
             class="status--section"
             data-status-section={section.bucket}
             aria-labelledby={`status-heading-${section.bucket}`}
+            open={sectionIsOpen(`status:${section.bucket}`)}
+            ontoggle={(event) => handleSectionToggle(event, `status:${section.bucket}`)}
           >
-            <h3 class="status--heading" id={`status-heading-${section.bucket}`}>
-              {STATUS_SECTION_LABELS[section.bucket]}
-              <span data-section-count={section.bucket}>{section.count}</span>
-            </h3>
+            <summary class="status--heading">
+              <h3 id={`status-heading-${section.bucket}`}>
+                {STATUS_SECTION_LABELS[section.bucket]}
+                <span data-section-count={section.bucket}>{section.count}</span>
+              </h3>
+            </summary>
             <div class="session--grid" role="list">
               {#each section.items as item (item.id)}
                 {#if shouldRenderCard(item)}
@@ -489,6 +563,11 @@
                       onOpen={handleOpen}
                       {selectLastSeen}
                       seenAvailable={seenStore.available}
+                      {unreadIds}
+                      {density}
+                      {signalVisibility}
+                      onDensityChange={setDensity}
+                      onSignalToggle={toggleSignal}
                     />
                     <Button
                       class="roster--favorite"
@@ -500,23 +579,82 @@
                     >
                       Pin
                     </Button>
+                    {#if previewMatch(item)}
+                      <span class="roster--match-label" data-search-match="preview">Matched in preview</span>
+                    {/if}
                   </div>
                 {/if}
               {/each}
             </div>
-          </section>
+          </details>
         {/each}
+      {:else if grouping === 'smart'}
+        <details
+          class="smart--section"
+          data-smart-section="true"
+          aria-labelledby="smart-heading"
+          open={sectionIsOpen('smart')}
+          ontoggle={(event) => handleSectionToggle(event, 'smart')}
+        >
+          <summary class="smart--heading">
+            <h3 id="smart-heading">
+              Smart
+              <span data-smart-count="true">{smartItems.length}</span>
+            </h3>
+          </summary>
+          <div class="session--grid" role="list">
+            {#each smartItems as item (item.id)}
+              {#if shouldRenderCard(item)}
+                <div role="listitem" class="roster--row">
+                  <CardSession
+                    sessionId={item.id}
+                    {selectSession}
+                    source={sessions.source}
+                    unread={cardUnread(item)}
+                    {launchingId}
+                    openDisabled={listOpenDisabled}
+                    onOpen={handleOpen}
+                    {selectLastSeen}
+                    seenAvailable={seenStore.available}
+                    {unreadIds}
+                    {density}
+                    {signalVisibility}
+                    onDensityChange={setDensity}
+                    onSignalToggle={toggleSignal}
+                  />
+                  <Button
+                    class="roster--favorite"
+                    data-favorite-id={item.id}
+                    aria-pressed={favoritePref.ids.has(item.id)}
+                    aria-label="Pin session"
+                    disabled={!favoritePref.available}
+                    onclick={() => toggleFavorite(item.id)}
+                  >
+                    Pin
+                  </Button>
+                  {#if previewMatch(item)}
+                    <span class="roster--match-label" data-search-match="preview">Matched in preview</span>
+                  {/if}
+                </div>
+              {/if}
+            {/each}
+          </div>
+        </details>
       {:else}
         {#each timeSections as section (section.bucket)}
-          <section
+          <details
             class="time--section"
             data-time-section={section.bucket}
             aria-labelledby={`time-heading-${section.bucket}`}
+            open={sectionIsOpen(`time:${section.bucket}`)}
+            ontoggle={(event) => handleSectionToggle(event, `time:${section.bucket}`)}
           >
-            <h3 class="time--heading" id={`time-heading-${section.bucket}`}>
-              {TIME_SECTION_LABELS[section.bucket]}
-              <span data-time-count={section.bucket}>{section.count}</span>
-            </h3>
+            <summary class="time--heading">
+              <h3 id={`time-heading-${section.bucket}`}>
+                {TIME_SECTION_LABELS[section.bucket]}
+                <span data-time-count={section.bucket}>{section.count}</span>
+              </h3>
+            </summary>
             <div class="session--grid" role="list">
               {#each section.items as item (item.id)}
                 {#if shouldRenderCard(item)}
@@ -531,6 +669,11 @@
                       onOpen={handleOpen}
                       {selectLastSeen}
                       seenAvailable={seenStore.available}
+                      {unreadIds}
+                      {density}
+                      {signalVisibility}
+                      onDensityChange={setDensity}
+                      onSignalToggle={toggleSignal}
                     />
                     <Button
                       class="roster--favorite"
@@ -542,11 +685,14 @@
                     >
                       Pin
                     </Button>
+                    {#if previewMatch(item)}
+                      <span class="roster--match-label" data-search-match="preview">Matched in preview</span>
+                    {/if}
                   </div>
                 {/if}
               {/each}
             </div>
-          </section>
+          </details>
         {/each}
       {/if}
     {/if}
@@ -916,12 +1062,15 @@
      3. STATUS SECTIONS AND RESUME SLOT
   ─────────────────────────────────────────────────────────────────── */
   /* Always-present section so empty buckets do not jump the list. */
-  .status--section {
+  .status--section,
+  .smart--section {
     margin-bottom: var(--space-6);
   }
 
-  /* Header count uses the same membership function as the rows. */
-  .status--heading {
+  /* Disclosure headers keep section counts available without hiding active hits. */
+  .status--heading,
+  .time--heading,
+  .smart--heading {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -931,6 +1080,28 @@
     font-weight: 680;
     letter-spacing: 0.04em;
     text-transform: uppercase;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* Keep the native disclosure marker from competing with the section label. */
+  .status--heading::-webkit-details-marker,
+  .time--heading::-webkit-details-marker,
+  .smart--heading::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Preserve heading semantics inside the disclosure trigger. */
+  .status--heading h3,
+  .time--heading h3,
+  .smart--heading h3 {
+    display: flex;
+    width: 100%;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0;
+    color: inherit;
+    font: inherit;
   }
 
   /* Reserved last-opened highlight; inert until the connection is live. */
@@ -1072,6 +1243,14 @@
   /* Pin sits on the row, not inside the open control. */
   .roster--row {
     position: relative;
+  }
+
+  /* Explain a preview-only hit without changing the card's host content. */
+  .roster--match-label {
+    display: block;
+    margin-top: var(--space-2);
+    color: var(--ink-muted);
+    font-size: 0.68rem;
   }
 
   /* Keep this rule aligned with its surrounding surface. */

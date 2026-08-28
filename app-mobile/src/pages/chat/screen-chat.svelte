@@ -106,6 +106,7 @@
   import { useHostCommandCatalog } from '$shared/commands/host-command-catalog.svelte.js';
   import { useSyncSocket } from '$shared/transport/use-sync-socket.svelte.js';
   import { readViewModePreference } from '$shared/state/view-mode.js';
+  import { createForegroundPoller } from '$shared/state/foreground-polling.js';
   import type { EffortSheetSection } from './chrome/sheet-model-effort.svelte';
 
   import {
@@ -122,6 +123,7 @@
   import RuntimeModeAnnouncer from './chrome/runtime-mode-announcer.svelte';
   import SessionHeader from './chrome/session-header.svelte';
   import RuntimeStrip from './chrome/runtime-strip.svelte';
+  import DockRecentSessions from './chrome/dock-recent-sessions.svelte';
   import PlanReadyCard from './chrome/card-plan-ready.svelte';
   import TranscriptList from './transcript/transcript-list.svelte';
   import TranscriptLoadPanel from './transcript/transcript-load-panel.svelte';
@@ -345,23 +347,27 @@
   });
 
   // On foreground or reconnect, refresh the runtime and command catalog once.
+  // The poller drops its timer while hidden and coalesces refocus plus the
+  // online edge into a single catch-up so both listeners cannot burst.
   $effect(() => {
-    const reconcileRuntime = () => {
-      if (document.visibilityState === 'visible') void runtimeControls.refresh('foreground');
+    const catchUp = () => {
+      void runtimeControls.refresh('foreground');
+      void commandCatalog.refresh('foreground');
     };
-    const reconcileCatalog = () => {
-      if (document.visibilityState === 'visible') void commandCatalog.refresh('foreground');
-    };
-    document.addEventListener('visibilitychange', reconcileRuntime);
-    document.addEventListener('visibilitychange', reconcileCatalog);
-    const onOnline = () => {
-      void runtimeControls.refresh('online');
-      void commandCatalog.refresh('online');
-    };
+    const poller = createForegroundPoller({
+      intervalMs: 0,
+      catchUpOnStart: false,
+      getVisibility: () => document.visibilityState,
+      read: catchUp,
+    });
+    const onVisibility = () => poller.notifyVisibility(document.visibilityState);
+    const onOnline = () => poller.notifyReconnect();
+    document.addEventListener('visibilitychange', onVisibility);
     window.addEventListener('online', onOnline);
+    poller.start();
     return () => {
-      document.removeEventListener('visibilitychange', reconcileRuntime);
-      document.removeEventListener('visibilitychange', reconcileCatalog);
+      poller.stop();
+      document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('online', onOnline);
     };
   });
@@ -790,6 +796,12 @@
   function updateElapsedLabel(label: string | null): void {
     elapsedLabel = label;
   }
+
+  // The shell owns pop-versus-replace; chat back is that same dismiss path
+  // so a card-entered stack pops and a deep-link root replaces.
+  function handleBack(): void {
+    onBack();
+  }
 </script>
 
 <!-- The in-session view: header, status line, transcript, composer, and the overlay sheets. -->
@@ -803,7 +815,7 @@
 
   <!-- Header: back / inbox / review, the theme toggle, and the model picker -->
   <SessionHeader
-    {onBack}
+    onBack={handleBack}
     {onInbox}
     {onReview}
     {theme}
@@ -897,6 +909,9 @@
     onOpenEffortSheet={() => openSheet('effort', stripTrigger)}
     bind:effortTriggerRef={stripTrigger}
   />
+
+  <!-- Recent sessions: the local quick-switcher stays between the transcript and composer. -->
+  <DockRecentSessions {sessionId} />
 
   <!-- Composer: the prompt input with its send / stop / slash actions -->
   <!-- Assertive a11y channel for send failures, cleared on the next accepted write. -->

@@ -89,6 +89,10 @@ const relay = vi.hoisted(() => {
 });
 
 vi.mock('../src/shared/transport/relay.js', () => relay);
+vi.mock('../src/shared/state/app-state.svelte.js', () => ({
+  getAppActions: () => ({ navigate: vi.fn() }),
+  getAppState: () => ({ sessions: { items: [] } }),
+}));
 vi.mock('@tanstack/svelte-virtual', () => {
   const store = (value: unknown) => ({
     subscribe: (run: (next: unknown) => void) => {

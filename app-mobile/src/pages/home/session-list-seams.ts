@@ -56,6 +56,63 @@ export function sortByRecency(items: readonly SessionCardDto[]): readonly Sessio
     .map((entry) => entry.item);
 }
 
+export const SMART_STALE_MS = 20 * 60_000;
+
+export type SmartClass = 'needs-you' | 'done-but-not-stale' | 'working' | 'idle/stale';
+
+const SMART_CLASS_RANK: Record<SmartClass, number> = {
+  'needs-you': 0,
+  'done-but-not-stale': 1,
+  working: 2,
+  'idle/stale': 3,
+};
+
+function hasNeedsYouSignal(item: SessionCardDto): boolean {
+  if (item.status === 'interrupted' || item.status === 'running') {
+    return item.status === 'interrupted';
+  }
+  return item.attention === 'blocked' || item.attention === 'waiting';
+}
+
+function isFresh(item: SessionCardDto, now: number): boolean {
+  const updatedAt = Date.parse(item.updatedAt);
+  return Number.isFinite(updatedAt) && now - updatedAt < SMART_STALE_MS;
+}
+
+/** Classify cards without inferring a missing host status or timestamp. */
+export function smartClass(item: SessionCardDto, now: number): SmartClass {
+  if (hasNeedsYouSignal(item)) return 'needs-you';
+  if (item.status === 'idle' && isFresh(item, now)) return 'done-but-not-stale';
+  if (item.status === 'running' && isFresh(item, now)) return 'working';
+  return 'idle/stale';
+}
+
+/** Compare the four smart classes, then use the host clock as a stable tie-breaker. */
+export function compareSmartSessions(
+  left: SessionCardDto,
+  right: SessionCardDto,
+  now: number,
+): number {
+  const classDifference = SMART_CLASS_RANK[smartClass(left, now)] - SMART_CLASS_RANK[smartClass(right, now)];
+  if (classDifference !== 0) return classDifference;
+  const leftTime = Date.parse(left.updatedAt);
+  const rightTime = Date.parse(right.updatedAt);
+  const leftOk = Number.isFinite(leftTime);
+  const rightOk = Number.isFinite(rightTime);
+  if (leftOk && !rightOk) return -1;
+  if (!leftOk && rightOk) return 1;
+  if (leftOk && rightOk && leftTime !== rightTime) return rightTime - leftTime;
+  return 0;
+}
+
+/** Smart order is a pure copy; it never mutates the host-owned input array. */
+export function sortBySmart(
+  items: readonly SessionCardDto[],
+  now: number = Date.now(),
+): readonly SessionCardDto[] {
+  return [...items].sort((left, right) => compareSmartSessions(left, right, now));
+}
+
 export interface TimeBucketGroup {
   readonly bucket: TimeBucket;
   readonly sessions: readonly SessionCardDto[];
@@ -234,6 +291,23 @@ export interface StatusListSection {
   readonly items: readonly SessionCardDto[];
 }
 
+export interface CollapsibleSectionState {
+  readonly key: string;
+  readonly collapsible: boolean;
+  readonly open: boolean;
+}
+
+/** Force only real disclosure sections open while a query or filter is active. */
+export function forceExpandSections(
+  sections: readonly CollapsibleSectionState[],
+  filtering: boolean,
+): readonly CollapsibleSectionState[] {
+  if (!filtering || !sections.some((section) => section.collapsible)) return sections;
+  return sections.map((section) =>
+    section.collapsible && !section.open ? { ...section, open: true } : section,
+  );
+}
+
 export const STATUS_SECTION_LABELS: Record<StatusBucket, string> = {
   attention: 'Attention',
   unread: 'Unread',
@@ -258,6 +332,8 @@ export function hostAttentionPresent(items: readonly SessionCardDto[]): boolean 
 export function buildStatusList(
   items: readonly SessionCardDto[],
   unreadById: ReadonlySet<string> = new Set(),
+  query = '',
+  labels: ReadonlyMap<string, string> = new Map(),
 ): readonly StatusListSection[] {
   const buckets: Record<StatusBucket, SessionCardDto[]> = {
     attention: [],
@@ -270,7 +346,7 @@ export function buildStatusList(
     buckets[sessionStatusGroup(item.status, unreadById.has(item.id))].push(item);
   }
   return BUCKET_DISPLAY_ORDER.map((bucket) => {
-    const sorted = sortByRecency(buckets[bucket]);
+    const sorted = sortBySearchRelevance(sortByRecency(buckets[bucket]), query, labels);
     return { bucket, count: sorted.length, items: sorted };
   });
 }
@@ -297,6 +373,7 @@ export interface TimeListSection {
 
 export interface OrganizeResult {
   readonly items: readonly SessionCardDto[];
+  readonly smartItems: readonly SessionCardDto[];
   readonly timeSections: readonly TimeListSection[];
   readonly statusSections: readonly StatusListSection[];
 }
@@ -310,21 +387,161 @@ export const TIME_SECTION_LABELS: Record<TimeBucket, string> = {
 
 const TIME_DISPLAY_ORDER: readonly TimeBucket[] = ['active', 'today', 'yesterday', 'older'];
 
-/**
- * Match only data this device already holds: the opaque id, its compact
- * form, and any device-local label. Host title/preview is never invented.
- */
+export interface ParsedRosterQuery {
+  readonly freeTerms: readonly string[];
+  readonly repo: readonly string[];
+  readonly path: readonly string[];
+}
+
+/** Parse known operators without pretending the client has their host fields. */
+export function parseRosterQuery(query: string): ParsedRosterQuery {
+  const freeTerms: string[] = [];
+  const repo: string[] = [];
+  const path: string[] = [];
+  for (const token of query.trim().split(/\s+/u).filter((value) => value.length > 0)) {
+    const operator = /^(repo|path):(.*)$/iu.exec(token);
+    if (operator === null) {
+      freeTerms.push(token);
+    } else if (operator[1]?.toLowerCase() === 'repo') {
+      repo.push(operator[2] ?? '');
+    } else {
+      path.push(operator[2] ?? '');
+    }
+  }
+  return { freeTerms, repo, path };
+}
+
+export type SearchMatchKind = 'id' | 'label' | 'title' | 'agent' | 'model' | 'preview';
+
+interface SearchField {
+  readonly kind: SearchMatchKind;
+  readonly value: string;
+}
+
+function ownSearchString(
+  item: SessionCardDto,
+  key: 'title' | 'agent' | 'model' | 'lastMessagePreview',
+): string | null {
+  if (!Object.prototype.hasOwnProperty.call(item, key)) return null;
+  const value = item[key];
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+function visibleSearchFields(
+  item: SessionCardDto,
+  labels: ReadonlyMap<string, string>,
+): readonly SearchField[] {
+  const fields: SearchField[] = [
+    { kind: 'id', value: item.id },
+    { kind: 'id', value: compactId(item.id) },
+  ];
+  const label = labels.get(item.id);
+  if (label !== undefined && label.length > 0) fields.push({ kind: 'label', value: label });
+  const title = ownSearchString(item, 'title');
+  if (title !== null) fields.push({ kind: 'title', value: title });
+  const agent = ownSearchString(item, 'agent');
+  if (agent !== null) fields.push({ kind: 'agent', value: agent });
+  const model = ownSearchString(item, 'model');
+  if (model !== null) fields.push({ kind: 'model', value: model });
+  const lastMessagePreview = ownSearchString(item, 'lastMessagePreview');
+  if (lastMessagePreview !== null) fields.push({ kind: 'preview', value: lastMessagePreview });
+  if (Object.prototype.hasOwnProperty.call(item, 'previewMessages')) {
+    const previews = item.previewMessages;
+    if (Array.isArray(previews) && previews.every((entry) => typeof entry === 'string')) {
+      for (const preview of previews) fields.push({ kind: 'preview', value: preview });
+    }
+  }
+  return fields;
+}
+
+function scoreSearchTerm(term: string, fields: readonly SearchField[]): number | null {
+  let best: number | null = null;
+  for (const field of fields) {
+    const score = scoreSubsequence(term, field.value);
+    if (score !== null && (best === null || score > best)) best = score;
+  }
+  return best;
+}
+
+function queryScore(
+  item: SessionCardDto,
+  parsed: ParsedRosterQuery,
+  labels: ReadonlyMap<string, string>,
+): number | null {
+  const fields = visibleSearchFields(item, labels);
+  let total = 0;
+  for (const term of parsed.freeTerms) {
+    const score = scoreSearchTerm(term, fields);
+    if (score === null) return null;
+    total += score;
+  }
+  return total;
+}
+
+/** Return the best subsequence score, or null when the term cannot be typed from the text. */
+export function scoreSubsequence(needle: string, candidate: string): number | null {
+  const normalizedNeedle = needle.trim().toLowerCase();
+  const normalizedCandidate = candidate.toLowerCase();
+  if (normalizedNeedle.length === 0) return 0;
+  let previousIndex = -1;
+  let score = 0;
+  for (const character of normalizedNeedle) {
+    const index = normalizedCandidate.indexOf(character, previousIndex + 1);
+    if (index === -1) return null;
+    const gap = previousIndex === -1 ? index : index - previousIndex - 1;
+    score += 1 - gap * 2;
+    if (index === 0 || !/[a-z0-9]/iu.test(normalizedCandidate[index - 1] ?? '')) score += 5;
+    previousIndex = index;
+  }
+  if (normalizedNeedle === normalizedCandidate) score += 20;
+  return score;
+}
+
+/** Explain which visible field made a query match so preview hits stay explicit. */
+export function searchMatchKind(
+  item: SessionCardDto,
+  query: string,
+  labels: ReadonlyMap<string, string> = new Map(),
+): SearchMatchKind | null {
+  const parsed = parseRosterQuery(query);
+  if (parsed.freeTerms.length === 0 || queryScore(item, parsed, labels) === null) return null;
+  const fields = visibleSearchFields(item, labels);
+  const previewFields = fields.filter((field) => field.kind === 'preview');
+  if (parsed.freeTerms.some((term) => scoreSearchTerm(term, previewFields) !== null)) {
+    return 'preview';
+  }
+  for (const field of fields) {
+    if (parsed.freeTerms.every((term) => scoreSubsequence(term, field.value) !== null)) {
+      return field.kind;
+    }
+  }
+  return 'id';
+}
+
 export function matchesClientHeldQuery(
   item: SessionCardDto,
   query: string,
   labels: ReadonlyMap<string, string> = new Map(),
 ): boolean {
-  const needle = query.trim().toLowerCase();
-  if (needle.length === 0) return true;
-  if (item.id.toLowerCase().includes(needle)) return true;
-  if (compactId(item.id).toLowerCase().includes(needle)) return true;
-  const label = labels.get(item.id);
-  return label !== undefined && label.toLowerCase().includes(needle);
+  const parsed = parseRosterQuery(query);
+  return parsed.freeTerms.length === 0 || queryScore(item, parsed, labels) !== null;
+}
+
+export function sortBySearchRelevance(
+  items: readonly SessionCardDto[],
+  query: string,
+  labels: ReadonlyMap<string, string> = new Map(),
+): readonly SessionCardDto[] {
+  const parsed = parseRosterQuery(query);
+  if (parsed.freeTerms.length === 0) return items;
+  return items
+    .map((item, index) => ({
+      item,
+      index,
+      score: queryScore(item, parsed, labels) ?? Number.NEGATIVE_INFINITY,
+    }))
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .map((entry) => entry.item);
 }
 
 export function filterRoster(
@@ -333,10 +550,11 @@ export function filterRoster(
   query: string,
   labels: ReadonlyMap<string, string> = new Map(),
 ): readonly SessionCardDto[] {
-  return items.filter((item) => {
+  const filtered = items.filter((item) => {
     if (filter !== null && item.status !== filter) return false;
     return matchesClientHeldQuery(item, query, labels);
   });
+  return sortBySearchRelevance(filtered, query, labels);
 }
 
 /**
@@ -361,6 +579,8 @@ export function buildTimeList(
   items: readonly SessionCardDto[],
   now: number,
   favorites: ReadonlySet<string> = new Set(),
+  query = '',
+  labels: ReadonlyMap<string, string> = new Map(),
 ): readonly TimeListSection[] {
   const buckets: Record<TimeBucket, SessionCardDto[]> = {
     active: [],
@@ -372,8 +592,9 @@ export function buildTimeList(
     buckets[sessionTimeBucket(item, now)].push(item);
   }
   return TIME_DISPLAY_ORDER.flatMap((bucket) => {
-    const sorted = floatFavorites(sortByRecency(buckets[bucket]), favorites);
-    return sorted.length === 0 ? [] : [{ bucket, count: sorted.length, items: sorted }];
+    const sorted = sortBySearchRelevance(sortByRecency(buckets[bucket]), query, labels);
+    const visible = floatFavorites(sorted, favorites);
+    return visible.length === 0 ? [] : [{ bucket, count: visible.length, items: visible }];
   });
 }
 
@@ -387,12 +608,14 @@ export function organize(
   input: OrganizeInput,
   unreadById: ReadonlySet<string> = new Set(),
 ): OrganizeResult {
-  const filtered = filterRoster(items, input.filter, input.query, input.labels ?? new Map());
-  const timeSections = buildTimeList(filtered, input.now, input.favorites);
-  const statusSections = buildStatusList(filtered, unreadById).map((section) => ({
+  const labels = input.labels ?? new Map();
+  const filtered = filterRoster(items, input.filter, input.query, labels);
+  const timeSections = buildTimeList(filtered, input.now, input.favorites, input.query, labels);
+  const statusSections = buildStatusList(filtered, unreadById, input.query, labels).map((section) => ({
     ...section,
     items: floatFavorites(section.items, input.favorites),
     count: section.count,
   }));
-  return { items: filtered, timeSections, statusSections };
+  const smartItems = sortBySmart(filtered, input.now);
+  return { items: filtered, smartItems, timeSections, statusSections };
 }

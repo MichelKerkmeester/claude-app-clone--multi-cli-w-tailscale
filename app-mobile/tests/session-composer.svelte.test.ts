@@ -1105,30 +1105,84 @@ describe('restore on reject', () => {
     // sendPrompt should have been called once.
     expect(sendPrompt).toHaveBeenCalledTimes(1);
 
-    // Now simulate a host reject by rerendering with promptError.
-    rerender(SessionComposerSurface, {
-      props: {
-        catalog: catalogState(),
-        sendPrompt,
-        sendSlashDraft: vi.fn(),
-        onInsertCommand: vi.fn(),
-        status: 'idle',
-        canSubmit: true,
-        binding: null,
-        slashSubmitting: false,
-        runtimeAuthority: true,
-        runtimeRunning: false,
-        initialPrompt: '  hello  ',
-        mediaCapability: null,
-        modelCanViewPhotos: true,
-        localFiles: undefined,
-        promptError: 'Host rejected',
-      },
+    // Clear the field the way a successful hand-off would, so the restored text
+    // is observably different from what the field already held. Asserting the
+    // initial value against itself would pass even if nothing restored it.
+    await user.clear(composer);
+    expect(composer).toHaveValue('');
+
+    // Now simulate a host reject by rerendering with promptError. Props are
+    // passed directly here: the (component, { props }) form is silently ignored
+    // by this testing-library version, which leaves the component untouched and
+    // makes any assertion after it meaningless.
+    rerender({
+      catalog: catalogState(),
+      sendPrompt,
+      sendSlashDraft: vi.fn(),
+      onInsertCommand: vi.fn(),
+      status: 'idle',
+      canSubmit: true,
+      binding: null,
+      slashSubmitting: false,
+      runtimeAuthority: true,
+      runtimeRunning: false,
+      initialPrompt: '  hello  ',
+      mediaCapability: null,
+      modelCanViewPhotos: true,
+      localFiles: undefined,
+      promptError: 'Host rejected',
     });
     await tick();
 
     // The exact raw draft (untrimmed with spaces) should be restored.
     expect(composer).toHaveValue('  hello  ');
+  });
+
+  it('leaves a newly typed draft alone when a late send failure paints', async () => {
+    // An unresolved send is held for twenty seconds before it is declared failed,
+    // and the person can type a whole new message inside that window. When the
+    // failure finally paints, the parent has already decided to park the old text
+    // rather than restore it, precisely so the new message survives. Restoring it
+    // here anyway would destroy what they just wrote.
+    const user = userEvent.setup();
+    const sendPrompt = vi.fn();
+    const { rerender } = renderComposer({
+      canSubmit: true,
+      initialPrompt: 'first message',
+      sendPrompt,
+    });
+    const composer = screen.getByLabelText('Message Pi') as HTMLTextAreaElement;
+
+    composer.focus();
+    await tick();
+    await user.keyboard('{Enter}');
+    await tick();
+    expect(sendPrompt).toHaveBeenCalledTimes(1);
+
+    await user.clear(composer);
+    await typeDraft(user, 'second message');
+    expect(composer).toHaveValue('second message');
+
+    rerender({
+      catalog: catalogState(),
+      sendPrompt,
+      sendSlashDraft: vi.fn(),
+      onInsertCommand: vi.fn(),
+      status: 'idle',
+      canSubmit: true,
+      binding: null,
+      slashSubmitting: false,
+      runtimeAuthority: true,
+      runtimeRunning: false,
+      initialPrompt: 'first message',
+      mediaCapability: null,
+      modelCanViewPhotos: true,
+      localFiles: undefined,
+      promptError: 'Send failed',
+    });
+    await tick();
+
+    expect(composer).toHaveValue('second message');
   });
 });
 

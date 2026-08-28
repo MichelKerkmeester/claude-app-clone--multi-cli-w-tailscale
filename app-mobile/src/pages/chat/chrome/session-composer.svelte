@@ -455,7 +455,14 @@
     if (promptError !== null && capturedDraftBeforeSend !== null) {
       const draft = capturedDraftBeforeSend;
       capturedDraftBeforeSend = null;
-      setPrompt(() => draft);
+      // An unresolved send stays open long enough for a whole new message to be
+      // typed, and the screen deliberately parks the old text rather than
+      // restoring it once that has happened. Writing it back here anyway would
+      // destroy the newer message. Read the field without depending on it: this
+      // effect also writes it, and a reactive read would re-trigger itself.
+      if (untrack(() => prompt).trim().length === 0) {
+        setPrompt(() => draft);
+      }
     }
   });
 

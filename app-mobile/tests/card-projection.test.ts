@@ -15,8 +15,10 @@
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 import { describe, expect, it } from 'vitest';
 
+import { resolveAttentionBadge } from '../src/shared/format/attention.js';
 import {
   WORKING_STALE_MS,
+  countAttentionSessions,
   decideStalePresentation,
   hasHostField,
   hasInlineEnrichment,
@@ -164,7 +166,7 @@ describe('optional host-field gate', () => {
       model: 'opus-4',
     });
     const projected = projectSessionCard(source);
-    expect(projected.attentionBadge).toBe('waiting');
+    expect(projected.attentionBadge).toEqual({ kind: 'permission', label: 'Permission' });
     expect(projected.title).toBe('Named session');
     expect(projected.lastMessagePreview).toBe('Last line from the host');
     expect(projected.agent).toBe('Opus');
@@ -176,9 +178,9 @@ describe('optional host-field gate', () => {
     expect(hasInlineEnrichment(projected)).toBe(true);
   });
 
-  it('never badges a running session as needs-you even when attention is present', () => {
+  it('uses the shared working badge before host attention', () => {
     const source = withHost(card({ status: 'running' }), { attention: 'waiting' });
-    expect(projectSessionCard(source).attentionBadge).toBeNull();
+    expect(projectSessionCard(source).attentionBadge).toEqual({ kind: 'working', label: 'Working' });
     expect(source.status).toBe('running');
   });
 
@@ -187,6 +189,47 @@ describe('optional host-field gate', () => {
     const projected = projectSessionCard(source);
     expect(projected.contextPercent).toBeNull();
     expect(projected.model).toBeNull();
+  });
+});
+
+describe('countAttentionSessions', () => {
+  it('counts permission, unread, and done signals without counting live work', () => {
+    const permissionAndUnread = withHost(
+      card({ id: 'permission_and_unread', status: 'idle' }),
+      { attention: 'waiting' },
+    );
+    const cards = [
+      withHost(card({ id: 'working', status: 'running' }), { attention: 'done' }),
+      permissionAndUnread,
+      card({ id: 'unread', status: 'idle' }),
+      withHost(card({ id: 'done', status: 'idle' }), { attention: 'done' }),
+      card({ id: 'ordinary', status: 'idle' }),
+    ];
+
+    expect(countAttentionSessions(cards, new Set(['permission_and_unread', 'unread']))).toBe(3);
+  });
+});
+
+describe('resolveAttentionBadge', () => {
+  it('uses working, permission, unread, then done precedence', () => {
+    const done = withHost(card({ id: 'done_unread', status: 'idle' }), { attention: 'done' });
+    const unread = new Set([done.id]);
+    expect(resolveAttentionBadge({ ...done, status: 'running', attention: 'done' }, unread)).toEqual({
+      kind: 'working',
+      label: 'Working',
+    });
+    expect(resolveAttentionBadge({ ...done, attention: 'waiting' }, unread)).toEqual({
+      kind: 'permission',
+      label: 'Permission',
+    });
+    expect(resolveAttentionBadge(done, unread)).toEqual({ kind: 'unread', label: 'Unread' });
+    expect(resolveAttentionBadge(done, new Set())).toEqual({ kind: 'done', label: 'Done' });
+  });
+
+  it('ignores inherited attention fields', () => {
+    const source = Object.create({ attention: 'done' }) as SessionCardDto;
+    Object.assign(source, card({ id: 'inherited_attention' }));
+    expect(resolveAttentionBadge(source, new Set())).toBeNull();
   });
 });
 

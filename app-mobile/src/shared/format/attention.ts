@@ -12,6 +12,7 @@ import {
   isPushPreferences,
   isPushSubscriptionInput,
   type AttentionItemDto,
+  type SessionCardDto,
   type AttentionResolutionDto,
   type PushPreferences,
 } from '@pi-remote/pi-rpc-protocol';
@@ -19,7 +20,35 @@ import {
 import { establishSession } from '../transport/auth.js';
 
 // ───────────────────────────────────────────────────────────────────
-// 2. PUSH CONFIG TYPE
+// 2. ATTENTION BADGE
+// ───────────────────────────────────────────────────────────────────
+
+export type AttentionBadgeKind = 'working' | 'permission' | 'unread' | 'done';
+
+export interface AttentionBadge {
+  readonly kind: AttentionBadgeKind;
+  readonly label: string;
+}
+
+/** Resolve the one badge shown by session surfaces without reading device storage. */
+export function resolveAttentionBadge(
+  card: SessionCardDto,
+  localUnreadIds: ReadonlySet<string>,
+): AttentionBadge | null {
+  if (card.status === 'running') return { kind: 'working', label: 'Working' };
+
+  const hasAttention = Object.prototype.hasOwnProperty.call(card, 'attention');
+  const attention = hasAttention ? card.attention : undefined;
+  if (attention === 'blocked' || attention === 'waiting') {
+    return { kind: 'permission', label: 'Permission' };
+  }
+  if (localUnreadIds.has(card.id)) return { kind: 'unread', label: 'Unread' };
+  if (attention === 'done') return { kind: 'done', label: 'Done' };
+  return null;
+}
+
+// ───────────────────────────────────────────────────────────────────
+// 3. PUSH CONFIG TYPE
 // ───────────────────────────────────────────────────────────────────
 
 export interface PushConfig {
@@ -29,7 +58,7 @@ export interface PushConfig {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 3. ATTENTION ENDPOINTS
+// 4. ATTENTION ENDPOINTS
 // ───────────────────────────────────────────────────────────────────
 
 export async function fetchAttention(signal?: AbortSignal): Promise<readonly AttentionItemDto[]> {
@@ -57,7 +86,7 @@ export async function openAttentionHint(
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 4. PUSH SUBSCRIPTION LIFECYCLE
+// 5. PUSH SUBSCRIPTION LIFECYCLE
 // ───────────────────────────────────────────────────────────────────
 
 export async function fetchPushConfig(signal?: AbortSignal): Promise<PushConfig> {
@@ -116,7 +145,7 @@ export async function setPushForeground(foreground: boolean): Promise<void> {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 5. TRANSPORT HELPERS
+// 6. TRANSPORT HELPERS
 // ───────────────────────────────────────────────────────────────────
 
 async function postJson(path: string, body: unknown, signal?: AbortSignal): Promise<unknown> {

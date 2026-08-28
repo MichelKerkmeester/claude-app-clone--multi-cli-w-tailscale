@@ -120,6 +120,10 @@ const relay = vi.hoisted(() => {
 });
 
 vi.mock('../src/shared/transport/relay.js', () => relay);
+vi.mock('../src/shared/state/app-state.svelte.js', () => ({
+  getAppActions: () => ({ navigate: vi.fn() }),
+  getAppState: () => ({ sessions: { items: [] } }),
+}));
 
 import { readParkedDraftText } from '../src/shared/state/chat-draft-cache.js';
 import Session from '../src/pages/chat/screen-chat.svelte';

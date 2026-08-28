@@ -216,6 +216,40 @@ the client own or edit mutable session truth (that is ❌, not a request).
   Consuming phase: `008-uiux-features-mining/006-host-usage-search-review`. Fail-closed fallback: the branch
   entry renders nothing until the RPC lands and never fabricates a session id or implies a branch was
   created. Wire-compat: additive.
+- **REQ-019** — A **typed edge-versus-tick push contract with an end reason** is requested, citing recs
+  `LA-4`, `LA-6`. Shape: every pushed update is typed as an EDGE (a real state change) or a TICK (progress on
+  an unchanged state), so edges can be delivered immediately at high priority while ticks coalesce at low
+  priority — a tick delivered immediately for every progress report would wake the device constantly for
+  information that has not meaningfully changed. Alongside it, an explicit END-REASON flag on the done edge,
+  because the alternative is matching message text, where a message that merely mentions finishing produces a
+  false done and any wording change silently breaks the rule. Consuming phase:
+  `008-uiux-features-mining/007-host-liveactivity-fields`. Fail-closed fallback: without the typing every
+  update is treated as today; without the flag nothing is given the done treatment at all, and the client
+  never falls back to reading the text. Wire-compat: additive.
+- **REQ-020** — A **host-parked unsent input draft** is requested, citing rec `CI-3`. Shape: read-only
+  `unsentInputDraft` plus `unsentInputDraftAt` on the session, so a draft typed elsewhere and never sent can
+  be adopted here. Consuming phase: `008-uiux-features-mining/007-host-liveactivity-fields`. Fail-closed
+  fallback: with the fields absent nothing is adopted; when present the client adopts ONCE and only into an
+  EMPTY composer, so it can neither resurrect text the person deleted nor overwrite what they are typing.
+  Wire-compat: additive and read-only — the client never writes these back.
+- **REQ-021** — A **media preview kind with object-URL delivery** is requested, citing rec `MA-3`. Shape: a
+  video/audio preview kind on an artifact plus a delivery path the client can turn into a scoped object URL.
+  Consuming phase: `008-uiux-features-mining/007-host-liveactivity-fields`. Fail-closed fallback: an artifact
+  the host does not mark playable keeps today's unsupported notice rather than rendering an empty player; the
+  client revokes any object URL it creates on teardown so a long-lived chat cannot accumulate blobs.
+  Wire-compat: additive.
+- **REQ-022** — **Working-session telemetry** is requested, citing recs `SC-1`, `SC-3`, `SP-3`. Three
+  independent fields: `cacheExpiresAt` for a prompt-cache countdown; token and tool-call counts on a working
+  session; and a subagent/task activity stream. They are requested together because they all decorate the
+  same working state, but each must be independently optional — the elapsed tick already ships and must keep
+  rendering when any of them is absent. Consuming phase:
+  `008-uiux-features-mining/007-host-liveactivity-fields`. Fail-closed fallback: each segment renders only
+  with its own field present; the subagent tail is entirely absent without its stream rather than an empty
+  expander that implies there is something to see. Wire-compat: additive.
+- **Cross-reference** — `HP-6` (grouping the home by project) needs the redacted `projectLabel` ALREADY
+  requested under REQ-002; it is not re-requested here. Its consuming phase extends to
+  `008-uiux-features-mining/007-host-liveactivity-fields`, and with the field absent the roster renders
+  ungrouped exactly as it does today.
 <!-- /ANCHOR:requirements -->
 
 ---

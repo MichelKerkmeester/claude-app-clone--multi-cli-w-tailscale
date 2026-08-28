@@ -28,7 +28,7 @@ _memory:
 | **Level** | 2 |
 | **Status** | Complete |
 | **Findings** | LA-1..7, CI-3, MA-3, SC-1, SC-3, SP-3, HP-6 (13) |
-| **Commits** | (this commit) |
+| **Commits** | `c44587d` |
 | **Executors** | Six file-disjoint lanes plus a wiring pass: GPT-5.6 Luna at xhigh |
 <!-- /ANCHOR:metadata -->
 

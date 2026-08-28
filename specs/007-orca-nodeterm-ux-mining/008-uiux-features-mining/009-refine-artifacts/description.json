@@ -1,0 +1,29 @@
+{
+  "level": "2",
+  "specFolder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/009-refine-artifacts",
+  "description": "The artifacts surfaces cover artifact cards, previews, diffs, image and media surfaces, and 91 screenshots record how they actually render",
+  "keywords": [
+    "artifacts",
+    "surfaces",
+    "cover",
+    "artifact",
+    "cards",
+    "previews",
+    "diffs",
+    "image",
+    "media",
+    "screenshots",
+    "record",
+    "actually",
+    "render"
+  ],
+  "lastUpdated": "2026-08-28T19:54:30.519Z",
+  "specId": "009",
+  "folderSlug": "refine-artifacts",
+  "parentChain": [
+    "007-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

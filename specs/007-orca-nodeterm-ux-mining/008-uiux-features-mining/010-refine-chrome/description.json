@@ -1,0 +1,29 @@
+{
+  "level": "2",
+  "specFolder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/010-refine-chrome",
+  "description": "The chrome surfaces cover the composer, sheets, headers, palettes and runtime strip, and 50 screenshots record how they actually render",
+  "keywords": [
+    "chrome",
+    "surfaces",
+    "cover",
+    "composer",
+    "sheets",
+    "headers",
+    "palettes",
+    "runtime",
+    "strip",
+    "screenshots",
+    "record",
+    "actually",
+    "render"
+  ],
+  "lastUpdated": "2026-08-28T19:54:30.520Z",
+  "specId": "010",
+  "folderSlug": "refine-chrome",
+  "parentChain": [
+    "007-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

@@ -1,13 +1,13 @@
 ---
 title: "Feature Specification: 008 UI/UX features mining - phase parent"
-description: "Phase parent for implementing the 99 mined orca+nodeterm UI/UX findings in the host-authoritative, fail-closed SvelteKit mobile client. Decomposes the master plan into 7 independently buildable Level-2 phase children, each a coherent surface, with every finding assigned to exactly one phase and the 2 principle-only items excluded."
+description: "Phase parent for implementing the 99 mined orca+nodeterm UI/UX findings in the host-authoritative, fail-closed SvelteKit mobile client. Decomposes the master plan into 7 independently buildable Level-2 phase children, each a coherent surface, with every finding assigned to exactly one phase and the 2 principle-only items excluded. Phases 8-14 follow on: they own no findings and instead make the screenshot archive trustworthy, then refine every surface it exposes."
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining"
     last_updated_at: "2026-08-27T18:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Decomposed the master plan into 7 Level-2 phase children."
+    recent_action: "Phases 1-7 shipped; added 8-14 for archive integrity and UI refinement."
     next_safe_action: "Operator picks a phase; client phases 001-004 before host phases 005-007."
     blockers:
       - "Phases 005, 006, 007 carry host-gated findings; each blocked finding needs a relay-authored, client-read-only field or RPC before its render unblocks."
@@ -36,7 +36,7 @@ _memory:
 | **Parent Packet** | `007-orca-nodeterm-ux-mining` |
 | **Source of truth** | `plan.md` (3-wave sequencing) + `research/findings-registry.json` (99 findings) |
 | **Constraint** | Host-authoritative, fail-closed - the client owns no editable session truth |
-| **Findings** | 99 total: 97 assigned across 7 phases, 2 excluded (RS-4, RS-5) |
+| **Findings** | 99 total: 97 assigned across phases 1-7, 2 excluded (RS-4, RS-5); phases 8-14 own none |
 <!-- /ANCHOR:metadata -->
 
 ---
@@ -48,7 +48,7 @@ _memory:
 The orca+nodeterm mining run produced 99 verdict-checked UI/UX findings for the app-mobile client (Pi Remote, a host-authoritative fail-closed SvelteKit PWA). The master `plan.md` sequences them into three waves but is a single flat backlog. It needs a phased packet structure so each coherent surface can be planned, built, verified, and shipped as an independent unit without one finding drifting into two workstreams.
 
 ### Purpose
-Turn the 99 findings into 7 independently executable Level-2 phase children, one coherent surface each, with every finding assigned to exactly one phase and the 2 not-portable principle-only items formally excluded. The client-only phases can ship now; the host-gated phases plan their client work now and unblock as each relay field lands.
+Turn the 99 findings into 7 independently executable Level-2 phase children, one coherent surface each, with every finding assigned to exactly one phase and the 2 not-portable principle-only items formally excluded. Phases 8-14 were added after those seven shipped, to close a gap no gate could see: they own no findings and refine the surfaces the screenshot archive exposes. The client-only phases can ship now; the host-gated phases plan their client work now and unblock as each relay field lands.
 
 > **Phase-parent note:** This spec.md is the only authored narrative document at the parent level. All detailed planning, task breakdowns, checklists, and per-finding requirements live in the child phase folders in the Phase Documentation Map below. This keeps the parent from drifting stale as phases execute.
 <!-- /ANCHOR:problem -->
@@ -93,15 +93,25 @@ Per-phase file detail lives in each child's plan.md. Summary of the primary app-
 
 | Phase | Folder | Focus | Findings (owned) | Client/Host | Level | Status |
 |-------|--------|-------|------------------|-------------|-------|--------|
-| 1 | `001-composer-send/` | Composer input and send-ambiguity | CI-1, CI-2, CI-4, CI-5, RS-1, RS-2, RS-3 (7) | Client (CI-5 host-gated) | 2 | Planned |
-| 2 | `002-streaming-reader-media/` | Transcript clarity, reader, media rendering | SP-1, SP-2, SP-4, TE-1, TE-2, TE-4, TE-5, MA-1, MA-2, MA-4, MA-5, MI-2, MI-4 (13) | Client | 2 | Planned |
-| 3 | `003-home-switcher-nav-search/` | Home/roster, in-session switcher, navigation, client search | HP-1, HP-4, HP-5, SC-2, SC-4, SD-1, SD-2, SD-3, SD-4, SD-5, SD-6, NL-1, NL-2, NL-4, NL-5, SH-2, SH-3, SH-4, SH-5 (19) | Client | 2 | Planned |
-| 4 | `004-a11y-onboarding/` | Accessibility, onboarding, settings, diagnostics | AI-1, AI-2, AI-3, AI-4, OS-1, OS-2, OS-3, OS-4, OS-5, OS-6, OS-7 (11) | Client | 2 | Planned |
-| 5 | `005-host-inbox-notifications/` | Cross-session inbox (needs sessionId) and push contract | CE-1, CE-2, CE-3, CE-4, CE-5, CE-6, CE-7, AN-1, AN-2, AN-3, AN-4, AN-5, HP-3 (13) | Host (CE-5 ready now) | 2 | Planned |
-| 6 | `006-host-usage-search-review/` | Usage/quota, transcript-search RPC, change-review PR/git | UQ-1..8, SH-1, CR-1..9, TE-3, MI-1, MI-3 (21) | Host (UQ-3, UQ-6 ready now) | 2 | Planned |
-| 7 | `007-host-liveactivity-fields/` | Live-Activity push contract, composer/card/media host DTO fields, project-grouped home | LA-1..7, SC-1, SC-3, CI-3, MA-3, SP-3, HP-6 (13) | Host (LA-1/2/3/5/7 ready now) | 2 | Planned |
+| 1 | `001-composer-send/` | Composer input and send-ambiguity | CI-1, CI-2, CI-4, CI-5, RS-1, RS-2, RS-3 (7) | Client (CI-5 host-gated) | 2 | Complete |
+| 2 | `002-streaming-reader-media/` | Transcript clarity, reader, media rendering | SP-1, SP-2, SP-4, TE-1, TE-2, TE-4, TE-5, MA-1, MA-2, MA-4, MA-5, MI-2, MI-4 (13) | Client | 2 | Complete |
+| 3 | `003-home-switcher-nav-search/` | Home/roster, in-session switcher, navigation, client search | HP-1, HP-4, HP-5, SC-2, SC-4, SD-1, SD-2, SD-3, SD-4, SD-5, SD-6, NL-1, NL-2, NL-4, NL-5, SH-2, SH-3, SH-4, SH-5 (19) | Client | 2 | Complete |
+| 4 | `004-a11y-onboarding/` | Accessibility, onboarding, settings, diagnostics | AI-1, AI-2, AI-3, AI-4, OS-1, OS-2, OS-3, OS-4, OS-5, OS-6, OS-7 (11) | Client | 2 | Complete |
+| 5 | `005-host-inbox-notifications/` | Cross-session inbox (needs sessionId) and push contract | CE-1, CE-2, CE-3, CE-4, CE-5, CE-6, CE-7, AN-1, AN-2, AN-3, AN-4, AN-5, HP-3 (13) | Host (CE-5 ready now) | 2 | Complete |
+| 6 | `006-host-usage-search-review/` | Usage/quota, transcript-search RPC, change-review PR/git | UQ-1..8, SH-1, CR-1..9, TE-3, MI-1, MI-3 (21) | Host (UQ-3, UQ-6 ready now) | 2 | Complete |
+| 7 | `007-host-liveactivity-fields/` | Live-Activity push contract, composer/card/media host DTO fields, project-grouped home | LA-1..7, SC-1, SC-3, CI-3, MA-3, SP-3, HP-6 (13) | Host (LA-1/2/3/5/7 ready now) | 2 | Complete |
 
-Coverage: 7 + 13 + 19 + 11 + 13 + 21 + 13 = 97 assigned. Plus 2 excluded = 99 total. Every finding appears in exactly one phase.
+| 8 | `008-screenshot-archive-integrity/` | Make the screenshot archive an honest record before it is used as evidence | n/a - visual QA, not finding-driven | Client | 2 | Planned |
+| 9 | `009-refine-artifacts/` | Per-shot UI refinement of the artifacts surfaces (91 shots) | n/a - screenshot-driven | Client | 2 | Planned |
+| 10 | `010-refine-chrome/` | Per-shot UI refinement of the chrome surfaces (50 shots) | n/a - screenshot-driven | Client | 2 | Planned |
+| 11 | `011-refine-transcript/` | Per-shot UI refinement of the transcript surfaces (39 shots) | n/a - screenshot-driven | Client | 2 | Planned |
+| 12 | `012-refine-views/` | Per-shot UI refinement of the whole-screen views (37 shots) | n/a - screenshot-driven | Client | 2 | Planned |
+| 13 | `013-refine-rich-content-ask-question/` | Per-shot UI refinement of rendered model output and the question card (54 shots) | n/a - screenshot-driven | Client | 2 | Planned |
+| 14 | `014-refine-source-control-and-small-surfaces/` | Per-shot UI refinement of the review hub and remaining small surfaces (31 shots) | n/a - screenshot-driven | Client | 2 | Planned |
+
+Coverage: 7 + 13 + 19 + 11 + 13 + 21 + 13 = 97 assigned across phases 1-7. Plus 2 excluded = 99 total. Every finding appears in exactly one phase.
+
+Phases 8-14 are a follow-on workstream and own no mined findings. They exist because a green test suite cannot see a UI defect: phases 1-7 shipped behind passing gates while text overflowed, states rendered identically, and one card lost its styling entirely. Phase 8 makes the screenshot archive trustworthy; phases 9-14 read all 302 shots one at a time and refine the surfaces they expose, split by screenshot group so each is independently verifiable.
 
 ### Phase Transition Rules
 

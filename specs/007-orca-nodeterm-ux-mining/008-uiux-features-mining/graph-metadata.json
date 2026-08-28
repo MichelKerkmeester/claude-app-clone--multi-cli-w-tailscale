@@ -10,7 +10,14 @@
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/004-a11y-onboarding",
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/005-host-inbox-notifications",
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/006-host-usage-search-review",
-    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/007-host-liveactivity-fields"
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/007-host-liveactivity-fields",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/008-screenshot-archive-integrity",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/009-refine-artifacts",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/010-refine-chrome",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/011-refine-transcript",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/012-refine-views",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/013-refine-rich-content-ask-question",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces"
   ],
   "manual": {
     "depends_on": [],
@@ -34,7 +41,7 @@
       "fail-closed"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "in_progress",
     "key_files": [
       "plan.md",
       "research/findings-registry.json",
@@ -159,7 +166,7 @@
     ],
     "causal_summary": "The orca+nodeterm mining run produced 99 verdict-checked UI/UX findings for the app-mobile client (Pi Remote, a host-authoritative fail-closed SvelteKit PWA)",
     "created_at": "2026-08-27T15:31:24.534Z",
-    "last_save_at": "2026-08-27T19:17:33.179Z",
+    "last_save_at": "2026-08-28T19:55:46.552Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -167,9 +174,9 @@
       "plan.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:5cf1c53e999273d161d7a4d22a3fef3a60a6d4958636218c43bf501a33cc4cde",
+    "source_fingerprint": "sha256:5a1a7833ae8738d1def6686b8aa7095f6dd60bf59c09865c13d4362c54587361",
     "source_doc_hashes": {
-      "spec.md": "e13f7e0d120c3534ef8dc46908c23839428489a1f6bd3a2c70437f8ef768aa3a",
+      "spec.md": "14a5c7bd8206740f534527c3bca587f4793be235a8a5a38214933f66e7ffb3f0",
       "plan.md": "355fef2ae12bb548b1964ef68aff51930cd2ea2e969108ed5265ce97e33e8a5e",
       "research/research.md": "65c460d0b46c091e24028dd4d0e6279b08e29548e12535863cc1fb943d8545c6"
     },

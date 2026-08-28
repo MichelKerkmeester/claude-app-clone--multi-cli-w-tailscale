@@ -2,2109 +2,2637 @@
   "generatedFrom": "storybook-static",
   "frame": "402x874",
   "deviceScaleFactor": 1,
-  "total": 300,
-  "captured": 300,
+  "cropsToContent": true,
+  "transparentBackground": true,
+  "total": 328,
+  "captured": 302,
+  "visuallyEmpty": 26,
+  "unstable": 0,
   "failed": 0,
   "entries": [
-    {
-      "id": "artifacts-artifactcard--default",
-      "title": "Artifacts/ArtifactCard",
-      "name": "Default",
-      "ok": true,
-      "rel": "artifacts/artifact-card--default.png"
-    },
     {
       "id": "artifacts-artifactdetails--closed",
       "title": "Artifacts/ArtifactDetails",
       "name": "Closed",
       "ok": true,
-      "rel": "artifacts/artifact-details--closed.png"
-    },
-    {
-      "id": "artifacts-artifactdetails--open",
-      "title": "Artifacts/ArtifactDetails",
-      "name": "Open",
-      "ok": true,
-      "rel": "artifacts/artifact-details--open.png"
-    },
-    {
-      "id": "artifacts-artifactheader--default",
-      "title": "Artifacts/ArtifactHeader",
-      "name": "Default",
-      "ok": true,
-      "rel": "artifacts/artifact-header--default.png"
-    },
-    {
-      "id": "artifacts-artifactheader--without-revision",
-      "title": "Artifacts/ArtifactHeader",
-      "name": "Without Revision",
-      "ok": true,
-      "rel": "artifacts/artifact-header--without-revision.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--corrupt",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Corrupt",
-      "ok": true,
-      "rel": "artifacts/artifact-status--corrupt.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--denied",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Denied",
-      "ok": true,
-      "rel": "artifacts/artifact-status--denied.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--empty",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Empty",
-      "ok": true,
-      "rel": "artifacts/artifact-status--empty.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--expired",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Expired",
-      "ok": true,
-      "rel": "artifacts/artifact-status--expired.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--idle",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Idle",
-      "ok": true,
-      "rel": "artifacts/artifact-status--idle.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--loading",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Loading",
-      "ok": true,
-      "rel": "artifacts/artifact-status--loading.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--missing",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Missing",
-      "ok": true,
-      "rel": "artifacts/artifact-status--missing.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--offline",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Offline",
-      "ok": true,
-      "rel": "artifacts/artifact-status--offline.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--ready",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Ready",
-      "ok": true,
-      "rel": "artifacts/artifact-status--ready.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--revoked",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Revoked",
-      "ok": true,
-      "rel": "artifacts/artifact-status--revoked.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--stale",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Stale",
-      "ok": true,
-      "rel": "artifacts/artifact-status--stale.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--stalled",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Stalled",
-      "ok": true,
-      "rel": "artifacts/artifact-status--stalled.png"
-    },
-    {
-      "id": "artifacts-artifactstatus--too-large",
-      "title": "Artifacts/ArtifactStatus",
-      "name": "Too Large",
-      "ok": true,
-      "rel": "artifacts/artifact-status--too-large.png"
-    },
-    {
-      "id": "artifacts-codepreview--follow-tail",
-      "title": "Artifacts/CodePreview",
-      "name": "Follow Tail",
-      "ok": true,
-      "rel": "artifacts/code-preview--follow-tail.png"
-    },
-    {
-      "id": "artifacts-codepreview--highlight",
-      "title": "Artifacts/CodePreview",
-      "name": "Highlight",
-      "ok": true,
-      "rel": "artifacts/code-preview--highlight.png"
-    },
-    {
-      "id": "artifacts-codepreview--wrapped",
-      "title": "Artifacts/CodePreview",
-      "name": "Wrapped",
-      "ok": true,
-      "rel": "artifacts/code-preview--wrapped.png"
-    },
-    {
-      "id": "artifacts-diffpreview--add",
-      "title": "Artifacts/DiffPreview",
-      "name": "Add",
-      "ok": true,
-      "rel": "artifacts/diff-preview--add.png"
-    },
-    {
-      "id": "artifacts-diffpreview--context",
-      "title": "Artifacts/DiffPreview",
-      "name": "Context",
-      "ok": true,
-      "rel": "artifacts/diff-preview--context.png"
-    },
-    {
-      "id": "artifacts-diffpreview--find-match",
-      "title": "Artifacts/DiffPreview",
-      "name": "Find Match",
-      "ok": true,
-      "rel": "artifacts/diff-preview--find-match.png"
-    },
-    {
-      "id": "artifacts-diffpreview--remove",
-      "title": "Artifacts/DiffPreview",
-      "name": "Remove",
-      "ok": true,
-      "rel": "artifacts/diff-preview--remove.png"
-    },
-    {
-      "id": "artifacts-diffpreview--wrapped",
-      "title": "Artifacts/DiffPreview",
-      "name": "Wrapped",
-      "ok": true,
-      "rel": "artifacts/diff-preview--wrapped.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--corrupt",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Corrupt",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--corrupt.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--denied",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Denied",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--denied.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--expired",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Expired",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--expired.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--missing",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Missing",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--missing.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--privacy-covered",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Privacy Covered",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--privacy-covered.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--processing",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Processing",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--processing.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--revision-conflict",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Revision Conflict",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--revision-conflict.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--revoked",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Revoked",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--revoked.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--stale",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Stale",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--stale.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--unsupported",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Unsupported",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--unsupported.png"
-    },
-    {
-      "id": "artifacts-imageplaceholder--withheld",
-      "title": "Artifacts/ImagePlaceholder",
-      "name": "Withheld",
-      "ok": true,
-      "rel": "artifacts/image-placeholder--withheld.png"
-    },
-    {
-      "id": "artifacts-imagepreview--corrupt",
-      "title": "Artifacts/ImagePreview",
-      "name": "Corrupt",
-      "ok": true,
-      "rel": "artifacts/image-preview--corrupt.png"
-    },
-    {
-      "id": "artifacts-imagepreview--ready",
-      "title": "Artifacts/ImagePreview",
-      "name": "Ready",
-      "ok": true,
-      "rel": "artifacts/image-preview--ready.png"
-    },
-    {
-      "id": "artifacts-imagestatus--capture-permission",
-      "title": "Artifacts/ImageStatus",
-      "name": "Capture Permission",
-      "ok": true,
-      "rel": "artifacts/image-status--capture-permission.png"
-    },
-    {
-      "id": "artifacts-imagestatus--corrupt",
-      "title": "Artifacts/ImageStatus",
-      "name": "Corrupt",
-      "ok": true,
-      "rel": "artifacts/image-status--corrupt.png"
-    },
-    {
-      "id": "artifacts-imagestatus--denied",
-      "title": "Artifacts/ImageStatus",
-      "name": "Denied",
-      "ok": true,
-      "rel": "artifacts/image-status--denied.png"
-    },
-    {
-      "id": "artifacts-imagestatus--details-open",
-      "title": "Artifacts/ImageStatus",
-      "name": "Details Open",
-      "ok": true,
-      "rel": "artifacts/image-status--details-open.png"
-    },
-    {
-      "id": "artifacts-imagestatus--expired",
-      "title": "Artifacts/ImageStatus",
-      "name": "Expired",
-      "ok": true,
-      "rel": "artifacts/image-status--expired.png"
-    },
-    {
-      "id": "artifacts-imagestatus--full-degraded",
-      "title": "Artifacts/ImageStatus",
-      "name": "Full Degraded",
-      "ok": true,
-      "rel": "artifacts/image-status--full-degraded.png"
-    },
-    {
-      "id": "artifacts-imagestatus--full-fetching",
-      "title": "Artifacts/ImageStatus",
-      "name": "Full Fetching",
-      "ok": true,
-      "rel": "artifacts/image-status--full-fetching.png"
-    },
-    {
-      "id": "artifacts-imagestatus--missing",
-      "title": "Artifacts/ImageStatus",
-      "name": "Missing",
-      "ok": true,
-      "rel": "artifacts/image-status--missing.png"
-    },
-    {
-      "id": "artifacts-imagestatus--offline-loaded",
-      "title": "Artifacts/ImageStatus",
-      "name": "Offline Loaded",
-      "ok": true,
-      "rel": "artifacts/image-status--offline-loaded.png"
-    },
-    {
-      "id": "artifacts-imagestatus--offline-unavailable",
-      "title": "Artifacts/ImageStatus",
-      "name": "Offline Unavailable",
-      "ok": true,
-      "rel": "artifacts/image-status--offline-unavailable.png"
-    },
-    {
-      "id": "artifacts-imagestatus--opening",
-      "title": "Artifacts/ImageStatus",
-      "name": "Opening",
-      "ok": true,
-      "rel": "artifacts/image-status--opening.png"
-    },
-    {
-      "id": "artifacts-imagestatus--privacy-covered",
-      "title": "Artifacts/ImageStatus",
-      "name": "Privacy Covered",
-      "ok": true,
-      "rel": "artifacts/image-status--privacy-covered.png"
-    },
-    {
-      "id": "artifacts-imagestatus--processing",
-      "title": "Artifacts/ImageStatus",
-      "name": "Processing",
-      "ok": true,
-      "rel": "artifacts/image-status--processing.png"
-    },
-    {
-      "id": "artifacts-imagestatus--rate-limited",
-      "title": "Artifacts/ImageStatus",
-      "name": "Rate Limited",
-      "ok": true,
-      "rel": "artifacts/image-status--rate-limited.png"
-    },
-    {
-      "id": "artifacts-imagestatus--revision-conflict",
-      "title": "Artifacts/ImageStatus",
-      "name": "Revision Conflict",
-      "ok": true,
-      "rel": "artifacts/image-status--revision-conflict.png"
-    },
-    {
-      "id": "artifacts-imagestatus--revoked",
-      "title": "Artifacts/ImageStatus",
-      "name": "Revoked",
-      "ok": true,
-      "rel": "artifacts/image-status--revoked.png"
-    },
-    {
-      "id": "artifacts-imagestatus--stale",
-      "title": "Artifacts/ImageStatus",
-      "name": "Stale",
-      "ok": true,
-      "rel": "artifacts/image-status--stale.png"
-    },
-    {
-      "id": "artifacts-imagestatus--stalled",
-      "title": "Artifacts/ImageStatus",
-      "name": "Stalled",
-      "ok": true,
-      "rel": "artifacts/image-status--stalled.png"
-    },
-    {
-      "id": "artifacts-imagestatus--thumbnail-fetching",
-      "title": "Artifacts/ImageStatus",
-      "name": "Thumbnail Fetching",
-      "ok": true,
-      "rel": "artifacts/image-status--thumbnail-fetching.png"
-    },
-    {
-      "id": "artifacts-imagestatus--unsupported",
-      "title": "Artifacts/ImageStatus",
-      "name": "Unsupported",
-      "ok": true,
-      "rel": "artifacts/image-status--unsupported.png"
-    },
-    {
-      "id": "artifacts-imagestatus--viewer-ready",
-      "title": "Artifacts/ImageStatus",
-      "name": "Viewer Ready",
-      "ok": true,
-      "rel": "artifacts/image-status--viewer-ready.png"
-    },
-    {
-      "id": "artifacts-imagestatus--withheld",
-      "title": "Artifacts/ImageStatus",
-      "name": "Withheld",
-      "ok": true,
-      "rel": "artifacts/image-status--withheld.png"
-    },
-    {
-      "id": "artifacts-inboundimageblockview--processing",
-      "title": "Artifacts/InboundImageBlockView",
-      "name": "Processing",
-      "ok": true,
-      "rel": "artifacts/inbound-image-block-view--processing.png"
-    },
-    {
-      "id": "artifacts-inboundimageblockview--ready",
-      "title": "Artifacts/InboundImageBlockView",
-      "name": "Ready",
-      "ok": true,
-      "rel": "artifacts/inbound-image-block-view--ready.png"
-    },
-    {
-      "id": "artifacts-inboundimagecard--corrupt",
-      "title": "Artifacts/InboundImageCard",
-      "name": "Corrupt",
-      "ok": true,
-      "rel": "artifacts/inbound-image-card--corrupt.png"
-    },
-    {
-      "id": "artifacts-inboundimagecard--deferred",
-      "title": "Artifacts/InboundImageCard",
-      "name": "Deferred",
-      "ok": true,
-      "rel": "artifacts/inbound-image-card--deferred.png"
-    },
-    {
-      "id": "artifacts-inboundimagecard--inline-ready",
-      "title": "Artifacts/InboundImageCard",
-      "name": "Inline Ready",
-      "ok": true,
-      "rel": "artifacts/inbound-image-card--inline-ready.png"
-    },
-    {
-      "id": "artifacts-inboundimagecard--privacy-covered",
-      "title": "Artifacts/InboundImageCard",
-      "name": "Privacy Covered",
-      "ok": true,
-      "rel": "artifacts/inbound-image-card--privacy-covered.png"
-    },
-    {
-      "id": "artifacts-inboundimagecard--processing",
-      "title": "Artifacts/InboundImageCard",
-      "name": "Processing",
-      "ok": true,
-      "rel": "artifacts/inbound-image-card--processing.png"
-    },
-    {
-      "id": "artifacts-markdownpreview--empty",
-      "title": "Artifacts/MarkdownPreview",
-      "name": "Empty",
-      "ok": true,
-      "rel": "artifacts/markdown-preview--empty.png"
-    },
-    {
-      "id": "artifacts-markdownpreview--find-match",
-      "title": "Artifacts/MarkdownPreview",
-      "name": "Find Match",
-      "ok": true,
-      "rel": "artifacts/markdown-preview--find-match.png"
-    },
-    {
-      "id": "artifacts-markdownpreview--ready",
-      "title": "Artifacts/MarkdownPreview",
-      "name": "Ready",
-      "ok": true,
-      "rel": "artifacts/markdown-preview--ready.png"
-    },
-    {
-      "id": "artifacts-markdownpreview--whitespace",
-      "title": "Artifacts/MarkdownPreview",
-      "name": "Whitespace",
-      "ok": true,
-      "rel": "artifacts/markdown-preview--whitespace.png"
-    },
-    {
-      "id": "artifacts-pdfpreview--ready",
-      "title": "Artifacts/PdfPreview",
-      "name": "Ready",
-      "ok": true,
-      "rel": "artifacts/pdf-preview--ready.png"
-    },
-    {
-      "id": "artifacts-pdfpreview--without-safe-bytes",
-      "title": "Artifacts/PdfPreview",
-      "name": "Without Safe Bytes",
-      "ok": true,
-      "rel": "artifacts/pdf-preview--without-safe-bytes.png"
-    },
-    {
-      "id": "artifacts-previewcontrols--code",
-      "title": "Artifacts/PreviewControls",
-      "name": "Code",
-      "ok": true,
-      "rel": "artifacts/preview-controls--code.png"
-    },
-    {
-      "id": "artifacts-previewcontrols--diff",
-      "title": "Artifacts/PreviewControls",
-      "name": "Diff",
-      "ok": true,
-      "rel": "artifacts/preview-controls--diff.png"
-    },
-    {
-      "id": "artifacts-previewcontrols--image",
-      "title": "Artifacts/PreviewControls",
-      "name": "Image",
-      "ok": true,
-      "rel": "artifacts/preview-controls--image.png"
-    },
-    {
-      "id": "artifacts-previewcontrols--markdown",
-      "title": "Artifacts/PreviewControls",
-      "name": "Markdown",
-      "ok": true,
-      "rel": "artifacts/preview-controls--markdown.png"
-    },
-    {
-      "id": "artifacts-previewcontrols--text",
-      "title": "Artifacts/PreviewControls",
-      "name": "Text",
-      "ok": true,
-      "rel": "artifacts/preview-controls--text.png"
-    },
-    {
-      "id": "artifacts-secureimagepreview--full-zoomed",
-      "title": "Artifacts/SecureImagePreview",
-      "name": "Full Zoomed",
-      "ok": true,
-      "rel": "artifacts/secure-image-preview--full-zoomed.png"
-    },
-    {
-      "id": "artifacts-secureimagepreview--loading",
-      "title": "Artifacts/SecureImagePreview",
-      "name": "Loading",
-      "ok": true,
-      "rel": "artifacts/secure-image-preview--loading.png"
-    },
-    {
-      "id": "artifacts-secureimagepreview--thumbnail-ready",
-      "title": "Artifacts/SecureImagePreview",
-      "name": "Thumbnail Ready",
-      "ok": true,
-      "rel": "artifacts/secure-image-preview--thumbnail-ready.png"
-    },
-    {
-      "id": "artifacts-textpreview--empty",
-      "title": "Artifacts/TextPreview",
-      "name": "Empty",
-      "ok": true,
-      "rel": "artifacts/text-preview--empty.png"
-    },
-    {
-      "id": "artifacts-textpreview--markdown",
-      "title": "Artifacts/TextPreview",
-      "name": "Markdown",
-      "ok": true,
-      "rel": "artifacts/text-preview--markdown.png"
-    },
-    {
-      "id": "artifacts-textpreview--ready",
-      "title": "Artifacts/TextPreview",
-      "name": "Ready",
-      "ok": true,
-      "rel": "artifacts/text-preview--ready.png"
-    },
-    {
-      "id": "artifacts-textpreview--whitespace",
-      "title": "Artifacts/TextPreview",
-      "name": "Whitespace",
-      "ok": true,
-      "rel": "artifacts/text-preview--whitespace.png"
-    },
-    {
-      "id": "artifacts-unsupportedpreview--default",
-      "title": "Artifacts/UnsupportedPreview",
-      "name": "Default",
-      "ok": true,
-      "rel": "artifacts/unsupported-preview--default.png"
-    },
-    {
-      "id": "artifacts-unsupportedpreview--with-display-name",
-      "title": "Artifacts/UnsupportedPreview",
-      "name": "With Display Name",
-      "ok": true,
-      "rel": "artifacts/unsupported-preview--with-display-name.png"
-    },
-    {
-      "id": "artifacts-verifiedimage--default",
-      "title": "Artifacts/VerifiedImage",
-      "name": "Default",
-      "ok": true,
-      "rel": "artifacts/verified-image--default.png"
-    },
-    {
-      "id": "artifacts-verifiedimage--privacy-covered",
-      "title": "Artifacts/VerifiedImage",
-      "name": "Privacy Covered",
-      "ok": true,
-      "rel": "artifacts/verified-image--privacy-covered.png"
-    },
-    {
-      "id": "askquestion-askquestioncard--answered",
-      "title": "AskQuestion/AskQuestionCard",
-      "name": "Answered",
-      "ok": true,
-      "rel": "ask-question/ask-question-card--answered.png"
-    },
-    {
-      "id": "askquestion-askquestioncard--expired",
-      "title": "AskQuestion/AskQuestionCard",
-      "name": "Expired",
-      "ok": true,
-      "rel": "ask-question/ask-question-card--expired.png"
-    },
-    {
-      "id": "askquestion-askquestioncard--presented",
-      "title": "AskQuestion/AskQuestionCard",
-      "name": "Presented",
-      "ok": true,
-      "rel": "ask-question/ask-question-card--presented.png"
-    },
-    {
-      "id": "askquestion-askquestioncard--read-only",
-      "title": "AskQuestion/AskQuestionCard",
-      "name": "Read Only",
-      "ok": true,
-      "rel": "ask-question/ask-question-card--read-only.png"
-    },
-    {
-      "id": "askquestion-askquestioncard--submitting",
-      "title": "AskQuestion/AskQuestionCard",
-      "name": "Submitting",
-      "ok": true,
-      "rel": "ask-question/ask-question-card--submitting.png"
-    },
-    {
-      "id": "askquestion-askquestionfreetext--default",
-      "title": "AskQuestion/AskQuestionFreeText",
-      "name": "Default",
-      "ok": true,
-      "rel": "ask-question/ask-question-free-text--default.png"
-    },
-    {
-      "id": "askquestion-askquestionfreetext--disabled",
-      "title": "AskQuestion/AskQuestionFreeText",
-      "name": "Disabled",
-      "ok": true,
-      "rel": "ask-question/ask-question-free-text--disabled.png"
-    },
-    {
-      "id": "askquestion-askquestionfreetext--filled",
-      "title": "AskQuestion/AskQuestionFreeText",
-      "name": "Filled",
-      "ok": true,
-      "rel": "ask-question/ask-question-free-text--filled.png"
-    },
-    {
-      "id": "askquestion-askquestionfreetext--invalid",
-      "title": "AskQuestion/AskQuestionFreeText",
-      "name": "Invalid",
-      "ok": true,
-      "rel": "ask-question/ask-question-free-text--invalid.png"
-    },
-    {
-      "id": "askquestion-askquestionfreetext--required",
-      "title": "AskQuestion/AskQuestionFreeText",
-      "name": "Required",
-      "ok": true,
-      "rel": "ask-question/ask-question-free-text--required.png"
-    },
-    {
-      "id": "askquestion-askquestionoptionlist--default",
-      "title": "AskQuestion/AskQuestionOptionList",
-      "name": "Default",
-      "ok": true,
-      "rel": "ask-question/ask-question-option-list--default.png"
-    },
-    {
-      "id": "askquestion-askquestionoptionlist--disabled",
-      "title": "AskQuestion/AskQuestionOptionList",
-      "name": "Disabled",
-      "ok": true,
-      "rel": "ask-question/ask-question-option-list--disabled.png"
-    },
-    {
-      "id": "askquestion-askquestionoptionlist--partial-selection",
-      "title": "AskQuestion/AskQuestionOptionList",
-      "name": "Partial Selection",
-      "ok": true,
-      "rel": "ask-question/ask-question-option-list--partial-selection.png"
-    },
-    {
-      "id": "askquestion-askquestionoptionlist--single-choice",
-      "title": "AskQuestion/AskQuestionOptionList",
-      "name": "Single Choice",
-      "ok": true,
-      "rel": "ask-question/ask-question-option-list--single-choice.png"
-    },
-    {
-      "id": "askquestion-askquestionoptionrow--default",
-      "title": "AskQuestion/AskQuestionOptionRow",
-      "name": "Default",
-      "ok": true,
-      "rel": "ask-question/ask-question-option-row--default.png"
-    },
-    {
-      "id": "askquestion-askquestionoptionrow--disabled",
-      "title": "AskQuestion/AskQuestionOptionRow",
-      "name": "Disabled",
-      "ok": true,
-      "rel": "ask-question/ask-question-option-row--disabled.png"
-    },
-    {
-      "id": "askquestion-askquestionoptionrow--multiple-indicator",
-      "title": "AskQuestion/AskQuestionOptionRow",
-      "name": "Multiple Indicator",
-      "ok": true,
-      "rel": "ask-question/ask-question-option-row--multiple-indicator.png"
-    },
-    {
-      "id": "askquestion-askquestionoptionrow--selected",
-      "title": "AskQuestion/AskQuestionOptionRow",
-      "name": "Selected",
-      "ok": true,
-      "rel": "ask-question/ask-question-option-row--selected.png"
-    },
-    {
-      "id": "askquestion-askquestionprompt--default",
-      "title": "AskQuestion/AskQuestionPrompt",
-      "name": "Default",
-      "ok": true,
-      "rel": "ask-question/ask-question-prompt--default.png"
-    },
-    {
-      "id": "askquestion-askquestionstatus--answered",
-      "title": "AskQuestion/AskQuestionStatus",
-      "name": "Answered",
-      "ok": true,
-      "rel": "ask-question/ask-question-status--answered.png"
-    },
-    {
-      "id": "askquestion-askquestionstatus--error",
-      "title": "AskQuestion/AskQuestionStatus",
-      "name": "Error",
-      "ok": true,
-      "rel": "ask-question/ask-question-status--error.png"
-    },
-    {
-      "id": "askquestion-askquestionstatus--expired",
-      "title": "AskQuestion/AskQuestionStatus",
-      "name": "Expired",
-      "ok": true,
-      "rel": "ask-question/ask-question-status--expired.png"
-    },
-    {
-      "id": "askquestion-askquestionstatus--presented",
-      "title": "AskQuestion/AskQuestionStatus",
-      "name": "Presented",
-      "ok": true,
-      "rel": "ask-question/ask-question-status--presented.png"
-    },
-    {
-      "id": "askquestion-askquestionstatus--selecting",
-      "title": "AskQuestion/AskQuestionStatus",
-      "name": "Selecting",
-      "ok": true,
-      "rel": "ask-question/ask-question-status--selecting.png"
-    },
-    {
-      "id": "askquestion-askquestionstatus--submitting",
-      "title": "AskQuestion/AskQuestionStatus",
-      "name": "Submitting",
-      "ok": true,
-      "rel": "ask-question/ask-question-status--submitting.png"
-    },
-    {
-      "id": "askquestion-askquestionsubmitbutton--disabled",
-      "title": "AskQuestion/AskQuestionSubmitButton",
-      "name": "Disabled",
-      "ok": true,
-      "rel": "ask-question/ask-question-submit-button--disabled.png"
-    },
-    {
-      "id": "askquestion-askquestionsubmitbutton--enabled",
-      "title": "AskQuestion/AskQuestionSubmitButton",
-      "name": "Enabled",
-      "ok": true,
-      "rel": "ask-question/ask-question-submit-button--enabled.png"
-    },
-    {
-      "id": "attachments-attachmentpreviewdialog--open",
-      "title": "Attachments/AttachmentPreviewDialog",
-      "name": "Open",
-      "ok": true,
-      "rel": "attachments/attachment-preview-dialog--open.png"
-    },
-    {
-      "id": "attachments-attachmentrail--default",
-      "title": "Attachments/AttachmentRail",
-      "name": "Default",
-      "ok": true,
-      "rel": "attachments/attachment-rail--default.png"
-    },
-    {
-      "id": "attachments-attachmenttile--model-blocked",
-      "title": "Attachments/AttachmentTile",
-      "name": "Model Blocked",
-      "ok": true,
-      "rel": "attachments/attachment-tile--model-blocked.png"
-    },
-    {
-      "id": "attachments-attachmenttile--ready",
-      "title": "Attachments/AttachmentTile",
-      "name": "Ready",
-      "ok": true,
-      "rel": "attachments/attachment-tile--ready.png"
-    },
-    {
-      "id": "attachments-attachmenttile--rejected",
-      "title": "Attachments/AttachmentTile",
-      "name": "Rejected",
-      "ok": true,
-      "rel": "attachments/attachment-tile--rejected.png"
-    },
-    {
-      "id": "attachments-attachmenttile--validating",
-      "title": "Attachments/AttachmentTile",
-      "name": "Validating",
-      "ok": true,
-      "rel": "attachments/attachment-tile--validating.png"
-    },
-    {
-      "id": "chrome-commandoption--active",
-      "title": "Chrome/CommandOption",
-      "name": "Active",
-      "ok": true,
-      "rel": "chrome/command-option--active.png"
-    },
-    {
-      "id": "chrome-commandoption--inactive",
-      "title": "Chrome/CommandOption",
-      "name": "Inactive",
-      "ok": true,
-      "rel": "chrome/command-option--inactive.png"
-    },
-    {
-      "id": "chrome-commandoption--matched",
-      "title": "Chrome/CommandOption",
-      "name": "Matched",
-      "ok": true,
-      "rel": "chrome/command-option--matched.png"
-    },
-    {
-      "id": "chrome-commandpalette--loading",
-      "title": "Chrome/CommandPalette",
-      "name": "Loading",
-      "ok": true,
-      "rel": "chrome/command-palette--loading.png"
-    },
-    {
-      "id": "chrome-commandpalette--ready",
-      "title": "Chrome/CommandPalette",
-      "name": "Ready",
-      "ok": true,
-      "rel": "chrome/command-palette--ready.png"
-    },
-    {
-      "id": "chrome-composercommandautocomplete--loading-initial",
-      "title": "Chrome/ComposerCommandAutocomplete",
-      "name": "Loading Initial",
-      "ok": true,
-      "rel": "chrome/composer-command-autocomplete--loading-initial.png"
-    },
-    {
-      "id": "chrome-composercommandautocomplete--ready-filtered",
-      "title": "Chrome/ComposerCommandAutocomplete",
-      "name": "Ready Filtered",
-      "ok": true,
-      "rel": "chrome/composer-command-autocomplete--ready-filtered.png"
-    },
-    {
-      "id": "chrome-composercommandautocomplete--ready-no-matches",
-      "title": "Chrome/ComposerCommandAutocomplete",
-      "name": "Ready No Matches",
-      "ok": true,
-      "rel": "chrome/composer-command-autocomplete--ready-no-matches.png"
-    },
-    {
-      "id": "chrome-composercommandautocomplete--ready-unfiltered",
-      "title": "Chrome/ComposerCommandAutocomplete",
-      "name": "Ready Unfiltered",
-      "ok": true,
-      "rel": "chrome/composer-command-autocomplete--ready-unfiltered.png"
-    },
-    {
-      "id": "chrome-composertools--catalog-loading",
-      "title": "Chrome/ComposerTools",
-      "name": "Catalog Loading",
-      "ok": true,
-      "rel": "chrome/composer-tools--catalog-loading.png"
-    },
-    {
-      "id": "chrome-composertools--default",
-      "title": "Chrome/ComposerTools",
-      "name": "Default",
-      "ok": true,
-      "rel": "chrome/composer-tools--default.png"
-    },
-    {
-      "id": "chrome-composertools--media-available",
-      "title": "Chrome/ComposerTools",
-      "name": "Media Available",
-      "ok": true,
-      "rel": "chrome/composer-tools--media-available.png"
-    },
-    {
-      "id": "chrome-dictationoverlay--open",
-      "title": "Chrome/DictationOverlay",
-      "name": "Open",
-      "ok": true,
-      "rel": "chrome/dictation-overlay--open.png"
-    },
-    {
-      "id": "chrome-dictationsheet--available",
-      "title": "Chrome/DictationSheet",
-      "name": "Available",
-      "ok": true,
-      "rel": "chrome/dictation-sheet--available.png"
-    },
-    {
-      "id": "chrome-dictationsheet--unavailable",
-      "title": "Chrome/DictationSheet",
-      "name": "Unavailable",
-      "ok": true,
-      "rel": "chrome/dictation-sheet--unavailable.png"
-    },
-    {
-      "id": "chrome-effortradiogroup--disabled",
-      "title": "Chrome/EffortRadioGroup",
-      "name": "Disabled",
-      "ok": true,
-      "rel": "chrome/effort-radio-group--disabled.png"
-    },
-    {
-      "id": "chrome-effortradiogroup--off-only",
-      "title": "Chrome/EffortRadioGroup",
-      "name": "Off Only",
-      "ok": true,
-      "rel": "chrome/effort-radio-group--off-only.png"
-    },
-    {
-      "id": "chrome-effortradiogroup--pending",
-      "title": "Chrome/EffortRadioGroup",
-      "name": "Pending",
-      "ok": true,
-      "rel": "chrome/effort-radio-group--pending.png"
-    },
-    {
-      "id": "chrome-effortradiogroup--ready",
-      "title": "Chrome/EffortRadioGroup",
-      "name": "Ready",
-      "ok": true,
-      "rel": "chrome/effort-radio-group--ready.png"
-    },
-    {
-      "id": "chrome-leaveplansheet--mode",
-      "title": "Chrome/LeavePlanSheet",
-      "name": "Mode",
-      "ok": true,
-      "rel": "chrome/leave-plan-sheet--mode.png"
-    },
-    {
-      "id": "chrome-leaveplansheet--plan-ready",
-      "title": "Chrome/LeavePlanSheet",
-      "name": "Plan Ready",
-      "ok": true,
-      "rel": "chrome/leave-plan-sheet--plan-ready.png"
-    },
-    {
-      "id": "chrome-modeleffortsheet--effort-section",
-      "title": "Chrome/ModelEffortSheet",
-      "name": "Effort Section",
-      "ok": true,
-      "rel": "chrome/model-effort-sheet--effort-section.png"
-    },
-    {
-      "id": "chrome-modeleffortsheet--model-section",
-      "title": "Chrome/ModelEffortSheet",
-      "name": "Model Section",
-      "ok": true,
-      "rel": "chrome/model-effort-sheet--model-section.png"
-    },
-    {
-      "id": "chrome-planmodebutton--build",
-      "title": "Chrome/PlanModeButton",
-      "name": "Build",
-      "ok": true,
-      "rel": "chrome/plan-mode-button--build.png"
-    },
-    {
-      "id": "chrome-planmodebutton--checking",
-      "title": "Chrome/PlanModeButton",
-      "name": "Checking",
-      "ok": true,
-      "rel": "chrome/plan-mode-button--checking.png"
-    },
-    {
-      "id": "chrome-planmodebutton--executing-plan",
-      "title": "Chrome/PlanModeButton",
-      "name": "Executing Plan",
-      "ok": true,
-      "rel": "chrome/plan-mode-button--executing-plan.png"
-    },
-    {
-      "id": "chrome-planmodebutton--plan",
-      "title": "Chrome/PlanModeButton",
-      "name": "Plan",
-      "ok": true,
-      "rel": "chrome/plan-mode-button--plan.png"
-    },
-    {
-      "id": "chrome-planreadycard--ready",
-      "title": "Chrome/PlanReadyCard",
-      "name": "Ready",
-      "ok": true,
-      "rel": "chrome/plan-ready-card--ready.png"
-    },
-    {
-      "id": "chrome-planreadycard--waiting-for-live-confirmation",
-      "title": "Chrome/PlanReadyCard",
-      "name": "Waiting For Live Confirmation",
-      "ok": true,
-      "rel": "chrome/plan-ready-card--waiting-for-live-confirmation.png"
-    },
-    {
-      "id": "chrome-planreviewsheet--executing",
-      "title": "Chrome/PlanReviewSheet",
-      "name": "Executing",
-      "ok": true,
-      "rel": "chrome/plan-review-sheet--executing.png"
-    },
-    {
-      "id": "chrome-planreviewsheet--open",
-      "title": "Chrome/PlanReviewSheet",
-      "name": "Open",
-      "ok": true,
-      "rel": "chrome/plan-review-sheet--open.png"
-    },
-    {
-      "id": "chrome-prompthistorysheet--open",
-      "title": "Chrome/PromptHistorySheet",
-      "name": "Open",
-      "ok": true,
-      "rel": "chrome/prompt-history-sheet--open.png"
-    },
-    {
-      "id": "chrome-rooterrorboundary--default",
-      "title": "Chrome/RootErrorBoundary",
-      "name": "Default",
-      "ok": true,
-      "rel": "chrome/root-error-boundary--default.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "chrome-runtimemodeannouncer--build",
       "title": "Chrome/RuntimeModeAnnouncer",
       "name": "Build",
       "ok": true,
-      "rel": "chrome/runtime-mode-announcer--build.png"
-    },
-    {
-      "id": "chrome-runtimemodeannouncer--checking",
-      "title": "Chrome/RuntimeModeAnnouncer",
-      "name": "Checking",
-      "ok": true,
-      "rel": "chrome/runtime-mode-announcer--checking.png"
-    },
-    {
-      "id": "chrome-runtimemodeannouncer--executing-plan",
-      "title": "Chrome/RuntimeModeAnnouncer",
-      "name": "Executing Plan",
-      "ok": true,
-      "rel": "chrome/runtime-mode-announcer--executing-plan.png"
-    },
-    {
-      "id": "chrome-runtimemodeannouncer--offline",
-      "title": "Chrome/RuntimeModeAnnouncer",
-      "name": "Offline",
-      "ok": true,
-      "rel": "chrome/runtime-mode-announcer--offline.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "chrome-runtimemodeannouncer--plan",
       "title": "Chrome/RuntimeModeAnnouncer",
       "name": "Plan",
       "ok": true,
-      "rel": "chrome/runtime-mode-announcer--plan.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
+    },
+    {
+      "id": "chrome-runtimemodeannouncer--executing-plan",
+      "title": "Chrome/RuntimeModeAnnouncer",
+      "name": "Executing Plan",
+      "ok": true,
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "chrome-runtimemodeannouncer--running",
       "title": "Chrome/RuntimeModeAnnouncer",
       "name": "Running",
       "ok": true,
-      "rel": "chrome/runtime-mode-announcer--running.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
-      "id": "chrome-runtimestrip--checking",
-      "title": "Chrome/RuntimeStrip",
+      "id": "chrome-runtimemodeannouncer--offline",
+      "title": "Chrome/RuntimeModeAnnouncer",
+      "name": "Offline",
+      "ok": true,
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
+    },
+    {
+      "id": "chrome-runtimemodeannouncer--checking",
+      "title": "Chrome/RuntimeModeAnnouncer",
       "name": "Checking",
       "ok": true,
-      "rel": "chrome/runtime-strip--checking.png"
-    },
-    {
-      "id": "chrome-runtimestrip--idle",
-      "title": "Chrome/RuntimeStrip",
-      "name": "Idle",
-      "ok": true,
-      "rel": "chrome/runtime-strip--idle.png"
-    },
-    {
-      "id": "chrome-runtimestrip--plan",
-      "title": "Chrome/RuntimeStrip",
-      "name": "Plan",
-      "ok": true,
-      "rel": "chrome/runtime-strip--plan.png"
-    },
-    {
-      "id": "chrome-runtimestrip--running",
-      "title": "Chrome/RuntimeStrip",
-      "name": "Running",
-      "ok": true,
-      "rel": "chrome/runtime-strip--running.png"
-    },
-    {
-      "id": "chrome-sessioncomposer--idle",
-      "title": "Chrome/SessionComposer",
-      "name": "Idle",
-      "ok": true,
-      "rel": "chrome/session-composer--idle.png"
-    },
-    {
-      "id": "chrome-sessioncomposer--running",
-      "title": "Chrome/SessionComposer",
-      "name": "Running",
-      "ok": true,
-      "rel": "chrome/session-composer--running.png"
-    },
-    {
-      "id": "chrome-sessioncomposer--with-media",
-      "title": "Chrome/SessionComposer",
-      "name": "With Media",
-      "ok": true,
-      "rel": "chrome/session-composer--with-media.png"
-    },
-    {
-      "id": "chrome-sessionheader--build",
-      "title": "Chrome/SessionHeader",
-      "name": "Build",
-      "ok": true,
-      "rel": "chrome/session-header--build.png"
-    },
-    {
-      "id": "chrome-sessionheader--plan",
-      "title": "Chrome/SessionHeader",
-      "name": "Plan",
-      "ok": true,
-      "rel": "chrome/session-header--plan.png"
-    },
-    {
-      "id": "chrome-sessionheader--sheet-open",
-      "title": "Chrome/SessionHeader",
-      "name": "Sheet Open",
-      "ok": true,
-      "rel": "chrome/session-header--sheet-open.png"
-    },
-    {
-      "id": "chrome-todopanel--empty",
-      "title": "Chrome/TodoPanel",
-      "name": "Empty",
-      "ok": true,
-      "rel": "chrome/todo-panel--empty.png"
-    },
-    {
-      "id": "chrome-todopanel--needs-refresh",
-      "title": "Chrome/TodoPanel",
-      "name": "Needs Refresh",
-      "ok": true,
-      "rel": "chrome/todo-panel--needs-refresh.png"
-    },
-    {
-      "id": "chrome-todopanel--refreshing",
-      "title": "Chrome/TodoPanel",
-      "name": "Refreshing",
-      "ok": true,
-      "rel": "chrome/todo-panel--refreshing.png"
-    },
-    {
-      "id": "home-pushsettings--default",
-      "title": "Home/PushSettings",
-      "name": "Default",
-      "ok": true,
-      "rel": "home/push-settings--default.png"
-    },
-    {
-      "id": "primitives-button--default",
-      "title": "Primitives/Button",
-      "name": "Default",
-      "ok": true,
-      "rel": "primitives/button--default.png"
-    },
-    {
-      "id": "primitives-button--disabled",
-      "title": "Primitives/Button",
-      "name": "Disabled",
-      "ok": true,
-      "rel": "primitives/button--disabled.png"
-    },
-    {
-      "id": "primitives-button--submit",
-      "title": "Primitives/Button",
-      "name": "Submit",
-      "ok": true,
-      "rel": "primitives/button--submit.png"
-    },
-    {
-      "id": "primitives-collapsible--collapsed",
-      "title": "Primitives/Collapsible",
-      "name": "Collapsed",
-      "ok": true,
-      "rel": "primitives/collapsible--collapsed.png"
-    },
-    {
-      "id": "primitives-collapsible--expanded",
-      "title": "Primitives/Collapsible",
-      "name": "Expanded",
-      "ok": true,
-      "rel": "primitives/collapsible--expanded.png"
-    },
-    {
-      "id": "rich-content-codecard--code",
-      "title": "Rich Content/CodeCard",
-      "name": "Code",
-      "ok": true,
-      "rel": "rich-content/code-card--code.png"
-    },
-    {
-      "id": "rich-content-commandoutputcard--cancelled",
-      "title": "Rich Content/CommandOutputCard",
-      "name": "Cancelled",
-      "ok": true,
-      "rel": "rich-content/command-output-card--cancelled.png"
-    },
-    {
-      "id": "rich-content-commandoutputcard--completed",
-      "title": "Rich Content/CommandOutputCard",
-      "name": "Completed",
-      "ok": true,
-      "rel": "rich-content/command-output-card--completed.png"
-    },
-    {
-      "id": "rich-content-commandoutputcard--denied",
-      "title": "Rich Content/CommandOutputCard",
-      "name": "Denied",
-      "ok": true,
-      "rel": "rich-content/command-output-card--denied.png"
-    },
-    {
-      "id": "rich-content-commandoutputcard--failed",
-      "title": "Rich Content/CommandOutputCard",
-      "name": "Failed",
-      "ok": true,
-      "rel": "rich-content/command-output-card--failed.png"
-    },
-    {
-      "id": "rich-content-commandoutputcard--interrupted",
-      "title": "Rich Content/CommandOutputCard",
-      "name": "Interrupted",
-      "ok": true,
-      "rel": "rich-content/command-output-card--interrupted.png"
-    },
-    {
-      "id": "rich-content-commandoutputcard--running",
-      "title": "Rich Content/CommandOutputCard",
-      "name": "Running",
-      "ok": true,
-      "rel": "rich-content/command-output-card--running.png"
-    },
-    {
-      "id": "rich-content-redactionbadge--cache",
-      "title": "Rich Content/RedactionBadge",
-      "name": "Cache",
-      "ok": true,
-      "rel": "rich-content/redaction-badge--cache.png"
-    },
-    {
-      "id": "rich-content-redactionbadge--command",
-      "title": "Rich Content/RedactionBadge",
-      "name": "Command",
-      "ok": true,
-      "rel": "rich-content/redaction-badge--command.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "rich-content-redactionbadge--none",
       "title": "Rich Content/RedactionBadge",
       "name": "None",
       "ok": true,
-      "rel": "rich-content/redaction-badge--none.png"
-    },
-    {
-      "id": "rich-content-richblockframe--plain",
-      "title": "Rich Content/RichBlockFrame",
-      "name": "Plain",
-      "ok": true,
-      "rel": "rich-content/rich-block-frame--plain.png"
-    },
-    {
-      "id": "rich-content-richblockframe--with-redaction",
-      "title": "Rich Content/RichBlockFrame",
-      "name": "With Redaction",
-      "ok": true,
-      "rel": "rich-content/rich-block-frame--with-redaction.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--cancelled",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Cancelled",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--cancelled.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--code",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Code",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--code.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--completed",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Completed",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--completed.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--denied",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Denied",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--denied.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--failed",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Failed",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--failed.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--fallback",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Fallback",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--fallback.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--interrupted",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Interrupted",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--interrupted.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--prose",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Prose",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--prose.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--running",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Running",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--running.png"
-    },
-    {
-      "id": "rich-content-richcontentrouter--text-artifact",
-      "title": "Rich Content/RichContentRouter",
-      "name": "Text Artifact",
-      "ok": true,
-      "rel": "rich-content/rich-content-router--text-artifact.png"
-    },
-    {
-      "id": "rich-content-safemarkdown--prose-rtl",
-      "title": "Rich Content/SafeMarkdown",
-      "name": "Prose Rtl",
-      "ok": true,
-      "rel": "rich-content/safe-markdown--prose-rtl.png"
-    },
-    {
-      "id": "rich-content-safemarkdown--prose",
-      "title": "Rich Content/SafeMarkdown",
-      "name": "Prose",
-      "ok": true,
-      "rel": "rich-content/safe-markdown--prose.png"
-    },
-    {
-      "id": "rich-content-textartifactcard--document",
-      "title": "Rich Content/TextArtifactCard",
-      "name": "Document",
-      "ok": true,
-      "rel": "rich-content/text-artifact-card--document.png"
-    },
-    {
-      "id": "rich-content-textartifactcard--long-text",
-      "title": "Rich Content/TextArtifactCard",
-      "name": "Long Text",
-      "ok": true,
-      "rel": "rich-content/text-artifact-card--long-text.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-changedfiles--without-host-data",
       "title": "Source Control/ChangedFiles",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/changed-files--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-checklist--without-host-data",
       "title": "Source Control/CheckList",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/check-list--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-checksummary--without-host-data",
       "title": "Source Control/CheckSummary",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/check-summary--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-commithistory--without-host-data",
       "title": "Source Control/CommitHistory",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/commit-history--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-conflictlist--without-host-data",
       "title": "Source Control/ConflictList",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/conflict-list--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-prchip--without-host-data",
       "title": "Source Control/PrChip",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/pr-chip--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-reviewerlist--without-host-data",
       "title": "Source Control/ReviewerList",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/reviewer-list--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-sheetprdetails--without-host-data",
       "title": "Source Control/SheetPrDetails",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/sheet-pr-details--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-sourcecontrolhub--without-host-data",
       "title": "Source Control/SourceControlHub",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/source-control-hub--without-host-data.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "source-control-upstreamstatus--without-host-data",
       "title": "Source Control/UpstreamStatus",
       "name": "Without Host Data",
       "ok": true,
-      "rel": "source-control/upstream-status--without-host-data.png"
-    },
-    {
-      "id": "transcript-assistantactions--answer-actions",
-      "title": "Transcript/AssistantActions",
-      "name": "Answer Actions",
-      "ok": true,
-      "rel": "transcript/assistant-actions--answer-actions.png"
-    },
-    {
-      "id": "transcript-block--file-preview-denied",
-      "title": "Transcript/Block",
-      "name": "File Preview Denied",
-      "ok": true,
-      "rel": "transcript/block--file-preview-denied.png"
-    },
-    {
-      "id": "transcript-block--file-preview-missing",
-      "title": "Transcript/Block",
-      "name": "File Preview Missing",
-      "ok": true,
-      "rel": "transcript/block--file-preview-missing.png"
-    },
-    {
-      "id": "transcript-block--file-preview-ready",
-      "title": "Transcript/Block",
-      "name": "File Preview Ready",
-      "ok": true,
-      "rel": "transcript/block--file-preview-ready.png"
-    },
-    {
-      "id": "transcript-block--file-preview-unsupported",
-      "title": "Transcript/Block",
-      "name": "File Preview Unsupported",
-      "ok": true,
-      "rel": "transcript/block--file-preview-unsupported.png"
-    },
-    {
-      "id": "transcript-block--file-preview-withheld",
-      "title": "Transcript/Block",
-      "name": "File Preview Withheld",
-      "ok": true,
-      "rel": "transcript/block--file-preview-withheld.png"
-    },
-    {
-      "id": "transcript-block--text-artifact",
-      "title": "Transcript/Block",
-      "name": "Text Artifact",
-      "ok": true,
-      "rel": "transcript/block--text-artifact.png"
-    },
-    {
-      "id": "transcript-block--text-assistant",
-      "title": "Transcript/Block",
-      "name": "Text Assistant",
-      "ok": true,
-      "rel": "transcript/block--text-assistant.png"
-    },
-    {
-      "id": "transcript-block--text-user",
-      "title": "Transcript/Block",
-      "name": "Text User",
-      "ok": true,
-      "rel": "transcript/block--text-user.png"
-    },
-    {
-      "id": "transcript-block--tool-call",
-      "title": "Transcript/Block",
-      "name": "Tool Call",
-      "ok": true,
-      "rel": "transcript/block--tool-call.png"
-    },
-    {
-      "id": "transcript-block--tool-error",
-      "title": "Transcript/Block",
-      "name": "Tool Error",
-      "ok": true,
-      "rel": "transcript/block--tool-error.png"
-    },
-    {
-      "id": "transcript-block--tool-result",
-      "title": "Transcript/Block",
-      "name": "Tool Result",
-      "ok": true,
-      "rel": "transcript/block--tool-result.png"
-    },
-    {
-      "id": "transcript-block--unknown",
-      "title": "Transcript/Block",
-      "name": "Unknown",
-      "ok": true,
-      "rel": "transcript/block--unknown.png"
-    },
-    {
-      "id": "transcript-collapsedevidence--tool-call",
-      "title": "Transcript/CollapsedEvidence",
-      "name": "Tool Call",
-      "ok": true,
-      "rel": "transcript/collapsed-evidence--tool-call.png"
-    },
-    {
-      "id": "transcript-collapsedevidence--tool-result",
-      "title": "Transcript/CollapsedEvidence",
-      "name": "Tool Result",
-      "ok": true,
-      "rel": "transcript/collapsed-evidence--tool-result.png"
-    },
-    {
-      "id": "transcript-filepreviewcard--denied",
-      "title": "Transcript/FilePreviewCard",
-      "name": "Denied",
-      "ok": true,
-      "rel": "transcript/file-preview-card--denied.png"
-    },
-    {
-      "id": "transcript-filepreviewcard--missing",
-      "title": "Transcript/FilePreviewCard",
-      "name": "Missing",
-      "ok": true,
-      "rel": "transcript/file-preview-card--missing.png"
-    },
-    {
-      "id": "transcript-filepreviewcard--ready",
-      "title": "Transcript/FilePreviewCard",
-      "name": "Ready",
-      "ok": true,
-      "rel": "transcript/file-preview-card--ready.png"
-    },
-    {
-      "id": "transcript-filepreviewcard--unsupported",
-      "title": "Transcript/FilePreviewCard",
-      "name": "Unsupported",
-      "ok": true,
-      "rel": "transcript/file-preview-card--unsupported.png"
-    },
-    {
-      "id": "transcript-filepreviewcard--withheld",
-      "title": "Transcript/FilePreviewCard",
-      "name": "Withheld",
-      "ok": true,
-      "rel": "transcript/file-preview-card--withheld.png"
-    },
-    {
-      "id": "transcript-menutranscriptaction--mixed-availability",
-      "title": "Transcript/MenuTranscriptAction",
-      "name": "Mixed Availability",
-      "ok": true,
-      "rel": "transcript/menu-transcript-action--mixed-availability.png"
-    },
-    {
-      "id": "transcript-normalizedactivitygroup--tool-call-activity",
-      "title": "Transcript/NormalizedActivityGroup",
-      "name": "Tool Call Activity",
-      "ok": true,
-      "rel": "transcript/normalized-activity-group--tool-call-activity.png"
-    },
-    {
-      "id": "transcript-normalizedtranscriptblockview--activity",
-      "title": "Transcript/NormalizedTranscriptBlockView",
-      "name": "Activity",
-      "ok": true,
-      "rel": "transcript/normalized-transcript-block-view--activity.png"
-    },
-    {
-      "id": "transcript-normalizedtranscriptblockview--code",
-      "title": "Transcript/NormalizedTranscriptBlockView",
-      "name": "Code",
-      "ok": true,
-      "rel": "transcript/normalized-transcript-block-view--code.png"
-    },
-    {
-      "id": "transcript-normalizedtranscriptblockview--command",
-      "title": "Transcript/NormalizedTranscriptBlockView",
-      "name": "Command",
-      "ok": true,
-      "rel": "transcript/normalized-transcript-block-view--command.png"
-    },
-    {
-      "id": "transcript-normalizedtranscriptblockview--fallback",
-      "title": "Transcript/NormalizedTranscriptBlockView",
-      "name": "Fallback",
-      "ok": true,
-      "rel": "transcript/normalized-transcript-block-view--fallback.png"
-    },
-    {
-      "id": "transcript-normalizedtranscriptblockview--prose",
-      "title": "Transcript/NormalizedTranscriptBlockView",
-      "name": "Prose",
-      "ok": true,
-      "rel": "transcript/normalized-transcript-block-view--prose.png"
-    },
-    {
-      "id": "transcript-normalizedtranscriptblockview--text-artifact",
-      "title": "Transcript/NormalizedTranscriptBlockView",
-      "name": "Text Artifact",
-      "ok": true,
-      "rel": "transcript/normalized-transcript-block-view--text-artifact.png"
-    },
-    {
-      "id": "transcript-runtimestatusregion--accepted",
-      "title": "Transcript/RuntimeStatusRegion",
-      "name": "Accepted",
-      "ok": true,
-      "rel": "transcript/runtime-status-region--accepted.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "transcript-runtimestatusregion--checking",
       "title": "Transcript/RuntimeStatusRegion",
       "name": "Checking",
       "ok": true,
-      "rel": "transcript/runtime-status-region--checking.png"
-    },
-    {
-      "id": "transcript-runtimestatusregion--pending",
-      "title": "Transcript/RuntimeStatusRegion",
-      "name": "Pending",
-      "ok": true,
-      "rel": "transcript/runtime-status-region--pending.png"
-    },
-    {
-      "id": "transcript-runtimestatusregion--stale",
-      "title": "Transcript/RuntimeStatusRegion",
-      "name": "Stale",
-      "ok": true,
-      "rel": "transcript/runtime-status-region--stale.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "transcript-runtimestatusregion--streaming",
       "title": "Transcript/RuntimeStatusRegion",
       "name": "Streaming",
       "ok": true,
-      "rel": "transcript/runtime-status-region--streaming.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
+    },
+    {
+      "id": "transcript-runtimestatusregion--pending",
+      "title": "Transcript/RuntimeStatusRegion",
+      "name": "Pending",
+      "ok": true,
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
+    },
+    {
+      "id": "transcript-runtimestatusregion--accepted",
+      "title": "Transcript/RuntimeStatusRegion",
+      "name": "Accepted",
+      "ok": true,
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
+    },
+    {
+      "id": "transcript-runtimestatusregion--stale",
+      "title": "Transcript/RuntimeStatusRegion",
+      "name": "Stale",
+      "ok": true,
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "transcript-runtimestatusregion--unsupported",
       "title": "Transcript/RuntimeStatusRegion",
       "name": "Unsupported",
       "ok": true,
-      "rel": "transcript/runtime-status-region--unsupported.png"
-    },
-    {
-      "id": "transcript-todoprojectionblock--unsupported",
-      "title": "Transcript/TodoProjectionBlock",
-      "name": "Unsupported",
-      "ok": true,
-      "rel": "transcript/todo-projection-block--unsupported.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
     },
     {
       "id": "transcript-todoprojectionblock--waiting",
       "title": "Transcript/TodoProjectionBlock",
       "name": "Waiting",
       "ok": true,
-      "rel": "transcript/todo-projection-block--waiting.png"
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
+    },
+    {
+      "id": "transcript-todoprojectionblock--unsupported",
+      "title": "Transcript/TodoProjectionBlock",
+      "name": "Unsupported",
+      "ok": true,
+      "visuallyEmpty": true,
+      "note": "Renders nothing a sighted person can see; no screenshot taken."
+    },
+    {
+      "id": "artifacts-artifactcard--default",
+      "title": "Artifacts/ArtifactCard",
+      "name": "Default",
+      "ok": true,
+      "rel": "artifacts/artifact-card--default.png",
+      "size": "394x214"
+    },
+    {
+      "id": "artifacts-artifactdetails--open",
+      "title": "Artifacts/ArtifactDetails",
+      "name": "Open",
+      "ok": true,
+      "rel": "artifacts/artifact-details--open.png",
+      "size": "394x408"
+    },
+    {
+      "id": "artifacts-artifactheader--default",
+      "title": "Artifacts/ArtifactHeader",
+      "name": "Default",
+      "ok": true,
+      "rel": "artifacts/artifact-header--default.png",
+      "size": "394x147"
+    },
+    {
+      "id": "artifacts-artifactheader--without-revision",
+      "title": "Artifacts/ArtifactHeader",
+      "name": "Without Revision",
+      "ok": true,
+      "rel": "artifacts/artifact-header--without-revision.png",
+      "size": "394x123"
+    },
+    {
+      "id": "artifacts-artifactstatus--corrupt",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Corrupt",
+      "ok": true,
+      "rel": "artifacts/artifact-status--corrupt.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--denied",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Denied",
+      "ok": true,
+      "rel": "artifacts/artifact-status--denied.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--empty",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Empty",
+      "ok": true,
+      "rel": "artifacts/artifact-status--empty.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--expired",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Expired",
+      "ok": true,
+      "rel": "artifacts/artifact-status--expired.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--idle",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Idle",
+      "ok": true,
+      "rel": "artifacts/artifact-status--idle.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--loading",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Loading",
+      "ok": true,
+      "rel": "artifacts/artifact-status--loading.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--missing",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Missing",
+      "ok": true,
+      "rel": "artifacts/artifact-status--missing.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--offline",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Offline",
+      "ok": true,
+      "rel": "artifacts/artifact-status--offline.png",
+      "size": "394x83"
+    },
+    {
+      "id": "artifacts-artifactstatus--ready",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Ready",
+      "ok": true,
+      "rel": "artifacts/artifact-status--ready.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--revoked",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Revoked",
+      "ok": true,
+      "rel": "artifacts/artifact-status--revoked.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-artifactstatus--stale",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Stale",
+      "ok": true,
+      "rel": "artifacts/artifact-status--stale.png",
+      "size": "394x83"
+    },
+    {
+      "id": "artifacts-artifactstatus--stalled",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Stalled",
+      "ok": true,
+      "rel": "artifacts/artifact-status--stalled.png",
+      "size": "394x83"
+    },
+    {
+      "id": "artifacts-artifactstatus--too-large",
+      "title": "Artifacts/ArtifactStatus",
+      "name": "Too Large",
+      "ok": true,
+      "rel": "artifacts/artifact-status--too-large.png",
+      "size": "394x68"
+    },
+    {
+      "id": "artifacts-codepreview--follow-tail",
+      "title": "Artifacts/CodePreview",
+      "name": "Follow Tail",
+      "ok": true,
+      "rel": "artifacts/code-preview--follow-tail.png",
+      "size": "398x143"
+    },
+    {
+      "id": "artifacts-codepreview--highlight",
+      "title": "Artifacts/CodePreview",
+      "name": "Highlight",
+      "ok": true,
+      "rel": "artifacts/code-preview--highlight.png",
+      "size": "398x143"
+    },
+    {
+      "id": "artifacts-codepreview--wrapped",
+      "title": "Artifacts/CodePreview",
+      "name": "Wrapped",
+      "ok": true,
+      "rel": "artifacts/code-preview--wrapped.png",
+      "size": "394x143"
+    },
+    {
+      "id": "artifacts-diffpreview--add",
+      "title": "Artifacts/DiffPreview",
+      "name": "Add",
+      "ok": true,
+      "rel": "artifacts/diff-preview--add.png",
+      "size": "394x265"
+    },
+    {
+      "id": "artifacts-diffpreview--context",
+      "title": "Artifacts/DiffPreview",
+      "name": "Context",
+      "ok": true,
+      "rel": "artifacts/diff-preview--context.png",
+      "size": "394x265"
+    },
+    {
+      "id": "artifacts-diffpreview--find-match",
+      "title": "Artifacts/DiffPreview",
+      "name": "Find Match",
+      "ok": true,
+      "rel": "artifacts/diff-preview--find-match.png",
+      "size": "394x265"
+    },
+    {
+      "id": "artifacts-diffpreview--remove",
+      "title": "Artifacts/DiffPreview",
+      "name": "Remove",
+      "ok": true,
+      "rel": "artifacts/diff-preview--remove.png",
+      "size": "394x265"
+    },
+    {
+      "id": "artifacts-diffpreview--wrapped",
+      "title": "Artifacts/DiffPreview",
+      "name": "Wrapped",
+      "ok": true,
+      "rel": "artifacts/diff-preview--wrapped.png",
+      "size": "394x392"
+    },
+    {
+      "id": "artifacts-imageplaceholder--corrupt",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Corrupt",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--corrupt.png",
+      "size": "234x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--denied",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Denied",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--denied.png",
+      "size": "234x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--expired",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Expired",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--expired.png",
+      "size": "394x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--missing",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Missing",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--missing.png",
+      "size": "234x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--privacy-covered",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Privacy Covered",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--privacy-covered.png",
+      "size": "234x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--processing",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Processing",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--processing.png",
+      "size": "234x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--revision-conflict",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Revision Conflict",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--revision-conflict.png",
+      "size": "234x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--revoked",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Revoked",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--revoked.png",
+      "size": "394x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--stale",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Stale",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--stale.png",
+      "size": "234x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--unsupported",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Unsupported",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--unsupported.png",
+      "size": "234x234"
+    },
+    {
+      "id": "artifacts-imageplaceholder--withheld",
+      "title": "Artifacts/ImagePlaceholder",
+      "name": "Withheld",
+      "ok": true,
+      "rel": "artifacts/image-placeholder--withheld.png",
+      "size": "394x234"
+    },
+    {
+      "id": "artifacts-imagepreview--corrupt",
+      "title": "Artifacts/ImagePreview",
+      "name": "Corrupt",
+      "ok": true,
+      "rel": "artifacts/image-preview--corrupt.png",
+      "size": "394x104"
+    },
+    {
+      "id": "artifacts-imagepreview--ready",
+      "title": "Artifacts/ImagePreview",
+      "name": "Ready",
+      "ok": true,
+      "rel": "artifacts/image-preview--ready.png",
+      "size": "394x592"
+    },
+    {
+      "id": "artifacts-imagestatus--capture-permission",
+      "title": "Artifacts/ImageStatus",
+      "name": "Capture Permission",
+      "ok": true,
+      "rel": "artifacts/image-status--capture-permission.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--corrupt",
+      "title": "Artifacts/ImageStatus",
+      "name": "Corrupt",
+      "ok": true,
+      "rel": "artifacts/image-status--corrupt.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--denied",
+      "title": "Artifacts/ImageStatus",
+      "name": "Denied",
+      "ok": true,
+      "rel": "artifacts/image-status--denied.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--details-open",
+      "title": "Artifacts/ImageStatus",
+      "name": "Details Open",
+      "ok": true,
+      "rel": "artifacts/image-status--details-open.png",
+      "size": "194x68"
+    },
+    {
+      "id": "artifacts-imagestatus--expired",
+      "title": "Artifacts/ImageStatus",
+      "name": "Expired",
+      "ok": true,
+      "rel": "artifacts/image-status--expired.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--full-degraded",
+      "title": "Artifacts/ImageStatus",
+      "name": "Full Degraded",
+      "ok": true,
+      "rel": "artifacts/image-status--full-degraded.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--full-fetching",
+      "title": "Artifacts/ImageStatus",
+      "name": "Full Fetching",
+      "ok": true,
+      "rel": "artifacts/image-status--full-fetching.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--missing",
+      "title": "Artifacts/ImageStatus",
+      "name": "Missing",
+      "ok": true,
+      "rel": "artifacts/image-status--missing.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--offline-loaded",
+      "title": "Artifacts/ImageStatus",
+      "name": "Offline Loaded",
+      "ok": true,
+      "rel": "artifacts/image-status--offline-loaded.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--offline-unavailable",
+      "title": "Artifacts/ImageStatus",
+      "name": "Offline Unavailable",
+      "ok": true,
+      "rel": "artifacts/image-status--offline-unavailable.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--opening",
+      "title": "Artifacts/ImageStatus",
+      "name": "Opening",
+      "ok": true,
+      "rel": "artifacts/image-status--opening.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--privacy-covered",
+      "title": "Artifacts/ImageStatus",
+      "name": "Privacy Covered",
+      "ok": true,
+      "rel": "artifacts/image-status--privacy-covered.png",
+      "size": "139x68"
+    },
+    {
+      "id": "artifacts-imagestatus--processing",
+      "title": "Artifacts/ImageStatus",
+      "name": "Processing",
+      "ok": true,
+      "rel": "artifacts/image-status--processing.png",
+      "size": "394x46"
+    },
+    {
+      "id": "artifacts-imagestatus--rate-limited",
+      "title": "Artifacts/ImageStatus",
+      "name": "Rate Limited",
+      "ok": true,
+      "rel": "artifacts/image-status--rate-limited.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--revision-conflict",
+      "title": "Artifacts/ImageStatus",
+      "name": "Revision Conflict",
+      "ok": true,
+      "rel": "artifacts/image-status--revision-conflict.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--revoked",
+      "title": "Artifacts/ImageStatus",
+      "name": "Revoked",
+      "ok": true,
+      "rel": "artifacts/image-status--revoked.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--stale",
+      "title": "Artifacts/ImageStatus",
+      "name": "Stale",
+      "ok": true,
+      "rel": "artifacts/image-status--stale.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--stalled",
+      "title": "Artifacts/ImageStatus",
+      "name": "Stalled",
+      "ok": true,
+      "rel": "artifacts/image-status--stalled.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-imagestatus--thumbnail-fetching",
+      "title": "Artifacts/ImageStatus",
+      "name": "Thumbnail Fetching",
+      "ok": true,
+      "rel": "artifacts/image-status--thumbnail-fetching.png",
+      "size": "127x68"
+    },
+    {
+      "id": "artifacts-imagestatus--unsupported",
+      "title": "Artifacts/ImageStatus",
+      "name": "Unsupported",
+      "ok": true,
+      "rel": "artifacts/image-status--unsupported.png",
+      "size": "394x46"
+    },
+    {
+      "id": "artifacts-imagestatus--viewer-ready",
+      "title": "Artifacts/ImageStatus",
+      "name": "Viewer Ready",
+      "ok": true,
+      "rel": "artifacts/image-status--viewer-ready.png",
+      "size": "84x68"
+    },
+    {
+      "id": "artifacts-imagestatus--withheld",
+      "title": "Artifacts/ImageStatus",
+      "name": "Withheld",
+      "ok": true,
+      "rel": "artifacts/image-status--withheld.png",
+      "size": "394x92"
+    },
+    {
+      "id": "artifacts-inapplinkoverlay--open-mail-link",
+      "title": "Artifacts/InAppLinkOverlay",
+      "name": "Open Mail Link",
+      "ok": true,
+      "rel": "artifacts/in-app-link-overlay--open-mail-link.png",
+      "size": "402x874"
+    },
+    {
+      "id": "artifacts-inboundimageblockview--processing",
+      "title": "Artifacts/InboundImageBlockView",
+      "name": "Processing",
+      "ok": true,
+      "rel": "artifacts/inbound-image-block-view--processing.png",
+      "size": "394x349"
+    },
+    {
+      "id": "artifacts-inboundimageblockview--ready",
+      "title": "Artifacts/InboundImageBlockView",
+      "name": "Ready",
+      "ok": true,
+      "rel": "artifacts/inbound-image-block-view--ready.png",
+      "size": "394x396"
+    },
+    {
+      "id": "artifacts-inboundimagecard--corrupt",
+      "title": "Artifacts/InboundImageCard",
+      "name": "Corrupt",
+      "ok": true,
+      "rel": "artifacts/inbound-image-card--corrupt.png",
+      "size": "394x396"
+    },
+    {
+      "id": "artifacts-inboundimagecard--deferred",
+      "title": "Artifacts/InboundImageCard",
+      "name": "Deferred",
+      "ok": true,
+      "rel": "artifacts/inbound-image-card--deferred.png",
+      "size": "394x396"
+    },
+    {
+      "id": "artifacts-inboundimagecard--inline-ready",
+      "title": "Artifacts/InboundImageCard",
+      "name": "Inline Ready",
+      "ok": true,
+      "rel": "artifacts/inbound-image-card--inline-ready.png",
+      "size": "394x316"
+    },
+    {
+      "id": "artifacts-inboundimagecard--privacy-covered",
+      "title": "Artifacts/InboundImageCard",
+      "name": "Privacy Covered",
+      "ok": true,
+      "rel": "artifacts/inbound-image-card--privacy-covered.png",
+      "size": "394x372"
+    },
+    {
+      "id": "artifacts-inboundimagecard--processing",
+      "title": "Artifacts/InboundImageCard",
+      "name": "Processing",
+      "ok": true,
+      "rel": "artifacts/inbound-image-card--processing.png",
+      "size": "394x349"
+    },
+    {
+      "id": "artifacts-markdownpreview--empty",
+      "title": "Artifacts/MarkdownPreview",
+      "name": "Empty",
+      "ok": true,
+      "rel": "artifacts/markdown-preview--empty.png",
+      "size": "394x48"
+    },
+    {
+      "id": "artifacts-markdownpreview--find-match",
+      "title": "Artifacts/MarkdownPreview",
+      "name": "Find Match",
+      "ok": true,
+      "rel": "artifacts/markdown-preview--find-match.png",
+      "size": "391x120"
+    },
+    {
+      "id": "artifacts-markdownpreview--ready",
+      "title": "Artifacts/MarkdownPreview",
+      "name": "Ready",
+      "ok": true,
+      "rel": "artifacts/markdown-preview--ready.png",
+      "size": "391x120"
+    },
+    {
+      "id": "artifacts-markdownpreview--whitespace",
+      "title": "Artifacts/MarkdownPreview",
+      "name": "Whitespace",
+      "ok": true,
+      "rel": "artifacts/markdown-preview--whitespace.png",
+      "size": "394x48"
+    },
+    {
+      "id": "artifacts-mediaplayer--audio-preview",
+      "title": "Artifacts/MediaPlayer",
+      "name": "Audio Preview",
+      "ok": true,
+      "rel": "artifacts/media-player--audio-preview.png",
+      "size": "324x78"
+    },
+    {
+      "id": "artifacts-pdfpreview--ready",
+      "title": "Artifacts/PdfPreview",
+      "name": "Ready",
+      "ok": true,
+      "rel": "artifacts/pdf-preview--ready.png",
+      "size": "398x679"
+    },
+    {
+      "id": "artifacts-pdfpreview--without-safe-bytes",
+      "title": "Artifacts/PdfPreview",
+      "name": "Without Safe Bytes",
+      "ok": true,
+      "rel": "artifacts/pdf-preview--without-safe-bytes.png",
+      "size": "394x360"
+    },
+    {
+      "id": "artifacts-previewcontrols--code",
+      "title": "Artifacts/PreviewControls",
+      "name": "Code",
+      "ok": true,
+      "rel": "artifacts/preview-controls--code.png",
+      "size": "394x172"
+    },
+    {
+      "id": "artifacts-previewcontrols--diff",
+      "title": "Artifacts/PreviewControls",
+      "name": "Diff",
+      "ok": true,
+      "rel": "artifacts/preview-controls--diff.png",
+      "size": "394x172"
+    },
+    {
+      "id": "artifacts-previewcontrols--image",
+      "title": "Artifacts/PreviewControls",
+      "name": "Image",
+      "ok": true,
+      "rel": "artifacts/preview-controls--image.png",
+      "size": "367x138"
+    },
+    {
+      "id": "artifacts-previewcontrols--markdown",
+      "title": "Artifacts/PreviewControls",
+      "name": "Markdown",
+      "ok": true,
+      "rel": "artifacts/preview-controls--markdown.png",
+      "size": "394x172"
+    },
+    {
+      "id": "artifacts-previewcontrols--text",
+      "title": "Artifacts/PreviewControls",
+      "name": "Text",
+      "ok": true,
+      "rel": "artifacts/preview-controls--text.png",
+      "size": "394x172"
+    },
+    {
+      "id": "artifacts-secureimagepreview--full-zoomed",
+      "title": "Artifacts/SecureImagePreview",
+      "name": "Full Zoomed",
+      "ok": true,
+      "rel": "artifacts/secure-image-preview--full-zoomed.png",
+      "size": "394x536"
+    },
+    {
+      "id": "artifacts-secureimagepreview--loading",
+      "title": "Artifacts/SecureImagePreview",
+      "name": "Loading",
+      "ok": true,
+      "rel": "artifacts/secure-image-preview--loading.png",
+      "size": "394x48"
+    },
+    {
+      "id": "artifacts-secureimagepreview--thumbnail-ready",
+      "title": "Artifacts/SecureImagePreview",
+      "name": "Thumbnail Ready",
+      "ok": true,
+      "rel": "artifacts/secure-image-preview--thumbnail-ready.png",
+      "size": "394x536"
+    },
+    {
+      "id": "artifacts-textpreview--empty",
+      "title": "Artifacts/TextPreview",
+      "name": "Empty",
+      "ok": true,
+      "rel": "artifacts/text-preview--empty.png",
+      "size": "394x48"
+    },
+    {
+      "id": "artifacts-textpreview--markdown",
+      "title": "Artifacts/TextPreview",
+      "name": "Markdown",
+      "ok": true,
+      "rel": "artifacts/text-preview--markdown.png",
+      "size": "398x138"
+    },
+    {
+      "id": "artifacts-textpreview--ready",
+      "title": "Artifacts/TextPreview",
+      "name": "Ready",
+      "ok": true,
+      "rel": "artifacts/text-preview--ready.png",
+      "size": "398x85"
+    },
+    {
+      "id": "artifacts-textpreview--whitespace",
+      "title": "Artifacts/TextPreview",
+      "name": "Whitespace",
+      "ok": true,
+      "rel": "artifacts/text-preview--whitespace.png",
+      "size": "394x48"
+    },
+    {
+      "id": "artifacts-unsupportedpreview--default",
+      "title": "Artifacts/UnsupportedPreview",
+      "name": "Default",
+      "ok": true,
+      "rel": "artifacts/unsupported-preview--default.png",
+      "size": "394x141"
+    },
+    {
+      "id": "artifacts-unsupportedpreview--with-display-name",
+      "title": "Artifacts/UnsupportedPreview",
+      "name": "With Display Name",
+      "ok": true,
+      "rel": "artifacts/unsupported-preview--with-display-name.png",
+      "size": "394x141"
+    },
+    {
+      "id": "artifacts-verifiedimage--default",
+      "title": "Artifacts/VerifiedImage",
+      "name": "Default",
+      "ok": true,
+      "rel": "artifacts/verified-image--default.png",
+      "size": "359x234"
+    },
+    {
+      "id": "artifacts-verifiedimage--privacy-covered",
+      "title": "Artifacts/VerifiedImage",
+      "name": "Privacy Covered",
+      "ok": true,
+      "rel": "artifacts/verified-image--privacy-covered.png",
+      "size": "359x234"
+    },
+    {
+      "id": "askquestion-askquestioncard--answered",
+      "title": "AskQuestion/AskQuestionCard",
+      "name": "Answered",
+      "ok": true,
+      "rel": "ask-question/ask-question-card--answered.png",
+      "size": "394x56"
+    },
+    {
+      "id": "askquestion-askquestioncard--expired",
+      "title": "AskQuestion/AskQuestionCard",
+      "name": "Expired",
+      "ok": true,
+      "rel": "ask-question/ask-question-card--expired.png",
+      "size": "394x56"
+    },
+    {
+      "id": "askquestion-askquestioncard--presented",
+      "title": "AskQuestion/AskQuestionCard",
+      "name": "Presented",
+      "ok": true,
+      "rel": "ask-question/ask-question-card--presented.png",
+      "size": "394x56"
+    },
+    {
+      "id": "askquestion-askquestioncard--read-only",
+      "title": "AskQuestion/AskQuestionCard",
+      "name": "Read Only",
+      "ok": true,
+      "rel": "ask-question/ask-question-card--read-only.png",
+      "size": "394x56"
+    },
+    {
+      "id": "askquestion-askquestioncard--submitting",
+      "title": "AskQuestion/AskQuestionCard",
+      "name": "Submitting",
+      "ok": true,
+      "rel": "ask-question/ask-question-card--submitting.png",
+      "size": "394x56"
+    },
+    {
+      "id": "askquestion-askquestionfreetext--default",
+      "title": "AskQuestion/AskQuestionFreeText",
+      "name": "Default",
+      "ok": true,
+      "rel": "ask-question/ask-question-free-text--default.png",
+      "size": "394x172"
+    },
+    {
+      "id": "askquestion-askquestionfreetext--disabled",
+      "title": "AskQuestion/AskQuestionFreeText",
+      "name": "Disabled",
+      "ok": true,
+      "rel": "ask-question/ask-question-free-text--disabled.png",
+      "size": "394x172"
+    },
+    {
+      "id": "askquestion-askquestionfreetext--filled",
+      "title": "AskQuestion/AskQuestionFreeText",
+      "name": "Filled",
+      "ok": true,
+      "rel": "ask-question/ask-question-free-text--filled.png",
+      "size": "394x172"
+    },
+    {
+      "id": "askquestion-askquestionfreetext--invalid",
+      "title": "AskQuestion/AskQuestionFreeText",
+      "name": "Invalid",
+      "ok": true,
+      "rel": "ask-question/ask-question-free-text--invalid.png",
+      "size": "394x172"
+    },
+    {
+      "id": "askquestion-askquestionfreetext--required",
+      "title": "AskQuestion/AskQuestionFreeText",
+      "name": "Required",
+      "ok": true,
+      "rel": "ask-question/ask-question-free-text--required.png",
+      "size": "394x172"
+    },
+    {
+      "id": "askquestion-askquestionoptionlist--default",
+      "title": "AskQuestion/AskQuestionOptionList",
+      "name": "Default",
+      "ok": true,
+      "rel": "ask-question/ask-question-option-list--default.png",
+      "size": "394x277"
+    },
+    {
+      "id": "askquestion-askquestionoptionlist--disabled",
+      "title": "AskQuestion/AskQuestionOptionList",
+      "name": "Disabled",
+      "ok": true,
+      "rel": "ask-question/ask-question-option-list--disabled.png",
+      "size": "394x277"
+    },
+    {
+      "id": "askquestion-askquestionoptionlist--partial-selection",
+      "title": "AskQuestion/AskQuestionOptionList",
+      "name": "Partial Selection",
+      "ok": true,
+      "rel": "ask-question/ask-question-option-list--partial-selection.png",
+      "size": "394x277"
+    },
+    {
+      "id": "askquestion-askquestionoptionlist--single-choice",
+      "title": "AskQuestion/AskQuestionOptionList",
+      "name": "Single Choice",
+      "ok": true,
+      "rel": "ask-question/ask-question-option-list--single-choice.png",
+      "size": "394x277"
+    },
+    {
+      "id": "askquestion-askquestionoptionrow--default",
+      "title": "AskQuestion/AskQuestionOptionRow",
+      "name": "Default",
+      "ok": true,
+      "rel": "ask-question/ask-question-option-row--default.png",
+      "size": "253x94"
+    },
+    {
+      "id": "askquestion-askquestionoptionrow--disabled",
+      "title": "AskQuestion/AskQuestionOptionRow",
+      "name": "Disabled",
+      "ok": true,
+      "rel": "ask-question/ask-question-option-row--disabled.png",
+      "size": "253x94"
+    },
+    {
+      "id": "askquestion-askquestionoptionrow--multiple-indicator",
+      "title": "AskQuestion/AskQuestionOptionRow",
+      "name": "Multiple Indicator",
+      "ok": true,
+      "rel": "ask-question/ask-question-option-row--multiple-indicator.png",
+      "size": "253x94"
+    },
+    {
+      "id": "askquestion-askquestionoptionrow--selected",
+      "title": "AskQuestion/AskQuestionOptionRow",
+      "name": "Selected",
+      "ok": true,
+      "rel": "ask-question/ask-question-option-row--selected.png",
+      "size": "253x94"
+    },
+    {
+      "id": "askquestion-askquestionprompt--default",
+      "title": "AskQuestion/AskQuestionPrompt",
+      "name": "Default",
+      "ok": true,
+      "rel": "ask-question/ask-question-prompt--default.png",
+      "size": "394x70"
+    },
+    {
+      "id": "askquestion-askquestionstatus--answered",
+      "title": "AskQuestion/AskQuestionStatus",
+      "name": "Answered",
+      "ok": true,
+      "rel": "ask-question/ask-question-status--answered.png",
+      "size": "113x44"
+    },
+    {
+      "id": "askquestion-askquestionstatus--error",
+      "title": "AskQuestion/AskQuestionStatus",
+      "name": "Error",
+      "ok": true,
+      "rel": "ask-question/ask-question-status--error.png",
+      "size": "394x60"
+    },
+    {
+      "id": "askquestion-askquestionstatus--expired",
+      "title": "AskQuestion/AskQuestionStatus",
+      "name": "Expired",
+      "ok": true,
+      "rel": "ask-question/ask-question-status--expired.png",
+      "size": "268x44"
+    },
+    {
+      "id": "askquestion-askquestionstatus--presented",
+      "title": "AskQuestion/AskQuestionStatus",
+      "name": "Presented",
+      "ok": true,
+      "rel": "ask-question/ask-question-status--presented.png",
+      "size": "240x44"
+    },
+    {
+      "id": "askquestion-askquestionstatus--selecting",
+      "title": "AskQuestion/AskQuestionStatus",
+      "name": "Selecting",
+      "ok": true,
+      "rel": "ask-question/ask-question-status--selecting.png",
+      "size": "242x44"
+    },
+    {
+      "id": "askquestion-askquestionstatus--submitting",
+      "title": "AskQuestion/AskQuestionStatus",
+      "name": "Submitting",
+      "ok": true,
+      "rel": "ask-question/ask-question-status--submitting.png",
+      "size": "128x44"
+    },
+    {
+      "id": "askquestion-askquestionsubmitbutton--disabled",
+      "title": "AskQuestion/AskQuestionSubmitButton",
+      "name": "Disabled",
+      "ok": true,
+      "rel": "ask-question/ask-question-submit-button--disabled.png",
+      "size": "394x68"
+    },
+    {
+      "id": "askquestion-askquestionsubmitbutton--enabled",
+      "title": "AskQuestion/AskQuestionSubmitButton",
+      "name": "Enabled",
+      "ok": true,
+      "rel": "ask-question/ask-question-submit-button--enabled.png",
+      "size": "394x68"
+    },
+    {
+      "id": "attachments-attachmentpreviewdialog--open",
+      "title": "Attachments/AttachmentPreviewDialog",
+      "name": "Open",
+      "ok": true,
+      "rel": "attachments/attachment-preview-dialog--open.png",
+      "size": "402x874"
+    },
+    {
+      "id": "attachments-attachmentrail--default",
+      "title": "Attachments/AttachmentRail",
+      "name": "Default",
+      "ok": true,
+      "rel": "attachments/attachment-rail--default.png",
+      "size": "174x99"
+    },
+    {
+      "id": "attachments-attachmenttile--model-blocked",
+      "title": "Attachments/AttachmentTile",
+      "name": "Model Blocked",
+      "ok": true,
+      "rel": "attachments/attachment-tile--model-blocked.png",
+      "size": "102x99"
+    },
+    {
+      "id": "attachments-attachmenttile--ready",
+      "title": "Attachments/AttachmentTile",
+      "name": "Ready",
+      "ok": true,
+      "rel": "attachments/attachment-tile--ready.png",
+      "size": "102x99"
+    },
+    {
+      "id": "attachments-attachmenttile--rejected",
+      "title": "Attachments/AttachmentTile",
+      "name": "Rejected",
+      "ok": true,
+      "rel": "attachments/attachment-tile--rejected.png",
+      "size": "102x99"
+    },
+    {
+      "id": "attachments-attachmenttile--validating",
+      "title": "Attachments/AttachmentTile",
+      "name": "Validating",
+      "ok": true,
+      "rel": "attachments/attachment-tile--validating.png",
+      "size": "102x99"
+    },
+    {
+      "id": "chrome-commandoption--active",
+      "title": "Chrome/CommandOption",
+      "name": "Active",
+      "ok": true,
+      "rel": "chrome/command-option--active.png",
+      "size": "370x82"
+    },
+    {
+      "id": "chrome-commandoption--inactive",
+      "title": "Chrome/CommandOption",
+      "name": "Inactive",
+      "ok": true,
+      "rel": "chrome/command-option--inactive.png",
+      "size": "370x82"
+    },
+    {
+      "id": "chrome-commandoption--matched",
+      "title": "Chrome/CommandOption",
+      "name": "Matched",
+      "ok": true,
+      "rel": "chrome/command-option--matched.png",
+      "size": "370x82"
+    },
+    {
+      "id": "chrome-commandpalette--loading",
+      "title": "Chrome/CommandPalette",
+      "name": "Loading",
+      "ok": true,
+      "rel": "chrome/command-palette--loading.png",
+      "size": "222x48"
+    },
+    {
+      "id": "chrome-commandpalette--ready",
+      "title": "Chrome/CommandPalette",
+      "name": "Ready",
+      "ok": true,
+      "rel": "chrome/command-palette--ready.png",
+      "size": "222x48"
+    },
+    {
+      "id": "chrome-composercommandautocomplete--loading-initial",
+      "title": "Chrome/ComposerCommandAutocomplete",
+      "name": "Loading Initial",
+      "ok": true,
+      "rel": "chrome/composer-command-autocomplete--loading-initial.png",
+      "size": "398x243"
+    },
+    {
+      "id": "chrome-composercommandautocomplete--ready-filtered",
+      "title": "Chrome/ComposerCommandAutocomplete",
+      "name": "Ready Filtered",
+      "ok": true,
+      "rel": "chrome/composer-command-autocomplete--ready-filtered.png",
+      "size": "398x105"
+    },
+    {
+      "id": "chrome-composercommandautocomplete--ready-no-matches",
+      "title": "Chrome/ComposerCommandAutocomplete",
+      "name": "Ready No Matches",
+      "ok": true,
+      "rel": "chrome/composer-command-autocomplete--ready-no-matches.png",
+      "size": "398x72"
+    },
+    {
+      "id": "chrome-composercommandautocomplete--ready-unfiltered",
+      "title": "Chrome/ComposerCommandAutocomplete",
+      "name": "Ready Unfiltered",
+      "ok": true,
+      "rel": "chrome/composer-command-autocomplete--ready-unfiltered.png",
+      "size": "398x400"
+    },
+    {
+      "id": "chrome-composertools--catalog-loading",
+      "title": "Chrome/ComposerTools",
+      "name": "Catalog Loading",
+      "ok": true,
+      "rel": "chrome/composer-tools--catalog-loading.png",
+      "size": "68x112"
+    },
+    {
+      "id": "chrome-composertools--default",
+      "title": "Chrome/ComposerTools",
+      "name": "Default",
+      "ok": true,
+      "rel": "chrome/composer-tools--default.png",
+      "size": "68x112"
+    },
+    {
+      "id": "chrome-composertools--media-available",
+      "title": "Chrome/ComposerTools",
+      "name": "Media Available",
+      "ok": true,
+      "rel": "chrome/composer-tools--media-available.png",
+      "size": "68x112"
+    },
+    {
+      "id": "chrome-dictationoverlay--open",
+      "title": "Chrome/DictationOverlay",
+      "name": "Open",
+      "ok": true,
+      "rel": "chrome/dictation-overlay--open.png",
+      "size": "394x86"
+    },
+    {
+      "id": "chrome-dictationsheet--available",
+      "title": "Chrome/DictationSheet",
+      "name": "Available",
+      "ok": true,
+      "rel": "chrome/dictation-sheet--available.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-dictationsheet--unavailable",
+      "title": "Chrome/DictationSheet",
+      "name": "Unavailable",
+      "ok": true,
+      "rel": "chrome/dictation-sheet--unavailable.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-dockrecentsessions--overflow",
+      "title": "Chrome/DockRecentSessions",
+      "name": "Overflow",
+      "ok": true,
+      "rel": "chrome/dock-recent-sessions--overflow.png",
+      "size": "398x136"
+    },
+    {
+      "id": "chrome-dockrecentsessions--populated",
+      "title": "Chrome/DockRecentSessions",
+      "name": "Populated",
+      "ok": true,
+      "rel": "chrome/dock-recent-sessions--populated.png",
+      "size": "398x136"
+    },
+    {
+      "id": "chrome-effortradiogroup--disabled",
+      "title": "Chrome/EffortRadioGroup",
+      "name": "Disabled",
+      "ok": true,
+      "rel": "chrome/effort-radio-group--disabled.png",
+      "size": "394x215"
+    },
+    {
+      "id": "chrome-effortradiogroup--off-only",
+      "title": "Chrome/EffortRadioGroup",
+      "name": "Off Only",
+      "ok": true,
+      "rel": "chrome/effort-radio-group--off-only.png",
+      "size": "394x87"
+    },
+    {
+      "id": "chrome-effortradiogroup--pending",
+      "title": "Chrome/EffortRadioGroup",
+      "name": "Pending",
+      "ok": true,
+      "rel": "chrome/effort-radio-group--pending.png",
+      "size": "394x231"
+    },
+    {
+      "id": "chrome-effortradiogroup--ready",
+      "title": "Chrome/EffortRadioGroup",
+      "name": "Ready",
+      "ok": true,
+      "rel": "chrome/effort-radio-group--ready.png",
+      "size": "394x215"
+    },
+    {
+      "id": "chrome-leaveplansheet--mode",
+      "title": "Chrome/LeavePlanSheet",
+      "name": "Mode",
+      "ok": true,
+      "rel": "chrome/leave-plan-sheet--mode.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-leaveplansheet--plan-ready",
+      "title": "Chrome/LeavePlanSheet",
+      "name": "Plan Ready",
+      "ok": true,
+      "rel": "chrome/leave-plan-sheet--plan-ready.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-modeleffortsheet--effort-section",
+      "title": "Chrome/ModelEffortSheet",
+      "name": "Effort Section",
+      "ok": true,
+      "rel": "chrome/model-effort-sheet--effort-section.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-modeleffortsheet--model-section",
+      "title": "Chrome/ModelEffortSheet",
+      "name": "Model Section",
+      "ok": true,
+      "rel": "chrome/model-effort-sheet--model-section.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-planmodebutton--build",
+      "title": "Chrome/PlanModeButton",
+      "name": "Build",
+      "ok": true,
+      "rel": "chrome/plan-mode-button--build.png",
+      "size": "105x68"
+    },
+    {
+      "id": "chrome-planmodebutton--checking",
+      "title": "Chrome/PlanModeButton",
+      "name": "Checking",
+      "ok": true,
+      "rel": "chrome/plan-mode-button--checking.png",
+      "size": "187x68"
+    },
+    {
+      "id": "chrome-planmodebutton--executing-plan",
+      "title": "Chrome/PlanModeButton",
+      "name": "Executing Plan",
+      "ok": true,
+      "rel": "chrome/plan-mode-button--executing-plan.png",
+      "size": "170x68"
+    },
+    {
+      "id": "chrome-planmodebutton--plan",
+      "title": "Chrome/PlanModeButton",
+      "name": "Plan",
+      "ok": true,
+      "rel": "chrome/plan-mode-button--plan.png",
+      "size": "176x68"
+    },
+    {
+      "id": "chrome-planreadycard--ready",
+      "title": "Chrome/PlanReadyCard",
+      "name": "Ready",
+      "ok": true,
+      "rel": "chrome/plan-ready-card--ready.png",
+      "size": "394x439"
+    },
+    {
+      "id": "chrome-planreadycard--waiting-for-live-confirmation",
+      "title": "Chrome/PlanReadyCard",
+      "name": "Waiting For Live Confirmation",
+      "ok": true,
+      "rel": "chrome/plan-ready-card--waiting-for-live-confirmation.png",
+      "size": "394x439"
+    },
+    {
+      "id": "chrome-planreviewsheet--executing",
+      "title": "Chrome/PlanReviewSheet",
+      "name": "Executing",
+      "ok": true,
+      "rel": "chrome/plan-review-sheet--executing.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-planreviewsheet--open",
+      "title": "Chrome/PlanReviewSheet",
+      "name": "Open",
+      "ok": true,
+      "rel": "chrome/plan-review-sheet--open.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-prompthistorysheet--open",
+      "title": "Chrome/PromptHistorySheet",
+      "name": "Open",
+      "ok": true,
+      "rel": "chrome/prompt-history-sheet--open.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-quickpromptssheet--empty",
+      "title": "Chrome/QuickPromptsSheet",
+      "name": "Empty",
+      "ok": true,
+      "rel": "chrome/quick-prompts-sheet--empty.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-quickpromptssheet--populated",
+      "title": "Chrome/QuickPromptsSheet",
+      "name": "Populated",
+      "ok": true,
+      "rel": "chrome/quick-prompts-sheet--populated.png",
+      "size": "402x874"
+    },
+    {
+      "id": "chrome-rooterrorboundary--default",
+      "title": "Chrome/RootErrorBoundary",
+      "name": "Default",
+      "ok": true,
+      "rel": "chrome/root-error-boundary--default.png",
+      "size": "394x112"
+    },
+    {
+      "id": "chrome-runtimestrip--checking",
+      "title": "Chrome/RuntimeStrip",
+      "name": "Checking",
+      "ok": true,
+      "rel": "chrome/runtime-strip--checking.png",
+      "size": "309x94"
+    },
+    {
+      "id": "chrome-runtimestrip--idle",
+      "title": "Chrome/RuntimeStrip",
+      "name": "Idle",
+      "ok": true,
+      "rel": "chrome/runtime-strip--idle.png",
+      "size": "295x117"
+    },
+    {
+      "id": "chrome-runtimestrip--plan",
+      "title": "Chrome/RuntimeStrip",
+      "name": "Plan",
+      "ok": true,
+      "rel": "chrome/runtime-strip--plan.png",
+      "size": "295x117"
+    },
+    {
+      "id": "chrome-runtimestrip--running",
+      "title": "Chrome/RuntimeStrip",
+      "name": "Running",
+      "ok": true,
+      "rel": "chrome/runtime-strip--running.png",
+      "size": "295x117"
+    },
+    {
+      "id": "chrome-sessioncomposer--idle",
+      "title": "Chrome/SessionComposer",
+      "name": "Idle",
+      "ok": true,
+      "rel": "chrome/session-composer--idle.png",
+      "size": "394x159"
+    },
+    {
+      "id": "chrome-sessioncomposer--running",
+      "title": "Chrome/SessionComposer",
+      "name": "Running",
+      "ok": true,
+      "rel": "chrome/session-composer--running.png",
+      "size": "394x159"
+    },
+    {
+      "id": "chrome-sessioncomposer--with-media",
+      "title": "Chrome/SessionComposer",
+      "name": "With Media",
+      "ok": true,
+      "rel": "chrome/session-composer--with-media.png",
+      "size": "394x159"
+    },
+    {
+      "id": "chrome-sessionheader--build",
+      "title": "Chrome/SessionHeader",
+      "name": "Build",
+      "ok": true,
+      "rel": "chrome/session-header--build.png",
+      "size": "394x85"
+    },
+    {
+      "id": "chrome-sessionheader--plan",
+      "title": "Chrome/SessionHeader",
+      "name": "Plan",
+      "ok": true,
+      "rel": "chrome/session-header--plan.png",
+      "size": "394x85"
+    },
+    {
+      "id": "chrome-sessionheader--sheet-open",
+      "title": "Chrome/SessionHeader",
+      "name": "Sheet Open",
+      "ok": true,
+      "rel": "chrome/session-header--sheet-open.png",
+      "size": "394x85"
+    },
+    {
+      "id": "chrome-todopanel--empty",
+      "title": "Chrome/TodoPanel",
+      "name": "Empty",
+      "ok": true,
+      "rel": "chrome/todo-panel--empty.png",
+      "size": "394x167"
+    },
+    {
+      "id": "chrome-todopanel--needs-refresh",
+      "title": "Chrome/TodoPanel",
+      "name": "Needs Refresh",
+      "ok": true,
+      "rel": "chrome/todo-panel--needs-refresh.png",
+      "size": "394x215"
+    },
+    {
+      "id": "chrome-todopanel--refreshing",
+      "title": "Chrome/TodoPanel",
+      "name": "Refreshing",
+      "ok": true,
+      "rel": "chrome/todo-panel--refreshing.png",
+      "size": "394x167"
+    },
+    {
+      "id": "home-pushsettings--default",
+      "title": "Home/PushSettings",
+      "name": "Default",
+      "ok": true,
+      "rel": "home/push-settings--default.png",
+      "size": "394x396"
+    },
+    {
+      "id": "primitives-button--default",
+      "title": "Primitives/Button",
+      "name": "Default",
+      "ok": true,
+      "rel": "primitives/button--default.png",
+      "size": "93x48"
+    },
+    {
+      "id": "primitives-button--disabled",
+      "title": "Primitives/Button",
+      "name": "Disabled",
+      "ok": true,
+      "rel": "primitives/button--disabled.png",
+      "size": "93x48"
+    },
+    {
+      "id": "primitives-button--submit",
+      "title": "Primitives/Button",
+      "name": "Submit",
+      "ok": true,
+      "rel": "primitives/button--submit.png",
+      "size": "93x48"
+    },
+    {
+      "id": "primitives-collapsible--collapsed",
+      "title": "Primitives/Collapsible",
+      "name": "Collapsed",
+      "ok": true,
+      "rel": "primitives/collapsible--collapsed.png",
+      "size": "76x48"
+    },
+    {
+      "id": "primitives-collapsible--expanded",
+      "title": "Primitives/Collapsible",
+      "name": "Expanded",
+      "ok": true,
+      "rel": "primitives/collapsible--expanded.png",
+      "size": "394x144"
+    },
+    {
+      "id": "rich-content-codecard--code",
+      "title": "Rich Content/CodeCard",
+      "name": "Code",
+      "ok": true,
+      "rel": "rich-content/code-card--code.png",
+      "size": "394x381"
+    },
+    {
+      "id": "rich-content-commandoutputcard--cancelled",
+      "title": "Rich Content/CommandOutputCard",
+      "name": "Cancelled",
+      "ok": true,
+      "rel": "rich-content/command-output-card--cancelled.png",
+      "size": "394x682"
+    },
+    {
+      "id": "rich-content-commandoutputcard--completed",
+      "title": "Rich Content/CommandOutputCard",
+      "name": "Completed",
+      "ok": true,
+      "rel": "rich-content/command-output-card--completed.png",
+      "size": "394x656"
+    },
+    {
+      "id": "rich-content-commandoutputcard--denied",
+      "title": "Rich Content/CommandOutputCard",
+      "name": "Denied",
+      "ok": true,
+      "rel": "rich-content/command-output-card--denied.png",
+      "size": "394x682"
+    },
+    {
+      "id": "rich-content-commandoutputcard--failed",
+      "title": "Rich Content/CommandOutputCard",
+      "name": "Failed",
+      "ok": true,
+      "rel": "rich-content/command-output-card--failed.png",
+      "size": "394x656"
+    },
+    {
+      "id": "rich-content-commandoutputcard--interrupted",
+      "title": "Rich Content/CommandOutputCard",
+      "name": "Interrupted",
+      "ok": true,
+      "rel": "rich-content/command-output-card--interrupted.png",
+      "size": "394x682"
+    },
+    {
+      "id": "rich-content-commandoutputcard--running",
+      "title": "Rich Content/CommandOutputCard",
+      "name": "Running",
+      "ok": true,
+      "rel": "rich-content/command-output-card--running.png",
+      "size": "394x656"
+    },
+    {
+      "id": "rich-content-redactionbadge--cache",
+      "title": "Rich Content/RedactionBadge",
+      "name": "Cache",
+      "ok": true,
+      "rel": "rich-content/redaction-badge--cache.png",
+      "size": "187x47"
+    },
+    {
+      "id": "rich-content-redactionbadge--command",
+      "title": "Rich Content/RedactionBadge",
+      "name": "Command",
+      "ok": true,
+      "rel": "rich-content/redaction-badge--command.png",
+      "size": "126x47"
+    },
+    {
+      "id": "rich-content-richblockframe--plain",
+      "title": "Rich Content/RichBlockFrame",
+      "name": "Plain",
+      "ok": true,
+      "rel": "rich-content/rich-block-frame--plain.png",
+      "size": "394x278"
+    },
+    {
+      "id": "rich-content-richblockframe--with-redaction",
+      "title": "Rich Content/RichBlockFrame",
+      "name": "With Redaction",
+      "ok": true,
+      "rel": "rich-content/rich-block-frame--with-redaction.png",
+      "size": "394x475"
+    },
+    {
+      "id": "rich-content-richcontentrouter--cancelled",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Cancelled",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--cancelled.png",
+      "size": "394x682"
+    },
+    {
+      "id": "rich-content-richcontentrouter--code",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Code",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--code.png",
+      "size": "394x381"
+    },
+    {
+      "id": "rich-content-richcontentrouter--completed",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Completed",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--completed.png",
+      "size": "394x708"
+    },
+    {
+      "id": "rich-content-richcontentrouter--denied",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Denied",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--denied.png",
+      "size": "394x682"
+    },
+    {
+      "id": "rich-content-richcontentrouter--failed",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Failed",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--failed.png",
+      "size": "394x708"
+    },
+    {
+      "id": "rich-content-richcontentrouter--fallback",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Fallback",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--fallback.png",
+      "size": "394x254"
+    },
+    {
+      "id": "rich-content-richcontentrouter--interrupted",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Interrupted",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--interrupted.png",
+      "size": "394x682"
+    },
+    {
+      "id": "rich-content-richcontentrouter--prose",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Prose",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--prose.png",
+      "size": "394x49"
+    },
+    {
+      "id": "rich-content-richcontentrouter--running",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Running",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--running.png",
+      "size": "394x708"
+    },
+    {
+      "id": "rich-content-richcontentrouter--text-artifact",
+      "title": "Rich Content/RichContentRouter",
+      "name": "Text Artifact",
+      "ok": true,
+      "rel": "rich-content/rich-content-router--text-artifact.png",
+      "size": "394x523"
+    },
+    {
+      "id": "rich-content-safemarkdown--prose-rtl",
+      "title": "Rich Content/SafeMarkdown",
+      "name": "Prose Rtl",
+      "ok": true,
+      "rel": "rich-content/safe-markdown--prose-rtl.png",
+      "size": "377x69"
+    },
+    {
+      "id": "rich-content-safemarkdown--prose",
+      "title": "Rich Content/SafeMarkdown",
+      "name": "Prose",
+      "ok": true,
+      "rel": "rich-content/safe-markdown--prose.png",
+      "size": "394x49"
+    },
+    {
+      "id": "rich-content-sandboxeddiagram--rejected-input",
+      "title": "Rich Content/SandboxedDiagram",
+      "name": "Rejected Input",
+      "ok": true,
+      "rel": "rich-content/sandboxed-diagram--rejected-input.png",
+      "size": "394x178"
+    },
+    {
+      "id": "rich-content-sandboxeddiagram--valid",
+      "title": "Rich Content/SandboxedDiagram",
+      "name": "Valid",
+      "ok": true,
+      "rel": "rich-content/sandboxed-diagram--valid.png",
+      "size": "394x176"
+    },
+    {
+      "id": "rich-content-textartifactcard--document",
+      "title": "Rich Content/TextArtifactCard",
+      "name": "Document",
+      "ok": true,
+      "rel": "rich-content/text-artifact-card--document.png",
+      "size": "394x434"
+    },
+    {
+      "id": "rich-content-textartifactcard--long-text",
+      "title": "Rich Content/TextArtifactCard",
+      "name": "Long Text",
+      "ok": true,
+      "rel": "rich-content/text-artifact-card--long-text.png",
+      "size": "394x523"
+    },
+    {
+      "id": "source-control-changedfiles--populated-with-diff",
+      "title": "Source Control/ChangedFiles",
+      "name": "Populated With Diff",
+      "ok": true,
+      "rel": "source-control/changed-files--populated-with-diff.png",
+      "size": "398x772"
+    },
+    {
+      "id": "source-control-checklist--worst-first-with-failure-expanded",
+      "title": "Source Control/CheckList",
+      "name": "Worst First With Failure Expanded",
+      "ok": true,
+      "rel": "source-control/check-list--worst-first-with-failure-expanded.png",
+      "size": "394x389"
+    },
+    {
+      "id": "source-control-checksummary--failing",
+      "title": "Source Control/CheckSummary",
+      "name": "Failing",
+      "ok": true,
+      "rel": "source-control/check-summary--failing.png",
+      "size": "394x119"
+    },
+    {
+      "id": "source-control-checksummary--passing",
+      "title": "Source Control/CheckSummary",
+      "name": "Passing",
+      "ok": true,
+      "rel": "source-control/check-summary--passing.png",
+      "size": "394x119"
+    },
+    {
+      "id": "source-control-checksummary--unknown",
+      "title": "Source Control/CheckSummary",
+      "name": "Unknown",
+      "ok": true,
+      "rel": "source-control/check-summary--unknown.png",
+      "size": "394x119"
+    },
+    {
+      "id": "source-control-commithistory--failed-files",
+      "title": "Source Control/CommitHistory",
+      "name": "Failed Files",
+      "ok": true,
+      "rel": "source-control/commit-history--failed-files.png",
+      "size": "394x232"
+    },
+    {
+      "id": "source-control-commithistory--idle-files",
+      "title": "Source Control/CommitHistory",
+      "name": "Idle Files",
+      "ok": true,
+      "rel": "source-control/commit-history--idle-files.png",
+      "size": "394x212"
+    },
+    {
+      "id": "source-control-commithistory--loaded-files",
+      "title": "Source Control/CommitHistory",
+      "name": "Loaded Files",
+      "ok": true,
+      "rel": "source-control/commit-history--loaded-files.png",
+      "size": "394x275"
+    },
+    {
+      "id": "source-control-commithistory--loading-files",
+      "title": "Source Control/CommitHistory",
+      "name": "Loading Files",
+      "ok": true,
+      "rel": "source-control/commit-history--loading-files.png",
+      "size": "394x212"
+    },
+    {
+      "id": "source-control-conflictlist--provider-reported-and-locally-confirmed",
+      "title": "Source Control/ConflictList",
+      "name": "Provider Reported And Locally Confirmed",
+      "ok": true,
+      "rel": "source-control/conflict-list--provider-reported-and-locally-confirmed.png",
+      "size": "394x303"
+    },
+    {
+      "id": "source-control-prchip--open-with-checks",
+      "title": "Source Control/PrChip",
+      "name": "Open With Checks",
+      "ok": true,
+      "rel": "source-control/pr-chip--open-with-checks.png",
+      "size": "252x68"
+    },
+    {
+      "id": "source-control-reviewerlist--review-round-in-progress",
+      "title": "Source Control/ReviewerList",
+      "name": "Review Round In Progress",
+      "ok": true,
+      "rel": "source-control/reviewer-list--review-round-in-progress.png",
+      "size": "394x269"
+    },
+    {
+      "id": "source-control-sheetprdetails--open-pull-request",
+      "title": "Source Control/SheetPrDetails",
+      "name": "Open Pull Request",
+      "ok": true,
+      "rel": "source-control/sheet-pr-details--open-pull-request.png",
+      "size": "402x874"
+    },
+    {
+      "id": "source-control-sourcecontrolhub--changes-selected",
+      "title": "Source Control/SourceControlHub",
+      "name": "Changes Selected",
+      "ok": true,
+      "rel": "source-control/source-control-hub--changes-selected.png",
+      "size": "394x759"
+    },
+    {
+      "id": "source-control-sourcecontrolhub--commits-selected",
+      "title": "Source Control/SourceControlHub",
+      "name": "Commits Selected",
+      "ok": true,
+      "rel": "source-control/source-control-hub--commits-selected.png",
+      "size": "394x447"
+    },
+    {
+      "id": "source-control-sourcecontrolhub--pull-request-selected",
+      "title": "Source Control/SourceControlHub",
+      "name": "Pull Request Selected",
+      "ok": true,
+      "rel": "source-control/source-control-hub--pull-request-selected.png",
+      "size": "394x993"
+    },
+    {
+      "id": "source-control-upstreamstatus--ahead-only",
+      "title": "Source Control/UpstreamStatus",
+      "name": "Ahead Only",
+      "ok": true,
+      "rel": "source-control/upstream-status--ahead-only.png",
+      "size": "394x225"
+    },
+    {
+      "id": "source-control-upstreamstatus--behind-only",
+      "title": "Source Control/UpstreamStatus",
+      "name": "Behind Only",
+      "ok": true,
+      "rel": "source-control/upstream-status--behind-only.png",
+      "size": "394x225"
+    },
+    {
+      "id": "source-control-upstreamstatus--diverged",
+      "title": "Source Control/UpstreamStatus",
+      "name": "Diverged",
+      "ok": true,
+      "rel": "source-control/upstream-status--diverged.png",
+      "size": "394x225"
+    },
+    {
+      "id": "transcript-assistantactions--answer-actions",
+      "title": "Transcript/AssistantActions",
+      "name": "Answer Actions",
+      "ok": true,
+      "rel": "transcript/assistant-actions--answer-actions.png",
+      "size": "178x56"
+    },
+    {
+      "id": "transcript-block--file-preview-denied",
+      "title": "Transcript/Block",
+      "name": "File Preview Denied",
+      "ok": true,
+      "rel": "transcript/block--file-preview-denied.png",
+      "size": "394x120"
+    },
+    {
+      "id": "transcript-block--file-preview-missing",
+      "title": "Transcript/Block",
+      "name": "File Preview Missing",
+      "ok": true,
+      "rel": "transcript/block--file-preview-missing.png",
+      "size": "394x144"
+    },
+    {
+      "id": "transcript-block--file-preview-ready",
+      "title": "Transcript/Block",
+      "name": "File Preview Ready",
+      "ok": true,
+      "rel": "transcript/block--file-preview-ready.png",
+      "size": "394x120"
+    },
+    {
+      "id": "transcript-block--file-preview-unsupported",
+      "title": "Transcript/Block",
+      "name": "File Preview Unsupported",
+      "ok": true,
+      "rel": "transcript/block--file-preview-unsupported.png",
+      "size": "394x168"
+    },
+    {
+      "id": "transcript-block--file-preview-withheld",
+      "title": "Transcript/Block",
+      "name": "File Preview Withheld",
+      "ok": true,
+      "rel": "transcript/block--file-preview-withheld.png",
+      "size": "394x144"
+    },
+    {
+      "id": "transcript-block--text-artifact",
+      "title": "Transcript/Block",
+      "name": "Text Artifact",
+      "ok": true,
+      "rel": "transcript/block--text-artifact.png",
+      "size": "394x140"
+    },
+    {
+      "id": "transcript-block--text-assistant",
+      "title": "Transcript/Block",
+      "name": "Text Assistant",
+      "ok": true,
+      "rel": "transcript/block--text-assistant.png",
+      "size": "394x209"
+    },
+    {
+      "id": "transcript-block--text-user",
+      "title": "Transcript/Block",
+      "name": "Text User",
+      "ok": true,
+      "rel": "transcript/block--text-user.png",
+      "size": "328x90"
+    },
+    {
+      "id": "transcript-block--tool-call",
+      "title": "Transcript/Block",
+      "name": "Tool Call",
+      "ok": true,
+      "rel": "transcript/block--tool-call.png",
+      "size": "394x114"
+    },
+    {
+      "id": "transcript-block--tool-error",
+      "title": "Transcript/Block",
+      "name": "Tool Error",
+      "ok": true,
+      "rel": "transcript/block--tool-error.png",
+      "size": "394x120"
+    },
+    {
+      "id": "transcript-block--tool-result",
+      "title": "Transcript/Block",
+      "name": "Tool Result",
+      "ok": true,
+      "rel": "transcript/block--tool-result.png",
+      "size": "394x254"
+    },
+    {
+      "id": "transcript-block--unknown",
+      "title": "Transcript/Block",
+      "name": "Unknown",
+      "ok": true,
+      "rel": "transcript/block--unknown.png",
+      "size": "394x141"
+    },
+    {
+      "id": "transcript-collapsedevidence--tool-call",
+      "title": "Transcript/CollapsedEvidence",
+      "name": "Tool Call",
+      "ok": true,
+      "rel": "transcript/collapsed-evidence--tool-call.png",
+      "size": "374x76"
+    },
+    {
+      "id": "transcript-collapsedevidence--tool-result",
+      "title": "Transcript/CollapsedEvidence",
+      "name": "Tool Result",
+      "ok": true,
+      "rel": "transcript/collapsed-evidence--tool-result.png",
+      "size": "374x76"
+    },
+    {
+      "id": "transcript-filepreviewcard--denied",
+      "title": "Transcript/FilePreviewCard",
+      "name": "Denied",
+      "ok": true,
+      "rel": "transcript/file-preview-card--denied.png",
+      "size": "394x118"
+    },
+    {
+      "id": "transcript-filepreviewcard--missing",
+      "title": "Transcript/FilePreviewCard",
+      "name": "Missing",
+      "ok": true,
+      "rel": "transcript/file-preview-card--missing.png",
+      "size": "394x142"
+    },
+    {
+      "id": "transcript-filepreviewcard--ready",
+      "title": "Transcript/FilePreviewCard",
+      "name": "Ready",
+      "ok": true,
+      "rel": "transcript/file-preview-card--ready.png",
+      "size": "394x118"
+    },
+    {
+      "id": "transcript-filepreviewcard--unsupported",
+      "title": "Transcript/FilePreviewCard",
+      "name": "Unsupported",
+      "ok": true,
+      "rel": "transcript/file-preview-card--unsupported.png",
+      "size": "394x166"
+    },
+    {
+      "id": "transcript-filepreviewcard--withheld",
+      "title": "Transcript/FilePreviewCard",
+      "name": "Withheld",
+      "ok": true,
+      "rel": "transcript/file-preview-card--withheld.png",
+      "size": "394x142"
+    },
+    {
+      "id": "transcript-menutranscriptaction--mixed-availability",
+      "title": "Transcript/MenuTranscriptAction",
+      "name": "Mixed Availability",
+      "ok": true,
+      "rel": "transcript/menu-transcript-action--mixed-availability.png",
+      "size": "402x874"
+    },
+    {
+      "id": "transcript-normalizedactivitygroup--tool-call-activity",
+      "title": "Transcript/NormalizedActivityGroup",
+      "name": "Tool Call Activity",
+      "ok": true,
+      "rel": "transcript/normalized-activity-group--tool-call-activity.png",
+      "size": "382x315"
+    },
+    {
+      "id": "transcript-normalizedtranscriptblockview--activity",
+      "title": "Transcript/NormalizedTranscriptBlockView",
+      "name": "Activity",
+      "ok": true,
+      "rel": "transcript/normalized-transcript-block-view--activity.png",
+      "size": "394x256"
+    },
+    {
+      "id": "transcript-normalizedtranscriptblockview--code",
+      "title": "Transcript/NormalizedTranscriptBlockView",
+      "name": "Code",
+      "ok": true,
+      "rel": "transcript/normalized-transcript-block-view--code.png",
+      "size": "394x381"
+    },
+    {
+      "id": "transcript-normalizedtranscriptblockview--command",
+      "title": "Transcript/NormalizedTranscriptBlockView",
+      "name": "Command",
+      "ok": true,
+      "rel": "transcript/normalized-transcript-block-view--command.png",
+      "size": "394x656"
+    },
+    {
+      "id": "transcript-normalizedtranscriptblockview--fallback",
+      "title": "Transcript/NormalizedTranscriptBlockView",
+      "name": "Fallback",
+      "ok": true,
+      "rel": "transcript/normalized-transcript-block-view--fallback.png",
+      "size": "394x141"
+    },
+    {
+      "id": "transcript-normalizedtranscriptblockview--prose",
+      "title": "Transcript/NormalizedTranscriptBlockView",
+      "name": "Prose",
+      "ok": true,
+      "rel": "transcript/normalized-transcript-block-view--prose.png",
+      "size": "394x49"
+    },
+    {
+      "id": "transcript-normalizedtranscriptblockview--text-artifact",
+      "title": "Transcript/NormalizedTranscriptBlockView",
+      "name": "Text Artifact",
+      "ok": true,
+      "rel": "transcript/normalized-transcript-block-view--text-artifact.png",
+      "size": "394x523"
     },
     {
       "id": "transcript-toolfold--completed-grep",
       "title": "Transcript/ToolFold",
       "name": "Completed Grep",
       "ok": true,
-      "rel": "transcript/tool-fold--completed-grep.png"
+      "rel": "transcript/tool-fold--completed-grep.png",
+      "size": "374x76"
     },
     {
       "id": "transcript-toolfold--in-flight",
       "title": "Transcript/ToolFold",
       "name": "In Flight",
       "ok": true,
-      "rel": "transcript/tool-fold--in-flight.png"
+      "rel": "transcript/tool-fold--in-flight.png",
+      "size": "374x76"
     },
     {
       "id": "transcript-transcriptfindbar--first-match",
       "title": "Transcript/TranscriptFindBar",
       "name": "First Match",
       "ok": true,
-      "rel": "transcript/transcript-find-bar--first-match.png"
+      "rel": "transcript/transcript-find-bar--first-match.png",
+      "size": "394x178"
     },
     {
       "id": "transcript-transcriptfindbar--no-matches",
       "title": "Transcript/TranscriptFindBar",
       "name": "No Matches",
       "ok": true,
-      "rel": "transcript/transcript-find-bar--no-matches.png"
+      "rel": "transcript/transcript-find-bar--no-matches.png",
+      "size": "394x112"
     },
     {
       "id": "transcript-transcriptlist--empty",
       "title": "Transcript/TranscriptList",
       "name": "Empty",
       "ok": true,
-      "rel": "transcript/transcript-list--empty.png"
+      "rel": "transcript/transcript-list--empty.png",
+      "size": "394x146"
     },
     {
       "id": "transcript-transcriptlist--live-edge",
       "title": "Transcript/TranscriptList",
       "name": "Live Edge",
       "ok": true,
-      "rel": "transcript/transcript-list--live-edge.png"
+      "rel": "transcript/transcript-list--live-edge.png",
+      "size": "394x846"
     },
     {
       "id": "transcript-transcriptlist--virtualized-list",
       "title": "Transcript/TranscriptList",
       "name": "Virtualized List",
       "ok": true,
-      "rel": "transcript/transcript-list--virtualized-list.png"
+      "rel": "transcript/transcript-list--virtualized-list.png",
+      "size": "394x846"
     },
     {
       "id": "transcript-transcriptloadpanel--error-retryable",
       "title": "Transcript/TranscriptLoadPanel",
       "name": "Error Retryable",
       "ok": true,
-      "rel": "transcript/transcript-load-panel--error-retryable.png"
+      "rel": "transcript/transcript-load-panel--error-retryable.png",
+      "size": "394x237"
     },
     {
       "id": "transcript-transcriptloadpanel--loading",
       "title": "Transcript/TranscriptLoadPanel",
       "name": "Loading",
       "ok": true,
-      "rel": "transcript/transcript-load-panel--loading.png"
+      "rel": "transcript/transcript-load-panel--loading.png",
+      "size": "394x177"
     },
     {
       "id": "transcript-transcriptloadpanel--missing",
       "title": "Transcript/TranscriptLoadPanel",
       "name": "Missing",
       "ok": true,
-      "rel": "transcript/transcript-load-panel--missing.png"
+      "rel": "transcript/transcript-load-panel--missing.png",
+      "size": "394x177"
     },
     {
       "id": "transcript-transcriptloadpanel--unsupported",
       "title": "Transcript/TranscriptLoadPanel",
       "name": "Unsupported",
       "ok": true,
-      "rel": "transcript/transcript-load-panel--unsupported.png"
+      "rel": "transcript/transcript-load-panel--unsupported.png",
+      "size": "394x199"
     },
     {
       "id": "views-attentioninbox--default",
       "title": "Views/AttentionInbox",
       "name": "Default",
       "ok": true,
-      "rel": "views/attention-inbox--default.png"
+      "rel": "views/attention-inbox--default.png",
+      "size": "362x676"
     },
     {
       "id": "views-chat--default",
       "title": "Views/Chat",
       "name": "Default",
       "ok": true,
-      "rel": "views/chat--default.png"
+      "rel": "views/chat--default.png",
+      "size": "362x1095"
     },
     {
       "id": "views-emptystate--empty",
       "title": "Views/EmptyState",
       "name": "Empty",
       "ok": true,
-      "rel": "views/empty-state--empty.png"
+      "rel": "views/empty-state--empty.png",
+      "size": "394x273"
     },
     {
       "id": "views-emptystate--error",
       "title": "Views/EmptyState",
       "name": "Error",
       "ok": true,
-      "rel": "views/empty-state--error.png"
+      "rel": "views/empty-state--error.png",
+      "size": "394x248"
     },
     {
       "id": "views-emptystate--host-too-old",
       "title": "Views/EmptyState",
       "name": "Host Too Old",
       "ok": true,
-      "rel": "views/empty-state--host-too-old.png"
+      "rel": "views/empty-state--host-too-old.png",
+      "size": "394x273"
     },
     {
       "id": "views-emptystate--loading",
       "title": "Views/EmptyState",
       "name": "Loading",
       "ok": true,
-      "rel": "views/empty-state--loading.png"
+      "rel": "views/empty-state--loading.png",
+      "size": "394x248"
     },
     {
       "id": "views-emptystate--no-match",
       "title": "Views/EmptyState",
       "name": "No Match",
       "ok": true,
-      "rel": "views/empty-state--no-match.png"
+      "rel": "views/empty-state--no-match.png",
+      "size": "394x273"
     },
     {
       "id": "views-enrollment--authenticating",
       "title": "Views/Enrollment",
       "name": "Authenticating",
       "ok": true,
-      "rel": "views/enrollment--authenticating.png"
+      "rel": "views/enrollment--authenticating.png",
+      "size": "362x1220"
     },
     {
       "id": "views-enrollment--default",
       "title": "Views/Enrollment",
       "name": "Default",
       "ok": true,
-      "rel": "views/enrollment--default.png"
+      "rel": "views/enrollment--default.png",
+      "size": "362x1170"
     },
     {
       "id": "views-enrollment-onboarding-wizard--choice",
       "title": "Views/Enrollment/Onboarding Wizard",
       "name": "Choice",
       "ok": true,
-      "rel": "views/enrollment-onboarding-wizard--choice.png"
+      "rel": "views/enrollment-onboarding-wizard--choice.png",
+      "size": "394x306"
     },
     {
       "id": "views-enrollment-onboarding-wizard--complete",
       "title": "Views/Enrollment/Onboarding Wizard",
       "name": "Complete",
       "ok": true,
-      "rel": "views/enrollment-onboarding-wizard--complete.png"
+      "rel": "views/enrollment-onboarding-wizard--complete.png",
+      "size": "394x217"
     },
     {
       "id": "views-freshness--ready",
       "title": "Views/Freshness",
       "name": "Ready",
       "ok": true,
-      "rel": "views/freshness--ready.png"
+      "rel": "views/freshness--ready.png",
+      "size": "164x59"
     },
     {
       "id": "views-freshness--stale",
       "title": "Views/Freshness",
       "name": "Stale",
       "ok": true,
-      "rel": "views/freshness--stale.png"
+      "rel": "views/freshness--stale.png",
+      "size": "157x59"
     },
     {
       "id": "views-header--default",
       "title": "Views/Header",
       "name": "Default",
       "ok": true,
-      "rel": "views/header--default.png"
+      "rel": "views/header--default.png",
+      "size": "394x158"
     },
     {
       "id": "views-header--no-review",
       "title": "Views/Header",
       "name": "No Review",
       "ok": true,
-      "rel": "views/header--no-review.png"
+      "rel": "views/header--no-review.png",
+      "size": "394x92"
     },
     {
       "id": "views-home--empty",
       "title": "Views/Home",
       "name": "Empty",
       "ok": true,
-      "rel": "views/home--empty.png"
+      "rel": "views/home--empty.png",
+      "size": "382x1689"
     },
     {
       "id": "views-home--error",
       "title": "Views/Home",
       "name": "Error",
       "ok": true,
-      "rel": "views/home--error.png"
+      "rel": "views/home--error.png",
+      "size": "382x1663"
     },
     {
       "id": "views-home--loading",
       "title": "Views/Home",
       "name": "Loading",
       "ok": true,
-      "rel": "views/home--loading.png"
+      "rel": "views/home--loading.png",
+      "size": "382x1689"
     },
     {
       "id": "views-home--ready",
       "title": "Views/Home",
       "name": "Ready",
       "ok": true,
-      "rel": "views/home--ready.png"
+      "rel": "views/home--ready.png",
+      "size": "382x2009"
     },
     {
       "id": "views-home--stale",
       "title": "Views/Home",
       "name": "Stale",
       "ok": true,
-      "rel": "views/home--stale.png"
+      "rel": "views/home--stale.png",
+      "size": "382x2009"
     },
     {
       "id": "views-review--default",
       "title": "Views/Review",
       "name": "Default",
       "ok": true,
-      "rel": "views/review--default.png"
+      "rel": "views/review--default.png",
+      "size": "362x720"
     },
     {
       "id": "views-review--focused",
       "title": "Views/Review",
       "name": "Focused",
       "ok": true,
-      "rel": "views/review--focused.png"
+      "rel": "views/review--focused.png",
+      "size": "362x720"
     },
     {
       "id": "views-sessioncard--default",
       "title": "Views/SessionCard",
       "name": "Default",
       "ok": true,
-      "rel": "views/session-card--default.png"
+      "rel": "views/session-card--default.png",
+      "size": "179x83"
     },
     {
       "id": "views-sessioncard--launching",
       "title": "Views/SessionCard",
       "name": "Launching",
       "ok": true,
-      "rel": "views/session-card--launching.png"
+      "rel": "views/session-card--launching.png",
+      "size": "179x83"
     },
     {
       "id": "views-sessioncard--stale-running",
       "title": "Views/SessionCard",
       "name": "Stale Running",
       "ok": true,
-      "rel": "views/session-card--stale-running.png"
+      "rel": "views/session-card--stale-running.png",
+      "size": "181x86"
     },
     {
       "id": "views-sessionstateicon--idle",
       "title": "Views/SessionStateIcon",
       "name": "Idle",
       "ok": true,
-      "rel": "views/session-state-icon--idle.png"
+      "rel": "views/session-state-icon--idle.png",
+      "size": "44x44"
     },
     {
       "id": "views-sessionstateicon--running",
       "title": "Views/SessionStateIcon",
       "name": "Running",
       "ok": true,
-      "rel": "views/session-state-icon--running.png"
+      "rel": "views/session-state-icon--running.png",
+      "size": "44x44"
     },
     {
       "id": "views-settings-diagnostics--default",
       "title": "Views/Settings Diagnostics",
       "name": "Default",
       "ok": true,
-      "rel": "views/settings-diagnostics--default.png"
+      "rel": "views/settings-diagnostics--default.png",
+      "size": "362x1031"
     },
     {
       "id": "views-statuspill--connecting",
       "title": "Views/StatusPill",
       "name": "Connecting",
       "ok": true,
-      "rel": "views/status-pill--connecting.png"
+      "rel": "views/status-pill--connecting.png",
+      "size": "394x68"
     },
     {
       "id": "views-statuspill--error",
       "title": "Views/StatusPill",
       "name": "Error",
       "ok": true,
-      "rel": "views/status-pill--error.png"
+      "rel": "views/status-pill--error.png",
+      "size": "394x68"
     },
     {
       "id": "views-statuspill--live",
       "title": "Views/StatusPill",
       "name": "Live",
       "ok": true,
-      "rel": "views/status-pill--live.png"
+      "rel": "views/status-pill--live.png",
+      "size": "394x68"
     },
     {
       "id": "views-statuspill--offline",
       "title": "Views/StatusPill",
       "name": "Offline",
       "ok": true,
-      "rel": "views/status-pill--offline.png"
+      "rel": "views/status-pill--offline.png",
+      "size": "394x68"
     },
     {
       "id": "views-statuspill--reconnecting",
       "title": "Views/StatusPill",
       "name": "Reconnecting",
       "ok": true,
-      "rel": "views/status-pill--reconnecting.png"
+      "rel": "views/status-pill--reconnecting.png",
+      "size": "394x68"
     },
     {
       "id": "views-themecontrol--dark",
       "title": "Views/ThemeControl",
       "name": "Dark",
       "ok": true,
-      "rel": "views/theme-control--dark.png"
+      "rel": "views/theme-control--dark.png",
+      "size": "394x69"
     },
     {
       "id": "views-themecontrol--light",
       "title": "Views/ThemeControl",
       "name": "Light",
       "ok": true,
-      "rel": "views/theme-control--light.png"
+      "rel": "views/theme-control--light.png",
+      "size": "394x69"
     },
     {
       "id": "views-themecontrol--system",
       "title": "Views/ThemeControl",
       "name": "System",
       "ok": true,
-      "rel": "views/theme-control--system.png"
+      "rel": "views/theme-control--system.png",
+      "size": "394x69"
+    },
+    {
+      "id": "views-usagesheet--mixed-states",
+      "title": "Views/UsageSheet",
+      "name": "Mixed States",
+      "ok": true,
+      "rel": "views/usage-sheet--mixed-states.png",
+      "size": "365x699"
     }
   ]
 }

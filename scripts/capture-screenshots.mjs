@@ -49,6 +49,26 @@ const SETTLE_MS = 500;
 // every relative label inverts into the future and reads "in 5,493 hours".
 const FIXED_CLOCK = new Date('2026-08-28T12:00:00.000Z');
 
+// The page paints a full-frame surface from the theme tokens. Left in place it
+// becomes an opaque rectangle behind every shot, so a small control ends up as a
+// speck on a large empty field. Dropping it lets the component be cropped to
+// itself and composited onto any background later.
+const TRANSPARENT_PAGE_CSS = `
+  html, body, #storybook-root, #root {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+`;
+
+/** Breathing room around the crop so a shadow, ring or outline is not sliced off. */
+const CROP_PADDING = 12;
+
+/** How many times a frame may be re-taken while trying to get two that agree. */
+const SHOT_RETRIES = 3;
+
+/** Below this the story drew nothing a person could see, so there is no shot to take. */
+const MIN_VISIBLE_PX = 4;
+
 // Spinners and pulses land on a different frame every run, so an animated
 // component produced a different PNG each time and its diff meant nothing.
 // Freezing motion is what makes this archive comparable at all: the app's own
@@ -137,7 +157,70 @@ function serve() {
 }
 
 // ───────────────────────────────────────────────────────────────────
-// 5. CAPTURE
+// 5. CONTENT BOUNDS
+// ───────────────────────────────────────────────────────────────────
+
+// Runs in the page. Walks what the story actually rendered — the story root's
+// children plus anything portaled to body, since sheets and dialogs escape the
+// root — and returns the union of the boxes that paint something. Measuring the
+// root itself would just return the full frame every time.
+const MEASURE_CONTENT = `(() => {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, hits = 0;
+
+  const consider = (element) => {
+    const style = getComputedStyle(element);
+    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return;
+    // A screen-reader-only node is deliberately clipped to a 1px box; counting it
+    // would report content where a sighted person sees none.
+    if (element.classList.contains('sr-only')) return;
+
+    const rect = element.getBoundingClientRect();
+    const paints =
+      rect.width > 0 &&
+      rect.height > 0 &&
+      ((style.backgroundColor && style.backgroundColor !== 'rgba(0, 0, 0, 0)') ||
+        style.backgroundImage !== 'none' ||
+        style.borderTopWidth !== '0px' ||
+        style.borderBottomWidth !== '0px' ||
+        style.boxShadow !== 'none' ||
+        // Native-shadow controls paint through the user agent, not through any
+        // style this walk can read, so they are matched by tag or missed entirely.
+        ['IMG', 'SVG', 'CANVAS', 'VIDEO', 'AUDIO', 'IFRAME', 'INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'PATH', 'OBJECT', 'EMBED'].includes(element.tagName) ||
+        [...element.childNodes].some((node) => node.nodeType === 3 && node.textContent.trim()));
+
+    if (paints) {
+      hits += 1;
+      minX = Math.min(minX, rect.left);
+      minY = Math.min(minY, rect.top);
+      maxX = Math.max(maxX, rect.right);
+      maxY = Math.max(maxY, rect.bottom);
+    }
+    for (const child of element.children) consider(child);
+  };
+
+  const root = document.querySelector('#storybook-root') || document.querySelector('#root');
+  for (const child of root ? root.children : []) consider(child);
+  for (const child of document.body.children) if (child !== root) consider(child);
+
+  if (hits === 0 || maxX <= minX || maxY <= minY) return { empty: true };
+  return { empty: false, x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+})()`;
+
+// Fonts and images finish asynchronously. Under concurrent workers a shot could
+// land microseconds before the last glyph or image decoded, which made a random
+// couple of stories differ on every run. Waiting for both removes that race.
+const AWAIT_ASSETS = `(async () => {
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  const pending = [...document.images].filter((image) => !image.complete);
+  await Promise.all(pending.map((image) => image.decode().catch(() => undefined)));
+  return true;
+})()`;
+
+/** Content can overflow the device frame, so the crop needs the real page height. */
+const MEASURE_PAGE_HEIGHT = `Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)`;
+
+// ───────────────────────────────────────────────────────────────────
+// 6. CAPTURE
 // ───────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -160,6 +243,8 @@ async function main() {
 
   let captured = 0;
   let failed = 0;
+  let skipped = 0;
+  let unstable = 0;
   const results = [];
   const seen = new Map();
   const queue = [...stories];
@@ -190,13 +275,69 @@ async function main() {
           timeout: 20_000,
         });
         await page.waitForSelector('#storybook-root, #root', { state: 'attached', timeout: 12_000 });
-        await page.addStyleTag({ content: FREEZE_MOTION_CSS });
+        await page.addStyleTag({ content: `${FREEZE_MOTION_CSS}\n${TRANSPARENT_PAGE_CSS}` });
+        await page.evaluate(AWAIT_ASSETS);
         await page.waitForTimeout(SETTLE_MS);
-        // A viewport shot rather than a full-page one, so fixed-position sheets,
-        // dialogs and announcers land in frame the way a person would see them.
-        await page.screenshot({ path: file });
+
+        const bounds = await page.evaluate(MEASURE_CONTENT);
+
+        // A story that paints nothing visible — an sr-only live region, say — has
+        // no picture to take. Emitting a blank frame would read as "this is how it
+        // looks" instead of "there is nothing to see", so record it and move on.
+        if (bounds.empty || bounds.width < MIN_VISIBLE_PX || bounds.height < MIN_VISIBLE_PX) {
+          skipped += 1;
+          results.push({
+            id: story.id,
+            title: story.title,
+            name: story.name,
+            ok: true,
+            visuallyEmpty: true,
+            note: 'Renders nothing a sighted person can see; no screenshot taken.',
+          });
+          continue;
+        }
+
+        // Crop to what the story drew rather than the device frame, so a small
+        // control is its own size instead of a speck on an empty field. Content
+        // can overflow the viewport, so the page is grown to fit before clipping.
+        const pageHeight = await page.evaluate(MEASURE_PAGE_HEIGHT);
+        const clip = {
+          x: Math.max(0, Math.floor(bounds.x - CROP_PADDING)),
+          y: Math.max(0, Math.floor(bounds.y - CROP_PADDING)),
+          width: Math.ceil(Math.min(bounds.width + CROP_PADDING * 2, VIEWPORT.width - Math.max(0, bounds.x - CROP_PADDING))),
+          height: Math.ceil(Math.min(bounds.height + CROP_PADDING * 2, pageHeight - Math.max(0, bounds.y - CROP_PADDING))),
+        };
+
+        // Always full-page: the clip is then in document coordinates either way,
+        // and branching on whether content happens to exceed the viewport made the
+        // same story render differently between runs when it landed on the boundary.
+        const shoot = () => page.screenshot({ clip, fullPage: true, omitBackground: true });
+
+        // Under concurrent workers a story occasionally rendered one way and then
+        // another, which put a spurious diff in the archive. Rather than trust a
+        // single frame, shoot twice and accept only a frame that reproduces; a shot
+        // that never settles is written anyway but flagged, so it is visible rather
+        // than quietly flapping in every future diff.
+        let buffer = await shoot();
+        let stable = false;
+        for (let attempt = 0; attempt < SHOT_RETRIES && !stable; attempt += 1) {
+          const confirm = await shoot();
+          if (confirm.equals(buffer)) stable = true;
+          else buffer = confirm;
+        }
+        writeFileSync(file, buffer);
+
         captured += 1;
-        results.push({ id: story.id, title: story.title, name: story.name, ok: true, rel });
+        if (!stable) unstable += 1;
+        results.push({
+          id: story.id,
+          title: story.title,
+          name: story.name,
+          ok: true,
+          rel,
+          size: `${clip.width}x${clip.height}`,
+          ...(stable ? {} : { unstable: true }),
+        });
       } catch (error) {
         failed += 1;
         results.push({
@@ -208,8 +349,8 @@ async function main() {
         });
       }
 
-      if ((captured + failed) % 25 === 0) {
-        console.log(`  ${captured + failed}/${stories.length} (ok ${captured}, fail ${failed})`);
+      if ((captured + failed + skipped) % 25 === 0) {
+        console.log(`  ${captured + failed + skipped}/${stories.length} (ok ${captured}, empty ${skipped}, fail ${failed})`);
       }
     }
 
@@ -230,8 +371,12 @@ async function main() {
         generatedFrom: 'storybook-static',
         frame: `${VIEWPORT.width}x${VIEWPORT.height}`,
         deviceScaleFactor: DEVICE_SCALE_FACTOR,
+        cropsToContent: true,
+        transparentBackground: true,
         total: stories.length,
         captured,
+        visuallyEmpty: skipped,
+        unstable,
         failed,
         entries: results.sort((a, b) => (a.rel || '').localeCompare(b.rel || '')),
       },
@@ -240,7 +385,7 @@ async function main() {
     )}\n`,
   );
 
-  console.log(`\nDONE: ${captured} captured, ${failed} failed, of ${stories.length}`);
+  console.log(`\nDONE: ${captured} captured (${unstable} unstable), ${skipped} visually empty, ${failed} failed, of ${stories.length}`);
   if (failed > 0) {
     console.log('FAILURES:');
     for (const result of results.filter((entry) => !entry.ok).slice(0, 20)) {

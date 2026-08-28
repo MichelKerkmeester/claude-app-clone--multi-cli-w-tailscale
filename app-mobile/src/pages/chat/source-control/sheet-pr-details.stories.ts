@@ -18,3 +18,23 @@ type Story = StoryObj<typeof meta>;
 export const WithoutHostData: Story = {
   args: {},
 };
+
+const OPEN_PULL_REQUEST = {
+  state: 'open',
+  rollup: 'passing',
+  commentCount: 8,
+  stateLabel: 'Open',
+  rollupLabel: 'Checks passing',
+  title: 'Add compact source-control surfaces to the chat view',
+  number: 1842,
+  webUrl: 'https://github.com/acme/atlas/pull/1842',
+  description:
+    'Adds the read-only pull-request summary, check rollup, and reviewer context to the session sidebar.',
+};
+
+export const OpenPullRequest: Story = {
+  args: {
+    open: true,
+    details: OPEN_PULL_REQUEST,
+  },
+};

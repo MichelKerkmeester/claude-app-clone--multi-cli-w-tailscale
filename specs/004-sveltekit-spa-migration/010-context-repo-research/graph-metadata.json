@@ -194,15 +194,14 @@
       "tasks.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:0a7a524e0efb20ba58e070b5c3db3b6230eae339f5ff6b8e470751254fcdf144",
+    "source_fingerprint": "sha256:52d64d23cd42458a38192d58ff5373867be350d40f8068d3c4b4f8f100d5e9e6",
     "source_doc_hashes": {
-      "spec.md": "b46aaa54375370a0092e3ec99e9156fb5c258dc965223c14ac9dd022789569db",
-      "plan.md": "bb212603e4d76d608387b25771a9a4fcc48d8f17c6ff7c8e5a3fe3f3bc99ba3e",
-      "tasks.md": "83e8bebfe7f8b6ae99c84896fa630c8a6b9180253bc771c58ee0a4ba1579c540",
-      "implementation-summary.md": "f5e6bfc24cc5c865374ac9ca52cd445b4d26105abf977bd76810b6590747870a"
+      "spec.md": "204bfd27fd13239a923f9fc9bb654e8ef623e4e9533432161be38f8f6df9fe7e",
+      "plan.md": "c5907db7a20102d274f6c09a12f793792eb238f1dad0e7d27ee7a136d1a0ee4f",
+      "tasks.md": "9f64103f3c98ae64b2feccfaddf0a5dd16e258a76f281b7c17b5d8b909ea67f8",
+      "implementation-summary.md": "9a996d2a05935a005eeaeda878b761ec13d7d7916969b699c5a61952e4b1f114"
     },
     "last_active_child_id": null,
     "last_active_at": null
-  },
-  "source_fingerprint": "sha256:52d64d23cd42458a38192d58ff5373867be350d40f8068d3c4b4f8f100d5e9e6"
+  }
 }

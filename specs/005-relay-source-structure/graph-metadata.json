@@ -90,12 +90,11 @@
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:b50e55e4d1564e83d9ef7554d5e6dfb1aa50d0c28d305d36185e2163e58f30b5",
+    "source_fingerprint": "sha256:1b9130e9d7dc43d2b6c9a18688af2f2a683d78fff568e49b7a16be0c76b27463",
     "source_doc_hashes": {
-      "spec.md": "043a01f032ec69f9a11be63f188222e4855d44135a99bd315d917ff86ce4c62f"
+      "spec.md": "4849d9fa48b4c3649f9c33e5b38e2c8c2bb440e192530a1832b28c4e42fcbe71"
     },
     "last_active_child_id": "005-relay-source-structure/001-source-section-banners",
     "last_active_at": null
-  },
-  "source_fingerprint": "sha256:1b9130e9d7dc43d2b6c9a18688af2f2a683d78fff568e49b7a16be0c76b27463"
+  }
 }

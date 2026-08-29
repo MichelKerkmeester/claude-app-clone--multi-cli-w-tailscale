@@ -87,12 +87,11 @@
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:0d9b56c0a42288eec3ed33ed8a10a751a2e58e7f631ef4b72ea450165c88d651",
+    "source_fingerprint": "sha256:d304b084bed0d75e473ac0467897662ed3ec68e4aa0e7ec954fd0fe6b200a0a1",
     "source_doc_hashes": {
-      "spec.md": "3bf6bd5c5606e4603190490bd34e189309e68fe2bbeb52f3fa73e13470c1b00e"
+      "spec.md": "1f712ff39783f558c14b3f41eedc5c32163d7f45b30df9bd7fab8d0a42a35d10"
     },
     "last_active_child_id": "004-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling",
     "last_active_at": null
-  },
-  "source_fingerprint": "sha256:d304b084bed0d75e473ac0467897662ed3ec68e4aa0e7ec954fd0fe6b200a0a1"
+  }
 }

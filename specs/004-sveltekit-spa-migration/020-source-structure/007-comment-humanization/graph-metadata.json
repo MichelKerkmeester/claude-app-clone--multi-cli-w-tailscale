@@ -88,13 +88,11 @@
       "spec.md",
       "goal.md"
     ],
-    "source_fingerprint": "sha256:eed06bfe12f00e79218c3a98e5df1b12344dfa4b839e69a413fb3d8725eb461c",
+    "source_fingerprint": "sha256:e456c52d1f826239b33d72767555143b76d4fc45279c18308a30427f509875a8",
     "source_doc_hashes": {
-      "spec.md": "8812fb5404e386a809169ef8c8d3f15bef914491e3fa66c185ff6079fa2992ef",
-      "goal.md": "dca310bb300af90cd247ae933d8807a25dc7bedf5675287e4a2ebadd5dfea6c8"
+      "spec.md": "a6a2318ab92a504fc773faa0c634dceab1496f9166c5cf39ca2f02bf2884e086"
     },
     "last_active_child_id": "004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify",
     "last_active_at": "2026-08-25T21:00:00.000Z"
-  },
-  "source_fingerprint": "sha256:e456c52d1f826239b33d72767555143b76d4fc45279c18308a30427f509875a8"
+  }
 }

@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 // ───────────────────────────────────────────────────────────────────
 
 const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
-const PACKET_ROOT = 'specs/003-pi-remote-design-system/005-sveltekit-spa-migration';
+const PACKET_ROOT = 'specs/004-sveltekit-spa-migration';
 const VALIDATE =
   '/Users/michelkerkmeester/MEGA/Development/Code_Environment/Public/.opencode/skills/system-spec-kit/scripts/spec/validate.sh';
 

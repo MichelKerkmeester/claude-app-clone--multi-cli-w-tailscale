@@ -82,12 +82,11 @@
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:9bf64c7e9a8be39fa0f5e88ea8723786e0fc099ffa73fb3de12cb2a1a71350b8",
+    "source_fingerprint": "sha256:d7b5c529a13ab8690c6373595c0b396acd227a6ae850bba263428f33dbbccc22",
     "source_doc_hashes": {
-      "spec.md": "4feb656c8cdc1cd03a1666fe5ef8f3e20cf4f1735ff6f4cddbdb6f0ed01ed4fc"
+      "spec.md": "85b7e4dd12ae1f971fc83b0cd2dd8a7a3564b998b62641d48eec9f4a4ab7016d"
     },
     "last_active_child_id": "004-sveltekit-spa-migration/020-source-structure/007-comment-humanization",
     "last_active_at": "2026-08-25T19:25:28.000Z"
-  },
-  "source_fingerprint": "sha256:d7b5c529a13ab8690c6373595c0b396acd227a6ae850bba263428f33dbbccc22"
+  }
 }

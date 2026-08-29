@@ -86,12 +86,11 @@
     "source_docs": [
       "spec.md"
     ],
-    "source_fingerprint": "sha256:82b0425c2736e26b490ba61d841ebcfaf18d7a152c23e50d86e635e9a23bceb8",
+    "source_fingerprint": "sha256:0abfc6f59ccd289493e3daf521e0eed598e0828164fa0dae0838d9e5f3d08444",
     "source_doc_hashes": {
-      "spec.md": "45e03ac232ace0c2209c49f00b376cc61ee4dcd8b6da0af354718435beac041b"
+      "spec.md": "cdfac65214aa123b7838f35996b06842dd3fda7245c7cb627e05d7384a52bc6f"
     },
     "last_active_child_id": "004-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle",
     "last_active_at": null
-  },
-  "source_fingerprint": "sha256:0abfc6f59ccd289493e3daf521e0eed598e0828164fa0dae0838d9e5f3d08444"
+  }
 }

@@ -196,16 +196,15 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:660da84e610d08ab6a93713358d6fcba5f6182dfc38231e45256aec6504f00af",
+    "source_fingerprint": "sha256:a005ef7c7420cf714455b334f032bf03c1bdff730a6302efb8a5ac63fa4f4a66",
     "source_doc_hashes": {
-      "spec.md": "4d20ae62a6744bc93b790de3833f0c9b3617b1c1cd010fd58a5deead01a4de7c",
-      "plan.md": "33b16e9280fd6de18a3e947d1be454b21b47dc8808f4e76cf09d13c76ce743b5",
-      "tasks.md": "2aaa7aa4e881f585e26ba5233a88b74401b617afd2df3167b5e29bd1ee23db13",
-      "checklist.md": "803dbeba8cc6adb0d711d63b219935e5ac034c08316522825d8dc473b4eb1919",
-      "implementation-summary.md": "9e682fa872ae789dba33a282573b84e34cdccf2988732802945170458c6ee079"
+      "spec.md": "74ddf31a494682c382394e6df3a81a80a231d89e3c888c250465b41ad91b130a",
+      "plan.md": "d0ae94a3ab2931c77ea262ffe34f9148afdbc99108f28395201fce92b7cc36f9",
+      "tasks.md": "03284000faf19dff8e3331d2fbb430118221a2dcc5433cf0b759523395e46d21",
+      "checklist.md": "267f77b2917128c42ada56ecc404da5316f68f4fe5101c357390f7e9004c23d7",
+      "implementation-summary.md": "df361ff680642c2ba77d48eeb43220fd5380e25b2386cc1fea36558ad3cb9e97"
     },
     "last_active_child_id": null,
     "last_active_at": null
-  },
-  "source_fingerprint": "sha256:a005ef7c7420cf714455b334f032bf03c1bdff730a6302efb8a5ac63fa4f4a66"
+  }
 }

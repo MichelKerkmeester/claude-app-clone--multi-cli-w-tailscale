@@ -1,16 +1,22 @@
 ---
-title: "Phase 15 implementation summary — Storybook designer adjustability (IN PROGRESS)"
+title: "Phase 15 implementation summary — Storybook designer adjustability"
 description: "A designer could read every surface in the catalog and change almost nothing about it. Three additions close that: a playground that retunes the design system and moves every story at once, derived controls that reach the state hidden behind object props, and a reference that reads the system's own record of what may be changed. Measuring first showed one planned item was already done and did not need building."
+trigger_phrases:
+  - "adjustability summary"
+  - "catalog state visibility gate"
+  - "check classification visible"
+  - "streaming state inert control"
+importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability"
-    last_updated_at: "2026-08-29T08:58:21.995Z"
+    last_updated_at: "2026-08-29T15:05:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Negative-controlled the persisted token-override gate; design links dropped."
-    next_safe_action: "Close the remaining catalog defects: dead props, inert state, unreachable arg."
+    recent_action: "Closed the four control defects; added the negative-controlled visibility gate."
+    next_safe_action: "Packet closed; no follow-up owed inside this phase."
     blockers: []
-    completion_pct: 92
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: impl-summary-core | v2.2 -->
@@ -25,9 +31,9 @@ _memory:
 |-------|-------|
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
-| **Status** | In Progress |
-| **Scope** | The catalog: 336 stories across 101 components |
-| **Commits** | `822b436`, `9b8af0e` |
+| **Status** | Complete |
+| **Scope** | The catalog: 337 stories across 101 components |
+| **Commits** | `822b436`, `9b8af0e`, `500a4da` |
 | **Executors** | Grok 4.6 xhigh via Cursor and GPT-5.6 Luna xhigh via Codex, on disjoint story files |
 <!-- /ANCHOR:metadata -->
 
@@ -51,6 +57,12 @@ _memory:
   frozen rules as comments beside the code. A page now reads those markers out of the components and
   the stylesheet at build time: 100 seams across layout, tokens, contrast, surface and motion, and
   185 frozen notes over 58 files.
+- **A gate for the defect class this phase kept finding.** `scripts/catalog-state-visibility.mjs`
+  asserts three things no other gate can express: that each check classification paints differently
+  from the others, that a control renders a difference at the block count its own stories use, and
+  that no story reports an age the pinned clock makes impossible. Every one of its checks exists
+  because that exact failure shipped green through typecheck, both suites, story coverage and the
+  render gate.
 <!-- /ANCHOR:what-built -->
 
 ---
@@ -105,7 +117,36 @@ gap — 142 props resolve to a raw object editor — which is what the derived c
 - `npm run test:web` — exit 0; 114 files / 782 passed + 3 skipped, and 83 files / 772 passed.
 - `node scripts/story-coverage.mjs`, `node scripts/css-comment-integrity.mjs` and
   `node scripts/token-identity.mjs verify app-mobile/src/app.css` all pass.
-- `git status --porcelain screenshots` reports only the pages this work adds.
+- `git status --porcelain screenshots` reports only the pages this work adds and the seven shots the
+  state fixes below intentionally move. Each of those reproduced byte-identically across two full
+  captures; the only shots that differed between the two runs were `plan-mode-button--build` and
+  `sandboxed-diagram--valid`, the known pre-existing flake families, and both were restored.
+- `node scripts/catalog-state-visibility.mjs` passes over all 337 stories, and is negative-controlled
+  three ways: deleting the classification rules turns it red on paint, disabling the streaming
+  append turns it red on the inert control, and reverting one fixture timestamp turns it red on
+  three todo-panel stories. Restoring all three returns it to green.
+- `node scripts/ui-audit.mjs` over 670 story-runs: 134 findings, all low or info (98 touch-target,
+  22 clip-clamped, 14 overlap). Zero high, zero medium.
+
+### The four control defects this phase's own tooling found
+
+- **A published state no rule consumed.** `check-summary.svelte` emitted the host's classification as
+  a data attribute that no CSS read. Measured, `passing` and `failing` were identical in background,
+  border AND ink in both themes — a failing build read exactly like a passing one. The attribute is
+  now load-bearing. Adding a tinted fill for `failing` immediately failed the audit at 4.48:1 against
+  the 4.5:1 floor, so the fill was dropped and the state carries on border and value ink instead.
+- **Story-only controls handed straight back to the component.** Both `screen-chat.stories.ts` and
+  `transcript-list.stories.ts` stripped their synthetic controls and then re-added the same four keys.
+  Neither component declares them and neither spreads rest props, so they were dropped at render;
+  the strip is now honest.
+- **A control that was inert exactly where it was used.** `streamingState: 'token'` produced DOM
+  identical to `'fixture'` at the block count every story sets, while differing at small counts no
+  story uses. The first diagnosis of this was wrong and produced an inert fix: the cause was not the
+  tail bail-out but the append path, which finds an unused assistant block and, at the full count,
+  has none left. `'token'` now always appends a truncated copy of a real assistant block.
+- **Fixtures stranded ten days from the pinned clock.** The todo panel reported "Updated 243 hours
+  ago" and a *running* session card reported "240d ago". Both now read plausibly, and the age sweep
+  in the new gate makes that permanent.
 <!-- /ANCHOR:verification -->
 
 ---
@@ -125,4 +166,23 @@ gap — 142 props resolve to a raw object editor — which is what the derived c
 - **An override is deliberately blunt.** It outranks the theme blocks, so an overridden token stops
   flipping between themes. The playground says so rather than leaving it to be discovered, but it
   remains a property of the mechanism rather than a bug to fix.
+- **`pending` and `failing` separate weakly, and the palette is why.** Measured as CIELAB deltaE,
+  `failing` against `passing` is 58.6 in light and 54.4 in dark, but `failing` against `pending` is
+  only 8.6 and 11.6, because `--warning` resolves to the app's rust accent, which sits near
+  `--danger` in hue. The two are distinguishable side by side and their labels differ, but the
+  colour alone is thin. Widening it needs a token the palette does not have, and tokens change only
+  through their own gate, so this is recorded rather than invented around.
+- **The streaming edge is not visible in the archive.** The transcript overflows the phone viewport
+  at every block count from one upward and the list is virtualised, so the tail is never rendered
+  and no screenshot can show a mid-stream reply. A story that claimed to show it was removed rather
+  than kept; the control is proven in the DOM by the state-visibility gate instead.
+- **The capture clock stays pinned where it is, and that is a decision rather than an oversight.**
+  Re-pinning it near the demo fixtures was measured and rejected: it fixes the todo panel's age but
+  breaks the review countdown from "05:00 remaining" to "14573:00 remaining" and collapses the
+  attention inbox's three distinct ages to "just now" three times. No single clock satisfies all of
+  them, because past-event and future-deadline fixtures pull in opposite directions. The pin is
+  correct and the stranded fixtures were migrated to it instead.
+- **One claim in the open-work list did not survive measurement.** The `SessionCard` `source` control
+  was recorded as unreachable through URL args. All three of its values render distinct DOM when set
+  that way, so there was nothing to fix.
 <!-- /ANCHOR:limitations -->

@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 - Usage/quota, transcript-search, change-review (host-gated)"
 description: "Plan the three host-gated read-only surfaces the client renders once the relay publishes their payloads: a per-provider usage/quota card and detail sheet, a cross-session transcript-search UI over a sessions.search RPC, and a per-session change-review PR/git hub, plus host-resolved tap-to-open and client quote/branch. Client-read-only, fail-closed inert until each field lands; the ready-now formatter/harness/detection is buildable against fixtures today."
+trigger_phrases:
+  - "host usage search review spec requirements"
+  - "host usage search review phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

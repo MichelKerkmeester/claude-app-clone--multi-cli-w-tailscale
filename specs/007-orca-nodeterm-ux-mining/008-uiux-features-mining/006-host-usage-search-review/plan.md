@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 plan - host-gated usage/search/change-review, ready-now first, fail-closed"
 description: "Sequenced approach for three host-gated read-only surfaces: build the ready-now client logic (UQ-3/UQ-6 formatter+toggle, SH-1 debounce/render harness, TE-3 detection) against fixtures first, then wire each render behind its relay field so it stays inert until the field lands. Proven fail-closed inert without the field, token-identity 0-diff, test:web, a11y-parity from the final state."
+trigger_phrases:
+  - "host usage search review plan approach"
+  - "host usage search review phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

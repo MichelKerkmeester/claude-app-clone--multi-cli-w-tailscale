@@ -1,6 +1,11 @@
 ---
 title: "Verification Checklist: Phase 3 home/switcher/nav/search"
 description: "Verification Date: TBD. Level-2 QA items mapping to the HP/SC/SD/NL/SH acceptance criteria; all open at 0%."
+trigger_phrases:
+  - "home switcher nav search verification checklist"
+  - "home switcher nav search phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

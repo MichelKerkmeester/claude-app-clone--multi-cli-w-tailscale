@@ -1,6 +1,11 @@
 ---
 title: "Phase 2 plan - streaming/reader/media over real files, quick-wins first, fail-closed"
 description: "Sequenced approach for the transcript-clarity, reader, and media findings: land the streaming-clarity batch (SP-1, SP-2, SP-4) and the media quick-wins (MA-1, MA-4, MA-2) first, then the reader gestures and safety gates (TE-1, TE-2, TE-4, TE-5), the artifact-find stepper (MA-5), and the reusable primitives (MI-4 then MI-2). Proven by token-identity 0-diff, test:web, a11y-parity from the final state."
+trigger_phrases:
+  - "streaming reader media plan approach"
+  - "streaming reader media phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

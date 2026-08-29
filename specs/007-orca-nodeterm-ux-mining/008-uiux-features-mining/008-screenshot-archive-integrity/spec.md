@@ -1,6 +1,11 @@
 ---
 title: "Phase 8 - Screenshot archive integrity"
 description: "Make every screenshot an honest picture of its component before any refinement phase reads one. Fix the real styling defect, confirm the story-level repairs already drafted, settle how full screens are framed, and leave the archive deterministic with no dead, unstyled, error-defaulted or indistinguishable shots. Scope: archive-wide. Chain: after 007-host-liveactivity-fields · before 009-refine-artifacts."
+trigger_phrases:
+  - "screenshot archive integrity spec requirements"
+  - "screenshot archive integrity phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

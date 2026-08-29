@@ -68,6 +68,36 @@
     color: var(--ink-muted);
   }
 
+  /* This state: passing — a successful host aggregate, on the section border. */
+  .source-control-check-summary[data-check-classification='passing'] {
+    border-color: var(--success);
+  }
+
+  /* This slot: value — success ink for a passing classification. */
+  .source-control-check-summary[data-check-classification='passing'] .source-control-check-summary--value {
+    color: var(--success);
+  }
+
+  /* This state: failing — a failing host aggregate, on the section border. */
+  .source-control-check-summary[data-check-classification='failing'] {
+    border-color: var(--danger);
+  }
+
+  /* This slot: value — danger ink for a failing classification. */
+  .source-control-check-summary[data-check-classification='failing'] .source-control-check-summary--value {
+    color: var(--danger);
+  }
+
+  /* This state: pending — an in-flight host aggregate, on the section border. */
+  .source-control-check-summary[data-check-classification='pending'] {
+    border-color: var(--warning);
+  }
+
+  /* This slot: value — warning ink for a pending classification. */
+  .source-control-check-summary[data-check-classification='pending'] .source-control-check-summary--value {
+    color: var(--warning);
+  }
+
   /* This slot: label — identifies the aggregate without implying a verdict. */
   .source-control-check-summary--label {
     color: var(--ink-muted);

@@ -1,6 +1,11 @@
 ---
 title: "Phase 12 implementation summary — refine views (COMPLETE)"
 description: "The archived picture of a healthy home screen was an error state, because the story never answered the push-config call. The home hero had been rendering without its base rule since a malformed comment deleted it. And the approval screen's primary action — the most consequential control in the app — was white text on clay at 3.12:1."
+trigger_phrases:
+  - "refine views implementation summary"
+  - "refine views phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

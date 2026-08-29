@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 plan - host inbox and notifications, ready-now first, fail-closed inert"
 description: "Sequenced approach for the cross-session Inbox and push contract: ship CE-5 device-local read/archive now, build the fixture-backed render harnesses (timeline, notification-tap routing, reconnect watermark) that unlock the moment each relay field lands, and keep every blocked finding inert until then. Proven by fail-closed inertness checks, token-identity 0-diff, test:web, and a11y-parity from the final state."
+trigger_phrases:
+  - "host inbox notifications plan approach"
+  - "host inbox notifications phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

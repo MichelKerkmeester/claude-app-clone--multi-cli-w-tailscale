@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 - Home, in-session switcher, navigation, and client search"
 description: "Plan the home/roster surface, a net-new in-session switcher dock, the navigation coordinator, and the client-side search upgrade over the real app-mobile home and routes files, host-authoritative and fail-closed. Ships the Wave-1 PWA app-badge quick-win plus 18 pure-client findings: smart sort, card density, tool glyph, the MRU dock with its correctness guardrails, stack-aware navigation, background-pause polling, reconnect refetch, and preview/fuzzy search over fields already on the DTO."
+trigger_phrases:
+  - "home switcher nav search spec requirements"
+  - "home switcher nav search phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

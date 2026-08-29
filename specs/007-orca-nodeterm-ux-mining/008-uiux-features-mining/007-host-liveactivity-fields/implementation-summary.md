@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 implementation summary — Live Activity and host fields (COMPLETE)"
 description: "Five ready-now Live-Activity findings shipped as pure modules and wired into the home card — single-slot arbitration on the shared attention resolver, a tick that refreshes rather than re-elects, one clip length with a three-tier content fallback, a boundary-aware stale watchdog, and a state-scoped latched dismiss — alongside eight host-gated findings that render nothing until their relay field lands, including a media player, a prompt-cache countdown, a subagent tail and project grouping."
+trigger_phrases:
+  - "host liveactivity fields implementation summary"
+  - "host liveactivity fields phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

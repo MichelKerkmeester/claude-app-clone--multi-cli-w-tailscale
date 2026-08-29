@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 - Cross-session Inbox and notification/push contract"
 description: "Plan the cross-session Inbox timeline (needs sessionId on every event) and the push/notification contract over the real app-mobile inbox, attention, and routing files, host-authoritative and fail-closed. Every finding but CE-5 is blocked on a relay-authored, client-read-only field or RPC; the client render is planned now and stays inert until the field lands. CE-5 (device-local read/archive) ships before the RPC."
+trigger_phrases:
+  - "host inbox notifications spec requirements"
+  - "host inbox notifications phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

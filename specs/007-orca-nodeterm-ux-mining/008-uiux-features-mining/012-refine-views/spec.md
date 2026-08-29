@@ -1,6 +1,11 @@
 ---
 title: "Phase 12 - Refine views"
 description: "Walk all 37 views screenshots one at a time and treat each as a UI review: analyse what it shows, debug what is wrong, then optimise and refine the component. Fix the component rather than the story, re-capture, and prove each change with a before and after diff of the shot itself. Scope: 37 screenshots. Chain: after 011-refine-transcript · before 013-refine-rich-content-ask-question."
+trigger_phrases:
+  - "refine views spec requirements"
+  - "refine views phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

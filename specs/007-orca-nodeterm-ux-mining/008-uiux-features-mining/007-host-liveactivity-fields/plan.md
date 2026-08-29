@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 plan - Live-Activity modules now, host DTO fields inert until they land"
 description: "Sequenced approach for the Live-Activity and host DTO-field phase: ship the five ready-now Live-Activity pure modules (arbitration, no-tick-rerank, content fallback, stale watchdog, latched dismiss) as reusable logic consumed by the home card today, then scaffold the eight host-gated findings inert behind their relay fields. Proven by fixture tests, token-identity 0-diff, test:web, a11y-parity from the final state."
+trigger_phrases:
+  - "host liveactivity fields plan approach"
+  - "host liveactivity fields phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

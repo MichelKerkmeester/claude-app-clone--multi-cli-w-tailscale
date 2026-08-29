@@ -1,6 +1,11 @@
 ---
 title: "Phase 14 - Refine source-control, attachments, primitives, home"
 description: "Walk all 31 source-control, attachments, primitives, home screenshots one at a time and treat each as a UI review: analyse what it shows, debug what is wrong, then optimise and refine the component. Fix the component rather than the story, re-capture, and prove each change with a before and after diff of the shot itself. Scope: 31 screenshots. Chain: after 013-refine-rich-content-ask-question · final refinement phase."
+trigger_phrases:
+  - "refine source control and small surfaces spec requirements"
+  - "refine source control and small surfaces phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

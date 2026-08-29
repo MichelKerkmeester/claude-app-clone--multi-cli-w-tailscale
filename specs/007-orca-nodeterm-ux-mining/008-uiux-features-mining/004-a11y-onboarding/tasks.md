@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 tasks - a11y and onboarding ledger (AI + OS findings)"
 description: "Task Format: T### [P?] Description (file path). Every task cites its finding id and the real app-mobile file it touches; all tasks open at 0%."
+trigger_phrases:
+  - "a11y onboarding task ledger"
+  - "a11y onboarding phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

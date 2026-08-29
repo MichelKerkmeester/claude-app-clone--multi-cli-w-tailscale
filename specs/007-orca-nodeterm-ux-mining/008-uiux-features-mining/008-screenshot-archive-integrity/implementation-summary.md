@@ -1,6 +1,11 @@
 ---
 title: "Phase 8 implementation summary — screenshot archive integrity (COMPLETE)"
 description: "Three components that rendered wrong in the live app are fixed: the file-preview card had no styling because the rules it named are scoped to a different component, artifact details had no rule at all, and the session status disc painted white on white because currentColor resolved against its own colour. Story repairs, a corrected fixture, and two determinism defects in the capture itself are also closed, leaving four consecutive runs byte-identical including the manifest."
+trigger_phrases:
+  - "screenshot archive integrity implementation summary"
+  - "screenshot archive integrity phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

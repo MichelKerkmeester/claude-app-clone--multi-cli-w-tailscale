@@ -1,6 +1,11 @@
 ---
 title: "Phase 2 - Streaming clarity, reader, and media rendering"
 description: "Plan the transcript-clarity, reader, and media-rendering findings over the real app-mobile transcript, rich-content, and artifact files, host-authoritative and fail-closed. Ships the Wave-1 quick-wins (thinking row, live elapsed timer, optimistic Stop, diff enrichment, image dimensions, mermaid diagrams) plus the reader gestures, fail-closed path/scheme handling, in-app browser, artifact find stepper, and the reusable excerpt and injection-guard primitives. All findings are pure client rendering with no host field."
+trigger_phrases:
+  - "streaming reader media spec requirements"
+  - "streaming reader media phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

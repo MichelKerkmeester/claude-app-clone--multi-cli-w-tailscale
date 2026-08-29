@@ -1,6 +1,11 @@
 ---
 title: "Phase 8 plan - Screenshot archive integrity"
 description: "Sequenced approach for screenshot archive integrity: archive-wide, reviewed per shot, fixed in the component, proven by image diff."
+trigger_phrases:
+  - "screenshot archive integrity plan approach"
+  - "screenshot archive integrity phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

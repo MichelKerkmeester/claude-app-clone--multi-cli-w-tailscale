@@ -4,8 +4,8 @@
   "deviceScaleFactor": 1,
   "cropsToContent": true,
   "transparentBackground": true,
-  "total": 336,
-  "captured": 310,
+  "total": 337,
+  "captured": 311,
   "visuallyEmpty": 26,
   "unstable": 0,
   "failed": 0,
@@ -2054,6 +2054,14 @@
       "size": "394x119"
     },
     {
+      "id": "source-control-checksummary--pending",
+      "title": "Source Control/CheckSummary",
+      "name": "Pending",
+      "ok": true,
+      "rel": "source-control/check-summary--pending.png",
+      "size": "394x119"
+    },
+    {
       "id": "source-control-checksummary--unknown",
       "title": "Source Control/CheckSummary",
       "name": "Unknown",
@@ -2741,7 +2749,7 @@
       "name": "Stale Running",
       "ok": true,
       "rel": "views/session-card--stale-running.png",
-      "size": "181x86",
+      "size": "179x86",
       "backdrop": "canvas"
     },
     {

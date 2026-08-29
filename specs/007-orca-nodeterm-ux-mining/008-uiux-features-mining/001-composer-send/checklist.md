@@ -1,6 +1,11 @@
 ---
 title: "Verification Checklist: Phase 1 composer/send"
 description: "Verification Date: TBD. Level-2 QA items mapping to the CI/RS acceptance criteria; all open at 0%."
+trigger_phrases:
+  - "composer send verification checklist"
+  - "composer send phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

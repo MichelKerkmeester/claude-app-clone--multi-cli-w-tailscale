@@ -1,6 +1,11 @@
 ---
 title: "Implementation plan - Phase 15 Storybook designer adjustability"
 description: "Sequenced approach for making the catalog the place the design system is explored and tuned: a token playground first because it carries the most leverage, then derived state controls per view, then the reference for what may be changed."
+trigger_phrases:
+  - "adjustability plan"
+  - "token playground sequencing"
+  - "catalog tooling plan"
+importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:

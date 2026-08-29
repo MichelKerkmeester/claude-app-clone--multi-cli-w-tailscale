@@ -1,6 +1,11 @@
 ---
 title: "Verification checklist - Phase 10 Refine chrome"
 description: "Verification checklist for refine chrome; every item needs evidence naming a real artifact."
+trigger_phrases:
+  - "refine chrome verification checklist"
+  - "refine chrome phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

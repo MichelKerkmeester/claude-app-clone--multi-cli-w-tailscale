@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 tasks - composer/send ledger (CI + RS findings)"
 description: "Task Format: T### [P?] Description (file path). Every task cites its finding id and the real app-mobile file it touches; all tasks open at 0%."
+trigger_phrases:
+  - "composer send task ledger"
+  - "composer send phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

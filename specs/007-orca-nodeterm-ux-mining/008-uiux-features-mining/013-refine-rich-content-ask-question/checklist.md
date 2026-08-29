@@ -1,6 +1,11 @@
 ---
 title: "Verification checklist - Phase 13 Refine rich-content + ask-question"
 description: "Verification checklist for refine rich-content + ask-question; every item needs evidence naming a real artifact."
+trigger_phrases:
+  - "refine rich content ask question verification checklist"
+  - "refine rich content ask question phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

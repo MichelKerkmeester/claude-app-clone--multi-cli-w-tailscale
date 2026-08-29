@@ -1,6 +1,11 @@
 ---
 title: "Phase 13 tasks - Refine rich-content + ask-question"
 description: "Task Format: T### Description. Every task names the surface it touches; all tasks open at 0%."
+trigger_phrases:
+  - "refine rich content ask question task ledger"
+  - "refine rich content ask question phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 implementation summary — inbox and notifications (COMPLETE)"
 description: "One shipped device-local read/archive overlay plus twelve host-gated findings built as pure, fixture-tested modules that render nothing until their relay field lands: a cross-session inbox timeline with dedup, supersede and retention, an ack that clears only on the host re-broadcast, inline approvals that refuse a stale ticket, an atomic catch-up watermark, a presence-aware push hold queue, kind gates evaluated before throttling, fail-closed notification tap routing, and flash-free banner retraction."
+trigger_phrases:
+  - "host inbox notifications implementation summary"
+  - "host inbox notifications phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

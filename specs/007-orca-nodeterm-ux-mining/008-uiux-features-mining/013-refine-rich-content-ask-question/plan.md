@@ -1,6 +1,11 @@
 ---
 title: "Phase 13 plan - Refine rich-content + ask-question"
 description: "Sequenced approach for refine rich-content + ask-question: 54 screenshots, reviewed per shot, fixed in the component, proven by image diff."
+trigger_phrases:
+  - "refine rich content ask question plan approach"
+  - "refine rich content ask question phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

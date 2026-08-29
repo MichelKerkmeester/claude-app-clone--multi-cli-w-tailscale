@@ -1,6 +1,11 @@
 ---
 title: "Verification Checklist: Phase 7 Live-Activity and host DTO fields"
 description: "Verification Date: TBD. Level-2 QA items mapping to the LA/SC/CI/MA/SP/HP acceptance criteria; all open at 0%."
+trigger_phrases:
+  - "host liveactivity fields verification checklist"
+  - "host liveactivity fields phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

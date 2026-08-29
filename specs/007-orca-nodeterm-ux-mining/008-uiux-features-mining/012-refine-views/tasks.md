@@ -1,6 +1,11 @@
 ---
 title: "Phase 12 tasks - Refine views"
 description: "Task Format: T### Description. Every task names the surface it touches; all tasks open at 0%."
+trigger_phrases:
+  - "refine views task ledger"
+  - "refine views phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

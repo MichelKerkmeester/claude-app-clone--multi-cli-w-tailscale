@@ -1,6 +1,11 @@
 ---
 title: "Phase 2 tasks - streaming/reader/media ledger (SP, MA, TE, MI findings)"
 description: "Task Format: T### [P?] Description (file path). Every task cites its finding id and the real app-mobile file it touches; all tasks open at 0%."
+trigger_phrases:
+  - "streaming reader media task ledger"
+  - "streaming reader media phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

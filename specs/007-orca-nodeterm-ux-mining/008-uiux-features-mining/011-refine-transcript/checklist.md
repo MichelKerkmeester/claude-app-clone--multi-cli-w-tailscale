@@ -1,6 +1,11 @@
 ---
 title: "Verification checklist - Phase 11 Refine transcript"
 description: "Verification checklist for refine transcript; every item needs evidence naming a real artifact."
+trigger_phrases:
+  - "refine transcript verification checklist"
+  - "refine transcript phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,6 +1,11 @@
 ---
 title: "Verification Checklist: Phase 2 streaming/reader/media"
 description: "Verification Date: TBD. Level-2 QA items mapping to the SP/MA/TE/MI acceptance criteria; all open at 0%."
+trigger_phrases:
+  - "streaming reader media verification checklist"
+  - "streaming reader media phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

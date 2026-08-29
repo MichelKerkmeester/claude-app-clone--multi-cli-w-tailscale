@@ -31,6 +31,12 @@ const FAILING_SUMMARY = {
   detail: '1 of 12 checks needs attention',
 };
 
+const PENDING_SUMMARY = {
+  classification: 'pending',
+  label: 'Checks pending',
+  detail: '12 checks still running',
+};
+
 const UNKNOWN_SUMMARY = {
   classification: 'unknown',
   label: 'Checks unavailable',
@@ -43,6 +49,10 @@ export const Passing: Story = {
 
 export const Failing: Story = {
   args: { summary: FAILING_SUMMARY },
+};
+
+export const Pending: Story = {
+  args: { summary: PENDING_SUMMARY },
 };
 
 export const Unknown: Story = {

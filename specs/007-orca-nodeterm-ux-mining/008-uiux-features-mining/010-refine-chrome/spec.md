@@ -1,6 +1,11 @@
 ---
 title: "Phase 10 - Refine chrome"
 description: "Walk all 50 chrome screenshots one at a time and treat each as a UI review: analyse what it shows, debug what is wrong, then optimise and refine the component. Fix the component rather than the story, re-capture, and prove each change with a before and after diff of the shot itself. Scope: 50 screenshots. Chain: after 009-refine-artifacts · before 011-refine-transcript."
+trigger_phrases:
+  - "refine chrome spec requirements"
+  - "refine chrome phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

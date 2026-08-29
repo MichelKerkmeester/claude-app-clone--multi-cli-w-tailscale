@@ -1,6 +1,11 @@
 ---
 title: "Verification Checklist: Phase 4 a11y and onboarding"
 description: "Verification Date: TBD. Level-2 QA items mapping to the AI/OS acceptance criteria; all open at 0%."
+trigger_phrases:
+  - "a11y onboarding verification checklist"
+  - "a11y onboarding phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

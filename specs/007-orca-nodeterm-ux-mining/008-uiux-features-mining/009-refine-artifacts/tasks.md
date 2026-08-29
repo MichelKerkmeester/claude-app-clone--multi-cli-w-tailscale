@@ -1,6 +1,11 @@
 ---
 title: "Phase 9 tasks - Refine artifacts"
 description: "Task Format: T### Description. Every task names the surface it touches; all tasks open at 0%."
+trigger_phrases:
+  - "refine artifacts task ledger"
+  - "refine artifacts phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

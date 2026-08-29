@@ -42,8 +42,8 @@ const STORY_CONTROLS_CATEGORY = 'Story controls';
 type TranscriptStateControl = 'fixture' | 'empty' | 'loading' | 'cache';
 type SessionStateControl = 'from-props' | 'live-idle' | 'live-running' | 'reconnecting';
 type ChatStoryArgs = SessionProps & {
-  readonly transcriptState: TranscriptStateControl;
-  readonly sessionState: SessionStateControl;
+  readonly transcriptState?: TranscriptStateControl;
+  readonly sessionState?: SessionStateControl;
 };
 
 function transcriptForState(
@@ -57,7 +57,7 @@ function transcriptForState(
 }
 
 function sessionPropsForState(args: ChatStoryArgs): Pick<SessionProps, 'connection' | 'status'> {
-  switch (args.sessionState) {
+  switch (args.sessionState ?? 'from-props') {
     case 'live-idle':
       return { connection: 'live', status: 'idle' };
     case 'live-running':
@@ -82,15 +82,14 @@ function withoutStoryControls<T extends object, K extends keyof T>(
 }
 
 function renderChat(args: ChatStoryArgs) {
+  const transcriptState = args.transcriptState ?? 'fixture';
   const props = withoutStoryControls(args, ['transcriptState', 'sessionState', 'transcript']);
   return {
     Component: Chat,
     props: {
       ...props,
-      transcript: transcriptForState(args.transcript, args.transcriptState),
+      transcript: transcriptForState(args.transcript, transcriptState),
       ...sessionPropsForState(args),
-      transcriptState: args.transcriptState,
-      sessionState: args.sessionState,
     },
   };
 }

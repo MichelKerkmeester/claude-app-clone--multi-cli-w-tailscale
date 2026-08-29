@@ -26,8 +26,8 @@ const DEFAULT_BLOCK_COUNT = BLOCKS.length;
 
 type StreamingState = 'fixture' | 'waiting' | 'token';
 type TranscriptStoryArgs = TranscriptListProps & {
-  readonly blockCount: number;
-  readonly streamingState: StreamingState;
+  readonly blockCount?: number;
+  readonly streamingState?: StreamingState;
 };
 
 function isAssistantTextBlock(block: DisplayTranscriptBlock | undefined): boolean {
@@ -46,10 +46,22 @@ function blocksForStreamingState(
     return blocks.slice(0, end);
   }
 
-  if (isAssistantTextBlock(blocks.at(-1))) return blocks;
   const selectedIds = new Set(blocks.map((block) => block.id));
-  const token = BLOCKS.find((block) => isAssistantTextBlock(block) && !selectedIds.has(block.id));
-  return token === undefined ? blocks : [...blocks, token];
+  const tokenSource = BLOCKS.find(isAssistantTextBlock);
+  if (tokenSource === undefined || tokenSource.kind !== 'text') return blocks;
+
+  let tokenId = `${tokenSource.id}-streaming`;
+  let suffix = 1;
+  while (selectedIds.has(tokenId)) {
+    tokenId = `${tokenSource.id}-streaming-${suffix}`;
+    suffix += 1;
+  }
+
+  const prefixLength = Math.max(1, Math.floor(tokenSource.text.length / 2));
+  return [
+    ...blocks,
+    { ...tokenSource, id: tokenId, text: tokenSource.text.slice(0, prefixLength) },
+  ];
 }
 
 // The synthetic controls are story-only and must not reach the component. Naming
@@ -65,9 +77,13 @@ function withoutStoryControls<T extends object, K extends keyof T>(
 }
 
 function renderTranscript(args: TranscriptStoryArgs) {
-  const blockCount = Math.max(0, Math.min(DEFAULT_BLOCK_COUNT, Math.floor(args.blockCount)));
+  const blockCount = Math.max(
+    0,
+    Math.min(DEFAULT_BLOCK_COUNT, Math.floor(args.blockCount ?? DEFAULT_BLOCK_COUNT)),
+  );
   const slicedBlocks = BLOCKS.slice(0, blockCount);
-  const blocks = blocksForStreamingState(slicedBlocks, args.streamingState);
+  const streamingState = args.streamingState ?? 'fixture';
+  const blocks = blocksForStreamingState(slicedBlocks, streamingState);
   const props = withoutStoryControls(args, ['blockCount', 'streamingState', 'blocks']);
 
   return {
@@ -75,9 +91,7 @@ function renderTranscript(args: TranscriptStoryArgs) {
     props: {
       ...props,
       blocks,
-      running: args.streamingState === 'fixture' ? args.running : true,
-      blockCount: args.blockCount,
-      streamingState: args.streamingState,
+      running: streamingState === 'fixture' ? args.running : true,
     },
   };
 }

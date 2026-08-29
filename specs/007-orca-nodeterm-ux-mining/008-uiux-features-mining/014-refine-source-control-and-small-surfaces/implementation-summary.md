@@ -1,6 +1,11 @@
 ---
 title: "Phase 14 implementation summary — refine source control and small surfaces (COMPLETE)"
 description: "Source control used the raw brand clay as body text, which the codebase's own test forbids by name. The attachment tile's remove badge painted a 44px circle across its own status copy, so a rejected upload read as 'Phot preview unavailabl' — a defect no contrast or geometry check can see, because the text is perfectly legible right up until something is painted over it."
+trigger_phrases:
+  - "refine source control and small surfaces implementation summary"
+  - "refine source control and small surfaces phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,15 +1,21 @@
 ---
 title: "Phase 15 - Storybook designer adjustability"
 description: "Make every component, view and page adjustable by a designer inside the catalog: a live token playground that retunes the design system, derived controls for the state that hides behind object props, and a reference page for what the system says may be changed. Nothing writes a stylesheet and no production API exists to serve a story. Chain: after 014-refine-source-control-and-small-surfaces."
+trigger_phrases:
+  - "storybook designer adjustability"
+  - "token playground catalog"
+  - "derived story controls"
+  - "editable seams reference"
+importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability"
-    last_updated_at: "2026-08-29T08:00:00.000Z"
+    last_updated_at: "2026-08-29T15:05:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Design links dropped by operator decision; the retune gate is negative-controlled."
-    next_safe_action: "Close the remaining catalog defects: dead props, inert state, unreachable arg."
-    completion_pct: 92
+    recent_action: "Closed the four control defects; added the negative-controlled visibility gate."
+    next_safe_action: "Packet closed; no follow-up owed inside this phase."
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -29,9 +35,9 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P1 |
-| **Status** | In Progress |
+| **Status** | Complete |
 | **Created** | 2026-08-29 |
-| **Scope** | The catalog: 336 stories across 101 components |
+| **Scope** | The catalog: 337 stories across 101 components |
 | **Constraint** | Story-only. No production API may exist to serve a story; tokens change only through their gate |
 | **Evidence** | A control is proven by rendering two values and showing the DOM differs |
 | **Phase chain** | after `014-refine-source-control-and-small-surfaces` |
@@ -68,8 +74,11 @@ Make the catalog the place the design system is explored and tuned. Retuning a t
 
 ### Files to Change
 - `app-mobile/.storybook/` - the playground, the seams reference, and the preview hook that applies a retune.
-- `app-mobile/src/**/*.stories.ts` - derived controls, story-side only.
+- `app-mobile/src/**/*.stories.ts` - derived controls and fixture ages, story-side only.
+- `app-mobile/src/pages/chat/source-control/check-summary.svelte` - make the published classification visible.
+- `app-mobile/src/shared/fixtures/demo.ts` - one timestamp stranded away from the pinned capture clock.
 - `scripts/ui-audit.mjs` - exclude catalog tooling from the product sweep.
+- `scripts/token-override-check.mjs`, `scripts/catalog-state-visibility.mjs` - the two gates this phase adds.
 <!-- /ANCHOR:scope -->
 
 ---
@@ -80,7 +89,7 @@ Make the catalog the place the design system is explored and tuned. Retuning a t
 ### P0 - Blockers
 - REQ-001 A token edited in the catalog applies to every other story, and clearing it restores the shipped value.
 - REQ-002 No production component gains a prop, slot or export that exists only to make a story render.
-- REQ-003 Every existing story keeps its name and renders exactly what it rendered before.
+- REQ-003 Every existing story keeps its name, and no story changes its pixels except as a named state fix carrying evidence. Amended during implementation: the original wording forbade any pixel change, which would have blocked the very defects this phase exists to find. Seven shots moved, each one listed in `implementation-summary.md` with what it rendered before and after.
 - REQ-004 The token gate stays the only authority on token values; the catalog writes no stylesheet.
 
 ### P1 - Required (complete OR user-approved deferral)
@@ -97,7 +106,7 @@ Make the catalog the place the design system is explored and tuned. Retuning a t
 
 - Editing a token in the playground changes a different story's computed value, and clearing it restores the original.
 - Every page view exposes its states as controls, each shown to change the rendered DOM.
-- The archive is unchanged by the work apart from pages the work itself adds.
+- The archive changes only where a state fix requires it, every moved shot is named with its before and after, and each reproduces across two full captures.
 - Typecheck, both suites, story coverage, comment integrity and the token gate stay green.
 <!-- /ANCHOR:success-criteria -->
 

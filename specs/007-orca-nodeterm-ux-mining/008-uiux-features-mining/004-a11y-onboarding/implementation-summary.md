@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 implementation summary — accessibility, onboarding, and diagnostics (COMPLETE)"
 description: "Client implementation of the eleven accessibility and onboarding findings: Find focuses its own input, every sheet inherits back-dismiss from the shared primitive, a quick-prompts sheet fills the draft without sending, onboarding skips decisions already made, a durable queue finishes an interrupted device removal, a bounded connection log feeds a streaming self-diagnostics screen, settings rows answer to synonyms, coach-marks fire once and never over an overlay, and the notification toggle can no longer claim a permission the OS has denied."
+trigger_phrases:
+  - "a11y onboarding implementation summary"
+  - "a11y onboarding phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

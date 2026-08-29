@@ -1,6 +1,11 @@
 ---
 title: "Phase 14 plan - Refine source-control, attachments, primitives, home"
 description: "Sequenced approach for refine source-control, attachments, primitives, home: 31 screenshots, reviewed per shot, fixed in the component, proven by image diff."
+trigger_phrases:
+  - "refine source control and small surfaces plan approach"
+  - "refine source control and small surfaces phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

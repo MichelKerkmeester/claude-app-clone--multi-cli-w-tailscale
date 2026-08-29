@@ -1,6 +1,11 @@
 ---
 title: "Phase 11 implementation summary — refine transcript (COMPLETE)"
 description: "The file-preview peek cut its metadata mid-word because it emitted a class whose rule is scoped to a different component, which is the same Svelte scoping trap this file fell into once before. The command output well sliced a row in half because its window was not a whole number of lines. Both are fixed and proven by the rendered pixels, not by the diff."
+trigger_phrases:
+  - "refine transcript implementation summary"
+  - "refine transcript phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

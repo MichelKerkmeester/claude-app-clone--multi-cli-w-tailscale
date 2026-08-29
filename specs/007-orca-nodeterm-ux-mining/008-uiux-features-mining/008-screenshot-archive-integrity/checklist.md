@@ -1,6 +1,11 @@
 ---
 title: "Verification checklist - Phase 8 Screenshot archive integrity"
 description: "Verification checklist for screenshot archive integrity; every item needs evidence naming a real artifact."
+trigger_phrases:
+  - "screenshot archive integrity verification checklist"
+  - "screenshot archive integrity phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

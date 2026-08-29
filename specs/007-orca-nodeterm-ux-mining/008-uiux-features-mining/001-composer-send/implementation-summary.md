@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 implementation summary — composer and send ledger (COMPLETE)"
 description: "Client implementation of the seven composer/send findings: the textarea stays editable through transient locks, drafts and attachments park per session, an ambiguous send is held against the echoed turn before the draft returns, send delivery is modelled as accepted/rejected/unknown, a deferred error paints only in the session that raised it, repeated socket auth rejections budget to three before re-pairing, and the reusable-prompt intake ships inert behind an absent host catalog."
+trigger_phrases:
+  - "composer send implementation summary"
+  - "composer send phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

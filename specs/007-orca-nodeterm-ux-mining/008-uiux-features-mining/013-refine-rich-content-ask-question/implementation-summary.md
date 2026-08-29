@@ -1,6 +1,11 @@
 ---
 title: "Phase 13 implementation summary — refine rich content and ask question (COMPLETE)"
 description: "Every rich card in the app was rendering a CSS boilerplate comment as visible body text, three times per card, because the comments had been pasted into the Svelte markup rather than a style block. No gate could see it — garbage text has perfect contrast — and it took reading the picture to notice."
+trigger_phrases:
+  - "refine rich content ask question implementation summary"
+  - "refine rich content ask question phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

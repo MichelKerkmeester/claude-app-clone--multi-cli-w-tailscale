@@ -1,6 +1,11 @@
 ---
 title: "Phase 12 plan - Refine views"
 description: "Sequenced approach for refine views: 37 screenshots, reviewed per shot, fixed in the component, proven by image diff."
+trigger_phrases:
+  - "refine views plan approach"
+  - "refine views phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

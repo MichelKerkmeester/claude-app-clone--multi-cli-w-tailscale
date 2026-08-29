@@ -1,6 +1,11 @@
 ---
 title: "Phase 10 implementation summary — refine chrome (COMPLETE)"
 description: "Four chrome surfaces photographed identically to a neighbouring state, and the command palette rendered with no chrome at all next to a styled sibling in the same panel. The states were split between components that never represented them and stories whose arguments never reached the code path, and each was fixed on the side that was actually wrong."
+trigger_phrases:
+  - "refine chrome implementation summary"
+  - "refine chrome phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

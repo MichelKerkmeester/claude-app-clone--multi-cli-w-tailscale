@@ -963,7 +963,7 @@ function demoTodoProjection(): TodoProjectionV1 | null {
     planId: 'plan_demo_todos',
     source: 'pi',
     revision: 1,
-    updatedAt: '2026-08-18T09:05:00.000Z',
+    updatedAt: '2026-08-28T11:50:00.000Z',
     tasks:
       state === 'empty'
         ? []

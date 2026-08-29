@@ -1,6 +1,11 @@
 ---
 title: "Verification Checklist: Phase 5 host inbox and notifications"
 description: "Verification Date: TBD. Level-2 QA items mapping to the CE/AN/HP-3 acceptance criteria; all open at 0%."
+trigger_phrases:
+  - "host inbox notifications verification checklist"
+  - "host inbox notifications phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

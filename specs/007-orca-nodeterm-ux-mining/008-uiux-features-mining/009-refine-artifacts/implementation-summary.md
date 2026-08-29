@@ -1,6 +1,11 @@
 ---
 title: "Phase 9 implementation summary — refine artifacts (COMPLETE)"
 description: "Reading the artifacts shots one at a time found defects no gate in this repo could see, and they turned out to share three root causes rather than being ninety-one separate problems: an ink token that flips paired with a surface token that does not, tint colours chosen for a light surface sitting on an always-dark well, and three stories that were one picture under three names. A browser-measuring audit was built to make the class findable rather than the instance."
+trigger_phrases:
+  - "refine artifacts implementation summary"
+  - "refine artifacts phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

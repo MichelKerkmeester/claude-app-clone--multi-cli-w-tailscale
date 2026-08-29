@@ -1,6 +1,11 @@
 ---
 title: "Phase 10 tasks - Refine chrome"
 description: "Task Format: T### Description. Every task names the surface it touches; all tasks open at 0%."
+trigger_phrases:
+  - "refine chrome task ledger"
+  - "refine chrome phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,6 +1,11 @@
 ---
 title: "Phase 11 - Refine transcript"
 description: "Walk all 39 transcript screenshots one at a time and treat each as a UI review: analyse what it shows, debug what is wrong, then optimise and refine the component. Fix the component rather than the story, re-capture, and prove each change with a before and after diff of the shot itself. Scope: 39 screenshots. Chain: after 010-refine-chrome · before 012-refine-views."
+trigger_phrases:
+  - "refine transcript spec requirements"
+  - "refine transcript phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

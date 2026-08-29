@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 - Accessibility and onboarding/settings/diagnostics"
 description: "Plan the accessibility and onboarding/settings/diagnostics findings over the real app-mobile files, host-authoritative and fail-closed. Ships the Wave-1 quick-wins (autofocus the find-bar, move back-gesture sheet-dismiss into the shared Sheet primitive) plus a saved quick-prompts library, a dead-end-proof onboarding wizard, self-healing cleanup, in-app diagnostics, searchable settings, contextual coach marks, and a permission toggle that never lies. All client-side, no host field."
+trigger_phrases:
+  - "a11y onboarding spec requirements"
+  - "a11y onboarding phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 tasks - Live-Activity and host DTO-field ledger (LA + SC + CI + MA + SP + HP findings)"
 description: "Task Format: T### [P?] Description (file path). Every task cites its finding id and the real app-mobile file it touches; ready-now first, host-gated inert; all tasks open at 0%."
+trigger_phrases:
+  - "host liveactivity fields task ledger"
+  - "host liveactivity fields phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

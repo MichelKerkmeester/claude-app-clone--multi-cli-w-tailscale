@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 - Live-Activity push contract and composer/card/media host DTO fields"
 description: "Plan the Live-Activity glanceable surface plus the independent composer, card, and media host DTO fields over the real app-mobile files, host-authoritative and fail-closed. Ships the five ready-now Live-Activity pure modules (arbitration, no-tick-rerank, content fallback, stale watchdog, latched dismiss) as reusable logic for the home card and a future in-app running banner today; plans the seven host-gated findings inert behind their relay fields, each naming the exact field or RPC it needs."
+trigger_phrases:
+  - "host liveactivity fields spec requirements"
+  - "host liveactivity fields phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

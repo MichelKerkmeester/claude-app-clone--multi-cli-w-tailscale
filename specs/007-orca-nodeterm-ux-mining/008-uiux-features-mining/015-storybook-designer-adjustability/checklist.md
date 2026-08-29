@@ -1,15 +1,20 @@
 ---
 title: "Verification checklist - Phase 15 Storybook designer adjustability"
 description: "Verification checklist for the catalog adjustability work; every completed item carries evidence naming a real artifact."
+trigger_phrases:
+  - "adjustability checklist"
+  - "control proven to change render"
+  - "state visibility negative control"
+importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability"
-    last_updated_at: "2026-08-29T08:00:00.000Z"
+    last_updated_at: "2026-08-29T15:05:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the adjustability checklist alongside the shipped work."
-    next_safe_action: "Finish the remaining page views, then wire design links."
-    completion_pct: 85
+    recent_action: "Recorded the four control defects and the negative-controlled gate."
+    next_safe_action: "Packet closed; no follow-up owed inside this phase."
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
@@ -50,9 +55,9 @@ Every completed item carries evidence naming a real artifact: a command and its 
 ## TESTING
 
 - [x] CHK-019 [P0] A retune reaches a story other than the one that set it [evidence: `--accent` in `views-header--default` reads `#d97757`, then `#00ff00` with an override stored, then `#d97757` once cleared]
-- [x] CHK-020 [P0] The mechanism carrying a retune is negative-controlled [evidence: with the `beforeEach` hook removed and Storybook rebuilt, the same check reports NOT APPLIED]
+- [x] CHK-020 [P0] The mechanism carrying a retune is negative-controlled and persisted [evidence: `scripts/token-override-check.mjs` stores the override, navigates to a different story and reads the computed value there; deleting the preview `beforeEach` hook and rebuilding makes it report NOT APPLIED and exit 1, restoring the hook returns APPLIED and exit 0]
 - [x] CHK-021 [P0] Every derived control is proven to change the render [evidence: rendered twice per control through `window.__STORYBOOK_PREVIEW__` — roster ready to empty takes cards 2/0, session count 1 to 4 gives 1/2, block count 1 to 6 grows the transcript 194/698 characters]
-- [x] CHK-022 [P0] No existing story changed its pixels [evidence: `git status --porcelain screenshots` reports only the pages this work adds]
+- [x] CHK-022 [P0] Every moved shot is intended and reproduces [evidence: seven existing shots moved, each one a state fix: three todo-panel ages, two check-summary classifications, the hub that embeds one, and the stale-running card. All seven reproduced byte-identically across two full captures; the only shots differing between runs were `plan-mode-button--build` and `sandboxed-diagram--valid`, the known pre-existing flake families, both restored with `git checkout HEAD --`]
 - [x] CHK-023 [P0] Both test suites green from the final state, confirmed by content [evidence: `npm run test:web` exit 0: 114 files with 782 passed and 3 skipped, plus 83 files with 772 passed]
 - [x] CHK-024 [P1] The token gate still passes with its input named [evidence: `node scripts/token-identity.mjs verify app-mobile/src/app.css` matched all 39 goldens across light, dark and system]
 - [x] CHK-025 [P1] Story coverage passes [evidence: `node scripts/story-coverage.mjs` passes; catalog tooling sits outside its scan]
@@ -69,6 +74,10 @@ Every completed item carries evidence naming a real artifact: a command and its 
 - [x] CHK-032 [P1] The reference cannot drift from the code it describes [evidence: `editable-seams.svelte` reads markers from component sources and `app.css` at build time rather than from a kept list]
 - [x] CHK-033 [P1] Every page view exposes its states as controls [evidence: `window.__STORYBOOK_PREVIEW__` reports synthetic controls on review, inbox, enrollment and the composer; `pendingCount:0` takes buttons 6/1 and `itemCount:0` takes them 7/1]
 - [ ] CHK-034 [P1] Components link to their design source [deferred by operator decision: there is no design file for this app, possibly one in future. `@storybook/addon-designs` stays installed and unwired, and `STORYBOOK.md` records that no story declares a `design:` parameter so the gap cannot be misread as coverage]
+- [x] CHK-035 [P0] A published state is proven visible, not just emitted [evidence: `data-check-classification` now drives border and value ink; measured per theme, `passing` / `failing` / `pending` / `unknown` paint distinctly, where before `passing` and `failing` were identical in background, border and ink in both themes]
+- [x] CHK-036 [P0] A control is proven to change the render where its own stories use it [evidence: `streamingState: 'token'` was inert at the default block count while differing at counts no story sets; it now always appends a truncated assistant block and differs at counts 1, 3 and the default]
+- [x] CHK-037 [P0] The state-visibility gate is negative-controlled on every check [evidence: `scripts/catalog-state-visibility.mjs` goes red three ways - classification rules deleted, streaming append disabled, one fixture timestamp reverted - and green when all three are restored]
+- [x] CHK-038 [P1] No story reports an age the pinned clock makes impossible [evidence: the gate sweeps all 337 stories against the `2026-08-28T12:00:00.000Z` pin; the todo panel's "Updated 243 hours ago" and the running card's "240d ago" now read "10 minutes ago" and "25m ago"]
 <!-- /ANCHOR:fix-completeness -->
 
 ---

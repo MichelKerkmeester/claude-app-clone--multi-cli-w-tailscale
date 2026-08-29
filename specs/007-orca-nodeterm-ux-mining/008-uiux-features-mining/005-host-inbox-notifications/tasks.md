@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 tasks - host inbox and notifications ledger (CE, AN, HP-3)"
 description: "Task Format: T### [P?] Description (file path). Every task cites its finding id and the real app-mobile file it touches; all tasks open at 0%. Host-gated tasks marked [B]."
+trigger_phrases:
+  - "host inbox notifications task ledger"
+  - "host inbox notifications phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

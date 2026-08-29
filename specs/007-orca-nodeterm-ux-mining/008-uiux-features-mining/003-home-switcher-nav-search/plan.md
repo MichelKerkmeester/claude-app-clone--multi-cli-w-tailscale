@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 plan - home/switcher/nav/search over real files, quick-win first, fail-closed"
 description: "Sequenced approach for the home, dock, navigation, and search findings: land the HP-4 PWA app-badge quick-win first, then the search batch as one unit in session-list-seams.ts, the dock with its SD-2/SD-6 guardrails, and the navigation coordinator that unblocks later host-gated deep-linking. Proven by token-identity, test:web, a11y-parity from the final state."
+trigger_phrases:
+  - "home switcher nav search plan approach"
+  - "home switcher nav search phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,6 +1,11 @@
 ---
 title: "Phase 14 tasks - Refine source-control, attachments, primitives, home"
 description: "Task Format: T### Description. Every task names the surface it touches; all tasks open at 0%."
+trigger_phrases:
+  - "refine source control and small surfaces task ledger"
+  - "refine source control and small surfaces phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

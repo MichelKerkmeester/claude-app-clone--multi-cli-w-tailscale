@@ -1,6 +1,11 @@
 ---
 title: "Verification checklist - Phase 9 Refine artifacts"
 description: "Verification checklist for refine artifacts; every item needs evidence naming a real artifact."
+trigger_phrases:
+  - "refine artifacts verification checklist"
+  - "refine artifacts phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

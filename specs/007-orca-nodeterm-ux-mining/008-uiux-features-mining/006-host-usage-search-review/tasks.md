@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 tasks - host-gated usage/search/change-review ledger"
 description: "Task Format: T### [P?] Description (file path). Every task cites its finding id, real app-mobile file, host field, and done-condition; all open at 0%."
+trigger_phrases:
+  - "host usage search review task ledger"
+  - "host usage search review phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

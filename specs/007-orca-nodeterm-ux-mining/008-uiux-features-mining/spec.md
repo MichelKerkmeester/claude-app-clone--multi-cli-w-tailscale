@@ -1,6 +1,11 @@
 ---
 title: "Feature Specification: 008 UI/UX features mining - phase parent"
 description: "Phase parent for implementing the 99 mined orca+nodeterm UI/UX findings in the host-authoritative, fail-closed SvelteKit mobile client. Decomposes the master plan into 7 independently buildable Level-2 phase children, each a coherent surface, with every finding assigned to exactly one phase and the 2 principle-only items excluded. Phases 8-14 follow on: they own no findings and instead make the screenshot archive trustworthy, then refine every surface it exposes."
+trigger_phrases:
+  - "uiux features mining spec requirements"
+  - "uiux features mining phase"
+  - "spec requirements"
+importance_tier: "important"
 contextType: "implementation"
 _memory:
   continuity:
@@ -101,17 +106,18 @@ Per-phase file detail lives in each child's plan.md. Summary of the primary app-
 | 6 | `006-host-usage-search-review/` | Usage/quota, transcript-search RPC, change-review PR/git | UQ-1..8, SH-1, CR-1..9, TE-3, MI-1, MI-3 (21) | Host (UQ-3, UQ-6 ready now) | 2 | Complete |
 | 7 | `007-host-liveactivity-fields/` | Live-Activity push contract, composer/card/media host DTO fields, project-grouped home | LA-1..7, SC-1, SC-3, CI-3, MA-3, SP-3, HP-6 (13) | Host (LA-1/2/3/5/7 ready now) | 2 | Complete |
 
-| 8 | `008-screenshot-archive-integrity/` | Make the screenshot archive an honest record before it is used as evidence | n/a - visual QA, not finding-driven | Client | 2 | Planned |
-| 9 | `009-refine-artifacts/` | Per-shot UI refinement of the artifacts surfaces (91 shots) | n/a - screenshot-driven | Client | 2 | Planned |
-| 10 | `010-refine-chrome/` | Per-shot UI refinement of the chrome surfaces (50 shots) | n/a - screenshot-driven | Client | 2 | Planned |
-| 11 | `011-refine-transcript/` | Per-shot UI refinement of the transcript surfaces (39 shots) | n/a - screenshot-driven | Client | 2 | Planned |
-| 12 | `012-refine-views/` | Per-shot UI refinement of the whole-screen views (37 shots) | n/a - screenshot-driven | Client | 2 | Planned |
-| 13 | `013-refine-rich-content-ask-question/` | Per-shot UI refinement of rendered model output and the question card (54 shots) | n/a - screenshot-driven | Client | 2 | Planned |
-| 14 | `014-refine-source-control-and-small-surfaces/` | Per-shot UI refinement of the review hub and remaining small surfaces (31 shots) | n/a - screenshot-driven | Client | 2 | Planned |
+| 8 | `008-screenshot-archive-integrity/` | Make the screenshot archive an honest record before it is used as evidence | n/a - visual QA, not finding-driven | Client | 2 | Complete |
+| 9 | `009-refine-artifacts/` | Per-shot UI refinement of the artifacts surfaces (91 shots) | n/a - screenshot-driven | Client | 2 | Complete |
+| 10 | `010-refine-chrome/` | Per-shot UI refinement of the chrome surfaces (50 shots) | n/a - screenshot-driven | Client | 2 | Complete |
+| 11 | `011-refine-transcript/` | Per-shot UI refinement of the transcript surfaces (39 shots) | n/a - screenshot-driven | Client | 2 | Complete |
+| 12 | `012-refine-views/` | Per-shot UI refinement of the whole-screen views (37 shots) | n/a - screenshot-driven | Client | 2 | Complete |
+| 13 | `013-refine-rich-content-ask-question/` | Per-shot UI refinement of rendered model output and the question card (54 shots) | n/a - screenshot-driven | Client | 2 | Complete |
+| 14 | `014-refine-source-control-and-small-surfaces/` | Per-shot UI refinement of the review hub and remaining small surfaces (31 shots) | n/a - screenshot-driven | Client | 2 | Complete |
+| 15 | `015-storybook-designer-adjustability/` | Make every component and view adjustable by a designer inside the catalog | n/a - catalog tooling, not finding-driven | Client | 2 | Complete |
 
 Coverage: 7 + 13 + 19 + 11 + 13 + 21 + 13 = 97 assigned across phases 1-7. Plus 2 excluded = 99 total. Every finding appears in exactly one phase.
 
-Phases 8-14 are a follow-on workstream and own no mined findings. They exist because a green test suite cannot see a UI defect: phases 1-7 shipped behind passing gates while text overflowed, states rendered identically, and one card lost its styling entirely. Phase 8 makes the screenshot archive trustworthy; phases 9-14 read all 302 shots one at a time and refine the surfaces they expose, split by screenshot group so each is independently verifiable.
+Phases 8-15 are a follow-on workstream and own no mined findings. They exist because a green test suite cannot see a UI defect: phases 1-7 shipped behind passing gates while text overflowed, states rendered identically, and one card lost its styling entirely. Phase 8 makes the screenshot archive trustworthy; phases 9-14 read all 302 shots one at a time and refine the surfaces they expose, split by screenshot group so each is independently verifiable. Phase 15 turns the catalog from something a designer can only read into something they can retune, and in doing so surfaces a further defect class the shots cannot show: a control that renders no difference, which reads as coverage while proving nothing.
 
 ### Phase Transition Rules
 

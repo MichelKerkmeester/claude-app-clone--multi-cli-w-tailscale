@@ -1,6 +1,11 @@
 ---
 title: "Phase 13 - Refine rich-content + ask-question"
 description: "Walk all 54 rich-content + ask-question screenshots one at a time and treat each as a UI review: analyse what it shows, debug what is wrong, then optimise and refine the component. Fix the component rather than the story, re-capture, and prove each change with a before and after diff of the shot itself. Scope: 54 screenshots. Chain: after 012-refine-views · before 014-refine-source-control-and-small-surfaces."
+trigger_phrases:
+  - "refine rich content ask question spec requirements"
+  - "refine rich content ask question phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

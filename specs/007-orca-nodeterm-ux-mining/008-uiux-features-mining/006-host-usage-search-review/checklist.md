@@ -1,6 +1,11 @@
 ---
 title: "Verification Checklist: Phase 6 host-gated usage/search/change-review"
 description: "Verification Date: TBD. Level-2 QA items mapping to the UQ/SH/CR/TE/MI acceptance criteria; all open at 0%."
+trigger_phrases:
+  - "host usage search review verification checklist"
+  - "host usage search review phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -24,7 +24,9 @@ const SESSION: SessionCardDto = DEMO_SESSIONS.sessions[0] ?? {
 const STALE_RUNNING: SessionCardDto = {
   ...SESSION,
   status: 'running',
-  updatedAt: '2026-01-01T00:00:00.000Z',
+  // Twenty-five minutes before the catalog clock: past the twenty-minute
+  // stale threshold, still a plausible running card.
+  updatedAt: '2026-08-28T11:35:00.000Z',
 };
 
 // ───────────────────────────────────────────────────────────────────

@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 plan - a11y and onboarding over real files, quick-wins first, sheet-primitive batched"
 description: "Sequenced approach for the accessibility and onboarding/settings/diagnostics findings: land the two Wave-1 P0 quick-wins (AI-1 find-bar focus, AI-2 back-dismiss into the shared Sheet) first, sequence AI-2 before every new sheet so they inherit back-dismiss for free, then build the onboarding wizard, self-healing cleanup, diagnostics, searchable settings, coach marks, and the honest permission toggle. Proven by token-identity 0-diff, test:web, a11y-parity from the final state."
+trigger_phrases:
+  - "a11y onboarding plan approach"
+  - "a11y onboarding phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

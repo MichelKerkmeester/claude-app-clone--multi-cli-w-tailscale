@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 tasks - home/switcher/nav/search ledger (HP/SC/SD/NL/SH findings)"
 description: "Task Format: T### [P?] Description (file path). Every task cites its finding id and the real app-mobile file it touches; all tasks open at 0%."
+trigger_phrases:
+  - "home switcher nav search task ledger"
+  - "home switcher nav search phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

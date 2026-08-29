@@ -1,6 +1,11 @@
 ---
 title: "Verification checklist - Phase 14 Refine source-control, attachments, primitives, home"
 description: "Verification checklist for refine source-control, attachments, primitives, home; every item needs evidence naming a real artifact."
+trigger_phrases:
+  - "refine source control and small surfaces verification checklist"
+  - "refine source control and small surfaces phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

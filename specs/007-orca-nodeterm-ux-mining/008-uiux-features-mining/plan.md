@@ -1,6 +1,11 @@
 ---
 title: "008 implementation plan — sequencing all 99 mined UI/UX findings into buildable waves"
 description: "A prioritized, ground-checked implementation plan for every one of the 99 orca+nodeterm findings: three sequenced waves (verified quick wins, other drop-ins by surface, host-gated surfaces grouped by the capability they need) plus the 2 excluded principle-only items — each finding named as a concrete app-mobile change, mapped to real app-mobile/src paths grepped from source, sized S/M/L, and tagged with its host dependency."
+trigger_phrases:
+  - "uiux features mining plan approach"
+  - "uiux features mining phase"
+  - "plan approach"
+importance_tier: "important"
 contextType: "planning"
 _memory:
   continuity:

@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 implementation summary — home, switcher, navigation, and search (COMPLETE)"
 description: "Client implementation of the nineteen home/switcher/navigation/search findings: the roster gained a smart sort, a shared device density preference, a tool glyph and a preview-honest fuzzy search; a recent-sessions dock ships mounted over a client-local recency stack with host reconciliation; navigation became a single-slot stack-aware coordinator with background-paused polling; and one shared attention resolver now feeds the home card, the dock chip and a PWA app badge."
+trigger_phrases:
+  - "home switcher nav search implementation summary"
+  - "home switcher nav search phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

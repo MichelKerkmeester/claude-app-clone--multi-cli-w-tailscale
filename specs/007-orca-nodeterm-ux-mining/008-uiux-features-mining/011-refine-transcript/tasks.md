@@ -1,6 +1,11 @@
 ---
 title: "Phase 11 tasks - Refine transcript"
 description: "Task Format: T### Description. Every task names the surface it touches; all tasks open at 0%."
+trigger_phrases:
+  - "refine transcript task ledger"
+  - "refine transcript phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

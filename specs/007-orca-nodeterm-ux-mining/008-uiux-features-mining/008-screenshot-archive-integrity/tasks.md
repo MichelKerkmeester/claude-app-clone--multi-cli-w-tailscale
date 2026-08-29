@@ -1,6 +1,11 @@
 ---
 title: "Phase 8 tasks - Screenshot archive integrity"
 description: "Task Format: T### Description. Every task names the surface it touches; all tasks open at 0%."
+trigger_phrases:
+  - "screenshot archive integrity task ledger"
+  - "screenshot archive integrity phase"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 plan - composer/send over real files, quick-wins first, fail-closed"
 description: "Sequenced approach for the composer and send-ambiguity findings: land the four Wave-1 P0 quick-wins (CI-4 editability, CI-1 keyed draft cache, CI-2 hold-before-restore, RS-1 three-outcome send) first, then RS-2 scope-safe deferred error and RS-3 rejection latch, then the host-gated CI-5 picker as an inert scaffold. Proven by token-identity 0-diff, test:web, a11y-parity from the final state."
+trigger_phrases:
+  - "composer send plan approach"
+  - "composer send phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

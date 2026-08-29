@@ -1,6 +1,11 @@
 ---
 title: "Verification checklist - Phase 12 Refine views"
 description: "Verification checklist for refine views; every item needs evidence naming a real artifact."
+trigger_phrases:
+  - "refine views verification checklist"
+  - "refine views phase"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

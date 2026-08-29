@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 implementation summary — usage, search, and change review (COMPLETE)"
 description: "Five ready-now findings shipped as tested pure logic — a boundary-aligned usage countdown, a used/remaining toggle, a usage severity colour deliberately separate from the context meter, a debounced cross-session search harness, and host-resolved prose paths — alongside sixteen host-gated findings built as capability-checked surfaces that render nothing without their relay field, including a full source-control hub, account usage windows, and a branch entry."
+trigger_phrases:
+  - "host usage search review implementation summary"
+  - "host usage search review phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

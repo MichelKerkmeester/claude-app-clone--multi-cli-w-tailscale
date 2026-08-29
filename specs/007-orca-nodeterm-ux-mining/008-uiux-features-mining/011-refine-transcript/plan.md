@@ -1,6 +1,11 @@
 ---
 title: "Phase 11 plan - Refine transcript"
 description: "Sequenced approach for refine transcript: 39 screenshots, reviewed per shot, fixed in the component, proven by image diff."
+trigger_phrases:
+  - "refine transcript plan approach"
+  - "refine transcript phase"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,6 +1,11 @@
 ---
 title: "Phase 2 implementation summary — streaming, reader, and media (COMPLETE)"
 description: "Client implementation of the thirteen streaming/reader/media findings: a running turn reads clearly, artifacts gained dimensions and a find stepper, a patch renders by line, the transcript pinches to scale, and the markdown sanitization boundary gained a sandboxed diagram path, one fail-closed scheme gate, inert file-path classification, and an in-app link overlay."
+trigger_phrases:
+  - "streaming reader media implementation summary"
+  - "streaming reader media phase"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

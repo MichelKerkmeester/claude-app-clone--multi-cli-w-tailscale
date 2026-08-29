@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 - Composer input and send-ambiguity"
 description: "Plan the composer/input surface and the send-ambiguity findings over the real app-mobile composer and transport files, host-authoritative and fail-closed. Ships the Wave-1 quick-wins (never-disable-the-textarea, per-session draft+attachment cache, hold-before-restore, three-outcome send) plus the scope-safe deferred error and the rejection-budget latch; plans the host-gated unified slash/skills picker inert behind its catalog RPC."
+trigger_phrases:
+  - "composer send spec requirements"
+  - "composer send phase"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

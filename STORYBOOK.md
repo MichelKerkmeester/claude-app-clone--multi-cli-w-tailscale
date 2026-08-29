@@ -22,8 +22,60 @@ Your browser opens automatically at the catalog. No other setup.
   surface re-inks through the real design tokens. The look is identical to the shipped app.
 - **A Docs tab** per component — an auto-generated page describing it and its options.
 - **An Accessibility panel** — automatic contrast / a11y checks on the component you're viewing.
+- **A Design section** — a token playground and an editable-seams reference (see below).
 
-Nothing here changes the app; it's a read-only catalog for looking and reviewing.
+Nothing here writes to the app. The playground changes what *you* see in *your* browser; the app's
+stylesheet is never touched.
+
+---
+
+## For designers
+
+Three surfaces under **Design** let you change things instead of only looking at them.
+
+### Token playground
+
+Every custom property the stylesheets declare, grouped and editable. Change one and **every story
+moves**, not just the page you are on, and it stays changed for your browser until you clear it.
+
+**Copy CSS** gives you back only what you changed, as a `:root` block to paste. The catalog
+deliberately writes no stylesheet — `scripts/token-identity.mjs` stays the one authority on what a
+token is, so a retune reaches the app only when someone applies that block and the gate accepts it.
+
+### The `flips` badge
+
+Marks a token whose light and dark values differ. **Overriding one pins it flat across both themes.**
+Worth reading before you change anything: pairing a surface that does not flip with an ink that does
+is exactly what once made a whole theme render text in its own background colour.
+
+### State controls
+
+Page views expose plain controls — roster and queue state, counts, streaming state, attachments,
+capability flags — that the story maps onto the real props. Reach a screen's states from a dropdown
+instead of editing an object literal. A control that changes nothing is treated as a defect here, and
+`scripts/catalog-state-visibility.mjs` fails the build over it.
+
+### Editable seams
+
+A page listing what the design system invites you to change and what is frozen, read out of the
+component source and `app.css` at build time — so it cannot drift from the code it describes.
+
+---
+
+## The screenshot archive
+
+`screenshots/` holds one image per story, tracked in git, with `MANIFEST.json` recording every story
+including the ones that render nothing visible. Re-capture with `npm run story:shots` after any
+rendering change and commit the shots alongside it.
+
+Two things to know before you read a diff:
+
+- **The archive is not byte-stable.** A few stories flake under concurrent capture — measured at five
+  differing runs out of five, on both the current capture and a pre-change one. A moved shot is a
+  flake only after a re-capture puts it back; if it stays changed, it is a real change and needs a
+  reason.
+- **It is captured in one theme.** `node scripts/ui-audit.mjs` renders every story in light *and*
+  dark and is the only gate that sees the other one. An entire defect class once existed only in dark.
 
 ---
 
@@ -55,10 +107,23 @@ entries. This is what keeps the catalog self-maintaining as the app grows.
 
 ### Verify a change didn't break rendering
 
+Run these in order after any rendering change. Each catches something the others cannot.
+
 ```bash
-npm run build-storybook -w @pi-remote/web   # the catalog compiles
-node scripts/catalog-smoke-cdp.mjs          # every story renders, light + dark, zero throws
+npm run build-storybook -w @pi-remote/web    # the catalog compiles
+node scripts/catalog-smoke-cdp.mjs           # every story renders, light + dark, zero throws
+node scripts/catalog-state-visibility.mjs    # no invisible state, no inert control, no impossible age
+node scripts/token-override-check.mjs        # the playground still retunes other stories
+node scripts/ui-audit.mjs                    # contrast, clipping, collision, touch targets — both themes
+npm run story:shots                          # re-capture the archive
 ```
+
+`catalog-state-visibility.mjs` deserves a word, because it exists for defects that passed every other
+gate: a check summary published its state as a data attribute no CSS read, so passing and failing were
+**identical in background, border and ink**; a streaming control rendered no difference at the block
+count its own stories used; and two fixtures had drifted ten days from the pinned capture clock, so a
+panel claimed "Updated 243 hours ago". Typecheck, both suites, story coverage and the render gate were
+green through all three.
 
 ### The addons
 

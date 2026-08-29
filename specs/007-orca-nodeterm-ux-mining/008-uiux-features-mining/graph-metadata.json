@@ -18,7 +18,8 @@
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/012-refine-views",
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/013-refine-rich-content-ask-question",
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces",
-    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability"
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/016-reference-structure-and-doc-accuracy"
   ],
   "manual": {
     "depends_on": [],
@@ -175,7 +176,7 @@
       "plan.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:aefc4d97e7c85598b1091ca0c9300607c86ed0137e408b62f34658bb6184c95c",
+    "source_fingerprint": "sha256:e264bc2399f1ec526be6981df6aae8293efa75f47ff9aa9f8ddc005feac7c1c5",
     "source_doc_hashes": {
       "spec.md": "14a5c7bd8206740f534527c3bca587f4793be235a8a5a38214933f66e7ffb3f0",
       "plan.md": "355fef2ae12bb548b1964ef68aff51930cd2ea2e969108ed5265ce97e33e8a5e",

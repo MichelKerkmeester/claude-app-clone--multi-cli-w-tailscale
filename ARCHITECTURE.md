@@ -49,9 +49,9 @@ The relay persists only redacted envelopes before it broadcasts anything, and mu
 - app-relay/src/approval/final-gate.ts (`verifyFinalGate`)
 - app-relay/src/http/server.ts (`startReadOnlyServer`, `handleExtensionAuthority`)
 - extensions/pi-remote-approval/src/index.ts (`createFinalBoundaryHandler`, `createRelayLeaseAuthorizer`)
-- app-mobile/src/shared/data/state.ts (`transcriptReducer`), app-mobile/src/shared/data/relay.ts, app-mobile/src/shared/data/cache.ts
+- app-mobile/src/shared/state/state.ts (`transcriptReducer`), app-mobile/src/shared/transport/relay.ts, app-mobile/src/shared/transport/cache.ts
 - deploy/containment/pi-remote.sb
-- docs/security.md, docs/release-verification.md, docs/setup.md
+- The operator documentation, which lives in the `sk-code-mobile-cli` skill rather than in this repository (see §9)
 
 ### Prerequisites
 
@@ -435,6 +435,29 @@ Run from the Pi Remote app directory.
 | `thresholds_pass`   | `npm run release:thresholds` | enforces `replaySnapshotBytes`, `storageGrowthBytes`, `restartRecoveryMs`, and `bundleGzipBytes` from release/thresholds.json |
 | `rollout_readiness` | `npm run release:rollout`    | evaluates stages `read-only`, `protected-mutation`, and `optional-push` against release/rollout.json                          |
 
+### Presentation Gates
+
+The gates above prove the system behaves. None of them can see whether a surface renders correctly —
+a component mounts, passes its tests and still shows text in its own background colour. These are the
+gates for that, and each exists because that failure shipped green through the ones above.
+
+| Checkpoint                  | Command                                    | Pass condition                                                                                  |
+| --------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `tokens_preserved`          | `node scripts/token-identity.mjs verify app-mobile/src/app.css` | every frozen golden still resolves the same across light, dark and system |
+| `stories_cover_components`  | `npm run story:coverage`                   | every renderable component has a co-located story, and no allowlist entry is stale               |
+| `catalog_renders`           | `node scripts/catalog-smoke-cdp.mjs`       | every story renders in both themes with zero throws                                              |
+| `states_are_visible`        | `node scripts/catalog-state-visibility.mjs` | no published state paints identically to its siblings, no control is inert, no age is impossible  |
+| `retune_reaches_catalog`    | `node scripts/token-override-check.mjs`    | a stored token override applies to a different story and clears cleanly                          |
+| `surfaces_are_legible`      | `node scripts/ui-audit.mjs`                | zero high or medium findings for contrast, clipping, control collision and text occlusion, in BOTH themes |
+| `archive_matches`           | `npm run story:shots`                      | every moved screenshot is an intended change; unexplained movement is a regression               |
+
+Two properties of this set are worth stating, because both have caused wrong conclusions here. The
+screenshot archive is captured in **one** theme, so `ui-audit.mjs` is the only gate that sees the
+other — an entire defect class once existed only in dark. And the archive is **not** byte-stable: a
+small set of stories flake under concurrent capture, measured at five differing runs out of five on
+both a current and a pre-change capture, so a single pair of runs cannot distinguish a real change
+from noise.
+
 ### Gate Decision Logic
 
 ```markdown
@@ -459,6 +482,9 @@ The machine suite cannot prove:
 - Actual protected tool execution inside `deploy/containment/pi-remote.sb`
 - Tailscale Serve identity and Funnel absence on the target tailnet
 - Physical device push delivery
+- Whether a surface *looks* right: the presentation gates measure contrast, geometry and state
+  difference, but semantic defects — a comment rendered as body text, two states differing only in
+  copy — pass every one of them and are found by reading the screenshots
 
 Each of these is a separate evidence row in release/rollout.json. `npm run release:verify -- --measurements <relative-file> --operator-evidence <relative-file>` accepts schema-versioned operator measurements and evidence.
 
@@ -466,12 +492,17 @@ Each of these is a separate evidence row in release/rollout.json. `npm run relea
 
 ## 9. REFERENCES AND RELATED RESOURCES
 
-- docs/security.md: Posture boundaries, exact-action approval, kill switch, containment, and redaction detail
-- docs/release-verification.md: Machine gates, numeric thresholds, stage readiness, and rollback evidence
-- docs/setup.md: Tailscale Serve deployment, phone enrollment, and the pinned live Pi version
-- docs/operations.md: Runtime operations
-- docs/incident-playbooks.md: Recovery procedures
-- docs/platform-support.md: Notification and offline limits
+The operator documentation moved into the `sk-code-mobile-cli` skill, under
+`.opencode/skills/sk-code/sk-code-mobile-cli/references/`, so a single copy serves both this
+repository and the agent surface that reads it:
+
+- `standards/security.md`: Posture boundaries, exact-action approval, kill switch, containment, and redaction detail
+- `release/release-verification.md`: Machine gates, numeric thresholds, stage readiness, and rollback evidence
+- `setup/setup.md`: Tailscale Serve deployment, phone enrollment, and the pinned live Pi version
+- `operations/operations.md`: Runtime operations
+- `operations/incident-playbooks.md`: Recovery procedures
+- `standards/platform-support.md`: Notification and offline limits
+- `design-system/design-system.md`, `verification/verification.md`: The design-system value model and the browser-free gate that proves a change preserved it
 - release/rollout.json: Stage definitions and kill switches
 - release/thresholds.json: Numeric threshold authority
 - deploy/containment/pi-remote.sb: macOS sandbox-exec containment profile

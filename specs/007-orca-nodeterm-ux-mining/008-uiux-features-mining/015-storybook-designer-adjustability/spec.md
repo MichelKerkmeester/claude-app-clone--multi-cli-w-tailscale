@@ -40,7 +40,7 @@ _memory:
 | **Scope** | The catalog: 337 stories across 101 components |
 | **Constraint** | Story-only. No production API may exist to serve a story; tokens change only through their gate |
 | **Evidence** | A control is proven by rendering two values and showing the DOM differs |
-| **Phase chain** | after `014-refine-source-control-and-small-surfaces` |
+| **Phase chain** | after `014-refine-source-control-and-small-surfaces` · before `016-reference-structure-and-doc-accuracy` |
 <!-- /ANCHOR:metadata -->
 
 ---

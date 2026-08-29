@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability",
-  "spec_folder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability",
+  "packet_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/016-reference-structure-and-doc-accuracy",
+  "spec_folder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/016-reference-structure-and-doc-accuracy",
   "parent_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining",
   "children_ids": [],
   "manual": {
@@ -180,7 +180,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "A designer opening the catalog can read every surface and change almost nothing about them",
+    "causal_summary": "The surface skill's reference folder held fourteen loose documents beside six grouped ones, and the two documents that describe the app to a newcomer named directories the SvelteKit migration had removed",
     "created_at": "2026-08-29T08:38:16.595Z",
     "last_save_at": "2026-08-29T08:59:23.001Z",
     "save_lineage": "graph_only",
@@ -192,7 +192,7 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:28fab29ffebf5fbe49034ad67e5196c87a8f2ef8a900c29d98eaea5a39d66ae0",
+    "source_fingerprint": "sha256:c3d98fdf080ce2e20cc33c0f73ef7a3ffa6d8f461fcb68b60534b7e494c9da2f",
     "source_doc_hashes": {
       "spec.md": "2332a29285a16ac6edbbb13d6dec1524cdc251ee187c4d53367fd42b740e1427",
       "plan.md": "fa0dc0ce3148c465bf78e0ae6fa6fbfd08f1b68129bb57754cb827f496b7185a",

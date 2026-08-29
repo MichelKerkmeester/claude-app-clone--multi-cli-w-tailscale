@@ -7,9 +7,9 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability"
     last_updated_at: "2026-08-29T08:00:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the adjustability phase alongside the work already shipped."
-    next_safe_action: "Finish the remaining page views, then wire design links."
-    completion_pct: 85
+    recent_action: "Design links dropped by operator decision; the retune gate is negative-controlled."
+    next_safe_action: "Close the remaining catalog defects: dead props, inert state, unreachable arg."
+    completion_pct: 92
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -132,7 +132,7 @@ The token list and the seams reference are read from source at build time, so ne
 <!-- ANCHOR:questions -->
 ## 7. OPEN QUESTIONS
 
-- Which Figma file and frames should each component link to? The addon is installed and unused; the links are not knowable from the repository.
+- ~~Which design source should each component link to?~~ Answered by the operator: there is no design file for this app, possibly one in future. Design links are out of scope; the addon stays installed and unwired.
 - Should the seams reference stay one page, or be split per component into autodocs? One page cannot rot; per-component text would need generating.
 <!-- /ANCHOR:questions -->
 

@@ -7,10 +7,10 @@ _memory:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability"
     last_updated_at: "2026-08-29T08:58:21.995Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Shipped the playground, controls on every page view, and the seams reference."
-    next_safe_action: "Obtain Figma file and frame URLs from the operator to wire design links."
-    blockers: ["Design links need Figma file and frame URLs the repository does not carry."]
-    completion_pct: 85
+    recent_action: "Negative-controlled the persisted token-override gate; design links dropped."
+    next_safe_action: "Close the remaining catalog defects: dead props, inert state, unreachable arg."
+    blockers: []
+    completion_pct: 92
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: impl-summary-core | v2.2 -->
@@ -91,8 +91,14 @@ gap — 142 props resolve to a raw object editor — which is what the derived c
 
 - A retune reaches other stories: `--accent` in `views-header--default` reads `#d97757`, then
   `#00ff00` with an override stored, then `#d97757` once cleared.
-- That mechanism is negative-controlled: with the preview hook removed and Storybook rebuilt, the same
-  check reports the override NOT APPLIED, so the green means the hook and not something incidental.
+- That check is persisted as `scripts/token-override-check.mjs`, so the mechanism keeps being proven
+  rather than having been proven once. It is end-to-end by construction: it stores the override the way
+  the playground does, navigates to a different story, and reads the computed value there.
+- The gate is negative-controlled. Deleting the preview's `beforeEach` hook and rebuilding makes it
+  report `NOT APPLIED` and exit 1; restoring the hook and rebuilding returns `APPLIED` and exit 0. The
+  green therefore means the hook, not something incidental. That hook is the whole mechanism and
+  nothing else in the repository fails when it is removed — typecheck, both suites, story coverage and
+  the token gate all stay green while a designer's retune silently stops reaching other surfaces.
 - Controls are proven behavioural, not merely present: roster ready to empty takes rendered cards
   2/0, session count 1 to 4 gives 1/2, block count 1 to 6 grows the transcript 194/698 characters.
 - `npm run typecheck -w @pi-remote/web` — 1250 files, 0 errors (6 warnings, the standing baseline).
@@ -110,9 +116,9 @@ gap — 142 props resolve to a raw object editor — which is what the derived c
 - **The composer's enrollment control covers two phases, not every state the screen can reach.** The
   screen renders more than `unenrolled` and `authenticating`; the control exposes the branches the
   component actually has a story path for, and the rest stay reachable only through the real host.
-- **Design links are blocked on information the repository does not hold.** The addon is installed and
-  unused; the Figma file and frame URLs have to come from the operator, and inventing them would put
-  a wrong link beside every component.
+- **There are no design links, by decision rather than by omission.** The operator confirmed no design
+  file exists for this app, possibly one in future. The addon stays installed and unwired; `STORYBOOK.md`
+  records that no story declares a `design:` parameter, so the gap cannot later be misread as coverage.
 - **Two themes cannot be shown side by side.** All seventeen dark rule groups are scoped to `:root`,
   so a container cannot switch theme. The toolbar toggle and the two-theme audit cover the need;
   panes would require rewriting theme selectors, which the token gate governs.

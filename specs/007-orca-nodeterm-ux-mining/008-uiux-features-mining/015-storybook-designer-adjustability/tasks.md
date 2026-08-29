@@ -45,7 +45,7 @@ _memory:
 - [x] T2.5 Give the page views derived state controls [evidence: Home, SessionCard, TranscriptList and Chat expose roster state, session count, block count and streaming state]
 - [x] T2.6 Extend derived controls to the remaining page views and object-prop components [evidence: review gains `queueState` and `pendingCount`, inbox `inboxState` and `itemCount`, enrollment `enrollmentPhase`, and the composer six controls; `pendingCount:0` takes rendered buttons 6/1 and `itemCount:0` takes them 7/1]
 - [x] T2.7 Make the system's editable and frozen markers readable in the catalog [evidence: `app-mobile/.storybook/editable-seams.svelte` reads the markers from source; 100 seams and 185 frozen notes across 58 files]
-- [ ] T2.8 Wire design links per component [deferred: `@storybook/addon-designs` is installed and unused; the Figma file and frame URLs are not knowable from the repository and must come from the operator]
+- [ ] T2.8 Wire design links per component [deferred by operator decision: no design file exists for this app, possibly one in future; the addon stays installed and unwired]
 <!-- /ANCHOR:phase-2 -->
 
 ---

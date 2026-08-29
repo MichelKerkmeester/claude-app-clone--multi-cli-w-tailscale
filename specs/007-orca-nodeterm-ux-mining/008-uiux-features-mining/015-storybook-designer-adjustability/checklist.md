@@ -68,7 +68,7 @@ Every completed item carries evidence naming a real artifact: a command and its 
 - [x] CHK-031 [P0] A token that behaves differently per theme is surfaced [evidence: the playground flags `--ink-inverse` and `--canvas`; `--surface-code`, `--on-code` and `--space-4` correctly carry no flag]
 - [x] CHK-032 [P1] The reference cannot drift from the code it describes [evidence: `editable-seams.svelte` reads markers from component sources and `app.css` at build time rather than from a kept list]
 - [x] CHK-033 [P1] Every page view exposes its states as controls [evidence: `window.__STORYBOOK_PREVIEW__` reports synthetic controls on review, inbox, enrollment and the composer; `pendingCount:0` takes buttons 6/1 and `itemCount:0` takes them 7/1]
-- [ ] CHK-034 [P1] Components link to their design source [deferred: `@storybook/addon-designs` is installed and unused; the Figma URLs are not knowable from the repository]
+- [ ] CHK-034 [P1] Components link to their design source [deferred by operator decision: there is no design file for this app, possibly one in future. `@storybook/addon-designs` stays installed and unwired, and `STORYBOOK.md` records that no story declares a `design:` parameter so the gap cannot be misread as coverage]
 <!-- /ANCHOR:fix-completeness -->
 
 ---

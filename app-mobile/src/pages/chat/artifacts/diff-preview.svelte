@@ -320,10 +320,10 @@
     padding-inline: var(--space-3);
   }
 
-  /* This slot: gutter — old or new line number; not part of copied source. */
+  /* This slot: gutter — old or new line number; muted-on-code ink because the well does not flip. */
   .artifact-diff--old,
   .artifact-diff--new {
-    color: var(--ink-muted);
+    color: var(--on-code-muted);
     text-align: end;
     user-select: none;
     -webkit-user-select: none;

@@ -235,7 +235,7 @@
     min-block-size: 44px;
     align-items: center;
     margin-block-start: var(--space-4);
-    color: var(--accent);
+    color: var(--accent-ink);
     font-weight: 700;
   }
 </style>

@@ -284,7 +284,7 @@
     align-content: start;
     padding: 1rem 0.7rem;
     border-inline-end: 1px solid #6c6a65;
-    color: #6c6a65;
+    color: #9f998f;
     text-align: end;
     user-select: none;
     -webkit-user-select: none;

@@ -153,12 +153,29 @@ const AUDIT = () => {
   // ── Clipped content ──────────────────────────────────────────────
   // Only `hidden` counts: `auto`/`scroll` is a deliberate pan affordance,
   // and a clip on a one-line ellipsis is an intended truncation.
+  //
+  // Two more shapes are excluded because they overflow by design. A form
+  // control scrolls its own value natively, so its scrollWidth always exceeds
+  // its box once the value is long enough. And a box whose overflow comes only
+  // from absolutely positioned children is a decorative bleed — a motif laid
+  // over the panel and trimmed at its edge — not content put out of reach.
+  const bleedsDecoratively = (el) => {
+    const rect = el.getBoundingClientRect();
+    const out = [...el.querySelectorAll('*')].filter((child) => {
+      const r = child.getBoundingClientRect();
+      return r.right > rect.right + 1 || r.bottom > rect.bottom + 1;
+    });
+    return out.length > 0 && out.every((child) => getComputedStyle(child).position === 'absolute');
+  };
+
   for (const el of all) {
+    if (el.matches('input, textarea, select')) continue;
     const cs = getComputedStyle(el);
     const rect = el.getBoundingClientRect();
     const clipsX = cs.overflowX === 'hidden' || cs.overflowX === 'clip';
     const clipsY = cs.overflowY === 'hidden' || cs.overflowY === 'clip';
     const ellipsis = cs.textOverflow === 'ellipsis';
+    if ((clipsX || clipsY) && bleedsDecoratively(el)) continue;
     if (clipsX && !ellipsis && el.scrollWidth > Math.ceil(rect.width) + CLIP_SLACK) {
       add('CLIP_X', 'high', `${el.scrollWidth}px of content in a ${Math.round(rect.width)}px box`, describe(el));
     }

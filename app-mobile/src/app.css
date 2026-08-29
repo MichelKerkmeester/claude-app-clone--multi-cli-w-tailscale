@@ -120,6 +120,7 @@
   --on-accent-text: #24221f;            /* AA-dark text on an accent fill: 5.08:1 on clay, both themes */
   --on-danger: var(--canvas);           /* content on a --danger fill; --canvas flips so AA holds both themes */
   --on-code: #f8f8f6;                   /* ink for the theme-invariant code surface */
+  --on-code-muted: #9f998f;             /* muted ink for the theme-invariant code surface */
   --scrim: color-mix(in srgb, #24221f 56%, transparent);  /* the fixed dark overlay backdrop, one source */
   --action-bg: var(--pi-carbon);
   --action-fg: var(--pi-bone);

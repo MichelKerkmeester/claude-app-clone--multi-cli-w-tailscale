@@ -293,6 +293,13 @@
     color: var(--slash-muted);
   }
 
+  /* This state: active — modestly strengthens secondary copy against the selected surface
+     while preserving its hierarchy beneath the primary command label. */
+  .slash--option[data-focused] .slash--desc,
+  .slash--option[data-focused] .slash-source {
+    color: color-mix(in srgb, var(--slash-muted) 85%, var(--slash-ink) 15%);
+  }
+
   /* Keep this rule aligned with its surrounding surface. */
   .slash--confirm {
     color: var(--slash-accent);

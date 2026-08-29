@@ -225,7 +225,7 @@
     display: inline-flex;
     min-block-size: 44px;
     align-items: center;
-    color: var(--accent);
+    color: var(--accent-ink);
     font-weight: 700;
   }
 </style>

@@ -110,7 +110,7 @@
 
   /* This state: commented — supplies a restrained informational cue. */
   .source-control-reviewer-list--row.is-commented .source-control-reviewer-list--status {
-    color: var(--accent);
+    color: var(--accent-ink);
   }
 
   /* This state: pending — supplies a restrained pending cue. */

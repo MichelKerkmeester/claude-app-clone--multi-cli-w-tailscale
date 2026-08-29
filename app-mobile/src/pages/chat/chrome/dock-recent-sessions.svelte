@@ -440,6 +440,12 @@
     line-height: 1;
   }
 
+  /* This state: selected — modestly strengthens the overflow cue against the selected surface
+     while preserving its subordinate role beside the session label. */
+  .recent-sessions--chip.is-selected :global(.recent-sessions--more) {
+    color: color-mix(in srgb, var(--dock-muted) 85%, var(--dock-ink) 15%);
+  }
+
   /* Keeps the menu trigger visibly interactive without relying on a sticky touch hover. */
   :global(.recent-sessions--more[data-hovered]) {
     background: var(--dock-surface-selected);

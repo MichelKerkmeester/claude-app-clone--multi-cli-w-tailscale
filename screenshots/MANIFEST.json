@@ -4,10 +4,10 @@
   "deviceScaleFactor": 1,
   "cropsToContent": true,
   "transparentBackground": true,
-  "total": 335,
-  "captured": 309,
+  "total": 336,
+  "captured": 310,
   "visuallyEmpty": 26,
-  "unstable": 1,
+  "unstable": 0,
   "failed": 0,
   "entries": [
     {
@@ -1711,6 +1711,15 @@
       "backdrop": "canvas"
     },
     {
+      "id": "design-editable-seams--reference",
+      "title": "Design/Editable seams",
+      "name": "Reference",
+      "ok": true,
+      "rel": "design/editable-seams--reference.png",
+      "size": "394x18003",
+      "backdrop": "canvas"
+    },
+    {
       "id": "design-token-playground--playground",
       "title": "Design/Token playground",
       "name": "Playground",
@@ -2697,8 +2706,7 @@
       "ok": true,
       "rel": "views/review--focused.png",
       "size": "362x1425",
-      "backdrop": "canvas",
-      "unstable": true
+      "backdrop": "canvas"
     },
     {
       "id": "views-review--host-error",

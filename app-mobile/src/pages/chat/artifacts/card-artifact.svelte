@@ -193,7 +193,7 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--surface-code);
-    color: var(--ink-inverse);
+    color: var(--on-code);
     font-family: var(--font-mono);
     font-size: 0.72rem;
     line-height: 1.45;

@@ -267,6 +267,11 @@
     font-style: italic;
   }
 
+  /* This state: dark — re-ink the transparent markdown well. */
+  :global(:root[data-theme='dark']) .artifact-markdown--preview {
+    color: #f8f8f6;
+  }
+
   /* This state: dark — dark-theme re-inks (foreign ancestor via :global). */
   :global(:root[data-theme='dark']) .artifact-markdown--image {
     color: #9f998f;

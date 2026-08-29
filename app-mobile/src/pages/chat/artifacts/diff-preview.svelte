@@ -223,9 +223,9 @@
 <!-- This surface: artifact-diff--preview — the unified-diff read well + per-line add/remove/find tints.
      Decomposed into this scoped block; the .artifact-diff--preview base merges the shared well-guardrail group
      (overflow/overscroll/user-select) with the diff-specific layout into one faithful rule. The add/
-     remove tints read --diff-add/--diff-remove tokens (system-dark remaps the token); the explicit
-     :root[data-theme='dark'] literal overrides use :global(:root[data-theme='dark']). is-wrapped /
-     is-find-match are per-element modifiers local to this component. Values unchanged. -->
+     remove tints read --diff-add/--diff-remove tokens; those tokens and the find-match tint stay
+     invariant because the well is a theme-invariant dark surface. is-wrapped / is-find-match are
+     per-element modifiers local to this component. Values unchanged. -->
 <style>
   /* This slot: diff-well — the unified-diff read-out. */
   /* Do not edit — Fixed reading well; selectable and pan-scoped; never overflow the page. */
@@ -240,7 +240,7 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
     background: var(--surface-code);
-    color: var(--ink-inverse);
+    color: var(--on-code);
     font-family: var(--font-mono);
     font-size: 0.8rem;
     line-height: 1.65;
@@ -262,33 +262,18 @@
     display: block;
   }
 
-  /* This state: add — inserted line tint (token; system-dark remaps --diff-add). */
+  /* This state: add — inserted line tint (token; invariant because the well is). */
   .artifact-diff--add {
     background: color-mix(in oklch, var(--diff-add) 90%, transparent);
   }
 
-  /* This state: remove — deleted line tint (token; system-dark remaps --diff-remove). */
+  /* This state: remove — deleted line tint (token; invariant because the well is). */
   .artifact-diff--remove {
     background: color-mix(in oklch, var(--diff-remove) 90%, transparent);
   }
 
-  /* This state: find-match — highlighted find hit. */
+  /* This state: find-match — highlighted find hit (invariant because the well is). */
   .artifact-diff--line.is-find-match {
-    background: #f3e4de;
-  }
-
-  /* This state: dark — explicit dark-theme tints (foreign ancestor via :global). */
-  :global(:root[data-theme='dark']) .artifact-diff--add {
-    background: #3a2720;
-  }
-
-  /* Keep this rule aligned with its surrounding surface. */
-  :global(:root[data-theme='dark']) .artifact-diff--remove {
-    background: #3a2720;
-  }
-
-  /* Keep this rule aligned with its surrounding surface. */
-  :global(:root[data-theme='dark']) .artifact-diff--line.is-find-match {
     background: #3a2720;
   }
 

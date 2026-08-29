@@ -26,6 +26,10 @@ deploy/serve.env
 # Local symlink to shared external subagent tooling — not part of the app.
 .pi-subagents
 
+# Regenerated on every `node scripts/ui-audit.mjs` run; the script is the
+# durable artefact, its report is not.
+/ui-audit.json
+
 # Track spec packets in this app repo (override ~/.gitignore_global /specs)
 !/specs
 !/specs/**

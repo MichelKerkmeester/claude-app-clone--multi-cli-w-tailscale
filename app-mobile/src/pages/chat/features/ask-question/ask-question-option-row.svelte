@@ -78,7 +78,7 @@
   .ask-question-option--row[aria-pressed='true'] {
     border-color: var(--ink);
     background: var(--surface-code);
-    color: var(--ink-inverse);
+    color: var(--on-code);
   }
 
   /* Do not edit — focus-visible — The shared AA focus ring across option rows, free text, and submit. */

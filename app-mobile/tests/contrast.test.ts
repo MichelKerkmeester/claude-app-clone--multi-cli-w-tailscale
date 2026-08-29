@@ -254,7 +254,7 @@ describe('ask-question accessibility palette and state contract', () => {
 
   it('uses carbon selected rows, clay focus rings, and safe responsive primitives', () => {
     expect(STYLE).toMatch(
-      /\.ask-question-option--row\[aria-pressed='true'\][\s\S]*?background: var\(--surface-code\);[\s\S]*?color: var\(--ink-inverse\);/u,
+      /\.ask-question-option--row\[aria-pressed='true'\][\s\S]*?background: var\(--surface-code\);[\s\S]*?color: var\(--on-code\);/u,
     );
     expect(STYLE).toMatch(
       /\.ask-question-option--row:focus-visible[\s\S]*?outline: 3px solid var\(--accent-ink\);[\s\S]*?box-shadow: 0 0 0 1px var\(--surface-raised\);/u,

@@ -286,16 +286,22 @@ const GOLDENS = {
     '::--accent': '#d97757', '::--accent-strong': '#b85f42', '::--accent-ink': '#8a452f',
     '::--accent-soft': '#f3e4de', '::--focus': '#121212', '::--action-bg': '#24221f', '::--action-fg': '#f8f8f6',
     '::--success': '#37624a', '::--danger': '#8d382e', '::--surface-code': '#24221f',
+    // --surface-code is the same dark tone in every theme, so its ink must be too.
+    // Pinning both sides of the pair is what catches an ink that starts flipping:
+    // a flipping ink collapses onto this ground in one theme and goes invisible.
+    '::--on-code': '#f8f8f6',
   },
   dark: {
     '::--canvas': '#24221f', '::--surface': '#2d2a26', '::--ink': '#f8f8f6', '::--ink-muted': '#9f998f',
     '::--accent': '#d97757', '::--accent-strong': '#b85f42', '::--accent-ink': '#f0b19a',
     '::--accent-soft': '#3a2720', '::--focus': '#f8f8f6', '::--action-bg': '#f8f8f6', '::--action-fg': '#24221f',
     '::--success': '#8fc4a4', '::--danger': '#ee9b91', '::--surface-code': '#24221f',
+    '::--on-code': '#f8f8f6',
   },
   system: {
     '::--canvas': '#24221f', '::--surface': '#2d2a26', '::--ink': '#f8f8f6', '::--ink-muted': '#9f998f',
     '::--accent-strong': '#b85f42', '::--accent-ink': '#f0b19a', '::--focus': '#f8f8f6',
+    '::--surface-code': '#24221f', '::--on-code': '#f8f8f6',
   },
 };
 

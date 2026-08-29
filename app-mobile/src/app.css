@@ -119,6 +119,7 @@
   --on-accent: #ffffff;                 /* content on an accent/accent-strong fill (clay is theme-invariant) */
   --on-accent-text: #24221f;            /* AA-dark text on an accent fill: 5.08:1 on clay, both themes */
   --on-danger: var(--canvas);           /* content on a --danger fill; --canvas flips so AA holds both themes */
+  --on-code: #f8f8f6;                   /* ink for the theme-invariant code surface */
   --scrim: color-mix(in srgb, #24221f 56%, transparent);  /* the fixed dark overlay backdrop, one source */
   --action-bg: var(--pi-carbon);
   --action-fg: var(--pi-bone);
@@ -130,10 +131,11 @@
   --danger-soft: #f4e7e4;
   --focus: #121212;
 /* Editable seam: tokens — the --diff-add / --diff-remove component tokens drive the add/remove tints
-   consumed by .artifact-diff--add and .artifact-diff--remove (dark and system-dark remap the same names). */
+   consumed by .artifact-diff--add and .artifact-diff--remove. These tints stay the same in every
+   theme because the diff well is a theme-invariant dark surface. */
 
-  --diff-add: #e4eee7;
-  --diff-remove: #f3e5e2;
+  --diff-add: #203129;
+  --diff-remove: #3a2522;
   --shadow-raised: 0 4px 20px rgb(0 0 0 / 4%);
 
   /* Editable seam: tokens — the recent-session dock keeps its status rings and surfaces
@@ -235,8 +237,6 @@
   --danger: #ee9b91;
   --danger-soft: #3a2522;
   --focus: #f8f8f6;
-  --diff-add: #203129;
-  --diff-remove: #3a2522;
   --shadow-raised: 0 4px 20px rgb(0 0 0 / 24%);
 
   /* Editable seam: tokens — the recent-session dock keeps its status rings and surfaces
@@ -313,8 +313,6 @@
     --danger: #ee9b91;
     --danger-soft: #3a2522;
     --focus: #f8f8f6;
-    --diff-add: #203129;
-    --diff-remove: #3a2522;
     --shadow-raised: 0 4px 20px rgb(0 0 0 / 24%);
 
     /* Editable seam: tokens — the recent-session dock keeps its status rings and surfaces
@@ -1345,7 +1343,7 @@ button[data-pressed]:not([data-disabled]) {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--surface-code);
-  color: var(--ink-inverse);
+  color: var(--on-code);
   font: 0.8125rem/1.45 var(--font-mono);
   white-space: pre-wrap;
   overflow-wrap: anywhere;

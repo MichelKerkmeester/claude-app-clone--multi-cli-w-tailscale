@@ -3,7 +3,11 @@
   "packet_id": "004-sveltekit-spa-migration/016-relay-correctness",
   "spec_folder": "004-sveltekit-spa-migration/016-relay-correctness",
   "parent_id": "004-sveltekit-spa-migration",
-  "children_ids": [],
+  "children_ids": [
+    "004-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity",
+    "004-sveltekit-spa-migration/016-relay-correctness/002-route-authority",
+    "004-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"
+  ],
   "manual": {
     "depends_on": [],
     "supersedes": [],

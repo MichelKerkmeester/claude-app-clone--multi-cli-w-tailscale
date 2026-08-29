@@ -3,7 +3,11 @@
   "packet_id": "004-sveltekit-spa-migration/012-naming-and-structure",
   "spec_folder": "004-sveltekit-spa-migration/012-naming-and-structure",
   "parent_id": "004-sveltekit-spa-migration",
-  "children_ids": [],
+  "children_ids": [
+    "004-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest",
+    "004-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split",
+    "004-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"
+  ],
   "manual": {
     "depends_on": [],
     "supersedes": [],

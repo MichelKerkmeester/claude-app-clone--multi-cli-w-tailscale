@@ -3,7 +3,15 @@
   "packet_id": "004-sveltekit-spa-migration/020-source-structure",
   "spec_folder": "004-sveltekit-spa-migration/020-source-structure",
   "parent_id": "004-sveltekit-spa-migration",
-  "children_ids": [],
+  "children_ids": [
+    "004-sveltekit-spa-migration/020-source-structure/001-css-ownership",
+    "004-sveltekit-spa-migration/020-source-structure/002-comment-structure",
+    "004-sveltekit-spa-migration/020-source-structure/003-css-files",
+    "004-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte",
+    "004-sveltekit-spa-migration/020-source-structure/005-comment-brevity",
+    "004-sveltekit-spa-migration/020-source-structure/006-bem-css",
+    "004-sveltekit-spa-migration/020-source-structure/007-comment-humanization"
+  ],
   "manual": {
     "depends_on": [],
     "supersedes": [],

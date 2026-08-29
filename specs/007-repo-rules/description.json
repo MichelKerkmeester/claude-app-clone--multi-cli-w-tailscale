@@ -1,0 +1,21 @@
+{
+  "level": "2",
+  "specFolder": "007-repo-rules",
+  "description": "An AI agent starting work in this repository cold reads `AGENTS.md`, which carries the rules true in every repository, and then has nothing that tells",
+  "keywords": [
+    "repo rules",
+    "agent contract",
+    "per-repository",
+    "verification ladder",
+    "traps",
+    "protected repositories",
+    "playwright gap",
+    "typecheck coverage"
+  ],
+  "lastUpdated": "2026-08-29T19:45:00.000Z",
+  "specId": "007",
+  "folderSlug": "007-repo-rules",
+  "parentChain": [],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

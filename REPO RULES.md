@@ -23,14 +23,6 @@ hundreds of phantom failures.
 **`npm run test:web | tail` reports *tail's* exit status, not vitest's.** Verify by content — both
 suite summaries present — or capture `RC=$?` before piping.
 
-**`validate.sh` can refuse to run entirely** — `compiled validation orchestrator is stale`, exit 3,
-and **no rule output at all**. A sweep that only looks for `RESULT: FAILED` reads that silence as a
-clean pass. Always require an explicit `RESULT: PASSED`. Fix it with:
-
-```bash
-cd "$(realpath .opencode)/skills/system-spec-kit/mcp-server" && npm run build
-```
-
 ---
 
 ## 2. HOST DATA AND STORY SEAMS
@@ -63,6 +55,8 @@ folder** — the skill's own `SKILL.md` carries the routing table.
 The **feature catalog** and the **manual testing playbook** live at this repository root
 (`feature-catalog/`, `manual-testing-playbook/`), not in the skill, so the evidence cannot drift from
 the shipped app.
+
+**`specs/` is symlinked into the Public monorepo as `specs/app-mobile-cli`.** Edit it here.
 
 ---
 
@@ -195,21 +189,3 @@ Confirm against these before calling anything a regression.
   commit for themselves, so **executors never run git; the orchestrating session commits.**
 
 ---
-
-## 8. SPEC-KIT INVOCATION
-
-**Scripts silently no-op through the `.opencode` symlink.** Always invoke via realpath with the
-symlink guard, and verify by *content* rather than exit code:
-
-```bash
-NODE_PRESERVE_SYMLINKS=1 bash "$(realpath .opencode)/skills/system-spec-kit/scripts/spec/validate.sh" <folder> --strict
-```
-
-**Validating a phase parent recurses into its children**, and the printed output continues past the
-folder you asked about. Take the **first** `RESULT:` line for a folder's own verdict, and validate
-children individually when you need a per-packet answer.
-
-After any spec-doc edit, regenerate `description.json` and `graph-metadata.json` or
-`GENERATED_METADATA_INTEGRITY` fails.
-
-**`specs/` is symlinked into the Public monorepo as `specs/app-mobile-cli`.** Edit it here.

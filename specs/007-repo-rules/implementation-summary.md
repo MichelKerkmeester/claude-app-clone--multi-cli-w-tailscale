@@ -12,7 +12,7 @@ _memory:
     packet_pointer: "specs/007-repo-rules"
     last_updated_at: "2026-08-29T19:45:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Folded five research passes into the rules file; six claims corrected."
+    recent_action: "Folded five research passes in; moved the spec-kit universals to the shared file."
     next_safe_action: "Packet closed; no follow-up owed inside this phase."
     completion_pct: 100
 ---
@@ -39,7 +39,7 @@ _memory:
 ## WHAT WAS BUILT
 
 - **A per-repository agent contract.** `REPO RULES.md` was a five-line stub declaring its own purpose.
-  It now carries eight sections of paths, commands, numbers and traps — what is true only here.
+  It now carries seven sections of paths, commands, numbers and traps — what is true only here.
 - **Five research passes**, each with a distinct lens and its own report under `research/`: the build
   and tooling surface, what the skill and specs know that the rules do not, failure archaeology from
   git history, structure and scannability for an AI reader, and an adversarial accuracy audit.
@@ -70,9 +70,11 @@ which is the argument for running it at all.
 - **The skill routing table was cut.** Seven rows restated the skill's own `SKILL.md` byte for byte,
   which this packet's spec forbids. Three lines remain: where the skill is, load the entry document,
   and the catalogs live at the repository root.
-- **Spec-kit universals were kept despite belonging elsewhere.** The validator-silence, phase-parent
-  recursion and metadata-regeneration rules are not Mobile-CLI-specific, but they are absent from
-  `AGENTS.md` today. Cutting them here would open a hole; moving them is a later packet.
+- **Spec-kit universals were moved out, not deleted.** The validator-silence, symlink no-op,
+  phase-parent recursion and metadata-regeneration rules are harness properties rather than
+  Mobile-CLI facts. `AGENTS.md` carried none of them, so deleting them here would have lost knowledge
+  that had already cost real time; they were added to the shared file under its completion rule
+  instead, and removed from this one.
 - **Unverifiable findings were not folded in.** Several research claims could not be checked
   read-only — whether a daemon is running, whether two concurrent builds actually corrupt the output.
   They are recorded in the reports and kept out of the document.
@@ -131,6 +133,7 @@ Four operational facts the document was missing:
 - **Some research findings remain unverified rather than rejected.** Whether two concurrent catalog
   builds actually corrupt the output, and whether the archive's flake reproduces today, would each
   need a run that writes to the tree. They stayed out of the document and stayed in the reports.
-- **Three sections are spec-kit universals sitting in a repo-specific file.** They are here because
-  `AGENTS.md` does not carry them yet, which is a hole to close rather than a place to leave them.
+- **The rules file now depends on a shared-file change landing.** The four spec-kit invocation traps
+  live in `AGENTS.md` as of the change that removed them here. Until that lands, a reader of this
+  repository alone has no copy of them.
 <!-- /ANCHOR:limitations -->

@@ -57,7 +57,7 @@ Make `REPO RULES.md` the one document that closes the gap between the universal 
 ## 3. SCOPE
 
 ### In Scope
-- `REPO RULES.md`: the gates, the design-system authority, the catalog and archive contract, the fail-closed seams, the known baselines, and the git and spec-kit traps.
+- `REPO RULES.md`: the first-command traps, the fail-closed seams, the design-system authority, the catalog and archive contract, and the known baselines.
 - Five independent research passes over it, each with a distinct lens, to find what is missing, stale or badly structured.
 - Folding the confirmed findings back into the document.
 
@@ -133,6 +133,7 @@ Claims are measurements rather than recollections, so a reader can re-run any of
 
 - Should the counts in the document be generated rather than written, so they cannot go stale? A generator is more machinery than the file currently justifies.
 - Should a gate verify the document's own path claims, the way the surface skill's paths are guarded? That would make decay detectable rather than discovered.
+- ~~Where do the spec-kit invocation traps belong?~~ Answered: they are harness properties, so they moved to `AGENTS.md` beside its completion rule.
 <!-- /ANCHOR:questions -->
 
 ---

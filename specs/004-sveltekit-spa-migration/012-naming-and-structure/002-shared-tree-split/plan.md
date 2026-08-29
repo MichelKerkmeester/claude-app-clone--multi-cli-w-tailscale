@@ -2,6 +2,11 @@
 title: "Child 002 plan — shared tree split"
 description: "The seven-folder target, the order that keeps the tree building, and why the existence check rather than the build is the gate."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "shared tree split plan approach"
+  - "shared tree split packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"

@@ -2,6 +2,11 @@
 title: "Phase D implementation summary — styles into Svelte"
 description: "The 66 component .css files folded back into their .svelte scoped <style> blocks by restoring the pre-extraction commit, proven value-identical by token identity 0-diff across three themes, fences 277, and green across the whole gate."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "styles into svelte implementation summary"
+  - "styles into svelte packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte"

@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "packet_id": "006-orca-nodeterm-ux-mining/002-home-selection/003-card-polish",
+  "spec_folder": "006-orca-nodeterm-ux-mining/002-home-selection/003-card-polish",
+  "parent_id": "006-orca-nodeterm-ux-mining/002-home-selection",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "shipped",
+      "card",
+      "presentation",
+      "over",
+      "existing",
+      "dto",
+      "fields",
+      "plus",
+      "device-local",
+      "seen",
+      "clock",
+      "messages"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Shipped the ✅ card presentation over existing DTO fields plus a device-local seen clock: messages + ISO datetime, 20-min stale-unknown look, dropped resting-done glyph, always-inline detail, hue mark, seen-dot, two channels. The ⚠️ card-content bundle is wired behind an optional-field gate and stays inert until the host publishes those keys.",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:6b74446472f40fc1bd85eb9328997eaa10fd9d35ce874647e8a0caecaf94395b",
+    "source_doc_hashes": {
+      "spec.md": "9d3c7f3e80c1d5b26ee444576c6021b2fd13219d4ed82aa4535fc056c19d4f05",
+      "plan.md": "22afed2ecee9857fa5bb9ac60fb33f8a7d2e6bb1c6c93870c7d08ab09ef57140",
+      "tasks.md": "38b03232a01827bf21c24e7e1823c8e276fe3ec9ed48036895c9c39799fa50d7",
+      "checklist.md": "f8053196b9617a2403ba46c6948f1ff9d2cc8abd3c4aa7c52a1007bf531364ae",
+      "implementation-summary.md": "334467dcd6eb5a64291cb3a827803a9acc73a43bcf6af7a5d022f0ea4746d0b8"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

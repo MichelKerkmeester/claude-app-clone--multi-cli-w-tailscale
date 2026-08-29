@@ -1,0 +1,27 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability",
+  "description": "A designer opening the catalog can read every surface and change almost nothing about them",
+  "keywords": [
+    "designer",
+    "opening",
+    "catalog",
+    "read",
+    "every",
+    "surface",
+    "change",
+    "almost",
+    "nothing",
+    "about",
+    "them"
+  ],
+  "lastUpdated": "2026-08-29T08:59:22.002Z",
+  "specId": "015",
+  "folderSlug": "storybook-designer-adjustability",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

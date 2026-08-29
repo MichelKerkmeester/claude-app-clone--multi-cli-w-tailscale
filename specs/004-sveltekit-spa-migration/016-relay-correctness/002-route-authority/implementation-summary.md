@@ -2,6 +2,11 @@
 title: "Child 016/002 implementation summary — route authority"
 description: "Foreground proof is universal across mutation routes, every rate-limited refusal carries a retry hint, and the two routes that had no HTTP coverage now have both directions asserted."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "route authority implementation summary"
+  - "route authority packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/002-route-authority"

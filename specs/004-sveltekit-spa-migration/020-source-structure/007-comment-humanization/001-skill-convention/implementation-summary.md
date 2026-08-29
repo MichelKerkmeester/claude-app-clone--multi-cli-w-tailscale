@@ -2,6 +2,11 @@
 title: "Phase 1 implementation summary — @ds retired in the surface skill"
 description: "The sk-code-mobile-cli surface skill was moved off the @ds grammar onto the natural human-voice comment convention and landed on Public skilled/v4.0.0.0 as v1.7.0.0. comment-grammar.md became the single convention source, editability-guardrails.md was restated around the greppable do-not-edit note, ds-grammar.md was deleted and every citation repointed, and @ds authoring was stripped from all live references and assets. Proven by the router-sync bijection (10/10), a packet-scoped alignment-drift delta of 0, a fresh leaf-manifest, and only the intended migration note still naming @ds."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill convention implementation summary"
+  - "skill convention packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention"

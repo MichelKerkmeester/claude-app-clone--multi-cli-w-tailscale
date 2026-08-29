@@ -1,0 +1,25 @@
+{
+  "phase": "phase_synthesis",
+  "status": "complete",
+  "artifact_dir": "specs/006-orca-nodeterm-ux-mining/research/lineages/luna",
+  "spec_folder": "specs/006-orca-nodeterm-ux-mining",
+  "session_id": "fanout-luna-1787718935950-gxg4a7",
+  "loop_type": "research",
+  "stop_policy": "max-iterations",
+  "max_iterations": 20,
+  "iterations_completed": 20,
+  "convergence_threshold": 0.05,
+  "stop_reason": "maxIterationsReached",
+  "convergence_was_telemetry_only": true,
+  "outputs": [
+    "research.md",
+    "resource-map.md",
+    "findings-registry.json",
+    "deep-research-dashboard.md",
+    "deep-research-strategy.md"
+  ],
+  "external_spec_sync": "deferred by lineage write boundary",
+  "memory_save": "skipped by lineage contract",
+  "git_writes": "forbidden by lineage contract",
+  "completed_at": "2026-08-26T05:52:00Z"
+}

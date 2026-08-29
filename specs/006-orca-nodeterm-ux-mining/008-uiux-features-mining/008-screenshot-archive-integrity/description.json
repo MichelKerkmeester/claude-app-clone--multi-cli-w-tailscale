@@ -1,0 +1,25 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/008-screenshot-archive-integrity",
+  "description": "The screenshot archive is the acceptance evidence for every later refinement phase, and it is not yet trustworthy",
+  "keywords": [
+    "screenshot",
+    "archive",
+    "acceptance",
+    "evidence",
+    "every",
+    "later",
+    "refinement",
+    "phase",
+    "trustworthy"
+  ],
+  "lastUpdated": "2026-08-28T22:45:18.476Z",
+  "specId": "008",
+  "folderSlug": "screenshot-archive-integrity",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

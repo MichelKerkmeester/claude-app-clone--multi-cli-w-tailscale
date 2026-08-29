@@ -2,6 +2,11 @@
 title: "Phase D — Styles into Svelte: component CSS folds back into scoped <style>"
 description: "Reverse the co-located .css extraction: each component's rules move back into its .svelte scoped <style> block, so a component is one file again — markup, its own Svelte-scoped CSS, and logic. app.css stays the global layer. Proven value-identical by the token-identity gate."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "styles into svelte spec requirements"
+  - "styles into svelte packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "004-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte"

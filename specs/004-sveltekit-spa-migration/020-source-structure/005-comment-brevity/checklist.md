@@ -2,6 +2,11 @@
 title: "Phase E checklist — web-client comment brevity barrier"
 description: "Barrier sign-off for trimming verbose inline comments across the app-mobile source: comment-only per the AST and region checks, token identity 0-diff, fences 277, test:web and catalog green."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment brevity verification checklist"
+  - "comment brevity packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/005-comment-brevity"

@@ -2,6 +2,11 @@
 title: "Child 016/003 plan — connection lifecycle"
 description: "Why the heartbeat interval is a constructor option, what each close code means for recovery, and the harness decision that gates the client half."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "connection lifecycle plan approach"
+  - "connection lifecycle packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"

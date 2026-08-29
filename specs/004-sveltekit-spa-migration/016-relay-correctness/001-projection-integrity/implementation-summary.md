@@ -2,6 +2,11 @@
 title: "Child 016/001 implementation summary — projection integrity"
 description: "The projection, framing and retention halves shipped and are proven by negative control. The epoch half is held for an operator decision, and three new defects were found on the same path."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "projection integrity implementation summary"
+  - "projection integrity packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"

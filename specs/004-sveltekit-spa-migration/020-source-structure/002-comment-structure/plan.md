@@ -2,6 +2,11 @@
 title: "Phase B plan — disjoint directory batches, fences and @ds re-checked per batch"
 description: "Harmonize section banners across the .svelte tree in disjoint directory batches dispatched to cli-codex Luna xhigh fast, each verified fence-stable and @ds-unchanged before the next lands."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment structure plan approach"
+  - "comment structure packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/002-comment-structure"

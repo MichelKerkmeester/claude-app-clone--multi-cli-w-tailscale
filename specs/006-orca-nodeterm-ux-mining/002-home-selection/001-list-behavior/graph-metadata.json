@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "packet_id": "006-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior",
+  "spec_folder": "006-orca-nodeterm-ux-mining/002-home-selection/001-list-behavior",
+  "parent_id": "006-orca-nodeterm-ux-mining/002-home-selection",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "plan",
+      "home",
+      "session",
+      "list",
+      "interaction",
+      "state",
+      "machine",
+      "verified",
+      "orca",
+      "synthesis",
+      "recency-sort",
+      "roster"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "6. RISKS & DEPENDENCIES",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Plan the home session list's interaction and state machine from the verified orca synthesis: recency-sort the roster by updatedAt (1.1), pull-to-refresh that keeps the last-good snapshot on failure (1.2), a four-kind list state machine — loading · error+retry · host-too-old · ready — that keeps old data on refetch (1.9), a reserved resume slot filled from cache and inert until live (1.10), single-flight Open that disables every open while one launch is in flight (1.11), and the five-way haptics taxonomy (1.12).",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-26T05:54:46.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:09fbc81b2bf585da1109ff6ec7d479b33349d7c8f90ee3d797b0dfb9507bbe82",
+    "source_doc_hashes": {
+      "spec.md": "57dd4048a13c4cdcb982c2b5ab502f42c7ae014af3864a4483adbcd62e4bce3e",
+      "plan.md": "32886d0068e9c30ba1821356dc81dccccc6770d987daeab29a81d8a33a2d6304",
+      "tasks.md": "d6c673b9d12a30226fc02477eed1ad959e032d04fcf206d39140d010ba216fd9",
+      "checklist.md": "dee87b5063f230f9069f27f0caf4fd734bce4a0f202be01f8275c8e229cf62fe",
+      "implementation-summary.md": "ab2faf29ef1c71b9f0a9bb1d1ab298feae1b99a866b341530a1614612060d0d9"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

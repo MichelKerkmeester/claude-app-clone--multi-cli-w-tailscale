@@ -2,6 +2,11 @@
 title: "Phase 1 checklist — skill @ds retirement barrier"
 description: "Barrier sign-off for retiring @ds from the surface skill and teaching the natural convention: no live @ds authoring taught, reference integrity clean, router-sync bijection green, drift-guard packet delta 0, the frozen-seam contract preserved as a greppable do-not-edit note, skill loads, changelog + version bump, landed on Public skilled/v4.0.0.0."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill convention verification checklist"
+  - "skill convention packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention"

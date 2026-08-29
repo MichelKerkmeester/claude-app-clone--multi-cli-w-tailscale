@@ -2,6 +2,11 @@
 title: "Phase 1 tasks — skill @ds retirement ledger"
 description: "Map the skill's @ds footprint, rewrite the comment references and strip @ds authoring, then verify reference integrity and the router bijection and land via the Public worktree. Each task carries its evidence inline."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill convention task ledger"
+  - "skill convention packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention"

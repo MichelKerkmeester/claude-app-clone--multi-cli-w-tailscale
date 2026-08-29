@@ -2,6 +2,11 @@
 title: "Phase E plan — web-client comment brevity, proven comment-only"
 description: "How the verbose inline comments in the app-mobile source are trimmed and how the comment-only claim is proven: batched CLI executor passes, then an AST re-print for scripts, a region check for .svelte, token identity 0-diff, fences, test:web and catalog smoke."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment brevity plan approach"
+  - "comment brevity packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/005-comment-brevity"

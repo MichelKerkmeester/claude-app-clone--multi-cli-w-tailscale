@@ -1,0 +1,11 @@
+{
+  "owner_pid": 77226,
+  "started_at_iso": "2026-08-26T04:53:04.278Z",
+  "ttl_ms": 300000,
+  "last_heartbeat_iso": "2026-08-26T04:53:04.278Z",
+  "packet_id": "specs/006-orca-nodeterm-ux-mining",
+  "runtime_kind": "main",
+  "phase": "running",
+  "last_activity_iso": "2026-08-26T04:53:04.278Z",
+  "acquire_nonce": "77226-1787719984279-fb4c7817-d6cf-4fca-961c-1ed0a0d5d1d2"
+}

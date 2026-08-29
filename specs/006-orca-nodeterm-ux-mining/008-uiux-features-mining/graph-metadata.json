@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "packet_id": "006-orca-nodeterm-ux-mining/008-uiux-features-mining",
+  "spec_folder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining",
+  "parent_id": "006-orca-nodeterm-ux-mining",
+  "children_ids": [
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/001-composer-send",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/002-streaming-reader-media",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/003-home-switcher-nav-search",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/004-a11y-onboarding",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/005-host-inbox-notifications",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/006-host-usage-search-review",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/007-host-liveactivity-fields",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/008-screenshot-archive-integrity",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/009-refine-artifacts",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/010-refine-chrome",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/011-refine-transcript",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/012-refine-views",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/013-refine-rich-content-ask-question",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining/016-reference-structure-and-doc-accuracy"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "orca",
+      "nodeterm",
+      "mining",
+      "run",
+      "produced",
+      "verdict-checked",
+      "findings",
+      "app-mobile",
+      "client",
+      "remote",
+      "host-authoritative",
+      "fail-closed"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "plan.md",
+      "research/findings-registry.json",
+      "research/research.md",
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "findings-registry.json",
+        "kind": "config",
+        "path": "research/findings-registry.json",
+        "source": "derived"
+      },
+      {
+        "name": "research.md",
+        "kind": "doc",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Feature Specification",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Phase Documentation Map",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Packet",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement The",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Turn",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Open Settings",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Inline Approve",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Source Control",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Live Activity",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "mermaid",
+        "kind": "technology",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "See Top",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "New Session",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Copy Context",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Optimistic Stop",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "The orca+nodeterm mining run produced 99 verdict-checked UI/UX findings for the app-mobile client (Pi Remote, a host-authoritative fail-closed SvelteKit PWA)",
+    "created_at": "2026-08-27T15:31:24.534Z",
+    "last_save_at": "2026-08-29T09:00:31.667Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "research/research.md"
+    ],
+    "source_fingerprint": "sha256:7b70011f5fb8f212eff59bb2ef8fef1c6b1453670f6dc13d946a97b282085862",
+    "source_doc_hashes": {
+      "spec.md": "14a5c7bd8206740f534527c3bca587f4793be235a8a5a38214933f66e7ffb3f0",
+      "plan.md": "355fef2ae12bb548b1964ef68aff51930cd2ea2e969108ed5265ce97e33e8a5e",
+      "research/research.md": "65c460d0b46c091e24028dd4d0e6279b08e29548e12535863cc1fb943d8545c6"
+    },
+    "last_active_child_id": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/006-host-usage-search-review",
+    "last_active_at": null
+  }
+}

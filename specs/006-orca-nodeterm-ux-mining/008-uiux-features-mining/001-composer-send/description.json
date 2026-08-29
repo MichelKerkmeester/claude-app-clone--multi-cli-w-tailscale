@@ -1,0 +1,24 @@
+{
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/001-composer-send",
+  "description": "The composer is the client's one write surface, and the send path is where a flaky mobile connection does the most damage",
+  "keywords": [
+    "level-2",
+    "implementation",
+    "phase",
+    "001-composer-send",
+    "findings",
+    "remote",
+    "mobile",
+    "client"
+  ],
+  "lastUpdated": "2026-08-27T17:00:55.884Z",
+  "specId": "001",
+  "folderSlug": "composer-send",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "2"
+}

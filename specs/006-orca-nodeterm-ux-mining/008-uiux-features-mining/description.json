@@ -1,0 +1,27 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining",
+  "description": "The orca+nodeterm mining run produced 99 verdict-checked UI/UX findings for the app-mobile client (Pi Remote, a host-authoritative fail-closed",
+  "keywords": [
+    "orca",
+    "nodeterm",
+    "mining",
+    "run",
+    "produced",
+    "verdict-checked",
+    "findings",
+    "app-mobile",
+    "client",
+    "remote",
+    "host-authoritative",
+    "fail-closed"
+  ],
+  "lastUpdated": "2026-08-28T19:55:32.091Z",
+  "specId": "008",
+  "folderSlug": "uiux-features-mining",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

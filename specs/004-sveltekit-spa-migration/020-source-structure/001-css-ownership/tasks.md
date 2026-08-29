@@ -2,6 +2,11 @@
 title: "Phase A tasks — the six-batch ledger"
 description: "One task per component batch, plus setup and the barrier. Each batch moves its single-owner classes and is proven value-identical before the next lands."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css ownership task ledger"
+  - "css ownership packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/001-css-ownership"

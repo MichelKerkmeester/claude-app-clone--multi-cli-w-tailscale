@@ -1,0 +1,19 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/005-host-inbox-notifications",
+  "description": "Today's inbox is snapshot-only",
+  "keywords": [
+    "today",
+    "inbox",
+    "snapshot-only"
+  ],
+  "lastUpdated": "2026-08-28T13:37:34.826Z",
+  "specId": "005",
+  "folderSlug": "host-inbox-notifications",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

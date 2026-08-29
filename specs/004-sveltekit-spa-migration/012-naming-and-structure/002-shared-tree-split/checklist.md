@@ -2,6 +2,11 @@
 title: "Child 002 checklist — shared tree split"
 description: "Barrier sign-off for the 28-file redistribution. Every item is open: the child is scoped and blocked on child 001's manifest."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "shared tree split verification checklist"
+  - "shared tree split packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"

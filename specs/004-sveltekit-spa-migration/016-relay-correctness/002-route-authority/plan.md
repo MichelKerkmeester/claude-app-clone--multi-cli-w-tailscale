@@ -2,6 +2,11 @@
 title: "Child 016/002 plan — route authority and rate-limit honesty"
 description: "One pass through the route table, the harness that has to be built first, and why the listing route is deliberately left alone."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "route authority plan approach"
+  - "route authority packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/002-route-authority"

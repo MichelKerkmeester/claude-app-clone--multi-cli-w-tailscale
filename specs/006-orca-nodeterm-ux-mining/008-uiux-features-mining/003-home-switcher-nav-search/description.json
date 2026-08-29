@@ -1,0 +1,31 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/003-home-switcher-nav-search",
+  "description": "The home surface has no OS-level \"N waiting\" signal, one flat sort that cannot say a just-finished session outranks a still-churning one, and a search",
+  "keywords": [
+    "home",
+    "surface",
+    "os-level",
+    "waiting",
+    "signal",
+    "one",
+    "flat",
+    "sort",
+    "cannot",
+    "say",
+    "just-finished",
+    "session",
+    "outranks",
+    "still-churning",
+    "search"
+  ],
+  "lastUpdated": "2026-08-28T11:41:42.392Z",
+  "specId": "003",
+  "folderSlug": "home-switcher-nav-search",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

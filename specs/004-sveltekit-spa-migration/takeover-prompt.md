@@ -2,6 +2,7 @@
 title: "Orchestrator takeover prompt"
 description: "The active goal prompt for a fresh orchestrator: mission, the external-agent dispatch ladder, the start set, the invariants, the nine gates, and the traps that fail silently."
 contextType: "planning"
+importance_tier: "normal"
 trigger_phrases:
   - "sveltekit spa migration takeover prompt"
   - "sveltekit spa migration packet"

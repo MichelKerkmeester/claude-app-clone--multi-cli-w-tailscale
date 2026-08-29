@@ -2,6 +2,11 @@
 title: "Child 016/001 plan — projection integrity"
 description: "Why the listener lands before the counter fix, why rotation and collection are one change, and the negative controls that make each fix provable."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "projection integrity plan approach"
+  - "projection integrity packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"

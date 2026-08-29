@@ -49,6 +49,7 @@
     "save_lineage": "manual",
     "last_accessed_at": null,
     "last_active_child_id": null,
-    "last_active_at": null
+    "last_active_at": null,
+    "source_fingerprint": "sha256:d208375304c5ee5d2bb1255ea6165519a6f3b91290c56be4cdb339ae251f7f66"
   }
 }

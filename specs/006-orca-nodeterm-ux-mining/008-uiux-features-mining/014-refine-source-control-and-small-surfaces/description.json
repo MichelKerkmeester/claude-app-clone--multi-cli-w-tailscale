@@ -1,0 +1,29 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces",
+  "description": "The source-control, attachments, primitives, home surfaces cover the review hub plus the remaining small surfaces, and 31 screenshots record how they",
+  "keywords": [
+    "source-control",
+    "attachments",
+    "primitives",
+    "home",
+    "surfaces",
+    "cover",
+    "review",
+    "hub",
+    "plus",
+    "remaining",
+    "small",
+    "screenshots",
+    "record"
+  ],
+  "lastUpdated": "2026-08-29T08:39:58.413Z",
+  "specId": "014",
+  "folderSlug": "refine-source-control-and-small-surfaces",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

@@ -2,6 +2,11 @@
 title: "Phase B tasks — the seven-batch ledger"
 description: "One task per directory batch, plus setup and the barrier. Each batch harmonizes its section banners and is proven fence-stable and @ds-unchanged before the next lands."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment structure task ledger"
+  - "comment structure packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/002-comment-structure"

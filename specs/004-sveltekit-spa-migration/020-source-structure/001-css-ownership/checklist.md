@@ -2,6 +2,11 @@
 title: "Phase A checklist — CSS ownership barrier"
 description: "Barrier sign-off for the single-owner CSS moves: value preservation, prop-class handling, media-order safety, and the nine gates. Every item open until executed."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css ownership verification checklist"
+  - "css ownership packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/001-css-ownership"

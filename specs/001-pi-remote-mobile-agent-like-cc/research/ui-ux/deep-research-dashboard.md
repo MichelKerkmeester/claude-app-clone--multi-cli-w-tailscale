@@ -1,6 +1,11 @@
 ---
 title: Deep Research Dashboard
 description: Auto-generated reducer view over the research packet.
+importance_tier: "normal"
+trigger_phrases:
+  - "ui ux deep research dashboard"
+  - "ui ux packet"
+  - "deep research dashboard"
 ---
 
 # Deep Research Dashboard - Session Overview

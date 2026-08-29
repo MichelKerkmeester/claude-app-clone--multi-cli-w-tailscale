@@ -2,6 +2,11 @@
 title: "Phase C — CSS files: each component's styles move to a co-located .css file"
 description: "Extract every component's scoped <style> block into a co-located .css file it imports, so the CSS is browsable per component as the operator asked. Global scope, unchanged class names and values, proven by the token-identity gate holding at zero diffs."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css files spec requirements"
+  - "css files packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/003-css-files"

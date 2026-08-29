@@ -2,6 +2,11 @@
 title: "Phase E implementation summary — web-client comment brevity"
 description: "Verbose inline comment descriptions across the app-mobile source (138 of 223 files) trimmed to a concise durable-WHY style, proven comment-only by a .svelte-aware AST-and-region check (223/223), token identity 0-diff across three themes, fences 277, test:web green, and catalog smoke 534 frames."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment brevity implementation summary"
+  - "comment brevity packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/005-comment-brevity"

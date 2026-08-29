@@ -2,6 +2,7 @@
 title: "SvelteKit SPA migration — handover"
 description: "Everything a fresh agent needs to take over the post-cutover queue: what shipped, what is scoped, who writes what, the nine gates, and the eleven traps that have each already cost a session."
 contextType: "handover"
+importance_tier: "normal"
 trigger_phrases:
   - "sveltekit spa migration handover"
   - "sveltekit spa migration packet"

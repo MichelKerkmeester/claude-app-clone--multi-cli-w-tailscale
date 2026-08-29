@@ -2,6 +2,11 @@
 title: "Child 001 decision record — naming grammar and shared-tree structure"
 description: "Why kebab-case wins over Svelte's PascalCase convention, why the kind comes first in a component name, how shared/ was split, and why routes/ is excluded from the rename."
 contextType: "decision"
+importance_tier: "normal"
+trigger_phrases:
+  - "grammar and manifest decision record"
+  - "grammar and manifest packet"
+  - "decision record"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"

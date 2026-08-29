@@ -2,6 +2,11 @@
 title: "Phase B — Comment structure: one Svelte section vocabulary across every component"
 description: "Harmonize the section-banner comments the migration already uses so every .svelte file names its script sections with one canonical vocabulary and order, adds banners to the significant files that lack them, and leaves the @ds design-system comments and the 277 guardrail fences untouched."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment structure spec requirements"
+  - "comment structure packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/002-comment-structure"

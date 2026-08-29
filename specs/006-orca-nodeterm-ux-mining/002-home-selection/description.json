@@ -1,0 +1,26 @@
+{
+  "level": "3",
+  "specFolder": "006-orca-nodeterm-ux-mining/002-home-selection",
+  "description": "Nested phase parent for the biggest-leverage orca-mining area: the home session list.",
+  "keywords": [
+    "nested",
+    "phase",
+    "parent",
+    "biggest-leverage",
+    "orca-mining",
+    "area",
+    "home",
+    "session",
+    "list",
+    "groups",
+    "home-selection"
+  ],
+  "lastUpdated": "2026-08-26T05:54:46.000Z",
+  "specId": "002",
+  "folderSlug": "home-selection",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

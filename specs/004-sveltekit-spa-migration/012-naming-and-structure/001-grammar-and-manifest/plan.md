@@ -2,6 +2,11 @@
 title: "Child 001 plan — naming grammar and rename manifest"
 description: "The target tree for shared/, the manifest-first sequence, the two proving-ground batches, and the rollback."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "grammar and manifest plan approach"
+  - "grammar and manifest packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"

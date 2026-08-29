@@ -2,6 +2,11 @@
 title: "Phase D plan — git-restore the pre-extraction <style>, token identity as the oracle"
 description: "Fold the 66 component .css back into their .svelte <style> blocks by restoring the pre-extraction commit (value-identical, correct :global), remove the .css and imports, repoint the CSS-corpus reader and four tests, proven by token identity."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "styles into svelte plan approach"
+  - "styles into svelte packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte"

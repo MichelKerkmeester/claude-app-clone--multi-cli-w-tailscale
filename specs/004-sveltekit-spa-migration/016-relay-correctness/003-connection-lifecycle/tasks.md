@@ -2,6 +2,11 @@
 title: "Child 016/003 tasks — connection lifecycle"
 description: "Task ledger for the server heartbeat, the lockout proof, the harness decision and the client close classification."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "connection lifecycle task ledger"
+  - "connection lifecycle packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"

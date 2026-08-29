@@ -2,6 +2,11 @@
 title: "Phase 2 checklist — source @ds retirement barrier"
 description: "Barrier sign-off for retiring @ds across the app source: comment-only per file, @ds=0, banners intact, frozen-seam fences preserved under the re-anchored gate, token-identity 0-diff, test:web green."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "svelte refactor verification checklist"
+  - "svelte refactor packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor"

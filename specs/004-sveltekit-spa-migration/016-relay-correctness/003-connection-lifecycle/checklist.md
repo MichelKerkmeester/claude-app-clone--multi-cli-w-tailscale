@@ -2,6 +2,11 @@
 title: "Child 016/003 checklist — connection lifecycle"
 description: "Barrier sign-off for the heartbeat and close classification. Every item is open: the packet is scoped and not started."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "connection lifecycle verification checklist"
+  - "connection lifecycle packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"

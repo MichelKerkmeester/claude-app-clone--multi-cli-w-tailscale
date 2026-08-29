@@ -2,6 +2,11 @@
 title: "Phase C plan — one deterministic transformer, token identity as the oracle"
 description: "Extract 65 component <style> blocks to co-located .css files with one deterministic transformer (balanced :global unwrap, comment-safe block location), then repoint the CSS-corpus reader and four tests, proven value-identical by token identity."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css files plan approach"
+  - "css files packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/003-css-files"

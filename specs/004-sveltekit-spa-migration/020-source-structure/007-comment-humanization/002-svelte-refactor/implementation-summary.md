@@ -2,6 +2,11 @@
 title: "Phase 2 implementation summary — @ds retired across the app source"
 description: "The @ds marker grammar was retired from every .svelte file (95), app.css, and 3 .ts files and replaced with the natural human-voice comment convention, comment-only bar three catalog editability-description strings. Proven by a per-file non-comment byte-identical check (98/99), frozen-seam fences preserved at 273 under the re-anchored gate, MODULE banners 63=HEAD, token-identity 0-diff across 65 tokens x 3 themes, and test:web 734 pass; landed on Mobile CLI main."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "svelte refactor implementation summary"
+  - "svelte refactor packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor"

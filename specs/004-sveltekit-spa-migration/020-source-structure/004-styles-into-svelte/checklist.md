@@ -2,6 +2,11 @@
 title: "Phase D checklist — styles-into-svelte barrier"
 description: "Barrier sign-off for folding component CSS back into scoped <style>: value preservation, correct :global restore, tooling repoint, and the whole gate."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "styles into svelte verification checklist"
+  - "styles into svelte packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte"

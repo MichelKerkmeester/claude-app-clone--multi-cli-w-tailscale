@@ -2,6 +2,7 @@
 title: "SvelteKit SPA migration — roadmap"
 description: "The order of play for the nine remaining packets: what is executable now, what each one is gated on, the two lanes that run in parallel, and what done looks like."
 contextType: "planning"
+importance_tier: "normal"
 trigger_phrases:
   - "sveltekit spa migration roadmap"
   - "sveltekit spa migration packet"

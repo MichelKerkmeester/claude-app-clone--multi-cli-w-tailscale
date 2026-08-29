@@ -2,6 +2,11 @@
 title: "Comment humanization — retire @ds, human-voice comments across the client, taught in the skill"
 description: "Phase parent for replacing the @ds inline-comment grammar with natural, concise, human-voice comments across every .svelte file: keep the numbered section banners, add a module-script header and in-markup section labels, and give each function and effect a plain purpose line. Teach the convention in the surface skill first, refactor the whole client second, then re-verify the skill against the shipped reality. Comment-only: proven by a per-file non-comment-identical check, token identity at 0 diffs, and test:web."
 contextType: "planning"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment humanization spec requirements"
+  - "comment humanization packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization"

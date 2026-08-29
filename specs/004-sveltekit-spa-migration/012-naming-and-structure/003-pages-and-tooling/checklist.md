@@ -2,6 +2,11 @@
 title: "Child 003 checklist — pages rename and tooling catch-up"
 description: "Barrier sign-off for the wide rename, the tooling catch-up and the nine program gates. Every item is open: the child is scoped and blocked on children 001 and 002."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "pages and tooling verification checklist"
+  - "pages and tooling packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"

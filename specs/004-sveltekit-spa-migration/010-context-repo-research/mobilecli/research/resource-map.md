@@ -1,6 +1,11 @@
 ---
 title: "Resource Map — Mine specs/context/mobilecli-main (READ-ONLY) for adoptable patterns for the Pi Remote SvelteKit mobile PWA"
 description: "Auto-generated research resource map from convergence evidence."
+importance_tier: "normal"
+trigger_phrases:
+  - "research resource map"
+  - "research packet"
+  - "resource map"
 ---
 # Resource Map
 

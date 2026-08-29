@@ -1,6 +1,11 @@
 ---
 title: Deep Research Dashboard
 description: Auto-generated reducer view over the research packet.
+importance_tier: "normal"
+trigger_phrases:
+  - "cli cursor grok 45 high deep research dashboard"
+  - "cli cursor grok 45 high packet"
+  - "deep research dashboard"
 ---
 
 # Deep Research Dashboard - Session Overview

@@ -2,6 +2,11 @@
 title: "Phase F checklist — BEM CSS rename barrier"
 description: "Barrier sign-off for renaming the app-mobile CSS classes to block--element: zero class-context orphans, over-rename 0, token-identity 0-diff, before/after screenshot diff no rename-induced change, fences 277, test:web green."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "bem css verification checklist"
+  - "bem css packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/006-bem-css"

@@ -2,6 +2,11 @@
 title: "Phase C tasks — pilot, fan-out, tooling, gate"
 description: "Extract component styles to co-located .css files: pilot one, fan out to the rest, repoint the readers, and prove the whole gate green from the final state."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css files task ledger"
+  - "css files packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/003-css-files"

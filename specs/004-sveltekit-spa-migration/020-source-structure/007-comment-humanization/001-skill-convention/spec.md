@@ -2,6 +2,11 @@
 title: "Phase 1 — Skill convention: teach the natural comment convention, retire @ds in the surface skill"
 description: "Update the sk-code-mobile-cli surface skill so it teaches the natural human-voice comment convention and no longer instructs authors to write @ds markers. Rewrite the comment references (ds-grammar.md, comment-grammar.md, editability-guardrails.md) and every reference that cites @ds; keep the numbered section banners and the module banner; describe the module-script header, in-markup section labels, per-function purpose lines, and the greppable do-not-edit note that replaces @ds guardrail. Skill docs only; landed via the Public worktree flow. Proven by scan-skill-references broken:0, the router-sync bijection, packet-scoped drift-guard delta 0, and a version changelog."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill convention spec requirements"
+  - "skill convention packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention"

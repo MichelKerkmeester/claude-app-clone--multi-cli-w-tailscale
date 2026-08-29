@@ -2,6 +2,11 @@
 title: "Phase 2 tasks — source @ds retirement ledger"
 description: "Dispatch luna to convert the source, re-anchor the fence gate, and prove the change comment-only and behaviour-preserving. Evidence inline."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "svelte refactor task ledger"
+  - "svelte refactor packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor"

@@ -2,6 +2,7 @@
 title: "Orchestrator goal prompt — post-cutover queue"
 description: "The full dispatch prompt for a fresh agent taking over as orchestrator: mission, authority, the nine remaining packets, the invariants, the gates, and the traps that have each already cost a session."
 contextType: "planning"
+importance_tier: "normal"
 trigger_phrases:
   - "sveltekit spa migration goal prompt"
   - "sveltekit spa migration packet"

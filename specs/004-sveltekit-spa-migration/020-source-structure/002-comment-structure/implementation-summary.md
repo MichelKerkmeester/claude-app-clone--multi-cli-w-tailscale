@@ -2,6 +2,11 @@
 title: "Phase B implementation summary — comment structure"
 description: "55 .svelte files converged on one section-banner vocabulary and order, proven a pure comment-and-reorder pass by an identical per-file code-line multiset, fences held at 277 and @ds held at 1030, and green across the whole gate."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment structure implementation summary"
+  - "comment structure packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/002-comment-structure"

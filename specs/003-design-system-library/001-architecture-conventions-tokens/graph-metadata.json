@@ -14,7 +14,7 @@
   },
   "derived": {
     "trigger_phrases": [
-      "phase 1 \u2014 architecture, conventions & token library"
+      "phase 1 — architecture, conventions & token library"
     ],
     "key_topics": [
       "phase",
@@ -141,7 +141,7 @@
       "spec.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:ced593977ee6c8be248be4709ecdff3bf4f25491aa278a6e421e31c6f9b6e8b9",
+    "source_fingerprint": "sha256:47f958f9cd177b3bc63be7177dd0e042d1dbf361134893f60eb66b0c0fea9650",
     "source_doc_hashes": {
       "spec.md": "dc579fd4a73cd32a393a55729452a9d38549ce98eb0f2981efc56687a7f96f51",
       "research/research.md": "9c62d7aedabbaaf1296ca728eff518b70cc031d71edf997efef091ce41b37f97"

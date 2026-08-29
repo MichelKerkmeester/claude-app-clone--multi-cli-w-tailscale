@@ -1,6 +1,11 @@
 ---
 title: "Resource Map — Mine specs/context/OGAM-main (READ-ONLY) for adoptable patterns for the Pi Remote SvelteKit mobile chat + remote-agent PWA, across ease-of-use, architecture, UX, and logic. Angles + where-to-look: specs/004-sveltekit-spa-migration/010-context-repo-research/ogam/charter.md. Produce adoptable-pattern findings with specs/context/OGAM-main/file:line citations. NEVER modify specs/context/**."
 description: "Auto-generated research resource map from convergence evidence."
+importance_tier: "normal"
+trigger_phrases:
+  - "research resource map"
+  - "research packet"
+  - "resource map"
 ---
 # Resource Map
 

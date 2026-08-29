@@ -2,6 +2,11 @@
 title: "Child 001 checklist — naming grammar and rename manifest"
 description: "Barrier sign-off for the taxonomy decision, the manifest, and the two proving-ground batches. Every item is open: the child is scoped and awaiting operator sign-off."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "grammar and manifest verification checklist"
+  - "grammar and manifest packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"

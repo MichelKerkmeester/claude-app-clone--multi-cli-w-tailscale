@@ -1,6 +1,11 @@
 ---
 title: Deep Research Dashboard
 description: Auto-generated reducer view over the research packet.
+importance_tier: "normal"
+trigger_phrases:
+  - "chat ux desktop parity deep research dashboard"
+  - "chat ux desktop parity packet"
+  - "deep research dashboard"
 ---
 
 # Deep Research Dashboard - Session Overview

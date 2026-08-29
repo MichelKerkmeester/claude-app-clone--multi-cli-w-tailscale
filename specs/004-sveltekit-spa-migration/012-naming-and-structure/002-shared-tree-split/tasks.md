@@ -2,6 +2,11 @@
 title: "Child 002 tasks — shared tree split"
 description: "Task ledger for the 28-file redistribution, the camelCase renames taken in the same move, and the specifier rewrite."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "shared tree split task ledger"
+  - "shared tree split packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"

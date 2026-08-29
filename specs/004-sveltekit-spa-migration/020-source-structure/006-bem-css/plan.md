@@ -2,6 +2,11 @@
 title: "Phase F plan — BEM CSS rename via a shared map, proven behaviour-preserving"
 description: "How the 402 app-mobile classes are renamed to block--element BEM and how the pure-relabel claim is proven: a deterministic injective name-map, a mechanical token-boundary apply, per-site dynamic-class fixes, then zero-orphan, over-rename scan, token-identity, a before/after screenshot diff and test:web — the screenshot diff being the only gate that catches a broken dynamic-class binding."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "bem css plan approach"
+  - "bem css packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/006-bem-css"

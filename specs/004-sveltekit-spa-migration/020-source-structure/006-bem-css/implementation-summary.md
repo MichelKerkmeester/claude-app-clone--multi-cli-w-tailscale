@@ -2,6 +2,11 @@
 title: "Phase F implementation summary — BEM CSS rename"
 description: "The app-mobile CSS classes renamed to a block--element BEM form — 402 of 499, with the is-* state family kept single-dash — proven behaviour-preserving by token-identity 0-diff across 65 tokens × 3 themes, zero class-context orphans, an over-rename scan at 0, and a before/after screenshot diff (514/534 frame-pairs pixel-identical) that surfaced and closed 4 dynamic-class regressions; test:web 734 pass, fences 277."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "bem css implementation summary"
+  - "bem css packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/006-bem-css"

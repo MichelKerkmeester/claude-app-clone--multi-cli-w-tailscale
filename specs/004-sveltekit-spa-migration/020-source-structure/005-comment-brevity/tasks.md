@@ -2,6 +2,11 @@
 title: "Phase E tasks — web-client comment brevity ledger"
 description: "Baseline, batched trims, and the verification barrier for the app-mobile comment brevity. Each task carries its evidence inline."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment brevity task ledger"
+  - "comment brevity packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/005-comment-brevity"

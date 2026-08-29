@@ -2,6 +2,11 @@
 title: "Child 016/001 tasks — projection integrity"
 description: "Task ledger for the reproduction test, the error listener, the sequence-allocation fix, epoch rotation and cross-epoch collection."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "projection integrity task ledger"
+  - "projection integrity packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"

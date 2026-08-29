@@ -2,6 +2,11 @@
 title: "Child 012/003 implementation summary — pages and tooling"
 description: "The whole source tree is kebab-case and kind-first, the tooling that named the old paths was re-baselined, and three more ways a reference can hide were found and closed."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "pages and tooling implementation summary"
+  - "pages and tooling packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"

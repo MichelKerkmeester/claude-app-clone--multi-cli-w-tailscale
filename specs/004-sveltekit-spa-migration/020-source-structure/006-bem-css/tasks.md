@@ -2,6 +2,11 @@
 title: "Phase F tasks — BEM CSS rename ledger"
 description: "Build the map, apply it per batch, and prove the rename behaviour-preserving. Each task carries its evidence inline."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "bem css task ledger"
+  - "bem css packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/006-bem-css"

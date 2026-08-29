@@ -29,6 +29,7 @@
     "status": "complete",
     "has_implementation_summary": true,
     "checklist_complete": null,
-    "last_active_child_id": null
+    "last_active_child_id": null,
+    "source_fingerprint": "sha256:3c19a69a74d6efa8ed548254c8177310bf608ef63fa68cb4f0fe80983b710b93"
   }
 }

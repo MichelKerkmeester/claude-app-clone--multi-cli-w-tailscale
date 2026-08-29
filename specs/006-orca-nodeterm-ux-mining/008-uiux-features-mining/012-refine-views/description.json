@@ -1,0 +1,31 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/012-refine-views",
+  "description": "The views surfaces cover whole screens, empty states, status pills and theme controls, and 37 screenshots record how they actually render",
+  "keywords": [
+    "views",
+    "surfaces",
+    "cover",
+    "whole",
+    "screens",
+    "empty",
+    "states",
+    "status",
+    "pills",
+    "theme",
+    "controls",
+    "screenshots",
+    "record",
+    "actually",
+    "render"
+  ],
+  "lastUpdated": "2026-08-29T07:31:44.401Z",
+  "specId": "012",
+  "folderSlug": "refine-views",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

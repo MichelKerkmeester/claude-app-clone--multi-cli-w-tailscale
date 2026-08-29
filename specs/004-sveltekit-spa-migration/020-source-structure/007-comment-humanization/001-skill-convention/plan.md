@@ -2,6 +2,11 @@
 title: "Phase 1 plan — retire @ds in the surface skill, teach the natural convention"
 description: "Rewrite the skill's comment-convention teaching off @ds and onto the natural human-voice convention, then land it via the Public worktree flow. comment-grammar.md becomes the single source (banners kept; module header, markup labels, per-part purpose lines, greppable do-not-edit note); ds-grammar.md is retired and repointed; editability-guardrails.md restates the frozen-seam contract around the greppable marker; every live reference and asset that instructs @ds authoring is updated. Proven by scan-skill-references broken:0, the router-sync bijection, a packet-scoped drift-guard delta of 0, and the skill loading."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill convention plan approach"
+  - "skill convention packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/001-skill-convention"

@@ -2,6 +2,11 @@
 title: "Phase C checklist — CSS files barrier"
 description: "Barrier sign-off for the co-located CSS extraction: value preservation, fence stability, comment-safe block location, tooling repoint, and the whole gate."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css files verification checklist"
+  - "css files packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/003-css-files"

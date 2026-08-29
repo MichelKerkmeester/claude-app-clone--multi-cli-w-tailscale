@@ -1,0 +1,24 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/002-streaming-reader-media",
+  "description": "The transcript is where a long agent turn either reads clearly or reads as a black box",
+  "keywords": [
+    "transcript",
+    "long",
+    "agent",
+    "turn",
+    "reads",
+    "clearly",
+    "black",
+    "box"
+  ],
+  "lastUpdated": "2026-08-28T11:42:24.616Z",
+  "specId": "002",
+  "folderSlug": "streaming-reader-media",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

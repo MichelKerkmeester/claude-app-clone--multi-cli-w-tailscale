@@ -2,6 +2,11 @@
 title: "Phase C implementation summary — CSS files"
 description: "65 components' scoped <style> blocks extracted to co-located .css files they import, proven value-identical by token identity 0-diff across three themes, fences held at 277, and green across the whole gate including the repointed CSS-corpus reader and four tests."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css files implementation summary"
+  - "css files packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/003-css-files"

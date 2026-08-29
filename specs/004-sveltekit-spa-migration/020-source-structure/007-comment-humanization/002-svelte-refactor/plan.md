@@ -2,6 +2,11 @@
 title: "Phase 2 plan — apply the natural comment convention to the source, comment-only"
 description: "Dispatch luna to retire @ds from every .svelte file, app.css, and the 3 .ts files, comment-only, matching the screen-chat.svelte pilot; Claude owns the fence-gate re-anchor and all verification. Proven per file by a non-comment byte-identical check, and suite-wide by @ds=0, banners intact, frozen-seam fences preserved, token-identity 0-diff, and test:web green."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "svelte refactor plan approach"
+  - "svelte refactor packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor"

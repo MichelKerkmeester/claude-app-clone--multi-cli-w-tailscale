@@ -2,6 +2,11 @@
 title: "Phase 3 — Skill reverify: reconcile the skill with the shipped .svelte reality"
 description: "After the refactor, re-read the sk-code-mobile-cli skill against what actually shipped in the .svelte source and the edge cases phase 2 surfaced (module-header wording, markup-label style, the do-not-edit marker the gate now counts). Fix any drift between what the skill teaches and what the code does; bump the skill version if it changes. Proven by a fresh grep of the shipped convention against the skill's claims, scan-skill-references broken:0, and the drift guards."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill reverify spec requirements"
+  - "skill reverify packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify"

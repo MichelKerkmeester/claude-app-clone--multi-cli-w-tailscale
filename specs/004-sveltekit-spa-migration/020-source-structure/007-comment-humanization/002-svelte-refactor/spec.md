@@ -2,6 +2,11 @@
 title: "Phase 2 — Svelte refactor: humanize comments across every .svelte file, re-anchor the gate"
 description: "Apply the natural human-voice comment convention to every .svelte file in the repo, comment-only: retire the @ds markers, add a module-script header and in-markup section labels, give each function/effect/rule a one-line purpose comment, keep the numbered section banners, and replace @ds guardrail with a greppable do-not-edit note. Re-anchor scripts/naming/scan-comments.mjs onto the new marker so the frozen-seam fence count is preserved. Proven per file by a non-comment byte-identical check, and suite-wide by @ds count 0, banners intact, fences preserved at 273, token-identity 0-diff, and test:web green."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "svelte refactor spec requirements"
+  - "svelte refactor packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/002-svelte-refactor"

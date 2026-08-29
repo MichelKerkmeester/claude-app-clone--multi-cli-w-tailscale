@@ -1,6 +1,11 @@
 ---
 title: Deep Research Strategy - Pi Remote Experience Parity (cli-pi deepseek-v4-flash lineage)
 description: Session tracking for the detached fan-out lineage investigating the 042 remote-experience charter against the 041 architecture.
+importance_tier: "normal"
+trigger_phrases:
+  - "cli pi deepseek v4 flash deep research strategy"
+  - "cli pi deepseek v4 flash packet"
+  - "deep research strategy"
 version: 1.14.0.19
 ---
 

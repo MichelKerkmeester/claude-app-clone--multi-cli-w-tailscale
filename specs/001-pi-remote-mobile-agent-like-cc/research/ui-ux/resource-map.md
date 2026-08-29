@@ -1,6 +1,11 @@
 ---
 title: "Resource Map — Improve the UI/UX and ease-of-use of the \"Pi Remote\" mobile PWA. It is an installable iPhone PWA (Vite + React 19 + Tailwind 4 + React Aria) that remote-controls the Pi coding agent over a Tailscale tailnet. Current surfaces: (1) Home = a session list of running/idle session cards; (2) Session = a typed-block transcript rendering text, thinking, plan, tool_call, tool_result, file_diff, and usage blocks with live streaming, plus a compose box to send and steer prompts; (3) Review = an exact-action approval card (approve, deny, accept-edits); (4) Attention Inbox = content-free push hints (needs_input, finished, error). Design: restrained tokens, one accent, light and dark, prefers-reduced-motion, keyboard and screen-reader support via React Aria. Constraints: mobile-first iPhone, foreground authority, redaction everywhere, mutation approval-gated."
 description: "Auto-generated research resource map from convergence evidence."
+importance_tier: "normal"
+trigger_phrases:
+  - "ui ux resource map"
+  - "ui ux packet"
+  - "resource map"
 ---
 # Resource Map
 

@@ -2,6 +2,11 @@
 title: "Phase F — BEM CSS: rename the web-client classes to a block--element convention"
 description: "Rename the app-mobile CSS classes to a dash-delimited BEM form (block--element / block--modifier) with a few literal-name fixes, everywhere they appear — markup, dynamic class construction, class directives, scoped and global CSS, and the class-selector consumers in scripts/. State-prefix classes (is-*) stay single-dash. A pure relabel, proven behaviour-preserving by zero-orphan, over-rename scan, token-identity, a before/after screenshot diff, and test:web."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "bem css spec requirements"
+  - "bem css packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/006-bem-css"

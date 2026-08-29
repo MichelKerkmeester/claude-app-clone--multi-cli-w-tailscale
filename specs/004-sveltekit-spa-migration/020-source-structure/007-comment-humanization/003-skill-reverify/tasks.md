@@ -2,6 +2,11 @@
 title: "Phase 3 tasks — skill reverify ledger"
 description: "Reconcile the skill with the shipped source, remove the residual @ds-named file, and land the version bump. Evidence inline."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill reverify task ledger"
+  - "skill reverify packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify"

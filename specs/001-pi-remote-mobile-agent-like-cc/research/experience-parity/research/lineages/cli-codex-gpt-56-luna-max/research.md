@@ -1,6 +1,11 @@
 ---
 title: "Research Synthesis — Pi Remote Experience Parity"
 description: "Best-in-class private mobile remote-control design anchored to the 041 Pi RPC relay architecture."
+importance_tier: "normal"
+trigger_phrases:
+  - "cli codex gpt 56 luna max research"
+  - "cli codex gpt 56 luna max packet"
+  - "research"
 session_id: "fanout-cli-codex-gpt-56-luna-max-1786514481346-vicu2t"
 loop_type: "research"
 iterations: 20

@@ -1,6 +1,11 @@
 ---
 title: Deep Research Dashboard
 description: Auto-generated reducer view over the research packet.
+importance_tier: "normal"
+trigger_phrases:
+  - "cli codex gpt 56 luna max deep research dashboard"
+  - "cli codex gpt 56 luna max packet"
+  - "deep research dashboard"
 ---
 
 # Deep Research Dashboard - Session Overview

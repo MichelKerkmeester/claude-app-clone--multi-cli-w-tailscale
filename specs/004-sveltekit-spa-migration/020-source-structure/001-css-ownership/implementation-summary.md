@@ -2,6 +2,11 @@
 title: "Phase A implementation summary — CSS ownership"
 description: "What moved and what stayed: 47 single-owner classes relocated into their components, 35 retained as shared a11y guardrails, proven value-identical and gate-green."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css ownership implementation summary"
+  - "css ownership packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/001-css-ownership"

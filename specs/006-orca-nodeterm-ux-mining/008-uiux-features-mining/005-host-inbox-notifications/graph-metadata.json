@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "packet_id": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/005-host-inbox-notifications",
+  "spec_folder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/005-host-inbox-notifications",
+  "parent_id": "006-orca-nodeterm-ux-mining/008-uiux-features-mining",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "today",
+      "inbox",
+      "snapshot-only",
+      "phase",
+      "cross-session",
+      "notification",
+      "push",
+      "contract",
+      "plan",
+      "timeline",
+      "needs",
+      "sessionid"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "tasks.md",
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement Today",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Plan",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "File Path",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Change Type",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Blockers None",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Technical Context",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Overview Ship",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Depends On",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Estimated Effort",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Test Type",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Task Format",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Inline Approve",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "until",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "field",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "stale",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Date",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Today's inbox is snapshot-only",
+    "created_at": "2026-08-27T17:00:58.399Z",
+    "last_save_at": "2026-08-28T13:37:35.209Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:9bd42ff21eb1e74d06838a43c23d4a965a72ffcba5f1f3a8286f5108444892f3",
+    "source_doc_hashes": {
+      "spec.md": "34577c886797f082ee79780e51a6a0eb7bb84023867b4aa82992b2bc1821b7f0",
+      "plan.md": "0fd56e2a8a5c793607f885bccd9e84752dbe0684ec8ab0709c46b6fcb0243f92",
+      "tasks.md": "1b6289da9fe29391f3bcd58d824cea4d391120fafe924915d8af8dfb50f4b0b5",
+      "checklist.md": "0d1eb7c09bde9a0976ebaf6a89b6a5c6081a04f4b3c6f05b4483792b55851d8c",
+      "implementation-summary.md": "c47ec9187a76e482c5fb06e1303134c62b3e8cd948a3c1067d2f29dc6623da04"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

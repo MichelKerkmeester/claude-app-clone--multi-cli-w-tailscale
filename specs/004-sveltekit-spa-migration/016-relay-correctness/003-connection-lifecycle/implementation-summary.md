@@ -2,6 +2,11 @@
 title: "Child 016/003 implementation summary — connection lifecycle"
 description: "Continuity anchor. Nothing is implemented yet: this records the lockout mechanism, the split that lets the uncontested half ship, and the dissent the client half carries."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "connection lifecycle implementation summary"
+  - "connection lifecycle packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/003-connection-lifecycle"

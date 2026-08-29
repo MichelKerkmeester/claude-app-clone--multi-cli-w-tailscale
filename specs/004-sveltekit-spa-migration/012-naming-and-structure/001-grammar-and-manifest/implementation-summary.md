@@ -2,6 +2,11 @@
 title: "Child 012/001 implementation summary — grammar and manifest"
 description: "The manifest and its applier exist as tooling, and the grammar is proven on the two smallest folders where every mechanical failure mode is present."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "grammar and manifest implementation summary"
+  - "grammar and manifest packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"

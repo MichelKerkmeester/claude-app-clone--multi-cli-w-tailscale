@@ -2,6 +2,11 @@
 title: "Child 001 tasks — naming grammar and rename manifest"
 description: "Task ledger for the taxonomy sign-off, the rename manifest, the generated rewrite, and the two proving-ground batches."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "grammar and manifest task ledger"
+  - "grammar and manifest packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/001-grammar-and-manifest"

@@ -2,6 +2,11 @@
 title: "Child 012/002 implementation summary — shared tree split"
 description: "Twenty-eight modules redistributed into seven folders from the manifest, and the four ways a specifier rewrite can be silently partial, each found by grep rather than by the build."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "shared tree split implementation summary"
+  - "shared tree split packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split"

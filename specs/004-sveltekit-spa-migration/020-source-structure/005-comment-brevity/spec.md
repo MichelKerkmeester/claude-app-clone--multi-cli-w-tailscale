@@ -2,6 +2,11 @@
 title: "Phase E — Comment brevity: trim verbose inline descriptions in the web client"
 description: "Shorten over-long inline comment descriptions across the app-mobile source toward a concise durable-WHY style, keeping section banners and guardrail fences. Comment-only, proven by an AST re-print for scripts, a region check for .svelte, token identity 0-diff, and the web gates."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment brevity spec requirements"
+  - "comment brevity packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/005-comment-brevity"

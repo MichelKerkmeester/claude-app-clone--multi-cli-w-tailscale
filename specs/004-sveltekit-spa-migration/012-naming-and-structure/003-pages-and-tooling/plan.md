@@ -2,6 +2,11 @@
 title: "Child 003 plan — pages rename and tooling catch-up"
 description: "One dispatch per feature folder, then the tooling that makes the renamed tree testable, then the barrier."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "pages and tooling plan approach"
+  - "pages and tooling packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"

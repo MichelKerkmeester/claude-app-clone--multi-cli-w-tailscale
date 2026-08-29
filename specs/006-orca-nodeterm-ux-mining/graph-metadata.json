@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "packet_id": "006-orca-nodeterm-ux-mining",
+  "spec_folder": "006-orca-nodeterm-ux-mining",
+  "parent_id": null,
+  "children_ids": [
+    "006-orca-nodeterm-ux-mining/001-tested-seams",
+    "006-orca-nodeterm-ux-mining/002-home-selection",
+    "006-orca-nodeterm-ux-mining/003-chat-message",
+    "006-orca-nodeterm-ux-mining/004-composer",
+    "006-orca-nodeterm-ux-mining/005-streaming-ask",
+    "006-orca-nodeterm-ux-mining/006-navigation",
+    "006-orca-nodeterm-ux-mining/007-host-requests",
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "phase",
+      "parent",
+      "porting",
+      "verified",
+      "portability-checked",
+      "recommendations",
+      "two",
+      "research",
+      "passes",
+      "sveltekit",
+      "mobile",
+      "client"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "research/research.md",
+      "research/research-angles.md",
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "research.md",
+        "kind": "doc",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "research-angles.md",
+        "kind": "doc",
+        "path": "research/research-angles.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "until",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "differential",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the UI",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "code",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Agent Session History",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Reserved Resume",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "New Workspace",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "Message Copy",
+        "kind": "proper_noun",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "research/research.md",
+        "source": "derived"
+      },
+      {
+        "name": "live-edge",
+        "kind": "key_phrase",
+        "path": "research/research.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase parent for porting verified, portability-checked UX recommendations from two research passes into the SvelteKit mobile client, both now folded area-by-area into the seven phases below: orca (research/research.md, ~48 recs) and nodeterm (research-nodeterm/, 58 findings from a manual multi-agent pass).",
+    "created_at": "2026-08-26T05:54:46.000Z",
+    "last_save_at": "2026-08-27T15:31:26.123Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "research/research.md"
+    ],
+    "source_fingerprint": "sha256:e7bebf1d93a67b7b02729d91a12a077d9903d1aa7512a824091a0415188b2f0a",
+    "source_doc_hashes": {
+      "spec.md": "5f71c435600ecdee83771fb9303744b0c7b336a763bfa8c5ae19740040e226f1",
+      "research/research.md": "69fdbf03c28169035cbf4b00b971d554c53762e5c156c03eed5bef9dacf3bccc"
+    },
+    "last_active_child_id": "006-orca-nodeterm-ux-mining/008-uiux-features-mining",
+    "last_active_at": null
+  }
+}

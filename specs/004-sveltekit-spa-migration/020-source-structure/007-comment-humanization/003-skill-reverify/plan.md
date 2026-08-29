@@ -2,6 +2,11 @@
 title: "Phase 3 plan — reconcile the skill with the shipped source"
 description: "Re-read the sk-code-mobile-cli skill against the .svelte/app.css/.ts reality phase 2 shipped and the edge cases it surfaced (the do-not-edit marker form, the re-anchored fence gate, any residual @ds-named artifact). Fix drift; bump the version if the skill changes."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill reverify plan approach"
+  - "skill reverify packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify"

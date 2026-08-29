@@ -2,6 +2,11 @@
 title: "Child 016/001 checklist — projection integrity"
 description: "Barrier sign-off for the projection and epoch work. Both halves executed; one collection rehearsal remains open."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "projection integrity verification checklist"
+  - "projection integrity packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/016-relay-correctness/001-projection-integrity"

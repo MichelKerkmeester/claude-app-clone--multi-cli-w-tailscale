@@ -2,6 +2,11 @@
 title: "Phase D tasks — restore, tooling, gate"
 description: "Fold component CSS back into scoped <style>: restore the pre-extraction blocks, repoint the readers, prove the whole gate green from the final state."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "styles into svelte task ledger"
+  - "styles into svelte packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/004-styles-into-svelte"

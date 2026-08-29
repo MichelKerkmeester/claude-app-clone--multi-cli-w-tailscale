@@ -2,6 +2,11 @@
 title: "Phase A plan — batched moves, token identity per batch"
 description: "How the 82 single-owner classes move: six disjoint component batches dispatched concurrently to cli-codex, each proven value-identical by the token-identity gate before it lands."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css ownership plan approach"
+  - "css ownership packet"
+  - "plan approach"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/001-css-ownership"

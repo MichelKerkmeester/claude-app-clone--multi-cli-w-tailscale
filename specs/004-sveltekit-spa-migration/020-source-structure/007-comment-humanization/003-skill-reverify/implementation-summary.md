@@ -2,6 +2,11 @@
 title: "Phase 3 implementation summary — skill reconciled with the shipped source"
 description: "The sk-code-mobile-cli skill was re-read against the .svelte/app.css/.ts reality phase 2 shipped and found to teach exactly that convention: the Do not edit — <why> marker, the MODULE and numbered banners, module headers, markup labels, and the re-anchored fence gate all match. The one residue — a manual-testing routing file still named for the retired grammar — was renamed to comment-convention-routing.md and landed as v1.7.1.0. No app source touched."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "skill reverify implementation summary"
+  - "skill reverify packet"
+  - "implementation summary"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify"

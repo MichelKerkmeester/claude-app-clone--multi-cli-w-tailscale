@@ -1,6 +1,11 @@
 ---
 title: "Resource Map — Mine specs/context/nodeterm-main (READ-ONLY) for adoptable patterns for the Pi Remote SvelteKit mobile PWA; full angles in specs/004-sveltekit-spa-migration/010-context-repo-research/nodeterm/charter.md"
 description: "Auto-generated research resource map from convergence evidence."
+importance_tier: "normal"
+trigger_phrases:
+  - "research resource map"
+  - "research packet"
+  - "resource map"
 ---
 # Resource Map
 

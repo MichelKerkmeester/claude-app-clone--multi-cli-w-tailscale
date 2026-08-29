@@ -2,6 +2,11 @@
 title: "Child 003 tasks — pages rename and tooling catch-up"
 description: "Task ledger for the per-folder kind-first renames, the tooling that follows the tree, the conventions stop-gap and the nine-gate barrier."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "pages and tooling task ledger"
+  - "pages and tooling packet"
+  - "task ledger"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling"

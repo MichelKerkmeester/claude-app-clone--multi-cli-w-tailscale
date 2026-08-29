@@ -1,0 +1,27 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/002-home-selection/003-card-polish",
+  "description": "Shipped the \u2705 card presentation over existing DTO fields plus a device-local seen clock: messages + ISO datetime, 20-min stale-unknown look, dropped",
+  "keywords": [
+    "shipped",
+    "card",
+    "presentation",
+    "over",
+    "existing",
+    "dto",
+    "fields",
+    "plus",
+    "device-local",
+    "seen",
+    "clock"
+  ],
+  "lastUpdated": "2026-08-26T05:54:46.000Z",
+  "specId": "003",
+  "folderSlug": "card-polish",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "002-home-selection"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

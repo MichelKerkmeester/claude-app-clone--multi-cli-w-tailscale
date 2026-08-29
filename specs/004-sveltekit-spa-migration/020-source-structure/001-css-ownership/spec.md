@@ -2,6 +2,11 @@
 title: "Phase A — CSS ownership: single-owner classes move to their component"
 description: "Move the 82 classes that app.css defines but only one component uses into that component's scoped style block, proven value-identical by the token-identity gate. app.css keeps tokens, theme, resets and the 44 genuinely shared classes."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "css ownership spec requirements"
+  - "css ownership packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/001-css-ownership"

@@ -2,6 +2,11 @@
 title: "Phase B checklist — comment structure barrier"
 description: "Barrier sign-off for the section-banner harmonization: fence stability, @ds preservation, canonical vocabulary, coverage split, and the whole gate. Every item proven with evidence."
 contextType: "implementation"
+importance_tier: "normal"
+trigger_phrases:
+  - "comment structure verification checklist"
+  - "comment structure packet"
+  - "verification checklist"
 _memory:
   continuity:
     packet_pointer: "specs/004-sveltekit-spa-migration/020-source-structure/002-comment-structure"

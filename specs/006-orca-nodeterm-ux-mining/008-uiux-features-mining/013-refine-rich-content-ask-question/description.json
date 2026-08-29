@@ -1,0 +1,29 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/013-refine-rich-content-ask-question",
+  "description": "The rich-content + ask-question surfaces cover rendered model output and the interactive question card, and 54 screenshots record how they actually",
+  "keywords": [
+    "rich-content",
+    "ask-question",
+    "surfaces",
+    "cover",
+    "rendered",
+    "model",
+    "output",
+    "interactive",
+    "question",
+    "card",
+    "screenshots",
+    "record",
+    "actually"
+  ],
+  "lastUpdated": "2026-08-29T07:31:44.721Z",
+  "specId": "013",
+  "folderSlug": "refine-rich-content-ask-question",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining",
+    "008-uiux-features-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

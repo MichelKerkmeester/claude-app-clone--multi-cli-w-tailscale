@@ -34,7 +34,7 @@ _memory:
 | **Scope** | 31 screenshots |
 | **Constraint** | Host-authoritative, fail-closed. Refinement never adds host truth |
 | **Evidence** | The screenshot itself; a change is proven by a before and after image diff |
-| **Phase chain** | after `013-refine-rich-content-ask-question` · final refinement phase |
+| **Phase chain** | after `013-refine-rich-content-ask-question` · before `015-storybook-designer-adjustability` |
 <!-- /ANCHOR:metadata -->
 
 ---

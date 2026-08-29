@@ -17,7 +17,8 @@
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/011-refine-transcript",
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/012-refine-views",
     "007-orca-nodeterm-ux-mining/008-uiux-features-mining/013-refine-rich-content-ask-question",
-    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces"
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces",
+    "007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability"
   ],
   "manual": {
     "depends_on": [],
@@ -166,7 +167,7 @@
     ],
     "causal_summary": "The orca+nodeterm mining run produced 99 verdict-checked UI/UX findings for the app-mobile client (Pi Remote, a host-authoritative fail-closed SvelteKit PWA)",
     "created_at": "2026-08-27T15:31:24.534Z",
-    "last_save_at": "2026-08-28T19:55:46.552Z",
+    "last_save_at": "2026-08-29T09:00:31.667Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [

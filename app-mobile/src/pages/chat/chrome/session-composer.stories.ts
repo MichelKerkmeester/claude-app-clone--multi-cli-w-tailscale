@@ -2,14 +2,14 @@
 // MODULE: SESSION COMPOSER STORIES
 // ───────────────────────────────────────────────────────────────────
 
-import type { Meta, StoryObj } from '@storybook/sveltekit';
+import type { StoryObj } from '@storybook/sveltekit';
 import type {
   CommandDescriptorDto,
   RuntimeStateDto,
   RuntimeModelCatalogDto,
 } from '@pi-remote/pi-rpc-protocol';
 
-import SessionComposer from './session-composer.svelte';
+import SessionComposer, { type SessionComposerProps } from './session-composer.svelte';
 import AttachmentDraftProvider from '../attachments/attachment-draft-provider.svelte';
 import AttachmentDraftStoryHost from '../attachments/attachment-draft-story-host.svelte';
 import {
@@ -21,7 +21,6 @@ import {
 import type {
   HostCommandCatalogState,
   ScopedCommandSnapshot,
-  SelectedCommandBinding,
 } from '$shared/commands/commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
 
@@ -90,13 +89,52 @@ function makeRuntimeControls(state: RuntimeStateDto): RuntimeControls {
 }
 
 const noop = (): void => {};
-const setPrompt = (_updater: (current: string) => string): void => undefined;
-const onInsertCommand = (_name: string, _binding: SelectedCommandBinding): void => undefined;
+const setPrompt: SessionComposerProps['setPrompt'] = () => undefined;
+const onInsertCommand: SessionComposerProps['onInsertCommand'] = () => undefined;
 
-const baseArgs = {
+const STORY_CONTROLS = 'Story controls';
+
+type SessionComposerStoryArgs = Omit<
+  SessionComposerProps,
+  | 'runtimeControls'
+  | 'catalog'
+  | 'binding'
+  | 'mediaCapability'
+  | 'transcriptQuoteCapability'
+  | 'prompt'
+> & {
+  draft: string;
+  attachments: boolean;
+  planMode: boolean;
+  mediaEnabled: boolean;
+  imageIn: boolean;
+  modelCanViewPhotos: boolean;
+};
+
+function runtimeStateFor(
+  args: Pick<SessionComposerStoryArgs, 'status' | 'runtimeRunning' | 'planMode'>,
+): RuntimeStateDto {
+  const state = args.status === 'running' || args.runtimeRunning ? RUNNING_STATE : DEMO_STATE;
+  return args.planMode ? { ...state, mode: 'plan' } : state;
+}
+
+function mediaCapabilityFor(
+  args: Pick<SessionComposerStoryArgs, 'attachments' | 'mediaEnabled' | 'imageIn'>,
+) {
+  return args.attachments && args.mediaEnabled && args.imageIn
+    ? { enabled: true, imageIn: true }
+    : null;
+}
+
+const baseArgs: SessionComposerStoryArgs = {
   // Isolated recovery session id.
   sessionId: 'storybook-composer',
-  prompt: '',
+  draft: '',
+  attachments: false,
+  planMode: false,
+  mediaEnabled: true,
+  imageIn: true,
+  modelCanViewPhotos: true,
   setPrompt,
   onDraftChange: noop,
   sendPrompt: noop,
@@ -110,46 +148,137 @@ const baseArgs = {
   sendingPrompt: false,
   stopping: false,
   promptError: null,
-  runtimeControls: makeRuntimeControls(DEMO_STATE),
-  catalog: makeCatalog(),
-  binding: null,
   slashSubmitting: false,
   runtimeAuthority: true,
   runtimeRunning: false,
   onInsertCommand,
-  mediaCapability: null,
   onAttachmentSubmitted: noop,
 };
+
+// The synthetic controls are story-only and must not reach the component. Naming
+// them in a discard destructure leaves bindings the linter counts as unused, so
+// they are removed from a copy instead.
+function withoutStoryControls<T extends object, K extends keyof T>(
+  source: T,
+  keys: readonly K[],
+): Omit<T, K> {
+  const copy = { ...source };
+  for (const key of keys) delete copy[key];
+  return copy;
+}
+
+function renderComposer(args: Partial<SessionComposerStoryArgs>) {
+  const storyArgs: SessionComposerStoryArgs = { ...baseArgs, ...args };
+  const props = withoutStoryControls(storyArgs, [
+    'draft',
+    'attachments',
+    'planMode',
+    'mediaEnabled',
+    'imageIn',
+    'modelCanViewPhotos',
+  ]);
+
+  return {
+    Component: SessionComposer,
+    props: {
+      ...props,
+      prompt: storyArgs.draft,
+      runtimeControls: makeRuntimeControls(runtimeStateFor(storyArgs)),
+      catalog: makeCatalog(),
+      binding: null,
+      mediaCapability: mediaCapabilityFor(storyArgs),
+    },
+  };
+}
 
 const meta = {
   title: 'Chrome/SessionComposer',
   component: SessionComposer,
   tags: ['autodocs'],
+  args: {
+    ...baseArgs,
+  },
+  argTypes: {
+    attachments: {
+      control: 'boolean',
+      description: 'Stage the demo photo fixtures in the attachment rail.',
+      table: { category: STORY_CONTROLS },
+    },
+    planMode: {
+      control: 'boolean',
+      description: 'Use the demo runtime fixture in confirmed plan mode.',
+      table: { category: STORY_CONTROLS },
+    },
+    mediaEnabled: {
+      control: 'boolean',
+      description: 'Toggle the host media capability fixture.',
+      table: { category: STORY_CONTROLS },
+    },
+    imageIn: {
+      control: 'boolean',
+      description: 'Toggle image input in the host media capability fixture.',
+      table: { category: STORY_CONTROLS },
+    },
+    modelCanViewPhotos: {
+      control: 'boolean',
+      description: 'Allow the demo model to validate staged photo attachments.',
+      table: { category: STORY_CONTROLS },
+    },
+    draft: {
+      control: 'text',
+      description: 'Edit the composer draft passed to the real prompt field.',
+      table: { category: STORY_CONTROLS },
+    },
+  },
+  parameters: {
+    controls: {
+      exclude: [
+        'runtimeControls',
+        'catalog',
+        'binding',
+        'mediaCapability',
+        'transcriptQuoteCapability',
+        'prompt',
+        'launchDraft',
+        'setPrompt',
+        'onDraftChange',
+        'sendPrompt',
+        'sendSlashDraft',
+        'stopRun',
+        'onInsertCommand',
+        'onAttachmentSubmitted',
+      ],
+    },
+  },
   // The provider receives the story's capability, and the host stages real local
   // files so the composer's attachment rail has content to render.
   decorators: [
     () => ({ Component: StoryHost }),
-    (_story, context) => ({
-      Component: AttachmentDraftProvider,
-      props: {
-        capability: context.args.mediaCapability ?? null,
-        sessionId: context.args.sessionId ?? null,
-        modelCanViewPhotos: true,
-      },
-    }),
+    (story: unknown, context: { args: Partial<SessionComposerStoryArgs> }) => {
+      void story;
+      const args: SessionComposerStoryArgs = { ...baseArgs, ...context.args };
+      return {
+        Component: AttachmentDraftProvider,
+        props: {
+          capability: mediaCapabilityFor(args),
+          sessionId: args.sessionId ?? null,
+          modelCanViewPhotos: args.modelCanViewPhotos,
+        },
+      };
+    },
   ],
-} satisfies Meta<typeof SessionComposer>;
+  render: renderComposer,
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<SessionComposerStoryArgs>;
 
 export const Idle: Story = { args: { ...baseArgs } };
 
 export const WithMedia: Story = {
   args: {
     ...baseArgs,
-    // Story supplies media capability when enabling the affordance.
-    mediaCapability: { enabled: true, imageIn: true },
+    attachments: true,
   },
 };
 
@@ -158,6 +287,5 @@ export const Running: Story = {
     ...baseArgs,
     status: 'running',
     runtimeRunning: true,
-    runtimeControls: makeRuntimeControls(RUNNING_STATE),
   },
 };

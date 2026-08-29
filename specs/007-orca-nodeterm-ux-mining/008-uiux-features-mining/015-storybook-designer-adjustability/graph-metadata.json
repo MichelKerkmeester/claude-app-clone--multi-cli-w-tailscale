@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "packet_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces",
-  "spec_folder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces",
+  "packet_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability",
+  "spec_folder": "007-orca-nodeterm-ux-mining/008-uiux-features-mining/015-storybook-designer-adjustability",
   "parent_id": "007-orca-nodeterm-ux-mining/008-uiux-features-mining",
   "children_ids": [],
   "manual": {
@@ -12,21 +12,21 @@
   "derived": {
     "trigger_phrases": [],
     "key_topics": [
-      "source-control",
-      "attachments",
-      "primitives",
-      "home",
-      "surfaces",
-      "cover",
-      "review",
-      "hub",
-      "plus",
-      "remaining",
-      "small",
-      "screenshots"
+      "designer",
+      "opening",
+      "catalog",
+      "read",
+      "every",
+      "surface",
+      "change",
+      "almost",
+      "nothing",
+      "about",
+      "them",
+      "phase"
     ],
     "importance_tier": "important",
-    "status": "complete",
+    "status": "in_progress",
     "key_files": [
       "plan.md",
       "tasks.md",
@@ -66,13 +66,19 @@
         "source": "derived"
       },
       {
-        "name": "Problem Statement The",
+        "name": "In Progress",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Purpose Walk",
+        "name": "Problem Statement",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Make",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
@@ -84,31 +90,31 @@
         "source": "derived"
       },
       {
-        "name": "Acceptance Criteria",
+        "name": "Performance The",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Performance No",
+        "name": "Security No",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Security The",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Technical Context The",
+        "name": "Implementation Plan",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Overview Walk",
+        "name": "Technical Context",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Overview Three",
         "kind": "proper_noun",
         "path": "plan.md",
         "source": "derived"
@@ -120,50 +126,50 @@
         "source": "derived"
       },
       {
-        "name": "their",
+        "name": "different",
         "kind": "key_phrase",
         "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
         "source": "derived"
       },
       {
         "name": "the",
         "kind": "key_phrase",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "its",
-        "kind": "key_phrase",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Task Format",
-        "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "until",
-        "kind": "key_phrase",
+        "name": "TASK NOTATION",
+        "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "storybook-static",
-        "kind": "key_phrase",
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "sibling",
-        "kind": "key_phrase",
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "siblings",
-        "kind": "key_phrase",
+        "name": "PHASE 3: VERIFICATION",
+        "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
@@ -172,17 +178,11 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Verification Protocol Every",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
-    "causal_summary": "The source-control, attachments, primitives, home surfaces cover the review hub plus the remaining small surfaces, and 31 screenshots record how they actually render",
-    "created_at": "2026-08-28T19:50:59.738Z",
-    "last_save_at": "2026-08-29T08:39:58.942Z",
+    "causal_summary": "A designer opening the catalog can read every surface and change almost nothing about them",
+    "created_at": "2026-08-29T08:38:16.595Z",
+    "last_save_at": "2026-08-29T08:59:23.001Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:6688e0990712659db5c99fc3e1199d48db3a883647cf62419ab1ce2fc9860969",
+    "source_fingerprint": "sha256:8f2589c49ed2844eadb69c326de4fee28cbfca7f0dc71634581bc43957d4ede6",
     "source_doc_hashes": {
-      "spec.md": "85d67c81b6215e354ce20cdff554871a2f7296c7eb6bde79695c209b4928bd29",
-      "plan.md": "bde2e9298c483567534c6876a9ad383fd4316b42df06b9b322a34b241490141a",
-      "tasks.md": "f2ee9d0489394e79edfefe1978a9d1574dc6f49887923152670308dc3091ffc2",
-      "checklist.md": "bec336dccdfd45fbedd2657ba341fce116e2bcbbd7de2c8f40a4f202b2ffd8aa",
-      "implementation-summary.md": "ef62dd5fc270a724fa2b4c1a0624080f0f36b8f32e527fcbc731d4ed49c51755"
+      "spec.md": "2332a29285a16ac6edbbb13d6dec1524cdc251ee187c4d53367fd42b740e1427",
+      "plan.md": "fa0dc0ce3148c465bf78e0ae6fa6fbfd08f1b68129bb57754cb827f496b7185a",
+      "tasks.md": "1672ac9b9646f2e0c39ecdedae0456f207ca178a3dbeb7ea22d9c4909f3afb91",
+      "checklist.md": "a1b8c4f0bd4aaf9dfa94e18150e1da7c109dca3a743f3b70aad8565b8f57621a",
+      "implementation-summary.md": "170d5064fe3b9396ec8546054abb0577920496fb194453d0feebc48eb1c02cf2"
     },
     "last_active_child_id": null,
     "last_active_at": null

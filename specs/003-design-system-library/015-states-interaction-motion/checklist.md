@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — State vocabulary, interaction & motion
 
 - [x] A unified `@ds surface: status` vocabulary exists with `@ds state:` blocks for the shared status

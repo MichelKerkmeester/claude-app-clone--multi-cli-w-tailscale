@@ -6,9 +6,10 @@ trigger_phrases:
   - "root feature catalog"
   - "app feature inventory"
 importance_tier: "normal"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/011-feature-catalog"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/011-feature-catalog"
     last_updated_at: "2026-08-18T19:15:00Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Scaffolded phase child; defined catalog taxonomy and the DeepSeek/Sonnet authoring pipeline"

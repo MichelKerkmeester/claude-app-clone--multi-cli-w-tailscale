@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 implementation summary — host card enrichment (IMPLEMENTED, in progress)"
 description: "Relay + protocol implementation of the host-request set: the SessionCardDto shape gained twelve optional read-only fields (additive-safe), and the relay now emits eight of them (model, attention, and six host-redacted content/derived fields) at GET /api/sessions. Three card fields need the external Pi CLI; the chat RPCs + presence extensions remain."
+trigger_phrases:
+  - "host requests implementation summary"
+  - "host requests packet"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

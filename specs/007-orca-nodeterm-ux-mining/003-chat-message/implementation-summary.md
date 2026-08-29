@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 implementation summary — chat message/transcript interactions (IMPLEMENTED)"
 description: "Shipped the transcript find bar, five-state load taxonomy, quantified copy receipts, http(s) vs file-path prose links, native tool folds, scoped selection copy, and a session action sheet that only forwards host slash-commands. Status Implemented."
+trigger_phrases:
+  - "chat message implementation summary"
+  - "chat message packet"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

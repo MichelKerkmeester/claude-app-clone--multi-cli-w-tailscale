@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 checklist — chat message/transcript interactions barrier"
 description: "Barrier sign-off for the message-level chat affordances (recs 3.1-3.6, 6.6) and the 3.7 exclusions: fail-closed, scoped selection, inert-vs-routed links, token-identity 0-diff, a11y-parity, and test:web green. Implemented."
+trigger_phrases:
+  - "chat message verification checklist"
+  - "chat message packet"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

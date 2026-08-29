@@ -1,0 +1,30 @@
+{
+  "level": "2",
+  "specFolder": "004-sveltekit-spa-migration/012-naming-and-structure/002-shared-tree-split",
+  "description": "Redistribute the 28-file shared/data grab-bag into seven folders grouped by reason to change, and rewrite the specifiers that reach it from nearly",
+  "keywords": [
+    "redistribute",
+    "28-file",
+    "shared",
+    "data",
+    "grab-bag",
+    "seven",
+    "folders",
+    "grouped",
+    "reason",
+    "change",
+    "rewrite",
+    "specifiers",
+    "reach",
+    "nearly"
+  ],
+  "lastUpdated": "2026-08-23T14:34:04.787Z",
+  "specId": "002",
+  "folderSlug": "shared-tree-split",
+  "parentChain": [
+    "004-sveltekit-spa-migration",
+    "012-naming-and-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

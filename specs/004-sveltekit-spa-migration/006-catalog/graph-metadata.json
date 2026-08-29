@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration/006-catalog",
+  "spec_folder": "004-sveltekit-spa-migration/006-catalog",
+  "parent_id": "004-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "storybook sveltekit catalog mock context decorator",
+      "pi remote catalog surfaces live stories"
+    ],
+    "key_topics": [
+      "storybook",
+      "sveltekit",
+      "catalog",
+      "mock",
+      "context",
+      "decorator",
+      "remote",
+      "surfaces",
+      "live",
+      "stories",
+      "stand",
+      "seed"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "reason",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "The React",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Rich",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Catalog",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "reasons",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Disable Storybook",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "exclusions",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol The",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Fix Completeness",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Stand up @storybook/sveltekit, seed stories from registry.ts's pure-data index, and add a mock-context decorator that injects a runtime over demo.ts fixtures so socket-coupled surfaces render — targeting ~60 of 64 surfaces live (vs 6 today). @storybook/addon-a11y + a data-theme toggle decorator replace the bespoke catalog affordances.",
+    "created_at": "2026-08-19T17:24:03.985Z",
+    "last_save_at": "2026-08-24T17:58:13.524Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:9ec251c7750aab986a8bce96ad725bd1604c71d4b609dd70adb19c0628f1d99a",
+    "source_doc_hashes": {
+      "spec.md": "f70bad04f74170a7f48d5066135d544ecd1a1cbc6f85a24bf7675be009e2a0bb",
+      "plan.md": "d2b90de6f9a4fc9febb26a6d7267aeedbc059caa574ca29a603954b6707ae710",
+      "tasks.md": "d757ea6b8649df2d99bbfca1ff70796c856fcf77f86e15ce95d644c08059c705",
+      "checklist.md": "13deb7c27f1efe3363120ee15511c1439a38d674afb57c785393289bb12b212d",
+      "implementation-summary.md": "d8045bff31ffa79b6b07154e644e62602214c26989766e1fabf12a78693dd583"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  },
+  "source_fingerprint": "sha256:86a20522194feda2bd3aba39f52f940cb59b8c44cfe7bd375ebe312306a20d1a"
+}

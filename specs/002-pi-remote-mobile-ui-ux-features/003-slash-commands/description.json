@@ -1,6 +1,6 @@
 {
   "level": "phase",
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/003-slash-commands",
   "description": "Typed slash commands with the real host command list, inline",
   "keywords": [
     "typed",

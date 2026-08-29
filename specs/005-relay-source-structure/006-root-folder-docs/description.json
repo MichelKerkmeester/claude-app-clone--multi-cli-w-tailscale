@@ -1,0 +1,28 @@
+{
+  "level": "2",
+  "specFolder": "005-relay-source-structure/006-root-folder-docs",
+  "description": "Fill the missing folder READMEs at the repo root: the two undocumented Pi extensions (inbound-media, plan) and the packages and extensions container",
+  "keywords": [
+    "fill",
+    "missing",
+    "folder",
+    "readmes",
+    "repo",
+    "root",
+    "two",
+    "undocumented",
+    "extensions",
+    "inbound-media",
+    "plan",
+    "packages",
+    "container"
+  ],
+  "lastUpdated": "2026-08-25T03:30:03.553Z",
+  "specId": "006",
+  "folderSlug": "root-folder-docs",
+  "parentChain": [
+    "005-relay-source-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

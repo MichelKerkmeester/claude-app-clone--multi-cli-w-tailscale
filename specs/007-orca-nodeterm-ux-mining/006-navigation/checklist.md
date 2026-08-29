@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 checklist — fail-closed navigation barrier"
 description: "Barrier sign-off for the Angle-6 navigation recs: fail-closed entry re-validation (id + epoch), selection-precedence separation with idempotent-only retry, the FAB/arrow split, load-earlier recorded as not-portable-now, and a per-session view-mode store that fails closed — proven with token-identity 0-diff, a11y-parity, and test:web green. All barriers closed with evidence."
+trigger_phrases:
+  - "navigation verification checklist"
+  - "navigation packet"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

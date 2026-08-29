@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Plan-mode controls
 
 - [x] Inventory the plan-mode rules in `style.css` and record each `ModePresentationKind` and gating

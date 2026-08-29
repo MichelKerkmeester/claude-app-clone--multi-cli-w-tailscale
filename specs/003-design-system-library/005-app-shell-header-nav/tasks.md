@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — App shell, header & navigation
 
 - [x] Map the shell in `App.tsx` (`App`, `Session` composition root, `Header`, `Home`, `Review`,

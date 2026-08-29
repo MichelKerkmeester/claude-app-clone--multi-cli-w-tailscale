@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Artifacts viewer & previews
 
 - [x] Inventory the artifact-viewer and preview rules in `style.css` and record each viewer phase,

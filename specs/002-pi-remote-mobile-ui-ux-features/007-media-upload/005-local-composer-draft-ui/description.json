@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
   "description": "Local Composer Draft, Preview, and Redacted-Card UI",
   "keywords": [
     "local",

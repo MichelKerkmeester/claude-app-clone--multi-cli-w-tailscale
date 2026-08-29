@@ -1,7 +1,7 @@
 {
   "level": "3",
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/001-research",
-  "description": "Research — F4 — Plan mode with a Tab / keyboard affordance",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/001-research",
+  "description": "Research \u2014 F4 \u2014 Plan mode with a Tab / keyboard affordance",
   "keywords": [
     "research",
     "plan",

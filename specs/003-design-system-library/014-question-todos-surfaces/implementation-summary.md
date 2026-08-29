@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: impl-summary-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Implementation Summary — 003 P2 grandchild 013 (plan/todo & ask-question surfaces)
 
 ## Final state — COMPLETE

@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "packet_id": "005-relay-source-structure/007-comment-brevity",
+  "spec_folder": "005-relay-source-structure/007-comment-brevity",
+  "parent_id": "005-relay-source-structure",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "shorten",
+      "over-long",
+      "inline",
+      "comment",
+      "descriptions",
+      "across",
+      "app-relay",
+      "repo-root",
+      "code",
+      "toward",
+      "concise",
+      "durable-why"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "plan.md",
+      "checklist.md",
+      "spec.md",
+      "tasks.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "comments",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. REQUIREMENTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "5. SUCCESS CRITERIA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Phase 1 · app-relay",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 3: VERIFICATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "VERIFICATION PROTOCOL",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Shorten over-long inline comment descriptions across app-relay and the repo-root code toward a concise durable-WHY style, keeping the section banners and guardrail fences. Comment-only, proven by an AST re-print that is byte-identical modulo comments.",
+    "created_at": "2026-08-25T03:30:44.319Z",
+    "last_save_at": "2026-08-25T03:30:44.319Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:f268c5617b8386ea6b001bb2c2cf6d22c6cca6a8ddb14826aad3592444c2dcff",
+    "source_doc_hashes": {
+      "spec.md": "c67c7abed23a2319e81b99706550a62de0444a5d087ec1078e731fec5117d5b6",
+      "plan.md": "a25b830b757d60447c8098f66b2ecbbe4e0c434898c6075ae143b6790999af1c",
+      "tasks.md": "30abc1d0bb25594752a064f43fb00ed7d4c7571b24b9be6780c7590952ce5a9d",
+      "checklist.md": "86abc523c6ae559e0729552bb79c4be7cd200835cba1c3f697614dc9ec1ca716",
+      "implementation-summary.md": "4c3b6d2341f5345d745b72217b9c12b6bce47733843d06accbdf82370fe98848"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  },
+  "source_fingerprint": "sha256:2cec135fce30fa6c4d711f6ab9cede837c2e5c95430908243bd7f89af4af3734"
+}

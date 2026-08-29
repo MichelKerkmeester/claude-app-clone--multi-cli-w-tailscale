@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Overlay, sheet & modal primitives
 
 - [x] One shared `@ds surface: overlay` primitive exists in `src/style.css` with `@ds slot:` seams

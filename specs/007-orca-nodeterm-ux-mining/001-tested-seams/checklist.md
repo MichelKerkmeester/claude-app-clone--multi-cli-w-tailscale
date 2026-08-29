@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 checklist — pure-seam barrier: differential + boundary tests, fail-closed, behaviour-preserving"
 description: "Barrier sign-off for the six pure-function seams: each is pure over an immutable id+epoch+revision snapshot, each has a differential test (incremental == full rebuild) and a boundary test (stale/unknown/mismatched stays unresolved), the scope-guard and draft-reconcile have one source of truth, and token-identity 0-diff + test:web + a11y-parity prove no rendered behaviour changed. All open — plan only."
+trigger_phrases:
+  - "tested seams verification checklist"
+  - "tested seams packet"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

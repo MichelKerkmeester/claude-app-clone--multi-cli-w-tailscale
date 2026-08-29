@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 — Host protocol request spec: the ⚠️ new-field/RPC set for the orca UX wins"
 description: "A cross-team request to the relay/host team for the read-only fields and RPCs the ⚠️ orca recommendations need: the minimum home-card bundle (title, lastMessagePreview, agent, attention), the optional/product-gated fields (queued/subagent counts or resumable, redacted projectLabel/cwd/branch, pinned + pin RPC, capped previewMessages[], hasMore page token), and the chat RPCs (@-file-search, image-paste upload lease, dictation/STT, typed approval envelope). Each entry gives the wire shape, the exact UI it unlocks in a named consuming phase, the fail-closed fallback until it lands, and its orca wire-compat note. Implements no client code; it is the buildable-when-the-host-ships contract."
+trigger_phrases:
+  - "host requests spec requirements"
+  - "host requests packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

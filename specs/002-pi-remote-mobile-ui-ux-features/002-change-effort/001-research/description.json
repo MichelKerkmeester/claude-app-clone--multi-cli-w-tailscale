@@ -1,7 +1,7 @@
 {
   "level": "3",
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/001-research",
-  "description": "Research — Change the effort / reasoning level",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/002-change-effort/001-research",
+  "description": "Research \u2014 Change the effort / reasoning level",
   "keywords": [
     "research",
     "change",

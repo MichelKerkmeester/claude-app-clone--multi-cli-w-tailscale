@@ -1,0 +1,30 @@
+{
+  "level": "2",
+  "specFolder": "005-relay-source-structure/002-bare-file-headers",
+  "description": "Give the 16 app-relay files with no header — 15 test suites and src/runtime/plan-status.ts — a // MODULE: banner and the same numbered section markers",
+  "keywords": [
+    "give",
+    "app-relay",
+    "files",
+    "header",
+    "test",
+    "suites",
+    "src",
+    "runtime",
+    "plan-status",
+    "module",
+    "banner",
+    "same",
+    "numbered",
+    "section",
+    "markers"
+  ],
+  "lastUpdated": "2026-08-24T19:45:01.123Z",
+  "specId": "002",
+  "folderSlug": "bare-file-headers",
+  "parentChain": [
+    "005-relay-source-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

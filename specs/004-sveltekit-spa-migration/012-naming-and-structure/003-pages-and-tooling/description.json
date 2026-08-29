@@ -1,0 +1,31 @@
+{
+  "level": "2",
+  "specFolder": "004-sveltekit-spa-migration/012-naming-and-structure/003-pages-and-tooling",
+  "description": "Kind-first renames across every feature folder under pages/, then the configs, globs, story ids and coverage allowlist that make the renamed tree",
+  "keywords": [
+    "kind-first",
+    "renames",
+    "across",
+    "every",
+    "feature",
+    "folder",
+    "pages",
+    "configs",
+    "globs",
+    "story",
+    "ids",
+    "coverage",
+    "allowlist",
+    "renamed",
+    "tree"
+  ],
+  "lastUpdated": "2026-08-23T18:54:07.492Z",
+  "specId": "003",
+  "folderSlug": "pages-and-tooling",
+  "parentChain": [
+    "004-sveltekit-spa-migration",
+    "012-naming-and-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 plan — how the host-request spec is structured and proven complete"
 description: "How the ⚠️ set becomes a buildable host request: one card-bundle table, one optional-fields table, one RPC table, each row a four-facet contract (shape · consuming-phase UI · fail-closed fallback · wire-compat), grounded in the real SessionCardDto/AttentionItemDto/guard shapes; and how completeness is proven — every row traces to a rec number and a consuming phase, Open-Q#1 is answered from the protocol, and no client code is touched."
+trigger_phrases:
+  - "host requests plan approach"
+  - "host requests packet"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

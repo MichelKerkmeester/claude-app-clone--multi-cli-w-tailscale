@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Model & effort sheet
 
 - [x] Inventory `.model-sheet-overlay` rules and the `--model-sheet-*` token set (light, dark,

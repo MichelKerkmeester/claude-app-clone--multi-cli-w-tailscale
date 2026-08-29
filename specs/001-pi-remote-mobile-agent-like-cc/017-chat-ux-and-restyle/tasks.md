@@ -1,6 +1,11 @@
 ---
 title: "Tasks — Pi Remote Desktop-Parity Chat UX"
 description: "Task ledger for Pi Remote Desktop-Parity Chat UX."
+trigger_phrases:
+  - "chat ux and restyle task ledger"
+  - "chat ux and restyle packet"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

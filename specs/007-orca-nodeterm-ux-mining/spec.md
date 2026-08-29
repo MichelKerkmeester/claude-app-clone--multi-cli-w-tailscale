@@ -2,6 +2,10 @@
 title: "orca + nodeterm UX mining — implement the verified portable recommendations"
 description: "Phase parent for porting verified, portability-checked UX recommendations from two research passes into the SvelteKit mobile client, both now folded area-by-area into the seven phases below: orca (research/research.md, ~48 recs) and nodeterm (research-nodeterm/, 58 findings from a manual multi-agent pass). Grouped by area and ordered by leverage and dependency: a tested pure-function foundation, home session-selection UX, chat message/transcript UX, composer UX, streaming and ask/permission hardening, navigation correctness, and a host-protocol request spec for the items that need new host fields. Every ported idea stays host-authoritative and fail-closed; nothing implements until the operator says go."
 contextType: "planning"
+trigger_phrases:
+  - "orca nodeterm ux mining spec requirements"
+  - "orca nodeterm ux mining packet"
+  - "spec requirements"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining"
@@ -95,6 +99,6 @@ Non-negotiable across every phase:
 
 - `research/research.md` — the verified synthesis every phase draws from.
 - `research/research-angles.md` — the goal, our current-state gaps, and the constraint.
-- `../005-sveltekit-spa-migration/020-source-structure/` — the source/comment conventions any new code follows.
+- `../004-sveltekit-spa-migration/020-source-structure/` — the source/comment conventions any new code follows.
 - `../002-pi-remote-mobile-ui-ux-features/` — the earlier per-feature UX packets some recommendations extend.
 <!-- /ANCHOR:cross-refs -->

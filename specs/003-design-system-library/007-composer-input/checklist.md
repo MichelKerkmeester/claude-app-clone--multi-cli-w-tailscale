@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Composer input
 
 - [x] `SessionComposer` declares `@ds surface:`, `@ds slot:` (tray, tools trigger, input, primary

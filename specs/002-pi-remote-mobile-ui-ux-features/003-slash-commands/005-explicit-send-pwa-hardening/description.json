@@ -1,6 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/005-explicit-send-pwa-hardening",
-  "description": "Phase 4 — Explicit Send integration and iPhone/PWA hardening",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/003-slash-commands/005-explicit-send-pwa-hardening",
+  "description": "Phase 4 \u2014 Explicit Send integration and iPhone/PWA hardening",
   "keywords": [
     "phase",
     "explicit",

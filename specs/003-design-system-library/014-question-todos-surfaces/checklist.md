@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Plan/todo & ask-question surfaces
 
 > Spec reconciliation: the ask-question and todos surfaces, planned as "future/pending" in spec.md,

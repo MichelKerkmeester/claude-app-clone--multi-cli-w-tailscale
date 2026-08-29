@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Plan/todo & ask-question surfaces
 
 > **Spec reconciliation (Logic-Sync):** spec.md was written when the ask-question and todos surfaces

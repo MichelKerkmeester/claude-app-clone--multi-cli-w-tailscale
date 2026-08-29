@@ -1,6 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/003-relay-authorized-immutable-artifact-contract",
-  "description": "Phase 2 — Relay-authorized immutable artifact contract",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/005-file-preview/003-relay-authorized-immutable-artifact-contract",
+  "description": "Phase 2 \u2014 Relay-authorized immutable artifact contract",
   "keywords": [
     "phase",
     "relay-authorized",

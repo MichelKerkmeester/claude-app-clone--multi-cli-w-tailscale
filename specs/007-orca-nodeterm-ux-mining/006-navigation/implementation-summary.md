@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 implementation summary — fail-closed session→chat navigation (planned)"
 description: "Planned stub for the Angle-6 navigation phase: carry the id raw and re-validate id + epoch at chat entry before any load or command (6.1); separate the selection-precedence states with idempotent-only retry and a host-follow supersede (6.2); keep the list FAB distinct from the per-turn arrow (6.3); record load-earlier as not-portable-now (6.4); and add a per-session view-mode store that fails closed (6.5). Implementation deferred until the operator says go — no completion claims."
+trigger_phrases:
+  - "navigation implementation summary"
+  - "navigation packet"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

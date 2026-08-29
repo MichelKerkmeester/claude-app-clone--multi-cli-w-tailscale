@@ -1,6 +1,11 @@
 ---
 title: "Pi Remote Desktop-Parity Chat UX"
 description: "Pi Remote Desktop-Parity Chat UX"
+trigger_phrases:
+  - "chat ux and restyle spec requirements"
+  - "chat ux and restyle packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

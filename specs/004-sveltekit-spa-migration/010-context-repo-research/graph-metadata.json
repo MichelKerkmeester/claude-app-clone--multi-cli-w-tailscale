@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration/010-context-repo-research",
+  "spec_folder": "004-sveltekit-spa-migration/010-context-repo-research",
+  "parent_id": "004-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "context repo research",
+      "five repo research sweep",
+      "research recommendations decision"
+    ],
+    "key_topics": [
+      "context",
+      "repo",
+      "research",
+      "five",
+      "sweep",
+      "recommendations",
+      "decision",
+      "mine",
+      "checked-out",
+      "reference",
+      "codebases",
+      "patterns"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Name",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Three",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Merge",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Open The",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Task Notation",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "React Native",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Completion Criteria The",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "What Was Built Five",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "How It Was Delivered Through",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Key Decisions",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "Known Limitations",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "no",
+        "kind": "key_phrase",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Mine five checked-out reference codebases for patterns that a phone-remote for an AI coding CLI has to get right, and hand the operator a decision-ready recommendation list. Research only: the sweep reads the context repos and writes findings, it never modifies them and never scaffolds anything into the product without approval.",
+    "created_at": "2026-08-23T06:30:13.518Z",
+    "last_save_at": "2026-08-24T17:58:13.686Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:0a7a524e0efb20ba58e070b5c3db3b6230eae339f5ff6b8e470751254fcdf144",
+    "source_doc_hashes": {
+      "spec.md": "b46aaa54375370a0092e3ec99e9156fb5c258dc965223c14ac9dd022789569db",
+      "plan.md": "bb212603e4d76d608387b25771a9a4fcc48d8f17c6ff7c8e5a3fe3f3bc99ba3e",
+      "tasks.md": "83e8bebfe7f8b6ae99c84896fa630c8a6b9180253bc771c58ee0a4ba1579c540",
+      "implementation-summary.md": "f5e6bfc24cc5c865374ac9ca52cd445b4d26105abf977bd76810b6590747870a"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  },
+  "source_fingerprint": "sha256:52d64d23cd42458a38192d58ff5373867be350d40f8068d3c4b4f8f100d5e9e6"
+}

@@ -1,6 +1,6 @@
 {
   "level": "3",
-  "specFolder": "app-mobile-cli/003-design-system-library/003-theming-light-dark",
+  "specFolder": "003-design-system-library/003-theming-light-dark",
   "description": "Grandchild 2 \u2014 Light/dark theming & contrast",
   "keywords": [
     "grandchild",

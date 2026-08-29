@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Token library foundation
 
 - [x] Inventory every token in `apps/pi-remote-web/src/style.css` and record its resolved light and

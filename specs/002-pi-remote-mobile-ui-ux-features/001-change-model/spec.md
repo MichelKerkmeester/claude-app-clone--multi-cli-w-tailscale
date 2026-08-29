@@ -3,10 +3,13 @@ title: "F1 — Change the active AI model"
 description: "F1 — Change the active AI model"
 trigger_phrases:
   - "f1 — change the active ai model"
+  - "change model spec requirements"
+  - "change model packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/001-change-model"
     last_updated_at: "2026-08-16T07:47:48Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Synthesized research and scaffolded feature spec plus build sub-phases"

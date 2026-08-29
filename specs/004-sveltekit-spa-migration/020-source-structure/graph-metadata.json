@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration/020-source-structure",
+  "spec_folder": "004-sveltekit-spa-migration/020-source-structure",
+  "parent_id": "004-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "phase",
+      "parent",
+      "finishing",
+      "migration",
+      "one-file-per-component",
+      "intent",
+      "move",
+      "single-owner",
+      "css",
+      "component",
+      "scoped",
+      "style"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Progress",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "their",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. PHASE DOCUMENTATION MAP",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. INVARIANTS",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Phase parent for finishing the migration's one-file-per-component intent: move single-owner CSS into its component's scoped style, standardise the section-comment vocabulary, and teach both in the surface skill.",
+    "created_at": "2026-08-24T06:38:17.258Z",
+    "last_save_at": "2026-08-25T19:25:28.000Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:9bf64c7e9a8be39fa0f5e88ea8723786e0fc099ffa73fb3de12cb2a1a71350b8",
+    "source_doc_hashes": {
+      "spec.md": "4feb656c8cdc1cd03a1666fe5ef8f3e20cf4f1735ff6f4cddbdb6f0ed01ed4fc"
+    },
+    "last_active_child_id": "004-sveltekit-spa-migration/020-source-structure/007-comment-humanization",
+    "last_active_at": "2026-08-25T19:25:28.000Z"
+  },
+  "source_fingerprint": "sha256:d7b5c529a13ab8690c6373595c0b396acd227a6ae850bba263428f33dbbccc22"
+}

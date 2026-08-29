@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 — Composer / input: port the verified orca composer recommendations"
 description: "Plan the composer-surface recommendations from the orca UX mining synthesis (recs 4.1–4.8) into the SvelteKit mobile client, host-authoritative and fail-closed. Ships the ✅ set — image-or-text send with a never-disabled textarea and exact-draft-restore-on-reject, the line-leading slash rule plus a suggestion cap sourced from the host catalog, a device-local prompt-history recall sheet, paste-image classification into the existing attachment lease, on-device dictation as an editable local draft, the composer action-row option pickers, and the model/effort-sheet reconciliation bug-fixes — and plans the ⚠️ @-file mention UI shape against a host file-search RPC. Plan only; nothing implements until the operator says go."
+trigger_phrases:
+  - "composer spec requirements"
+  - "composer packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

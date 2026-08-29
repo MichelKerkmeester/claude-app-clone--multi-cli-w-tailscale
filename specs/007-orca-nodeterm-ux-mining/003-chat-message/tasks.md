@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 tasks — chat message/transcript interactions ledger"
 description: "Setup the reusable seams, build recs 3.1-3.6 and 6.6 against the cited transcript files, record the 3.7 exclusions, and prove fail-closed + token-identity 0-diff + a11y-parity + test:web. Implemented."
+trigger_phrases:
+  - "chat message task ledger"
+  - "chat message packet"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

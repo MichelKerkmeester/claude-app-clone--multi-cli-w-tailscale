@@ -1,6 +1,6 @@
 {
   "level": "3",
-  "specFolder": "app-mobile-cli/003-design-system-library/009-slash-command-autocomplete",
+  "specFolder": "003-design-system-library/009-slash-command-autocomplete",
   "description": "Grandchild 8 \u2014 Slash command autocomplete",
   "keywords": [
     "grandchild",

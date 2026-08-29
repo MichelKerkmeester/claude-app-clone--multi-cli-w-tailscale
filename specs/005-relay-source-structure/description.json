@@ -1,0 +1,29 @@
+{
+  "level": "3",
+  "specFolder": "005-relay-source-structure",
+  "description": "Phase parent for making the non-web source read the same way the web client does: numbered section banners, a module header on the files that lack",
+  "keywords": [
+    "phase",
+    "parent",
+    "non-web",
+    "source",
+    "read",
+    "same",
+    "way",
+    "web",
+    "client",
+    "numbered",
+    "section",
+    "banners",
+    "module",
+    "header",
+    "files",
+    "lack"
+  ],
+  "lastUpdated": "2026-08-25T03:29:46.050Z",
+  "specId": "005",
+  "folderSlug": "relay-source-structure",
+  "parentChain": [],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

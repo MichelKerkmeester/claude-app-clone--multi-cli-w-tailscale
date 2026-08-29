@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration/015-test-lanes",
+  "spec_folder": "004-sveltekit-spa-migration/015-test-lanes",
+  "parent_id": "004-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "vitest logic allowlist glob",
+      "svelte eslint parser missing",
+      "virtualizer mocked in every test"
+    ],
+    "key_topics": [
+      "vitest",
+      "logic",
+      "allowlist",
+      "glob",
+      "svelte",
+      "eslint",
+      "parser",
+      "missing",
+      "virtualizer",
+      "mocked",
+      "every",
+      "test"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "extra",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Baseline Record",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "glob-first",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "every",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Dead React",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Fix Completeness",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Replace the hardcoded logic-test allowlist with a glob, stop mocking the virtualizer out of existence, give ESLint a Svelte parser, and cover the transcript reducer. A precondition packet: it makes every later fix provable.",
+    "created_at": "2026-08-23T10:26:59.698Z",
+    "last_save_at": "2026-08-24T17:58:13.879Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:7834906011ccbc1ae0ed0c35ab7196b8418cf7f39e2ef83bdb90aadf73c84582",
+    "source_doc_hashes": {
+      "spec.md": "fd5d04baaa838ce42d475bc2da9c04d9f9f71659fb265cd760eaff3acaa9dc6b",
+      "plan.md": "33b272cab61dd8d7d51cbc3377428680cc4cf477531e3e6b0677c41a1726a2a6",
+      "tasks.md": "e63c6cc4ed9c0a3d25e12a0296570eb83f886847a2950246de071c10c51a1219",
+      "checklist.md": "18863811592f3ac0317791f044fb8f6365cbeb78715a0fa78d190015fc8f1ecc",
+      "implementation-summary.md": "3dc88f11571b31af77d14909b1ba0cc1e4eccd0857fe5e85ce898ce28c7fc38f"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  },
+  "source_fingerprint": "sha256:96af464c785228c3ca950c117e354fa231233733bf740f8900652fd592ba9b11"
+}

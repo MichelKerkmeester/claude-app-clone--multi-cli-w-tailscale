@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 tasks — composer recommendation ledger (recs 4.1–4.8)"
 description: "Extract the shared seams, apply each Angle-4 composer recommendation to its cited file, then prove the set fail-closed and behaviour-preserving."
+trigger_phrases:
+  - "composer task ledger"
+  - "composer packet"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

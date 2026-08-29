@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration/020-source-structure/003-css-files",
+  "spec_folder": "004-sveltekit-spa-migration/020-source-structure/003-css-files",
+  "parent_id": "004-sveltekit-spa-migration/020-source-structure",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "extract",
+      "every",
+      "component",
+      "scoped",
+      "style",
+      "block",
+      "co-located",
+      "css",
+      "file",
+      "imports",
+      "browsable",
+      "per"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "plan.md",
+      "checklist.md",
+      "spec.md",
+      "tasks.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "balanced",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "styles",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "another",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "one",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ARCHITECTURE",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "4. IMPLEMENTATION PHASES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 3: VERIFICATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "COMPLETION CRITERIA",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "VERIFICATION PROTOCOL",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Extract every component's scoped <style> block into a co-located .css file it imports, so the CSS is browsable per component as the operator asked. Global scope, unchanged class names and values, proven by the token-identity gate holding at zero diffs.",
+    "created_at": "2026-08-24T12:29:37.794Z",
+    "last_save_at": "2026-08-24T18:40:12.122Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:17ecbc0fb00ff6dbc7ede7c698adeb5f135076c75fcfeaa70985c329f6af3095",
+    "source_doc_hashes": {
+      "spec.md": "0b1141a731010b19e16906439e949af00c568c11f14d0fe1386dd56aa1317bdc",
+      "plan.md": "2e14e601596b01ef3e97e84dbe6778797ebcb3d0a84643d3e0b71d0faa6b25fd",
+      "tasks.md": "fe97e7bdabc30015a67e6beda3a2599a9fcf9af5abc7f4c3f282a35063d7076e",
+      "checklist.md": "88467974d66ea81c6cf8cd7c2865d9e073a807408e5d6e2cbeb2844a87f704e4",
+      "implementation-summary.md": "252fdd6af84a2953e69d9ab1d7a165547ed98c7d1b108d46048ad553c7e14d44"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  },
+  "source_fingerprint": "sha256:c420052bb808778f722a5a8b4bf0060904fbfc3ca3446757ad5758915e672d17"
+}

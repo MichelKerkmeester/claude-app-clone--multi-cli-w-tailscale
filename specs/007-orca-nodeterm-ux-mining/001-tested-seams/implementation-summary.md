@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 implementation summary — tested pure-function seams (IMPLEMENTED)"
 description: "Planned stub. The six view-logic seams — home filter/sort/group, session-card projection, message grouping, draft reconciliation, id+epoch scope-guard, and stale-decay — will be extracted or authored as pure functions over immutable id+epoch+revision snapshots, each with a differential test (incremental == full rebuild) and a boundary test (stale/unknown/mismatched stays unresolved), proven behaviour-preserving by token-identity 0-diff and test:web. No implementation until the operator says go."
+trigger_phrases:
+  - "tested seams implementation summary"
+  - "tested seams packet"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

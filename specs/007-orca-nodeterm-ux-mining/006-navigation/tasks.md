@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 tasks — fail-closed navigation ledger"
 description: "Inventory the nav/entry seam, add fail-closed entry re-validation and selection-precedence separation, assert the FAB/arrow split, record load-earlier as not-portable-now, and add a fail-closed per-session view-mode store. Every task is open and cites its rec number and the real app file it will touch. Plan only."
+trigger_phrases:
+  - "navigation task ledger"
+  - "navigation packet"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

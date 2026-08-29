@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
   "description": "Protocol Contracts and Fail-Closed Capability Gate",
   "keywords": [
     "protocol",

@@ -1,0 +1,27 @@
+{
+  "level": "2",
+  "specFolder": "005-relay-source-structure/004-folder-ownership-map",
+  "description": "Write a reason-to-change map for the 16 top-level app-relay/src folders — for each folder, what it owns and the kind of change that belongs there — so",
+  "keywords": [
+    "write",
+    "reason-to-change",
+    "map",
+    "top-level",
+    "app-relay",
+    "src",
+    "folders",
+    "folder",
+    "owns",
+    "kind",
+    "change",
+    "belongs"
+  ],
+  "lastUpdated": "2026-08-24T21:41:27.038Z",
+  "specId": "004",
+  "folderSlug": "folder-ownership-map",
+  "parentChain": [
+    "005-relay-source-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

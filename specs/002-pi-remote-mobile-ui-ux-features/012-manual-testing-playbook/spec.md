@@ -6,9 +6,10 @@ trigger_phrases:
   - "root testing playbook"
   - "app validation scenarios"
 importance_tier: "normal"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/012-manual-testing-playbook"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/012-manual-testing-playbook"
     last_updated_at: "2026-08-18T20:15:00Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Scaffolded phase child; defined playbook taxonomy + feature-ID map + DeepSeek/Sonnet pipeline"

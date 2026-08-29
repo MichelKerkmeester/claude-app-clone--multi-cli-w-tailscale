@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 plan — derivation-first streaming/ask hardening, proven fail-closed and behaviour-safe"
 description: "How the eight Angle-5 recs land: introduce streaming-token, input-lock-reason, and one-blocking-prompt as pure derivations over existing state first, then apply each rec to its surface — peek-safe streaming and the working-vs-streaming split in the transcript, echo reconciliation by host message id in the send path, named lock reasons with a 600 ms settle on the composer gate, verified option-identity + out-of-card dismissal on the ask card, ticket-driven single-flight approval on Review, one-blocking-prompt precedence, and named empty/error copy with an assertive send-failure channel — then prove it with a fail-closed pass, token-identity, a11y-parity, and test:web."
+trigger_phrases:
+  - "streaming ask plan approach"
+  - "streaming ask packet"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

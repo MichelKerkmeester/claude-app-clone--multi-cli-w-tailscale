@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Live catalog & designer docs
 
 - [x] The catalog enumerates every `@ds surface:` and its `@ds state:` blocks and renders each

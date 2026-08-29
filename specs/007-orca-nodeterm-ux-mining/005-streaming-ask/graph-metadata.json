@@ -102,7 +102,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Harden the mature streaming and blocking-prompt surfaces against the eight verified orca Angle-5 recommendations: keep streaming session-scoped and peek-safe, split the working dots from the streaming partial-text, reconcile the optimistic user echo by host message id, name the input-lock reasons with a settle window, verify the ask card answers by option identity with dismissal kept outside the card, render approval buttons from the host ticket under single-flight, allow one blocking prompt at a time, and name the empty/loading/error transcript copy with a single assertive send-failure channel. Every affordance reads existing DTO fields or is pure interaction; nothing owns session truth. Plan only \u2014 no implementation until the operator says go.",
+    "causal_summary": "Harden the mature streaming and blocking-prompt surfaces against the eight verified orca Angle-5 recommendations: keep streaming session-scoped and peek-safe, split the working dots from the streaming partial-text, reconcile the optimistic user echo by host message id, name the input-lock reasons with a settle window, verify the ask card answers by option identity with dismissal kept outside the card, render approval buttons from the host ticket under single-flight, allow one blocking prompt at a time, and name the empty/loading/error transcript copy with a single assertive send-failure channel. Every affordance reads existing DTO fields or is pure interaction; nothing owns session truth. Plan only — no implementation until the operator says go.",
     "created_at": "2026-08-26T05:54:46.000Z",
     "last_save_at": "2026-08-26T05:54:46.000Z",
     "save_lineage": "graph_only",
@@ -114,7 +114,7 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:555397a5ad9f54e323e23b0506e4c61d5c294c696773446a32847227e037d730",
+    "source_fingerprint": "sha256:bf8d436c9e979bb3eab8f2a88039f5c698809997e0c97e5bcbf87f75113ad0c6",
     "source_doc_hashes": {
       "spec.md": "3787787bdb65e451592edb648ae88d6587e455cbde19939fb1ff598550faa3d9",
       "plan.md": "4832a2d6dbd5303687e47fa014261ac6861ef52d330b61cc3bd7e0d707428014",

@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 plan — fail-closed session→chat navigation, proven by fail-closed + interaction tests"
 description: "How the Angle-6 navigation recs land: keep the id raw through the router and re-validate id + epoch at chat entry before any load or command; separate the selection-precedence states so a snapshot refresh cannot move the user and only a host follow supersedes; keep the list FAB distinct from the per-turn arrow; record load-earlier as not-portable-now; and add a per-session view-mode store that fails closed. Proven by fail-closed unit/behaviour tests, token-identity 0-diff, a11y-parity and test:web — plan only, nothing implements until the operator says go."
+trigger_phrases:
+  - "navigation plan approach"
+  - "navigation packet"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

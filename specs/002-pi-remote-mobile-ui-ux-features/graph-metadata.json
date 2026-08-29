@@ -4,16 +4,16 @@
   "spec_folder": "002-pi-remote-mobile-ui-ux-features",
   "parent_id": null,
   "children_ids": [
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/001-change-model",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/006-rich-content-blocks",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos",
+    "002-pi-remote-mobile-ui-ux-features/001-change-model",
+    "002-pi-remote-mobile-ui-ux-features/002-change-effort",
+    "002-pi-remote-mobile-ui-ux-features/003-slash-commands",
+    "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab",
+    "002-pi-remote-mobile-ui-ux-features/005-file-preview",
+    "002-pi-remote-mobile-ui-ux-features/006-rich-content-blocks",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload",
+    "002-pi-remote-mobile-ui-ux-features/008-inbound-media",
+    "002-pi-remote-mobile-ui-ux-features/009-ask-question",
+    "002-pi-remote-mobile-ui-ux-features/010-todos",
     "002-pi-remote-mobile-ui-ux-features/001-change-model",
     "002-pi-remote-mobile-ui-ux-features/002-change-effort",
     "002-pi-remote-mobile-ui-ux-features/003-slash-commands",
@@ -34,7 +34,7 @@
   },
   "derived": {
     "trigger_phrases": [
-      "feature specification: pi remote — mobile ui/ux feature parity"
+      "feature specification: pi remote \u2014 mobile ui/ux feature parity"
     ],
     "key_topics": [
       "feature",
@@ -159,12 +159,12 @@
       "spec.md",
       "handover.md"
     ],
-    "source_fingerprint": "sha256:69aa5ce3e8d621d48069e37adadc5cdcb65df381cad21868bbc29d13aed3a5de",
+    "source_fingerprint": "sha256:946cad00e27df11486a270516a855836d01ba1b85970602d0136a51ea7f229f5",
     "source_doc_hashes": {
       "spec.md": "acab933ffbc6e581860d477c0f2f60981002232879fb44ea60e75f37c3d33ed0",
       "handover.md": "d2b8cec39d5486cce4eeab6baf2f2610670ef2f091a331578181cff964123043"
     },
-    "last_active_child_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media",
+    "last_active_child_id": "002-pi-remote-mobile-ui-ux-features/008-inbound-media",
     "last_active_at": null
   }
 }

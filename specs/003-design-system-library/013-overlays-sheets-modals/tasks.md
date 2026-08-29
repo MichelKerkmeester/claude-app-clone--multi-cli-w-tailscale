@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Overlay, sheet & modal primitives
 
 - [x] Inventory the overlay chrome and choreography across `ModelEffortSheet`, `PlanReviewSheet`,

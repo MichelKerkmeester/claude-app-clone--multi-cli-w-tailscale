@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Light/dark theming & contrast
 
 - [x] Each of the three theme states is one labelled semantic→primitive remap; no component repeats

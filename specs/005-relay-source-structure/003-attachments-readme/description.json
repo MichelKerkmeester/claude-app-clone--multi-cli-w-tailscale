@@ -1,0 +1,30 @@
+{
+  "level": "2",
+  "specFolder": "005-relay-source-structure/003-attachments-readme",
+  "description": "Write a README for app-relay/src/attachments, the eight-file subsystem that decodes, bounds, normalises, projects and reaps inbound media, so a first",
+  "keywords": [
+    "write",
+    "readme",
+    "app-relay",
+    "src",
+    "attachments",
+    "eight-file",
+    "subsystem",
+    "decodes",
+    "bounds",
+    "normalises",
+    "projects",
+    "reaps",
+    "inbound",
+    "media",
+    "first"
+  ],
+  "lastUpdated": "2026-08-24T19:46:07.914Z",
+  "specId": "003",
+  "folderSlug": "attachments-readme",
+  "parentChain": [
+    "005-relay-source-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

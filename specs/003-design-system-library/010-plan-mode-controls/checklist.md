@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Plan-mode controls
 
 - [x] Every plan-mode component reads its colours from the semantic and component tokens; no raw

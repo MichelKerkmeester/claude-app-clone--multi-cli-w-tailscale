@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration",
+  "spec_folder": "004-sveltekit-spa-migration",
+  "parent_id": null,
+  "children_ids": [
+    "004-sveltekit-spa-migration/001-move-and-scaffold",
+    "004-sveltekit-spa-migration/002-ports-and-primitives",
+    "004-sveltekit-spa-migration/003-feature-dirs",
+    "004-sveltekit-spa-migration/004-chrome-and-composer",
+    "004-sveltekit-spa-migration/005-views-and-shell",
+    "004-sveltekit-spa-migration/006-catalog",
+    "004-sveltekit-spa-migration/007-verify-and-cutover",
+    "004-sveltekit-spa-migration/008-sk-code-svelte-refactor",
+    "004-sveltekit-spa-migration/009-storybook-experience",
+    "004-sveltekit-spa-migration/010-context-repo-research",
+    "004-sveltekit-spa-migration/011-ux-affordances",
+    "004-sveltekit-spa-migration/012-naming-and-structure",
+    "004-sveltekit-spa-migration/013-comment-grammar",
+    "004-sveltekit-spa-migration/014-folder-documentation",
+    "004-sveltekit-spa-migration/015-test-lanes",
+    "004-sveltekit-spa-migration/016-relay-correctness",
+    "004-sveltekit-spa-migration/017-ask-question-activation",
+    "004-sveltekit-spa-migration/018-transcript-affordances",
+    "004-sveltekit-spa-migration/019-surface-skill-refresh",
+    "004-sveltekit-spa-migration/020-source-structure"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [
+      {
+        "packet_id": "003-design-system-library/001-architecture-conventions-tokens",
+        "reason": "Imported from legacy graph-metadata.json",
+        "source": "legacy"
+      }
+    ],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "sveltekit spa migration",
+      "react to svelte 5 rewrite pi remote",
+      "apps to src move mobile app",
+      "phase 5 sveltekit spa migration"
+    ],
+    "key_topics": [
+      "sveltekit",
+      "spa",
+      "migration",
+      "react",
+      "svelte",
+      "rewrite",
+      "remote",
+      "apps",
+      "src",
+      "move",
+      "mobile",
+      "app"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "007-verify-and-cutover/a11y-parity-findings.md",
+      "handover.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "a11y-parity-findings.md",
+        "kind": "doc",
+        "path": "007-verify-and-cutover/a11y-parity-findings.md",
+        "source": "derived"
+      },
+      {
+        "name": "handover.md",
+        "kind": "doc",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement The Pi Remote",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Re",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Tailscale Serve",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "cli-devin",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Then Gemini",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "No Svelte",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "bounded",
+        "kind": "key_phrase",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "Funnel",
+        "kind": "key_phrase",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "handover.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "The Pi Remote mobile web app is hard to author as a designer",
+    "created_at": "2026-08-19T17:23:39.714Z",
+    "last_save_at": "2026-08-24T17:58:13.356Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "handover.md"
+    ],
+    "source_fingerprint": "sha256:7136fc6b6278feb698fda6ab5f7ea958bdbcc6580fbaec02cb0ade046fb41137",
+    "source_doc_hashes": {
+      "spec.md": "5ce246b955469b070a217f6496076dbe54f507dc7f49181b339b5e3763c54cce",
+      "handover.md": "ca6ef26b01ff1826b3c743ad17f2cbd0eae8e9d22faa3d83097afb910050f81c"
+    },
+    "last_active_child_id": "004-sveltekit-spa-migration/019-surface-skill-refresh",
+    "last_active_at": null
+  },
+  "source_fingerprint": "sha256:4cb3a1d874a5a4b0ed53f92bf26b9e43b0d7f9382da471bab2cba327edfda586"
+}

@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 plan — composer recommendations over real files, fail-closed and proven"
 description: "How recs 4.1–4.8 land on the composer: pure trigger/store seams first, then per-rec changes to session-composer.svelte, use-slash-trigger.ts, rank-host-commands.ts, the autocomplete overlay, a new recall sheet + dictation sheet, composer-tools.svelte, and sheet-model-effort.svelte; the ⚠️ @-file search and paste-upload stay inert behind their host capability. Proven behaviour-preserving by fail-closed inertness checks, token-identity 0-diff on existing composer CSS, test:web, and a11y-parity, all from the final state."
+trigger_phrases:
+  - "composer plan approach"
+  - "composer packet"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

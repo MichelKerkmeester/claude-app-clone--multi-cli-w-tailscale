@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 — Tested pure-function seams: the fail-closed foundation phases 002–006 build on"
 description: "Extract the six view-logic seams — home filter/sort/group, session-card projection, message grouping, draft reconciliation, id+epoch scope-guard, and stale-decay — as PURE functions over immutable snapshots that each carry session id + host epoch + revision. Each seam gets a differential test (every incremental result equals a canonical full rebuild) and a boundary test (stale / unknown / mismatched data stays visibly unresolved, never promoted to success). Every seam reads existing DTO fields only, so nothing here is blocked on a host field. Plan only; no implementation until the operator says go."
+trigger_phrases:
+  - "tested seams spec requirements"
+  - "tested seams packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:
@@ -205,6 +210,6 @@ host dependency to resolve first.
 
 - `../spec.md` — the phase parent (constraint, phase map, invariants).
 - `../research/research.md` — "Cross-cutting engineering guardrail" (the rec this phase implements) and recs 1.1/1.3/1.4/1.7/1.8/2.1/2.4/3.4/4.1/5.1/5.3/6.1/6.2 (the affordances these seams back).
-- `../../005-sveltekit-spa-migration/020-source-structure/` — the source/comment conventions the new pure modules follow.
+- `../../004-sveltekit-spa-migration/020-source-structure/` — the source/comment conventions the new pure modules follow.
 - `../002-home-selection/`, `../003-chat-message/`, `../004-composer/`, `../005-streaming-ask/`, `../006-navigation/` — the phases that consume these seams.
 <!-- /ANCHOR:cross-refs -->

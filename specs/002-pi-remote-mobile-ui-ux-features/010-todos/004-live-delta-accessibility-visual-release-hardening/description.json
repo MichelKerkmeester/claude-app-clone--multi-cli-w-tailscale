@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos/004-live-delta-accessibility-visual-release-hardening",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/010-todos/004-live-delta-accessibility-visual-release-hardening",
   "description": "Phase 3 \u2014 Live delta updates, accessibility, visual, and iPhone/PWA release hardening",
   "keywords": [
     "phase",

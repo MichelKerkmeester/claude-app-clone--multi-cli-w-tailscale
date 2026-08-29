@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: roadmap | v2.2 -->
+<!-- SPECKIT_LEVEL: phase -->
+
 # Spec 002 — Cross-feature build roadmap
 
 ## Recommended order

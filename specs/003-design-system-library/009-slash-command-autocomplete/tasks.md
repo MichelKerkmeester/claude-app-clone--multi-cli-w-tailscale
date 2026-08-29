@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Slash command autocomplete
 
 - [x] Inventory the `.slash-panel` rules and the `--slash-*` token set (light, dark, system-dark) and

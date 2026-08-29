@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: impl-summary-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Implementation Summary — 003 P2 grandchild 015 (live catalog & designer docs)
 
 ## Final state — COMPLETE

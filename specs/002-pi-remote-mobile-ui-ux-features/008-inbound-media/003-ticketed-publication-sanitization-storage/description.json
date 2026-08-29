@@ -1,6 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media/003-ticketed-publication-sanitization-storage",
-  "description": "Phase 2 — Ticketed publication, sanitization, and atomic artifact storage",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/008-inbound-media/003-ticketed-publication-sanitization-storage",
+  "description": "Phase 2 \u2014 Ticketed publication, sanitization, and atomic artifact storage",
   "keywords": [
     "phase",
     "ticketed",

@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 plan — extract six pure seams behind differential + boundary tests, behaviour-preserving"
 description: "How the six view-logic seams become pure functions over immutable snapshots and how the fail-closed claim is proven: each snapshot carries id+epoch+revision, each seam gets a differential test (every incremental prefix equals a canonical full rebuild) and a boundary test (stale/unknown/mismatched stays unresolved), the extracted scope-guard and grouping/reconcile paths route their old call sites through one source of truth, and token-identity 0-diff + test:web + a11y-parity prove no rendered behaviour changed."
+trigger_phrases:
+  - "tested seams plan approach"
+  - "tested seams packet"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

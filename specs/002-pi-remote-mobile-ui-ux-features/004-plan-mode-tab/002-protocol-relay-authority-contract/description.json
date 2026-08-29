@@ -1,6 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/002-protocol-relay-authority-contract",
-  "description": "Phase 1 — Protocol and relay authority contract",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab/002-protocol-relay-authority-contract",
+  "description": "Phase 1 \u2014 Protocol and relay authority contract",
   "keywords": [
     "phase",
     "protocol",

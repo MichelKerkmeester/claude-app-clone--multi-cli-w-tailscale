@@ -1,6 +1,11 @@
 ---
 title: "Home session-selection UX — orca-mined recency, organization, and card-polish recommendations"
 description: "Nested phase parent for the biggest-leverage orca-mining area: the home session list. Groups the 15 home-selection recommendations from research/research.md into three verification-distinct sub-phases — 001-list-behavior (recency-sort, pull-to-refresh, four-kind list states, resume slot, single-flight open, haptics; all ✅ drop-in), 002-list-organization (time-bucket sections, status filter chips, search-box chrome, device-local favorite, new-session chrome; ✅ chrome with the useful-query and create paths deferred to the host), and 003-card-polish (relabel blocks→messages, real datetime + absolute-on-tap, stale-decay, drop resting-done dot, peek accordion, plus the ⚠️ card-content bundle — title/preview/agent/attention/recoverable — that needs new host fields). Every affordance stays host-authoritative and fail-closed; nothing implements until the operator says go."
+trigger_phrases:
+  - "home selection spec requirements"
+  - "home selection packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:
@@ -113,5 +118,5 @@ Non-negotiable across every sub-phase:
 - `../spec.md` — the `007-orca-nodeterm-ux-mining` implementation phase parent.
 - `../research/research.md` — the verified synthesis; Angle 1 and Angle 2 are the source for this area.
 - `../007-host-requests/` — the host-protocol request spec that unblocks the ⚠️ items in `002` and `003`.
-- `../../005-sveltekit-spa-migration/020-source-structure/` — the source/comment/CSS conventions any new code follows.
+- `../../004-sveltekit-spa-migration/020-source-structure/` — the source/comment/CSS conventions any new code follows.
 <!-- /ANCHOR:cross-refs -->

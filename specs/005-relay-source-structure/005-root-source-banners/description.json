@@ -1,0 +1,23 @@
+{
+  "level": "2",
+  "specFolder": "005-relay-source-structure/005-root-source-banners",
+  "description": "Ensure every repo-root code file has a // MODULE: header and numbered // N.",
+  "keywords": [
+    "ensure",
+    "every",
+    "repo-root",
+    "code",
+    "file",
+    "module",
+    "header",
+    "numbered"
+  ],
+  "lastUpdated": "2026-08-24T21:38:17.083Z",
+  "specId": "005",
+  "folderSlug": "root-source-banners",
+  "parentChain": [
+    "005-relay-source-structure"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

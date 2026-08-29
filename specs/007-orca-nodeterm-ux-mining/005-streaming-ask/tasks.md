@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 tasks — streaming & ask/permission hardening ledger"
 description: "Build the three pure derivations, apply the eight Angle-5 recs to their surfaces, and prove the result fail-closed and behaviour-safe. Every task cites its rec number and the real app file(s) it touches; all open until the operator says go."
+trigger_phrases:
+  - "streaming ask task ledger"
+  - "streaming ask packet"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

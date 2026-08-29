@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: plan-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Plan — Light/dark theming & contrast
 
 ## Approach

@@ -3,10 +3,13 @@ title: "F9 — Ask-Question"
 description: "F9 — Ask-Question"
 trigger_phrases:
   - "f9 — ask-question"
+  - "ask question spec requirements"
+  - "ask question packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/009-ask-question"
     last_updated_at: "2026-08-16T12:00:00Z"
     last_updated_by: "gpt-5.6-luna"
     recent_action: "Synthesized research and authored feature spec plus implementation phases"

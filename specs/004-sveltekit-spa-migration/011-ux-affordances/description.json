@@ -1,0 +1,28 @@
+{
+  "level": "2",
+  "specFolder": "004-sveltekit-spa-migration/011-ux-affordances",
+  "description": "The home for deliberate, operator-requested UX and visual changes to the shipped Svelte app — the first packet in this program allowed to change a",
+  "keywords": [
+    "home",
+    "deliberate",
+    "operator-requested",
+    "visual",
+    "changes",
+    "shipped",
+    "svelte",
+    "app",
+    "first",
+    "packet",
+    "program",
+    "allowed",
+    "change"
+  ],
+  "lastUpdated": "2026-08-23T18:54:07.182Z",
+  "specId": "011",
+  "folderSlug": "ux-affordances",
+  "parentChain": [
+    "004-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

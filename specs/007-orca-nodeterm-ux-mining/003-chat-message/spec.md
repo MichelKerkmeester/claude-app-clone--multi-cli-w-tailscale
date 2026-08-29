@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 — Chat message & transcript interactions"
 description: "Shipped orca message-level transcript affordances into the SvelteKit mobile client: per-turn scroll-to-top, per-fence copy, tint confirm, native tool folds, scoped selection-copy, a host-only session action sheet, http(s) vs inert file-path links, snapshot find bar, and five-state load. The ❌ 3.7 set except in-conversation search stays backlog."
+trigger_phrases:
+  - "chat message spec requirements"
+  - "chat message packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:
@@ -224,5 +229,5 @@ These are presentation choices, not blockers. No host dependency gates this phas
 - `../research/research.md` — Angle 3 (recs 3.1-3.7) and Angle 6 (rec 6.6), the verified synthesis.
 - `../007-host-requests/` — the ⚠️ host-title rename RPC and the new authorized artifact reference this phase
   falls back from.
-- `../../005-sveltekit-spa-migration/020-source-structure/` — the source/comment conventions new code follows.
+- `../../004-sveltekit-spa-migration/020-source-structure/` — the source/comment conventions new code follows.
 <!-- /ANCHOR:cross-refs -->

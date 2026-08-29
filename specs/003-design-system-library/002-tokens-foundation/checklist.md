@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Token library foundation
 - [x] `src/style.css` carries three labelled token layers — primitive (source), semantic (roles),
       and component (per-component) — each fenced with the `@ds` grammar. — primitive blocks open

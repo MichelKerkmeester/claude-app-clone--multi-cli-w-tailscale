@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Rich content cards
 
 - [x] Feature `006-rich-content-blocks` is merged into `main` and its merge commit is recorded as the

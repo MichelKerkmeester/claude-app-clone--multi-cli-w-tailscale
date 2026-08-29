@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Composer input
 
 - [x] Map `SessionComposer` (tray, "+" tools popover trigger, single circular primary button and its

@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration/001-move-and-scaffold",
+  "spec_folder": "004-sveltekit-spa-migration/001-move-and-scaffold",
+  "parent_id": "004-sveltekit-spa-migration",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "move apps to src pi remote",
+      "sveltekit scaffold app.css foundation"
+    ],
+    "key_topics": [
+      "move",
+      "apps",
+      "src",
+      "remote",
+      "sveltekit",
+      "scaffold",
+      "app",
+      "css",
+      "foundation",
+      "relocate",
+      "pi-remote-web",
+      "mobile-app"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "checklist.md",
+      "implementation-summary.md",
+      "tasks.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Folder Move",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "The React",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Tailscale Serve",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "app.css",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Done Resolve",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "enormous",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. QUALITY GATES",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Checklist",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Verification Protocol The",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Code Quality",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "Fix Completeness",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "File Organization",
+        "kind": "proper_noun",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Relocate apps/pi-remote-web→src/mobile-app and apps/pi-remote-relay→src/relay (folder-rename only, @pi-remote/* names kept), fix the finite set of filesystem-path refs, npm install; then stand up the SvelteKit 5 SPA skeleton at src/mobile-app with app.css foundation. The React suite stays the correctness oracle through the move; an empty Svelte page renders after scaffold.",
+    "created_at": "2026-08-19T17:24:02.340Z",
+    "last_save_at": "2026-08-24T17:58:13.362Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:c595d3c42caaf40af55c8e667481fc3128f9208082be934e863904c23c73e6fc",
+    "source_doc_hashes": {
+      "spec.md": "375f0f316cddf3824024f46baada1904598b2124e8a28ec487e6753dab8af318",
+      "plan.md": "8480d68edc993917b655ba8491eb175092b435776adb5b5383a3de00bf3ffc20",
+      "tasks.md": "5ee415dcd7de42d14f6db1ebc5c3e209a37b6dcf28ea0e857a87223acd85efb8",
+      "checklist.md": "e55db7360515f5ea60e66f405bb08cbe924b48e90d7a69777f17391e5b16552e",
+      "implementation-summary.md": "f729d2d9e5bcb1de527df03bedb04653dd976f902b2b2b0968cf81012881665c"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  },
+  "source_fingerprint": "sha256:3f1b642771d0977f07ef916508a336c8e3a4bb20a6f4fdd4deede195f0b33750"
+}

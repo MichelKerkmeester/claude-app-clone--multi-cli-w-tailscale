@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Transcript & message blocks
 
 - [x] Map the transcript in `App.tsx` (`TranscriptList`, `Block` per-kind switch, `ActivityGroup`,

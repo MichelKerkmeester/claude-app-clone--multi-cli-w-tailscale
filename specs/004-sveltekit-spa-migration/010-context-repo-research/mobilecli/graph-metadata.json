@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration/010-context-repo-research/mobilecli",
+  "spec_folder": "004-sveltekit-spa-migration/010-context-repo-research/mobilecli",
+  "parent_id": "004-sveltekit-spa-migration/010-context-repo-research",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "mobilecli pattern mining",
+      "pi remote adoptable patterns research",
+      "attach-v2 reconnection research"
+    ],
+    "key_topics": [
+      "mobilecli",
+      "attach-v2",
+      "reconnection",
+      "wait-state-detection",
+      "pairing-auth",
+      "qr-onboarding",
+      "filesystem-contract",
+      "push-notifications",
+      "pi-remote-pwa"
+    ],
+    "status": "complete",
+    "has_implementation_summary": true,
+    "checklist_complete": null,
+    "last_active_child_id": null
+  }
+}

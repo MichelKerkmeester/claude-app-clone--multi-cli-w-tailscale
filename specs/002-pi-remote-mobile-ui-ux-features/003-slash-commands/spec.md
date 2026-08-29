@@ -3,10 +3,13 @@ title: "F3 — Typed “/” Commands"
 description: "F3 — Typed “/” Commands"
 trigger_phrases:
   - "f3 — typed “/” commands"
+  - "slash commands spec requirements"
+  - "slash commands packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/003-slash-commands"
     last_updated_at: "2026-08-16T07:47:48Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Synthesized research and scaffolded feature spec plus build sub-phases"

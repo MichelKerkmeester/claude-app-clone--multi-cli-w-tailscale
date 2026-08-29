@@ -4,11 +4,11 @@
   "spec_folder": "002-pi-remote-mobile-ui-ux-features/005-file-preview",
   "parent_id": "002-pi-remote-mobile-ui-ux-features",
   "children_ids": [
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/001-research",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/002-openable-redacted-diff-foundation",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/003-relay-authorized-immutable-artifact-contract",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/004-text-markdown-code-controlled-export",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/005-image-pdf-renderers-device-release-hardening",
+    "002-pi-remote-mobile-ui-ux-features/005-file-preview/001-research",
+    "002-pi-remote-mobile-ui-ux-features/005-file-preview/002-openable-redacted-diff-foundation",
+    "002-pi-remote-mobile-ui-ux-features/005-file-preview/003-relay-authorized-immutable-artifact-contract",
+    "002-pi-remote-mobile-ui-ux-features/005-file-preview/004-text-markdown-code-controlled-export",
+    "002-pi-remote-mobile-ui-ux-features/005-file-preview/005-image-pdf-renderers-device-release-hardening",
     "002-pi-remote-mobile-ui-ux-features/005-file-preview/001-research",
     "002-pi-remote-mobile-ui-ux-features/005-file-preview/002-openable-redacted-diff-foundation",
     "002-pi-remote-mobile-ui-ux-features/005-file-preview/003-relay-authorized-immutable-artifact-contract",
@@ -22,7 +22,7 @@
   },
   "derived": {
     "trigger_phrases": [
-      "f6 — file preview"
+      "f6 \u2014 file preview"
     ],
     "key_topics": [
       "file",
@@ -104,7 +104,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "F6 — File Preview",
+    "causal_summary": "F6 \u2014 File Preview",
     "created_at": "2026-08-16T07:15:12.583Z",
     "last_save_at": "2026-08-24T16:40:11.778Z",
     "save_lineage": "graph_only",
@@ -113,12 +113,12 @@
       "spec.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:ca17170939eea7217097118259716de0f4b4f3191e4dba155bcd243f6963c5a6",
+    "source_fingerprint": "sha256:6ff3b916995c2c0b0c38f0ddc8a0a7d6e5a7c8506e4eb90d476a88326cd35519",
     "source_doc_hashes": {
       "spec.md": "338a8894f61cdc044fbde13c1dc687fc27610d6e3d77890ad4fc78d35d962962",
       "research/research.md": "3a44f417fd1f32cd577a0e2f3c06bf9556decb22126758f59a97a76099f97d9f"
     },
-    "last_active_child_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/005-file-preview/001-research",
+    "last_active_child_id": "002-pi-remote-mobile-ui-ux-features/005-file-preview/001-research",
     "last_active_at": null
   }
 }

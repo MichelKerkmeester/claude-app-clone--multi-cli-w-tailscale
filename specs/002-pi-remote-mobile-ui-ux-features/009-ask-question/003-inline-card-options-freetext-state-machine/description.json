@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/003-inline-card-options-freetext-state-machine",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/009-ask-question/003-inline-card-options-freetext-state-machine",
   "description": "Phase 2 \u2014 Inline ask-question card, options, free-text, and non-optimistic state machine",
   "keywords": [
     "phase",

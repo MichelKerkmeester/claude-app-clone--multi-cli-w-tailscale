@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/009-ask-question/002-ask-question-protocol-authority-redaction",
   "description": "Phase 1 \u2014 Ask-question protocol, host authority, and redaction",
   "keywords": [
     "phase",

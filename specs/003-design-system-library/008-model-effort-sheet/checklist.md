@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Model & effort sheet
 
 - [x] The model + effort sheet reads its colours from the semantic and `--model-sheet-*` component

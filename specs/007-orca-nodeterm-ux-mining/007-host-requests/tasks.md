@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 tasks — host-request contract ledger"
 description: "Inventory the ⚠️ recs, then author each requested field/RPC as a four-facet contract (shape · consuming-phase UI · fail-closed fallback · wire-compat), then prove every row traces to a rec and a consuming phase and touches no client code. All tasks OPEN — plan only."
+trigger_phrases:
+  - "host requests task ledger"
+  - "host requests packet"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

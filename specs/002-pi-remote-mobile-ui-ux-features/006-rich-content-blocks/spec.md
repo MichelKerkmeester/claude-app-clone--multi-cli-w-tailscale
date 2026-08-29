@@ -3,10 +3,13 @@ title: "F7 — Rich Content Blocks"
 description: "F7 — Rich Content Blocks"
 trigger_phrases:
   - "f7 — rich content blocks"
+  - "rich content blocks spec requirements"
+  - "rich content blocks packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/006-rich-content-blocks"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/006-rich-content-blocks"
     last_updated_at: "2026-08-16T07:47:48Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Synthesized research and scaffolded feature spec plus build sub-phases"

@@ -3,10 +3,13 @@ title: "F8 — Inbound Media Preview"
 description: "F8 — Inbound Media Preview"
 trigger_phrases:
   - "f8 — inbound media preview"
+  - "inbound media spec requirements"
+  - "inbound media packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/008-inbound-media"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/008-inbound-media"
     last_updated_at: "2026-08-16T07:47:48Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Synthesized research and scaffolded feature spec plus build sub-phases"

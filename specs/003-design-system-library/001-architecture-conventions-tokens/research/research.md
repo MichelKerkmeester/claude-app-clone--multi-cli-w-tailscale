@@ -10,7 +10,7 @@
 > Svelte 5 (SPA) so every component is one `.svelte` file with a co-located scoped `<style>`.
 > Decision 1 (component architecture) is superseded; **Decisions 2 and 3 are carried forward
 > unchanged**. This table is intentionally left intact — see
-> `../../005-sveltekit-spa-migration/amendment.md` for the clause-by-clause reversal.
+> `../../004-sveltekit-spa-migration/amendment.md` for the clause-by-clause reversal.
 >
 > **Frozen contracts carried in (never weighed):** the ink-on-parchment palette **values**,
 > Inter + Source Serif 4, the light/dark/system theming, WCAG AA, `>=44px` interactive targets,

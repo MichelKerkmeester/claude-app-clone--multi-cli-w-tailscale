@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Refine & audit for designer-editability
 
 - [x] Define the representative designer edit-task set (retint a role token; retint one component;

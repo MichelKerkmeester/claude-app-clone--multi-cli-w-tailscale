@@ -4,12 +4,12 @@
   "spec_folder": "002-pi-remote-mobile-ui-ux-features/007-media-upload",
   "parent_id": "002-pi-remote-mobile-ui-ux-features",
   "children_ids": [
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/001-research",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/006-end-to-end-submission-release",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/001-research",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/004-pi-image-bridge-transcript",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/005-local-composer-draft-ui",
+    "002-pi-remote-mobile-ui-ux-features/007-media-upload/006-end-to-end-submission-release",
     "002-pi-remote-mobile-ui-ux-features/007-media-upload/001-research",
     "002-pi-remote-mobile-ui-ux-features/007-media-upload/002-protocol-capability-gate",
     "002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
@@ -24,7 +24,7 @@
   },
   "derived": {
     "trigger_phrases": [
-      "f5 media upload — photos in chat"
+      "f5 media upload \u2014 photos in chat"
     ],
     "key_topics": [
       "media",
@@ -102,7 +102,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "F5 Media Upload — Photos in Chat",
+    "causal_summary": "F5 Media Upload \u2014 Photos in Chat",
     "created_at": "2026-08-16T07:15:16.818Z",
     "last_save_at": "2026-08-24T16:40:11.807Z",
     "save_lineage": "graph_only",
@@ -111,12 +111,12 @@
       "spec.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:7b9013b2fe94fdf4694b8ada2499f857b4ac4a7be45f6a718e14cf4eae77bd5a",
+    "source_fingerprint": "sha256:5c86824481829ad7be82d892b0351c9ae402b9ae342c0b589ef76331e02d3bf2",
     "source_doc_hashes": {
       "spec.md": "96c4316a82953fcae07c6fb6ebbb8e87f8f644b4b08413d88faddbc7d3f23477",
       "research/research.md": "ca3853f9f802235a8de5338dd43d98984a578b50cd286dd2d0e1b476c12e0600"
     },
-    "last_active_child_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/001-research",
+    "last_active_child_id": "002-pi-remote-mobile-ui-ux-features/007-media-upload/001-research",
     "last_active_at": null
   }
 }

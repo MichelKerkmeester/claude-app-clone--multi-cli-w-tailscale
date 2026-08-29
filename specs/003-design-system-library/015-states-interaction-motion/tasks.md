@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — State vocabulary, interaction & motion
 
 - [x] Inventory the status families across `apps/pi-remote-web/src/state.ts`, `PlanModeButton.tsx`,

@@ -1,6 +1,11 @@
 ---
 title: "Plan — Pi Remote Desktop-Parity Chat UX"
 description: "Delivery plan for Pi Remote Desktop-Parity Chat UX."
+trigger_phrases:
+  - "chat ux and restyle plan approach"
+  - "chat ux and restyle packet"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

@@ -3,10 +3,13 @@ title: "Phase 1 — Architecture, Conventions & Token Library"
 description: "Phase 1 — Architecture, Conventions & Token Library"
 trigger_phrases:
   - "phase 1 — architecture, conventions & token library"
+  - "architecture conventions tokens spec requirements"
+  - "architecture conventions tokens packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/003-design-system-library/001-architecture-conventions-tokens"
+    packet_pointer: "specs/003-design-system-library/001-architecture-conventions-tokens"
     last_updated_at: "2026-08-18T00:00:00Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Research synthesized into the build-ready decision (research/research.md) with six single-lens cited iterations; decision verified against the real code and frozen contracts"

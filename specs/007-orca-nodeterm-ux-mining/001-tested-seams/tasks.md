@@ -1,6 +1,11 @@
 ---
 title: "Phase 1 tasks — six pure seams, each with a differential + boundary test"
 description: "Confirm the snapshot contract, extract or author each seam, then prove each with a differential test (incremental == full rebuild) and a boundary test (stale/unknown/mismatched stays unresolved). Every task cites its rec and the real app file it touches. All open — nothing implemented."
+trigger_phrases:
+  - "tested seams task ledger"
+  - "tested seams packet"
+  - "task ledger"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

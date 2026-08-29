@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: handover | v2.2 -->
+<!-- SPECKIT_LEVEL: phase -->
+
 # Spec 002 — Handover (detailed)
 
 > **State:** build in progress, 7/10 features shipped.

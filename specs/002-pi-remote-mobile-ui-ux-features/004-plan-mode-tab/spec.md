@@ -3,10 +3,13 @@ title: "F4 — Plan mode with a Tab / keyboard affordance"
 description: "F4 — Plan mode with a Tab / keyboard affordance"
 trigger_phrases:
   - "f4 — plan mode with a tab / keyboard affordance"
+  - "plan mode tab spec requirements"
+  - "plan mode tab packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/004-plan-mode-tab"
     last_updated_at: "2026-08-16T07:47:48Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Synthesized research and scaffolded feature spec plus build sub-phases"

@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Light/dark theming & contrast
 
 - [x] Record what each theme block resolves every semantic token to today: `:root` (light),

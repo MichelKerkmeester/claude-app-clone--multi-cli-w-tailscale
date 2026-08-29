@@ -1,6 +1,11 @@
 ---
 title: "Phase 7 checklist — host-request spec barrier"
 description: "Barrier sign-off for the host-protocol request spec: every requested field/RPC carries shape + consuming-phase UI + fail-closed fallback + wire-compat; every entry traces to a rec number; the attention approach is the additive-safe SessionCardDto field; Open-Q#1 is answered from the protocol; no client code is touched; the token-identity/test:web/a11y gate is inherited by the consuming phases. All barriers OPEN — plan only."
+trigger_phrases:
+  - "host requests verification checklist"
+  - "host requests packet"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

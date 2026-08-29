@@ -3,10 +3,13 @@ title: "Feature Specification: Pi Remote — Mobile UI/UX Feature Parity"
 description: "Pi Remote — Mobile UI/UX Feature Parity"
 trigger_phrases:
   - "feature specification: pi remote — mobile ui/ux feature parity"
+  - "pi remote mobile ui ux features spec requirements"
+  - "pi remote mobile ui ux features packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features"
     last_updated_at: "2026-08-16T07:47:48Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Scaffolded packet and migrated research to deep-loop research folders"

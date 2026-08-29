@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Control primitives
 
 - [x] Each shared control primitive declares a `@ds surface:` and one `@ds state:` block per visual

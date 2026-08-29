@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Live catalog & designer docs
 
 - [x] Confirm the catalog delivery fixed by the Phase 1 decision (app route vs. standalone Vite entry

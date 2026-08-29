@@ -102,7 +102,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Plan the composer-surface recommendations from the orca UX mining synthesis (recs 4.1\u20134.8) into the SvelteKit mobile client, host-authoritative and fail-closed. Ships the \u2705 set \u2014 image-or-text send with a never-disabled textarea and exact-draft-restore-on-reject, the line-leading slash rule plus a suggestion cap sourced from the host catalog, a device-local prompt-history recall sheet, paste-image classification into the existing attachment lease, on-device dictation as an editable local draft, the composer action-row option pickers, and the model/effort-sheet reconciliation bug-fixes \u2014 and plans the \u26a0\ufe0f @-file mention UI shape against a host file-search RPC. Plan only; nothing implements until the operator says go.",
+    "causal_summary": "Plan the composer-surface recommendations from the orca UX mining synthesis (recs 4.1–4.8) into the SvelteKit mobile client, host-authoritative and fail-closed. Ships the ✅ set — image-or-text send with a never-disabled textarea and exact-draft-restore-on-reject, the line-leading slash rule plus a suggestion cap sourced from the host catalog, a device-local prompt-history recall sheet, paste-image classification into the existing attachment lease, on-device dictation as an editable local draft, the composer action-row option pickers, and the model/effort-sheet reconciliation bug-fixes — and plans the ⚠️ @-file mention UI shape against a host file-search RPC. Plan only; nothing implements until the operator says go.",
     "created_at": "2026-08-26T05:54:46.000Z",
     "last_save_at": "2026-08-26T05:54:46.000Z",
     "save_lineage": "graph_only",
@@ -114,7 +114,7 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:a16d1c680fac06604b5d9e5863bac2e915e09991a889acd29a85aa28b2ad028a",
+    "source_fingerprint": "sha256:996cfc3e31a324c409b42ff71d3446c211060aa78b30a90f7ac92732bd8f108d",
     "source_doc_hashes": {
       "spec.md": "a78320ce1e6b52a0fcd8b703937b2621492642b0094e251e72a6490cd84d98b9",
       "plan.md": "c93386b984863474a0a7ddb3bfed047f98413e610b72b59feb9e3c8c27270420",

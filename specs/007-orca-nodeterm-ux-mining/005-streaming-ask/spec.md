@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 — Streaming & ask/permission hardening: peek-safe streaming, working-vs-streaming split, and blocking-prompt discipline"
 description: "Harden the mature streaming and blocking-prompt surfaces against the eight verified orca Angle-5 recommendations: keep streaming session-scoped and peek-safe, split the working dots from the streaming partial-text, reconcile the optimistic user echo by host message id, name the input-lock reasons with a settle window, verify the ask card answers by option identity with dismissal kept outside the card, render approval buttons from the host ticket under single-flight, allow one blocking prompt at a time, and name the empty/loading/error transcript copy with a single assertive send-failure channel. Every affordance reads existing DTO fields or is pure interaction; nothing owns session truth. Plan only — no implementation until the operator says go."
+trigger_phrases:
+  - "streaming ask spec requirements"
+  - "streaming ask packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

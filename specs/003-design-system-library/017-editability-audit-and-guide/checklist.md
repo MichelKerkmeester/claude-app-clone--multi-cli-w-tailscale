@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — Refine & audit for designer-editability
 
 - [x] The representative designer edit-task set is defined and each task is bound to a real migrated

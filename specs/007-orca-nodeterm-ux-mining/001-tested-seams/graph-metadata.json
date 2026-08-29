@@ -102,7 +102,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Extract the six view-logic seams \u2014 home filter/sort/group, session-card projection, message grouping, draft reconciliation, id+epoch scope-guard, and stale-decay \u2014 as PURE functions over immutable snapshots that each carry session id + host epoch + revision. Each seam gets a differential test (every incremental result equals a canonical full rebuild) and a boundary test (stale / unknown / mismatched data stays visibly unresolved, never promoted to success). Every seam reads existing DTO fields only, so nothing here is blocked on a host field. Plan only; no implementation until the operator says go.",
+    "causal_summary": "Extract the six view-logic seams — home filter/sort/group, session-card projection, message grouping, draft reconciliation, id+epoch scope-guard, and stale-decay — as PURE functions over immutable snapshots that each carry session id + host epoch + revision. Each seam gets a differential test (every incremental result equals a canonical full rebuild) and a boundary test (stale / unknown / mismatched data stays visibly unresolved, never promoted to success). Every seam reads existing DTO fields only, so nothing here is blocked on a host field. Plan only; no implementation until the operator says go.",
     "created_at": "2026-08-26T05:54:46.000Z",
     "last_save_at": "2026-08-26T05:54:46.000Z",
     "save_lineage": "graph_only",
@@ -114,7 +114,7 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8e39293e752913256fec95f72625dd3a2570bc80a16642a383ed1c9b58a6d80d",
+    "source_fingerprint": "sha256:a535c840dab5961d12e3a2a4384da0c6881f149d4967f0c089bd37c3afc329f6",
     "source_doc_hashes": {
       "spec.md": "b45d7efa708588c2eb63f96c3fdc62aa4e14e84d58370e2ba7e51ccc80e30731",
       "plan.md": "295ef44ddc58320480bca8d61658055f2c23270e7f4c24bb49569ea07ebdeea3",

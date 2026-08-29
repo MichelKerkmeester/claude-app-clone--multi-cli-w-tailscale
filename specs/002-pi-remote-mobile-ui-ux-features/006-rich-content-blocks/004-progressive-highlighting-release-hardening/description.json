@@ -1,6 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/006-rich-content-blocks/004-progressive-highlighting-release-hardening",
-  "description": "Phase 3 — Progressive highlighting, performance, accessibility, and release hardening",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/006-rich-content-blocks/004-progressive-highlighting-release-hardening",
+  "description": "Phase 3 \u2014 Progressive highlighting, performance, accessibility, and release hardening",
   "keywords": [
     "phase",
     "progressive",

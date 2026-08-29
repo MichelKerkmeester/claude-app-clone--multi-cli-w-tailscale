@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 implementation summary — streaming & ask/permission hardening"
 description: "Implemented the eight Angle-5 recs: peek-safe session-scoped streaming, the working-vs-streaming dots/partial-text split, optimistic-echo reconciliation by host message id with draft restore on reject, named input-lock reasons with a 600 ms settle, verified option-identity + out-of-card ask dismissal, ticket-driven single-flight approval, one blocking prompt at a time, and named empty/error copy with an assertive send-failure channel. All fail-closed proofs pass."
+trigger_phrases:
+  - "streaming ask implementation summary"
+  - "streaming ask packet"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

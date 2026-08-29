@@ -102,7 +102,7 @@
         "source": "derived"
       }
     ],
-    "causal_summary": "Shipped orca message-level transcript affordances into the SvelteKit mobile client: per-turn scroll-to-top, per-fence copy, tint confirm, native tool folds, scoped selection-copy, a host-only session action sheet, http(s) vs inert file-path links, snapshot find bar, and five-state load. The \u274c 3.7 set except in-conversation search stays backlog.",
+    "causal_summary": "Shipped orca message-level transcript affordances into the SvelteKit mobile client: per-turn scroll-to-top, per-fence copy, tint confirm, native tool folds, scoped selection-copy, a host-only session action sheet, http(s) vs inert file-path links, snapshot find bar, and five-state load. The ❌ 3.7 set except in-conversation search stays backlog.",
     "created_at": "2026-08-26T05:54:46.000Z",
     "last_save_at": "2026-08-26T05:54:46.000Z",
     "save_lineage": "graph_only",
@@ -114,7 +114,7 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:1f2a96a2d6859cb4244984a36b547476a5f8c49a6cc70b7d952a714695100bce",
+    "source_fingerprint": "sha256:6a088c375a73520e27c0762b02882e993e3664c28892dab19569fe6e2564d3b5",
     "source_doc_hashes": {
       "spec.md": "7e5cc2235e301d6a4b5c4275a39e8e788825eedc739f918bd3b1df58aa294d34",
       "plan.md": "f3196d5fe4ac0dcfffafa4b9c248b96f4d48f90af739b01a543251cad61da899",

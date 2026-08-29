@@ -1,6 +1,6 @@
 {
   "level": "phase",
-  "specFolder": "app-mobile-cli/003-design-system-library/001-architecture-conventions-tokens",
+  "specFolder": "003-design-system-library/001-architecture-conventions-tokens",
   "description": "Phase 2 cannot migrate ~55 components safely until three things are decided: how a component is",
   "keywords": [
     "phase",

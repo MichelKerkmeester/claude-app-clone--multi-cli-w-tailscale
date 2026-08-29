@@ -1,0 +1,28 @@
+{
+  "level": "1",
+  "specFolder": "004-sveltekit-spa-migration/020-source-structure/007-comment-humanization/003-skill-reverify",
+  "description": "After the refactor, re-read the surface skill against the shipped .svelte reality and the edge cases phase 2 surfaced; fix any drift between what the skill teac",
+  "keywords": [
+    "after",
+    "refactor",
+    "re-read",
+    "surface",
+    "skill",
+    "against",
+    "shipped",
+    "svelte",
+    "reality",
+    "edge",
+    "cases"
+  ],
+  "lastUpdated": "2026-08-25T19:25:28.000Z",
+  "specId": "003",
+  "folderSlug": "skill-reverify",
+  "parentChain": [
+    "004-sveltekit-spa-migration",
+    "020-source-structure",
+    "007-comment-humanization"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

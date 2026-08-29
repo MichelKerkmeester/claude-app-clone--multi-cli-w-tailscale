@@ -1,7 +1,7 @@
 {
   "level": "3",
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/003-slash-commands/001-research",
-  "description": "Research — F3 — Typed “/” Commands",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/003-slash-commands/001-research",
+  "description": "Research \u2014 F3 \u2014 Typed \u201c/\u201d Commands",
   "keywords": [
     "research",
     "typed",

@@ -4,11 +4,11 @@
   "spec_folder": "002-pi-remote-mobile-ui-ux-features/002-change-effort",
   "parent_id": "002-pi-remote-mobile-ui-ux-features",
   "children_ids": [
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/001-research",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/002-typed-host-snapshot",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/003-runtime-state-machine",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/004-canonical-effort-sheet",
-    "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/005-accessibility-visual-hardening",
+    "002-pi-remote-mobile-ui-ux-features/002-change-effort/001-research",
+    "002-pi-remote-mobile-ui-ux-features/002-change-effort/002-typed-host-snapshot",
+    "002-pi-remote-mobile-ui-ux-features/002-change-effort/003-runtime-state-machine",
+    "002-pi-remote-mobile-ui-ux-features/002-change-effort/004-canonical-effort-sheet",
+    "002-pi-remote-mobile-ui-ux-features/002-change-effort/005-accessibility-visual-hardening",
     "002-pi-remote-mobile-ui-ux-features/002-change-effort/001-research",
     "002-pi-remote-mobile-ui-ux-features/002-change-effort/002-typed-host-snapshot",
     "002-pi-remote-mobile-ui-ux-features/002-change-effort/003-runtime-state-machine",
@@ -115,12 +115,12 @@
       "spec.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:53b23d953f88156b12133829e148f840c6f69b5869df8da7506ba1032bb81fa4",
+    "source_fingerprint": "sha256:cff196ae05cc09dbf1da0a2b2c4816a292b045f19f98456360f537e1a2d72845",
     "source_doc_hashes": {
       "spec.md": "b0b49c0d76d54811ee23a32288ba0bf410c2ff850ac8847ed416c5aec944065c",
       "research/research.md": "45c041e663b2c1808f36d0228f25de8487c7a6e4be3614ab5d2e38a9c3207177"
     },
-    "last_active_child_id": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/001-research",
+    "last_active_child_id": "002-pi-remote-mobile-ui-ux-features/002-change-effort/001-research",
     "last_active_at": null
   }
 }

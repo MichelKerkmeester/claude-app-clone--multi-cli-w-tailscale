@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/007-media-upload/003-ticketed-binary-ingress",
   "description": "Ticketed Binary Ingress, Quarantine, and Cleanup",
   "keywords": [
     "ticketed",

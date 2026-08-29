@@ -3,10 +3,13 @@ title: "F10 — Todos"
 description: "F10 — Todos"
 trigger_phrases:
   - "f10 — todos"
+  - "todos spec requirements"
+  - "todos packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/010-todos"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/010-todos"
     last_updated_at: "2026-08-16T12:00:00Z"
     last_updated_by: "gpt-5.6-luna"
     recent_action: "Synthesized research and authored feature spec plus implementation phases"

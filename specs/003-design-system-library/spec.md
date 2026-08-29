@@ -1,10 +1,15 @@
 ---
 title: "Design system and component library — phase parent"
 description: "Phase parent for the React-era design system: decide the architecture, conventions and tokens; migrate ~15 component groups from one global stylesheet onto a shared component library; and audit that a designer can edit each surface safely. The SvelteKit rewrite that later superseded the rendering path is its own top-level spec."
+trigger_phrases:
+  - "design system library spec requirements"
+  - "design system library packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:
-    packet_pointer: "003-design-system-library"
+    packet_pointer: "specs/003-design-system-library"
     last_updated_at: "2026-08-24T16:49:14Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Phase parent scoped; the React design-system trio merged into 17 children."
@@ -44,7 +49,7 @@ edit each migrated surface without breaking it.
 
 Each concern is a phase because each has a different verification and a different failure mode. It is
 the React-era foundation; the SvelteKit rewrite that later replaced the rendering path is tracked
-separately in `005-sveltekit-spa-migration`, and the sk-code skill mode for this surface in
+separately in `004-sveltekit-spa-migration`, and the sk-code skill mode for this surface in
 `004-sk-code-mobile-cli-mode`.
 <!-- /ANCHOR:problem -->
 
@@ -92,5 +97,5 @@ Non-negotiable across every phase:
 ## 5. CROSS-REFERENCES
 
 - `004-sk-code-mobile-cli-mode` — the sk-code skill mode for this surface.
-- `005-sveltekit-spa-migration` — the rewrite that superseded the React rendering path.
+- `004-sveltekit-spa-migration` — the rewrite that superseded the React rendering path.
 <!-- /ANCHOR:cross-refs -->

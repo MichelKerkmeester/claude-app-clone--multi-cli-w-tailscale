@@ -3,10 +3,13 @@ title: "F5 Media Upload — Photos in Chat"
 description: "F5 Media Upload — Photos in Chat"
 trigger_phrases:
   - "f5 media upload — photos in chat"
+  - "media upload spec requirements"
+  - "media upload packet"
 importance_tier: "important"
+contextType: "implementation"
 _memory:
   continuity:
-    packet_pointer: "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/007-media-upload"
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/007-media-upload"
     last_updated_at: "2026-08-16T07:47:48Z"
     last_updated_by: "claude-opus-4-8"
     recent_action: "Synthesized research and scaffolded feature spec plus build sub-phases"

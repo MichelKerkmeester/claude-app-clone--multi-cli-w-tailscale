@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: handover | v2.2 -->
+<!-- SPECKIT_LEVEL: 2 -->
+
 # Pi Remote — Handover
 
 > Pick-up-where-we-left-off document. Read this, then `goal.md` for the full vision, then `implementation-phases.md` (in the spec-kit packet) for the build order.

@@ -1,6 +1,6 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/002-change-effort/003-runtime-state-machine",
-  "description": "Phase 2 — Complete runtime state machine and mutation boundary",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/002-change-effort/003-runtime-state-machine",
+  "description": "Phase 2 \u2014 Complete runtime state machine and mutation boundary",
   "keywords": [
     "phase",
     "complete",

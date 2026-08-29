@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 checklist — composer recommendation barrier (recs 4.1–4.8)"
 description: "Barrier sign-off for the composer phase: every ⚠️ affordance inert without its host capability, the pure seams differential/boundary-tested, token-identity 0-diff on existing composer CSS, test:web green (incl. the model/effort reconciliation regression tests), a11y-parity preserved, and every task traceable to a rec. All barriers PASSED."
+trigger_phrases:
+  - "composer verification checklist"
+  - "composer packet"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

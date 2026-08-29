@@ -1,6 +1,11 @@
 ---
 title: "Phase 3 plan — chat message/transcript interactions over existing seams"
 description: "How the ✅ message-level recs (3.1-3.6, 6.6) plus ND-4.1-4.8 were built as pure interaction/layout over the existing transcript. Proven by fail-closed review, token-identity 0-diff, a11y-parity, and test:web."
+trigger_phrases:
+  - "chat message plan approach"
+  - "chat message packet"
+  - "plan approach"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: checklist-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Checklist — App shell, header & navigation
 
 - [x] The shell, headers, and routed surfaces declare `@ds surface:`, `@ds slot:`, `@ds edit: layout`,

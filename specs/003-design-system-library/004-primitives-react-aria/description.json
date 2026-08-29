@@ -1,6 +1,6 @@
 {
   "level": "3",
-  "specFolder": "app-mobile-cli/003-design-system-library/004-primitives-react-aria",
+  "specFolder": "003-design-system-library/004-primitives-react-aria",
   "description": "Grandchild 3 \u2014 Control primitives",
   "keywords": [
     "grandchild",

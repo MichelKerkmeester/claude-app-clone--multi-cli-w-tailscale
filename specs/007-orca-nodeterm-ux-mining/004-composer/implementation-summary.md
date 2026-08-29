@@ -1,6 +1,11 @@
 ---
 title: "Phase 4 implementation summary — composer recommendation + dictation pipeline"
 description: "Composer recommendation ledger (recs 4.1–4.8) and on-device dictation pipeline (ND-5.x). Orca recs shipped in prior pass; this pass delivers the net-new dictation overlay, setup sheet, permission gate, and pure seams."
+trigger_phrases:
+  - "composer implementation summary"
+  - "composer packet"
+  - "implementation summary"
+importance_tier: "normal"
 contextType: "implementation"
 _memory:
   continuity:

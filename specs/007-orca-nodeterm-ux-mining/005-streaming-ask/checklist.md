@@ -1,6 +1,11 @@
 ---
 title: "Phase 5 checklist — streaming & ask/permission hardening barrier"
 description: "Barrier sign-off for the eight Angle-5 recs: fail-closed proof (no synthetic progress, no duplicate echo, no approval against a working agent, stale stays unresolved), one-blocking-prompt precedence, ticket-only approval under single-flight, named empty/error copy with an assertive send-failure channel, a11y-parity preserved, token-identity 0-diff, and test:web green — every barrier open until the operator says go."
+trigger_phrases:
+  - "streaming ask verification checklist"
+  - "streaming ask packet"
+  - "verification checklist"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

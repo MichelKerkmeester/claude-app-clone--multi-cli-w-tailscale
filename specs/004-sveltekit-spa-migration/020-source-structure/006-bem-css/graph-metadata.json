@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "packet_id": "004-sveltekit-spa-migration/020-source-structure/006-bem-css",
+  "spec_folder": "004-sveltekit-spa-migration/020-source-structure/006-bem-css",
+  "parent_id": "004-sveltekit-spa-migration/020-source-structure",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [],
+    "key_topics": [
+      "rename",
+      "app-mobile",
+      "css",
+      "classes",
+      "dash-delimited",
+      "bem",
+      "form",
+      "block-element",
+      "block-modifier",
+      "literal-name",
+      "everywhere",
+      "appear"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "plan.md",
+      "checklist.md",
+      "spec.md",
+      "tasks.md",
+      "implementation-summary.md"
+    ],
+    "entities": [
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "checklist.md",
+        "kind": "doc",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "child",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. PROBLEM & PURPOSE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. SCOPE",
+        "kind": "heading",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "one",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "an",
+        "kind": "key_phrase",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "realpath",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "TASK NOTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 1: SETUP",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "PHASE 2: IMPLEMENTATION",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "evidence",
+        "kind": "key_phrase",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "VERIFICATION PROTOCOL",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "PRE-IMPLEMENTATION",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "CODE QUALITY",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      },
+      {
+        "name": "TESTING",
+        "kind": "heading",
+        "path": "checklist.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "Rename the app-mobile CSS classes to a dash-delimited BEM form (block--element / block--modifier) with a few literal-name fixes, everywhere they appear — markup, dynamic class construction, class directives, scoped and global CSS, and the class-selector consumers in scripts/. State-prefix classes (is-*) stay single-dash. A pure relabel, proven behaviour-preserving by zero-orphan, over-rename scan, token-identity, a before/after screenshot diff, and test:web.",
+    "created_at": "2026-08-25T07:40:42.695Z",
+    "last_save_at": "2026-08-25T07:46:27.261Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "checklist.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:11e1e3b48aa45157a00dfabc15a5af1d0c43925225d52a2e257454683b580305",
+    "source_doc_hashes": {
+      "spec.md": "9b50decd98c9643bfded93b66d1f0e001ef7ac4e69cec0c70df27115ef7f9cb9",
+      "plan.md": "89811aa4229a851256e50724a5d468f7c6d3839943de980675d5403a02bb1717",
+      "tasks.md": "7686d1becd7000ba6a9e040257249b0306736a4eae93397344b9295f636aceb7",
+      "checklist.md": "1a7d317e2e7c11dadd6e4d84c8c9f427a9e74fa7a2b69f67b0586c65e94d0305",
+      "implementation-summary.md": "5511512d82a4f7637b71ffd146f2bec7da3516c44922b0a42aac26715cb49889"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  },
+  "source_fingerprint": "sha256:71d92d4e9cf37c05c60620726b32c135708c02c3c418050fdd244098f10c9073"
+}

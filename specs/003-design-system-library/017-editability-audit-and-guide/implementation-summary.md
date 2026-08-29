@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: impl-summary-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Implementation Summary — 003 Phase 3 (editability audit, refinement & designer guide)
 
 ## Final state — COMPLETE (audit passed; no functional refinement required)

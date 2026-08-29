@@ -1,3 +1,6 @@
+<!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->
+<!-- SPECKIT_LEVEL: 3 -->
+
 # Tasks — Rich content cards
 
 - [x] Confirm feature `006-rich-content-blocks` has merged its cards into `main`; block this

@@ -1,6 +1,11 @@
 ---
 title: "Phase 6 — Navigation: fail-closed session→chat correctness"
 description: "Carry the opaque session id raw into the router, encode it once at the router boundary, then re-validate id + epoch at the chat page before loading the transcript or issuing any command. Model selection precedence (selected / host-active / navigation-requested) as separate presentation states; keep the list jump-to-latest FAB distinct from the per-turn scroll arrow; record load-earlier as not-portable-now; and add a per-session device-local view-mode preference that fails closed when its store is unreadable. Plan only — nothing implements until the operator says go."
+trigger_phrases:
+  - "navigation spec requirements"
+  - "navigation packet"
+  - "spec requirements"
+importance_tier: "normal"
 contextType: "planning"
 _memory:
   continuity:

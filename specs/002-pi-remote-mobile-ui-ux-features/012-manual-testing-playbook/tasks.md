@@ -2,6 +2,19 @@
 title: "Tasks: Root Manual Testing Playbook"
 description: "Ordered task list for authoring and landing the repo-root Pi Remote manual testing playbook."
 version: 1.0.0.0
+trigger_phrases:
+  - "manual testing playbook task ledger"
+  - "manual testing playbook packet"
+  - "task ledger"
+importance_tier: "normal"
+contextType: "implementation"
+_memory:
+  continuity:
+    packet_pointer: "specs/002-pi-remote-mobile-ui-ux-features/012-manual-testing-playbook"
+    last_updated_at: "2026-08-29T18:00:00.000Z"
+    last_updated_by: "claude-opus-5"
+    recent_action: "Backfilled template and continuity metadata for the drift sweep."
+    next_safe_action: "None; this packet is an archived record."
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: tasks-core | v2.2 -->

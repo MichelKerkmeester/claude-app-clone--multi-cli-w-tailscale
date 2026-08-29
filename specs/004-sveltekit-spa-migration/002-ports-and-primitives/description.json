@@ -1,0 +1,29 @@
+{
+  "level": "2",
+  "specFolder": "004-sveltekit-spa-migration/002-ports-and-primitives",
+  "description": "Port the framework-agnostic TypeScript (relay.ts, state.ts, cache.ts, auth.ts, effort.ts, pure halves of runtime.ts/commands.ts, workers) verbatim,",
+  "keywords": [
+    "port",
+    "framework-agnostic",
+    "typescript",
+    "relay",
+    "state",
+    "cache",
+    "auth",
+    "effort",
+    "pure",
+    "halves",
+    "runtime",
+    "commands",
+    "workers",
+    "verbatim"
+  ],
+  "lastUpdated": "2026-08-23T06:50:39.502Z",
+  "specId": "002",
+  "folderSlug": "ports-and-primitives",
+  "parentChain": [
+    "004-sveltekit-spa-migration"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

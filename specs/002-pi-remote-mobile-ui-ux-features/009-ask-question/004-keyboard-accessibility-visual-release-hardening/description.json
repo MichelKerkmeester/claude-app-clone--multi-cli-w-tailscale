@@ -1,5 +1,5 @@
 {
-  "specFolder": "app-mobile-cli/002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening",
+  "specFolder": "002-pi-remote-mobile-ui-ux-features/009-ask-question/004-keyboard-accessibility-visual-release-hardening",
   "description": "Phase 3 \u2014 Keyboard and thumb navigation, accessibility, visual, and iPhone/PWA release hardening",
   "keywords": [
     "phase",

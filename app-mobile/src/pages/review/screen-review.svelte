@@ -169,7 +169,7 @@
                 <Button class="deny-button" disabled={submitted} onclick={() => decide(approval, 'deny')}>
                   Deny
                 </Button>
-                <Button disabled={submitted} onclick={() => decide(approval, 'approve')}>
+                <Button class="approve-button" disabled={submitted} onclick={() => decide(approval, 'approve')}>
                   {submitted ? 'Submitted, verifying' : 'Approve once'}
                 </Button>
               </div>
@@ -408,7 +408,7 @@
     border: 0;
     border-radius: var(--radius-sm);
     background: var(--accent);
-    color: white;
+    color: var(--on-accent-text);
     font-size: 0.78rem;
     font-weight: 720;
     white-space: nowrap;
@@ -419,8 +419,8 @@
   }
 
   /* Keep this rule aligned with its surrounding surface. */
-  :global(.approval--actions button[data-hovered]) {
-    background: var(--accent-strong);
+  :global(.approval--actions .approve-button[data-hovered]) {
+    background: color-mix(in oklch, var(--accent) 75%, white);
   }
 
   /* Keep this rule aligned with its surrounding surface. */
@@ -439,7 +439,7 @@
   /* Keep this rule aligned with its surrounding surface. */
   :global(.approval--actions .deny-button[data-hovered]) {
     background: var(--danger);
-    color: white;
+    color: var(--on-danger);
   }
 
   /* Keep this rule aligned with its surrounding surface. */

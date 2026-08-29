@@ -57,6 +57,13 @@
   // Ranker owns filtering; Bits must not apply its own input filtering.
   // Do not edit — ranker — Deterministic host-command ranking.
   const ranked = $derived.by(() => rankHostCommands(catalog.commands, query));
+  const placeholder = $derived(
+    catalog.status === 'loading'
+      ? 'Loading commands…'
+      : isDisabled
+        ? 'Commands unavailable'
+        : '/ command',
+  );
 
   // ───────────────────────────────────────────────────────────────────
   // 7. EFFECTS
@@ -122,7 +129,8 @@
           bind:this={inputEl}
           {...props}
           aria-label="Insert a command"
-          placeholder="/ command"
+          aria-busy={catalog.status === 'loading' ? 'true' : undefined}
+          placeholder={placeholder}
           value={query}
           oninput={(event) => {
             chainHandler(props.oninput, event);
@@ -135,7 +143,9 @@
         />
       {/snippet}
     </Combobox.Input>
-    <Combobox.Trigger aria-label="Show commands">/</Combobox.Trigger>
+    <Combobox.Trigger class="command--trigger" aria-label="Show commands">
+      <span class="command--trigger-chrome" aria-hidden="true">/</span>
+    </Combobox.Trigger>
     <Combobox.Portal>
       <Combobox.Content class="react-aria-Popover" bind:ref={contentEl}>
         <Combobox.Viewport class="react-aria-ListBox">
@@ -175,17 +185,109 @@
 
 <!-- Slash autocomplete -->
 <!-- This surface: slash-autocomplete — the command palette. Decomposed into this scoped block;
-     command--palette / command--empty / command--name / command--desc have no owned
-     declarations in the original stylesheet (they inherit the shared overlay
-     primitives). Shared .react-aria-Popover / .react-aria-ListBox /
+     command--palette owns the field row; the input and trigger chrome live here.
+     command--empty / command--name / command--desc inherit the shared overlay
+     primitives. Shared .react-aria-Popover / .react-aria-ListBox /
      .react-aria-ListBoxItem stay GLOBAL — they style every react-aria dropdown
      (Select / ComboBox). Child-primitive classes and react-aria/runtime
-     data-attributes use :global so Svelte scoping cannot drop them. Values unchanged. -->
+     data-attributes use :global so Svelte scoping cannot drop them. -->
 <style>
+  /* ───────────────────────────────────────────────────────────────────
+     1. FIELD ROW
+  ─────────────────────────────────────────────────────────────────── */
   /* This surface: slash-autocomplete — the inline autocomplete card and the
      command palette share this surface name. */
-  /* `.command--palette`, `.command--empty`, `.command--name`, and `.command--desc`
-     carry structure only; the original stylesheet has no owned declarations
-     for them. Shared overlay primitives stay in app.css:
-     .react-aria-Popover, .react-aria-ListBox, .react-aria-ListBoxItem. */
+  /* Lays the command field and the slash trigger on one row inside the
+     tools popover width. */
+  .command--palette {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-inline-size: 0;
+    width: 100%;
+  }
+
+  /* Matches the sibling prompts field: bordered, padded, 44px-tall control. */
+  .command--palette input {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    min-block-size: 44px;
+    margin: 0;
+    padding-block: 0;
+    padding-inline: var(--space-2);
+    appearance: none;
+    border: 1px solid var(--control-border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 650;
+  }
+
+  /* Keep placeholder ink on the muted role so empty-state copy stays secondary. */
+  .command--palette input::placeholder {
+    color: var(--placeholder);
+  }
+
+  /* This state: disabled — authority is unavailable; the field stays readable
+     but not operable. */
+  .command--palette input:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  /* ───────────────────────────────────────────────────────────────────
+     2. SLASH TRIGGER
+  ─────────────────────────────────────────────────────────────────── */
+  /* Combobox.Trigger renders a bits-ui button, so the hit-box rule is :global. */
+  /* Do not edit — >=44px interactive target (WCAG). Only the inner face may shrink. */
+  .command--palette :global(.command--trigger) {
+    display: grid;
+    flex: none;
+    inline-size: 44px;
+    block-size: 44px;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  /* Paints the slash on a compact face so the extra hit area stays clear of the field. */
+  .command--trigger-chrome {
+    display: grid;
+    inline-size: var(--space-6);
+    block-size: var(--space-6);
+    min-inline-size: var(--space-6);
+    min-block-size: var(--space-6);
+    place-items: center;
+    border: 1px solid var(--control-border);
+    border-radius: var(--radius-control);
+    background: var(--surface);
+    font-size: 0.82rem;
+    font-weight: 650;
+    line-height: 1;
+  }
+
+  /* This state: focus-visible — suppress the shared ring on the hit box so it can hug the face. */
+  .command--palette :global(.command--trigger:focus-visible) {
+    outline: none;
+  }
+
+  /* This state: focus-visible — the ring follows the painted face, not the invisible 44px box. */
+  :global(.command--trigger:focus-visible) .command--trigger-chrome {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* This state: disabled — the slash control tracks the field's unavailable treatment. */
+  .command--palette :global(.command--trigger:disabled) {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
 </style>

@@ -11,6 +11,7 @@ import type {
 
 import SessionComposer from './session-composer.svelte';
 import AttachmentDraftProvider from '../attachments/attachment-draft-provider.svelte';
+import AttachmentDraftStoryHost from '../attachments/attachment-draft-story-host.svelte';
 import {
   INITIAL_RUNTIME_STATE,
   runtimeReducer,
@@ -23,6 +24,8 @@ import type {
   SelectedCommandBinding,
 } from '$shared/commands/commands.js';
 import { demoPostJson } from '$shared/fixtures/demo.js';
+
+const StoryHost = AttachmentDraftStoryHost as unknown as typeof AttachmentDraftProvider;
 
 // Reducer + command + attachment fixtures for real authority/capability shapes.
 const DEMO_STATE = (
@@ -122,7 +125,19 @@ const meta = {
   title: 'Chrome/SessionComposer',
   component: SessionComposer,
   tags: ['autodocs'],
-  decorators: [() => ({ Component: AttachmentDraftProvider })],
+  // The provider receives the story's capability, and the host stages real local
+  // files so the composer's attachment rail has content to render.
+  decorators: [
+    () => ({ Component: StoryHost }),
+    (_story, context) => ({
+      Component: AttachmentDraftProvider,
+      props: {
+        capability: context.args.mediaCapability ?? null,
+        sessionId: context.args.sessionId ?? null,
+        modelCanViewPhotos: true,
+      },
+    }),
+  ],
 } satisfies Meta<typeof SessionComposer>;
 
 export default meta;

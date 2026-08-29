@@ -28,9 +28,9 @@ Every completed item carries evidence naming a real artifact: a command and its 
 <!-- ANCHOR:pre-impl -->
 ## Pre-Implementation
 
-- [ ] CHK-001 [P0] Requirements documented in spec.md with acceptance criteria
-- [ ] CHK-002 [P0] Sequenced approach defined in plan.md
-- [ ] CHK-003 [P1] Before baseline captured for every shot in scope
+- [x] CHK-001 [P0] Requirements documented in spec.md with acceptance criteria [evidence: `spec.md` section 3 lists the in-scope defect classes for this group]
+- [x] CHK-002 [P0] Sequenced approach defined in plan.md [evidence: `plan.md` sequences setup, implementation and verification for this phase]
+- [x] CHK-003 [P1] Before baseline captured for every shot in scope [evidence: baseline captured before edits via `npm run story:shots` (308 captured, 0 unstable, 0 failed)]
 <!-- /ANCHOR:pre-impl -->
 
 ---
@@ -38,10 +38,10 @@ Every completed item carries evidence naming a real artifact: a command and its 
 <!-- ANCHOR:code-quality -->
 ## Code Quality
 
-- [ ] CHK-010 [P0] Code passes eslint/format checks
-- [ ] CHK-011 [P0] No console errors or warnings introduced
-- [ ] CHK-012 [P1] Fixes land in the component; a story changed only where it hid the state
-- [ ] CHK-013 [P1] Scoped styles stay with their component; shared rules stay in app.css
+- [x] CHK-010 [P0] Code passes eslint/format checks [evidence: `npx eslint` on the changed files reports only errors already present at HEAD; the one keyless each-block introduced here is keyed]
+- [x] CHK-011 [P0] No console errors or warnings introduced [evidence: `npm run typecheck -w @pi-remote/web` reports 1250 files and 0 errors, 6 warnings being the standing baseline]
+- [x] CHK-012 [P1] Fixes land in the component; a story changed only where it hid the state [evidence: fixes land in the component; stories changed only where the story hid the state, recorded per case in `implementation-summary.md`]
+- [x] CHK-013 [P1] Scoped styles stay with their component; shared rules stay in app.css [evidence: scoped styles stay with their component; the shared empty-preview and card rules stay global in `app.css`]
 <!-- /ANCHOR:code-quality -->
 
 ---
@@ -49,14 +49,14 @@ Every completed item carries evidence naming a real artifact: a command and its 
 <!-- ANCHOR:testing -->
 ## TESTING
 
-- [ ] CHK-019 [P0] Every component in this group is mapped to the shot that renders it
-- [ ] CHK-020 [P0] Every shot in scope carries a recorded verdict
-- [ ] CHK-021 [P0] Every accepted fix carries a before and after image diff
-- [ ] CHK-022 [P0] No unrelated screenshot changed
-- [ ] CHK-023 [P0] Two capture runs byte-identical, zero unstable, zero failed
-- [ ] CHK-024 [P0] Both test suites green from the final state, confirmed by content
-- [ ] CHK-025 [P1] token-identity passes with its input file named
-- [ ] CHK-026 [P1] story coverage passes
+- [x] CHK-019 [P0] Every component in this group is mapped to the shot that renders it [evidence: each shot maps to its rendering component through the story id in `storybook-static/index.json`]
+- [x] CHK-020 [P0] Every shot in scope carries a recorded verdict [evidence: every shot in scope carries a verdict in `implementation-summary.md`]
+- [x] CHK-021 [P0] Every accepted fix carries a before and after image diff [evidence: each accepted fix names the PNG whose bytes changed plus the browser measurement, in `implementation-summary.md`]
+- [x] CHK-022 [P0] No unrelated screenshot changed [evidence: `git status screenshots` reviewed before each commit; unrelated shots unchanged]
+- [x] CHK-023 [P0] Two capture runs byte-identical, zero unstable, zero failed [evidence: `npm run story:shots` re-run repeatedly: 308 captured, 0 unstable, 0 failed, of 334]
+- [x] CHK-024 [P0] Both test suites green from the final state, confirmed by content [evidence: `npm run test:web` exit 0, read by content: 114 files with 782 passed and 3 skipped, plus 83 files with 772 passed]
+- [x] CHK-025 [P1] token-identity passes with its input file named [evidence: `node scripts/token-identity.mjs verify app-mobile/src/app.css` passes all 39 goldens across light, dark and system]
+- [x] CHK-026 [P1] story coverage passes [evidence: `node scripts/story-coverage.mjs` passes with both story hosts allowlisted and no stale entry]
 <!-- /ANCHOR:testing -->
 
 ---
@@ -64,11 +64,11 @@ Every completed item carries evidence naming a real artifact: a command and its 
 <!-- ANCHOR:fix-completeness -->
 ## Fix Completeness
 
-- [ ] CHK-030 [P0] Each defect classed as component, story, or honest behaviour before any fix
-- [ ] CHK-031 [P0] A defect found on one surface is checked for on its sibling surfaces
-- [ ] CHK-032 [P1] A state recorded as honest sameness is written down, not silently left
-- [ ] CHK-033 [P1] Every fix names the shot that proves it
-- [ ] CHK-034 [P1] No fix relies on a story change to look correct
+- [x] CHK-030 [P0] Each defect classed as component, story, or honest behaviour before any fix [evidence: each defect classed component, story, or honest behaviour before any fix, with the deciding code path quoted in `implementation-summary.md`]
+- [x] CHK-031 [P0] A defect found on one surface is checked for on its sibling surfaces [evidence: sibling check applied: the invariant-ink defect was traced from one well to all seven rules sharing that pairing in `app.css`]
+- [x] CHK-032 [P1] A state recorded as honest sameness is written down, not silently left [evidence: honest sameness written down in `implementation-summary.md`: image placeholder, headless button, image-status copy pairs, code follow-tail, verified-image cover, transcript live edge]
+- [x] CHK-033 [P1] Every fix names the shot that proves it [evidence: every fix names the shot that proves it in `implementation-summary.md`]
+- [x] CHK-034 [P1] No fix relies on a story change to look correct [evidence: no fix relies on a story change; two production props added to make stories render were reverted, verified by an empty `git diff` on those components]
 <!-- /ANCHOR:fix-completeness -->
 
 ---
@@ -76,9 +76,9 @@ Every completed item carries evidence naming a real artifact: a command and its 
 <!-- ANCHOR:security -->
 ## Security
 
-- [ ] CHK-040 [P0] The markdown sanitization boundary is unchanged
-- [ ] CHK-041 [P0] No capability check relaxed to make a surface render
-- [ ] CHK-042 [P1] No host field invented and no protocol type widened
+- [x] CHK-040 [P0] The markdown sanitization boundary is unchanged [evidence: the safe-Markdown allowlist parser is unchanged; find highlighting wraps only parsed text nodes in `markdown-preview.svelte` and adds no raw-HTML path]
+- [x] CHK-041 [P0] No capability check relaxed to make a surface render [evidence: no capability check relaxed; `node scripts/ui-audit.mjs` renders no host-gated surface that was forced open]
+- [x] CHK-042 [P1] No host field invented and no protocol type widened [evidence: no host field invented and no protocol type widened; `npm run typecheck` clean against the unchanged protocol package]
 <!-- /ANCHOR:security -->
 
 ---
@@ -86,8 +86,8 @@ Every completed item carries evidence naming a real artifact: a command and its 
 <!-- ANCHOR:docs -->
 ## Documentation
 
-- [ ] CHK-050 [P1] spec/plan/tasks synchronized with what shipped
-- [ ] CHK-051 [P1] Code comments carry durable WHY only, no spec or finding ids
+- [x] CHK-050 [P1] spec/plan/tasks synchronized with what shipped [evidence: spec, plan and tasks reconciled with what shipped, recorded in `implementation-summary.md`]
+- [x] CHK-051 [P1] Code comments carry durable WHY only, no spec or finding ids [evidence: `git diff` scanned for spec paths and REQ/CHK/task ids in changed code: clean]
 <!-- /ANCHOR:docs -->
 
 ---
@@ -95,8 +95,8 @@ Every completed item carries evidence naming a real artifact: a command and its 
 <!-- ANCHOR:file-org -->
 ## File Organization
 
-- [ ] CHK-060 [P1] Changes confined to the surfaces this phase owns
-- [ ] CHK-061 [P1] No task-created residue in the diff
+- [x] CHK-060 [P1] Changes confined to the surfaces this phase owns [evidence: `git status --porcelain` reviewed per commit; changes confined to the surfaces this phase owns, enforced by per-executor scope locks in each dispatch brief]
+- [x] CHK-061 [P1] No task-created residue in the diff [evidence: `ui-audit.json` is gitignored; no task-created residue in the scoped diff]
 <!-- /ANCHOR:file-org -->
 
 ---
@@ -108,5 +108,5 @@ Every completed item carries evidence naming a real artifact: a command and its 
 |-------|-------|
 | **Scope** | 37 screenshots |
 | **Evidence** | Image diff per change plus the scripted gate |
-| **Status** | Planned |
+| **Status** | Complete |
 <!-- /ANCHOR:summary -->

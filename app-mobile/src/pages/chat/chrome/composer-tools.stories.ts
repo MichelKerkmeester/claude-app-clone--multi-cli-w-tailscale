@@ -10,6 +10,7 @@ import type {
 } from '@pi-remote/pi-rpc-protocol';
 
 import ComposerTools from './composer-tools.svelte';
+import ComposerToolsStoryHost from './composer-tools-story-host.svelte';
 import {
   INITIAL_RUNTIME_STATE,
   runtimeReducer,
@@ -103,12 +104,13 @@ const meta = {
   title: 'Chrome/ComposerTools',
   component: ComposerTools,
   tags: ['autodocs'],
+  render: (args) => ({ Component: ComposerToolsStoryHost, props: args }),
 } satisfies Meta<typeof ComposerTools>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Popover opens via real interaction.
+// Popover opens via the story host clicking the real + trigger.
 export const Default: Story = { args: { ...baseArgs } };
 
 export const MediaAvailable: Story = {

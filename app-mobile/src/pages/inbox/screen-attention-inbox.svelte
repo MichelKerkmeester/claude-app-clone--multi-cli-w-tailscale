@@ -339,6 +339,7 @@
                     Deny
                   </Button>
                   <Button
+                    class="approve-button"
                     disabled={pendingInlineDecision === item.lookupId}
                     onclick={() => decideInline(item.lookupId, 'approve')}
                   >
@@ -506,8 +507,19 @@
   :global(.attention--approval-actions button) {
     min-height: 3rem;
     background: var(--accent);
-    color: white;
+    color: var(--on-accent-text);
     font-weight: 720;
+  }
+
+  /* Keep the primary approval action visibly responsive without lowering text contrast. */
+  :global(.attention--approval-actions .approve-button[data-hovered]) {
+    background: color-mix(in oklch, var(--accent) 75%, white);
+  }
+
+  /* Keep submitted decisions readable while the host verifies them. */
+  :global(.attention--approval-actions button[data-disabled]) {
+    background: var(--surface-muted);
+    color: var(--ink-muted);
   }
 
   /* Keep denial visually distinct from an approval decision. */

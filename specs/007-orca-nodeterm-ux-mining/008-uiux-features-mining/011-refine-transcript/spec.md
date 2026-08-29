@@ -29,7 +29,7 @@ _memory:
 | **Parent** | `008-uiux-features-mining` |
 | **Level** | 2 |
 | **Priority** | P1 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-28 |
 | **Scope** | 39 screenshots |
 | **Constraint** | Host-authoritative, fail-closed. Refinement never adds host truth |

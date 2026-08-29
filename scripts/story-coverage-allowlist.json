@@ -26,6 +26,14 @@
       "reason": "Story-support scaffolding, not an app surface — it wraps SessionStateIcon in the same .state--idle / .state--running / .state--interrupted parent the roster supplies so currentColor resolves. Renders only its children, so it has no visual of its own."
     },
     {
+      "path": "pages/chat/chrome/composer-tools-story-host.svelte",
+      "reason": "Story-support scaffolding, not an app surface — it mounts ComposerTools and presses the real + trigger so the catalog photographs the open path instead of a production prop. Its visual IS the ComposerTools stories, which render through it."
+    },
+    {
+      "path": "pages/chat/chrome/session-header-story-host.svelte",
+      "reason": "Story-support scaffolding, not an app surface — it composes SessionHeader and an open ModelEffortSheet as the siblings the live screen mounts, so the open sheet can be photographed without a children hole in the sheet. Its visual IS the SessionHeader SheetOpen story."
+    },
+    {
       "path": "pages/chat/chrome/menu-plan-mode.svelte",
       "reason": "Compositional Bits Menu content — renders Menu.Content/Sub internals that require a Menu.Root ancestor; throws \"Context Menu.Root not found\" when rendered standalone. Exercised via the plan-mode menu surface (PlanModeButton), same class as the shared Menu sub-parts."
     },

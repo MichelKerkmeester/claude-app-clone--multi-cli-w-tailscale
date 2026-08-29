@@ -182,7 +182,7 @@
     ],
     "causal_summary": "The glanceable Live-Activity surface and a cluster of single-field card, composer, and media improvements all depend on host-published, client-read-only data the DTO does not carry yet",
     "created_at": "2026-08-27T17:00:59.524Z",
-    "last_save_at": "2026-08-28T15:54:16.224Z",
+    "last_save_at": "2026-08-29T06:07:11.078Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:b59fa233f64a75cb939dd212ea49004de4034054b6152da455a7f01337919d9a",
+    "source_fingerprint": "sha256:6ca96029e54b93cf9405adf9f11f5ec99e0f6f0cf4ec489946b5cf9abf1e084d",
     "source_doc_hashes": {
-      "spec.md": "d9920ccb649a7c875c73ae7af6813779789e12d7b73274ff9168d0ef0536cd7d",
+      "spec.md": "3ae886c707b7155e36c4a3a80ea6ee007545111db3d9502392e3aa7ec12ea3be",
       "plan.md": "29d8c1fe9745f64124261dd50b1af586c961fc78a3ec4abd5e2173799fd22802",
       "tasks.md": "a140ae6a4d6b9b593f74146d8a9b3944ddfe391e01b6cc81ca332baba879abcb",
       "checklist.md": "99a9d89f82446e37e3caac632af0bdcf21e9db020ffb88f25cdda5b014f60caa",
-      "implementation-summary.md": "a0872246d1585656c042b014ead9a7ab5d39f82d1f019f71dabcddb52dcdd323"
+      "implementation-summary.md": "dd4de7be904c08a1e11c022e9400c8248b3df290da5e0179b5865aff6a97ee2f"
     },
     "last_active_child_id": null,
     "last_active_at": null

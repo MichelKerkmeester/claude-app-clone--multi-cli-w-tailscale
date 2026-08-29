@@ -98,7 +98,7 @@
     use:focusVisible
     onclick={() => onRemove(item.id)}
   >
-    <span aria-hidden="true">×</span>
+    <span class="attachment-tile--remove-chrome" aria-hidden="true">×</span>
   </button>
   <span class="attachment-tile--status" aria-live="polite">{attachmentStatusLabel(item)}</span>
 </div>
@@ -174,6 +174,7 @@
 
   /* Keep this rule aligned with its surrounding surface. */
   .attachment-tile--unavailable {
+    align-self: start;
     max-inline-size: 100%;
     padding: 3px;
     color: var(--ink-muted);
@@ -182,40 +183,54 @@
     text-align: center;
   }
 
-  /* Keep this rule aligned with its surrounding surface. */
+  /* Do not edit — >=44px interactive target (WCAG). Only the inner face may shrink. */
   .attachment-tile--remove {
     position: absolute;
     z-index: 1;
-    inset-block-start: -10px;
-    inset-inline-end: -14px;
+    inset-block-start: -28px;
+    inset-inline-end: -8px;
     display: grid;
     inline-size: 44px;
     block-size: 44px;
     min-inline-size: 44px;
     min-block-size: 44px;
-    place-items: center;
+    place-items: end end;
     padding: 0;
-    border: 1px solid var(--control-border);
-    border-radius: 999px;
-    background: var(--surface-raised);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     color: var(--ink);
     cursor: pointer;
   }
 
-  /* Keep this rule aligned with its surrounding surface. */
-  .attachment-tile--remove span {
-    font-size: 1.25rem;
+  /* Paints the remove glyph on a small face so the extra hit area stays clear of the tile copy. */
+  .attachment-tile--remove-chrome {
+    display: grid;
+    inline-size: 22px;
+    block-size: 22px;
+    min-inline-size: 22px;
+    min-block-size: 22px;
+    place-items: center;
+    border: 1px solid var(--control-border);
+    border-radius: 999px;
+    background: var(--surface-raised);
+    font-size: 0.875rem;
     line-height: 1;
   }
 
-  /* Keep this rule aligned with its surrounding surface. */
-  .attachment-tile--remove:global([data-hovered]),
-  .attachment-tile--remove:global([data-pressed]) {
+  /* This state: hovered/pressed — fills the painted face only, not the 44px hit box. */
+  .attachment-tile--remove:global([data-hovered]) .attachment-tile--remove-chrome,
+  .attachment-tile--remove:global([data-pressed]) .attachment-tile--remove-chrome {
     background: var(--accent-soft);
   }
 
-  /* Keep this rule aligned with its surrounding surface. */
+  /* This state: focus-visible — suppress the shared ring on the hit box so it can hug the face. */
   .attachment-tile--remove:global([data-focus-visible]) {
+    outline: none;
+  }
+
+  /* This state: focus-visible — the ring follows the painted face, not the invisible 44px box. */
+  .attachment-tile--remove:global([data-focus-visible]) .attachment-tile--remove-chrome {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }

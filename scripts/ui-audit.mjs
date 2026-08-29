@@ -25,6 +25,13 @@ const VIEWPORT = { width: 402, height: 874 };
 const SETTLE_MS = 450;
 const WORKERS = 4;
 
+// The same instant the screenshot capture pins. Several surfaces are time-gated
+// — a pending approval past its deadline simply does not render — so auditing on
+// the wall clock silently skips exactly the content the archive shows, and every
+// defect inside it reads as absent rather than as passing. Keep this in step
+// with FIXED_CLOCK in scripts/capture-screenshots.mjs.
+const FIXED_CLOCK = new Date('2026-08-28T12:00:00.000Z');
+
 const MIME = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -233,6 +240,96 @@ const AUDIT = () => {
     add('OVERLAP_LAYERED', 'info', `${layeredPairs} overlapping pair(s) skipped as deliberate layering`, 'root');
   }
 
+  // ── Controls sitting on top of text ──────────────────────────────
+  // Deliberate layering is fine between two controls — a remove badge belongs on
+  // its own thumbnail. It stops being fine when the badge lands on words: the
+  // text is still in the accessibility tree and still measures full contrast,
+  // so nothing else here can see that a person cannot read it.
+  // Overlapping rectangles prove nothing on their own — a transcript scrolls
+  // UNDER a fixed composer, so their boxes intersect while every word stays
+  // readable. Only paint order settles it, so each text box is hit-tested: if
+  // the topmost element at a point is neither the text nor part of it, that
+  // point is genuinely covered.
+  const textBoxes = all.filter((el) =>
+    [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim().length > 1),
+  );
+  // Text scrolled out of its own container still reports viewport coordinates,
+  // and the hit test at those coordinates truthfully returns whatever is painted
+  // there instead. That is clipping, not occlusion, so sample only the part of
+  // the text that survives every ancestor's clip.
+  const visibleRect = (el) => {
+    let rect = el.getBoundingClientRect();
+    let node = el.parentElement;
+    while (node && node !== document.documentElement) {
+      const cs = getComputedStyle(node);
+      if (cs.overflowX !== 'visible' || cs.overflowY !== 'visible') {
+        const nr = node.getBoundingClientRect();
+        const left = Math.max(rect.left, nr.left);
+        const top = Math.max(rect.top, nr.top);
+        const right = Math.min(rect.right, nr.right);
+        const bottom = Math.min(rect.bottom, nr.bottom);
+        if (right <= left || bottom <= top) return null;
+        rect = { left, top, right, bottom, width: right - left, height: bottom - top };
+      }
+      node = node.parentElement;
+    }
+    return rect;
+  };
+
+  for (const text of textBoxes) {
+    const tr = visibleRect(text);
+    if (tr === null || tr.width < 8 || tr.height < 6) continue;
+    // A dense grid: a badge clipping one corner of a label still makes it
+    // unreadable, and a coarse grid rounds that away to nothing.
+    const samples = [];
+    for (const fx of [0.15, 0.38, 0.62, 0.85]) {
+      for (const fy of [0.25, 0.5, 0.75]) {
+        samples.push([tr.left + tr.width * fx, tr.top + tr.height * fy]);
+      }
+    }
+    const blockers = new Map();
+    let covered = 0;
+    for (const [x, y] of samples) {
+      if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) continue;
+      const top = document.elementFromPoint(x, y);
+      if (top === null) continue;
+      if (top === text || text.contains(top) || top.contains(text)) continue;
+      covered += 1;
+      const control = top.closest(CONTROL);
+      if (control === null || control.contains(text)) continue;
+      // Sitting in front of the text is not the same as hiding it. An invisible
+      // file input laid over a panel, or a transparent wrapper that makes a whole
+      // row tappable, intercepts the pointer while every word still shows
+      // through. Only a blocker that actually paints can occlude.
+      const bs = getComputedStyle(top);
+      const fill = parseRgb(bs.backgroundColor);
+      const paints = Number(bs.opacity) > 0 && ((fill !== null && fill.a > 0.1) || /^(IMG|SVG|CANVAS|VIDEO)$/u.test(top.tagName));
+      if (!paints) continue;
+      blockers.set(control, (blockers.get(control) ?? 0) + 1);
+    }
+    if (covered === 0 || blockers.size === 0) continue;
+    const [worst, hits] = [...blockers.entries()].sort((a, b) => b[1] - a[1])[0];
+    const share = hits / samples.length;
+    if (share < 0.15) continue;
+
+    // Screen chrome floating above the page — a fixed composer over a scrolling
+    // transcript — is layering working as designed, and the content beneath it
+    // is reachable by scrolling. The defect worth reporting is a control that
+    // covers text belonging to its OWN component, where no scroll reveals it.
+    // A shared ancestor spanning much of the screen means the first case.
+    let common = worst.parentElement;
+    while (common && !common.contains(text)) common = common.parentElement;
+    if (common === null) continue;
+    const cr = common.getBoundingClientRect();
+    if (cr.width * cr.height > window.innerWidth * window.innerHeight * 0.25) continue;
+    add(
+      'OCCLUDES_TEXT',
+      share > 0.5 ? 'high' : 'medium',
+      `${describe(worst)} paints over ${Math.round(share * 100)}% of "${(text.textContent || '').trim().slice(0, 40)}"`,
+      describe(text),
+    );
+  }
+
   // ── Unreadable text ──────────────────────────────────────────────
   for (const el of all) {
     const text = [...el.childNodes]
@@ -380,6 +477,7 @@ const queue = [...targets];
 await Promise.all(
   Array.from({ length: WORKERS }, async () => {
     const context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 1, reducedMotion: 'reduce' });
+    await context.clock.setFixedTime(FIXED_CLOCK);
     const page = await context.newPage();
     for (;;) {
       const story = queue.shift();

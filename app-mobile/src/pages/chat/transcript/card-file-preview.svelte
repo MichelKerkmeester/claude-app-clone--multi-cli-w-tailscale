@@ -82,7 +82,7 @@
       </span>
       <span class="artifact-card--summary">{block.displayName}</span>
       <span class="artifact-card-peek" aria-label="Preview metadata">
-        {#each metadataLines as line, index}<span class="artifact-card-peek--line">{line || ' '}{index < metadataLines.length - 1 ? '\n' : ''}</span>{/each}
+        {#each metadataLines as line, index (index)}<span class="artifact-card-peek--line">{line || ' '}{index < metadataLines.length - 1 ? '\n' : ''}</span>{/each}
       </span>
     </span>
     <span class="artifact-card--open" aria-hidden="true">
@@ -201,6 +201,14 @@
     line-height: 1.45;
     text-align: start;
     white-space: pre;
+  }
+
+  /* This slot: peek-line — one clipped, ellipsized peek row. */
+  .artifact-card-peek--line {
+    display: block;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* This slot: open — the trailing "Open" handoff affordance. */

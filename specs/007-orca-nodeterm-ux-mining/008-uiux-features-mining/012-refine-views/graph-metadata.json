@@ -26,12 +26,13 @@
       "screenshots"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "plan.md",
       "tasks.md",
       "checklist.md",
-      "spec.md"
+      "spec.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -56,6 +57,12 @@
         "name": "spec.md",
         "kind": "doc",
         "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -143,20 +150,20 @@
         "source": "derived"
       },
       {
+        "name": "storybook-static",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
         "name": "sibling",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "TASK NOTATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "PHASE 1: SETUP",
-        "kind": "heading",
+        "name": "siblings",
+        "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
@@ -171,31 +178,27 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Code Quality",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "The views surfaces cover whole screens, empty states, status pills and theme controls, and 37 screenshots record how they actually render",
     "created_at": "2026-08-28T19:50:56.130Z",
-    "last_save_at": "2026-08-28T19:54:37.988Z",
+    "last_save_at": "2026-08-29T06:02:35.572Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:a0a737b78bbd48f3c01545e48ece64461d9caacbcd81bf02ccf51aa748f1bb3c",
+    "source_fingerprint": "sha256:e3ba5360f9933578d087fb755fff842e6a27b81f4ef7519e11a3e3dbb9a7dfca",
     "source_doc_hashes": {
-      "spec.md": "03b4648fcc0e801199736839f3aa4e79723750bc161488f0b1a121813f2e0dd4",
+      "spec.md": "758108a8420626422765f9de50a38d19b0d2ed10f027f119cdaf46ee872966af",
       "plan.md": "59382710d9eb8c82d684ee6a9d8900db1e1f96a58110294ac92d1186e1e0afea",
-      "tasks.md": "58e3b10414f9774795a7fce8d9371bffd9b6fca47bb4ed7d8ced3e834de95b27",
-      "checklist.md": "4bac42287148bfe998b96dd1469fc35300500144f63168a894a14bcac3ec11da"
+      "tasks.md": "a43db2bbb9cce1c236fca43b4e2804dc18ae7b1d6a942d0c6ab645ba8ffa6e6b",
+      "checklist.md": "ec63efe714c3c68a1750cb1fa19c23ea04e33c9f5155b2077bd2b1af1cc8ddce",
+      "implementation-summary.md": "1f2304ca957f74c0c047ec0616d58eb9befea9ea345b35127303adea88ae2639"
     },
     "last_active_child_id": null,
     "last_active_at": null

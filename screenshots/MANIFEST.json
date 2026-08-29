@@ -384,7 +384,7 @@
       "name": "Add",
       "ok": true,
       "rel": "artifacts/diff-preview--add.png",
-      "size": "394x265"
+      "size": "394x152"
     },
     {
       "id": "artifacts-diffpreview--context",
@@ -392,7 +392,7 @@
       "name": "Context",
       "ok": true,
       "rel": "artifacts/diff-preview--context.png",
-      "size": "394x265"
+      "size": "394x173"
     },
     {
       "id": "artifacts-diffpreview--find-match",
@@ -408,7 +408,7 @@
       "name": "Remove",
       "ok": true,
       "rel": "artifacts/diff-preview--remove.png",
-      "size": "394x265"
+      "size": "394x131"
     },
     {
       "id": "artifacts-diffpreview--wrapped",
@@ -1176,7 +1176,7 @@
       "name": "Default",
       "ok": true,
       "rel": "attachments/attachment-rail--default.png",
-      "size": "174x99"
+      "size": "168x117"
     },
     {
       "id": "attachments-attachmenttile--model-blocked",
@@ -1184,7 +1184,7 @@
       "name": "Model Blocked",
       "ok": true,
       "rel": "attachments/attachment-tile--model-blocked.png",
-      "size": "102x99"
+      "size": "96x117"
     },
     {
       "id": "attachments-attachmenttile--ready",
@@ -1192,7 +1192,7 @@
       "name": "Ready",
       "ok": true,
       "rel": "attachments/attachment-tile--ready.png",
-      "size": "102x99"
+      "size": "96x117"
     },
     {
       "id": "attachments-attachmenttile--rejected",
@@ -1200,7 +1200,7 @@
       "name": "Rejected",
       "ok": true,
       "rel": "attachments/attachment-tile--rejected.png",
-      "size": "102x99"
+      "size": "96x117"
     },
     {
       "id": "attachments-attachmenttile--validating",
@@ -1208,7 +1208,7 @@
       "name": "Validating",
       "ok": true,
       "rel": "attachments/attachment-tile--validating.png",
-      "size": "102x99"
+      "size": "96x117"
     },
     {
       "id": "chrome-commandoption--active",
@@ -1240,7 +1240,7 @@
       "name": "Loading",
       "ok": true,
       "rel": "chrome/command-palette--loading.png",
-      "size": "222x48"
+      "size": "394x68"
     },
     {
       "id": "chrome-commandpalette--ready",
@@ -1248,7 +1248,7 @@
       "name": "Ready",
       "ok": true,
       "rel": "chrome/command-palette--ready.png",
-      "size": "222x48"
+      "size": "394x68"
     },
     {
       "id": "chrome-composercommandautocomplete--loading-initial",
@@ -1288,7 +1288,7 @@
       "name": "Catalog Loading",
       "ok": true,
       "rel": "chrome/composer-tools--catalog-loading.png",
-      "size": "68x112"
+      "size": "346x468"
     },
     {
       "id": "chrome-composertools--default",
@@ -1296,7 +1296,7 @@
       "name": "Default",
       "ok": true,
       "rel": "chrome/composer-tools--default.png",
-      "size": "68x112"
+      "size": "346x468"
     },
     {
       "id": "chrome-composertools--media-available",
@@ -1304,7 +1304,7 @@
       "name": "Media Available",
       "ok": true,
       "rel": "chrome/composer-tools--media-available.png",
-      "size": "68x112"
+      "size": "346x601"
     },
     {
       "id": "chrome-dictationoverlay--open",
@@ -1560,7 +1560,7 @@
       "name": "With Media",
       "ok": true,
       "rel": "chrome/session-composer--with-media.png",
-      "size": "394x159"
+      "size": "394x243"
     },
     {
       "id": "chrome-sessionheader--build",
@@ -1584,7 +1584,7 @@
       "name": "Sheet Open",
       "ok": true,
       "rel": "chrome/session-header--sheet-open.png",
-      "size": "394x85"
+      "size": "402x874"
     },
     {
       "id": "chrome-todopanel--empty",
@@ -1688,7 +1688,7 @@
       "name": "Cancelled",
       "ok": true,
       "rel": "rich-content/command-output-card--cancelled.png",
-      "size": "394x551"
+      "size": "394x460"
     },
     {
       "id": "rich-content-commandoutputcard--completed",
@@ -1696,7 +1696,7 @@
       "name": "Completed",
       "ok": true,
       "rel": "rich-content/command-output-card--completed.png",
-      "size": "394x525"
+      "size": "394x434"
     },
     {
       "id": "rich-content-commandoutputcard--denied",
@@ -1704,7 +1704,7 @@
       "name": "Denied",
       "ok": true,
       "rel": "rich-content/command-output-card--denied.png",
-      "size": "394x551"
+      "size": "394x460"
     },
     {
       "id": "rich-content-commandoutputcard--failed",
@@ -1712,7 +1712,7 @@
       "name": "Failed",
       "ok": true,
       "rel": "rich-content/command-output-card--failed.png",
-      "size": "394x525"
+      "size": "394x434"
     },
     {
       "id": "rich-content-commandoutputcard--interrupted",
@@ -1720,7 +1720,7 @@
       "name": "Interrupted",
       "ok": true,
       "rel": "rich-content/command-output-card--interrupted.png",
-      "size": "394x551"
+      "size": "394x460"
     },
     {
       "id": "rich-content-commandoutputcard--running",
@@ -1728,7 +1728,7 @@
       "name": "Running",
       "ok": true,
       "rel": "rich-content/command-output-card--running.png",
-      "size": "394x525"
+      "size": "394x528"
     },
     {
       "id": "rich-content-redactionbadge--cache",
@@ -1768,7 +1768,7 @@
       "name": "Cancelled",
       "ok": true,
       "rel": "rich-content/rich-content-router--cancelled.png",
-      "size": "394x551"
+      "size": "394x460"
     },
     {
       "id": "rich-content-richcontentrouter--code",
@@ -1784,7 +1784,7 @@
       "name": "Completed",
       "ok": true,
       "rel": "rich-content/rich-content-router--completed.png",
-      "size": "394x577"
+      "size": "394x486"
     },
     {
       "id": "rich-content-richcontentrouter--denied",
@@ -1792,7 +1792,7 @@
       "name": "Denied",
       "ok": true,
       "rel": "rich-content/rich-content-router--denied.png",
-      "size": "394x551"
+      "size": "394x460"
     },
     {
       "id": "rich-content-richcontentrouter--failed",
@@ -1800,7 +1800,7 @@
       "name": "Failed",
       "ok": true,
       "rel": "rich-content/rich-content-router--failed.png",
-      "size": "394x577"
+      "size": "394x486"
     },
     {
       "id": "rich-content-richcontentrouter--fallback",
@@ -1816,7 +1816,7 @@
       "name": "Interrupted",
       "ok": true,
       "rel": "rich-content/rich-content-router--interrupted.png",
-      "size": "394x551"
+      "size": "394x460"
     },
     {
       "id": "rich-content-richcontentrouter--prose",
@@ -1832,7 +1832,7 @@
       "name": "Running",
       "ok": true,
       "rel": "rich-content/rich-content-router--running.png",
-      "size": "394x577"
+      "size": "394x580"
     },
     {
       "id": "rich-content-richcontentrouter--text-artifact",
@@ -2240,7 +2240,7 @@
       "name": "Command",
       "ok": true,
       "rel": "transcript/normalized-transcript-block-view--command.png",
-      "size": "394x525"
+      "size": "394x528"
     },
     {
       "id": "transcript-normalizedtranscriptblockview--fallback",

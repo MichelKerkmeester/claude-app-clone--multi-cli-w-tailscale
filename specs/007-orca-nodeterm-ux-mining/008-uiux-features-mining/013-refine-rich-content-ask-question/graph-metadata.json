@@ -26,12 +26,13 @@
       "record"
     ],
     "importance_tier": "important",
-    "status": "planned",
+    "status": "complete",
     "key_files": [
       "plan.md",
       "tasks.md",
       "checklist.md",
-      "spec.md"
+      "spec.md",
+      "implementation-summary.md"
     ],
     "entities": [
       {
@@ -56,6 +57,12 @@
         "name": "spec.md",
         "kind": "doc",
         "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
         "source": "derived"
       },
       {
@@ -143,20 +150,20 @@
         "source": "derived"
       },
       {
+        "name": "storybook-static",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
         "name": "sibling",
         "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "TASK NOTATION",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "PHASE 1: SETUP",
-        "kind": "heading",
+        "name": "siblings",
+        "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
@@ -171,31 +178,27 @@
         "kind": "proper_noun",
         "path": "checklist.md",
         "source": "derived"
-      },
-      {
-        "name": "Code Quality",
-        "kind": "proper_noun",
-        "path": "checklist.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "The rich-content + ask-question surfaces cover rendered model output and the interactive question card, and 54 screenshots record how they actually render",
     "created_at": "2026-08-28T19:50:57.927Z",
-    "last_save_at": "2026-08-28T19:54:39.865Z",
+    "last_save_at": "2026-08-29T06:02:35.850Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "checklist.md"
+      "checklist.md",
+      "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8446831a699b3dc9fc34fdc110b88a0745e865813b5a51dbc5ee848c2c08f950",
+    "source_fingerprint": "sha256:a1b43b9f5e9b433bf896bba60b5fcd296c489bfa53c1ce0e56e3e202ce6584e4",
     "source_doc_hashes": {
-      "spec.md": "b2b8e2a50d325db51ed7f0b6742f63a7d406d0d4a41f8ce2e032ff025070819e",
+      "spec.md": "4f473d84decfd9b3506762bfffbfc15a830820d60095a741336d8b6da6f2b664",
       "plan.md": "6415c90671755a532c999e25ff3d749403b08af3d4411c43f396725926fbb422",
-      "tasks.md": "1154a03716051ebcaac173eda206db8f6dc8277614751a6c79ebe25b446fb0bb",
-      "checklist.md": "40d74eb2d681a4c36fe589b8de0900b8297aada5c01dc6278048c458bba8d51a"
+      "tasks.md": "38b5f70cae5496e94c31d96cf3b76f9fa4b22e795359d2edcf9c348774932b61",
+      "checklist.md": "7f66f5d4d88826675ef1aa4544e24e3a5c40ea182b57b2162d9a1d79fa6a6ef5",
+      "implementation-summary.md": "c447bc37b306869f9e7edc6c171f147cbe2203f4448d942cb247313d44e6eece"
     },
     "last_active_child_id": null,
     "last_active_at": null

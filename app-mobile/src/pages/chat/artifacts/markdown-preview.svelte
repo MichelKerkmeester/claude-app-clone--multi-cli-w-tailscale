@@ -147,7 +147,13 @@
 
 <script lang="ts">
   // ───────────────────────────────────────────────────────────────────
-  // 3. PROPS
+  // 3. IMPORTS
+  // ───────────────────────────────────────────────────────────────────
+
+  import { findParts } from '../transcript/transcript-find-index.js';
+
+  // ───────────────────────────────────────────────────────────────────
+  // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
   interface Props {
@@ -159,18 +165,19 @@
   let { text, ariaLabel = 'Markdown preview', findTerm = '' }: Props = $props();
 
   // ───────────────────────────────────────────────────────────────────
-  // 4. DERIVED STATE
+  // 5. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
 
   const blocks = $derived(parseMarkdown(text));
 </script>
 
 <!-- Component content -->
-{#snippet inline(nodes: readonly MarkdownInline[])}{#each nodes as node, index (index)}{#if node.kind === 'text'}{node.value}{:else if node.kind === 'strong'}<strong>{@render inline(node.value)}</strong>{:else if node.kind === 'emphasis'}<em>{@render inline(node.value)}</em>{:else if node.kind === 'code'}<code>{node.value}</code>{:else if node.kind === 'strike'}<del>{@render inline(node.value)}</del>{:else if node.kind === 'link'}<span class="artifact-markdown--link" data-navigation="disabled">{@render inline(node.label)}</span>{:else if node.kind === 'image'}<span class="artifact-markdown--image">[{node.alt}]</span>{/if}{/each}{/snippet}
+{#snippet marked(text: string)}{#each findParts(text, findTerm) as part, partIndex (partIndex)}{#if part.mark}<mark class="artifact-find--match">{part.text}</mark>{:else}{part.text}{/if}{/each}{/snippet}
+{#snippet inline(nodes: readonly MarkdownInline[])}{#each nodes as node, index (index)}{#if node.kind === 'text'}{@render marked(node.value)}{:else if node.kind === 'strong'}<strong>{@render inline(node.value)}</strong>{:else if node.kind === 'emphasis'}<em>{@render inline(node.value)}</em>{:else if node.kind === 'code'}<code>{node.value}</code>{:else if node.kind === 'strike'}<del>{@render inline(node.value)}</del>{:else if node.kind === 'link'}<span class="artifact-markdown--link" data-navigation="disabled">{@render inline(node.label)}</span>{:else if node.kind === 'image'}<span class="artifact-markdown--image">[{node.alt}]</span>{/if}{/each}{/snippet}
 
 <!-- Markdown preview -->
 <!-- This surface: markdown-preview — the bounded safe-Markdown renderer well. -->
-<!-- This state: ready · empty · whitespace — empty/whitespace swap the read content. -->
+<!-- This state: ready · empty · whitespace · find-match — empty/whitespace swap the read content; find wraps parsed text nodes only. -->
 <!-- Do not edit — parseMarkdown uses a bounded allowlist parser, so raw HTML is excluded and links/images render as inert spans. -->
 {#if text.length === 0}
   <p class="artifact--empty-preview">This preview is empty.</p>
@@ -185,8 +192,8 @@
      The markdown blocks render via svelte:element / renderer constructs, so the descendant
      tag rules use :global(tag) (faithful — same reach; prune-proof). Links render as inert spans, so the
      defensive .artifact-markdown--preview a rule is kept via :global(a). Dark re-inks use
-     :global(:root[data-theme='dark']). The shared .artifact--empty-preview stays global. Literal hex
-     preserved. Values unchanged. -->
+     :global(:root[data-theme='dark']). The shared .artifact--empty-preview and .artifact-find--match
+     (<mark> on parsed text nodes) stay global. Literal hex preserved. Values unchanged. -->
 <style>
   /* This slot: markdown-well — the bounded safe-Markdown render surface. */
   /* Do not edit — Bounded reading well; selectable; links/images render inert. */

@@ -9,6 +9,7 @@ import type {
 } from '@pi-remote/pi-rpc-protocol';
 
 import SessionHeader, { type ThemePreference } from './session-header.svelte';
+import SessionHeaderStoryHost from './session-header-story-host.svelte';
 import {
   INITIAL_RUNTIME_STATE,
   runtimeReducer,
@@ -91,4 +92,8 @@ export const SheetOpen: Story = {
     ...Build.args,
     sheetOpen: true,
   },
+  render: (args) => ({
+    Component: SessionHeaderStoryHost,
+    props: args,
+  }),
 };

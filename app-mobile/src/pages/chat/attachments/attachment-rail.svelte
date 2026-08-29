@@ -61,15 +61,16 @@
 <!-- Attachment rail -->
 <!-- This surface: attachment-rail — the horizontal draft-photo rail; the tiles are child components. -->
 <style>
-  /* Keep this rule aligned with its surrounding surface. */
+  /* Holds room above each tile so overflow-x:auto does not clip the remove face. */
   .attachment-rail {
     display: flex;
     min-inline-size: 0;
-    min-block-size: 72px;
+    min-block-size: 80px;
     gap: 8px;
     max-inline-size: 100%;
     margin: 0;
-    padding-block: 4px;
+    padding-block-start: 12px;
+    padding-block-end: 4px;
     padding-inline: 0 2rem;
     overflow-x: auto;
     overscroll-behavior-inline: contain;

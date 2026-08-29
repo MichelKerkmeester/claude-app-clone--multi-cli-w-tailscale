@@ -245,10 +245,18 @@
     font-size: 0.8125rem;
   }
 
-  /* This slot: output-preview — tail-window preview of command output. */
+  /* This slot: output-preview — tail-window preview of command output.
+     Clip the inner code to whole line boxes. Overflow on this padded
+     well paints the next row into the padding and slices it. */
   .rich-output--preview {
-    block-size: 8.5rem;
     contain: content;
+  }
+
+  /* This slot: output-preview-code — six of the well's own line boxes. */
+  .rich-output--preview code {
+    display: block;
+    overflow: hidden;
+    max-block-size: calc(6 * 1lh);
   }
 
   /* This slot: labels — clipped-count and output-meta share muted small type. */

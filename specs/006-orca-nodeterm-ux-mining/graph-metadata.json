@@ -11,7 +11,8 @@
     "006-orca-nodeterm-ux-mining/005-streaming-ask",
     "006-orca-nodeterm-ux-mining/006-navigation",
     "006-orca-nodeterm-ux-mining/007-host-requests",
-    "006-orca-nodeterm-ux-mining/008-uiux-features-mining"
+    "006-orca-nodeterm-ux-mining/008-uiux-features-mining",
+    "006-orca-nodeterm-ux-mining/009-home-balance-and-controls"
   ],
   "manual": {
     "depends_on": [],
@@ -142,7 +143,7 @@
       "spec.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:e7bebf1d93a67b7b02729d91a12a077d9903d1aa7512a824091a0415188b2f0a",
+    "source_fingerprint": "sha256:88ad8ced5281072264688d4b1270678ace2c790d405fb845a98957fd96d908ba",
     "source_doc_hashes": {
       "spec.md": "5f71c435600ecdee83771fb9303744b0c7b336a763bfa8c5ae19740040e226f1",
       "research/research.md": "69fdbf03c28169035cbf4b00b971d554c53762e5c156c03eed5bef9dacf3bccc"

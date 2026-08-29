@@ -73,6 +73,7 @@ behaviour, a11y-parity for the AT tree), which is why they are separated rather 
 | 5 | `005-streaming-ask` | Streaming & blocking-prompt hardening: working-vs-streaming split, peek-safe streaming, optimistic-echo reconciliation, input-lock reasons, ask-card wizard + index answers, approval-from-ticket, one-blocking-at-a-time, named empty/error copy. | 2 |
 | 6 | `006-navigation` | Fail-closed navigation: carry id raw + re-validate `id`+`epoch` at chat entry, selection-vs-host-active precedence, per-session view-mode preference. | 2 |
 | 7 | `007-host-requests` | The ⚠️ set as a host-protocol request spec: the card bundle (`title`, `lastMessagePreview`, `agent`, `attention`) + optional fields + RPCs (`@`-file-search, media-lease), each with the UI it unlocks and the fail-closed fallback. Includes the Inbox-`sessionId` question that could unblock the attention badge for free. Buildable when the host ships. | 2 |
+| 9 | `009-home-balance-and-controls` | Operator-reported, not finding-driven: the home column reads as unstructured on a phone — half-width cards beneath full-width headings, three control clusters in three shapes, an unlabelled theme control — and closing the model picker leaves the chat unable to scroll or accept input. Every acceptance criterion is a browser measurement rather than a judgement. | 2 |
 <!-- /ANCHOR:phases -->
 
 ---

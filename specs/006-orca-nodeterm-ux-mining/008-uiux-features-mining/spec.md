@@ -35,6 +35,7 @@ _memory:
 |-------|-------|
 | **Level** | 2 (phase parent) |
 | **Parent Spec** | ../spec.md |
+| **Phase chain** | before `009-home-balance-and-controls` |
 | **Priority** | P1 |
 | **Status** | Planned |
 | **Created** | 2026-08-27 |

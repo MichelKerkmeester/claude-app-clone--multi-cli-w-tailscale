@@ -1,0 +1,23 @@
+{
+  "level": "2",
+  "specFolder": "006-orca-nodeterm-ux-mining/009-home-balance-and-controls",
+  "description": "The home screen does not read as a designed surface on a phone",
+  "keywords": [
+    "home balance",
+    "session card alignment",
+    "theme control",
+    "sheet interaction lock",
+    "scroll lock",
+    "control rhythm",
+    "402x874",
+    "both themes"
+  ],
+  "lastUpdated": "2026-08-29T20:15:00.000Z",
+  "specId": "009",
+  "folderSlug": "009-home-balance-and-controls",
+  "parentChain": [
+    "006-orca-nodeterm-ux-mining"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

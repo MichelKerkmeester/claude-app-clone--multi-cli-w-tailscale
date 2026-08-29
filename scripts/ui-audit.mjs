@@ -433,10 +433,23 @@ const stories = Object.values(index.entries ?? {})
   .map((entry) => ({ id: entry.id, title: entry.title, name: entry.name }))
   .sort((a, b) => a.id.localeCompare(b.id));
 
-const only = process.argv.slice(2).filter((a) => !a.startsWith('-'));
-const targets = only.length > 0 ? stories.filter((s) => only.some((f) => s.id.includes(f))) : stories;
+// Catalog tooling — the token playground and anything beside it — is a dense
+// pointer-driven page for building the product, not a surface the product
+// ships. Auditing it buries the app's own findings under hundreds of its table
+// controls. Naming it explicitly still audits it, so the exclusion narrows the
+// default sweep without putting the page out of reach.
+const TOOLING_PREFIX = 'design-';
 
-console.log(`Auditing ${targets.length} stories at ${VIEWPORT.width}x${VIEWPORT.height}\n`);
+const only = process.argv.slice(2).filter((a) => !a.startsWith('-'));
+const selected = only.length > 0 ? stories.filter((s) => only.some((f) => s.id.includes(f))) : stories;
+const targets = only.length > 0 ? selected : selected.filter((s) => !s.id.startsWith(TOOLING_PREFIX));
+const excluded = selected.length - targets.length;
+
+console.log(`Auditing ${targets.length} stories at ${VIEWPORT.width}x${VIEWPORT.height}`);
+if (excluded > 0) {
+  console.log(`  (${excluded} catalog tooling stor${excluded === 1 ? 'y' : 'ies'} skipped; name one to audit it)`);
+}
+console.log('');
 
 const browser = await chromium.launch({ headless: true, channel: 'chrome' });
 const results = [];

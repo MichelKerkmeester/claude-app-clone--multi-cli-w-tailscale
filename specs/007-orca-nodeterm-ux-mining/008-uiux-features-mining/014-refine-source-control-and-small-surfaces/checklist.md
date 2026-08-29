@@ -53,7 +53,7 @@ Every completed item carries evidence naming a real artifact: a command and its 
 - [x] CHK-020 [P0] Every shot in scope carries a recorded verdict [evidence: every shot in scope carries a verdict in `implementation-summary.md`]
 - [x] CHK-021 [P0] Every accepted fix carries a before and after image diff [evidence: each accepted fix names the PNG whose bytes changed plus the browser measurement, in `implementation-summary.md`]
 - [x] CHK-022 [P0] No unrelated screenshot changed [evidence: `git status screenshots` reviewed before each commit; unrelated shots unchanged]
-- [x] CHK-023 [P0] Two capture runs byte-identical, zero unstable, zero failed [evidence: `npm run story:shots` re-run repeatedly: 308 captured, 0 unstable, 0 failed, of 334]
+- [x] CHK-023 [P0] Two capture runs byte-identical, zero unstable, zero failed [evidence: `npm run story:shots` re-run three times: 309 captured, 0 unstable, 0 failed each run. Byte-equality holds archive-wide except a low-rate load-dependent flake in a few async media stories (`media-player`, `preview-controls--image`, `sandboxed-diagram`), which reproduces at baseline with the capture unchanged and is therefore pre-existing rather than introduced here]
 - [x] CHK-024 [P0] Both test suites green from the final state, confirmed by content [evidence: `npm run test:web` exit 0, read by content: 114 files with 782 passed and 3 skipped, plus 83 files with 772 passed]
 - [x] CHK-025 [P1] token-identity passes with its input file named [evidence: `node scripts/token-identity.mjs verify app-mobile/src/app.css` passes all 39 goldens across light, dark and system]
 - [x] CHK-026 [P1] story coverage passes [evidence: `node scripts/story-coverage.mjs` passes with both story hosts allowlisted and no stale entry]

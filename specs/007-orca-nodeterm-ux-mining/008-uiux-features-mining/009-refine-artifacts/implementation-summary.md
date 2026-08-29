@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/009-refine-artifacts"
-    last_updated_at: "2026-08-29T06:01:34.396Z"
+    last_updated_at: "2026-08-29T07:30:43.148Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Fixed the artifacts defects and built the audit that finds their class."
     next_safe_action: "Operator reviews; the archive and the audit are the evidence."
@@ -132,6 +132,11 @@ browser measurement.
   rather than done quietly.
 - **A pre-existing keyless `{#each}` remains** in `card-artifact.svelte`; the sibling this phase
   touched was fixed, and the original is left alone as out of scope.
+- **The archive is not perfectly reproducible, and an earlier claim that it was came from too small a
+  sample.** Two consecutive runs agreeing was read as determinism; three runs show a low-rate flake in
+  a few async media stories, where a player or a sandboxed frame loses a load race under concurrent
+  capture. It reproduces with the capture reverted, so it is pre-existing rather than introduced, and
+  a wait for media metadata now removes one of its sources. The rest of the archive is byte-stable.
 - **Two states cannot be told apart in isolation, for a reason worth naming.** The verified-image
   privacy cover is a real branch — `showPixels` excludes `privacy-covered` — but no image resource
   resolves inside a story, so the default and covered shots both fall to the same no-pixels

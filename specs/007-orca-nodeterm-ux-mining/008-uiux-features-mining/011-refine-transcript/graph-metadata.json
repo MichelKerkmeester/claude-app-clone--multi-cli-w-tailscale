@@ -182,7 +182,7 @@
     ],
     "causal_summary": "The transcript surfaces cover transcript blocks, folds, find bar and load panels, and 39 screenshots record how they actually render",
     "created_at": "2026-08-28T19:50:54.319Z",
-    "last_save_at": "2026-08-29T06:02:35.296Z",
+    "last_save_at": "2026-08-29T07:31:44.389Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:17c665cc19a8e17a1980fa058f37245baec94c0a8e9b70b1948b353ae4717782",
+    "source_fingerprint": "sha256:ee6c94000d9843a8213147aea5d8ddee16b126377159c6c64fe595a304145ec5",
     "source_doc_hashes": {
       "spec.md": "6bdefe1bdb8e792c2a96298baa98dce7a900d88af7955889fe2d76b79b684aa1",
       "plan.md": "d55e222d3707147e281784a64b74c60bf8e9cce365a997f2adc0a2ffa46dcb50",
       "tasks.md": "09ead2e010fef441c4b94f63bff3a5e4fd67275dc26fe2d5aa928afaa9045259",
-      "checklist.md": "81369c52762ff2dd36ff4da5acb6167ca1a3489af5acf2b9ad2e7849ef3fe0df",
-      "implementation-summary.md": "3534617d6bae4f20a7db21eab30fd4e86fe48bef6e7fc30e1d1fbf5a53eb1fe8"
+      "checklist.md": "a1c6e69db3544e6c801b5b9f983e871ec83475ebc803b96709ab29678897ff37",
+      "implementation-summary.md": "bf094add02b9f7448f8294653b3f55f637f112987133fb005e9ca8a883f9684d"
     },
     "last_active_child_id": null,
     "last_active_at": null

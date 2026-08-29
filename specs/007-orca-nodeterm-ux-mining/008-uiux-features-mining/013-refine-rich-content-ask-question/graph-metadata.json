@@ -182,7 +182,7 @@
     ],
     "causal_summary": "The rich-content + ask-question surfaces cover rendered model output and the interactive question card, and 54 screenshots record how they actually render",
     "created_at": "2026-08-28T19:50:57.927Z",
-    "last_save_at": "2026-08-29T06:02:35.850Z",
+    "last_save_at": "2026-08-29T07:31:45.017Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:a1b43b9f5e9b433bf896bba60b5fcd296c489bfa53c1ce0e56e3e202ce6584e4",
+    "source_fingerprint": "sha256:dbe2b43d7b9f0522f3a5a61e8786ef0bd3db83d4efa4eafe203a83657070500b",
     "source_doc_hashes": {
       "spec.md": "4f473d84decfd9b3506762bfffbfc15a830820d60095a741336d8b6da6f2b664",
       "plan.md": "6415c90671755a532c999e25ff3d749403b08af3d4411c43f396725926fbb422",
       "tasks.md": "38b5f70cae5496e94c31d96cf3b76f9fa4b22e795359d2edcf9c348774932b61",
-      "checklist.md": "7f66f5d4d88826675ef1aa4544e24e3a5c40ea182b57b2162d9a1d79fa6a6ef5",
-      "implementation-summary.md": "c447bc37b306869f9e7edc6c171f147cbe2203f4448d942cb247313d44e6eece"
+      "checklist.md": "f96895d75e24e553894adc6ab5c455bf84afb6ddebd684f79e4c4ff25036cb66",
+      "implementation-summary.md": "6255e6063d18f9a24fba1553945bd4b3cafbc419fb918b2908b2213c65899222"
     },
     "last_active_child_id": null,
     "last_active_at": null

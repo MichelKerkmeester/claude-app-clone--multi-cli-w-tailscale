@@ -5,7 +5,7 @@ contextType: "implementation"
 _memory:
   continuity:
     packet_pointer: "specs/007-orca-nodeterm-ux-mining/008-uiux-features-mining/014-refine-source-control-and-small-surfaces"
-    last_updated_at: "2026-08-29T06:01:34.396Z"
+    last_updated_at: "2026-08-29T07:30:43.148Z"
     last_updated_by: "claude-opus-5"
     recent_action: "Fixed clay-as-text in source control and the badge covering tile copy."
     next_safe_action: "Operator reviews; the archive and the audit are the evidence."

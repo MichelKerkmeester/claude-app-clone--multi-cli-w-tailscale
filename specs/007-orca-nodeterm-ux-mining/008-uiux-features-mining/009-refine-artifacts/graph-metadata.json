@@ -182,7 +182,7 @@
     ],
     "causal_summary": "The artifacts surfaces cover artifact cards, previews, diffs, image and media surfaces, and 91 screenshots record how they actually render",
     "created_at": "2026-08-28T19:50:50.700Z",
-    "last_save_at": "2026-08-29T06:02:34.754Z",
+    "last_save_at": "2026-08-29T07:31:43.725Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:9f676c771663d1b582731c67478027753e200083d490e23fbb618f8898edad9c",
+    "source_fingerprint": "sha256:b159bcffb1f1e4d7425679fb80713fb6b5ba9bfff0bee6c3964b22b0a89c3b7c",
     "source_doc_hashes": {
       "spec.md": "59837d7f7d6dbfd6a8fbfb1f7c4388940e4e1485266f2df0f53e76bd6c0ebc84",
       "plan.md": "9364b0526daa24da7e487b1ea7690a27ae324ea160bd2faa5a252b5d36d57800",
       "tasks.md": "7e27f8dc50e1280677543f96443a9e3b59f0b6b7d51081d83a044e9cd5eb6de2",
-      "checklist.md": "ed5921b065a2cd4b710e5b8599bc12dcaff3d5f48a5895a2d679e53748f90944",
-      "implementation-summary.md": "1f5bc952fce24f23ed2d44e424d1f61942ef5a112353993ee12d668934cc975b"
+      "checklist.md": "624883397a0482f044c489fe1df983222ee7ec58e5b8b4445fc3ef604f87c726",
+      "implementation-summary.md": "d91b04682b5cea5aa804e84009cbb6dc08794b7c8920a8ee44738a81da2070b5"
     },
     "last_active_child_id": null,
     "last_active_at": null

@@ -227,6 +227,22 @@ const AWAIT_ASSETS = `(async () => {
   const painted = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(undefined))));
   await painted();
 
+  // Native audio and video controls draw a different width once metadata lands,
+  // so a player shot before that renders one way and after it another. In
+  // isolation the element is always ready in time and the story looks perfectly
+  // stable; only under concurrent workers does one run lose the race, which is
+  // exactly how it produced a diff that meant nothing.
+  const media = [...document.querySelectorAll('audio, video')].filter((element) => element.readyState < 1);
+  if (media.length > 0) {
+    await Promise.all(media.map((element) => new Promise((resolve) => {
+      const done = () => resolve(undefined);
+      element.addEventListener('loadedmetadata', done, { once: true });
+      element.addEventListener('error', done, { once: true });
+      setTimeout(done, 2000);
+    })));
+    await painted();
+  }
+
   const frames = [...document.querySelectorAll('iframe')];
   if (frames.length > 0) {
     await Promise.all(frames.map((frame) => new Promise((resolve) => {
@@ -242,6 +258,63 @@ const AWAIT_ASSETS = `(async () => {
 
 /** Content can overflow the device frame, so the crop needs the real page height. */
 const MEASURE_PAGE_HEIGHT = `Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)`;
+
+// Share of the measured content an opaque element must span before the shot is
+// left transparent. A card covers essentially all of it; a bare control covers
+// none, and nothing real sits near the line.
+const BACKDROP_COVERAGE = 0.8;
+
+/**
+ * Whether the story paints its own ground.
+ *
+ * A card brings a surface with it and reads correctly on transparency. A
+ * component that draws only text — a label, a bare control, a headless
+ * primitive — brings none, so a transparent shot of it is legible only if the
+ * viewer happens to have a pale backdrop and vanishes on a dark one.
+ *
+ * This compares rectangles rather than hit-testing sample points. Sampling was
+ * the first attempt and it flapped: a point on an element boundary picks a
+ * different owner when sub-pixel layout or a late image decode shifts things,
+ * so four shots changed their own answer between runs. Geometry has no such
+ * knife edge.
+ */
+const MEASURE_BACKDROP = ({ x, y, width, height }) => {
+  const probe = document.createElement('canvas');
+  probe.width = 1;
+  probe.height = 1;
+  const context = probe.getContext('2d', { willReadFrequently: true });
+  const opaque = (value) => {
+    if (typeof value !== 'string' || value.length === 0) return false;
+    context.clearRect(0, 0, 1, 1);
+    context.fillStyle = '#ff00ff';
+    context.fillStyle = value;
+    const accepted = context.fillStyle;
+    context.fillStyle = '#00ff00';
+    context.fillStyle = value;
+    if (context.fillStyle !== accepted) return false;
+    context.fillRect(0, 0, 1, 1);
+    return context.getImageData(0, 0, 1, 1).data[3] > 200;
+  };
+
+  const area = Math.max(1, width * height);
+  const root = document.querySelector('#storybook-root') || document.body;
+  let best = 0;
+  for (const element of [root, ...root.querySelectorAll('*')]) {
+    // html and body are forced transparent for the capture, so a ground found
+    // there is the capture's own doing and must not count as the story's.
+    if (element === document.body || element === document.documentElement) continue;
+    if (!opaque(getComputedStyle(element).backgroundColor)) continue;
+    const rect = element.getBoundingClientRect();
+    const overlap =
+      Math.max(0, Math.min(x + width, rect.right) - Math.max(x, rect.left)) *
+      Math.max(0, Math.min(y + height, rect.bottom) - Math.max(y, rect.top));
+    if (overlap > best) best = overlap;
+  }
+  return { ratio: best / area };
+};
+
+/** The app's own page tone, so a composited shot matches how the app renders it. */
+const READ_CANVAS = `getComputedStyle(document.documentElement).getPropertyValue('--canvas').trim() || '#f8f8f6'`;
 
 // ───────────────────────────────────────────────────────────────────
 // 6. CAPTURE
@@ -332,6 +405,42 @@ async function main() {
           height: Math.ceil(Math.min(bounds.height + CROP_PADDING * 2, pageHeight - Math.max(0, bounds.y - CROP_PADDING))),
         };
 
+        // A story that brings no surface of its own would otherwise be captured
+        // onto nothing, which reads only against a pale viewer background and
+        // disappears against a dark one. Where the crop is mostly unpainted, the
+        // app's own page tone goes behind it so the shot shows what the app shows.
+        // Measured against the content, not the padded crop: the padding is the
+        // capture's own margin and would push every card under the threshold.
+        const backdrop = await page.evaluate(MEASURE_BACKDROP, {
+          x: bounds.x,
+          y: bounds.y,
+          width: bounds.width,
+          height: bounds.height,
+        });
+        const needsBackdrop = backdrop.ratio < BACKDROP_COVERAGE;
+
+        // The ground is restated and repainted for EVERY shot, not only the ones
+        // that need a backdrop. Doing this work conditionally gave the two paths
+        // different timing, which pushed image-bearing stories across a settle
+        // boundary and made five of them disagree with themselves between runs.
+        // The ground is painted as a real element behind the story rather than as
+        // the page background, so `omitBackground` stays true for every shot.
+        // Flipping that option per shot was what made six image-bearing stories
+        // disagree with themselves between runs; the capture call is now identical
+        // for all of them and only the page content differs.
+        await page.evaluate((colour) => {
+          const existing = document.getElementById('pi-capture-ground');
+          if (existing !== null) existing.remove();
+          if (colour === null) return;
+          const ground = document.createElement('div');
+          ground.id = 'pi-capture-ground';
+          ground.style.cssText = `position:fixed;inset:0;z-index:-1;background:${colour};`;
+          document.body.prepend(ground);
+        }, needsBackdrop ? await page.evaluate(READ_CANVAS) : null);
+        await page.evaluate(
+          () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+        );
+
         // Always full-page: the clip is then in document coordinates either way,
         // and branching on whether content happens to exceed the viewport made the
         // same story render differently between runs when it landed on the boundary.
@@ -365,6 +474,9 @@ async function main() {
           ok: true,
           rel,
           size: `${clip.width}x${clip.height}`,
+          // Named so a reader can tell a shot that carries its own surface from
+          // one standing on the app's page tone.
+          ...(needsBackdrop ? { backdrop: 'canvas' } : {}),
           ...(stable ? {} : { unstable: true }),
         });
       } catch (error) {

@@ -182,7 +182,7 @@
     ],
     "causal_summary": "The source-control, attachments, primitives, home surfaces cover the review hub plus the remaining small surfaces, and 31 screenshots record how they actually render",
     "created_at": "2026-08-28T19:50:59.738Z",
-    "last_save_at": "2026-08-29T06:02:36.126Z",
+    "last_save_at": "2026-08-29T07:31:45.328Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -192,13 +192,13 @@
       "checklist.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:a9006586aa70e9cab7a64e7336704584714b49b529d34cccf299c40adfbd8e5f",
+    "source_fingerprint": "sha256:032d15436e49a703610910c81d396b3a75fb083635e4095544b33c0957051e7e",
     "source_doc_hashes": {
       "spec.md": "36cc019107211381280e4e813a2f3b4f890caf943634b842ef0a81732831d33c",
       "plan.md": "bde2e9298c483567534c6876a9ad383fd4316b42df06b9b322a34b241490141a",
       "tasks.md": "f2ee9d0489394e79edfefe1978a9d1574dc6f49887923152670308dc3091ffc2",
-      "checklist.md": "14d59058a38cb683cdc161c6e8994f7764c01c31f2b1163f4f2c6c412e8263d1",
-      "implementation-summary.md": "11a11430567233140799324c7211e85c08b6be3d963d5c1aa47d1bea334100ec"
+      "checklist.md": "bec336dccdfd45fbedd2657ba341fce116e2bcbbd7de2c8f40a4f202b2ffd8aa",
+      "implementation-summary.md": "0244afcb233d085ddcb2776905d417e885f3b958dc8858cfbbe2fdc0cdb709c6"
     },
     "last_active_child_id": null,
     "last_active_at": null

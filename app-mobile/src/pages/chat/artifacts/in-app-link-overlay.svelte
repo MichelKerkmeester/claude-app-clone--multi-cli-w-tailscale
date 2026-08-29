@@ -166,7 +166,10 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="artifact-viewer--overlay in-app-link--overlay" onclick={onOverlayPointer}>
-    <div class="artifact-viewer--modal in-app-link--modal">
+    <div
+      class="artifact-viewer--modal in-app-link--modal"
+      class:in-app-link--modal-unframed={!framed}
+    >
       <div
         class="artifact-viewer--dialog in-app-link--dialog"
         role="dialog"
@@ -215,6 +218,17 @@
   /* This slot: in-app-link--content — URL read-out plus optional framed document. */
   .in-app-link--content {
     align-content: stretch;
+  }
+
+  /* This state: unframed — mailto/read-out links size to their content instead of the frame. */
+  .in-app-link--modal-unframed {
+    align-self: flex-start;
+    block-size: auto;
+  }
+
+  .in-app-link--modal-unframed .in-app-link--dialog {
+    min-block-size: auto;
+    max-block-size: none;
   }
 
   /* This slot: in-app-link--url — the gated destination, never a navigable top-level href. */

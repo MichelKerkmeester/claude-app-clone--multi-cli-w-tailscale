@@ -768,7 +768,7 @@
       "name": "Empty",
       "ok": true,
       "rel": "artifacts/markdown-preview--empty.png",
-      "size": "394x48"
+      "size": "394x83"
     },
     {
       "id": "artifacts-markdownpreview--find-match",
@@ -792,7 +792,7 @@
       "name": "Whitespace",
       "ok": true,
       "rel": "artifacts/markdown-preview--whitespace.png",
-      "size": "394x48"
+      "size": "394x83"
     },
     {
       "id": "artifacts-mediaplayer--audio-preview",
@@ -888,7 +888,7 @@
       "name": "Empty",
       "ok": true,
       "rel": "artifacts/text-preview--empty.png",
-      "size": "394x48"
+      "size": "394x83"
     },
     {
       "id": "artifacts-textpreview--markdown",
@@ -912,7 +912,7 @@
       "name": "Whitespace",
       "ok": true,
       "rel": "artifacts/text-preview--whitespace.png",
-      "size": "394x48"
+      "size": "394x83"
     },
     {
       "id": "artifacts-unsupportedpreview--default",
@@ -1680,7 +1680,7 @@
       "name": "Code",
       "ok": true,
       "rel": "rich-content/code-card--code.png",
-      "size": "394x381"
+      "size": "394x294"
     },
     {
       "id": "rich-content-commandoutputcard--cancelled",
@@ -1688,7 +1688,7 @@
       "name": "Cancelled",
       "ok": true,
       "rel": "rich-content/command-output-card--cancelled.png",
-      "size": "394x682"
+      "size": "394x551"
     },
     {
       "id": "rich-content-commandoutputcard--completed",
@@ -1696,7 +1696,7 @@
       "name": "Completed",
       "ok": true,
       "rel": "rich-content/command-output-card--completed.png",
-      "size": "394x656"
+      "size": "394x525"
     },
     {
       "id": "rich-content-commandoutputcard--denied",
@@ -1704,7 +1704,7 @@
       "name": "Denied",
       "ok": true,
       "rel": "rich-content/command-output-card--denied.png",
-      "size": "394x682"
+      "size": "394x551"
     },
     {
       "id": "rich-content-commandoutputcard--failed",
@@ -1712,7 +1712,7 @@
       "name": "Failed",
       "ok": true,
       "rel": "rich-content/command-output-card--failed.png",
-      "size": "394x656"
+      "size": "394x525"
     },
     {
       "id": "rich-content-commandoutputcard--interrupted",
@@ -1720,7 +1720,7 @@
       "name": "Interrupted",
       "ok": true,
       "rel": "rich-content/command-output-card--interrupted.png",
-      "size": "394x682"
+      "size": "394x551"
     },
     {
       "id": "rich-content-commandoutputcard--running",
@@ -1728,7 +1728,7 @@
       "name": "Running",
       "ok": true,
       "rel": "rich-content/command-output-card--running.png",
-      "size": "394x656"
+      "size": "394x525"
     },
     {
       "id": "rich-content-redactionbadge--cache",
@@ -1752,7 +1752,7 @@
       "name": "Plain",
       "ok": true,
       "rel": "rich-content/rich-block-frame--plain.png",
-      "size": "394x278"
+      "size": "394x191"
     },
     {
       "id": "rich-content-richblockframe--with-redaction",
@@ -1760,7 +1760,7 @@
       "name": "With Redaction",
       "ok": true,
       "rel": "rich-content/rich-block-frame--with-redaction.png",
-      "size": "394x475"
+      "size": "394x344"
     },
     {
       "id": "rich-content-richcontentrouter--cancelled",
@@ -1768,7 +1768,7 @@
       "name": "Cancelled",
       "ok": true,
       "rel": "rich-content/rich-content-router--cancelled.png",
-      "size": "394x682"
+      "size": "394x551"
     },
     {
       "id": "rich-content-richcontentrouter--code",
@@ -1776,7 +1776,7 @@
       "name": "Code",
       "ok": true,
       "rel": "rich-content/rich-content-router--code.png",
-      "size": "394x381"
+      "size": "394x294"
     },
     {
       "id": "rich-content-richcontentrouter--completed",
@@ -1784,7 +1784,7 @@
       "name": "Completed",
       "ok": true,
       "rel": "rich-content/rich-content-router--completed.png",
-      "size": "394x708"
+      "size": "394x577"
     },
     {
       "id": "rich-content-richcontentrouter--denied",
@@ -1792,7 +1792,7 @@
       "name": "Denied",
       "ok": true,
       "rel": "rich-content/rich-content-router--denied.png",
-      "size": "394x682"
+      "size": "394x551"
     },
     {
       "id": "rich-content-richcontentrouter--failed",
@@ -1800,7 +1800,7 @@
       "name": "Failed",
       "ok": true,
       "rel": "rich-content/rich-content-router--failed.png",
-      "size": "394x708"
+      "size": "394x577"
     },
     {
       "id": "rich-content-richcontentrouter--fallback",
@@ -1808,7 +1808,7 @@
       "name": "Fallback",
       "ok": true,
       "rel": "rich-content/rich-content-router--fallback.png",
-      "size": "394x254"
+      "size": "394x167"
     },
     {
       "id": "rich-content-richcontentrouter--interrupted",
@@ -1816,7 +1816,7 @@
       "name": "Interrupted",
       "ok": true,
       "rel": "rich-content/rich-content-router--interrupted.png",
-      "size": "394x682"
+      "size": "394x551"
     },
     {
       "id": "rich-content-richcontentrouter--prose",
@@ -1832,7 +1832,7 @@
       "name": "Running",
       "ok": true,
       "rel": "rich-content/rich-content-router--running.png",
-      "size": "394x708"
+      "size": "394x577"
     },
     {
       "id": "rich-content-richcontentrouter--text-artifact",
@@ -1840,7 +1840,7 @@
       "name": "Text Artifact",
       "ok": true,
       "rel": "rich-content/rich-content-router--text-artifact.png",
-      "size": "394x523"
+      "size": "394x428"
     },
     {
       "id": "rich-content-safemarkdown--prose-rtl",
@@ -1880,7 +1880,7 @@
       "name": "Document",
       "ok": true,
       "rel": "rich-content/text-artifact-card--document.png",
-      "size": "394x434"
+      "size": "394x331"
     },
     {
       "id": "rich-content-textartifactcard--long-text",
@@ -1888,7 +1888,7 @@
       "name": "Long Text",
       "ok": true,
       "rel": "rich-content/text-artifact-card--long-text.png",
-      "size": "394x523"
+      "size": "394x428"
     },
     {
       "id": "source-control-changedfiles--populated-with-diff",
@@ -2216,7 +2216,7 @@
       "name": "Tool Call Activity",
       "ok": true,
       "rel": "transcript/normalized-activity-group--tool-call-activity.png",
-      "size": "382x315"
+      "size": "382x209"
     },
     {
       "id": "transcript-normalizedtranscriptblockview--activity",
@@ -2224,7 +2224,7 @@
       "name": "Activity",
       "ok": true,
       "rel": "transcript/normalized-transcript-block-view--activity.png",
-      "size": "394x256"
+      "size": "394x169"
     },
     {
       "id": "transcript-normalizedtranscriptblockview--code",
@@ -2232,7 +2232,7 @@
       "name": "Code",
       "ok": true,
       "rel": "transcript/normalized-transcript-block-view--code.png",
-      "size": "394x381"
+      "size": "394x294"
     },
     {
       "id": "transcript-normalizedtranscriptblockview--command",
@@ -2240,7 +2240,7 @@
       "name": "Command",
       "ok": true,
       "rel": "transcript/normalized-transcript-block-view--command.png",
-      "size": "394x656"
+      "size": "394x525"
     },
     {
       "id": "transcript-normalizedtranscriptblockview--fallback",
@@ -2264,7 +2264,7 @@
       "name": "Text Artifact",
       "ok": true,
       "rel": "transcript/normalized-transcript-block-view--text-artifact.png",
-      "size": "394x523"
+      "size": "394x428"
     },
     {
       "id": "transcript-toolfold--completed-grep",
@@ -2488,7 +2488,7 @@
       "name": "Empty",
       "ok": true,
       "rel": "views/home--empty.png",
-      "size": "382x1689"
+      "size": "382x1747"
     },
     {
       "id": "views-home--error",
@@ -2512,7 +2512,7 @@
       "name": "Ready",
       "ok": true,
       "rel": "views/home--ready.png",
-      "size": "382x2009"
+      "size": "382x2066"
     },
     {
       "id": "views-home--stale",
@@ -2520,7 +2520,7 @@
       "name": "Stale",
       "ok": true,
       "rel": "views/home--stale.png",
-      "size": "382x2009"
+      "size": "382x2066"
     },
     {
       "id": "views-review--default",

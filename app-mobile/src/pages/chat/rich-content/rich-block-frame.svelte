@@ -52,7 +52,6 @@
     <!-- This slot: heading — eyebrow + title + metadata column. -->
     <div class="rich-block--heading">
       {#if eyebrow !== undefined}<p class="rich-block--eyebrow">{eyebrow}</p>{/if}
-      /* Keep this rule aligned with its surrounding surface. */
       <h3>{title}</h3>
       <!-- This slot: metadata — factual chips; the map wiring is guardrailed. -->
       {#if metadata.length > 0}
@@ -65,10 +64,8 @@
     <!-- This slot: status — lifecycle caption + redaction badge. -->
     <div class="rich-block--status">
       {#if status !== undefined}<span>{status}</span>{/if}
-      /* Keep this rule aligned with its surrounding surface. */
       <!-- Do not edit — RedactionBadge marks already-redacted, read-only content; never remove it from the frame. -->
       <RedactionBadge {redaction} />
-    /* Keep this rule aligned with its surrounding surface. */
     </div>
   </header>
   <!-- This slot: content — the per-card preview region. -->

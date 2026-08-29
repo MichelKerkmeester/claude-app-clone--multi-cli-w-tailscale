@@ -285,6 +285,10 @@ const AUDIT = () => {
   for (const el of all) {
     const r = el.getBoundingClientRect();
     if (r.height < window.innerHeight * 0.6) continue;
+    // A modal scrim covers the whole screen on purpose; that is the entire job
+    // of a backdrop, so its unused area is not reserved space going to waste.
+    const position = getComputedStyle(el).position;
+    if (position === 'fixed' || position === 'absolute') continue;
     const kids = [...el.children].filter(visible);
     if (kids.length === 0) continue;
     const bottom = Math.max(...kids.map((k) => k.getBoundingClientRect().bottom));

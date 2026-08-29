@@ -512,8 +512,8 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* This surface: home-view — hero, session roster, device footer, push settings. */
-/* This state: loading · empty · error · stale — via shared empty--state,
-.inbox--heading h1{
+/* This state: loading · empty · error · stale — via shared empty--state, inline-alert and freshness surfaces. */
+.hero h1 {
   max-width: 13ch;
   margin: 0;
   color: var(--ink);
@@ -589,10 +589,7 @@ button[data-pressed]:not([data-disabled]) {
 /* This slot: device — device-key footer (logout · revoke). */
 
 /* This surface: push--settings — device notification preferences. */
-/* This state: loading · disabled · off · on — support check, relay-off, enable CTA{
-  background: var(--accent-strong);
-  color: white;
-}
+/* This state: loading · disabled · off · on — support check, relay-off, enable CTA, preference grid. */
 
 /* End of surface: enrollment--view */
 /* This surface: review--view, inbox--view — routed list surfaces sharing the back-bar. */
@@ -1285,11 +1282,7 @@ button[data-pressed]:not([data-disabled]) {
 }
 
 /* This slot: header — title/eyebrow/metadata versus status/redaction row. */
-/* Editable seam: layout — header gap, alignment{
-  margin: 0;
-  color: var(--ink);
-  font-weight: 600;
-}
+/* Editable seam: layout — header gap, alignment, space-between rhythm. */
 
 /* This slot: metadata — quiet factual chips (language, call, lines, labels). */
 
@@ -1354,14 +1347,7 @@ button[data-pressed]:not([data-disabled]) {
 /* This state: running-tail — React sets data-tail-first='true'; the preview shows
    the newest output lines at the bottom while a command streams. */
 
-/* This slot: labels — clipped-count, output-meta{
-  max-block-size: 228px;
-  min-inline-size: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-inline: contain;
-  scrollbar-width: thin;
-}
+/* This slot: labels — clipped-count, output-meta. */
 
 /* This slot: code well — the code lines scroll inside this mono well. */
 
@@ -1387,7 +1373,8 @@ button[data-pressed]:not([data-disabled]) {
 /* This slot: safe-markdown--code — neutralizes the inline-chip chrome inside a
    fenced block. */
 
-/* This slot: prose-table — table rhythm, borders{
+/* This slot: prose-table — table rhythm, borders, and start-aligned cells. */
+.safe-markdown table {
   box-shadow: none;
 }
 
@@ -1600,7 +1587,7 @@ button[data-pressed]:not([data-disabled]) {
    Do not edit — theme-invariant token colours must stay fixed. */
 
 /* This surface: diff-preview — the unified-diff read well. */
-/* Do not edit — fixed ltr, isolate bidi, selectable,
+/* Do not edit — fixed ltr, isolate bidi, selectable. */
 .artifact--empty-preview {
   max-inline-size: 100%;
   margin: 0;
@@ -1958,12 +1945,7 @@ button[data-pressed]:not([data-disabled]) {
 
 /* Popover sheets + every react-aria dropdown (Select / ComboBox / Dialog). */
 /* End of surface: session--view */
-/* This surface: session-sheet — in-session overflow popover (nav · theme){
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-raised);
-}
+/* This surface: session-sheet — in-session overflow popover (nav · theme). */
 
 /* This surface: overlay — the base react-aria Popover is an INSTANCE of the shared
    overlay primitive (a raised panel over its anchored trigger; the runtime model

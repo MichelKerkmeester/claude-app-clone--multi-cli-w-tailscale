@@ -52,6 +52,7 @@
     block.byteLength === null ? 'Size unavailable' : `${formatArtifactSize(block.byteLength)}`,
     block.redaction === 'withheld' ? 'Relay withheld content' : 'Relay metadata only',
   ].join('\n'));
+  const metadataLines = $derived(metadata.split('\n'));
 </script>
 
 <!-- Component content -->
@@ -81,7 +82,7 @@
       </span>
       <span class="artifact-card--summary">{block.displayName}</span>
       <span class="artifact-card-peek" aria-label="Preview metadata">
-        {metadata}
+        {#each metadataLines as line, index}<span class="artifact-card-peek--line">{line || ' '}{index < metadataLines.length - 1 ? '\n' : ''}</span>{/each}
       </span>
     </span>
     <span class="artifact-card--open" aria-hidden="true">

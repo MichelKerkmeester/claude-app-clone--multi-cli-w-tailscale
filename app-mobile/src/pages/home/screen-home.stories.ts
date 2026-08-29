@@ -5,7 +5,9 @@
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 import type { SessionCardDto } from '@pi-remote/pi-rpc-protocol';
 import type { SessionListState, ConnectionPhase } from '$shared/state/state.js';
+import type { PushConfig } from '$shared/format/attention.js';
 import { demoPostJson, DEMO_IDENTITY } from '$shared/fixtures/demo.js';
+import { installStoryHostFetch } from '$shared/fixtures/story-host-fetch.js';
 import Home from './screen-home.svelte';
 
 const DEMO_SESSIONS = demoPostJson('/api/sessions', {}) as {
@@ -13,6 +15,17 @@ const DEMO_SESSIONS = demoPostJson('/api/sessions', {}) as {
 };
 const ROSTER_ITEMS: readonly SessionCardDto[] = DEMO_SESSIONS.sessions;
 const UPDATED_AT: string = ROSTER_ITEMS[0]?.updatedAt ?? new Date().toISOString();
+
+const DEMO_PUSH_CONFIG: PushConfig = {
+  supported: true,
+  vapidPublicKey: 'BNtYwF0z3q4VapidPublicKeyFromHostPreviewNotASecret',
+  preferences: { needs_input: true, finished: true, error: false },
+};
+
+const installHealthyHomeHost = (): (() => void) =>
+  installStoryHostFetch({
+    '/api/push/config': () => DEMO_PUSH_CONFIG,
+  });
 
 const noop = (): void => {};
 
@@ -58,6 +71,7 @@ export const Empty: Story = {
       error: null,
     } satisfies SessionListState,
   },
+  beforeEach: installHealthyHomeHost,
 };
 
 export const Error: Story = {
@@ -84,6 +98,7 @@ export const Stale: Story = {
       error: null,
     } satisfies SessionListState,
   },
+  beforeEach: installHealthyHomeHost,
 };
 
 export const Ready: Story = {
@@ -97,4 +112,5 @@ export const Ready: Story = {
       error: null,
     } satisfies SessionListState,
   },
+  beforeEach: installHealthyHomeHost,
 };

@@ -1,0 +1,16 @@
+<style>
+  /* Panels render in the order their addons register, and the core ones register
+     from presets before anything in this folder. Reading the component is the
+     first thing an author wants, so the Source tab is pulled to the front of the
+     strip. The strip is a block container, so it is switched to flex here — the
+     only reason `order` has anything to act on. Scoped by :has() to that exact
+     container so no other manager layout is touched. */
+  div:has(> #tabbutton-pi-source-panel-panel) {
+    display: flex;
+    align-items: center;
+  }
+
+  div:has(> #tabbutton-pi-source-panel-panel) > #tabbutton-pi-source-panel-panel {
+    order: -1;
+  }
+</style>

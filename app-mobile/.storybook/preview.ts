@@ -2,6 +2,9 @@ import type { Preview } from '@storybook/sveltekit';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { themes } from 'storybook/theming';
 import { componentSources } from 'virtual:pi-component-sources';
+import { addons } from 'storybook/preview-api';
+
+import { SOURCE_EVENT, SOURCE_REQUEST_EVENT } from './source-panel-events.js';
 
 import { applyOverrides } from './token-overrides.js';
 
@@ -9,6 +12,27 @@ import { applyOverrides } from './token-overrides.js';
 // surfaces render against the real --pi-* tokens; component rules live in each
 // component's scoped <style> and travel with the story.
 import '../src/app.css';
+
+// The story view has no source panel of its own: its tabs are Controls, Actions,
+// Interactions and Accessibility. Reading a component meant leaving the story
+// for its docs page. The preview knows which component is rendering and holds
+// the source map, so it publishes both over the addon channel and a manager
+// panel renders them beside the canvas.
+//
+// The last published payload is retained because a panel that mounts after a
+// story has already rendered would otherwise show nothing until the next
+// navigation. The panel asks on mount and this answers.
+let lastPublished: { name: string | null; source: string | null } = { name: null, source: null };
+
+function publishSource(context: { component?: { __docgen?: { name?: string } } }): void {
+  const name = context?.component?.__docgen?.name ?? null;
+  lastPublished = { name, source: name ? (componentSources[name] ?? null) : null };
+  addons.getChannel().emit(SOURCE_EVENT, lastPublished);
+}
+
+addons.getChannel().on(SOURCE_REQUEST_EVENT, () => {
+  addons.getChannel().emit(SOURCE_EVENT, lastPublished);
+});
 
 const preview: Preview = {
   parameters: {
@@ -69,8 +93,9 @@ const preview: Preview = {
   // designer sees the whole catalog move rather than one page. With no
   // overrides stored this removes nothing and costs a single map read, which
   // is why it is unconditional rather than gated on a flag someone must find.
-  beforeEach: () => {
+  beforeEach: (context) => {
     applyOverrides();
+    publishSource(context);
   },
   // addon-themes drives the design system's data-theme on <html> and gives the
   // toolbar toggle, so every surface can be checked in system / light / dark. Its

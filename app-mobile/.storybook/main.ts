@@ -23,6 +23,11 @@ const config: StorybookConfig = {
     '@storybook/addon-themes',
     '@storybook/addon-designs',
     '@storybook/addon-docs',
+    // Registered so the catalog's test surface is present and versioned with the
+    // rest of the addon set. Running stories as tests additionally needs vitest
+    // browser mode, which this repository does not install: the two web suites
+    // run in jsdom. The addon is inert until that stack is added deliberately.
+    '@storybook/addon-vitest',
   ],
   framework: {
     name: '@storybook/sveltekit',

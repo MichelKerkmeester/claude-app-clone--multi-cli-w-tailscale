@@ -12,11 +12,11 @@ _memory:
     packet_pointer: "specs/006-orca-nodeterm-ux-mining/008-uiux-features-mining"
     last_updated_at: "2026-08-27T18:30:00.000Z"
     last_updated_by: "claude-opus-4-8"
-    recent_action: "Phases 1-7 shipped; added 8-14 for archive integrity and UI refinement."
-    next_safe_action: "Operator picks a phase; client phases 001-004 before host phases 005-007."
+    recent_action: "All 16 phase children closed; parent status reconciled to match them."
+    next_safe_action: "None; every child is Complete."
     blockers:
       - "Phases 005, 006, 007 carry host-gated findings; each blocked finding needs a relay-authored, client-read-only field or RPC before its render unblocks."
-    completion_pct: 0
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -37,7 +37,7 @@ _memory:
 | **Parent Spec** | ../spec.md |
 | **Phase chain** | before `009-home-balance-and-controls` |
 | **Priority** | P1 |
-| **Status** | Planned |
+| **Status** | Complete |
 | **Created** | 2026-08-27 |
 | **Branch** | `main` |
 | **Parent Packet** | `006-orca-nodeterm-ux-mining` |

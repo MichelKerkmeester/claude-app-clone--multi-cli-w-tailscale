@@ -544,8 +544,20 @@
     isCommitting = true;
     mutationMessage = strings.applying;
     announcement = strings.applying;
-    const response = await runtimeControls.setModel(draft.provider, draft.id);
-    isCommitting = false;
+    let response: RuntimeControlResponse | null;
+    try {
+      response = await runtimeControls.setModel(draft.provider, draft.id);
+    } catch {
+      // A rejected request is indistinguishable from an unacknowledged one: the
+      // host may or may not have applied it. Report the same terminal state the
+      // transport reports when delivery cannot be confirmed.
+      response = { outcome: { status: 'delivery-unknown', reasonCode: 'delivery_unknown' } };
+    } finally {
+      // This latch gates every exit from the sheet while the page beneath holds
+      // pointer-events: none. It has to clear on every path, or a failed commit
+      // strands the reader in a modal with no way out but a reload.
+      isCommitting = false;
+    }
     if (response === null) {
       mutationMessage = strings.hostChanged;
       announcement = modelStatusAnnouncement(strings.hostChanged);

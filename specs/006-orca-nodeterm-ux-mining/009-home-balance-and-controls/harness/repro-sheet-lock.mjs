@@ -6,7 +6,11 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
 const ROOT = process.argv[2] ?? 'app-mobile/storybook-static';
-const PORT = 4173;
+// Port 0 lets the OS pick a free one. A fixed port is unsafe here: binding the
+// wildcard address succeeds even while another process holds 127.0.0.1 on the
+// same port, so the browser reaches THAT server and the probe silently measures
+// the wrong application.
+let PORT = 0;
 const MIME = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png',
@@ -26,7 +30,8 @@ const server = http.createServer((req, res) => {
     res.writeHead(404); res.end('not found');
   }
 });
-await new Promise((r) => server.listen(PORT, r));
+await new Promise((r) => server.listen(0, '127.0.0.1', r));
+PORT = server.address().port;
 
 async function snapshot(page, label) {
   const s = await page.evaluate(() => {
@@ -130,15 +135,21 @@ console.log('=== CLICK TEST ===', { clickOpensSheet });
 
 const secondClose = await snapshot(page, 'AFTER SECOND CLOSE');
 
+// Compare against the BASELINE, never against absolute literals. The app's own
+// resting body overflow is `hidden auto`, so asserting `visible` fails a healthy
+// surface and hides whether anything actually leaked.
+const restored = (after) =>
+  after.bodyPointerEvents === before.bodyPointerEvents &&
+  after.bodyOverflow === before.bodyOverflow &&
+  after.ariaHiddenOutsideCount === before.ariaHiddenOutsideCount &&
+  after.inertCount === before.inertCount &&
+  !/pointer-events|overflow/.test(after.bodyStyleAttr ?? '');
+
 const pass =
   clickOpensSheet &&
   (wheelY > 0 || scrollProbe.programmaticY > 0) &&
-  afterClose.bodyPointerEvents === 'auto' &&
-  afterClose.bodyOverflow === 'visible' &&
-  afterClose.ariaHiddenOutsideCount === before.ariaHiddenOutsideCount &&
-  afterClose.inertCount === before.inertCount &&
-  secondClose.bodyPointerEvents === 'auto' &&
-  secondClose.bodyOverflow === 'visible';
+  restored(afterClose) &&
+  restored(secondClose);
 
 console.log('\n=== VERDICT (pre-fix expected FAIL) ===', pass ? 'PASS' : 'FAIL');
 

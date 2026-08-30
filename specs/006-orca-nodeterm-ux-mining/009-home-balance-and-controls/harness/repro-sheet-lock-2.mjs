@@ -5,7 +5,11 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
 const ROOT = 'app-mobile/storybook-static';
-const PORT = 4175;
+// Port 0 lets the OS pick a free one. A fixed port is unsafe here: binding the
+// wildcard address succeeds even while another process holds 127.0.0.1 on the
+// same port, so the browser reaches THAT server and the probe silently measures
+// the wrong application.
+let PORT = 0;
 const MIME = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png',
@@ -23,7 +27,8 @@ const server = http.createServer((req, res) => {
     res.end(data);
   } catch { res.writeHead(500); res.end(); }
 });
-await new Promise((r) => server.listen(PORT, '127.0.0.1', r));
+await new Promise((r) => server.listen(0, '127.0.0.1', r));
+PORT = server.address().port;
 
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const page = await browser.newPage({ viewport: { width: 402, height: 874 }, deviceScaleFactor: 1 });

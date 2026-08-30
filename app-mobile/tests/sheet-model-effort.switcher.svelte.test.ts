@@ -346,6 +346,35 @@ describe('ModelEffortSheet (model section)', () => {
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
   });
 
+  it('releases every dismissal path when the commit request rejects', async () => {
+    // A rejected mutation must not strand the committing latch. Every exit from
+    // this sheet is gated on it, and the open dialog holds `pointer-events: none`
+    // on <body>, so a latch that never clears leaves the whole page unusable with
+    // no way out but a reload.
+    const user = userEvent.setup();
+    let rejectCommit: ((reason: Error) => void) | undefined;
+    const setModel = vi.fn<RuntimeControls['setModel']>().mockImplementation(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectCommit = reject;
+        }),
+    );
+    const onOpenChange = vi.fn();
+    await openSheet({ catalog: models(7), setModel, onOpenChange });
+
+    await user.click(screen.getByRole('option', { name: /Beta Next/ }));
+    await user.click(screen.getByRole('button', { name: 'Switch model' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Close sheet' })).toBeDisabled());
+
+    rejectCommit?.(new Error('relay unreachable'));
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Close sheet' })).not.toBeDisabled(),
+    );
+    await user.click(screen.getByRole('button', { name: 'Close sheet' }));
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+  });
+
   it('dismisses only from a qualifying header swipe and snaps shorter travel back', async () => {
     const onOpenChange = vi.fn();
     await openSheet({ catalog: models(7), onOpenChange });

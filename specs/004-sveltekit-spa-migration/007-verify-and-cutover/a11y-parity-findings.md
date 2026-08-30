@@ -52,7 +52,39 @@ Every P0 and P1 finding was remediated (executor-written source, gpt-5.6-luna) a
 - **P1-6 · Header overflow changed ARIA widget pattern (composite-in-composite).** React `SessionHeader.tsx:112-153` = Popover>Dialog + independent ToggleButtons; Svelte `SessionHeader.svelte:163-237` = Bits UI `DropdownMenu` (role=menu/menuitem) with a `ToggleGroup` (role=radio, roving tabindex) nested inside — a documented ARIA anti-pattern. Needs live-AT verification.
 - **P1-7 · Menu lost hidden AT-discoverable "Dismiss" button.** React `Popover.mjs` renders visually-hidden `DismissButton`s (touch-AT swipe close) when non-modal; Svelte menu family has none. (Escape/outside-tap still close.)
 
-## P2 — completeness/robustness gaps (batch-fixable; confirm before cutover)
+## P2 — RESOLVED 2026-08-30
+
+All eight items are closed: five fixed at the primitive with a test that fails without the fix, one
+waived with its reason, two already satisfied by the current source. Each fix was negative-controlled
+by reverting the source and watching the covering test fail — reverting the three primitives failed 4
+tests, reverting the two components failed 2.
+
+| # | Outcome | Where |
+|---|---------|-------|
+| 1 | FIXED | `composer-tools.svelte` enables `preventScroll`; covered in `composer-tools-a11y.svelte.test.ts` |
+| 2 | FIXED | `command-palette.svelte` restores `aria-disabled`, listbox ownership and trigger tab exclusion |
+| 3 | FIXED | `collapsible.svelte` restores group labeling and `hiddenUntilFound` |
+| 4 | FIXED | `radio-group.svelte` and `toggle-group.svelte` restore `aria-orientation` |
+| 5 | WAIVED | See the waiver below |
+| 6 | FIXED | `toggle-group.svelte` enforces non-empty single selection in the primitive; the consuming `runtime-strip.svelte` mirror became a `$derived` rather than an `$effect` |
+| 7 | ALREADY-CORRECT | `theme-control.svelte` already carries `role="group"` with `aria-pressed`; no redundant nesting |
+| 8 | ALREADY-CORRECT | The menu primitive delegates to the dialog library, whose current behaviour closes on focus leaving the menu; the added test passes with no source change |
+
+### Waiver — item 5, native input versus role-only button
+
+**Decision:** accept the button-based `role="switch"` / radio implementations; do not revert to native
+`<input>` + `<label>`.
+
+**Why:** the finding recorded this as defense-in-depth with *no confirmed mainstream screen-reader
+break*, and none was demonstrated when re-examined. `push-settings.svelte` carries a valid
+`role="switch"` with `aria-checked`, which is a conforming pattern. Reverting would rewrite a
+primitive and every consumer of it to buy a benefit nobody could name. It becomes worth revisiting if
+a specific assistive technology is shown to mishandle the role-only form — that is the fact that would
+change this decision.
+
+---
+
+## P2 — the original findings (kept for the record)
 - Composer "+" popover: background scroll not locked (`preventScroll=false`).
 - CommandPalette: disabled rows lost `aria-disabled` (only `data-disabled`); `/` trigger re-enters Tab order (no `excludeFromTabOrder`); input lost `aria-controls`.
 - DisclosurePanel lost `role="group"` + `aria-labelledby` linking to its trigger; collapsed content lost `hidden="until-found"` (Ctrl+F auto-reveal).

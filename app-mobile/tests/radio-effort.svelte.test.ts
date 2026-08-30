@@ -135,6 +135,7 @@ describe('EffortRadioGroup', () => {
   it('checks only the host-confirmed row and reports states in accessible names', () => {
     renderGroup({ levels: ['off', 'high', 'max'], confirmed: 'high' });
     const group = screen.getByRole('radiogroup');
+    expect(group).toHaveAttribute('aria-orientation', 'vertical');
     expect(group).not.toHaveAttribute('aria-busy');
     expect(screen.getByRole('radio', { name: 'High, Confirmed' })).toBeChecked();
     expect(screen.getByRole('radio', { name: 'Off' })).not.toBeChecked();

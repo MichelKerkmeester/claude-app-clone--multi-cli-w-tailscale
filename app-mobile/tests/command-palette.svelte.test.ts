@@ -177,6 +177,24 @@ describe('CommandPalette', () => {
     expect(onInsert).not.toHaveBeenCalled();
   });
 
+  it('preserves disabled semantics, trigger tab exclusion, and input list ownership', async () => {
+    const commands: readonly CommandDescriptorDto[] = [
+      { ...COMMANDS[0]!, enabled: false, disabledReason: 'Unavailable: demo' },
+      COMMANDS[1]!,
+    ];
+    render(CommandPalette, { props: { catalog: catalogState(commands), onInsert: vi.fn() } });
+
+    expect(screen.getByRole('button', { name: 'Show commands' })).toHaveAttribute('tabindex', '-1');
+
+    await openPalette();
+    const input = screen.getByRole('combobox');
+    const listbox = screen.getByRole('listbox');
+    const disabledOption = screen.getByRole('option', { name: /plan/ });
+
+    expect(input).toHaveAttribute('aria-controls', listbox.id);
+    expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
+  });
+
   it('disables the input when authority is unavailable', () => {
     render(CommandPalette, { props: { catalog: catalogState(COMMANDS), onInsert: vi.fn(), isDisabled: true } });
     expect(screen.getByRole('combobox')).toBeDisabled();

@@ -131,4 +131,23 @@ describe('shared menu accessibility parity', () => {
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
     expect(screen.queryAllByRole('menuitem')).toHaveLength(0);
   });
+
+  it('closes when focus moves outside the menu', async () => {
+    const user = userEvent.setup();
+    const outside = document.createElement('button');
+    outside.type = 'button';
+    outside.textContent = 'Outside menu';
+    document.body.append(outside);
+
+    try {
+      const menu = await renderMenu().openMenu(user);
+      const row = within(menu).getAllByRole('menuitem')[0];
+      row?.focus();
+      outside.focus();
+
+      await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+    } finally {
+      outside.remove();
+    }
+  });
 });

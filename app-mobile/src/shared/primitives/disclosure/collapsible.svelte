@@ -13,12 +13,22 @@
 	}
 
 	let { open = $bindable(false), trigger, children, ...rest }: Props = $props();
+	const collapsibleId = $props.id();
+	const triggerId = `${collapsibleId}-trigger`;
+	const contentId = `${collapsibleId}-content`;
 </script>
 
 <!-- Component content -->
 <Collapsible.Root bind:open {...rest}>
 	<h3>
-		<Collapsible.Trigger>{@render trigger()}</Collapsible.Trigger>
+		<Collapsible.Trigger id={triggerId}>{@render trigger()}</Collapsible.Trigger>
 	</h3>
-	<Collapsible.Content>{@render children()}</Collapsible.Content>
+	<Collapsible.Content
+		id={contentId}
+		role="group"
+		aria-labelledby={triggerId}
+		hiddenUntilFound={true}
+	>
+		{@render children()}
+	</Collapsible.Content>
 </Collapsible.Root>

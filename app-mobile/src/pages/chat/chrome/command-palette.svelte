@@ -37,7 +37,9 @@
   // 4. PROPS
   // ───────────────────────────────────────────────────────────────────
 
-  let { catalog, onInsert, isDisabled = false }: CommandPaletteProps = $props();
+	let { catalog, onInsert, isDisabled = false }: CommandPaletteProps = $props();
+	const paletteId = $props.id();
+	const listboxId = `${paletteId}-listbox`;
 
   // ───────────────────────────────────────────────────────────────────
   // 5. LOCAL STATE
@@ -125,11 +127,12 @@
   <div class="command--palette">
     <Combobox.Input>
       {#snippet child({ props })}
-        <input
-          bind:this={inputEl}
-          {...props}
-          aria-label="Insert a command"
-          aria-busy={catalog.status === 'loading' ? 'true' : undefined}
+						<input
+							bind:this={inputEl}
+							{...props}
+							aria-label="Insert a command"
+							aria-controls={listboxId}
+							aria-busy={catalog.status === 'loading' ? 'true' : undefined}
           placeholder={placeholder}
           value={query}
           oninput={(event) => {
@@ -143,12 +146,14 @@
         />
       {/snippet}
     </Combobox.Input>
-    <Combobox.Trigger class="command--trigger" aria-label="Show commands">
+		<Combobox.Trigger class="command--trigger" aria-label="Show commands" tabindex={-1}>
       <span class="command--trigger-chrome" aria-hidden="true">/</span>
     </Combobox.Trigger>
-    <Combobox.Portal>
-      <Combobox.Content class="react-aria-Popover" bind:ref={contentEl}>
-        <Combobox.Viewport class="react-aria-ListBox">
+	    <Combobox.Portal>
+		<Combobox.Content class="react-aria-Popover" bind:ref={contentEl}>
+			{#snippet child({ props })}
+				<div {...props} id={listboxId}>
+					<Combobox.Viewport class="react-aria-ListBox">
           {#if ranked.items.length === 0}
             <!-- This state: ready.emptyCatalog — no ranked commands; fail-closed empty copy. -->
             <span class="command--empty">No commands</span>
@@ -162,9 +167,10 @@
                 disabled={!item.enabled}
               >
                 {#snippet child({ props, highlighted })}
-                  <div
-                    {...props}
-                    class="react-aria-ListBoxItem"
+						<div
+							{...props}
+							aria-disabled={item.enabled ? undefined : 'true'}
+							class="react-aria-ListBoxItem"
                     data-focused={highlighted ? true : undefined}
                     data-hovered={highlighted ? true : undefined}
                   >
@@ -177,8 +183,10 @@
               </Combobox.Item>
             {/each}
           {/if}
-        </Combobox.Viewport>
-      </Combobox.Content>
+					</Combobox.Viewport>
+				</div>
+			{/snippet}
+	      </Combobox.Content>
     </Combobox.Portal>
   </div>
 </Combobox.Root>

@@ -81,8 +81,20 @@ describe('single-select ToggleGroup accessibility', () => {
       },
     });
 
-    expect(screen.getByRole('radiogroup')).toBeInTheDocument();
+    expect(screen.getByRole('radiogroup')).toHaveAttribute('aria-orientation', 'horizontal');
     expect(screen.getByRole('radio', { name: 'Build' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('radio', { name: 'Plan' })).toHaveAttribute('aria-checked', 'false');
+  });
+
+  it('keeps the selected single-toggle option selected when activated again', async () => {
+    const user = (await import('@testing-library/user-event')).default.setup();
+    const ToggleGroupParityHarness = (await import('./support/ToggleGroupParityHarness.svelte')).default;
+    render(ToggleGroupParityHarness);
+
+    const build = screen.getByRole('radio', { name: 'Build' });
+    await user.click(build);
+
+    expect(build).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByRole('radio', { name: 'Plan' })).toHaveAttribute('aria-checked', 'false');
   });
 });

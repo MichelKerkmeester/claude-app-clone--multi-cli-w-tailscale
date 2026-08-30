@@ -56,8 +56,16 @@ describe('Collapsible heading wrapper', () => {
     expect(trigger.closest('h3')).not.toBeNull();
     expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
 
+    const contentId = trigger.getAttribute('aria-controls');
+    expect(contentId).not.toBeNull();
+    const content = document.getElementById(contentId as string);
+    expect(content).not.toBeNull();
+    expect(content).toHaveAttribute('role', 'group');
+    expect(content).toHaveAttribute('aria-labelledby', trigger.id);
+
     await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
     await user.click(trigger);
     await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'false'));
+    expect(document.getElementById(contentId as string)).toHaveAttribute('hidden', 'until-found');
   });
 });

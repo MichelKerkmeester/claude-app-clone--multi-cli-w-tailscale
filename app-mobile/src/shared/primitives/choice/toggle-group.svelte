@@ -11,7 +11,28 @@
     children: Snippet;
   }
 
-  let { value = $bindable(''), children, ...rest }: Props = $props();
+  let {
+    value = $bindable(''),
+    orientation = 'horizontal',
+    children,
+    onValueChange: onRootValueChange,
+    ...rest
+  }: Props = $props();
+  let lastNonEmptyValue = $state(value);
+
+  $effect(() => {
+    if (value !== '') lastNonEmptyValue = value;
+  });
+
+  function handleValueChange(next: string): void {
+    if (next === '') {
+      value = lastNonEmptyValue;
+      return;
+    }
+
+    lastNonEmptyValue = next;
+    onRootValueChange?.(next);
+  }
 </script>
 
 <!-- Component content -->
@@ -21,4 +42,12 @@
   </div>
 {/snippet}
 
-<ToggleGroup.Root type="single" bind:value {...rest} child={root} />
+<ToggleGroup.Root
+	type="single"
+	bind:value
+	orientation={orientation}
+	{...rest}
+	aria-orientation={orientation}
+	onValueChange={handleValueChange}
+	child={root}
+/>

@@ -154,6 +154,13 @@ describe('ComposerTools accessibility parity', () => {
     expect(screen.queryByRole('dialog', { name: 'Session tools' })).not.toBeInTheDocument();
   });
 
+  it('locks background scrolling while the tools popover is open', async () => {
+    renderTools();
+    await openTools();
+
+    expect(document.body.style.overflow).toBe('hidden');
+  });
+
   it('focuses the dialog container before tabbing into its controls', async () => {
     renderTools(true);
     const { dialog, user } = await openTools();

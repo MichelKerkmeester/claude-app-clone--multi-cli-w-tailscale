@@ -173,6 +173,12 @@ const MEASURE_CONTENT = `(() => {
   const consider = (element) => {
     const style = getComputedStyle(element);
     if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return;
+    // Content behind `hidden="until-found"` is skipped for the same reason as the
+    // three above: a person sees none of it until find-in-page reveals it. It is
+    // laid out rather than removed, so without this a collapsed disclosure
+    // measures the full box its content would occupy and the shot becomes mostly
+    // empty space.
+    if (style.contentVisibility === 'hidden') return;
     // A screen-reader-only node is deliberately clipped to a 1px box; counting it
     // would report content where a sighted person sees none.
     if (element.classList.contains('sr-only')) return;

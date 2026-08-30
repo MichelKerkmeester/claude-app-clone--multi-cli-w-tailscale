@@ -11,8 +11,10 @@
     children: Snippet;
   }
 
-  let { value = $bindable(''), children, ...rest }: Props = $props();
+  let { value = $bindable(''), orientation = 'vertical', children, ...rest }: Props = $props();
 </script>
 
 <!-- Component content -->
-<RadioGroup.Root bind:value {...rest}>{@render children()}</RadioGroup.Root>
+<RadioGroup.Root bind:value orientation={orientation} {...rest} aria-orientation={orientation}>
+	{@render children()}
+</RadioGroup.Root>

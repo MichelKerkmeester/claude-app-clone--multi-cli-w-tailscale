@@ -62,9 +62,6 @@
   // 5. LOCAL STATE
   // ───────────────────────────────────────────────────────────────────
 
-  // Bits ToggleGroup can empty; mirror host mode after every change.
-  let modeValue = $state('');
-
   // ───────────────────────────────────────────────────────────────────
   // 6. DERIVED STATE
   // ───────────────────────────────────────────────────────────────────
@@ -78,15 +75,8 @@
   );
   const planActive = $derived(snapshot?.mode === 'plan' || snapshot?.mode === 'executing-plan');
   const hostMode = $derived(snapshot === null ? '' : planActive ? 'plan' : 'build');
-
-  // ───────────────────────────────────────────────────────────────────
-  // 7. EFFECTS
-  // ───────────────────────────────────────────────────────────────────
-
-  // Keep this effect synchronized with the state it observes.
-  $effect(() => {
-    modeValue = hostMode;
-  });
+  // Mirror the host-confirmed mode while a mode request is in flight.
+  let modeValue = $derived(hostMode);
 
   // ───────────────────────────────────────────────────────────────────
   // 8. HANDLERS
@@ -95,7 +85,6 @@
   // Keep on mode change focused on its single responsibility.
   function onModeChange(next: string): void {
     if (next === 'build' || next === 'plan') void controls.setMode(next);
-    modeValue = hostMode;
   }
 </script>
 

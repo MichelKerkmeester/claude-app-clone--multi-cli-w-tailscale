@@ -285,11 +285,12 @@
       </Button>
     {/snippet}
   </Popover.Trigger>
-  <Popover.Content
-    class="composer-tools--popover"
-    side="top"
-    align="start"
-    bind:ref={contentEl}
+		<Popover.Content
+			class="composer-tools--popover"
+			side="top"
+			align="start"
+			preventScroll={true}
+			bind:ref={contentEl}
     onOpenAutoFocus={(event) => {
       event.preventDefault();
       toolsDialogEl?.focus();

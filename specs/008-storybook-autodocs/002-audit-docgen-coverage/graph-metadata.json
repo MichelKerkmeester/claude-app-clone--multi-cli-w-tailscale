@@ -15,14 +15,14 @@
       "props table empty",
       "which components need prose",
       "docgen quality report",
-      "implementation",
-      "plan",
-      "name",
-      "template",
-      "plan core",
-      "tasks",
-      "tasks core",
-      "packet goal"
+      "docgen coverage plan",
+      "docs page audit approach",
+      "docgen coverage tasks",
+      "docs audit ledger",
+      "packet goal",
+      "durable directive",
+      "completion criteria",
+      "docgen coverage audit"
     ],
     "key_topics": [
       "audit",
@@ -36,16 +36,18 @@
       "prose",
       "quality",
       "report",
-      "implementation"
+      "plan"
     ],
-    "importance_tier": "normal",
-    "status": "draft",
+    "importance_tier": "important",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
       "tasks.md",
       "goal.md",
-      "implementation-summary.md"
+      "implementation-summary.md",
+      "scripts/docgen-coverage.mjs",
+      "scripts/docgen-coverage.json"
     ],
     "entities": [
       {
@@ -76,6 +78,18 @@
         "name": "implementation-summary.md",
         "kind": "doc",
         "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "docgen-coverage.mjs",
+        "kind": "file",
+        "path": "scripts/docgen-coverage.mjs",
+        "source": "derived"
+      },
+      {
+        "name": "docgen-coverage.json",
+        "kind": "config",
+        "path": "scripts/docgen-coverage.json",
         "source": "derived"
       },
       {
@@ -121,37 +135,31 @@
         "source": "derived"
       },
       {
-        "name": "Technical Context",
-        "kind": "proper_noun",
+        "name": "known",
+        "kind": "key_phrase",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Clean Architecture",
-        "kind": "proper_noun",
+        "name": "1. SUMMARY",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Key Components",
-        "kind": "proper_noun",
+        "name": "2. APPROACH",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Data Flow",
-        "kind": "proper_noun",
+        "name": "3. ROLLBACK PLAN",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Task Checklist Execution Rules Status Reporting Format Blocked Task Protocol",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Task Format",
+        "name": "Task Ledger",
         "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
@@ -163,39 +171,33 @@
         "source": "derived"
       },
       {
-        "name": "Completion Criteria",
+        "name": "Completion Criteria Eight",
         "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Phase 1: Setup",
-        "kind": "heading",
+        "name": "observed",
+        "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Phase 2: Implementation",
-        "kind": "heading",
+        "name": "prose",
+        "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Phase 3: Verification",
-        "kind": "heading",
+        "name": "any",
+        "kind": "key_phrase",
         "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "1. DURABLE DIRECTIVE",
-        "kind": "heading",
-        "path": "goal.md",
         "source": "derived"
       }
     ],
     "causal_summary": "The docs layer renders 100 pages, and nothing says which of them are useful",
     "created_at": "2026-08-30T06:50:08Z",
-    "last_save_at": "2026-08-30T08:48:13.038Z",
+    "last_save_at": "2026-08-30T10:19:05.322Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -205,13 +207,13 @@
       "goal.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:8ef4e525bf2d5976ea25acaa38bfe6be3cabe832e1aa9dd5804aa752601041c6",
+    "source_fingerprint": "sha256:0d8a17ed0a32c1c27bf54d1f76f25ffaf4f20f53d1565416f812e3c385ef50bb",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
-      "spec.md": "ae469a8680c240199c598468025bdb7826028c1eefbd79035540ee714ffca914",
-      "plan.md": "0d1a359044a1c3cd9220b947ee1121e0a256ac62ba4210710bd70f2c278f6570",
-      "tasks.md": "20f99e394b3719163b9238e44ab0f738aae0d4fc46b49ca7e1e91bb6be89f995",
-      "implementation-summary.md": "09fe1802bb49ade2a6f77400f45549816f2b79ae0d51b96ae85484f593e81373"
+      "spec.md": "51493c5d77576deb9ef9d94d462e98b45564803e107e927a7c71a7748234d074",
+      "plan.md": "33471152ffbdccae3248f7a3bf903c5437e8687c6f4f51efe79f03d429b06a77",
+      "tasks.md": "22cd3f50b1e26fa1d0ebcfb9ea1f91a367388beae5d508f61893776b37478f63",
+      "implementation-summary.md": "552836a5b0f7df4e889348fd3b861144ef5edab3d895d61ec97f21675450393f"
     },
     "last_active_child_id": null,
     "last_active_at": null

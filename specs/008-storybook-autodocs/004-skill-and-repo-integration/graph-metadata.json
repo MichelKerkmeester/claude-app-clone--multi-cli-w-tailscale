@@ -14,15 +14,13 @@
       "skill integration docs layer",
       "sk-code-mobile-cli docs",
       "repo rules storybook docs",
-      "implementation",
-      "plan",
-      "name",
-      "template",
-      "plan core",
-      "tasks",
-      "tasks core",
+      "skill integration plan",
+      "skill integration tasks",
       "packet goal",
-      "durable directive"
+      "durable directive",
+      "completion criteria",
+      "docs layer skill reference",
+      "sk-code-mobile-cli docs routing"
     ],
     "key_topics": [
       "skill",
@@ -33,13 +31,13 @@
       "repo",
       "rules",
       "storybook",
-      "implementation",
       "plan",
-      "name",
-      "template"
+      "tasks",
+      "packet",
+      "goal"
     ],
-    "importance_tier": "normal",
-    "status": "draft",
+    "importance_tier": "important",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
@@ -121,37 +119,37 @@
         "source": "derived"
       },
       {
-        "name": "Technical Context",
-        "kind": "proper_noun",
+        "name": "1. SUMMARY",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Clean Architecture",
-        "kind": "proper_noun",
+        "name": "2. APPROACH",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Key Components",
-        "kind": "proper_noun",
+        "name": "3. ROLLBACK PLAN",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Data Flow",
-        "kind": "proper_noun",
+        "name": "description:",
+        "kind": "quoted",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Task Checklist Execution Rules Status Reporting Format Blocked Task Protocol",
-        "kind": "proper_noun",
+        "name": "trigger_phrases:   -",
+        "kind": "quoted",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Task Format",
+        "name": "Task Ledger",
         "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
@@ -163,39 +161,39 @@
         "source": "derived"
       },
       {
-        "name": "Completion Criteria",
+        "name": "Completion Criteria Seven",
         "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Phase 1: Setup",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "Phase 2: Implementation",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "Phase 3: Verification",
-        "kind": "heading",
+        "name": "observed",
+        "kind": "key_phrase",
         "path": "tasks.md",
         "source": "derived"
       },
       {
         "name": "the",
         "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Tasks",
+        "kind": "heading",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. DURABLE DIRECTIVE",
+        "kind": "heading",
         "path": "goal.md",
         "source": "derived"
       }
     ],
     "causal_summary": "A capability nobody knows about is not a capability",
     "created_at": "2026-08-30T06:50:13Z",
-    "last_save_at": "2026-08-30T08:48:13.302Z",
+    "last_save_at": "2026-08-30T10:57:06.660Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -205,13 +203,13 @@
       "goal.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:cfbd61be4d674d7417dc88b68d84a9a8b3628d3d41f281fab318e3d60aa726b6",
+    "source_fingerprint": "sha256:ecf5a09698d05e4c08fba20e5bc8ee2078a40b785fe37fe0347951c65a40ba34",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
-      "spec.md": "9b0949ebce23dbdaf2b0d75e46b7023b18a2f9f75843ba69aef4de3cdcfec47f",
-      "plan.md": "c01b070240a10c11d395fe009637bef17db976c52625e232b6d8930b6d763098",
-      "tasks.md": "b30074ea07ee830e0b6252c301a0a0431d69ef16c31c92e818b307060f488ed3",
-      "implementation-summary.md": "1db506ac0df837c9000c2b9e637020fa0408a341fe10ea2be78b4f948529b934"
+      "spec.md": "1d5fd178034721e6c239f74d94f5b96a57d4b5b0d1973faf40c5416385f04744",
+      "plan.md": "91b83d6838e07344218b93b447b95dae8f74825bc5d7467483cd0f1d81c63c0e",
+      "tasks.md": "0b9fb1beb431c1ccd848ebcc9b7a69a9bcff4cb1021aa4dc53d71728f3dead1a",
+      "implementation-summary.md": "47deafbf43c92361f19ca7e155dec6fd8a9fa57aca647888e06105955d412715"
     },
     "last_active_child_id": null,
     "last_active_at": null

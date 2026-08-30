@@ -14,9 +14,9 @@ _memory:
     packet_pointer: "specs/008-storybook-autodocs"
     last_updated_at: "2026-08-30T08:10:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the phase parent and its four child scopes."
-    next_safe_action: "Execute phase 1: install the docs addon and prove the gates are unaffected."
-    completion_pct: 5
+    recent_action: "All four phases closed"
+    next_safe_action: "None; the packet is closed."
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: phase-parent.spec | v2.2 -->
@@ -33,7 +33,7 @@ _memory:
 |-------|-------|
 | **Level** | 3 |
 | **Priority** | P2 |
-| **Status** | In Progress |
+| **Status** | Complete |
 | **Created** | 2026-08-30 |
 | **Phases** | 4 |
 | **Scope** | `app-mobile/.storybook/`, component prose, the `sk-code-mobile-cli` skill, `REPO RULES.md` |
@@ -116,10 +116,10 @@ genuinely invisible in its rendering, so the part that can decay stays small and
 
 | Phase | Folder | Level | Status | Description |
 |-------|--------|-------|--------|-------------|
-| 1 | `001-enable-docs-layer/` | 1 | active | Install `@storybook/addon-docs`, configure it, and prove docs entries generate while every gate and the archive stay untouched |
-| 2 | `002-audit-docgen-coverage/` | 2 | draft | Measure what the docgen produces for all 100 tagged components; produce the ranked list of where a generated table is thin or absent, and why |
-| 3 | `003-author-component-prose/` | 2 | draft | Write descriptions for the components the audit names, starting with contracts invisible in the rendering — two-mode surfaces, capability gates, fenced lines |
-| 4 | `004-skill-and-repo-integration/` | 2 | draft | Land the layer in `sk-code-mobile-cli` and `REPO RULES.md` so the next agent finds it without being told |
+| 1 | `001-enable-docs-layer/` | 1 | complete | Install `@storybook/addon-docs`, configure it, and prove docs entries generate while every gate and the archive stay untouched |
+| 2 | `002-audit-docgen-coverage/` | 1 | complete | Measure what the docgen produces for all 100 tagged components; produce the ranked list of where a generated table is thin or absent, and why |
+| 3 | `003-author-component-prose/` | 1 | complete | Write descriptions for the components the audit names, starting with contracts invisible in the rendering — two-mode surfaces, capability gates, fenced lines |
+| 4 | `004-skill-and-repo-integration/` | 1 | complete | Land the layer in `sk-code-mobile-cli` and `REPO RULES.md` so the next agent finds it without being told |
 
 The phases are risk-ascending. Phase 1 is reversible in one commit and touches configuration only.
 Phase 4 crosses into another repository with its own landing flow and pre-push gates, so it is last

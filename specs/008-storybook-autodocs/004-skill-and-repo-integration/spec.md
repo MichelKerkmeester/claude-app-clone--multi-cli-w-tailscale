@@ -12,9 +12,9 @@ _memory:
     packet_pointer: "specs/008-storybook-autodocs/004-skill-and-repo-integration"
     last_updated_at: "2026-08-30T09:30:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Scoped the phase; not yet planned in detail."
-    next_safe_action: "Plan this phase when phase 3 closes."
-    completion_pct: 0
+    recent_action: "Landed the routed reference on main and v4"
+    next_safe_action: "None; the packet is closed."
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -31,7 +31,7 @@ _memory:
 |-------|-------|
 | **Level** | 1 |
 | **Priority** | P2 |
-| **Status** | Draft |
+| **Status** | Complete |
 | **Created** | 2026-08-30 |
 | **Parent Spec** | `../spec.md` |
 | **Phase** | 4 of 4 |

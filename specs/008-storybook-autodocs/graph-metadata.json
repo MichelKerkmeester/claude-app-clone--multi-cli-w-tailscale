@@ -81,12 +81,6 @@
         "source": "derived"
       },
       {
-        "name": "In Progress",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
         "name": "Problem Statement The",
         "kind": "proper_noun",
         "path": "spec.md",
@@ -112,6 +106,12 @@
       },
       {
         "name": "its",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "real",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
@@ -155,17 +155,17 @@
     ],
     "causal_summary": "The catalog holds 337 story entries and zero docs entries",
     "created_at": "2026-08-30T06:50:04Z",
-    "last_save_at": "2026-08-30T08:48:12.772Z",
+    "last_save_at": "2026-08-30T10:57:06.213Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "goal.md"
     ],
-    "source_fingerprint": "sha256:68b47942d0d12104d329e4e667018ef7cc12324008bcb67656e69f55e9cc2b62",
+    "source_fingerprint": "sha256:ebb81187c8721b827a9122b910b079f4ebc315b7dd10cc15c8cebd7fd8669a1e",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
-      "spec.md": "41eb2b87b484cade1789e5e61f34ac1d4378dcb3dc9d46030609903c08ee4984"
+      "spec.md": "a384991a24e7392b6e487ddb4c11f074a4feb81317014be89306a395db05359b"
     },
     "last_active_child_id": "008-storybook-autodocs/004-skill-and-repo-integration",
     "last_active_at": null

@@ -24,7 +24,10 @@
       "packet goal",
       "durable directive",
       "completion criteria",
-      "autodocs goal"
+      "autodocs goal",
+      "autodocs handover",
+      "catalog documentation handover",
+      "docs layer handover"
     ],
     "key_topics": [
       "storybook",
@@ -45,6 +48,7 @@
     "key_files": [
       "spec.md",
       "goal.md",
+      "handover.md",
       "app-mobile/.storybook/main.ts",
       "app-mobile/package.json",
       "001-enable-docs-layer/spec.md",
@@ -53,7 +57,9 @@
       "004-skill-and-repo-integration/spec.md",
       "002-audit-docgen-coverage/goal.md",
       "003-author-component-prose/goal.md",
-      "004-skill-and-repo-integration/goal.md"
+      "004-skill-and-repo-integration/goal.md",
+      "scripts/docgen-coverage.mjs",
+      "scripts/capture-screenshots.mjs"
     ],
     "entities": [
       {
@@ -69,6 +75,12 @@
         "source": "derived"
       },
       {
+        "name": "handover.md",
+        "kind": "doc",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
         "name": "main.ts",
         "kind": "code",
         "path": "app-mobile/.storybook/main.ts",
@@ -78,6 +90,18 @@
         "name": "package.json",
         "kind": "config",
         "path": "app-mobile/package.json",
+        "source": "derived"
+      },
+      {
+        "name": "docgen-coverage.mjs",
+        "kind": "file",
+        "path": "scripts/docgen-coverage.mjs",
+        "source": "derived"
+      },
+      {
+        "name": "capture-screenshots.mjs",
+        "kind": "file",
+        "path": "scripts/capture-screenshots.mjs",
         "source": "derived"
       },
       {
@@ -151,21 +175,53 @@
         "kind": "heading",
         "path": "goal.md",
         "source": "derived"
+      },
+      {
+        "name": "The Storybook",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "The Build",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "Clicking Plan",
+        "kind": "proper_noun",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
+        "path": "handover.md",
+        "source": "derived"
+      },
+      {
+        "name": "each",
+        "kind": "key_phrase",
+        "path": "handover.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "The catalog holds 337 story entries and zero docs entries",
     "created_at": "2026-08-30T06:50:04Z",
-    "last_save_at": "2026-08-30T15:49:47.791Z",
+    "last_save_at": "2026-08-30T17:33:49.829Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
-      "goal.md"
+      "goal.md",
+      "handover.md"
     ],
-    "source_fingerprint": "sha256:0d103eab0fa34bdc12358117403fd21609c57fdb567403a8d7f2fe1b2a20d9f5",
+    "source_fingerprint": "sha256:95ae2bfeec8fa363c23616e0f0d59ac5f5d7ea64cc6989c5fda172901470f9ef",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
-      "spec.md": "a384991a24e7392b6e487ddb4c11f074a4feb81317014be89306a395db05359b"
+      "spec.md": "a384991a24e7392b6e487ddb4c11f074a4feb81317014be89306a395db05359b",
+      "handover.md": "fec39500ab912a81ef0d4cebbe8ef14215d48bd17034e272f01383afcc8e7c9a"
     },
     "last_active_child_id": "008-storybook-autodocs/004-skill-and-repo-integration",
     "last_active_at": null

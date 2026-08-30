@@ -192,7 +192,11 @@ captured, 26 visually empty.**
 Confirm against these before calling anything a regression.
 
 - **Flaky screenshots under concurrent capture:** `sandboxed-diagram--valid` (dominant),
-  `plan-mode-button--*`. Restore rather than commit.
+  `plan-mode-button--*`, `composer-tools--*`, `attachment-tile--rejected`,
+  `preview-controls--image`, `review--focused`. Restore rather than commit. The composer-tools
+  members joined the set when the tools popover gained a background scroll lock: locking the body
+  changes scrollbar-dependent layout, and two consecutive captures of the same story now disagree
+  with each other. Confirm any of these with a second capture before believing a diff.
 - **`app-relay/tests/auth.test.ts`** is timing-flaky (201 versus 403).
 - **`app-mobile/tests/menu-plan-mode.svelte.test.ts`** has a keyboard-activation case that flakes at
   baseline. Confirm flake-versus-regression with a scoped stash and **at least eight runs**, never one.

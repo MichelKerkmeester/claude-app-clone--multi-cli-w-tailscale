@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/sveltekit';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import { themes } from 'storybook/theming';
 
 import { applyOverrides } from './token-overrides.js';
 
@@ -13,6 +14,13 @@ const preview: Preview = {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
     // Tokens own the surface background; Storybook's own backgrounds would fight them.
     backgrounds: { disable: true },
+    // The docs page chrome is separate from the story canvas and defaults to
+    // white. This app's surfaces are dark far more often than not, so a white
+    // page put a bright field around every component and made the canvases read
+    // as cut-outs. The chrome is a reading surface, not a preview surface: it is
+    // pinned dark rather than following the theme toolbar, which continues to
+    // drive what the canvases themselves render.
+    docs: { theme: themes.dark },
     // This app only ever ships in a phone frame, and every gate renders it there:
     // the screenshot archive, the CDP smoke sweep and the UI audit all use
     // 402x874. A catalog that opens at desktop width shows a rendering no user

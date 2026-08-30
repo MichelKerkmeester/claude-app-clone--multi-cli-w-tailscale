@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/ReviewerList',
   component: ReviewerList,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Displays reviewer identity alongside the host-provided review status, using fixed labels only when a row does not include its own label. Without source-control capability or reviewer rows, the section is omitted.',
+      },
+    },
+  },
 } satisfies Meta<typeof ReviewerList>;
 
 export default meta;

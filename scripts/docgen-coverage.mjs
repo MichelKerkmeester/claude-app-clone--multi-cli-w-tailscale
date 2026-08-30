@@ -127,8 +127,18 @@ const MEASURE = `(() => {
   return {
     props,
     storyCount: document.querySelectorAll('.docs-story').length,
-    hasDescription: [...document.querySelectorAll('.sbdocs-content p')]
-      .some((p) => p.innerText.trim().length > 40),
+    // The component description renders above the first story. Matching any long
+    // paragraph on the page also catches a story's own copy, which is why the
+    // search stops at the first docs-story element.
+    hasDescription: (() => {
+      const content = document.querySelector('.sbdocs-content');
+      if (content === null) return false;
+      for (const node of content.children) {
+        if (node.classList.contains('docs-story') || node.querySelector?.('.docs-story')) break;
+        if (node.tagName === 'P' && node.innerText.trim().length > 40) return true;
+      }
+      return false;
+    })(),
   };
 })()`;
 

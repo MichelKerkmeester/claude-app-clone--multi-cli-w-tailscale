@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/SourceControlHub',
   component: SourceControlHub,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Only segments backed by host data are offered; if the requested segment is unavailable, the hub falls back to the first available one, and with no capability or segments it renders nothing. Commit file lists remain lazy and are requested only when a commit is expanded.',
+      },
+    },
+  },
 } satisfies Meta<typeof SourceControlHub>;
 
 export default meta;

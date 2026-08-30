@@ -43,6 +43,14 @@ const meta = {
   title: 'Transcript/Block',
   component: Block,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Each block kind is routed from host-normalized transcript data: routine evidence collapses, tool errors stay open, and unknown or redacted kinds render a non-interactive fallback. If media, artifact-viewer, or answer capabilities are unavailable, the surrounding transcript remains readable while the affected preview or action fails closed.',
+      },
+    },
+  },
 } satisfies Meta<typeof Block>;
 
 export default meta;

@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/UpstreamStatus',
   component: UpstreamStatus,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Renders only an upstream snapshot that contains at least one branch, remote, or ahead/behind field; an empty object is intentionally inert. Without source-control capability or such a snapshot, nothing is rendered.',
+      },
+    },
+  },
 } satisfies Meta<typeof UpstreamStatus>;
 
 export default meta;

@@ -11,6 +11,14 @@ const meta = {
   title: 'Views/StatusPill',
   component: StatusPill,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'At widths of 52rem and below, the shared chrome rule hides the entire pill, including its status dot; it returns above that breakpoint. The label maps the host connection phase to fixed text, so offline and error are explicit states rather than inferred from color.',
+      },
+    },
+  },
 } satisfies Meta<typeof StatusPill>;
 
 export default meta;

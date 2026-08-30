@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/CommitHistory',
   component: CommitHistory,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Commit rows come from a host snapshot, while file lists are requested lazily when a row is expanded; loading, failed, and not-yet-loaded states stay distinct from an empty file list. Without source-control capability or commits, the history is omitted.',
+      },
+    },
+  },
 } satisfies Meta<typeof CommitHistory>;
 
 export default meta;

@@ -13,6 +13,14 @@ const meta: Meta<typeof AttachmentRail> = {
   title: 'Attachments/AttachmentRail',
   component: AttachmentRail,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Reads staged photos from the attachment-draft context, whose draft is scoped to the active session; the provider parks and restores items as sessions change. If photo media is unavailable or the draft is empty, the rail renders nothing.',
+      },
+    },
+  },
   // Storybook applies the last decorator outermost, so the provider must be listed last.
   decorators: [
     () => ({ Component: AttachmentDraftStoryHost }),

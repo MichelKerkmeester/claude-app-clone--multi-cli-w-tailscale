@@ -21,7 +21,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 1,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -177,7 +177,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 6,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -189,7 +189,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -201,7 +201,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -273,7 +273,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -297,7 +297,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 6,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -309,7 +309,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -321,7 +321,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -333,7 +333,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 5,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -345,7 +345,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 6,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -369,7 +369,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 5,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -381,7 +381,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -393,7 +393,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 4,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -453,7 +453,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 1,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -465,7 +465,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 5,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -501,7 +501,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 6,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -513,7 +513,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -525,7 +525,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 23,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -549,7 +549,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 6,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -597,7 +597,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 7,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -621,7 +621,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 6,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -765,7 +765,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -789,7 +789,7 @@
       "described": 2,
       "opaque": 0,
       "stories": 3,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -837,7 +837,7 @@
       "described": 1,
       "opaque": 0,
       "stories": 6,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -849,7 +849,7 @@
       "described": 1,
       "opaque": 0,
       "stories": 4,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -921,7 +921,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -933,7 +933,7 @@
       "described": 0,
       "opaque": 0,
       "stories": 3,
-      "hasProse": false,
+      "hasProse": true,
       "errors": 0,
       "errorSample": null
     },
@@ -1005,7 +1005,7 @@
       "described": 1,
       "opaque": 0,
       "stories": 4,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -1065,7 +1065,7 @@
       "described": 3,
       "opaque": 0,
       "stories": 3,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -1077,7 +1077,7 @@
       "described": 1,
       "opaque": 0,
       "stories": 3,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -1161,7 +1161,7 @@
       "described": 4,
       "opaque": 0,
       "stories": 4,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -1173,7 +1173,7 @@
       "described": 3,
       "opaque": 0,
       "stories": 1,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -1185,7 +1185,7 @@
       "described": 12,
       "opaque": 0,
       "stories": 4,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     },
@@ -1197,7 +1197,7 @@
       "described": 54,
       "opaque": 1,
       "stories": 3,
-      "hasProse": true,
+      "hasProse": false,
       "errors": 0,
       "errorSample": null
     }

@@ -141,6 +141,14 @@ const meta = {
   title: 'Chrome/DockRecentSessions',
   component: DockRecentSessions,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Builds its visible list by intersecting the host app’s live session roster with the locally stored recency stack, so stale local IDs and sessions absent from the host disappear. With no host-listed sessions, the dock renders nothing; removing a pinned session asks for confirmation, and overflow cues appear only after measuring the strip.',
+      },
+    },
+  },
 } satisfies Meta<typeof DockRecentSessions>;
 
 export default meta;

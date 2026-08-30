@@ -10,6 +10,14 @@ const meta = {
   title: 'Transcript/FilePreviewCard',
   component: FilePreviewCard,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'The availability badge is resolved from the relay’s explicit preview state, with safe legacy inference when that state is absent. If the artifact-viewer capability is missing, the card remains readable but its Open action has no effect; at 24rem and below, the trailing Open label is removed to preserve the card layout.',
+      },
+    },
+  },
   decorators: [() => ({ Component: ArtifactViewerProvider })],
 } satisfies Meta<typeof FilePreviewCard>;
 

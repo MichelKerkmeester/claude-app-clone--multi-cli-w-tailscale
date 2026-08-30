@@ -47,6 +47,14 @@ const meta = {
   title: 'Rich Content/RichContentRouter',
   component: RichContentRouter,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Dispatches normalized transcript blocks to different views; rich card blocks expose an open action only when an artifact viewer context or callback exists. Without that capability, the cards remain display-only, while unsupported or redacted blocks use a bounded fallback instead of being opened or fetched.',
+      },
+    },
+  },
   decorators: [() => ({ Component: ArtifactViewerProvider })],
 } satisfies Meta<typeof RichContentRouter>;
 

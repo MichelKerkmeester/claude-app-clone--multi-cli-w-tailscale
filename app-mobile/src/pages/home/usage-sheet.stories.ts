@@ -62,6 +62,14 @@ const meta = {
   title: 'Views/UsageSheet',
   component: UsageSheet,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'The sheet opens only for a usage payload with exactly one host-marked gating window; missing or ambiguous gating data leaves it closed even when requested open. Each window preserves loading, unavailable, current, stale, or expired states instead of turning missing readings into a zero meter.',
+      },
+    },
+  },
 } satisfies Meta<typeof UsageSheet>;
 
 export default meta;

@@ -20,6 +20,14 @@ const meta = {
   title: 'Home/PushSettings',
   component: PushSettings,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Push support and current preferences are fetched from the relay after mount. A denied browser permission disables preference changes and shows a recovery notice; if the browser exposes no notification capability, subscribe is inert, and if the relay does not advertise push the inbox remains the fallback. The browser-settings action is unavailable when the host cannot open browser settings.',
+      },
+    },
+  },
 } satisfies Meta<typeof PushSettings>;
 
 export default meta;

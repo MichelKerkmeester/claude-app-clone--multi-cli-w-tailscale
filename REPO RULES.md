@@ -158,6 +158,20 @@ satisfies both — migrate a stranded fixture instead.
 light and dark, so a theme-specific defect is caught by those and never by a screenshot diff. An
 entire defect class once existed only in dark.
 
+**The catalog documents itself, and only half of that can rot.** Every component carries a docs page
+beside its stories — 100 of them against 337 stories. The **props table is generated** on every build
+from the component's own `$props()` runes and types, so it cannot drift from the component; the
+**prose is written**, and it can. Trust the table; check the prose against the source. Reading a
+component's file needs no navigation either: the **Source** panel sits first in the story view and
+shows the real `.svelte` file, markup and scoped `<style>` included.
+
+A page's usefulness is measured, not assumed. `node scripts/docgen-coverage.mjs` ranks all 100 pages by
+how little the generated table conveys and writes `scripts/docgen-coverage.json`. It exits 0 with thin
+pages present — a low score is the finding, not an error. **No gate sweeps the docs pages**: all four
+presentation gates filter `entry.type === 'story'`, which is exactly why enabling docs disturbed none
+of them, and equally means nothing checks a docs page. That was a deliberate call, taken because all
+100 render with zero page errors.
+
 ```bash
 npm run storybook        # storybook dev -p 6006 → http://localhost:6006
 ```

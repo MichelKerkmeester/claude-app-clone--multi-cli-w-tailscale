@@ -14,15 +14,15 @@
       "author component prose",
       "component description docs",
       "two-mode component documentation",
-      "implementation",
-      "plan",
-      "name",
-      "template",
-      "plan core",
-      "tasks",
-      "tasks core",
+      "component prose plan",
+      "which pages get descriptions",
+      "component prose tasks",
       "packet goal",
-      "durable directive"
+      "durable directive",
+      "completion criteria",
+      "component prose written",
+      "which components got descriptions",
+      "invisible contract"
     ],
     "key_topics": [
       "author",
@@ -32,14 +32,14 @@
       "docs",
       "two-mode",
       "documentation",
-      "implementation",
       "plan",
-      "name",
-      "template",
-      "core"
+      "pages",
+      "get",
+      "descriptions",
+      "tasks"
     ],
-    "importance_tier": "normal",
-    "status": "draft",
+    "importance_tier": "important",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "plan.md",
@@ -121,37 +121,37 @@
         "source": "derived"
       },
       {
-        "name": "Technical Context",
-        "kind": "proper_noun",
+        "name": "the",
+        "kind": "key_phrase",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Clean Architecture",
-        "kind": "proper_noun",
+        "name": "1. SUMMARY",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Key Components",
-        "kind": "proper_noun",
+        "name": "2. APPROACH",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Data Flow",
-        "kind": "proper_noun",
+        "name": "3. ROLLBACK PLAN",
+        "kind": "heading",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Task Checklist Execution Rules Status Reporting Format Blocked Task Protocol",
-        "kind": "proper_noun",
+        "name": "description:",
+        "kind": "quoted",
         "path": "plan.md",
         "source": "derived"
       },
       {
-        "name": "Task Format",
+        "name": "Task Ledger",
         "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
@@ -163,25 +163,25 @@
         "source": "derived"
       },
       {
-        "name": "Completion Criteria",
+        "name": "Completion Criteria Eight",
         "kind": "proper_noun",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Phase 1: Setup",
+        "name": "observed",
+        "kind": "key_phrase",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Tasks",
         "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
       },
       {
-        "name": "Phase 2: Implementation",
-        "kind": "heading",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
-        "name": "Phase 3: Verification",
+        "name": "Completion Criteria",
         "kind": "heading",
         "path": "tasks.md",
         "source": "derived"
@@ -195,7 +195,7 @@
     ],
     "causal_summary": "The generated half of a docs page states what a component accepts",
     "created_at": "2026-08-30T06:50:10Z",
-    "last_save_at": "2026-08-30T08:48:13.170Z",
+    "last_save_at": "2026-08-30T10:53:45.621Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -205,13 +205,13 @@
       "goal.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:f1c1d849cd54937e4426941d2f0dd3db13d42ef454f02704057807188b4148a0",
+    "source_fingerprint": "sha256:9091cb595939595614114cf73c16cfa4e557a947b6b8a0d7ddc17bb707f2075e",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
-      "spec.md": "2f53c00be7f55d209315e1543f693a0f2d0b3b69cba0fd9f3d3aaa16390dd055",
-      "plan.md": "78806337b87afee0e9676e9edafad9d3455dcfe7cbe731b3e83e13e70101dfe9",
-      "tasks.md": "695146e629ada0d986561e4f7db5aca232c561a2f7375ef2f9e34687e7ecdb63",
-      "implementation-summary.md": "cda126701914c998de899c05c95218559d4dff93cf989d312fba5f56cd1e4c9e"
+      "spec.md": "119dddd7d78cc205a2e32326c2d70f530911519f805e0b6bfbb648fdb3f30b58",
+      "plan.md": "66a9d6b8587f6c76fe3cba5f960a7367016e1d8f0f4fc15859bcb8fea00e0d82",
+      "tasks.md": "e135a30b70f093c32d14704fb04dea3221653d1d50133850e6f1ff1d0a2ad3e5",
+      "implementation-summary.md": "4f8181bc40dd5c9404b884e67e517e29d8ff054e30973b0f98a0420fe2777465"
     },
     "last_active_child_id": null,
     "last_active_at": null

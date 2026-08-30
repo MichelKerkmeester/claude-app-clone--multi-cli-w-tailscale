@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/PrChip',
   component: PrChip,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Clicking the read-only chip opens a details sheet using the separate details record when present, or the summary as its fallback; it does not derive a rollup from checks. Without source-control capability or a pull-request summary, the chip and sheet are omitted.',
+      },
+    },
+  },
 } satisfies Meta<typeof PrChip>;
 
 export default meta;

@@ -16,6 +16,14 @@ const meta = {
   title: 'Views/Freshness',
   component: Freshness,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'At 39rem and below, the sync readout aligns to the start of its section heading instead of the end; above that breakpoint it stays end-aligned.',
+      },
+    },
+  },
 } satisfies Meta<typeof Freshness>;
 
 export default meta;

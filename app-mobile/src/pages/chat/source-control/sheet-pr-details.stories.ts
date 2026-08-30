@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/SheetPrDetails',
   component: SheetPrDetails,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Details are shown only for an open, capability-supported read-only sheet; missing optional provider fields are left out rather than replaced with placeholders. External navigation is allowed only for host URLs with a safe external scheme.',
+      },
+    },
+  },
 } satisfies Meta<typeof SheetPrDetails>;
 
 export default meta;

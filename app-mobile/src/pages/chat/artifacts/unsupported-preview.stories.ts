@@ -17,6 +17,14 @@ const meta: Meta<typeof UnsupportedPreview> = {
   title: 'Artifacts/UnsupportedPreview',
   component: UnsupportedPreview,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'When the media resolver cannot produce a supported, non-empty source—because the capability is missing, bytes are absent, or the type is unsupported—the component shows an unavailable notice instead of an empty player. It mounts a media player only for a resolver-approved source.',
+      },
+    },
+  },
 } satisfies Meta<typeof UnsupportedPreview>;
 
 export default meta;

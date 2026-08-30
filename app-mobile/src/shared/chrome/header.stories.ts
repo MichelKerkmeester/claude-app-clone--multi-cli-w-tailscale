@@ -25,6 +25,14 @@ const meta = {
   title: 'Views/Header',
   component: Header,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Review and Inbox navigation are omitted together when the host marks review unavailable. At widths of 52rem and below, the wordmark subtitle and connection pill are hidden and the theme labels become icons; at 39rem and below, the remaining navigation buttons use tighter spacing.',
+      },
+    },
+  },
 } satisfies Meta<typeof Header>;
 
 export default meta;

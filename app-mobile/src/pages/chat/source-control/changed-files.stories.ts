@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/ChangedFiles',
   component: ChangedFiles,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Projects the host’s committed-branch file snapshot as a read-only list and opens only the selected file’s host-supplied patch. Without source-control capability or a non-empty snapshot, it renders nothing; a selected file without a patch reports “Diff unavailable.”',
+      },
+    },
+  },
 } satisfies Meta<typeof ChangedFiles>;
 
 export default meta;

@@ -81,6 +81,14 @@ const meta = {
   title: 'Artifacts/InboundImageBlockView',
   component: InboundImageBlockView,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'It gates the image card on the media capability; without it, the component renders only a redacted inbound_image message and no pixels. When the capability is available but image state has not resolved, it passes a deferred-ready state instead of inventing a ready preview.',
+      },
+    },
+  },
   decorators: [() => ({ Component: ArtifactViewerProvider })],
 } satisfies Meta<typeof InboundImageBlockView>;
 

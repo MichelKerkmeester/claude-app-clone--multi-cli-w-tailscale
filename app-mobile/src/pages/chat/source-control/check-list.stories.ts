@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/CheckList',
   component: CheckList,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Preserves the host’s check order and expands the first explicitly failing check by default; an `unknown` classification is labeled “MUTED UNRESOLVED,” never treated as passing. Without source-control capability or checks, the list is omitted.',
+      },
+    },
+  },
 } satisfies Meta<typeof CheckList>;
 
 export default meta;

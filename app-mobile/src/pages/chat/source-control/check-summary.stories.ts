@@ -10,6 +10,14 @@ const meta = {
   title: 'Source Control/CheckSummary',
   component: CheckSummary,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Uses the host’s aggregate classification as given, and renders `unknown` as “MUTED UNRESOLVED” rather than a pass. Without source-control capability or a summary, no section is rendered.',
+      },
+    },
+  },
 } satisfies Meta<typeof CheckSummary>;
 
 export default meta;

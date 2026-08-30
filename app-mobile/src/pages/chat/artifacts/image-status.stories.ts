@@ -30,6 +30,14 @@ const meta = {
   title: 'Artifacts/ImageStatus',
   component: ImageStatus,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Neutral lifecycle states with no message or action render no status node at all. When image pixels cannot be provided, the state registry emits a bounded status such as withheld, denied, corrupt, or unsupported and exposes only that state’s recovery actions.',
+      },
+    },
+  },
 } satisfies Meta<typeof ImageStatus>;
 
 export default meta;

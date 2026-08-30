@@ -14,6 +14,14 @@ const meta = {
   title: 'Views/ThemeControl',
   component: ThemeControl,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'At widths of 52rem and below, the visible Auto, Light, and Dark labels are replaced by a half-lit circle, sun, and moon; the accessible names remain the full theme labels. At 39rem and below, the control moves to the third position in its parent layout.',
+      },
+    },
+  },
 } satisfies Meta<typeof ThemeControl>;
 
 export default meta;

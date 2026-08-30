@@ -27,40 +27,64 @@
     "related_to": []
   },
   "derived": {
-    "trigger_phrases": [],
+    "trigger_phrases": [
+      "uiux features mining spec requirements",
+      "uiux features mining phase",
+      "spec requirements",
+      "uiux features mining plan approach",
+      "plan approach",
+      "research research",
+      "research packet",
+      "research"
+    ],
     "key_topics": [
-      "orca",
-      "nodeterm",
+      "uiux",
+      "features",
       "mining",
-      "run",
-      "produced",
-      "verdict-checked",
-      "findings",
-      "app-mobile",
-      "client",
-      "remote",
-      "host-authoritative",
-      "fail-closed"
+      "spec",
+      "requirements",
+      "phase",
+      "plan",
+      "approach",
+      "research",
+      "packet",
+      "orca",
+      "nodeterm"
     ],
     "importance_tier": "important",
     "status": "in_progress",
     "key_files": [
+      "spec.md",
       "plan.md",
-      "research/findings-registry.json",
       "research/research.md",
-      "spec.md"
+      "research/findings-registry.json",
+      "app-mobile/src/shared/format/attention.ts",
+      "app-mobile/src/shared/format/card-projection.ts",
+      "app-mobile/src/pages/home/card-session.svelte",
+      "app-mobile/src/pages/chat/chrome/session-composer.svelte",
+      "app-mobile/src/pages/chat/transcript/transcript-find-bar.svelte",
+      "app-mobile/src/pages/chat/screen-chat.svelte",
+      "app-mobile/src/pages/chat/transcript/transcript-list.svelte",
+      "app-mobile/src/routes/+layout.svelte",
+      "app-mobile/src/pages/chat/rich-content/rich-content-router.svelte",
+      "app-mobile/src/pages/chat/attachments/attachment-draft-provider.svelte",
+      "app-mobile/src/pages/chat/artifacts/diff-preview.svelte",
+      "app-mobile/src/shared/transport/relay.ts",
+      "app-mobile/src/shared/primitives/sheet/sheet.svelte",
+      "app-mobile/src/shared/primitives/a11y/aria-hide-outside.svelte.ts",
+      "app-mobile/src/app.css"
     ],
     "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
       {
         "name": "plan.md",
         "kind": "doc",
         "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "findings-registry.json",
-        "kind": "config",
-        "path": "research/findings-registry.json",
         "source": "derived"
       },
       {
@@ -70,9 +94,99 @@
         "source": "derived"
       },
       {
-        "name": "spec.md",
-        "kind": "doc",
-        "path": "spec.md",
+        "name": "findings-registry.json",
+        "kind": "config",
+        "path": "research/findings-registry.json",
+        "source": "derived"
+      },
+      {
+        "name": "attention.ts",
+        "kind": "code",
+        "path": "app-mobile/src/shared/format/attention.ts",
+        "source": "derived"
+      },
+      {
+        "name": "card-projection.ts",
+        "kind": "code",
+        "path": "app-mobile/src/shared/format/card-projection.ts",
+        "source": "derived"
+      },
+      {
+        "name": "card-session.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/home/card-session.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "session-composer.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/chat/chrome/session-composer.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "transcript-find-bar.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/chat/transcript/transcript-find-bar.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "screen-chat.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/chat/screen-chat.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "transcript-list.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/chat/transcript/transcript-list.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "+layout.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/routes/+layout.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "rich-content-router.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/chat/rich-content/rich-content-router.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "attachment-draft-provider.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/chat/attachments/attachment-draft-provider.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "diff-preview.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/chat/artifacts/diff-preview.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "relay.ts",
+        "kind": "code",
+        "path": "app-mobile/src/shared/transport/relay.ts",
+        "source": "derived"
+      },
+      {
+        "name": "sheet.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/shared/primitives/sheet/sheet.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "aria-hide-outside.svelte.ts",
+        "kind": "code",
+        "path": "app-mobile/src/shared/primitives/a11y/aria-hide-outside.svelte.ts",
+        "source": "derived"
+      },
+      {
+        "name": "app.css",
+        "kind": "file",
+        "path": "app-mobile/src/app.css",
         "source": "derived"
       },
       {
@@ -88,6 +202,12 @@
         "source": "derived"
       },
       {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
         "name": "Parent Packet",
         "kind": "proper_noun",
         "path": "spec.md",
@@ -98,77 +218,11 @@
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
-      },
-      {
-        "name": "Pi Remote",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Purpose Turn",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Open Settings",
-        "kind": "proper_noun",
-        "path": "research/research.md",
-        "source": "derived"
-      },
-      {
-        "name": "Inline Approve",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Source Control",
-        "kind": "proper_noun",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "Live Activity",
-        "kind": "proper_noun",
-        "path": "research/research.md",
-        "source": "derived"
-      },
-      {
-        "name": "mermaid",
-        "kind": "technology",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
-        "name": "See Top",
-        "kind": "proper_noun",
-        "path": "research/research.md",
-        "source": "derived"
-      },
-      {
-        "name": "New Session",
-        "kind": "proper_noun",
-        "path": "research/research.md",
-        "source": "derived"
-      },
-      {
-        "name": "Copy Context",
-        "kind": "proper_noun",
-        "path": "research/research.md",
-        "source": "derived"
-      },
-      {
-        "name": "Optimistic Stop",
-        "kind": "proper_noun",
-        "path": "research/research.md",
-        "source": "derived"
       }
     ],
     "causal_summary": "The orca+nodeterm mining run produced 99 verdict-checked UI/UX findings for the app-mobile client (Pi Remote, a host-authoritative fail-closed SvelteKit PWA)",
     "created_at": "2026-08-27T15:31:24.534Z",
-    "last_save_at": "2026-08-29T09:00:31.667Z",
+    "last_save_at": "2026-08-30T10:17:28.098Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -176,11 +230,12 @@
       "plan.md",
       "research/research.md"
     ],
-    "source_fingerprint": "sha256:7a84471f56b06f83eeb5933881bc72fcf7feb28835edf4799f39a437cac08c29",
+    "source_fingerprint": "sha256:4d8d73c4c842fd4088b2de3aaafba0b5eddf843706b105f6cce67efe7c66a9b1",
+    "source_fingerprint_docset": 3,
     "source_doc_hashes": {
-      "spec.md": "14a5c7bd8206740f534527c3bca587f4793be235a8a5a38214933f66e7ffb3f0",
-      "plan.md": "355fef2ae12bb548b1964ef68aff51930cd2ea2e969108ed5265ce97e33e8a5e",
-      "research/research.md": "65c460d0b46c091e24028dd4d0e6279b08e29548e12535863cc1fb943d8545c6"
+      "spec.md": "8adc4fda01772d1978395eecd7602c38f8c27ebc17fd8b20bcbb22447f189310",
+      "plan.md": "354195ac6f4691d6f1c272c007763268cdfafd52f5fec7db16a57191aadde2d3",
+      "research/research.md": "ac1222e0aa36d7d499dcea9ce1885f9f0b62d080f2b66c32b1006bb255538813"
     },
     "last_active_child_id": "006-orca-nodeterm-ux-mining/008-uiux-features-mining/006-host-usage-search-review",
     "last_active_at": null

@@ -13,9 +13,9 @@ _memory:
     packet_pointer: "specs/008-storybook-autodocs"
     last_updated_at: "2026-08-30T10:10:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the durable directive for the three open phases"
-    next_safe_action: "Execute phase 2 against the completion criteria"
-    completion_pct: 25
+    recent_action: "All four phases closed"
+    next_safe_action: "None; the packet is closed."
+    completion_pct: 100
 ---
 # Goal: Storybook autodocs
 
@@ -68,12 +68,12 @@ summary of it. Name a conflict rather than resolving it silently.
 <!-- ANCHOR:completion -->
 ## 3. COMPLETION CRITERIA
 
-- [ ] A coverage script exists, reports every `autodocs`-tagged component exactly once, and produces the same ranking on two consecutive runs.
-- [ ] Every component the audit ranks thin either carries a description or is recorded with the reason it needs none.
-- [ ] `sk-code-mobile-cli` routes to a docs-layer reference, and `REPO RULES.md` states what the layer guarantees and what it does not.
-- [ ] `validate.sh --strict` reports `RESULT: PASSED` for the parent and all four children, read per RESULT line.
-- [ ] `npm run typecheck` exits 0 and `catalog-smoke-cdp` reports 674 frames with 0 throws.
-- [ ] A full re-capture moves no screenshot outside the documented flake set.
+- [x] A coverage script exists, reports every `autodocs`-tagged component exactly once, and produces the same ranking on two consecutive runs.
+- [x] Every component the audit ranks thin either carries a description or is recorded with the reason it needs none.
+- [x] `sk-code-mobile-cli` routes to a docs-layer reference, and `REPO RULES.md` states what the layer guarantees and what it does not.
+- [x] `validate.sh --strict` reports `RESULT: PASSED` for the parent and all four children, read per RESULT line.
+- [x] `npm run typecheck` exits 0 and `catalog-smoke-cdp` reports 674 frames with 0 throws.
+- [x] A full re-capture moves no screenshot outside the documented flake set.
 <!-- /ANCHOR:completion -->
 
 ---
@@ -88,9 +88,9 @@ Everything below is VOLATILE and is not part of the directive.
 | Item | State | Evidence |
 |------|-------|----------|
 | Phase 1 enable the docs layer | Done | Index `{"docs":100,"story":337}`; props table renders `value*` with `"system" \| "light" \| "dark"`; 0 shots moved |
-| Phase 2 audit docgen coverage | Pending | - |
-| Phase 3 author component prose | Pending | - |
-| Phase 4 skill and repo integration | Pending | - |
+| Phase 2 audit docgen coverage | Done | 100 pages, 0 errors, ranking reproducible |
+| Phase 3 author component prose | Done | 26 descriptions, matching the candidate set |
+| Phase 4 skill and repo integration | Done | Reference routed and landed on both branches |
 
 ### Deviations and findings
 

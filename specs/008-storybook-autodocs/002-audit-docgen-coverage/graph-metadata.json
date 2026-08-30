@@ -197,7 +197,7 @@
     ],
     "causal_summary": "The docs layer renders 100 pages, and nothing says which of them are useful",
     "created_at": "2026-08-30T06:50:08Z",
-    "last_save_at": "2026-08-30T10:19:05.322Z",
+    "last_save_at": "2026-08-30T15:51:06.351Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
@@ -207,7 +207,7 @@
       "goal.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:0d8a17ed0a32c1c27bf54d1f76f25ffaf4f20f53d1565416f812e3c385ef50bb",
+    "source_fingerprint": "sha256:3e3fdc35487a8abb004396b83c158159557cffed61f4159ed3f5b475eb506fed",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
       "spec.md": "51493c5d77576deb9ef9d94d462e98b45564803e107e927a7c71a7748234d074",

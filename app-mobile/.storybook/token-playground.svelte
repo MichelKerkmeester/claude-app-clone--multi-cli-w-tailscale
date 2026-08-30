@@ -90,7 +90,7 @@
     context.clearRect(0, 0, 1, 1);
     context.fillRect(0, 0, 1, 1);
     const [r, g, b, a] = context.getImageData(0, 0, 1, 1).data;
-    if (a === 0) return null;
+    if (a === 0 || r === undefined || g === undefined || b === undefined) return null;
     return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
   }
 

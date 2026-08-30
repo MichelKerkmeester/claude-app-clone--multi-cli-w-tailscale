@@ -17,7 +17,8 @@
     "src/pages/**/*.ts",
     "src/pages/**/*.svelte",
     "src/shared/**/*.ts",
-    "src/shared/**/*.svelte"
+    "src/shared/**/*.svelte",
+    ".storybook/**/*.ts"
   ],
   "exclude": ["node_modules", "src/service-worker.js"]
 }

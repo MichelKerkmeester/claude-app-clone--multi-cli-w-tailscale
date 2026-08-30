@@ -71,10 +71,10 @@
       const seams: Seam[] = [];
       const frozen: string[] = [];
       for (const match of source.matchAll(SEAM)) {
-        seams.push({ category: match[1], note: tidy(match[2]) });
+        seams.push({ category: match[1] ?? '', note: tidy(match[2] ?? '') });
       }
       for (const match of source.matchAll(FROZEN)) {
-        const note = tidy(match[1]);
+        const note = tidy(match[1] ?? '');
         if (note.length > 0) frozen.push(note);
       }
       if (seams.length === 0 && frozen.length === 0) continue;
@@ -83,7 +83,7 @@
       entries.push({
         path: relative,
         group: parts.slice(0, -1).join('/') || 'src',
-        name: parts[parts.length - 1].replace('.svelte', ''),
+        name: (parts[parts.length - 1] ?? relative).replace('.svelte', ''),
         seams,
         frozen,
       });

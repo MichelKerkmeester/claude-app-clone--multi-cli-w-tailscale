@@ -10,3 +10,10 @@ package-lock.json
 .codex/
 .cursor/
 .devin/
+
+# Spec packets are authored prose with their own template contracts; a formatter
+# rewrapping them breaks anchor blocks and frontmatter the validator checks.
+# specs/context/ is worse than that: six read-only research repositories vendored
+# for reference. `prettier --write .` would have rewritten all of them.
+specs/
+screenshots/

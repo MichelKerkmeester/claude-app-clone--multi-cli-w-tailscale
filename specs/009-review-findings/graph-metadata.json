@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "packet_id": "008-storybook-autodocs/003-author-component-prose",
-  "spec_folder": "008-storybook-autodocs/003-author-component-prose",
-  "parent_id": "008-storybook-autodocs",
+  "packet_id": "009-review-findings",
+  "spec_folder": "009-review-findings",
+  "parent_id": null,
   "children_ids": [],
   "manual": {
     "depends_on": [],
@@ -11,32 +11,29 @@
   },
   "derived": {
     "trigger_phrases": [
-      "author component prose",
-      "component description docs",
-      "two-mode component documentation",
-      "component prose plan",
-      "which pages get descriptions",
-      "component prose tasks",
-      "packet goal",
-      "durable directive",
-      "completion criteria",
-      "component prose written",
-      "which components got descriptions",
-      "invisible contract"
+      "review findings",
+      "storybook typecheck gap",
+      "prettier svelte parser",
+      "undeclared playwright react",
+      "review findings plan",
+      "review findings tasks",
+      "review findings closed",
+      "typecheck coverage gap",
+      "formatter vendored repos"
     ],
     "key_topics": [
-      "author",
-      "component",
-      "prose",
-      "description",
-      "docs",
-      "two-mode",
-      "documentation",
-      "plan",
-      "pages",
-      "get",
-      "descriptions",
-      "tasks"
+      "review",
+      "findings",
+      "storybook",
+      "typecheck",
+      "gap",
+      "prettier",
+      "svelte",
+      "parser",
+      "undeclared",
+      "playwright",
+      "react",
+      "plan"
     ],
     "importance_tier": "important",
     "status": "complete",
@@ -44,8 +41,9 @@
       "spec.md",
       "plan.md",
       "tasks.md",
-      "goal.md",
-      "implementation-summary.md"
+      "implementation-summary.md",
+      "app-mobile/tsconfig.json",
+      "app-mobile/package.json"
     ],
     "entities": [
       {
@@ -67,31 +65,31 @@
         "source": "derived"
       },
       {
-        "name": "goal.md",
-        "kind": "doc",
-        "path": "goal.md",
-        "source": "derived"
-      },
-      {
         "name": "implementation-summary.md",
         "kind": "doc",
         "path": "implementation-summary.md",
         "source": "derived"
       },
       {
-        "name": "Parent Spec",
+        "name": "tsconfig.json",
+        "kind": "config",
+        "path": "app-mobile/tsconfig.json",
+        "source": "derived"
+      },
+      {
+        "name": "package.json",
+        "kind": "config",
+        "path": "app-mobile/package.json",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement An",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "Problem Statement The",
-        "kind": "proper_noun",
-        "path": "spec.md",
-        "source": "derived"
-      },
-      {
-        "name": "Purpose Write",
+        "name": "Purpose Make",
         "kind": "proper_noun",
         "path": "spec.md",
         "source": "derived"
@@ -103,20 +101,32 @@
         "source": "derived"
       },
       {
-        "name": "contracts",
+        "name": "its",
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
       },
       {
-        "name": "zero",
+        "name": "it",
         "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. METADATA",
+        "kind": "heading",
         "path": "spec.md",
         "source": "derived"
       },
       {
         "name": "Implementation Plan",
         "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "a",
+        "kind": "key_phrase",
         "path": "plan.md",
         "source": "derived"
       },
@@ -145,12 +155,6 @@
         "source": "derived"
       },
       {
-        "name": "description:",
-        "kind": "quoted",
-        "path": "plan.md",
-        "source": "derived"
-      },
-      {
         "name": "Task Ledger",
         "kind": "proper_noun",
         "path": "tasks.md",
@@ -169,12 +173,6 @@
         "source": "derived"
       },
       {
-        "name": "observed",
-        "kind": "key_phrase",
-        "path": "tasks.md",
-        "source": "derived"
-      },
-      {
         "name": "Tasks",
         "kind": "heading",
         "path": "tasks.md",
@@ -187,31 +185,30 @@
         "source": "derived"
       },
       {
-        "name": "1. DURABLE DIRECTIVE",
-        "kind": "heading",
-        "path": "goal.md",
+        "name": "Implementation Summary",
+        "kind": "proper_noun",
+        "path": "implementation-summary.md",
         "source": "derived"
       }
     ],
-    "causal_summary": "The generated half of a docs page states what a component accepts",
-    "created_at": "2026-08-30T06:50:10Z",
-    "last_save_at": "2026-08-30T15:51:06.355Z",
+    "causal_summary": "An independent review of a day's work found two defects that every green gate had missed, and both",
+    "created_at": "2026-08-30T15:49:47.775Z",
+    "last_save_at": "2026-08-30T15:50:41.102Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
-      "goal.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:3fd9ac70fa6a497ccb3cd3fce991cef431617a3a89cab8634f47520898c86a2c",
+    "source_fingerprint": "sha256:afdb64bffd70ca94a81e5699bf12c470161cc93c4f25a5d93052e95ade4f0c10",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
-      "spec.md": "119dddd7d78cc205a2e32326c2d70f530911519f805e0b6bfbb648fdb3f30b58",
-      "plan.md": "66a9d6b8587f6c76fe3cba5f960a7367016e1d8f0f4fc15859bcb8fea00e0d82",
-      "tasks.md": "e135a30b70f093c32d14704fb04dea3221653d1d50133850e6f1ff1d0a2ad3e5",
-      "implementation-summary.md": "4f8181bc40dd5c9404b884e67e517e29d8ff054e30973b0f98a0420fe2777465"
+      "spec.md": "9285952f21fd0e1479cb4baf96af90b95b85c33c89b8dcac4326db1d7c3ed6d0",
+      "plan.md": "faa4b142ca3bb00ff738d08c74549519b2a862a95b296dab4beabd19971029b6",
+      "tasks.md": "7e49626fb8a926a3ae5c37c860e9caa7f25dc69f7cfb120103dab3d5a80d7a0e",
+      "implementation-summary.md": "bb1dfea7900a8d4ff0be9dda351842216fae8c57c6079a754e3001560814ec00"
     },
     "last_active_child_id": null,
     "last_active_at": null

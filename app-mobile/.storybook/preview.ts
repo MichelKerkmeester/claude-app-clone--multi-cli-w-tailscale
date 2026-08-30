@@ -24,8 +24,12 @@ import '../src/app.css';
 // navigation. The panel asks on mount and this answers.
 let lastPublished: { name: string | null; source: string | null } = { name: null, source: null };
 
-function publishSource(context: { component?: { __docgen?: { name?: string } } }): void {
-  const name = context?.component?.__docgen?.name ?? null;
+function publishSource(context: { component?: unknown }): void {
+  // The framework types `component` as a Svelte component, not as the carrier
+  // of the docgen payload the build attaches to it, so the narrowing happens
+  // here rather than in the parameter.
+  const docgen = (context?.component as { __docgen?: { name?: string } } | undefined)?.__docgen;
+  const name = docgen?.name ?? null;
   lastPublished = { name, source: name ? (componentSources[name] ?? null) : null };
   addons.getChannel().emit(SOURCE_EVENT, lastPublished);
 }

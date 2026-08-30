@@ -12,9 +12,9 @@ _memory:
     packet_pointer: "specs/008-storybook-autodocs/004-skill-and-repo-integration"
     last_updated_at: "2026-08-30T10:10:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the durable directive"
-    next_safe_action: "Execute against the completion criteria"
-    completion_pct: 0
+    recent_action: "Phase closed"
+    next_safe_action: "None; the phase is closed."
+    completion_pct: 100
 ---
 # Goal: Skill and repo integration
 
@@ -62,7 +62,7 @@ Everything below is VOLATILE.
 
 | Item | State | Evidence |
 |------|-------|----------|
-| Phase not started | Pending | - |
+| Route the reference from the surface skill | Done | Landed on the release line and main; 14 skill roots audited, 14 passed |
 
 ### Deviations and findings
 

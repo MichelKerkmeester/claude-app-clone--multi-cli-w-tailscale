@@ -12,9 +12,9 @@ _memory:
     packet_pointer: "specs/008-storybook-autodocs/003-author-component-prose"
     last_updated_at: "2026-08-30T10:10:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the durable directive"
-    next_safe_action: "Execute against the completion criteria"
-    completion_pct: 0
+    recent_action: "Phase closed"
+    next_safe_action: "None; the phase is closed."
+    completion_pct: 100
 ---
 # Goal: Author component prose
 
@@ -61,7 +61,7 @@ Everything below is VOLATILE.
 
 | Item | State | Evidence |
 |------|-------|----------|
-| Phase not started | Pending | - |
+| Write descriptions where the contract is hidden | Done | 26 pages, matching the candidate set exactly |
 
 ### Deviations and findings
 

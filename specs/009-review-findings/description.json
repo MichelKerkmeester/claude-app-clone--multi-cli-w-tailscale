@@ -1,0 +1,21 @@
+{
+  "level": "1",
+  "specFolder": "009-review-findings",
+  "description": "An independent review found two shipped defects and five gaps where a check reported success without looking; the defects were fixed and this closes the gaps",
+  "keywords": [
+    "review findings",
+    "typecheck coverage",
+    "prettier svelte parser",
+    "vendored repositories",
+    "undeclared playwright",
+    "undeclared react",
+    "goal log reconciliation",
+    "verification gaps"
+  ],
+  "lastUpdated": "2026-08-30T15:20:00.000Z",
+  "specId": "009",
+  "folderSlug": "009-review-findings",
+  "parentChain": [],
+  "memorySequence": 0,
+  "memoryNameHistory": []
+}

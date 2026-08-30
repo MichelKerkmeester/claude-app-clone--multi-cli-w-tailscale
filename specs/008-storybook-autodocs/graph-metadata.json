@@ -41,7 +41,7 @@
       "layer"
     ],
     "importance_tier": "important",
-    "status": "in_progress",
+    "status": "complete",
     "key_files": [
       "spec.md",
       "goal.md",
@@ -155,14 +155,14 @@
     ],
     "causal_summary": "The catalog holds 337 story entries and zero docs entries",
     "created_at": "2026-08-30T06:50:04Z",
-    "last_save_at": "2026-08-30T10:57:06.213Z",
+    "last_save_at": "2026-08-30T15:49:47.791Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "goal.md"
     ],
-    "source_fingerprint": "sha256:ebb81187c8721b827a9122b910b079f4ebc315b7dd10cc15c8cebd7fd8669a1e",
+    "source_fingerprint": "sha256:0d103eab0fa34bdc12358117403fd21609c57fdb567403a8d7f2fe1b2a20d9f5",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
       "spec.md": "a384991a24e7392b6e487ddb4c11f074a4feb81317014be89306a395db05359b"

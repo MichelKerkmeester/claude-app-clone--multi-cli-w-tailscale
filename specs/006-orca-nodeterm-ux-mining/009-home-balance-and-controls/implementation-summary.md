@@ -12,9 +12,9 @@ _memory:
     packet_pointer: "specs/006-orca-nodeterm-ux-mining/009-home-balance-and-controls"
     last_updated_at: "2026-08-29T20:15:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the phase from the committed screenshots; criteria written as measurements."
-    next_safe_action: "Dispatch the design executor against the acceptance criteria."
-    completion_pct: 10
+    recent_action: "Recorded the delivered state and the two harness defects found."
+    next_safe_action: "None; the phase is closed."
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: impl-summary-core | v2.2 -->
@@ -29,7 +29,7 @@ _memory:
 |-------|-------|
 | **Parent** | `006-orca-nodeterm-ux-mining` |
 | **Level** | 2 |
-| **Status** | In Progress |
+| **Status** | Complete |
 | **Scope** | The home column, the theme control, and the sheet interaction lock |
 | **Executor** | GLM-5.3-Flash via the Pi CLI over OpenRouter, carrying the `sk-design` skill |
 <!-- /ANCHOR:metadata -->

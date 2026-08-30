@@ -2601,14 +2601,6 @@ button[data-pressed]:not([data-disabled]) {
     display: none;
   }
 
-  /* Keep this rule aligned with its surrounding surface. */
-  .theme--option:nth-child(2)::before {
-    content: '☀';
-  }
-  /* Keep this rule aligned with its surrounding surface. */
-  .theme--option:nth-child(3)::before {
-    content: '●';
-  }
 }
 
 @media (max-width: 39rem) {

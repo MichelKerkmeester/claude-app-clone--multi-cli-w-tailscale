@@ -993,7 +993,8 @@
      surface, already left global by SessionStateIcon.svelte), and the shared prefers-contrast /
      forced-colors / reduced-motion .session--card groups stay GLOBAL in app.css (unchanged). The
      @media .section-heading .freshness variant lives in Freshness.svelte. The orbit is static (no
-     @keyframes). Values unchanged. -->
+     @keyframes). Roster geometry: the card fills its row, toolbar lines stretch to one height
+     packing at the column's left edge, and the chip row grows across the column. -->
 <style>
   /* This surface: home-view — hero, session roster, device footer, push settings. */
   /* This state: loading · empty · error · stale — via shared empty--state, inline-alert and freshness surfaces. */
@@ -1119,6 +1120,8 @@
   :global(.session--card) {
     position: relative;
     display: grid;
+    /* A button's auto width shrink-wraps; the card owes its row the full column. */
+    width: 100%;
     min-height: 11rem;
     align-content: space-between;
     gap: var(--space-4);
@@ -1331,8 +1334,10 @@
   .roster--toolbar {
     display: flex;
     flex-wrap: wrap;
-    align-items: end;
-    justify-content: end;
+    /* Stretched lines give every control its row's full height, and the cluster
+       packs at the column's left edge instead of ragged right-aligned ends. */
+    align-items: stretch;
+    justify-content: flex-start;
     gap: var(--space-3);
   }
 
@@ -1510,6 +1515,9 @@
   .roster--chips {
     display: flex;
     flex-wrap: wrap;
+    /* Grows across the column so the chip row never strands dead space beside
+       the search field on a phone-width line. */
+    flex: 1 1 auto;
     gap: var(--space-2);
   }
 

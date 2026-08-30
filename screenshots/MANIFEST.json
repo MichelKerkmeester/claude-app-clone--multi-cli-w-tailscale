@@ -2844,7 +2844,7 @@
       "name": "Dark",
       "ok": true,
       "rel": "views/theme-control--dark.png",
-      "size": "394x69"
+      "size": "148x69"
     },
     {
       "id": "views-themecontrol--light",
@@ -2852,7 +2852,7 @@
       "name": "Light",
       "ok": true,
       "rel": "views/theme-control--light.png",
-      "size": "394x69"
+      "size": "148x69"
     },
     {
       "id": "views-themecontrol--system",
@@ -2860,7 +2860,7 @@
       "name": "System",
       "ok": true,
       "rel": "views/theme-control--system.png",
-      "size": "394x69"
+      "size": "148x69"
     },
     {
       "id": "views-usagesheet--mixed-states",

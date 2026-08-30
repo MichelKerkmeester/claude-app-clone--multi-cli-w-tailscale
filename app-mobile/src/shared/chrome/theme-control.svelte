@@ -90,12 +90,16 @@
      theme--control is owned solely by this component so it moves with it. .theme--option is
      on the ToggleGroupItem primitive so it uses :global. The grouped .nav-button, .theme--option,
      .back-button base + hover rules stay GLOBAL in app.css (unchanged) so their byte-for-byte
-     structure is preserved. Values unchanged. -->
+     structure is preserved. The control hugs its options (width fit-content) instead of
+     stretching to its container's width. -->
 <style>
   /* This slot: theme-toggle — segmented theme control (shared theme-switcher surface below). */
   /* This surface: theme-switcher — segmented theme selector (ToggleButton group). */
   .theme--control {
     display: flex;
+    /* Hugs its options instead of stretching to its container's width, so the
+       segmented control never reads as marks stranded in a wide pill. */
+    width: fit-content;
     padding: 0.2rem;
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
@@ -125,11 +129,16 @@
       font-size: 0;
     }
 
-    /* Keep this rule aligned with its surrounding surface. */
+    /* The header cannot hold three text labels at phone width: they need 172px
+       inside a 253px action cluster that already shares a 370px bar with the
+       wordmark. So the labels give way to marks — but the marks have to be one
+       vocabulary a reader already knows, or the control reads as decoration.
+       Sun, moon and a half-lit disc for the state that follows the system.
+       Each option keeps its aria-label, so nothing here is the accessible name. */
     :global(.theme--option::before) {
       color: var(--ink-secondary);
       font-size: 0.72rem;
-      content: 'A';
+      content: '◐';
     }
 
     /* Keep this rule aligned with its surrounding surface. */
@@ -138,7 +147,7 @@
     }
     /* Keep this rule aligned with its surrounding surface. */
     :global(.theme--option:nth-child(3)::before) {
-      content: '●';
+      content: '☾';
     }
     /* Keep this rule aligned with its surrounding surface. */
     :global(.theme--option[data-selected]::before) {

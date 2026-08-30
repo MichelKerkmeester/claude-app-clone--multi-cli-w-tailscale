@@ -14,9 +14,9 @@ _memory:
     packet_pointer: "specs/006-orca-nodeterm-ux-mining/009-home-balance-and-controls"
     last_updated_at: "2026-08-29T20:15:00.000Z"
     last_updated_by: "claude-opus-5"
-    recent_action: "Authored the phase from the committed home screenshot and an operator report."
-    next_safe_action: "Dispatch the design executor against the acceptance criteria."
-    completion_pct: 10
+    recent_action: "Closed the phase: sheet latch fixed, home geometry green in both themes."
+    next_safe_action: "None; the phase is closed."
+    completion_pct: 100
 ---
 
 <!-- SPECKIT_TEMPLATE_SOURCE: spec-core | v2.2 -->
@@ -36,7 +36,7 @@ _memory:
 | **Parent** | `006-orca-nodeterm-ux-mining` |
 | **Level** | 2 |
 | **Priority** | P0 |
-| **Status** | In Progress |
+| **Status** | Complete |
 | **Created** | 2026-08-29 |
 | **Scope** | `app-mobile/src/pages/home/`, `shared/chrome/theme-control.svelte`, the sheet primitive |
 | **Constraint** | Presentation and interaction only. No host field, no production API for a story, no token outside its gate |

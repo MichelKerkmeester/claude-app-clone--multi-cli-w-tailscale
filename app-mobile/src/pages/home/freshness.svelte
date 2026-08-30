@@ -30,12 +30,15 @@
      The @media (max-width: 39rem) .section-heading .freshness variant has an external ancestor
      (.section-heading, rendered by section headings, not this component), so the ancestor is
      :global(...) while the .freshness descendant stays scoped — matching the original selector
-     structure byte-for-byte. Values unchanged. -->
+     structure byte-for-byte. The status lines stay packed (align-content center) when a toolbar
+     line stretches the readout to control height. -->
 <style>
   /* This surface: freshness — sync staleness readout. */
   .freshness {
     display: grid;
     justify-items: end;
+    /* Stays one packed block when a toolbar line stretches the readout to control height. */
+    align-content: center;
     gap: 0.2rem;
     color: var(--success);
     font-size: 0.66rem;

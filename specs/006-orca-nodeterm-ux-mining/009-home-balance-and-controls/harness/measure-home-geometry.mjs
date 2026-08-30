@@ -97,6 +97,18 @@ const measureHome = () => {
   const section = document.querySelector('.session--section');
   const columnBox = section === null ? null : box(section);
 
+  // The pin affordance acts on one session, so it must sit inside that
+  // session's card rather than beside it in the empty half of the column.
+  const pins = vis('.roster--favorite');
+  const pinsOutside = pins.filter((pin) => {
+    const owner = pin.closest('.roster--row');
+    const card = owner?.querySelector('.session--card') ?? null;
+    if (card === null) return true;
+    const p = box(pin);
+    const c = box(card);
+    return p.left < c.left - 1 || p.right > c.right + 1;
+  }).length;
+
   const chipRow = document.querySelector('.roster--chips');
   const chipFill = chipRow === null || columnBox === null
     ? null
@@ -110,6 +122,8 @@ const measureHome = () => {
     toolbarBox,
     toolbarKids,
     chipFill,
+    pinCount: pins.length,
+    pinsOutside,
     scrollWidth: document.documentElement.scrollWidth,
   };
 };
@@ -129,6 +143,18 @@ const measureTheme = () => {
       text: (el.textContent ?? '').trim(),
       label: el.getAttribute('aria-label') ?? '',
       selected: el.getAttribute('data-selected') === 'true',
+      // Text in the DOM is not text on the screen. This control hides its
+      // labels at phone width and marks each option with a ::before glyph, so
+      // a legible option is one that renders EITHER real text or a mark.
+      // Checking textContent alone passes a control that shows nothing.
+      scrollWidth: el.scrollWidth,
+      clientWidth: el.clientWidth,
+      clipped: el.scrollWidth > el.clientWidth + 1,
+      textRendered: Number.parseFloat(getComputedStyle(el).fontSize) > 0,
+      mark: (() => {
+        const c = getComputedStyle(el, '::before').content;
+        return c === 'none' || c === 'normal' ? '' : c.replace(/^"|"$/g, '');
+      })(),
     })),
     optionsWidth: options.reduce((sum, el) => sum + box(el).width, 0),
   };
@@ -192,6 +218,9 @@ for (const theme of ['light', 'dark']) {
         }
       }
     }
+    if (m.pinsOutside > 0) {
+      findings.push(`${tag}: ${m.pinsOutside} pin affordance(s) sit outside the card they act on`);
+    }
     if (m.chipFill !== null && m.chipFill < CHIP_ROW_MIN_FILL) {
       findings.push(`${tag}: filter chips use ${(m.chipFill * 100).toFixed(0)}% of the column (min ${CHIP_ROW_MIN_FILL * 100}%)`);
     }
@@ -214,7 +243,18 @@ for (const theme of ['light', 'dark']) {
         findings.push(`${tag}: theme options differ in width by ${(spread * 100).toFixed(0)}% — ${widths.map((w) => w.toFixed(0)).join('/')} (max ${THEME_WIDTH_SPREAD * 100}%)`);
       }
       for (const o of m.options) {
-        if (o.text.length === 0) findings.push(`${tag}: a theme option renders no visible label (aria-label "${o.label}")`);
+        if (o.text.length === 0) findings.push(`${tag}: a theme option carries no label at all (aria-label "${o.label}")`);
+        if (!o.textRendered && o.mark.length === 0) {
+          findings.push(`${tag}: theme option "${o.text}" renders nothing — its label is hidden and it carries no mark, so the reader sees an empty box`);
+        }
+        if (o.clipped) {
+          findings.push(`${tag}: theme option "${o.text}" is clipped — ${o.scrollWidth}px of label in a ${o.clientWidth}px button, so the reader sees a fragment`);
+        }
+      }
+      // One vocabulary, not three: a distinct mark per option, none repeated.
+      const marks = m.options.map((o) => o.mark).filter((x) => x.length > 0);
+      if (marks.length > 0 && new Set(marks).size !== marks.length) {
+        findings.push(`${tag}: theme options repeat a mark (${marks.join(' ')}) — two states look the same`);
       }
       if (m.controlWidth !== null && m.optionsWidth / m.controlWidth < 0.6) {
         findings.push(`${tag}: options fill ${((m.optionsWidth / m.controlWidth) * 100).toFixed(0)}% of the control — the rest is dead space (min 60%)`);

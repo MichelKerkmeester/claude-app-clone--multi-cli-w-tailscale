@@ -7,7 +7,17 @@ const config: StorybookConfig = {
   // catalog tooling that edits the design system rather than demonstrating a
   // surface, which is kept out of src so it never reaches the app bundle.
   stories: ['../src/**/*.stories.@(ts|svelte)', './*.stories.@(ts|svelte)'],
-  addons: ['@storybook/addon-a11y', '@storybook/addon-themes', '@storybook/addon-designs'],
+  // addon-docs renders what the framework already extracts. `svelte-vite` runs a
+  // TypeScript docgen over every .svelte file on each build, reading $props()
+  // runes for name, type, optionality, default and JSDoc; without this addon
+  // that output is computed and discarded. The props table is therefore derived
+  // on every build and cannot drift from the component.
+  addons: [
+    '@storybook/addon-a11y',
+    '@storybook/addon-themes',
+    '@storybook/addon-designs',
+    '@storybook/addon-docs',
+  ],
   framework: {
     name: '@storybook/sveltekit',
     options: {},

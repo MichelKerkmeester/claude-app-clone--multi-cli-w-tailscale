@@ -1,0 +1,17 @@
+{
+  "specFolder": "008-storybook-autodocs/001-enable-docs-layer",
+  "description": "Phase 1: enable-docs-layer",
+  "keywords": [
+    "phase",
+    "enable-docs-layer"
+  ],
+  "lastUpdated": "2026-08-30T06:50:08.314Z",
+  "specId": "001",
+  "folderSlug": "enable-docs-layer",
+  "parentChain": [
+    "008-storybook-autodocs"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "1"
+}

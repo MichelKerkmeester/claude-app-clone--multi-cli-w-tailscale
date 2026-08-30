@@ -1,0 +1,17 @@
+{
+  "specFolder": "008-storybook-autodocs/003-author-component-prose",
+  "description": "Phase 3: author-component-prose",
+  "keywords": [
+    "phase",
+    "author-component-prose"
+  ],
+  "lastUpdated": "2026-08-30T06:50:13.055Z",
+  "specId": "003",
+  "folderSlug": "author-component-prose",
+  "parentChain": [
+    "008-storybook-autodocs"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "1"
+}

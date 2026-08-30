@@ -140,7 +140,20 @@ async function waitForStory(c) {
     })()`);
     const { err, mounted } = JSON.parse(state);
     if (err) return 'error-overlay';
-    if (mounted) return 'mounted';
+    if (mounted) {
+      // Mounting is not the end of the story. Storybook fills the root first and
+      // renders its error overlay a beat later, so returning on the first
+      // `mounted` reports a clean frame for a story that is about to fail. That
+      // is not hypothetical: a story whose context setup threw was reported as a
+      // passing frame here while its committed screenshot grew to the full
+      // viewport, and only the archive noticed. One more look after a settle.
+      await sleep(120);
+      const settled = await ev(c, `(() => {
+        const errEl = document.querySelector('.sb-errordisplay') || document.querySelector('.sb-nopreview');
+        return !!errEl && errEl.offsetParent !== null && errEl.getBoundingClientRect().height > 4;
+      })()`);
+      return settled === true || settled === 'true' ? 'error-overlay' : 'mounted';
+    }
     await sleep(120);
   }
   return 'timeout';

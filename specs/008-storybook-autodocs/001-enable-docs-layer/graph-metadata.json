@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "packet_id": "008-storybook-autodocs/001-enable-docs-layer",
+  "spec_folder": "008-storybook-autodocs/001-enable-docs-layer",
+  "parent_id": "008-storybook-autodocs",
+  "children_ids": [],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "enable docs layer",
+      "install addon-docs",
+      "docs entries generate",
+      "docgen renders",
+      "enable docs layer plan",
+      "addon-docs install plan",
+      "enable docs layer tasks",
+      "addon-docs task ledger",
+      "docs layer enabled",
+      "lifecycle outside component story",
+      "smoke gate settle"
+    ],
+    "key_topics": [
+      "enable",
+      "docs",
+      "layer",
+      "install",
+      "addon-docs",
+      "entries",
+      "docgen",
+      "renders",
+      "plan",
+      "tasks",
+      "task",
+      "ledger"
+    ],
+    "importance_tier": "important",
+    "status": "complete",
+    "key_files": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "implementation-summary.md",
+      "app-mobile/.storybook/main.ts",
+      "app-mobile/package.json",
+      "app-mobile/src/pages/chat/chrome/dock-recent-sessions-story-host.svelte",
+      "app-mobile/src/pages/chat/chrome/dock-recent-sessions.stories.ts",
+      "scripts/catalog-smoke-cdp.mjs",
+      "scripts/story-coverage-allowlist.json"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "plan.md",
+        "kind": "doc",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "tasks.md",
+        "kind": "doc",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "implementation-summary.md",
+        "kind": "doc",
+        "path": "implementation-summary.md",
+        "source": "derived"
+      },
+      {
+        "name": "main.ts",
+        "kind": "code",
+        "path": "app-mobile/.storybook/main.ts",
+        "source": "derived"
+      },
+      {
+        "name": "package.json",
+        "kind": "config",
+        "path": "app-mobile/package.json",
+        "source": "derived"
+      },
+      {
+        "name": "dock-recent-sessions-story-host.svelte",
+        "kind": "file",
+        "path": "app-mobile/src/pages/chat/chrome/dock-recent-sessions-story-host.svelte",
+        "source": "derived"
+      },
+      {
+        "name": "dock-recent-sessions.stories.ts",
+        "kind": "code",
+        "path": "app-mobile/src/pages/chat/chrome/dock-recent-sessions.stories.ts",
+        "source": "derived"
+      },
+      {
+        "name": "catalog-smoke-cdp.mjs",
+        "kind": "file",
+        "path": "scripts/catalog-smoke-cdp.mjs",
+        "source": "derived"
+      },
+      {
+        "name": "story-coverage-allowlist.json",
+        "kind": "config",
+        "path": "scripts/story-coverage-allowlist.json",
+        "source": "derived"
+      },
+      {
+        "name": "Parent Spec",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Render",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "zero",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Implementation Plan",
+        "kind": "proper_noun",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. SUMMARY",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. APPROACH",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. ROLLBACK PLAN",
+        "kind": "heading",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "description:",
+        "kind": "quoted",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "trigger_phrases:   -",
+        "kind": "quoted",
+        "path": "plan.md",
+        "source": "derived"
+      },
+      {
+        "name": "Task Ledger",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "Task Notation",
+        "kind": "proper_noun",
+        "path": "tasks.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "`@storybook/svelte-vite` runs `storybook:svelte-docgen-plugin` over every `.svelte` file on every",
+    "created_at": "2026-08-30T06:50:06Z",
+    "last_save_at": "2026-08-30T07:51:31.091Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md",
+      "plan.md",
+      "tasks.md",
+      "implementation-summary.md"
+    ],
+    "source_fingerprint": "sha256:f703cfbc10fad7a8d298a9f7f455dc7e4835f5c4bf7961e317e62b364b29f3f2",
+    "source_fingerprint_docset": 3,
+    "source_doc_hashes": {
+      "spec.md": "f2a746ffd45e9282252dc1b86d5d24311d52afc7b2f40bc92590337fe35b30ef",
+      "plan.md": "4b8dbb4c91ad842166c69b071412531a22f1f46715a825f9b42d8b1b79297458",
+      "tasks.md": "023b9742d091048a63fae5b12f1ae0cfc984dc67aec365644427c5e78a018781",
+      "implementation-summary.md": "0c339285ebce476c956d2970caaec588caa61284c1a1445908f04606cab7d357"
+    },
+    "last_active_child_id": null,
+    "last_active_at": null
+  }
+}

@@ -3,11 +3,11 @@
   "allow": [
     {
       "path": "pages/chat/artifacts/artifact-viewer-host.svelte",
-      "reason": "Full-screen viewer host — driven entirely by ArtifactViewer context; exercised via the artifact cards' stories."
+      "reason": "Full-screen viewer host \u2014 driven entirely by ArtifactViewer context; exercised via the artifact cards' stories."
     },
     {
       "path": "pages/chat/artifacts/artifact-viewer-provider.svelte",
-      "reason": "Context provider — renders no visual of its own; used AS a decorator in other stories."
+      "reason": "Context provider \u2014 renders no visual of its own; used AS a decorator in other stories."
     },
     {
       "path": "pages/chat/artifacts/pdf-page.svelte",
@@ -15,103 +15,107 @@
     },
     {
       "path": "pages/chat/attachments/attachment-draft-provider.svelte",
-      "reason": "Context provider — no isolated visual; supplies attachment-draft context to consuming surfaces."
+      "reason": "Context provider \u2014 no isolated visual; supplies attachment-draft context to consuming surfaces."
     },
     {
       "path": "pages/chat/attachments/attachment-draft-story-host.svelte",
-      "reason": "Story-support scaffolding, not an app surface — it seeds the attachment draft with real Files so the context-only rail and preview dialog render populated states. Renders only its children, so it has no visual of its own."
+      "reason": "Story-support scaffolding, not an app surface \u2014 it seeds the attachment draft with real Files so the context-only rail and preview dialog render populated states. Renders only its children, so it has no visual of its own."
     },
     {
       "path": "shared/chrome/session-state-icon-story-host.svelte",
-      "reason": "Story-support scaffolding, not an app surface — it wraps SessionStateIcon in the same .state--idle / .state--running / .state--interrupted parent the roster supplies so currentColor resolves. Renders only its children, so it has no visual of its own."
+      "reason": "Story-support scaffolding, not an app surface \u2014 it wraps SessionStateIcon in the same .state--idle / .state--running / .state--interrupted parent the roster supplies so currentColor resolves. Renders only its children, so it has no visual of its own."
     },
     {
       "path": "pages/chat/chrome/composer-tools-story-host.svelte",
-      "reason": "Story-support scaffolding, not an app surface — it mounts ComposerTools and presses the real + trigger so the catalog photographs the open path instead of a production prop. Its visual IS the ComposerTools stories, which render through it."
+      "reason": "Story-support scaffolding, not an app surface \u2014 it mounts ComposerTools and presses the real + trigger so the catalog photographs the open path instead of a production prop. Its visual IS the ComposerTools stories, which render through it."
     },
     {
       "path": "pages/chat/chrome/session-header-story-host.svelte",
-      "reason": "Story-support scaffolding, not an app surface — it composes SessionHeader and an open ModelEffortSheet as the siblings the live screen mounts, so the open sheet can be photographed without a children hole in the sheet. Its visual IS the SessionHeader SheetOpen story."
+      "reason": "Story-support scaffolding, not an app surface \u2014 it composes SessionHeader and an open ModelEffortSheet as the siblings the live screen mounts, so the open sheet can be photographed without a children hole in the sheet. Its visual IS the SessionHeader SheetOpen story."
+    },
+    {
+      "path": "pages/chat/chrome/dock-recent-sessions-story-host.svelte",
+      "reason": "Story-support scaffolding, not an app surface \u2014 it establishes the app store and action context during its own initialisation, which is the only point setContext is legal. The story's render function cannot do that. Its visual IS the DockRecentSessions stories, which render through it."
     },
     {
       "path": "pages/chat/chrome/menu-plan-mode.svelte",
-      "reason": "Compositional Bits Menu content — renders Menu.Content/Sub internals that require a Menu.Root ancestor; throws \"Context Menu.Root not found\" when rendered standalone. Exercised via the plan-mode menu surface (PlanModeButton), same class as the shared Menu sub-parts."
+      "reason": "Compositional Bits Menu content \u2014 renders Menu.Content/Sub internals that require a Menu.Root ancestor; throws \"Context Menu.Root not found\" when rendered standalone. Exercised via the plan-mode menu surface (PlanModeButton), same class as the shared Menu sub-parts."
     },
     {
       "path": "routes/+layout.svelte",
-      "reason": "SvelteKit route wrapper — the app shell, rendered in-situ only; not an isolated surface."
+      "reason": "SvelteKit route wrapper \u2014 the app shell, rendered in-situ only; not an isolated surface."
     },
     {
       "path": "routes/+page.svelte",
-      "reason": "SvelteKit route wrapper (home route) — delegates to the Home page component, which is storied."
+      "reason": "SvelteKit route wrapper (home route) \u2014 delegates to the Home page component, which is storied."
     },
     {
       "path": "routes/attention/[lookupId]/+page.svelte",
-      "reason": "SvelteKit route wrapper — deep-link entry, no isolated visual."
+      "reason": "SvelteKit route wrapper \u2014 deep-link entry, no isolated visual."
     },
     {
       "path": "routes/session/[id]/+page.svelte",
-      "reason": "SvelteKit route wrapper — mounts the Chat page, which is storied."
+      "reason": "SvelteKit route wrapper \u2014 mounts the Chat page, which is storied."
     },
     {
       "path": "routes/source-control/+page.svelte",
-      "reason": "SvelteKit route wrapper — selects the hub's default segment; the hub itself is storied."
+      "reason": "SvelteKit route wrapper \u2014 selects the hub's default segment; the hub itself is storied."
     },
     {
       "path": "routes/source-control/[segment]/+page.svelte",
-      "reason": "SvelteKit route wrapper — deep-link segment entry, no isolated visual of its own."
+      "reason": "SvelteKit route wrapper \u2014 deep-link segment entry, no isolated visual of its own."
     },
     {
       "path": "routes/source-control/source-control-route.svelte",
-      "reason": "Route composition shell — resolves a segment and mounts the storied hub; renders nothing itself."
+      "reason": "Route composition shell \u2014 resolves a segment and mounts the storied hub; renders nothing itself."
     },
     {
       "path": "shared/primitives/choice/radio-group-item.svelte",
-      "reason": "Compositional sub-part of RadioGroup — no standalone render."
+      "reason": "Compositional sub-part of RadioGroup \u2014 no standalone render."
     },
     {
       "path": "shared/primitives/choice/radio-group.svelte",
-      "reason": "Compositional Bits primitive — needs RadioGroupItem children; exercised via the effort picker surface."
+      "reason": "Compositional Bits primitive \u2014 needs RadioGroupItem children; exercised via the effort picker surface."
     },
     {
       "path": "shared/primitives/choice/toggle-group-item.svelte",
-      "reason": "Compositional sub-part of ToggleGroup — no standalone render."
+      "reason": "Compositional sub-part of ToggleGroup \u2014 no standalone render."
     },
     {
       "path": "shared/primitives/choice/toggle-group.svelte",
-      "reason": "Compositional Bits primitive — needs ToggleGroupItem children; exercised via the theme/runtime toggles."
+      "reason": "Compositional Bits primitive \u2014 needs ToggleGroupItem children; exercised via the theme/runtime toggles."
     },
     {
       "path": "shared/primitives/menu/menu-content.svelte",
-      "reason": "Compositional sub-part of Menu — no standalone render."
+      "reason": "Compositional sub-part of Menu \u2014 no standalone render."
     },
     {
       "path": "shared/primitives/menu/menu-item.svelte",
-      "reason": "Compositional sub-part of Menu — no standalone render."
+      "reason": "Compositional sub-part of Menu \u2014 no standalone render."
     },
     {
       "path": "shared/primitives/menu/menu-trigger.svelte",
-      "reason": "Compositional sub-part of Menu — no standalone render."
+      "reason": "Compositional sub-part of Menu \u2014 no standalone render."
     },
     {
       "path": "shared/primitives/menu/menu.svelte",
-      "reason": "Compositional Bits primitive — renders nothing without MenuTrigger/MenuContent/MenuItem children; exercised via consuming surfaces (Header, Plan menus)."
+      "reason": "Compositional Bits primitive \u2014 renders nothing without MenuTrigger/MenuContent/MenuItem children; exercised via consuming surfaces (Header, Plan menus)."
     },
     {
       "path": "shared/primitives/sheet/sheet-close.svelte",
-      "reason": "Compositional sub-part of Sheet — no standalone render."
+      "reason": "Compositional sub-part of Sheet \u2014 no standalone render."
     },
     {
       "path": "shared/primitives/sheet/sheet-content.svelte",
-      "reason": "Compositional sub-part of Sheet — no standalone render."
+      "reason": "Compositional sub-part of Sheet \u2014 no standalone render."
     },
     {
       "path": "shared/primitives/sheet/sheet-title.svelte",
-      "reason": "Compositional sub-part of Sheet — no standalone render."
+      "reason": "Compositional sub-part of Sheet \u2014 no standalone render."
     },
     {
       "path": "shared/primitives/sheet/sheet.svelte",
-      "reason": "Compositional Bits primitive (Dialog) — needs SheetContent/SheetTitle/SheetClose; exercised via the sheet surfaces (ModelEffortSheet, LeavePlanSheet)."
+      "reason": "Compositional Bits primitive (Dialog) \u2014 needs SheetContent/SheetTitle/SheetClose; exercised via the sheet surfaces (ModelEffortSheet, LeavePlanSheet)."
     }
   ]
 }

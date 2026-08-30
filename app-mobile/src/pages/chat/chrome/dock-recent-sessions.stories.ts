@@ -4,13 +4,8 @@
 
 import type { Meta, StoryObj } from '@storybook/sveltekit';
 
-import DockRecentSessions, { type RecentSessionsDockProps } from './dock-recent-sessions.svelte';
-import {
-  createAppState,
-  setAppActions,
-  setAppState,
-} from '$shared/state/app-state.svelte.js';
-import { writeRecencyStack } from '$shared/state/recency-stack.js';
+import DockRecentSessions from './dock-recent-sessions.svelte';
+import DockRecentSessionsStoryHost from './dock-recent-sessions-story-host.svelte';
 
 interface SessionFixture {
   readonly id: string;
@@ -130,21 +125,16 @@ const ROSTER: readonly SessionFixture[] = [
   },
 ];
 
-const noop = (): void => {};
 const rosterAt = '2026-08-18T09:50:00.000Z';
 
-function renderDock(roster: readonly SessionFixture[], args: RecentSessionsDockProps) {
-  const app = setAppState(createAppState());
-  app.dispatchSessions({ type: 'loaded', items: roster, at: rosterAt });
-  setAppActions({
-    navigate: noop,
-    openReview: noop,
-    openInbox: noop,
-    onRevoke: noop,
-    onLogout: noop,
-  });
-  writeRecencyStack(roster.map((session) => session.id));
-  return { Component: DockRecentSessions, props: args };
+// The dock's context is established by a host component rather than here.
+// `setContext` is only legal during a component's initialisation, and a story's
+// `render` runs outside one.
+function renderDock(roster: readonly SessionFixture[], args: { sessionId: string }) {
+  return {
+    Component: DockRecentSessionsStoryHost,
+    props: { roster, rosterAt, sessionId: args.sessionId },
+  };
 }
 
 const meta = {

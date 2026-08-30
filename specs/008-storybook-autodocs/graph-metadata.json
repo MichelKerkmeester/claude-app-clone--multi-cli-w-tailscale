@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "packet_id": "008-storybook-autodocs",
+  "spec_folder": "008-storybook-autodocs",
+  "parent_id": null,
+  "children_ids": [
+    "008-storybook-autodocs/001-enable-docs-layer",
+    "008-storybook-autodocs/002-audit-docgen-coverage",
+    "008-storybook-autodocs/003-author-component-prose",
+    "008-storybook-autodocs/004-skill-and-repo-integration"
+  ],
+  "manual": {
+    "depends_on": [],
+    "supersedes": [],
+    "related_to": []
+  },
+  "derived": {
+    "trigger_phrases": [
+      "storybook autodocs",
+      "component docs page",
+      "props table",
+      "docgen coverage",
+      "catalog documentation layer"
+    ],
+    "key_topics": [
+      "storybook",
+      "autodocs",
+      "component",
+      "docs",
+      "page",
+      "props",
+      "table",
+      "docgen",
+      "coverage",
+      "catalog",
+      "documentation",
+      "layer"
+    ],
+    "importance_tier": "important",
+    "status": "in_progress",
+    "key_files": [
+      "spec.md",
+      "app-mobile/.storybook/main.ts",
+      "app-mobile/package.json",
+      "001-enable-docs-layer/spec.md",
+      "002-audit-docgen-coverage/spec.md",
+      "003-author-component-prose/spec.md",
+      "004-skill-and-repo-integration/spec.md"
+    ],
+    "entities": [
+      {
+        "name": "spec.md",
+        "kind": "doc",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "main.ts",
+        "kind": "code",
+        "path": "app-mobile/.storybook/main.ts",
+        "source": "derived"
+      },
+      {
+        "name": "package.json",
+        "kind": "config",
+        "path": "app-mobile/package.json",
+        "source": "derived"
+      },
+      {
+        "name": "In Progress",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Problem Statement The",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "Purpose Give",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "In Scope",
+        "kind": "proper_noun",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "contracts",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "its",
+        "kind": "key_phrase",
+        "path": "spec.md",
+        "source": "derived"
+      }
+    ],
+    "causal_summary": "The catalog holds 337 story entries and zero docs entries",
+    "created_at": "2026-08-30T06:50:04Z",
+    "last_save_at": "2026-08-30T07:51:31.588Z",
+    "save_lineage": "graph_only",
+    "last_accessed_at": null,
+    "source_docs": [
+      "spec.md"
+    ],
+    "source_fingerprint": "sha256:0249f16e162a658e9eff3394c431b60a32f57e3a8284022c952231be3d7bb829",
+    "source_fingerprint_docset": 3,
+    "source_doc_hashes": {
+      "spec.md": "41eb2b87b484cade1789e5e61f34ac1d4378dcb3dc9d46030609903c08ee4984"
+    },
+    "last_active_child_id": "008-storybook-autodocs/004-skill-and-repo-integration",
+    "last_active_at": null
+  }
+}

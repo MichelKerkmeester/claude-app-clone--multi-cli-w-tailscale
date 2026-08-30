@@ -1,0 +1,17 @@
+{
+  "specFolder": "008-storybook-autodocs/004-skill-and-repo-integration",
+  "description": "Phase 4: skill-and-repo-integration",
+  "keywords": [
+    "phase",
+    "skill-and-repo-integration"
+  ],
+  "lastUpdated": "2026-08-30T06:50:15.561Z",
+  "specId": "004",
+  "folderSlug": "skill-and-repo-integration",
+  "parentChain": [
+    "008-storybook-autodocs"
+  ],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "1"
+}

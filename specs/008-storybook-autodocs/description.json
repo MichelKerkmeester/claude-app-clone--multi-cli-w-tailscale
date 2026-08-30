@@ -1,0 +1,29 @@
+{
+  "specFolder": "008-storybook-autodocs",
+  "description": "Storybook autodocs: enable the docs layer, audit docgen coverage, author component prose, and integrate it into the surface skill and repo rules",
+  "keywords": [
+    "storybook",
+    "autodocs",
+    "enable",
+    "docs",
+    "layer",
+    "audit",
+    "docgen",
+    "coverage",
+    "author",
+    "component",
+    "prose",
+    "integrate",
+    "surface",
+    "skill",
+    "repo",
+    "rules"
+  ],
+  "lastUpdated": "2026-08-30T06:50:06.203Z",
+  "specId": "008",
+  "folderSlug": "storybook-autodocs",
+  "parentChain": [],
+  "memorySequence": 0,
+  "memoryNameHistory": [],
+  "level": "phase"
+}

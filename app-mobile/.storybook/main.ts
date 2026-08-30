@@ -1,4 +1,10 @@
 import type { StorybookConfig } from '@storybook/sveltekit';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { componentSourcesPlugin } from './component-sources';
+
+const SRC_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'src');
 
 // The Svelte component catalog, replacing the bespoke React catalog. The
 // SvelteKit framework preset mocks $app/* so socket/route-coupled surfaces load.
@@ -21,6 +27,10 @@ const config: StorybookConfig = {
   framework: {
     name: '@storybook/sveltekit',
     options: {},
+  },
+  viteFinal: (config) => {
+    config.plugins = [...(config.plugins ?? []), componentSourcesPlugin(SRC_ROOT)];
+    return config;
   },
 };
 

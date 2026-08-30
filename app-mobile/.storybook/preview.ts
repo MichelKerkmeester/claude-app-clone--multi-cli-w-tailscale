@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/sveltekit';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { themes } from 'storybook/theming';
+import { componentSources } from 'virtual:pi-component-sources';
 
 import { applyOverrides } from './token-overrides.js';
 
@@ -20,7 +21,22 @@ const preview: Preview = {
     // as cut-outs. The chrome is a reading surface, not a preview surface: it is
     // pinned dark rather than following the theme toolbar, which continues to
     // drive what the canvases themselves render.
-    docs: { theme: themes.dark },
+    docs: {
+      theme: themes.dark,
+      source: {
+        // Storybook synthesises a one-line invocation from the args, which shows
+        // how to call a component and nothing about what it is. Nearly every
+        // rendering decision in this app lives in a component's markup and its
+        // scoped <style>, so the invocation is followed by the real file read
+        // off disk. Both are behind "Show code", collapsed by default.
+        transform: (code: string, context: { component?: { __docgen?: { name?: string } } }) => {
+          const name = context?.component?.__docgen?.name;
+          const source = name ? componentSources[name] : undefined;
+          if (source === undefined) return code;
+          return `${code}\n\n<!-- ─────────────── ${name} ─────────────── -->\n\n${source}`;
+        },
+      },
+    },
     // This app only ever ships in a phone frame, and every gate renders it there:
     // the screenshot archive, the CDP smoke sweep and the UI audit all use
     // 402x874. A catalog that opens at desktop width shows a rendering no user

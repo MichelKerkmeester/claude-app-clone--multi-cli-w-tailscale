@@ -173,7 +173,7 @@ const MEASURE_CONTENT = `(() => {
   const consider = (element) => {
     const style = getComputedStyle(element);
     if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return;
-    // Content behind `hidden="until-found"` is skipped for the same reason as the
+    // Content behind a hidden-until-found attribute is skipped for the same reason as the
     // three above: a person sees none of it until find-in-page reveals it. It is
     // laid out rather than removed, so without this a collapsed disclosure
     // measures the full box its content would occupy and the shot becomes mostly

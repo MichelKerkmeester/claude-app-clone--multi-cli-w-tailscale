@@ -180,6 +180,13 @@ describe('RuntimeStrip', () => {
     const { controls } = renderStrip();
     await user.click(screen.getByRole('radio', { name: 'Plan' }));
     expect(controls.setMode).toHaveBeenCalledWith('plan');
+
+    // The request was sent; the host has not confirmed it. This client is
+    // host-authoritative, so the control must still show the mode the host
+    // reports, not the one the reader asked for. Showing the requested mode
+    // would tell them a switch happened that may never land.
+    expect(screen.getByRole('radio', { name: 'Build' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('radio', { name: 'Plan' })).toHaveAttribute('aria-checked', 'false');
   });
 
   it('renders a confirmed unknown effort id as a bounded ordinal with no raw host text', () => {

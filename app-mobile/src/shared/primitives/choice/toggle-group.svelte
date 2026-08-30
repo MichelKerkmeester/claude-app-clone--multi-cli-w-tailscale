@@ -43,11 +43,11 @@
 {/snippet}
 
 <ToggleGroup.Root
-	type="single"
-	bind:value
-	orientation={orientation}
-	{...rest}
-	aria-orientation={orientation}
-	onValueChange={handleValueChange}
-	child={root}
+  type="single"
+  bind:value
+  orientation={orientation}
+  {...rest}
+  aria-orientation={orientation}
+  onValueChange={handleValueChange}
+  child={root}
 />

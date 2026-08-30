@@ -16,5 +16,5 @@
 
 <!-- Component content -->
 <RadioGroup.Root bind:value orientation={orientation} {...rest} aria-orientation={orientation}>
-	{@render children()}
+  {@render children()}
 </RadioGroup.Root>

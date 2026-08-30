@@ -166,7 +166,8 @@ component's file needs no navigation either: the **Source** panel sits first in 
 shows the real `.svelte` file, markup and scoped `<style>` included.
 
 A page's usefulness is measured, not assumed. `node scripts/docgen-coverage.mjs` ranks all 100 pages by
-how little the generated table conveys and writes `scripts/docgen-coverage.json`. It exits 0 with thin
+how little the generated table conveys and writes `scripts/docgen-coverage.json`, which is generated
+rather than committed — re-run it rather than reading a stale copy. It exits 0 with thin
 pages present — a low score is the finding, not an error. **No gate sweeps the docs pages**: all four
 presentation gates filter `entry.type === 'story'`, which is exactly why enabling docs disturbed none
 of them, and equally means nothing checks a docs page. That was a deliberate call, taken because all

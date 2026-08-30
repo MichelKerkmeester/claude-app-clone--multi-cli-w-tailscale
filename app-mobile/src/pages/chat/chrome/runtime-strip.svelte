@@ -85,6 +85,10 @@
   // Keep on mode change focused on its single responsibility.
   function onModeChange(next: string): void {
     if (next === 'build' || next === 'plan') void controls.setMode(next);
+    // Put the selection back to what the host reports. The binding moves it on
+    // click, which would show a mode the host has not confirmed and may never
+    // accept; this client shows host truth, never a request in flight.
+    modeValue = hostMode;
   }
 </script>
 

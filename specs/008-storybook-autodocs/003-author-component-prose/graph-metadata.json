@@ -21,8 +21,8 @@
       "plan core",
       "tasks",
       "tasks core",
-      "summary",
-      "impl summary core"
+      "packet goal",
+      "durable directive"
     ],
     "key_topics": [
       "author",
@@ -44,6 +44,7 @@
       "spec.md",
       "plan.md",
       "tasks.md",
+      "goal.md",
       "implementation-summary.md"
     ],
     "entities": [
@@ -63,6 +64,12 @@
         "name": "tasks.md",
         "kind": "doc",
         "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "goal.md",
+        "kind": "doc",
+        "path": "goal.md",
         "source": "derived"
       },
       {
@@ -180,30 +187,25 @@
         "source": "derived"
       },
       {
-        "name": "Implementation Summary",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
-        "source": "derived"
-      },
-      {
-        "name": "Spec Folder",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "name": "1. DURABLE DIRECTIVE",
+        "kind": "heading",
+        "path": "goal.md",
         "source": "derived"
       }
     ],
     "causal_summary": "The generated half of a docs page states what a component accepts",
     "created_at": "2026-08-30T06:50:10Z",
-    "last_save_at": "2026-08-30T07:51:31.339Z",
+    "last_save_at": "2026-08-30T08:48:13.170Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
+      "goal.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:e8979021f1bec60bafe6e664ce7466ce15d68817890d9963f6a2dfec3f4ee5c9",
+    "source_fingerprint": "sha256:f1c1d849cd54937e4426941d2f0dd3db13d42ef454f02704057807188b4148a0",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
       "spec.md": "2f53c00be7f55d209315e1543f693a0f2d0b3b69cba0fd9f3d3aaa16390dd055",

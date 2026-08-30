@@ -22,7 +22,7 @@
       "plan core",
       "tasks",
       "tasks core",
-      "summary"
+      "packet goal"
     ],
     "key_topics": [
       "audit",
@@ -44,6 +44,7 @@
       "spec.md",
       "plan.md",
       "tasks.md",
+      "goal.md",
       "implementation-summary.md"
     ],
     "entities": [
@@ -63,6 +64,12 @@
         "name": "tasks.md",
         "kind": "doc",
         "path": "tasks.md",
+        "source": "derived"
+      },
+      {
+        "name": "goal.md",
+        "kind": "doc",
+        "path": "goal.md",
         "source": "derived"
       },
       {
@@ -180,30 +187,25 @@
         "source": "derived"
       },
       {
-        "name": "Implementation Summary",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
-        "source": "derived"
-      },
-      {
-        "name": "Spec Folder",
-        "kind": "proper_noun",
-        "path": "implementation-summary.md",
+        "name": "1. DURABLE DIRECTIVE",
+        "kind": "heading",
+        "path": "goal.md",
         "source": "derived"
       }
     ],
     "causal_summary": "The docs layer renders 100 pages, and nothing says which of them are useful",
     "created_at": "2026-08-30T06:50:08Z",
-    "last_save_at": "2026-08-30T07:51:31.216Z",
+    "last_save_at": "2026-08-30T08:48:13.038Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
       "spec.md",
       "plan.md",
       "tasks.md",
+      "goal.md",
       "implementation-summary.md"
     ],
-    "source_fingerprint": "sha256:763d1600421ebb7245e48bdc4461d49e423e3ca9f47201fe46e7722f851a8eae",
+    "source_fingerprint": "sha256:8ef4e525bf2d5976ea25acaa38bfe6be3cabe832e1aa9dd5804aa752601041c6",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
       "spec.md": "ae469a8680c240199c598468025bdb7826028c1eefbd79035540ee714ffca914",

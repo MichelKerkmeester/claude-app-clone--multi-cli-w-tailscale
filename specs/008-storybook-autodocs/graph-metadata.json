@@ -20,7 +20,11 @@
       "component docs page",
       "props table",
       "docgen coverage",
-      "catalog documentation layer"
+      "catalog documentation layer",
+      "packet goal",
+      "durable directive",
+      "completion criteria",
+      "autodocs goal"
     ],
     "key_topics": [
       "storybook",
@@ -40,18 +44,28 @@
     "status": "in_progress",
     "key_files": [
       "spec.md",
+      "goal.md",
       "app-mobile/.storybook/main.ts",
       "app-mobile/package.json",
       "001-enable-docs-layer/spec.md",
       "002-audit-docgen-coverage/spec.md",
       "003-author-component-prose/spec.md",
-      "004-skill-and-repo-integration/spec.md"
+      "004-skill-and-repo-integration/spec.md",
+      "002-audit-docgen-coverage/goal.md",
+      "003-author-component-prose/goal.md",
+      "004-skill-and-repo-integration/goal.md"
     ],
     "entities": [
       {
         "name": "spec.md",
         "kind": "doc",
         "path": "spec.md",
+        "source": "derived"
+      },
+      {
+        "name": "goal.md",
+        "kind": "doc",
+        "path": "goal.md",
         "source": "derived"
       },
       {
@@ -101,17 +115,54 @@
         "kind": "key_phrase",
         "path": "spec.md",
         "source": "derived"
+      },
+      {
+        "name": "Decisions Frozen",
+        "kind": "proper_noun",
+        "path": "goal.md",
+        "source": "derived"
+      },
+      {
+        "name": "the",
+        "kind": "key_phrase",
+        "path": "goal.md",
+        "source": "derived"
+      },
+      {
+        "name": "1. DURABLE DIRECTIVE",
+        "kind": "heading",
+        "path": "goal.md",
+        "source": "derived"
+      },
+      {
+        "name": "Decisions",
+        "kind": "heading",
+        "path": "goal.md",
+        "source": "derived"
+      },
+      {
+        "name": "2. BINDING",
+        "kind": "heading",
+        "path": "goal.md",
+        "source": "derived"
+      },
+      {
+        "name": "3. COMPLETION CRITERIA",
+        "kind": "heading",
+        "path": "goal.md",
+        "source": "derived"
       }
     ],
     "causal_summary": "The catalog holds 337 story entries and zero docs entries",
     "created_at": "2026-08-30T06:50:04Z",
-    "last_save_at": "2026-08-30T07:51:31.588Z",
+    "last_save_at": "2026-08-30T08:48:12.772Z",
     "save_lineage": "graph_only",
     "last_accessed_at": null,
     "source_docs": [
-      "spec.md"
+      "spec.md",
+      "goal.md"
     ],
-    "source_fingerprint": "sha256:0249f16e162a658e9eff3394c431b60a32f57e3a8284022c952231be3d7bb829",
+    "source_fingerprint": "sha256:68b47942d0d12104d329e4e667018ef7cc12324008bcb67656e69f55e9cc2b62",
     "source_fingerprint_docset": 3,
     "source_doc_hashes": {
       "spec.md": "41eb2b87b484cade1789e5e61f34ac1d4378dcb3dc9d46030609903c08ee4984"

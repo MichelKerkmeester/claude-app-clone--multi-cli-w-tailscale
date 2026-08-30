@@ -13,6 +13,33 @@ const preview: Preview = {
     controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
     // Tokens own the surface background; Storybook's own backgrounds would fight them.
     backgrounds: { disable: true },
+    // This app only ever ships in a phone frame, and every gate renders it there:
+    // the screenshot archive, the CDP smoke sweep and the UI audit all use
+    // 402x874. A catalog that opens at desktop width shows a rendering no user
+    // receives — and hides the ones they do, because several surfaces change
+    // below 52rem. `wide` exists so those alternates stay one click away rather
+    // than requiring someone to drag the canvas and guess when the breakpoint
+    // flipped.
+    viewport: {
+      options: {
+        phone: {
+          name: 'Phone — the archive frame',
+          styles: { width: '402px', height: '874px' },
+          type: 'mobile',
+        },
+        wide: {
+          name: 'Wide — above the 52rem breakpoint',
+          styles: { width: '900px', height: '874px' },
+          type: 'tablet',
+        },
+      },
+    },
+  },
+  // Open every story in the frame the app actually ships in. This is a manager
+  // default only: the gates load `iframe.html` directly at their own size, so
+  // nothing here changes what they measure.
+  initialGlobals: {
+    viewport: { value: 'phone', isRotated: false },
   },
   // A token retune set on the playground is re-applied before each story, so a
   // designer sees the whole catalog move rather than one page. With no

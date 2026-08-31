@@ -1,210 +1,100 @@
 # Repo Rules — Pi Remote (Mobile CLI)
 
-> Per-repository companion to `AGENTS.md`. That file carries rules true in every repository; this one carries what is true only here — the gates, the baselines, the traps.
+> Per-repository router. `AGENTS.md` carries what is true in every repository. The rules
+> below carry how to think and act; the ones marked **local** carry what is true only here —
+> the paths, the commands, the numbers, the traps.
 >
-> When this file and `AGENTS.md` disagree about a *rule*, `AGENTS.md` wins. About a *path, command or number*, this file wins.
+> When a rule and `AGENTS.md` disagree about a *rule*, `AGENTS.md` wins. About a *path,
+> command or number*, the local rule wins.
+
+Design-system and source-convention **evidence** lives in the `sk-code-mobile-cli` skill under
+`.opencode/skills/sk-code/sk-code-mobile-cli/`, read-only: it supplies the contract, the acting
+workflow applies it. Load a reference folder's entry document, not the whole folder. The feature
+catalog and manual testing playbook live at this repository root so the evidence cannot drift from
+the shipped app. `specs/` is symlinked into the Public monorepo as `specs/app-mobile-cli`; edit it
+here.
 
 ---
 
-## 1. FIRST-COMMAND TRAPS
+## 1. HOW TO USE THIS
 
-These fire before any design decision. Read them before you run anything.
+1. **Match on the action you are about to take**, not the topic of the request.
+2. **Load before the action.** A rule read afterwards is a post-mortem.
+3. **A file already in context is not re-read.**
+4. **Two triggers fire → load both.** They compose; the more specific wins on conflict.
+5. **Nothing fires → `AGENTS.md` alone governs.** Do not hunt for a rule to apply.
 
-**`specs/context/` holds six untracked research repositories** — `OGAM-main`, `mobilecli-main`,
-`nodeterm-main`, `openclaude-android-main`, `orca-main`, `remote-for-opencode-master`. They are
-read-only inputs. **Never `git add specs/`, `git add .`, `git clean`, or `git stash -u`** — any of
-those stages or destroys thousands of files. Stage explicit packet paths; recover a mistake with
-`git restore --staged specs/context/`.
+### Precedence
 
-**Never widen a vitest positional to a bare `tests`.** The root `npm test` names five explicit
-directories for a reason: a bare positional greedily sweeps those context repositories and reports
-hundreds of phantom failures.
+| Level | Source | Can be overridden? |
+|-------|--------|--------------------|
+| 1 | Every `AGENTS.md` §1 hard blocker — the Four Laws, PLAN-WORKFLOW LOCK, Comment Hygiene — and every mandatory gate in §2 | No |
+| 2 | An explicit, in-the-moment operator instruction | — it is the instruction |
+| 3 | These rule files | Only by level 1 or 2 |
+| 4 | General judgment | By anything above |
 
-**`npm run test:web | tail` reports *tail's* exit status, not vitest's.** Verify by content — both
-suite summaries present — or capture `RC=$?` before piping.
-
----
-
-## 2. HOST DATA AND STORY SEAMS
-
-This client is **host-authoritative and fail-closed**: it owns no editable session truth. This shapes
-whether work is permitted at all, so settle it before designing anything.
-
-**Never invent a host field.** A surface that needs data the relay does not send is built inert behind
-a capability check, and the request is appended to the host-requests packet under
-`specs/006-orca-nodeterm-ux-mining/007-host-requests/`.
-
-**No production API may exist to serve a story.** A prop, slot or export added only to make a story
-render is a defect; compose the real component in an allowlisted story host instead.
-
-`Do not edit — <why>` marks a load-bearing line with its reason inline. The one worth knowing by
-heart: `app-mobile/src/pages/chat/chrome/session-composer.svelte:599` fences the mutation path —
-submit, steer, stop, snapshot, slash-draft, attachment flow. **No presentation change crosses it.**
+A rule file may tighten `AGENTS.md`. None relaxes a HARD BLOCK or authorizes what
+`AGENTS.md` forbids. Gate 5 does not change that: it makes the **load** mandatory,
+while what you load stays at level 3 — the obligation to read is tier 1, the content
+is not.
 
 ---
 
-## 3. THE SURFACE SKILL
+## 2. TRIGGER TABLE
 
-Design-system and source-convention evidence lives in the **`sk-code-mobile-cli`** skill, under
-`.opencode/skills/sk-code/sk-code-mobile-cli/`. It is read-only evidence: it supplies the contract,
-the acting workflow applies it.
-
-`references/` is grouped into purpose-named folders. **Load the folder's entry document, not the whole
-folder** — the skill's own `SKILL.md` carries the routing table.
-
-The **feature catalog** and the **manual testing playbook** live at this repository root
-(`feature-catalog/`, `manual-testing-playbook/`), not in the skill, so the evidence cannot drift from
-the shipped app.
-
-**`specs/` is symlinked into the Public monorepo as `specs/app-mobile-cli`.** Edit it here.
-
----
-
-## 4. THE VERIFICATION LADDER
-
-Behaviour gates, from the repository root:
-
-```bash
-npm run typecheck                    # five of the six workspaces — see the gap below
-npm run test:web                     # both web suites — svelte, then logic
-npm test                             # protocol, relay, extensions, release
-npm run build                        # dependency order
-```
-
-**`npm run typecheck` covers five workspaces; the repository has six.**
-`@pi-remote/inbound-media-extension` is not in the chain and is never typechecked. Do not read a green
-typecheck as whole-tree coverage.
-
-Presentation gates. **The behaviour gates cannot see whether a surface renders correctly** — a
-component mounts, passes its tests, and still shows text in its own background colour:
-
-```bash
-node scripts/token-identity.mjs verify app-mobile/src/app.css   # the frozen goldens, light + dark + system
-npm run story:coverage                                          # every renderable component has a story
-npm run build-storybook -w @pi-remote/web                       # the catalog compiles
-node scripts/catalog-smoke-cdp.mjs                              # every story renders both themes, zero throws
-node scripts/catalog-state-visibility.mjs                       # no invisible state, no inert control, no impossible age
-node scripts/token-override-check.mjs                           # the playground still retunes other stories
-node scripts/css-comment-integrity.mjs                          # no swallowed rules, no leaked markup comments
-node scripts/ui-audit.mjs                                       # contrast, clipping, collision, touch targets — both themes
-npm run story:shots                                             # re-capture the archive
-```
-
-**Four of those gates need `playwright`, and it is declared nowhere.** `ui-audit.mjs`,
-`catalog-state-visibility.mjs`, `token-override-check.mjs` and `capture-screenshots.mjs` all
-`require('playwright')` and launch with `channel: 'chrome'`. `playwright` appears in neither
-`package.json` nor `package-lock.json` — the copy in `node_modules` is an undeclared leftover, so
-**`npm ci` removes it and those four gates then throw `Cannot find module 'playwright'`** even with
-Chrome installed. Reinstall it explicitly if a clean install has run.
-
-**`catalog-smoke-cdp.mjs` is macOS-only.** It shells Chrome at the hardcoded
-`/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` with no `CHROME_PATH` fallback, and
-exits as a harness failure rather than a story failure when that path is absent.
-
-**Node and npm floors are enforced in `scripts/boot.mjs`, not in `package.json`.** There is no
-`engines` field, no `packageManager`, no `.nvmrc`. `boot.mjs` requires Node 22+, npm 10+, a pinned
-`pi` version, and `tailscale` on PATH — so a tree that installs fine can still fail to boot.
+| You are about to | Load | It settles |
+|------------------|------|------------|
+| Add a file, module, class, interface, option, layer, or dependency · generalize something that works · write "flexible", "future-proof", "might need", "best practice" · add a test beyond the coverage floor | [`overengineering.md`](repo-rules/overengineering.md) | Whether this should exist at all, and at what size |
+| Touch a file outside the ask · fix something noticed in passing · rename, reformat, or delete beyond the named area · deviate from an approved plan | [`scope-discipline.md`](repo-rules/scope-discipline.md) | What is yours to change, and how to raise what isn't |
+| Say "done", "works", "fixed", "passing", "no regressions" · report a result · quote a number · act on a tool's or sub-agent's success report · close out a turn | [`evidence-and-proof.md`](repo-rules/evidence-and-proof.md) | What counts as proof, how a green run lies, what an honest close-out contains |
+| Hand work to another runtime: a CLI executor, sub-agent, fan-out lineage, or deep loop · compose the prompt one will act on · accept or quote what one returned · answer a judgment question from your own reading alone | [`delegation-and-orchestration.md`](repo-rules/delegation-and-orchestration.md) | The orchestrating posture, what a brief must carry, why one model is one opinion |
+| Delete, overwrite, migrate, deploy, publish, send, install · force-push or rewrite history · change a shared contract · touch auth, data, or config | [`blast-radius.md`](repo-rules/blast-radius.md) | Reversibility, the rollback sentence, when to stop for a yes |
+| Diagnose a failure · make a red check green · attempt the same fix twice · add a special case, retry, sleep, or broadened catch | [`root-cause.md`](repo-rules/root-cause.md) | Fixing the producer instead of the symptom, and when to level up to the seam |
+| Answer without certainty · contradict the operator · fill a gap with a plausible guess · hit a contradiction between two things that must both be true | [`uncertainty-and-honesty.md`](repo-rules/uncertainty-and-honesty.md) | Confidence bands, UNKNOWN, contradiction halts |
+| Write any substantive reply · present a recommendation, a fork, or a trade-off · answer a complex or ambiguous request · the reader says they did not follow | [`communication.md`](repo-rules/communication.md) | How a reply reads: sentence shape, length, filler, verdict-first order, Ask→Do framing |
+| Wire, rewire or remove a mode in a parent-hub skill · edit a hub's registry, router, `ROUTER.md`, `graph-metadata.json` or `SKILL.md` mode table · report that a mode is registered, routed or integrated · quote a per-hub gate result | [`hub-routing.md`](repo-rules/hub-routing.md) | The two routing stages, what "integrated" requires, and checking the hub you actually changed |
+| Stage, clean or stash · run or widen a test command · pipe a test run and read its result | [`first-command-traps.md`](repo-rules/first-command-traps.md) **local** | The three commands that destroy or mislead before any design decision |
+| Design a surface needing host data · add a prop, slot or export so a story renders · touch a `Do not edit` line | [`host-authority.md`](repo-rules/host-authority.md) **local** | Why a missing field is built inert, and where the mutation fence sits |
+| Run any gate · claim complete · quote a gate result · read a green typecheck as coverage | [`verification-ladder.md`](repo-rules/verification-ladder.md) **local** | Two separate ladders, the workspace the typecheck misses, and the dependency declared nowhere |
+| Change a token · decide where a CSS rule belongs · rename a class · read a resolved value from a browser | [`design-system.md`](repo-rules/design-system.md) **local** | The single token authority, CSS ownership, class grammar, and what the CSP forbids |
+| Judge a changed capture · change the capture clock · start the catalog · cite a docs page | [`storybook-archive.md`](repo-rules/storybook-archive.md) **local** | Why the archive is not byte-stable, and which half of the docs can rot |
+| Call a failure a regression · report an error count · wonder whether live-follow reverted your work | [`known-baselines.md`](repo-rules/known-baselines.md) **local** | The standing baselines, and the confirmation each needs |
 
 ---
 
-## 5. THE DESIGN SYSTEM
+## 3. INDEX
 
-**`scripts/token-identity.mjs` is the only authority on a token value** — 39 goldens across light,
-dark and system. A change that moves one without updating the goldens is a regression no test reports.
-The catalog's token playground deliberately writes no stylesheet for this reason; it hands back a
-`:root` block to paste.
-
-Three layers, edited highest-first: primitive → semantic role → component token. Edit the highest
-layer that still isolates the change; retinting a primitive moves everything downstream.
-
-**CSS ownership.** The app has exactly **one** `.css` file — `app-mobile/src/app.css` — and **95**
-component-scoped `<style>` blocks. Svelte scoped CSS reaches only the component that declares it, so a
-rule needed by two renderers, by a `class` prop, or across a parent/child boundary belongs in
-`app.css`, usually behind `:global()`. Putting it in the wrong file is the most common way a change
-renders as nothing at all, and a byte-identical screenshot is what exposes it.
-
-**Class grammar is `block--element`, with `is-*` as a single-dash state prefix.** A mechanical rename
-once broke rendering four separate ways through dynamically constructed class names; only a
-before/after image diff caught it.
-
-**The CSP forbids reading values from a browser.** The web app sets `default-src 'self'` in
-`app-mobile/svelte.config.js` and the relay serves `default-src 'none'; frame-ancestors 'none'`, so
-headless Chrome renders the app unstyled. Resolve token chains to final literals instead of
-screenshotting them. Screenshots remain the right tool for layout, legibility, and whether two states
-actually look different.
+| Rule | Binding sentence |
+|------|------------------|
+| [Overengineering](repo-rules/overengineering.md) | Build the smallest thing that solves the stated problem; take a costlier move only by naming what fails at the cheaper one. |
+| [Scope discipline](repo-rules/scope-discipline.md) | The requested scope is the deliverable — adjacent problems get named, not fixed. |
+| [Evidence and proof](repo-rules/evidence-and-proof.md) | A claim is only as strong as the observation behind it. |
+| [Delegation and orchestration](repo-rules/delegation-and-orchestration.md) | Delegating makes you the orchestrator; brief with evidence, and no single model's verdict closes a question. |
+| [Blast radius](repo-rules/blast-radius.md) | Size effort to what the change can break; no irreversible step without a named rollback and a yes. |
+| [Root cause](repo-rules/root-cause.md) | Fix the producer, not the symptom; every fix names the mechanism. |
+| [Uncertainty and honesty](repo-rules/uncertainty-and-honesty.md) | Never fabricate; mark the confidence you actually have. |
+| [Communication](repo-rules/communication.md) | Write so the reader can act after one pass: one idea per sentence, verdict first, nothing that does not carry information. |
+| [Hub routing](repo-rules/hub-routing.md) | A hub projects one advisor identity and routes in two stages; registered is not routed, and a gate run without its hub argument checks something else. |
+| [First-command traps](repo-rules/first-command-traps.md) **local** | Stage explicit packet paths, name test directories explicitly, and never read an exit status through a pipe. |
+| [Host authority and story seams](repo-rules/host-authority.md) **local** | Never invent a host field, and never add production API to serve a story. |
+| [The verification ladder](repo-rules/verification-ladder.md) **local** | Behaviour gates and presentation gates are separate ladders, and neither one green covers the other. |
+| [The design system](repo-rules/design-system.md) **local** | One script is the only authority on a token value, and cross-component CSS belongs in `app.css`. |
+| [Storybook and the screenshot archive](repo-rules/storybook-archive.md) **local** | A moved shot is a flake only after it returns, and one pair of runs never establishes determinism. |
+| [Known baselines](repo-rules/known-baselines.md) **local** | Confirm against the standing list before calling anything a regression, and judge your delta. |
 
 ---
 
-## 6. STORYBOOK AND THE SCREENSHOT ARCHIVE
+## 4. SCOPE OF THIS DOCUMENT
 
-**The archive is not byte-stable, and the size of the gap is measured.** Six capture runs compared
-against the first differed in **five of five** comparisons; the same experiment against a pre-change
-capture gave the same answer. The flake lives in a handful of stories — a sandboxed diagram frame
-dominates — not in any recent change.
+**In:** how to think and act — restraint, scope, evidence, risk, diagnosis, honesty,
+the posture to hold when work is handed to another runtime, how the resulting reply
+reads, and what you may claim about wiring you have changed. Plus, in the **local**
+rules only, the paths, commands, numbers and baselines true of this repository.
 
-Two rules follow. **Never conclude determinism from one pair of runs**; that sample has produced a
-wrong call here in both directions. And **a moved shot is a flake only after it returns** — re-capture,
-and if the bytes match the committed version again it flaked. Restore rather than commit churn:
-`git checkout HEAD -- screenshots/<path>` (that also stages, so `git restore --staged` after).
+**Out:** skill routing, workflow selection, spec-folder mechanics, and the *mechanics*
+of agent and CLI dispatch — which agent, which command, which model, which flags.
+Those belong to `AGENTS.md` §2 and the skills it routes to. The line is between
+plumbing and posture: how to dispatch is theirs, how to think while dispatching is ours.
 
-**The capture clock is pinned to `2026-08-28T12:00:00.000Z`** in `capture-screenshots.mjs`,
-`ui-audit.mjs` and `catalog-state-visibility.mjs`. **Change all three together or none.** Re-pinning
-was measured and rejected: it fixes the todo panel's age but breaks the review countdown from
-`05:00 remaining` to `14573:00` and collapses the attention inbox's three distinct ages to "just now"
-three times. Past-event and future-deadline fixtures pull in opposite directions, so no single clock
-satisfies both — migrate a stranded fixture instead.
-
-**The archive is captured in one theme only.** `ui-audit.mjs` and `catalog-smoke-cdp.mjs` both render
-light and dark, so a theme-specific defect is caught by those and never by a screenshot diff. An
-entire defect class once existed only in dark.
-
-**The catalog documents itself, and only half of that can rot.** Every component carries a docs page
-beside its stories — 100 of them against 337 stories. The **props table is generated** on every build
-from the component's own `$props()` runes and types, so it cannot drift from the component; the
-**prose is written**, and it can. Trust the table; check the prose against the source. Reading a
-component's file needs no navigation either: the **Source** panel sits first in the story view and
-shows the real `.svelte` file, markup and scoped `<style>` included.
-
-A page's usefulness is measured, not assumed. `node scripts/docgen-coverage.mjs` ranks all 100 pages by
-how little the generated table conveys and writes `scripts/docgen-coverage.json`, which is generated
-rather than committed — re-run it rather than reading a stale copy. It exits 0 with thin
-pages present — a low score is the finding, not an error. **No gate sweeps the docs pages**: all four
-presentation gates filter `entry.type === 'story'`, which is exactly why enabling docs disturbed none
-of them, and equally means nothing checks a docs page. That was a deliberate call, taken because all
-100 render with zero page errors.
-
-```bash
-npm run storybook        # storybook dev -p 6006 → http://localhost:6006
-```
-
-**Start it in the background and hand back the URL.** It is a server, not a task; a foreground start
-blocks until killed and reads as a hang. **One build directory, one writer** — every gate that needs a
-built catalog reads `app-mobile/storybook-static`, and two concurrent builds corrupt it.
-
-The archive is `screenshots/`, one image per story, rebuilt whole rather than patched.
-`MANIFEST.json` records every story including those that render nothing visible: **337 stories, 311
-captured, 26 visually empty.**
-
----
-
-## 7. KNOWN BASELINES — NOT REGRESSIONS
-
-Confirm against these before calling anything a regression.
-
-- **Flaky screenshots under concurrent capture:** `sandboxed-diagram--valid` (dominant),
-  `plan-mode-button--*`, `composer-tools--*`, `attachment-tile--rejected`,
-  `preview-controls--image`, `review--focused`. Restore rather than commit. The composer-tools
-  members joined the set when the tools popover gained a background scroll lock: locking the body
-  changes scrollbar-dependent layout, and two consecutive captures of the same story now disagree
-  with each other. Confirm any of these with a second capture before believing a diff.
-- **`app-relay/tests/auth.test.ts`** is timing-flaky (201 versus 403).
-- **`app-mobile/tests/menu-plan-mode.svelte.test.ts`** has a keyboard-activation case that flakes at
-  baseline. Confirm flake-versus-regression with a scoped stash and **at least eight runs**, never one.
-- **eslint** carries a standing baseline of exactly three errors, all in
-  `app-mobile/src/pages/chat/chrome/sheet-model-effort.svelte` (`:156`, `:626`, `:662`). `.svelte.ts`
-  files fail eslint parsing repo-wide — a config gap, not a defect. Judge your **delta**, not the total.
-- **`git-live-follow.sh --live main` is fast-forward-only and non-destructive.** Do not stop it on the
-  assumption that it reverts uncommitted edits. Commit promptly anyway: dispatched executors cannot
-  commit for themselves, so **executors never run git; the orchestrating session commits.**
-
----
+The shared rules are symlinked from the Public monorepo and are git-ignored here; edit
+them there. The local rules and this router are tracked in this repository.

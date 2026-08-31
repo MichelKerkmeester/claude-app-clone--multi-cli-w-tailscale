@@ -24,7 +24,7 @@ version: 1.0.0.0
 # Rule: Known baselines
 
 > Routed from [`REPO RULES.md`](../REPO%20RULES.md). Load it before calling any failure a regression.
-> Expands `AGENTS.md`, never overrides it — where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
+> Expands `AGENTS.md`, never overrides it. Where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
 
 ## Fires when
 
@@ -49,7 +49,7 @@ Restore rather than commit. The `composer-tools` members joined when the tools p
 ## 2. FLAKY TESTS
 
 - **`app-relay/tests/auth.test.ts`** is timing-flaky, 201 versus 403.
-- **`app-mobile/tests/menu-plan-mode.svelte.test.ts`** has a keyboard-activation case that flakes at baseline. Confirm flake-versus-regression with a scoped stash and **at least eight runs**, never one.
+- **`app-mobile/tests/menu-plan-mode.svelte.test.ts`** has a keyboard-activation case that flakes at baseline. Confirm flake-versus-regression with a scoped stash and **at least eight runs** never one.
 
 ---
 
@@ -57,7 +57,7 @@ Restore rather than commit. The `composer-tools` members joined when the tools p
 
 Exactly three errors, all in `app-mobile/src/pages/chat/chrome/sheet-model-effort.svelte` at `:156`, `:626` and `:662`.
 
-`.svelte.ts` files fail eslint parsing repo-wide — **a config gap, not a defect**.
+`.svelte.ts` files fail eslint parsing repo-wide, **a config gap, not a defect**.
 
 **Judge your delta, not the total.** Reporting three errors as a finding wastes a review; reporting four is the finding.
 

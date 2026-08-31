@@ -45,8 +45,8 @@ repo-rules/blast-radius.md
 repo-rules/communication.md
 repo-rules/delegation-and-orchestration.md
 repo-rules/evidence-and-proof.md
-repo-rules/hub-routing.md
-repo-rules/overengineering.md
-repo-rules/root-cause.md
+repo-rules/skill-hub-routing.md
+repo-rules/prevent-overengineering.md
+repo-rules/root-cause-and-debugging.md
 repo-rules/scope-discipline.md
 repo-rules/uncertainty-and-honesty.md

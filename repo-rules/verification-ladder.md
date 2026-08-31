@@ -27,7 +27,7 @@ version: 1.0.0.0
 # Rule: The verification ladder
 
 > Routed from [`REPO RULES.md`](../REPO%20RULES.md). Load it before running the gates, and before claiming any work here is complete.
-> Expands `AGENTS.md`, never overrides it — where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
+> Expands `AGENTS.md`, never overrides it. Where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
 
 ## Fires when
 
@@ -46,7 +46,7 @@ version: 1.0.0.0
 From the repository root:
 
 ```bash
-npm run typecheck                    # five of six workspaces — see below
+npm run typecheck                    # five of six workspaces, see below
 npm run test:web                     # both web suites: svelte, then logic
 npm test                             # protocol, relay, extensions, release
 npm run build                        # dependency order
@@ -88,7 +88,7 @@ It appears in neither `package.json` nor `package-lock.json`; the copy in `node_
 
 **`catalog-smoke-cdp.mjs` is macOS-only.** It shells Chrome at the hardcoded `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` with no `CHROME_PATH` fallback, and exits as a harness failure rather than a story failure when that path is absent.
 
-**Node and npm floors live in `scripts/boot.mjs`, not `package.json`.** There is no `engines` field, no `packageManager`, no `.nvmrc`. `boot.mjs` requires Node 22+, npm 10+, a pinned `pi`, and `tailscale` on PATH — so a tree that installs cleanly can still fail to boot.
+**Node and npm floors live in `scripts/boot.mjs`, not `package.json`.** There is no `engines` field, no `packageManager`, no `.nvmrc`. `boot.mjs` requires Node 22+, npm 10+, a pinned `pi`, and `tailscale` on PATH, so a tree that installs cleanly can still fail to boot.
 
 ---
 

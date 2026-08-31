@@ -26,7 +26,7 @@ version: 1.0.0.0
 # Rule: First-command traps
 
 > Routed from [`REPO RULES.md`](../REPO%20RULES.md). Load it before staging anything or running a test command here. These fire before any design decision.
-> Expands `AGENTS.md`, never overrides it — where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
+> Expands `AGENTS.md`, never overrides it. Where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
 
 ## Fires when
 
@@ -70,7 +70,7 @@ The root `npm test` names five explicit directories deliberately. **A bare `test
 npm run test:web | tail     # reports tail's status, not vitest's
 ```
 
-Verify by content — both suite summaries present — or capture `RC=$?` before piping.
+Verify by content, both suite summaries present, or capture `RC=$?` before piping.
 
 **The failure this prevents:** reporting a suite as green when it failed and the pipe returned zero.
 

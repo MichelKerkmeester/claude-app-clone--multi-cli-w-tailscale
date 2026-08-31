@@ -27,7 +27,7 @@ version: 1.0.0.0
 # Rule: The design system
 
 > Routed from [`REPO RULES.md`](../REPO%20RULES.md). Load it before changing a token, adding CSS, or renaming a class.
-> Expands `AGENTS.md`, never overrides it — where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
+> Expands `AGENTS.md`, never overrides it. Where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
 
 ## Fires when
 
@@ -52,9 +52,9 @@ Three layers, edited highest-first: **primitive → semantic role → component 
 
 ## 2. CSS OWNERSHIP
 
-The app has exactly **one** `.css` file — `app-mobile/src/app.css` — and **95** component-scoped `<style>` blocks.
+The app has exactly **one** `.css` file, `app-mobile/src/app.css`, and **95** component-scoped `<style>` blocks.
 
-Svelte scoped CSS reaches only the component that declares it. **A rule needed by two renderers, by a `class` prop, or across a parent/child boundary belongs in `app.css`**, usually behind `:global()`.
+Svelte scoped CSS reaches only the component that declares it. **A rule needed by two renderers, by a `class` prop, or across a parent/child boundary belongs in `app.css`** usually behind `:global()`.
 
 **The failure this prevents:** putting it in the wrong file is the most common way a change renders as nothing at all, and a byte-identical screenshot is what exposes it.
 

@@ -25,7 +25,7 @@ version: 1.0.0.0
 # Rule: Host authority and story seams
 
 > Routed from [`REPO RULES.md`](../REPO%20RULES.md). Load it before designing any surface that needs session data, and before adding anything to make a story render.
-> Expands `AGENTS.md`, never overrides it — where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
+> Expands `AGENTS.md`, never overrides it. Where they appear to disagree, `AGENTS.md` wins and this file is wrong. Say so.
 
 ## Fires when
 
@@ -43,7 +43,7 @@ This client is host-authoritative and fail-closed: it owns no editable session t
 
 ## 1. A MISSING FIELD IS BUILT INERT, NOT INVENTED
 
-A surface that needs data the relay does not send is built **inert behind a capability check**, and the request is appended to the host-requests packet under `specs/006-orca-nodeterm-ux-mining/007-host-requests/`.
+A surface that needs data the relay does not send is built **inert behind a capability check** and the request is appended to the host-requests packet under `specs/006-orca-nodeterm-ux-mining/007-host-requests/`.
 
 **The failure this prevents:** a surface that looks correct locally and has no truth behind it in production.
 
@@ -59,13 +59,13 @@ A prop, slot or export added only to make a story render is a defect. Compose th
 
 ## 3. THE FENCE
 
-`Do not edit — <why>` marks a load-bearing line with its reason inline. The one worth knowing by heart:
+`Do not edit, <why>` marks a load-bearing line with its reason inline. The one worth knowing by heart:
 
 ```
 app-mobile/src/pages/chat/chrome/session-composer.svelte:599
 ```
 
-It fences the mutation path — submit, steer, stop, snapshot, slash-draft, attachment flow. **No presentation change crosses it.**
+It fences the mutation path, submit, steer, stop, snapshot, slash-draft, attachment flow. **No presentation change crosses it.**
 
 ---
 

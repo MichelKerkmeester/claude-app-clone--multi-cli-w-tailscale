@@ -20,7 +20,9 @@ here.
 1. **Match on the action you are about to take** not the topic of the request.
 2. **Load before the action.** A rule read afterwards is a post-mortem.
 3. **A file already in context is not re-read.**
-4. **Two triggers fire → load both.** They compose; the more specific wins on conflict.
+4. **Every trigger that fires is loaded, not just the first.** They compose; the more
+   specific wins on conflict. Three and four firing at once is the normal case, not an
+   edge case.
 5. **Nothing fires → `AGENTS.md` alone governs.** Do not hunt for a rule to apply.
 
 ### Precedence
@@ -28,7 +30,7 @@ here.
 | Level | Source | Can be overridden? |
 |-------|--------|--------------------|
 | 1 | Every `AGENTS.md` §1 hard blocker, the Four Laws, PLAN-WORKFLOW LOCK, Comment Hygiene, and every mandatory gate in §2 | No |
-| 2 | An explicit, in-the-moment operator instruction |, it is the instruction |
+| 2 | An explicit, in-the-moment operator instruction | Not applicable, it is the instruction |
 | 3 | These rule files | Only by level 1 or 2 |
 | 4 | General judgment | By anything above |
 
